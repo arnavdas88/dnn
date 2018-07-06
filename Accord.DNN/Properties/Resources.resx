@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="E_InvalidKernelSize" xml:space="preserve">
+    <value>The kernel size should be greater than zero.</value>
+  </data>
+  <data name="E_InvalidLayerChannels" xml:space="preserve">
+    <value>The number of channels in layer layout should be greater than zero.</value>
+  </data>
+  <data name="E_InvalidLayerHeight" xml:space="preserve">
+    <value>Layer height should be greater than zero.</value>
+  </data>
+  <data name="E_InvalidLayerWidth" xml:space="preserve">
+    <value>Layer width should be greater than zero.</value>
+  </data>
+  <data name="E_InvalidLRNKernelSize" xml:space="preserve">
+    <value>The kernel size must be an odd number greater or equal than three.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_MissingInputLayer" xml:space="preserve">
+    <value>The source layer in network architecture should be the Input layer.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_NoLayers" xml:space="preserve">
+    <value>The network architecture must have at least one layer.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture" xml:space="preserve">
+    <value>Invalid network architecture: {0}.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_DuplicateEdge" xml:space="preserve">
+    <value>Invalid network architecture. Duplicate edge {0} -&gt; {1}.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_DuplicateVertex" xml:space="preserve">
+    <value>Invalid network architecture. Duplicate vertex {0}.</value>
+  </data>
+  <data name="E_CannotCreateTensor_LayoutIsFlexible" xml:space="preserve">
+    <value>Cannot create tensor with flexible layout.</value>
+  </data>
+  <data name="E_InvalidInputTensor_InvalidCount" xml:space="preserve">
+    <value>The network accepts only one input tensor.</value>
+  </data>
+  <data name="E_InvalidLayout_WrongBatchCount" xml:space="preserve">
+    <value>The number of batches in the layout is invalid.</value>
+  </data>
+  <data name="E_InvalidLayout_WrongChannelCount" xml:space="preserve">
+    <value>The number of channels in the layout is invalid.</value>
+  </data>
+  <data name="E_InvalidLayout_WrongHeight" xml:space="preserve">
+    <value>The height of the layout is invalid.</value>
+  </data>
+  <data name="E_InvalidLayout_WrongWidth" xml:space="preserve">
+    <value>The width of the layout is invalid.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_MissingLossLayer" xml:space="preserve">
+    <value>The sink layers in network architecture should be the Loss layers.</value>
+  </data>
+  <data name="E_InvalidStride" xml:space="preserve">
+    <value>The stride should be greater than zero.</value>
+  </data>
+  <data name="E_InvalidInputTensor_InvalidDimension" xml:space="preserve">
+    <value>The input tensor dimension '{0}' along axis '{1}' does not match the network dimension '{2}'.</value>
+  </data>
+  <data name="E_InvalidInputTensor_InvalidRank" xml:space="preserve">
+    <value>The input tensor rank '{0}' does not match the network rank '{1}'.</value>
+  </data>
+  <data name="E_LanguageModel_EmptyCharset" xml:space="preserve">
+    <value>The charset must contain at least one character.</value>
+  </data>
+  <data name="E_LanguageModel_EmptyVocabulary" xml:space="preserve">
+    <value>The vocabulary must contain at least one word.</value>
+  </data>
+  <data name="E_LanguageModel_InvalidCharacterCount" xml:space="preserve">
+    <value>Invalid count {0} for character {1}.</value>
+  </data>
+  <data name="E_LanguageModel_InvalidCharacterFrequency" xml:space="preserve">
+    <value>Invalid frequency {0} for character {1}.</value>
+  </data>
+  <data name="E_LanguageModel_InvalidMaximumRepeatCount" xml:space="preserve">
+    <value>The maximum repeat count must be greater or equal than its minimum repeat count.</value>
+  </data>
+  <data name="E_LanguageModel_InvalidMinimumRepeatCount" xml:space="preserve">
+    <value>The minimum repeat count must be non-negative.</value>
+  </data>
+  <data name="E_LanguageModel_InvalidWordCount" xml:space="preserve">
+    <value>Invalid count {0} for word {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_RangeIsEmpty" xml:space="preserve">
+    <value>Character range is empty, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_RangeMissingClosingBracket" xml:space="preserve">
+    <value>Character range missing closing bracket, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_RangeOutOfOrder" xml:space="preserve">
+    <value>Character range is out of order, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_UnsupportedCulture" xml:space="preserve">
+    <value>Character class is not supported for culture '{0}', regular expression '{1}' at position {2}.</value>
+  </data>
+  <data name="E_InvalidRegex_GroupIsEmpty" xml:space="preserve">
+    <value>Group is empty, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_GroupMissingClosingBracket" xml:space="preserve">
+    <value>Group missing closing bracket, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_MayNotEndWithBackslash" xml:space="preserve">
+    <value>Pattern may not end with a trailing backslash, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_TokenNotQuantifiable" xml:space="preserve">
+    <value>The preceding token is not quantifiable, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidRegex_RangeWithSequence" xml:space="preserve">
+    <value>You can not create a range with a shorthand escape sequences, regular expression '{0}' at position {1}.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_InvalidClassCountInLossLayer" xml:space="preserve">
+    <value>The number of classes in the Loss layers must match the number of classification network classes.</value>
+  </data>
+  <data name="E_InvalidNetArchitecture_NoClasses" xml:space="preserve">
+    <value>The classification network architecture must have at least one class.</value>
+  </data>
+  <data name="E_NegativeAxisIndex" xml:space="preserve">
+    <value>The axis index must be a non-negative.</value>
+  </data>
+</root>
