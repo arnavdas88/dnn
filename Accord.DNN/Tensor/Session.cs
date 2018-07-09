@@ -67,6 +67,7 @@ namespace Accord.DNN
         /// </summary>
         /// <param name="actionName">The name of the action.</param>
         /// <param name="action">The operation to add to the graph.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "actionName", Justification = "Reserved for debugging.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Push(string actionName, Action action)
         {
@@ -230,6 +231,7 @@ namespace Accord.DNN
 #endif
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "actionName", Justification = "Reserved for debugging.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal T RunOperation<T>(string actionName, Func<T> action)
         {

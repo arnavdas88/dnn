@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.Imaging
+namespace Accord.DNN
 {
     using System;
     using System.Collections.Generic;

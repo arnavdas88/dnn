@@ -190,11 +190,7 @@ namespace Accord.DNN.Imaging
 
             if (invert)
             {
-                uint[] bits = image.Bits;
-                for (int i = 0, ii = bits.Length; i < ii; i++)
-                {
-                    bits[i] = ~bits[i];
-                }
+                image.InvertIP();
             }
 
             return image;

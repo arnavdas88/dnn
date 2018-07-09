@@ -30,14 +30,12 @@ namespace Accord.DNN.Imaging
             {
                 pix.pixSetResolution(image.HorizontalResolution, image.VerticalResolution);
 
-                CopyCrop.CopyDIB(
-                    pix.pixGetData(),
-                    image.Bits,
+                LeptonicaUtils.CopyBits(
                     image.Height,
-                    pix.Wpl * sizeof(uint),
-                    image.Stride8,
-                    false,
-                    false);
+                    image.Bits,
+                    image.Stride,
+                    pix.pixGetData(),
+                    pix.Wpl);
             }
             catch
             {
@@ -57,14 +55,12 @@ namespace Accord.DNN.Imaging
                 xres,
                 yres);
 
-            CopyCrop.CopyDIB(
-                image.Bits,
-                pix.pixGetData(),
+            LeptonicaUtils.CopyBits(
                 image.Height,
-                image.Stride8,
-                pix.Wpl * sizeof(uint),
-                false,
-                false);
+                pix.pixGetData(),
+                pix.Wpl,
+                image.Bits,
+                image.Stride);
 
             return image;
         }
@@ -112,6 +108,40 @@ namespace Accord.DNN.Imaging
             {
                 return pixs.pixOtsuThreshOnBackgroundNorm(null, sx, sy, Thresh, mincount, 255, Smoothx, Smoothy, Scorefact, out int pthresh);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst)
+        {
+            /*if (strideDst == strideSrc)
+            {
+                NativeMethods.memcpy(bitsDst, bitsSrc, height * strideDst);
+            }
+            else
+            {
+                int count = Math.Min(strideDst, strideSrc);
+                for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc += strideSrc)
+                {
+                    NativeMethods.memcpy(bitsDst, bitsSrc, count);
+                }
+            }*/
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst)
+        {
+            /*if (strideDst == strideSrc)
+            {
+                NativeMethods.memcpy(bitsDst, bitsSrc, height * strideDst);
+            }
+            else
+            {
+                int count = Math.Min(strideDst, strideSrc);
+                for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc += strideSrc)
+                {
+                    NativeMethods.memcpy(bitsDst, bitsSrc, count);
+                }
+            }*/
         }
     }
 }

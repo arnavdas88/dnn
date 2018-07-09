@@ -52,7 +52,6 @@ namespace Accord.DNN.Imaging
                 return image.Copy();
             }
 
-#if true
             float a = (float)(Math.PI * (angle / 180.0));
             if (Math.Abs(a) < 0.001f)
             {
@@ -72,166 +71,6 @@ namespace Accord.DNN.Imaging
                     return pixd.CreateImage(image.HorizontalResolution, image.VerticalResolution);
                 }
             }
-#else
-
-            /*if (angle == 180.0)
-            {
-                return image.Rotate180();
-            }
-            else if (angle == 90.0)
-            {
-                return image.Rotate90(true);
-            }
-            else if (angle == 270.0)
-            {
-                return image.Rotate90(false);
-            }*/
-
-            if (image.BitsPerPixel != 1)
-            {
-                throw new NotSupportedException();
-            }
-
-            angle = 3.14159265 * angle / 180;
-
-            // calculate new image size and position
-            int x1 = image.Width - 1;
-            int y1 = 0;
-            _RotatePoint(ref x1, ref y1, angle);
-
-            int x2 = image.Width - 1;
-            int y2 = image.Height - 1;
-            _RotatePoint(ref x2, ref y2, angle);
-
-            int x3 = 0;
-            int y3 = image.Height - 1;
-            _RotatePoint(ref x3, ref y3, angle);
-
-            int left = MKL.Min(x1, x2, x3, 0);
-            int top = MKL.Min(y1, y2, y3, 0);
-            int right = MKL.Max(x1, x2, x3, 0);
-            int bottom = MKL.Max(y1, y2, y3, 0);
-
-            // allocate new image
-            Image dst = new Image(
-                right - left + 1,
-                bottom - top + 1,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution);
-
-            ////double sinA = Math.Sin(angle);
-            ////double cosA = Math.Cos(angle);
-
-#if false
-            /*unsigned char** pp = new unsigned char*[heightDst];
-            unsigned char* p = BitsDst->Get();
-            for (int n = 0; n < heightDst; n++, p += strideDst)
-                pp[n] = p;
-
-            int nByteWidth = _BYTEWIDTH(_width * _bitCount);
-            const unsigned char* pBits = _Bits->Get();*/
-
-            for (int y = 0; y < _height; y++, pBits += _stride)
-            {
-                double ysinA = sinA * y;
-                double ycosA = cosA * y;
-
-                const unsigned char* p = pBits;
-                for (int nX = 0, nX8 = 0; nX < nByteWidth; nX++, nX8 += 8, p++)
-                {
-                    unsigned char b = *p;
-                    if (b == 0)
-                    {
-                        continue;
-                    }
-
-                    double xfactor = cosA * (double)nX8 - ysinA - left;
-                    double yfactor = sinA * (double)nX8 + ycosA - top;
-
-                    if ((b & 0x80) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x40) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x20) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x10) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x08) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x04) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x02) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-
-                    xfactor += cosA;
-                    yfactor += sinA;
-
-                    if ((b & 0x01) != 0)
-                    {
-                        uint x = (uint)xfactor;
-                        pp[(int)yfactor][x >> 3] |= bM[x & 0x07];
-                    }
-                }
-            }
-#endif
-
-            return dst;
-
-            void _RotatePoint(ref int x, ref int y, double a)
-            {
-                int tempx = (int)Math.Round(((double)x * Math.Cos(a)) - ((double)y * Math.Sin(a)));
-                int tempy = (int)Math.Round(((double)y * Math.Cos(a)) + ((double)x * Math.Sin(a)));
-
-                x = tempx;
-                y = tempy;
-            }
-#endif
         }
 
         /// <summary>
@@ -270,8 +109,8 @@ namespace Accord.DNN.Imaging
             int stridesrc1 = image.Stride1;
             int stridedst1 = dst.Stride1;
 
-            uint[] bitssrc = image.Bits;
-            uint[] bitsdst = dst.Bits;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
 
             for (int iy = 0, possrc = 0, posdst = 0; iy < image.Height; iy++, possrc += stridesrc1, posdst += stridedst1)
             {

@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <assert.h>
 
-#define BITS_COUNT			32
+#define BITS_COUNT			64
 #define BITS_MASK			(BITS_COUNT - 1)
 
 #if BITS_COUNT == 64
@@ -452,7 +452,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_copy_be)(
 }
 
 // Counts the number of one bits(population count) in a range of integers.
-extern "C" __declspec(dllexport) unsigned WINAPI BITS_METHOD(bits_onecount_)(
+extern "C" __declspec(dllexport) __bits WINAPI BITS_METHOD(bits_onecount_)(
 	int count,				// number of bits to count
 	const __bits* bits,		// the bits to set
 	int pos					// the zero-based index of starting bit in bits
@@ -499,7 +499,7 @@ extern "C" __declspec(dllexport) unsigned WINAPI BITS_METHOD(bits_onecount_)(
 }
 
 // Counts the number of zero bits in a range of integers.
-extern "C" __declspec(dllexport) unsigned WINAPI BITS_METHOD(bits_zerocount_)(
+extern "C" __declspec(dllexport) __bits WINAPI BITS_METHOD(bits_zerocount_)(
 	int count,				// number of bits to count
 	const __bits* bits,		// the bits to set
 	int pos					// the zero-based index of starting bit in bits

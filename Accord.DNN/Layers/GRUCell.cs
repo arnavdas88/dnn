@@ -48,7 +48,8 @@ namespace Accord.DNN.Layers
             this.UC = new Tensor("hidden weights (2)", GRUCell.CalculateCandidateWeightsShape(numberOfNeurons));
             this.UC.Randomize(random ?? new RandomRangeGenerator(-0.08f, 0.08f));
 
-            MKL.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);
+            // initialize biases for update and reset gates only
+            MKL.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
         }
 
         /// <summary>

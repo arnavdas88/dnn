@@ -41,7 +41,7 @@ namespace Accord.DNN.Imaging
                 image.HorizontalResolution,
                 image.VerticalResolution);
 
-            NativeMethods.mkl_copyi32(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
+            MKL.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
 
             return dst;
         }
@@ -222,7 +222,7 @@ namespace Accord.DNN.Imaging
                 if (image.BitsPerPixel > 1)
                 {
                     // set all image to white
-                    MKL.Set(dst.Bits.Length, uint.MaxValue, dst.Bits, 0);
+                    MKL.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
                 }
             }
 
@@ -232,24 +232,24 @@ namespace Accord.DNN.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void CopyArea(Image src, int x, int y, int width, int height, Image dst, int dstx, int dsty)
         {
-            uint[] bitssrc = src.Bits;
-            uint[] bitsdst = dst.Bits;
+            ulong[] bitssrc = src.Bits;
+            ulong[] bitsdst = dst.Bits;
 
-            int stridesrc = src.Stride1;
-            int stridedst = dst.Stride1;
+            int stride1src = src.Stride1;
+            int stride1dst = dst.Stride1;
 
-            int offsrc = (y * stridesrc) + (x * src.BitsPerPixel);
-            int offdst = (dsty * stridedst) + (dstx * src.BitsPerPixel);
+            int offsrc = (y * stride1src) + (x * src.BitsPerPixel);
+            int offdst = (dsty * stride1dst) + (dstx * src.BitsPerPixel);
 
             int count = width * src.BitsPerPixel;
 
-            if (stridesrc == stridedst && x == 0 && dstx == 0 && width == src.Width)
+            if (stride1src == stride1dst && x == 0 && dstx == 0 && width == src.Width)
             {
-                MKL.Copy(height * src.Stride32, bitssrc, y * src.Stride32, bitsdst, dsty * src.Stride32);
+                MKL.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
             }
             else
             {
-                for (int i = 0; i < height; i++, offsrc += stridesrc, offdst += stridedst)
+                for (int i = 0; i < height; i++, offsrc += stride1src, offdst += stride1dst)
                 {
                     BitUtils.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
                 }
@@ -257,31 +257,31 @@ namespace Accord.DNN.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CopyDIB(IntPtr bitsDst, uint[] bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapBytes)
+        internal static void CopyDIB(IntPtr bitsDst, ulong[] bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
         {
             unsafe
             {
-                fixed (uint* usrc = bitsSrc)
+                fixed (ulong* usrc = bitsSrc)
                 {
-                    CopyCrop.CopyDIB((byte*)bitsDst, (byte*)usrc, height, strideDst, strideSrc, isUpsideDown, swapBytes);
+                    CopyCrop.CopyDIB((byte*)bitsDst, (byte*)usrc, height, strideDst, strideSrc, isUpsideDown, swapWords, swapBytes);
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CopyDIB(uint[] bitsDst, IntPtr bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapBytes)
+        internal static void CopyDIB(ulong[] bitsDst, IntPtr bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
         {
             unsafe
             {
-                fixed (uint* udst = bitsDst)
+                fixed (ulong* udst = bitsDst)
                 {
-                    CopyCrop.CopyDIB((byte*)udst, (byte*)bitsSrc, height, strideDst, strideSrc, isUpsideDown, swapBytes);
+                    CopyCrop.CopyDIB((byte*)udst, (byte*)bitsSrc, height, strideDst, strideSrc, isUpsideDown, swapWords, swapBytes);
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void CopyDIB(byte* bitsDst, byte* bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapBytes)
+        private static unsafe void CopyDIB(byte* bitsDst, byte* bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
         {
             if (isUpsideDown)
             {
@@ -308,9 +308,14 @@ namespace Accord.DNN.Imaging
                 }
             }
 
+            if (swapWords)
+            {
+
+            }
+
             if (swapBytes)
             {
-                NativeMethods.bytesswap_ip_32(height * strideDst / sizeof(uint), (uint*)bitsDst, 0);
+                NativeMethods.bytesswap_ip_64(height * strideDst / sizeof(ulong), (ulong*)bitsDst, 0);
             }
         }
 
@@ -318,11 +323,7 @@ namespace Accord.DNN.Imaging
         {
             [DllImport("Accord.DNN.CPP.dll")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void mkl_copyi32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport("Accord.DNN.CPP.dll")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bytesswap_ip_32(int n, uint* xy, int offxy);
+            public static extern unsafe void bytesswap_ip_64(int n, ulong* xy, int offxy);
 
             [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl)]
             [SuppressUnmanagedCodeSecurity]

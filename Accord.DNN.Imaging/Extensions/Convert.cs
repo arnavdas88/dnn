@@ -90,33 +90,37 @@ namespace Accord.DNN.Imaging
             int width = image.Width;
             int height = image.Height;
 
-            uint[] bitssrc = image.Bits;
-            uint[] bitsdst = dst.Bits;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
 
-            int stride32src = image.Stride32;
-            int stride32dst = dst.Stride32;
+            int stridesrc = image.Stride;
+            int stridedst = dst.Stride;
 
             // build conversion table
             uint[] values = { value0, value1 };
-            uint[] map = new uint[16];
-            for (int i = 0; i < 16; i++)
+            ulong[] map = new ulong[256];
+            for (int i = 0; i < 256; i++)
             {
-                map[i] = (values[(i >> 3) & 1] << 24) |
+                map[i] = (values[(i >> 7) & 1] << 56) |
+                         (values[(i >> 6) & 1] << 48) |
+                         (values[(i >> 5) & 1] << 40) |
+                         (values[(i >> 4) & 1] << 32) |
+                         (values[(i >> 3) & 1] << 24) |
                          (values[(i >> 2) & 1] << 16) |
                          (values[(i >> 1) & 1] << 8) |
                          values[i & 1];
             }
 
-            for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stride32src, offydst += stride32dst)
+            for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
             {
                 for (int x = 0, offxsrc = offysrc, offxdst = offydst; x < width;)
                 {
-                    uint b = bitssrc[offxsrc++];
+                    ulong b = bitssrc[offxsrc++];
 
-                    // convert 4 bits at a time
-                    for (int i = 28; i >= 0 && x < width; i -= 4, x += 4)
+                    // convert 8 bits at a time
+                    for (int i = 64 - 8; i >= 0 && x < width; i -= 8, x += 8)
                     {
-                        bitsdst[offxdst++] = map[(b >> i) & 0xf];
+                        bitsdst[offxdst++] = map[(b >> i) & 0xff];
                     }
                 }
             }

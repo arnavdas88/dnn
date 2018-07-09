@@ -23,10 +23,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accord.DNN.Imaging", "Accor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accord.DNN.Imaging.Test", "Accord.DNN.Imaging.Test\Accord.DNN.Imaging.Test.csproj", "{C3F7181D-F341-4080-B947-745F3408C51D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accord.DNN.DocumentAnalysis", "Accord.DNN.DocumentAnalysis\Accord.DNN.DocumentAnalysis.csproj", "{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -194,11 +193,30 @@ Global
 		{C3F7181D-F341-4080-B947-745F3408C51D}.Release|x64.Build.0 = Release|Any CPU
 		{C3F7181D-F341-4080-B947-745F3408C51D}.Release|x86.ActiveCfg = Release|Any CPU
 		{C3F7181D-F341-4080-B947-745F3408C51D}.Release|x86.Build.0 = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|ARM.Build.0 = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|x64.Build.0 = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Debug|x86.Build.0 = Debug|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|ARM.ActiveCfg = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|ARM.Build.0 = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|x64.ActiveCfg = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|x64.Build.0 = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|x86.ActiveCfg = Release|Any CPU
+		{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D80916AC-677F-4083-B57A-3562C04772D2}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

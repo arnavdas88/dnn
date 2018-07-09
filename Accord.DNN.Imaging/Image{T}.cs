@@ -1,5 +1,5 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="Image.cs" company="Noname, Inc.">
+// -----------------------------------------------------------------------
+// <copyright file="Image{T}.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -9,14 +9,15 @@ namespace Accord.DNN.Imaging
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
     /// </summary>
-    public partial class Image
+    public class Image<T> where T : struct
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Image"/> class.
+        /// Initializes a new instance of the <see cref="Image{T}"/> class.
         /// </summary>
         /// <param name="width">The image width, in pixels.</param>
         /// <param name="height">The image height, in pixels.</param>
@@ -41,24 +42,26 @@ namespace Accord.DNN.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
             }
 
+            int sizeInBytes = Marshal.SizeOf(default(T));
+
             this.Width = width;
             this.Height = height;
             this.BitsPerPixel = bitsPerPixel;
-            this.Stride8 = CalculateStride();
-            this.ImageSize = this.Stride8 * height;
+            this.Stride = CalculateStride();
+            this.ImageSize = this.Stride * height * sizeInBytes;
             this.HorizontalResolution = horizontalResolution;
             this.VerticalResolution = verticalResolution;
-            this.Bits = new ulong[this.ImageSize / sizeof(ulong)];
+            this.Bits = new T[this.Stride * height];
 
             int CalculateStride()
             {
-                int stride = width * bitsPerPixel;
-                return ((stride + 63) & ~63) >> 3;
+                int sizeInBits = sizeInBytes * 8;
+                return ((width * bitsPerPixel) + sizeInBits - 1) / sizeInBits;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(int width, int height, Image image) : this(
+        internal Image(int width, int height, Image<T> image) : this(
             width,
             height,
             image.BitsPerPixel,
@@ -68,7 +71,7 @@ namespace Accord.DNN.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(Image image) : this(
+        internal Image(Image<T> image) : this(
             image.Width,
             image.Height,
             image.BitsPerPixel,
@@ -78,90 +81,66 @@ namespace Accord.DNN.Imaging
         }
 
         /// <summary>
-        /// Gets the width, in pixels, of this <see cref="Image"/>.
+        /// Gets the width, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// The width, in pixels, of this <see cref="Image"/>.
+        /// The width, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public int Width { get; }
 
         /// <summary>
-        /// Gets the width, in bits, of this <see cref="Image"/>.
+        /// Gets the height, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// The width, in bits, of this <see cref="Image"/>.
-        /// </value>
-        public int WidthBits => this.Width * this.BitsPerPixel;
-
-        /// <summary>
-        /// Gets the height, in pixels, of this <see cref="Image"/>.
-        /// </summary>
-        /// <value>
-        /// The height, in pixels, of this <see cref="Image"/>.
+        /// The height, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public int Height { get; }
 
         /// <summary>
-        /// Gets the color depth, in number of bits per pixel, of this <see cref="Image"/>.
+        /// Gets the color depth, in number of bits per pixel, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// The color depth, in number of bits per pixel, of this <see cref="Image"/>.
+        /// The color depth, in number of bits per pixel, of this <see cref="Image{T}"/>.
         /// </value>
         public int BitsPerPixel { get; }
 
         /// <summary>
-        /// Gets the offset, in bits, between the beginning of one scan line and the next.
+        /// Gets the offset, in <see cref="sizeof(T)"/>, between the beginning of one scan line and the next.
         /// </summary>
         /// <value>
-        /// The integer that specifies the offset, in bits, between the beginning of one scan line and the next.
+        /// The integer that specifies the offset between the beginning of one scan line and the next.
         /// </value>
-        public int Stride1 => this.Stride8 * 8;
+        public int Stride { get; }
 
         /// <summary>
-        /// Gets the offset, in bytes, between the beginning of one scan line and the next.
+        /// Gets the number of bytes occupied in memory by this <see cref="Image{T}"/> bits.
         /// </summary>
         /// <value>
-        /// The integer that specifies the offset, in bytes, between the beginning of one scan line and the next.
-        /// </value>
-        public int Stride8 { get; }
-
-        /// <summary>
-        /// Gets the offset, in elements of <see cref="Bits"/>, between the beginning of one scan line and the next.
-        /// </summary>
-        /// <value>
-        /// The integer that specifies the offset, in elements of <see cref="Bits"/>, between the beginning of one scan line and the next.
-        /// </value>
-        public int Stride => this.Stride8 / sizeof(ulong);
-
-        /// <summary>
-        /// Gets the number of bytes occupied in memory by this <see cref="Image"/> bits.
-        /// </summary>
-        /// <value>
-        /// The number of bytes occupied in memory by this <see cref="Image"/> bits.
+        /// The number of bytes occupied in memory by this <see cref="Image{T}"/> bits.
         /// </value>
         public int ImageSize { get; }
 
         /// <summary>
-        /// Gets the horizontal resolution, in pixels per inch, of this <see cref="Image"/>.
+        /// Gets the horizontal resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// The horizontal resolution, in pixels per inch, of this <see cref="Image"/>.
+        /// The horizontal resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </value>
         public int HorizontalResolution { get; }
 
         /// <summary>
-        /// Gets the vertical resolution, in pixels per inch, of this <see cref="Image"/>.
+        /// Gets the vertical resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// The vertical resolution, in pixels per inch, of this <see cref="Image"/>.
+        /// The vertical resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </value>
         public int VerticalResolution { get; }
 
         /// <summary>
-        /// Gets the bounds, in pixels, of this <see cref="Image"/>.
+        /// Gets the bounds, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image"/>.
+        /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public System.Drawing.Rectangle Bounds => new System.Drawing.Rectangle(0, 0, this.Width, this.Height);
 
@@ -172,26 +151,7 @@ namespace Accord.DNN.Imaging
         /// The array that contains the image bits.
         /// </value>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Provide direct access to image data.")]
-        [CLSCompliant(false)]
-        public ulong[] Bits { get; }
-
-        /// <summary>
-        /// Randomizes all colors in the <see cref="Image"/>.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Randomize()
-        {
-            Random random = new Random(0);
-
-            ulong[] bits = this.Bits;
-            for (int i = 0, ii = bits.Length; i < ii; i++)
-            {
-                bits[i] = (ulong)(uint)random.Next() |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) | 
-                          (ulong)(uint)random.Next() << 32 |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
-            }
-        }
+        public T[] Bits { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ValidatePosition(int x, int y)

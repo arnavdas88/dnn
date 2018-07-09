@@ -160,7 +160,7 @@ namespace Accord.DNN
             {
                 if (this.gradient == null)
                 {
-                    lock (this.Weights)
+                    lock (this)
                     {
                         if (this.gradient == null)
                         {
@@ -278,116 +278,134 @@ namespace Accord.DNN
             switch (bitsPerPixel)
             {
                 case 1:
-                    {
-                        tensor = new Tensor(name, new[] { 1, width, height, 1 });
-
-                        int xstride = tensor.Strides[(int)Axis.X];
-                        int ystride = tensor.Strides[(int)Axis.Y];
-                        float[] w = tensor.Weights;
-
-                        uint[] bits = image.Bits;
-                        int stride32 = image.Stride32;
-
-                        for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += stride32, offy += ystride)
-                        {
-                            for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
-                            {
-                                uint b = bits[offbx];
-                                if (b != 0)
-                                {
-                                    for (uint mask = 0x8000_0000u; mask != 0 && x < width; x++, mask >>= 1, offx += xstride)
-                                    {
-                                        if ((b & mask) != 0)
-                                        {
-                                            w[offx] = 1.0f;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    x += 32;
-                                    offx += 32 * xstride;
-                                }
-                            }
-                        }
-                    }
-
+                    convert1bpp();
                     break;
 
                 case 2:
                 case 4:
                 case 8:
                 case 16:
-                    {
-                        tensor = new Tensor(name, new[] { 1, width, height, 1 });
-
-                        int xstride = tensor.Strides[(int)Axis.X];
-                        int ystride = tensor.Strides[(int)Axis.Y];
-                        float[] w = tensor.Weights;
-
-                        uint[] bits = image.Bits;
-                        int stride32 = image.Stride32;
-                        int pixelsPerSample = 32 / bitsPerPixel;
-
-                        float unitValue = (float)(1.0 / (Math.Pow(2.0, pixelsPerSample) - 1));
-                        uint mask = ~(uint.MaxValue << bitsPerPixel);
-
-                        for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += stride32, offy += ystride)
-                        {
-                            for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
-                            {
-                                uint b = bits[offbx];
-                                if (b != 0)
-                                {
-                                    for (int shift = 32 - bitsPerPixel; shift >= 0 && x < width; x++, shift -= bitsPerPixel, offx += xstride)
-                                    {
-                                        w[offx] = unitValue * ((b >> shift) & mask);
-                                    }
-                                }
-                                else
-                                {
-                                    x += pixelsPerSample;
-                                    offx += pixelsPerSample * xstride;
-                                }
-                            }
-                        }
-                    }
-
+                    convert2to16bpp();
                     break;
 
                 case 32:
-                    {
-                        tensor = new Tensor(name, new[] { 1, width, height, 3 });
-
-                        int xstride = tensor.Strides[(int)Axis.X];
-                        int ystride = tensor.Strides[(int)Axis.Y];
-                        int cstride = tensor.Strides[(int)Axis.C];
-                        float[] w = tensor.Weights;
-
-                        uint[] bits = image.Bits;
-                        int stride32 = image.Stride32;
-
-                        const float UnitValue = 1.0f / 255;
-
-                        for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += stride32, offy += ystride)
-                        {
-                            for (int x = 0, offx = offy, offbx = offby; x < width; x++, offx += xstride, offbx++)
-                            {
-                                uint b = bits[offbx];
-                                if (b != 0)
-                                {
-                                    w[offx] = UnitValue * ((b >> 24) & 0xff);
-                                    w[offx + cstride] = UnitValue * ((b >> 16) & 0xff);
-                                    w[offx + (2 * cstride)] = UnitValue * ((b >> 8) & 0xff);
-                                }
-                            }
-                        }
-                    }
-
+                    convert32bpp();
                     break;
 
                 default:
                     throw new NotSupportedException();
+            }
+
+            void convert1bpp()
+            {
+                tensor = new Tensor(name, new[] { 1, width, height, 1 });
+
+                int xstride = tensor.Strides[(int)Axis.X];
+                int ystride = tensor.Strides[(int)Axis.Y];
+                float[] w = tensor.Weights;
+
+                ulong[] bits = image.Bits;
+                int bstride = image.Stride;
+
+                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                {
+                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    {
+                        ulong b = bits[offbx];
+                        if (b != 0)
+                        {
+                            for (ulong mask = 0x8000_0000_0000_0000ul; mask != 0 && x < width; x++, mask >>= 1, offx += xstride)
+                            {
+                                if ((b & mask) != 0)
+                                {
+                                    w[offx] = 1.0f;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            x += 64;
+                            offx += 64 * xstride;
+                        }
+                    }
+                }
+            }
+
+            void convert2to16bpp()
+            {
+                tensor = new Tensor(name, new[] { 1, width, height, 1 });
+
+                int xstride = tensor.Strides[(int)Axis.X];
+                int ystride = tensor.Strides[(int)Axis.Y];
+                float[] w = tensor.Weights;
+
+                ulong[] bits = image.Bits;
+                int bstride = image.Stride;
+                int pixelsPerSample = 64 / bitsPerPixel;
+
+                float unitValue = (float)(1.0 / (Math.Pow(2.0, pixelsPerSample) - 1));
+                ulong mask = ~(ulong.MaxValue << bitsPerPixel);
+
+                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                {
+                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    {
+                        ulong b = bits[offbx];
+                        if (b != 0)
+                        {
+                            for (int shift = 64 - bitsPerPixel; shift >= 0 && x < width; x++, shift -= bitsPerPixel, offx += xstride)
+                            {
+                                w[offx] = unitValue * ((b >> shift) & mask);
+                            }
+                        }
+                        else
+                        {
+                            x += pixelsPerSample;
+                            offx += pixelsPerSample * xstride;
+                        }
+                    }
+                }
+            }
+
+            void convert32bpp()
+            {
+                tensor = new Tensor(name, new[] { 1, width, height, 3 });
+
+                int xstride = tensor.Strides[(int)Axis.X];
+                int ystride = tensor.Strides[(int)Axis.Y];
+                int cstride = tensor.Strides[(int)Axis.C];
+                float[] w = tensor.Weights;
+
+                ulong[] bits = image.Bits;
+                int bstride = image.Stride;
+                int pixelsPerSample = 64 / bitsPerPixel;
+
+                const float UnitValue = 1.0f / 255;
+                ulong mask = ~(ulong.MaxValue << bitsPerPixel);
+
+                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                {
+                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    {
+                        ulong b = bits[offbx];
+                        if (b != 0)
+                        {
+                            for (int shift = 64 - bitsPerPixel; shift >= 0 && x < width; x++, shift -= bitsPerPixel, offx += xstride)
+                            {
+                                ulong bvalue = (b >> shift) & mask;
+
+                                w[offx] = UnitValue * ((bvalue >> 24) & 0xff);
+                                w[offx + cstride] = UnitValue * ((bvalue >> 16) & 0xff);
+                                w[offx + (2 * cstride)] = UnitValue * ((bvalue >> 8) & 0xff);
+                            }
+                        }
+                        else
+                        {
+                            x += pixelsPerSample;
+                            offx += pixelsPerSample * xstride;
+                        }
+                    }
+                }
             }
 
             return tensor;

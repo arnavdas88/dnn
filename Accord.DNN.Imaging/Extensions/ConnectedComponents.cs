@@ -42,7 +42,7 @@ namespace Accord.DNN.Imaging
             List<ConnectedComponent> last = new List<ConnectedComponent>();
             List<ConnectedComponent> current = new List<ConnectedComponent>();
 
-            uint[] bits = image.Bits;
+            ulong[] bits = image.Bits;
             for (int y = 0, startpos = 0; y < image.Height; y++, startpos += image.Stride1)
             {
                 current.Clear();
@@ -121,7 +121,7 @@ namespace Accord.DNN.Imaging
             }
 
             IList<int> intervals = component.Intervals;
-            uint[] bits = image.Bits;
+            ulong[] bits = image.Bits;
             int stride1 = image.Stride1;
 
             for (int i = 0, count = intervals.Count; i < count; i += 3)
@@ -205,7 +205,7 @@ namespace Accord.DNN.Imaging
             }
 
             IList<int> intervals = component.Intervals;
-            uint[] bits = image.Bits;
+            ulong[] bits = image.Bits;
             int stride1 = image.Stride1;
 
             for (int i = 0, count = intervals.Count; i < count; i += 3)
@@ -296,10 +296,10 @@ namespace Accord.DNN.Imaging
             // allocate new image
             Image dst = new Image(width, height, image);
 
-            uint[] bitssrc = image.Bits;
-            uint[] bitsdst = dst.Bits;
-            int stridesrc32 = image.Stride32;
-            int stridedst32 = dst.Stride32;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
+            int stridesrc = image.Stride;
+            int stridedst = dst.Stride;
 
             // copy bits
             IList<int> intervals = component.Intervals;
@@ -309,7 +309,7 @@ namespace Accord.DNN.Imaging
                 int x = intervals[i + 1];
                 int c = intervals[i + 2];
 
-                BitUtils.CopyBits(c, bitssrc, (y * stridesrc32) + x, bitsdst, ((y - top) * stridedst32) + x - left);
+                BitUtils.CopyBits(c, bitssrc, (y * stridesrc) + x, bitsdst, ((y - top) * stridedst) + x - left);
             }
 
             return dst;
@@ -382,8 +382,8 @@ namespace Accord.DNN.Imaging
             // allocate new image
             Image dst = new Image(right - left, bottom - top, image);
 
-            uint[] bitssrc = image.Bits;
-            uint[] bitsdst = dst.Bits;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
             int stridesrc1 = image.Stride1;
             int stridedst1 = dst.Stride1;
 

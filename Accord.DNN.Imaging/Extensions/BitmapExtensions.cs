@@ -68,7 +68,7 @@ namespace Accord.DNN.Imaging
 
             unsafe
             {
-                fixed (uint* bits = image.Bits)
+                fixed (ulong* bits = image.Bits)
                 {
                     BitmapData dstData = new BitmapData()
                     {
@@ -122,7 +122,7 @@ namespace Accord.DNN.Imaging
 
             unsafe
             {
-                fixed (uint* bits = image.Bits)
+                fixed (ulong* bits = image.Bits)
                 {
                     BitmapData dstData = new BitmapData()
                     {
@@ -185,6 +185,7 @@ namespace Accord.DNN.Imaging
                     Math.Abs(dstData.Stride),
                     image.Stride8,
                     dstData.Stride < 0,
+                    false,
                     true /* swap bytes to make storage big-endian */);
 
                 bitmap.UnlockBits(dstData);
@@ -261,7 +262,7 @@ namespace Accord.DNN.Imaging
                 bitmapPalette);
 
             // swap bytes to make storage little-endian
-            uint[] bits = new uint[image.Bits.Length];
+            ulong[] bits = new ulong[image.Bits.Length];
             BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0, bits, 0);
 
             bitmapSource.WritePixels(
@@ -402,19 +403,19 @@ namespace Accord.DNN.Imaging
             int height = image.Height;
             int bitsPerPixel = image.BitsPerPixel;
 
-            uint[] srcbits = image.Bits;
-            uint[] dstbits = dst.Bits;
-            int srcstride32 = image.Stride32;
-            int dststride32 = dst.Stride32;
+            ulong[] srcbits = image.Bits;
+            ulong[] dstbits = dst.Bits;
+            int srcstride = image.Stride;
+            int dststride = dst.Stride;
 
-            int srcwidth32 = image.WidthBits / srcstride32;
+            int srcwidth32 = image.WidthBits / srcstride;
             int srctail = image.WidthBits - (srcwidth32 * 32);
 
             uint[] colormap = palette
                 .Select(x => ((uint)x.R << 24) | ((uint)x.G << 16) | ((uint)x.B << 8) | ((uint)x.A << 0))
                 .ToArray();
 
-            for (int row = 0, offsrc = 0, offdst = 0; row < height; row++, offsrc = srcstride32, offdst = dststride32)
+            for (int row = 0, offsrc = 0, offdst = 0; row < height; row++, offsrc = srcstride, offdst = dststride)
             {
                 int offs = offsrc;
                 int offd = offdst;

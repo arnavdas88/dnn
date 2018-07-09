@@ -323,6 +323,11 @@ namespace Accord.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void InitializeShape(int[] shape)
         {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
             int length = 1;
 
             int rank = shape.Length;

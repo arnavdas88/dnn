@@ -359,7 +359,7 @@ namespace Accord.DNN
         }
 
         /// <summary>
-        /// Copies a range of values from a array starting at the specified source index
+        /// Copies a range of signed 32-bit values from a array starting at the specified source index
         /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
@@ -374,7 +374,7 @@ namespace Accord.DNN
         }
 
         /// <summary>
-        /// Copies a range of values from a array starting at the specified source index
+        /// Copies a range of unsigned 32-bit values from a array starting at the specified source index
         /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
@@ -389,8 +389,9 @@ namespace Accord.DNN
             NativeMethods.mkl_copyu32(length, x, offx, y, offy);
         }
 
-        /*/// <summary>
-        /// Copies a range of values from a array starting at the specified source index
+
+        /// <summary>
+        /// Copies a range of signed 64-bit values from a array starting at the specified source index
         /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
@@ -399,10 +400,41 @@ namespace Accord.DNN
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, char[] x, int offx, char[] y, int offy)
+        public static void Copy(int length, long[] x, int offx, long[] y, int offy)
         {
-            NativeMethods.mkl_copyi16(length, x, offx, y, offy);
-        }*/
+            NativeMethods.mkl_copyi64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Copies a range of unsigned 64-bit values from a array starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="x">The array that contains the data to copy.</param>
+        /// <param name="offx">The index in the <c>x</c> at which copying begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Copy(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.mkl_copyu64(length, x, offx, y, offy);
+        }
+
+        /*/// <summary>
+         /// Copies a range of values from a array starting at the specified source index
+         /// to another array starting at the specified destination index.
+         /// </summary>
+         /// <param name="length">The number of elements to copy.</param>
+         /// <param name="x">The array that contains the data to copy.</param>
+         /// <param name="offx">The index in the <c>x</c> at which copying begins.</param>
+         /// <param name="y">The array that receives the data.</param>
+         /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
+         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+         public static void Copy(int length, char[] x, int offx, char[] y, int offy)
+         {
+             NativeMethods.mkl_copyi16(length, x, offx, y, offy);
+         }*/
 
         /// <summary>
         /// Sets values in the array starting at the specified source index to the specified value.
@@ -432,7 +464,7 @@ namespace Accord.DNN
         }
 
         /// <summary>
-        /// Sets values in the array starting at the specified source index to the specified value.
+        /// Sets signed 32-bit values in the array starting at the specified source index to the specified value.
         /// </summary>
         /// <param name="length">The number of elements to set.</param>
         /// <param name="value">The value to set.</param>
@@ -445,7 +477,7 @@ namespace Accord.DNN
         }
 
         /// <summary>
-        /// Sets values in the array starting at the specified source index to the specified value.
+        /// Sets unsigned 32-bit values in the array starting at the specified source index to the specified value.
         /// </summary>
         /// <param name="length">The number of elements to set.</param>
         /// <param name="value">The value to set.</param>
@@ -456,6 +488,33 @@ namespace Accord.DNN
         public static void Set(int length, uint value, uint[] y, int offy)
         {
             NativeMethods.mkl_setu32(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets signed 64-bit values in the array starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, long value, long[] y, int offy)
+        {
+            NativeMethods.mkl_seti64(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets unsigned 64-bit values in the array starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, ulong value, ulong[] y, int offy)
+        {
+            NativeMethods.mkl_setu64(length, value, y, offy);
         }
 
         /// <summary>
@@ -1689,6 +1748,14 @@ namespace Accord.DNN
             [SuppressUnmanagedCodeSecurity]
             public static extern void mkl_copyu32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mkl_copyi64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "mkl_copyi64")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mkl_copyu64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
             /*[DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void mkl_sinv(int n, [In] float[] a, int offa, [Out] float[] y, int offy);*/
@@ -1951,6 +2018,14 @@ namespace Accord.DNN
             [DllImport(NativeMethods.DllName, EntryPoint = "mkl_seti32")]
             [SuppressUnmanagedCodeSecurity]
             public static extern void mkl_setu32(int n, uint a, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mkl_seti64(int n, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "mkl_seti64")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mkl_setu64(int n, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

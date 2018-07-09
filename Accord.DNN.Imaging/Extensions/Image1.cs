@@ -50,7 +50,7 @@ namespace Accord.DNN.Imaging
                 throw new NotSupportedException();
             }
 
-            uint[] bits = image.Bits;
+            ulong[] bits = image.Bits;
             int stride1 = image.Stride1;
             int width = image.WidthBits;
 
@@ -96,8 +96,8 @@ namespace Accord.DNN.Imaging
             int width = image.Width;
             int height = image.Height;
             int stride1 = image.Stride1;
-            int stride32 = image.Stride32;
-            uint[] bits = image.Bits;
+            int stride = image.Stride;
+            ulong[] bits = image.Bits;
 
             // calculate top
             int top = findTop();
@@ -114,8 +114,8 @@ namespace Accord.DNN.Imaging
             }
 
             // calculate left
-            uint endMask = uint.MaxValue << (32 - (image.WidthBits & 31));
-            int left = findLeft(out int leftColumn, out uint leftMask);
+            ulong endMask = ulong.MaxValue << (64 - (image.WidthBits & 63));
+            int left = findLeft(out int leftColumn, out ulong leftMask);
             if (left == -1)
             {
                 throw new InvalidOperationException("Something went wrong.");
@@ -156,15 +156,15 @@ namespace Accord.DNN.Imaging
                 return -1;
             }
 
-            int findLeft(out int resultColumn, out uint resultMask)
+            int findLeft(out int resultColumn, out ulong resultMask)
             {
                 resultColumn = 0;
                 resultMask = 0;
 
-                for (int i = 0; i < stride32; i++)
+                for (int i = 0; i < stride; i++)
                 {
-                    uint mask = columnBlackMask(i);
-                    if (i == stride32 - 1)
+                    ulong mask = columnBlackMask(i);
+                    if (i == stride - 1)
                     {
                         mask &= endMask;
                     }
@@ -173,7 +173,7 @@ namespace Accord.DNN.Imaging
                     {
                         resultColumn = i;
                         resultMask = mask;
-                        return (i * 32) + BitUtils.BitScanOneForward(mask);
+                        return (i * 64) + BitUtils.BitScanOneForward(mask);
                     }
                 }
 
@@ -182,28 +182,28 @@ namespace Accord.DNN.Imaging
 
             int findRight()
             {
-                for (int i = stride32 - 1; i >= 0; i--)
+                for (int i = stride - 1; i >= 0; i--)
                 {
-                    uint mask = i == leftColumn ? leftMask : columnBlackMask(i);
-                    if (i == stride32 - 1)
+                    ulong mask = i == leftColumn ? leftMask : columnBlackMask(i);
+                    if (i == stride - 1)
                     {
                         mask &= endMask;
                     }
 
                     if (mask != 0ul)
                     {
-                        return (i * 32) + BitUtils.BitScanOneReverse(mask);
+                        return (i * 64) + BitUtils.BitScanOneReverse(mask);
                     }
                 }
 
                 return -1;
             }
 
-            uint columnBlackMask(int column)
+            ulong columnBlackMask(int column)
             {
-                uint mask = 0;
+                ulong mask = 0;
 
-                for (int i = top, off = (i * stride32) + column; i <= bottom; i++, off += stride32)
+                for (int i = top, off = (i * stride) + column; i <= bottom; i++, off += stride)
                 {
                     mask |= bits[off];
                 }

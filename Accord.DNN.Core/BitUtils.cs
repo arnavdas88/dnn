@@ -14,14 +14,15 @@ namespace Accord.DNN.Imaging
     using System.Security;
 
     /// <summary>
-    /// Provides bit manipulation methods for 32-bit big-endian architecture.
+    /// Provides bit manipulation methods for 64-bit big-endian architecture.
     /// </summary>
-    internal static class BitUtils
+    [CLSCompliant(false)]
+    public static class BitUtils
     {
         /// <summary>
         /// The first bit.
         /// </summary>
-        private const uint LSB = 0x8000_0000;
+        private const ulong LSB = 0x8000_0000_0000_0000ul;
 
         /// <summary>
         /// Examines the bit at the specified position, and returns the value of that bit.
@@ -32,9 +33,9 @@ namespace Accord.DNN.Imaging
         /// The bit at the position specified.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TestBit(uint bits, int position)
+        public static bool TestBit(ulong bits, int position)
         {
-            Debug.Assert(position < 32, "The bit position must be less than 32.");
+            Debug.Assert(position < 64, "The bit position must be less than 64.");
             return (bits & (LSB >> position)) != 0;
         }
 
@@ -48,10 +49,10 @@ namespace Accord.DNN.Imaging
         /// The value at the index specified.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint GetBits(uint bits, int position, int count)
+        public static ulong GetBits(ulong bits, int position, int count)
         {
-            Debug.Assert(position + count < 32, "The position+count must be less than 32.");
-            return (bits >> (32 - (position + count))) & (0xffff_ffff >> (32 - count));
+            Debug.Assert(position + count < 64, "The position+count must be less than 64.");
+            return (bits >> (64 - (position + count))) & (0xffff_ffff_ffff_fffful >> (64 - count));
         }
 
         /// <summary>
@@ -60,9 +61,9 @@ namespace Accord.DNN.Imaging
         /// <param name="bits">The bits to set.</param>
         /// <param name="position">The bit position to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetBit(ref uint bits, int position)
+        public static void SetBit(ref ulong bits, int position)
         {
-            Debug.Assert(position < 32, "The bit position must be less than 32.");
+            Debug.Assert(position < 64, "The bit position must be less than 64.");
             bits |= LSB >> position;
         }
 
@@ -73,9 +74,9 @@ namespace Accord.DNN.Imaging
         /// <param name="bits">The bits to set.</param>
         /// <param name="position">The starting bit position to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetBits(int count, uint[] bits, int position)
+        public static void SetBits(int count, ulong[] bits, int position)
         {
-            NativeMethods.bits_set_be32(count, bits, position);
+            NativeMethods.bits_set_be64(count, bits, position);
         }
 
         /// <summary>
@@ -84,9 +85,9 @@ namespace Accord.DNN.Imaging
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The bit position to reset.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ResetBit(ref uint bits, int position)
+        public static void ResetBit(ref ulong bits, int position)
         {
-            Debug.Assert(position < 32, "The bit position must be less than 32.");
+            Debug.Assert(position < 64, "The bit position must be less than 64.");
             bits &= ~(LSB >> position);
         }
 
@@ -97,9 +98,9 @@ namespace Accord.DNN.Imaging
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The starting bit position to reset.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ResetBits(int count, uint[] bits, int position)
+        public static void ResetBits(int count, ulong[] bits, int position)
         {
-            NativeMethods.bits_reset_be32(count, bits, position);
+            NativeMethods.bits_reset_be64(count, bits, position);
         }
 
         /// <summary>
@@ -112,9 +113,9 @@ namespace Accord.DNN.Imaging
         /// <param name="bitsDst">The bits to copy to.</param>
         /// <param name="positionDst">The starting bit position in <c>bitsdst</c>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyBits(int count, uint[] bitsSrc, int positionSrc, uint[] bitsDst, int positionDst)
+        public static void CopyBits(int count, ulong[] bitsSrc, int positionSrc, ulong[] bitsDst, int positionDst)
         {
-            NativeMethods.bits_copy_be32(count, bitsSrc, positionSrc, bitsDst, positionDst);
+            NativeMethods.bits_copy_be64(count, bitsSrc, positionSrc, bitsDst, positionDst);
         }
 
         /// <summary>
@@ -125,9 +126,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the first set bit (1) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanOneForward(uint bits)
+        public static int BitScanOneForward(ulong bits)
         {
-            return NativeMethods.bit_scan_forward_be32(bits);
+            return NativeMethods.bit_scan_forward_be64(bits);
         }
 
         /// <summary>
@@ -138,9 +139,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the last set bit (1) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanOneReverse(uint bits)
+        public static int BitScanOneReverse(ulong bits)
         {
-            return NativeMethods.bit_scan_reverse_be32(bits);
+            return NativeMethods.bit_scan_reverse_be64(bits);
         }
 
         /// <summary>
@@ -153,9 +154,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the first set bit (1) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanOneForward(int count, uint[] bits, int position)
+        public static int BitScanOneForward(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_forward_be32(count, bits, position);
+            return NativeMethods.bits_scan_one_forward_be64(count, bits, position);
         }
 
         /// <summary>
@@ -168,9 +169,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the last set bit (1) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanOneReverse(int count, uint[] bits, int position)
+        public static int BitScanOneReverse(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_reverse_be32(count, bits, position);
+            return NativeMethods.bits_scan_one_reverse_be64(count, bits, position);
         }
 
         /// <summary>
@@ -183,9 +184,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the first reset bit (0) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanZeroForward(int count, uint[] bits, int position)
+        public static int BitScanZeroForward(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_forward_be32(count, bits, position);
+            return NativeMethods.bits_scan_zero_forward_be64(count, bits, position);
         }
 
         /// <summary>
@@ -198,9 +199,9 @@ namespace Accord.DNN.Imaging
         /// The bit position of the last reset bit (0) found.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BitScanZeroReverse(int count, uint[] bits, int position)
+        public static int BitScanZeroReverse(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_reverse_be32(count, bits, position);
+            return NativeMethods.bits_scan_zero_reverse_be64(count, bits, position);
         }
 
         /// <summary>
@@ -213,13 +214,13 @@ namespace Accord.DNN.Imaging
         /// The number of one bits.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint CountOneBits(int count, uint[] bits, int position)
+        public static ulong CountOneBits(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_onecount_32(count, bits, position);
+            return NativeMethods.bits_onecount_64(count, bits, position);
         }
 
         /// <summary>
-        /// Counts the number of zero bits (population count) in a range of 32-bits integers.
+        /// Counts the number of zero bits (population count) in a range of 64-bits integers.
         /// </summary>
         /// <param name="count">The number of bits to count.</param>
         /// <param name="bits">The bits to count.</param>
@@ -228,38 +229,38 @@ namespace Accord.DNN.Imaging
         /// The number of zero bits.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint CountZeroBits(int count, uint[] bits, int position)
+        public static ulong CountZeroBits(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_zerocount_32(count, bits, position);
+            return NativeMethods.bits_zerocount_64(count, bits, position);
         }
 
         /// <summary>
-        /// Reverses the order of bytes in a 32-bit integer.
+        /// Reverses the order of bytes in a 64-bit integer.
         /// </summary>
         /// <param name="bits">The integer to reverse byte order.</param>
         /// <returns>
         /// The integer with a reversed bytes.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BiteSwap(uint bits)
+        public static int BiteSwap(ulong bits)
         {
-            return NativeMethods.byteswap_32(bits);
+            return NativeMethods.byteswap_64(bits);
         }
 
         /// <summary>
-        /// Reverses the order of bytes in an array of 32-bit integers.
+        /// Reverses the order of bytes in an array of 64-bit integers.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="xy">The integers to reverse byte order.</param>
         /// <param name="offxy">The index in the <c>xy</c> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BiteSwap(int length, uint[] xy, int offxy)
+        public static void BiteSwap(int length, ulong[] xy, int offxy)
         {
-            NativeMethods.bytesswap_ip_32(length, xy, offxy);
+            NativeMethods.bytesswap_ip_64(length, xy, offxy);
         }
 
         /// <summary>
-        /// Reverses the order of bytes in an array of 32-bit integers.
+        /// Reverses the order of bytes in an array of 64-bit integers.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The integers to reverse byte order.</param>
@@ -267,9 +268,9 @@ namespace Accord.DNN.Imaging
         /// <param name="y">The integers that receive swapped bytes.</param>
         /// <param name="offy">The index in the <c>y</c> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BiteSwap(int length, uint[] x, int offx, uint[] y, int offy)
+        public static void BiteSwap(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.bytesswap_32(length, x, offx, y, offy);
+            NativeMethods.bytesswap_64(length, x, offx, y, offy);
         }
 
         private static class NativeMethods
@@ -278,59 +279,59 @@ namespace Accord.DNN.Imaging
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int byteswap_32(uint bits);
+            public static extern int byteswap_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bytesswap_ip_32(int n, [In, Out] uint[] xy, int offxy);
+            public static extern void bytesswap_ip_64(int n, [In, Out] ulong[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bytesswap_32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            public static extern void bytesswap_64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_forward_be32(uint bits);
+            public static extern int bit_scan_forward_be64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_reverse_be32(uint bits);
+            public static extern int bit_scan_reverse_be64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_forward_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_one_forward_be64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_reverse_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_one_reverse_be64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_forward_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_zero_forward_be64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_reverse_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_zero_reverse_be64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_reset_be32(int count, [In, Out] uint[] bits, int pos);
+            public static extern void bits_reset_be64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_set_be32(int count, [In, Out] uint[] bits, int pos);
+            public static extern void bits_set_be64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_copy_be32(int count, [In] uint[] bitssrc, int possrc, [Out] uint[] bitsdst, int posdst);
+            public static extern void bits_copy_be64(int count, [In] ulong[] bitssrc, int possrc, [Out] ulong[] bitsdst, int posdst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern uint bits_onecount_32(int count, [In] uint[] bits, int pos);
+            public static extern ulong bits_onecount_64(int count, [In] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern uint bits_zerocount_32(int count, [In] uint[] bits, int pos);
+            public static extern ulong bits_zerocount_64(int count, [In] ulong[] bits, int pos);
         }
     }
 } 

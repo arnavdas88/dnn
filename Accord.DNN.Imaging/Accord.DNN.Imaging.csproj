@@ -53,6 +53,9 @@
     <Reference Include="leptonica.net, Version=1.75.0.3, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\leptonica.net.1.75.0.3\lib\net471\leptonica.net.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -64,8 +67,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\Logical.cs" />
+    <Compile Include="Extensions\Morthology.cs" />
+    <Compile Include="ImageF.cs" />
     <Compile Include="ConnectedComponent.cs" />
-    <Compile Include="DirectoryInfoExtensions.cs" />
     <Compile Include="EXIF\EXIFExposureProgram.cs" />
     <Compile Include="EXIF\EXIFField.cs" />
     <Compile Include="EXIF\EXIFFieldAttribute.cs" />
@@ -73,19 +78,20 @@
     <Compile Include="EXIF\EXIFMeteringMode.cs" />
     <Compile Include="Extensions\Convert.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
-    <Compile Include="BitUtils.cs" />
     <Compile Include="Extensions\ConnectedComponents.cs" />
     <Compile Include="Extensions\CopyCrop.cs" />
     <Compile Include="Extensions\Edit.cs" />
     <Compile Include="Extensions\Libtiff.cs" />
     <Compile Include="Extensions\RotateShear.cs" />
     <Compile Include="Extensions\ScalingOptions.cs" />
+    <Compile Include="Extensions\Statistic.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="Extensions\Image1.cs" />
     <Compile Include="ImageFormat.cs" />
     <Compile Include="ImageMetadata.cs" />
     <Compile Include="ImageOpen.cs" />
     <Compile Include="ImageSave.cs" />
+    <Compile Include="Image{T}.cs" />
     <Compile Include="LeptonicaUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
@@ -97,7 +103,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PropertyItem.cs" />
-    <Compile Include="RectangleExtensions.cs" />
     <Compile Include="TIFF\TIFFCompression.cs" />
     <Compile Include="TIFF\TIFFField.cs" />
     <Compile Include="TIFF\TIFFFieldAttribute.cs" />
@@ -108,6 +113,8 @@
     <Compile Include="TIFF\TIFFPlanarConfiguration.cs" />
     <Compile Include="TIFF\TIFFResolutionUnit.cs" />
     <Compile Include="TIFF\TIFFSubfileType.cs" />
+    <Compile Include="Transforms\ShiftTransform.cs" />
+    <Compile Include="Transforms\TransformBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Accord.DNN.Imaging.snk" />
@@ -126,6 +133,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

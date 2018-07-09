@@ -102,104 +102,6 @@ namespace Accord.DNN.Imaging
             }
         }
 
-#if false
-        private static Image Load(Tiff tiff)
-        {
-            // read image properties
-            int width = GetTiffTag(TiffTag.IMAGEWIDTH, null);
-            int height = GetTiffTag(TiffTag.IMAGELENGTH, null);
-            int samplesPerPixel = GetTiffTag(TiffTag.SAMPLESPERPIXEL, 1);
-            int bitsPerSample = GetTiffTag(TiffTag.BITSPERSAMPLE, 1);
-            int xres = GetTiffTag(TiffTag.XRESOLUTION, 200);
-            int yres = GetTiffTag(TiffTag.YRESOLUTION, 200);
-            int photometric = GetTiffTag(TiffTag.PHOTOMETRIC, (int)Photometric.MINISBLACK);
-
-            if (photometric == (int)Photometric.YCBCR)
-            {
-                // special case for YCbCr photometric - read image as rgba
-                Image image = new Image(width, height, 32, xres, yres);
-
-                int imageSize = height * width;
-                int[] buffer = new int[imageSize];
-
-                // Read the image into the memory buffer
-                if (tiff.ReadRGBAImageOriented(width, height, buffer, Orientation.TOPLEFT))
-                {
-                    unsafe
-                    {
-                        fixed (int* p = buffer)
-                        {
-                            ////frame.Bitmap.SetBits(new IntPtr(p), width, height, width * 4, 32);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Image image = new Image(
-                    width,
-                    height,
-                    samplesPerPixel * bitsPerSample,
-                    xres,
-                    yres);
-
-                // read bytes
-                int scanlineSize = tiff.ScanlineSize();
-                byte[] buffer = new byte[Math.Max(scanlineSize, image.Stride8)];
-
-                for (int i = 0, offset = 0; i < height; i++, offset += scanlineSize)
-                {
-                    if (!tiff.ReadScanline(buffer, 0, i, 0))
-                    {
-                        throw new InvalidOperationException(Properties.Resources.E_CannotDecodeImage);
-                    }
-                }
-
-                unsafe
-                {
-                    fixed (byte* p = buffer)
-                    {
-                        ////frame.Bitmap.SetBits(new IntPtr(p), width, height, scanlineSize, samplesPerPixel * bitsPerSample);
-                    }
-                }
-            }
-
-            // read all set tags
-            /*foreach (TiffFieldInfo fip in tiff.EnumFields(TiffType.ANY))
-            {
-                object value = Image.LoadTiffTag(tiff, fip);
-                if (value != null)
-                {
-                    frame.SetPropertyItem((int)fip.Tag, value);
-                }
-            }*/
-
-            // determine whether the image must be inverted using photometric interpretation
-            ////frame.ApplyPhotometricInterpretation(true);
-
-            // change image orientation to top-left
-            ////frame.ApplyOrientation();
-
-            return null;
-
-            int GetTiffTag(TiffTag tag, int? defaultValue)
-            {
-                FieldValue[] values = tiff.GetField(tag);
-                if (values != null && values.Length > 0)
-                {
-                    return values[0].ToInt();
-                }
-
-                if (!defaultValue.HasValue)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return defaultValue.Value;
-            }
-        }
-#endif
-
         private static void Save(Tiff tiff, Image image)
         {
             Libtiff.SaveTags(tiff, image, null);
@@ -207,10 +109,10 @@ namespace Accord.DNN.Imaging
             byte[] buffer = new byte[image.Stride8];
 
             // raster stride MAY be bigger than TIFF stride (due to padding in raster bits)
-            for (int i = 0, offset = 0; i < image.Height; i++, offset += image.Stride32)
+            for (int i = 0, offset = 0; i < image.Height; i++, offset += image.Stride)
             {
                 // copy and swap bytes
-                NativeMethods.bytesswap_32(image.Stride32, image.Bits, offset, buffer, 0);
+                NativeMethods.bytesswap_64(image.Stride, image.Bits, offset, buffer, 0);
                 ////ConvertBGRToRGB(bytes, bitmap._width, bitmap._height, image.BitsPerPixel);
 
                 if (!tiff.WriteScanline(buffer, 0, i, 0))
@@ -650,7 +552,7 @@ namespace Accord.DNN.Imaging
         {
             [DllImport("Accord.DNN.CPP.dll")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bytesswap_32(int n, [In] uint[] x, int offx, [Out] byte[] y, int offy);
+            public static extern unsafe void bytesswap_64(int n, [In] ulong[] x, int offx, [Out] byte[] y, int offy);
         }
 
         private sealed class MyTiffErrorHandler : TiffErrorHandler

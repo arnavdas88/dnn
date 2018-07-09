@@ -4,9 +4,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.Imaging
+namespace Accord.DNN
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
 
     /// <summary>
@@ -73,6 +74,24 @@ namespace Accord.DNN.Imaging
             }
 
             return distance;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Rectangle"/> structure that contains the union of the sequence of <see cref="Rectangle"/> structures.
+        /// </summary>
+        /// <param name="values">The rectangles to union.</param>
+         /// <returns>
+        /// A <see cref="Rectangle"/> structure that bounds the union of the sequence of <see cref="Rectangle"/> structures.
+        /// </returns>
+        public static Rectangle Union(IEnumerable<Rectangle> values)
+        {
+            Rectangle result = Rectangle.Empty;
+            foreach (Rectangle value in values)
+            {
+                result = Rectangle.Union(result, value);
+            }
+
+            return result;
         }
     }
 }

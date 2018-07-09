@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2B717DA4-EB9D-47D6-8D74-DC1FDED6B193}</ProjectGuid>
+    <ProjectGuid>{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Accord.DNN.Core</RootNamespace>
-    <AssemblyName>Accord.DNN.Core</AssemblyName>
+    <RootNamespace>Accord.DNN.DocumentAnalysis</RootNamespace>
+    <AssemblyName>Accord.DNN.DocumentAnalysis</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -32,7 +30,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -40,41 +37,44 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Accord.DNN.Core.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>DocumentAnalysis.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitUtils.cs" />
-    <Compile Include="Common\ArrayHelpers.cs" />
-    <Compile Include="Common\CommonParallel.cs" />
-    <Compile Include="Common\LinkedList.cs" />
-    <Compile Include="Common\LinkedListItem.cs" />
-    <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
-    <Compile Include="Extensions\RectangleExtensions.cs" />
-    <Compile Include="MatrixLayout.cs" />
-    <Compile Include="MKL.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
-    </Compile>
-    <Compile Include="Random\GaussianGenerator.cs" />
-    <Compile Include="Random\RandomGenerator.cs" />
-    <Compile Include="Random\RandomNumberGenerator.cs" />
-    <Compile Include="Random\RandomRangeGenerator.cs" />
+    <Compile Include="LineDetector\LineDetector.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shapes\Container.cs" />
+    <Compile Include="Shapes\Line.cs" />
+    <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Shapes\Text.cs" />
+    <Compile Include="Shapes\TextBlock.cs" />
+    <Compile Include="Shapes\TextLine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Accord.DNN.Core.snk" />
-    <None Include="Settings.StyleCop" />
+    <None Include="DocumentAnalysis.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Accord.DNN.Core\Accord.DNN.Core.csproj">
+      <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
+      <Name>Accord.DNN.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Accord.DNN.Imaging\Accord.DNN.Imaging.csproj">
+      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
+      <Name>Accord.DNN.Imaging</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.targets" />
 </Project>

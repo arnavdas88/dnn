@@ -34,8 +34,8 @@ namespace Accord.DNN.Imaging
         /// <para>-or-</para>
         /// <para><c>y</c> is less than 0, or greater than or equal to <see cref="Image.Height"/>.</para>
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint GetPixel(this Image image, int x, int y)
         {
             if (image == null)
@@ -45,32 +45,32 @@ namespace Accord.DNN.Imaging
 
             image.ValidatePosition(x, y);
 
-            int pos = y * image.Stride32;
+            int pos = y * image.Stride;
             switch (image.BitsPerPixel)
             {
                 case 1:
-                    pos += x >> 5;
-                    return (image.Bits[pos] >> (1 * (31 - (x & 31)))) & 1;
+                    pos += x >> 6;
+                    return (uint)(image.Bits[pos] >> (1 * (63 - (x & 63)))) & 1;
 
                 case 2:
-                    pos += x >> 4;
-                    return (image.Bits[pos] >> (2 * (15 - (x & 15)))) & 3;
+                    pos += x >> 5;
+                    return (uint)(image.Bits[pos] >> (2 * (31 - (x & 31)))) & 3;
 
                 case 4:
-                    pos += x >> 3;
-                    return (image.Bits[pos] >> (4 * (7 - (x & 7)))) & 0xf;
+                    pos += x >> 4;
+                    return (uint)(image.Bits[pos] >> (4 * (15 - (x & 15)))) & 0xf;
 
                 case 8:
-                    pos += x >> 2;
-                    return (image.Bits[pos] >> (8 * (3 - (x & 3)))) & 0xff;
+                    pos += x >> 3;
+                    return (uint)(image.Bits[pos] >> (8 * (7 - (x & 7)))) & 0xff;
 
                 case 16:
-                    pos += x >> 1;
-                    return (image.Bits[pos] >> (16 * (1 - (x & 1)))) & 0xffff;
+                    pos += x >> 2;
+                    return (uint)(image.Bits[pos] >> (16 * (3 - (x & 3)))) & 0xffff;
 
                 case 32:
-                    pos += x;
-                    return image.Bits[pos];
+                    pos += x >> 1;
+                    return (uint)(image.Bits[pos] >> (32 * (1 - (x & 1)))) & 0xffff_ffff;
 
                 default:
                     throw new InvalidOperationException(Properties.Resources.E_InvalidDepth);
@@ -102,8 +102,8 @@ namespace Accord.DNN.Imaging
         /// <c>color</c> > 0 is masked to the maximum allowable pixel value, and any(invalid) higher order bits are discarded.
         /// </para>
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetPixel(this Image image, int x, int y, uint color)
         {
             if (image == null)
@@ -113,55 +113,57 @@ namespace Accord.DNN.Imaging
 
             image.ValidatePosition(x, y);
 
-            int pos = y * image.Stride32;
+            int pos = y * image.Stride;
             int shift;
             switch (image.BitsPerPixel)
             {
                 case 1:
-                    pos += x >> 5;
-                    shift = 1 * (x & 31);
+                    pos += x >> 6;
+                    shift = 1 * (x & 63);
                     if (color > 0)
                     {
-                        image.Bits[pos] |= 0x8000_0000u >> shift;
+                        image.Bits[pos] |= 0x8000_0000_0000_0000ul >> shift;
                     }
                     else
                     {
-                        image.Bits[pos] &= ~(0x8000_0000u >> shift);
+                        image.Bits[pos] &= ~(0x8000_0000_0000_0000ul >> shift);
                     }
 
                     break;
 
                 case 2:
-                    pos += x >> 4;
-                    shift = 2 * (x & 15);
-                    image.Bits[pos] &= ~(0xc000_0000u >> shift);
-                    image.Bits[pos] |= (color & 3) << ((2 * 15) - shift);
+                    pos += x >> 5;
+                    shift = 2 * (x & 31);
+                    image.Bits[pos] &= ~(0xc000_0000_0000_0000ul >> shift);
+                    image.Bits[pos] |= (color & 3) << ((2 * 31) - shift);
                     break;
 
                 case 4:
-                    pos += x >> 3;
-                    shift = 4 * (x & 7);
-                    image.Bits[pos] &= ~(0xf000_0000u >> shift);
-                    image.Bits[pos] |= (color & 0xf) << ((4 * 7) - shift);
+                    pos += x >> 4;
+                    shift = 4 * (x & 15);
+                    image.Bits[pos] &= ~(0xf000_0000_0000_0000ul >> shift);
+                    image.Bits[pos] |= (color & 0xf) << ((4 * 15) - shift);
                     break;
 
                 case 8:
-                    pos += x >> 2;
-                    shift = 8 * (x & 3);
-                    image.Bits[pos] &= ~(0xff00_0000u >> shift);
-                    image.Bits[pos] |= (color & 0xff) << ((8 * 3) - shift);
+                    pos += x >> 3;
+                    shift = 8 * (x & 7);
+                    image.Bits[pos] &= ~(0xff00_0000_0000_0000ul >> shift);
+                    image.Bits[pos] |= (color & 0xff) << ((8 * 7) - shift);
                     break;
 
                 case 16:
-                    pos += x >> 1;
-                    shift = 16 * (x & 1);
-                    image.Bits[pos] &= ~(0xffff_0000u >> shift);
-                    image.Bits[pos] |= (color & 0xffff) << ((16 * 1) - shift);
+                    pos += x >> 2;
+                    shift = 16 * (x & 3);
+                    image.Bits[pos] &= ~(0xffff_0000_0000_0000ul >> shift);
+                    image.Bits[pos] |= (color & 0xffff) << ((16 * 3) - shift);
                     break;
 
                 case 32:
-                    pos += x;
-                    image.Bits[pos] = color;
+                    pos += x >> 1;
+                    shift = 32 * (x & 1);
+                    image.Bits[pos] &= ~(0xffff_ffff_0000_0000ul >> shift);
+                    image.Bits[pos] |= (ulong)color << ((32 * 1) - shift);
                     break;
 
                 default:
@@ -196,7 +198,7 @@ namespace Accord.DNN.Imaging
 
             MKL.Set(
                 dst.Bits.Length,
-                dst.BitsPerPixel == 1 ? 0 : uint.MaxValue,
+                dst.BitsPerPixel == 1 ? 0ul : ulong.MaxValue,
                 dst.Bits,
                 0);
 
@@ -234,7 +236,7 @@ namespace Accord.DNN.Imaging
 
             Image dst = image.Copy();
 
-            uint[] bits = dst.Bits;
+            ulong[] bits = dst.Bits;
             int bitCount = width * dst.BitsPerPixel;
             int stride1 = dst.Stride1;
 
@@ -340,13 +342,13 @@ namespace Accord.DNN.Imaging
 
             image.ValidateArea(x, y, width, height);
 
-            uint[] bits = image.Bits;
-            uint white = image.BitsPerPixel == 1 ? 0 : uint.MaxValue;
+            ulong[] bits = image.Bits;
+            ulong white = image.BitsPerPixel == 1 ? 0ul : ulong.MaxValue;
 
             // clear top
             if (y > 0)
             {
-                MKL.Set(y * image.Stride32, white, bits, 0);
+                MKL.Set(y * image.Stride, white, bits, 0);
             }
 
             // clear left
@@ -374,7 +376,7 @@ namespace Accord.DNN.Imaging
             // clear bottom
             if (y + height < image.Height)
             {
-                MKL.Set((image.Height - (y + height)) * image.Stride32, white, bits, (y + height) * image.Stride32);
+                MKL.Set((image.Height - (y + height)) * image.Stride, white, bits, (y + height) * image.Stride);
             }
         }
 
@@ -406,11 +408,7 @@ namespace Accord.DNN.Imaging
 
             if (dst.BitsPerPixel == 1)
             {
-                NativeMethods.mkl_seti32(
-                    dst.Bits.Length,
-                    uint.MaxValue,
-                    dst.Bits,
-                    0);
+                MKL.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
 
             return new Image(image);
@@ -448,7 +446,7 @@ namespace Accord.DNN.Imaging
 
             Image dst = image.Copy();
 
-            uint[] bits = dst.Bits;
+            ulong[] bits = dst.Bits;
             int bitCount = width * dst.BitsPerPixel;
             int stride1 = dst.Stride1;
 
@@ -510,8 +508,8 @@ namespace Accord.DNN.Imaging
 
             Image dst = new Image(image);
 
-            uint[] srcbits = image.Bits;
-            uint[] dstbits = dst.Bits;
+            ulong[] srcbits = image.Bits;
+            ulong[] dstbits = dst.Bits;
             for (int i = 0, ii = srcbits.Length; i < ii; i++)
             {
                 dstbits[i] = ~srcbits[i];
@@ -535,18 +533,11 @@ namespace Accord.DNN.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            uint[] bits = image.Bits;
+            ulong[] bits = image.Bits;
             for (int i = 0, ii = bits.Length; i < ii; i++)
             {
                 bits[i] = ~bits[i];
             }
-        }
-
-        private static class NativeMethods
-        {
-            [DllImport("Accord.DNN.CPP.dll")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void mkl_seti32(int n, uint a, [Out] uint[] y, int offy);
         }
     }
 }
