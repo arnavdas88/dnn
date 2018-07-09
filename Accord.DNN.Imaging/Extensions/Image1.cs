@@ -57,7 +57,7 @@ namespace Accord.DNN.Imaging
             ulong sum = 0;
             for (int i = 0, ii = image.Height, pos = 0; i < ii; i++, pos += stride1)
             {
-                sum += BitUtils.CountOneBits(width, bits, pos);
+                sum += BitUtils64.CountOneBits(width, bits, pos);
             }
 
             return sum;
@@ -134,7 +134,7 @@ namespace Accord.DNN.Imaging
             {
                 for (int i = 0, off = 0; i < height; i++, off += stride1)
                 {
-                    if (BitUtils.BitScanOneForward(width, bits, off) != -1)
+                    if (BitUtils64.BitScanOneForward(width, bits, off) != -1)
                     {
                         return i;
                     }
@@ -147,7 +147,7 @@ namespace Accord.DNN.Imaging
             {
                 for (int i = height - 1, off = i * stride1; i >= 0; i--, off -= stride1)
                 {
-                    if (BitUtils.BitScanOneForward(width, bits, off) != -1)
+                    if (BitUtils64.BitScanOneForward(width, bits, off) != -1)
                     {
                         return i;
                     }
@@ -173,7 +173,7 @@ namespace Accord.DNN.Imaging
                     {
                         resultColumn = i;
                         resultMask = mask;
-                        return (i * 64) + BitUtils.BitScanOneForward(mask);
+                        return (i * 64) + BitUtils64.BitScanOneForward(mask);
                     }
                 }
 
@@ -192,7 +192,7 @@ namespace Accord.DNN.Imaging
 
                     if (mask != 0ul)
                     {
-                        return (i * 64) + BitUtils.BitScanOneReverse(mask);
+                        return (i * 64) + BitUtils64.BitScanOneReverse(mask);
                     }
                 }
 

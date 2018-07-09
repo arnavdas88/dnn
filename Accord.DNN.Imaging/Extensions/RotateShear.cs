@@ -118,14 +118,14 @@ namespace Accord.DNN.Imaging
 
                 if (offset > 0)
                 {
-                    BitUtils.ResetBits(offset, bitsdst, posdst);
+                    BitUtils64.ResetBits(offset, bitsdst, posdst);
                 }
 
-                BitUtils.CopyBits(widthsrc1, bitssrc, possrc, bitsdst, posdst + offset);
+                BitUtils64.CopyBits(widthsrc1, bitssrc, possrc, bitsdst, posdst + offset);
 
                 if (offset < maxoffset)
                 {
-                    BitUtils.ResetBits(widthdst1 - widthsrc1 - offset, bitsdst, posdst + offset + widthsrc1);
+                    BitUtils64.ResetBits(widthdst1 - widthsrc1 - offset, bitsdst, posdst + offset + widthsrc1);
                 }
             }
 

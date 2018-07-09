@@ -189,7 +189,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bitutils.cpp" />
+    <ClCompile Include="bitutils32.cpp" />
+    <ClCompile Include="bitutils64.cpp" />
     <ClCompile Include="CTC.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -220,6 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Accord.DNN.CPP.ruleset" />
+    <None Include="bitutils.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

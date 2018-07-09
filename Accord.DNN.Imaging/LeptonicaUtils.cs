@@ -9,6 +9,8 @@ namespace Accord.DNN.Imaging
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using Leptonica;
 
     /// <summary>
@@ -113,35 +115,56 @@ namespace Accord.DNN.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst)
         {
-            /*if (strideDst == strideSrc)
+            unsafe
             {
-                NativeMethods.memcpy(bitsDst, bitsSrc, height * strideDst);
-            }
-            else
-            {
-                int count = Math.Min(strideDst, strideSrc);
-                for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc += strideSrc)
+                uint* udst = (uint*)dst;
+
+                if (2 * strideDst == strideSrc)
                 {
-                    NativeMethods.memcpy(bitsDst, bitsSrc, count);
+                    NativeMethods.bits_copy_be64to32(strideDst, src, 0, udst, 0);
                 }
-            }*/
+                else
+                {
+                    for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
+                    {
+                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst);
+                    }
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst)
         {
-            /*if (strideDst == strideSrc)
+            unsafe
             {
-                NativeMethods.memcpy(bitsDst, bitsSrc, height * strideDst);
-            }
-            else
-            {
-                int count = Math.Min(strideDst, strideSrc);
-                for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc += strideSrc)
+                uint* usrc = (uint*)src;
+
+                if (strideDst == 2 * strideSrc)
                 {
-                    NativeMethods.memcpy(bitsDst, bitsSrc, count);
+                    NativeMethods.bits_copy_be32to64(height * strideDst, usrc, 0, dst, 0);
                 }
-            }*/
+                else
+                {
+                    for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
+                    {
+                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst);
+                    }
+                }
+            }
+        }
+
+        private static class NativeMethods
+        {
+            private const string DllName = "Accord.DNN.CPP.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void bits_copy_be64to32(int count, [In] ulong[] src, int offsrc, [Out] uint* dst, int offdst);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void bits_copy_be32to64(int count, [In] uint* src, int offsrc, [Out] ulong[] dst, int offdst);
         }
     }
 }

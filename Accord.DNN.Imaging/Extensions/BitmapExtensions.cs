@@ -90,7 +90,7 @@ namespace Accord.DNN.Imaging
             }
 
             // swap bytes to make storage big-endian
-            BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0);
+            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
 
             return Image.OnLoaded(image, null, bitmap.Palette?.Entries);
         }
@@ -144,7 +144,7 @@ namespace Accord.DNN.Imaging
             }
 
             // swap bytes to make storage big-endian
-            BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0);
+            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
 
             return Image.OnLoaded(image, null, bitmap.Palette?.Entries);
         }
@@ -263,7 +263,7 @@ namespace Accord.DNN.Imaging
 
             // swap bytes to make storage little-endian
             ulong[] bits = new ulong[image.Bits.Length];
-            BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0, bits, 0);
+            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0, bits, 0);
 
             bitmapSource.WritePixels(
                 new System.Windows.Int32Rect(0, 0, image.Width, image.Height),
@@ -339,7 +339,7 @@ namespace Accord.DNN.Imaging
                 0);
 
             // swap bytes to make storage big-endian
-            BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0);
+            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
 
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
@@ -424,13 +424,13 @@ namespace Accord.DNN.Imaging
                 {
                     for (int i = 0; i < 32; i += bitsPerPixel, offd++)
                     {
-                        dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
+                        dstbits[offd] = colormap[BitUtils64.GetBits(srcbits[offs], i, bitsPerPixel)];
                     }
                 }
 
                 for (int i = 0; i < srctail; i += bitsPerPixel, offd++)
                 {
-                    dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
+                    dstbits[offd] = colormap[BitUtils64.GetBits(srcbits[offs], i, bitsPerPixel)];
                 }
             }
 

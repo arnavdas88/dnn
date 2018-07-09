@@ -48,7 +48,8 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitUtils.cs" />
+    <Compile Include="BitUtils32.cs" />
+    <Compile Include="BitUtils64.cs" />
     <Compile Include="Common\ArrayHelpers.cs" />
     <Compile Include="Common\CommonParallel.cs" />
     <Compile Include="Common\LinkedList.cs" />

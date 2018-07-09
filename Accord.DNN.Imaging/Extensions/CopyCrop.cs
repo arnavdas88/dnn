@@ -251,7 +251,7 @@ namespace Accord.DNN.Imaging
             {
                 for (int i = 0; i < height; i++, offsrc += stride1src, offdst += stride1dst)
                 {
-                    BitUtils.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
+                    BitUtils64.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
                 }
             }
         }

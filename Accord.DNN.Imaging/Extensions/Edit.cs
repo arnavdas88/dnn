@@ -244,11 +244,11 @@ namespace Accord.DNN.Imaging
             {
                 if (dst.BitsPerPixel == 1)
                 {
-                    BitUtils.ResetBits(bitCount, bits, off);
+                    BitUtils64.ResetBits(bitCount, bits, off);
                 }
                 else
                 {
-                    BitUtils.SetBits(bitCount, bits, off);
+                    BitUtils64.SetBits(bitCount, bits, off);
                 }
             }
 
@@ -358,7 +358,7 @@ namespace Accord.DNN.Imaging
                 int pos = y * image.Stride1;
                 for (int i = 0; i < height; i++, pos += image.Stride1)
                 {
-                    BitUtils.SetBits(count, bits, pos);
+                    BitUtils64.SetBits(count, bits, pos);
                 }
             }
 
@@ -369,7 +369,7 @@ namespace Accord.DNN.Imaging
                 int pos = (y * image.Stride1) + ((x + width) * image.BitsPerPixel);
                 for (int i = 0; i < height; i++, pos += image.Stride1)
                 {
-                    BitUtils.SetBits(count, bits, pos);
+                    BitUtils64.SetBits(count, bits, pos);
                 }
             }
 
@@ -454,11 +454,11 @@ namespace Accord.DNN.Imaging
             {
                 if (dst.BitsPerPixel == 1)
                 {
-                    BitUtils.SetBits(bitCount, bits, off);
+                    BitUtils64.SetBits(bitCount, bits, off);
                 }
                 else
                 {
-                    BitUtils.ResetBits(bitCount, bits, off);
+                    BitUtils64.ResetBits(bitCount, bits, off);
                 }
             }
 

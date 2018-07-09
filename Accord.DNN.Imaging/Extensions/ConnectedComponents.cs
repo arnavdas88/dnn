@@ -50,13 +50,13 @@ namespace Accord.DNN.Imaging
                 // find intervals
                 for (int pos = startpos, endpos = startpos + image.Width; pos < endpos;)
                 {
-                    int index1 = BitUtils.BitScanOneForward(endpos - pos, bits, pos);
+                    int index1 = BitUtils64.BitScanOneForward(endpos - pos, bits, pos);
                     if (index1 == -1)
                     {
                         break;
                     }
 
-                    int index2 = BitUtils.BitScanZeroForward(endpos - index1 - 1, bits, index1 + 1);
+                    int index2 = BitUtils64.BitScanZeroForward(endpos - index1 - 1, bits, index1 + 1);
                     if (index2 == -1)
                     {
                         index2 = endpos;
@@ -130,7 +130,7 @@ namespace Accord.DNN.Imaging
                 int x = intervals[i + 1];
                 int c = intervals[i + 2];
 
-                BitUtils.SetBits(c, bits, (y * stride1) + x);
+                BitUtils64.SetBits(c, bits, (y * stride1) + x);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Accord.DNN.Imaging
                 int x = intervals[i + 1];
                 int c = intervals[i + 2];
 
-                BitUtils.ResetBits(c, bits, (y * stride1) + x);
+                BitUtils64.ResetBits(c, bits, (y * stride1) + x);
             }
         }
 
@@ -309,7 +309,7 @@ namespace Accord.DNN.Imaging
                 int x = intervals[i + 1];
                 int c = intervals[i + 2];
 
-                BitUtils.CopyBits(c, bitssrc, (y * stridesrc) + x, bitsdst, ((y - top) * stridedst) + x - left);
+                BitUtils64.CopyBits(c, bitssrc, (y * stridesrc) + x, bitsdst, ((y - top) * stridedst) + x - left);
             }
 
             return dst;
@@ -397,7 +397,7 @@ namespace Accord.DNN.Imaging
                     int x = intervals[i + 1];
                     int c = intervals[i + 2];
 
-                    BitUtils.CopyBits(c, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - top) * stridedst1) + x - left);
+                    BitUtils64.CopyBits(c, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - top) * stridedst1) + x - left);
                 }
             }
 

@@ -48,7 +48,7 @@ namespace Accord.DNN.Imaging
 
             for (int i = 0, pos = 0; i < height; i++, pos += stride1)
             {
-                histogram[i] = (int)BitUtils.CountOneBits(width, bits, pos);
+                histogram[i] = (int)BitUtils64.CountOneBits(width, bits, pos);
             }
 
             return histogram;

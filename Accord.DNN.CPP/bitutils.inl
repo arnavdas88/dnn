@@ -1,11 +1,3 @@
-#include "stdafx.h"
-
-#include <intrin.h>
-#include <math.h>
-#include <limits.h>
-#include <assert.h>
-
-#define BITS_COUNT			64
 #define BITS_MASK			(BITS_COUNT - 1)
 
 #if BITS_COUNT == 64
