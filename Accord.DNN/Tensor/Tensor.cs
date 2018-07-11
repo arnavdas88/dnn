@@ -265,7 +265,7 @@ namespace Accord.DNN
         /// <param name="image">The <see cref="Imaging.Image"/> to copy weights from.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
         [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 local functions.")]
-        public static Tensor FromBitmap(string name, Imaging.Image image)
+        public static Tensor FromBitmap(string name, Genix.Imaging.Image image)
         {
             if (image == null)
             {

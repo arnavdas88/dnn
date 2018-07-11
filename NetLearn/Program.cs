@@ -20,10 +20,7 @@ namespace Accord.DNN.NetLearn
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Accord.DNN.LanguageModel;
-    using Imaging;
     using Lab;
-    using Lab.Testing;
     using Learning;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

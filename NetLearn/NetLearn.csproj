@@ -95,10 +95,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Accord.DNN.Imaging\Accord.DNN.Imaging.csproj">
-      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
-      <Name>Accord.DNN.Imaging</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Accord.DNN.Lab\Accord.DNN.Lab.csproj">
       <Project>{eb0918b2-2405-4732-ae91-cba582a466bc}</Project>
       <Name>Accord.DNN.Lab</Name>
@@ -106,6 +102,10 @@
     <ProjectReference Include="..\Accord.DNN\Accord.DNN.csproj">
       <Project>{230d84d1-08e6-47c8-9ddd-8d730f1d93fb}</Project>
       <Name>Accord.DNN</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
+      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
+      <Name>Genix.Imaging</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

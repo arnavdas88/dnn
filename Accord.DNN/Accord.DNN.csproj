@@ -161,13 +161,13 @@
       <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
       <Name>Accord.DNN.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Accord.DNN.Imaging\Accord.DNN.Imaging.csproj">
-      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
-      <Name>Accord.DNN.Imaging</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
+      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
+      <Name>Genix.Imaging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

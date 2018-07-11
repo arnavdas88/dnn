@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D19A13BA-1C8F-4CEB-840C-D485D0936D56}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Genix.Imaging</RootNamespace>
+    <AssemblyName>Genix.Imaging</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Genix.Imaging.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BitMiracle.LibTiff.NET40, Version=2.4.584.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
+      <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.584.1\lib\net40\BitMiracle.LibTiff.NET40.dll</HintPath>
+    </Reference>
+    <Reference Include="leptonica.net, Version=1.75.0.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\leptonica.net.1.75.0.3\lib\net471\leptonica.net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Linq.Expressions">
+      <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions\Logical.cs" />
+    <Compile Include="Extensions\Morphology.cs" />
+    <Compile Include="Extensions\StructuringElement.cs" />
+    <Compile Include="ImageF.cs" />
+    <Compile Include="Extensions\ConnectedComponent.cs" />
+    <Compile Include="EXIF\EXIFExposureProgram.cs" />
+    <Compile Include="EXIF\EXIFField.cs" />
+    <Compile Include="EXIF\EXIFFieldAttribute.cs" />
+    <Compile Include="EXIF\EXIFLightSource.cs" />
+    <Compile Include="EXIF\EXIFMeteringMode.cs" />
+    <Compile Include="Extensions\Convert.cs" />
+    <Compile Include="Extensions\BitmapExtensions.cs" />
+    <Compile Include="Extensions\ConnectedComponents.cs" />
+    <Compile Include="Extensions\CopyCrop.cs" />
+    <Compile Include="Extensions\Edit.cs" />
+    <Compile Include="Extensions\Libtiff.cs" />
+    <Compile Include="Extensions\RotateShear.cs" />
+    <Compile Include="Extensions\ScalingOptions.cs" />
+    <Compile Include="Extensions\Statistic.cs" />
+    <Compile Include="Image.cs" />
+    <Compile Include="OpenSave\ImageFormat.cs" />
+    <Compile Include="Metadata\ImageMetadata.cs" />
+    <Compile Include="OpenSave\ImageOpen.cs" />
+    <Compile Include="OpenSave\ImageSave.cs" />
+    <Compile Include="Image{T}.cs" />
+    <Compile Include="Leptonica\LeptonicaUtils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
+    </Compile>
+    <Compile Include="Extensions\ScaleResize.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Metadata\PropertyItem.cs" />
+    <Compile Include="TIFF\TIFFCompression.cs" />
+    <Compile Include="TIFF\TIFFField.cs" />
+    <Compile Include="TIFF\TIFFFieldAttribute.cs" />
+    <Compile Include="TIFF\TIFFFillOrder.cs" />
+    <Compile Include="TIFF\TIFFNewSubfileTypes.cs" />
+    <Compile Include="TIFF\TIFFOrientation.cs" />
+    <Compile Include="TIFF\TIFFPhotometricInterpretation.cs" />
+    <Compile Include="TIFF\TIFFPlanarConfiguration.cs" />
+    <Compile Include="TIFF\TIFFResolutionUnit.cs" />
+    <Compile Include="TIFF\TIFFSubfileType.cs" />
+    <Compile Include="Transforms\CompositeTransform.cs" />
+    <Compile Include="Transforms\IdentityTransform.cs" />
+    <Compile Include="Transforms\MatrixTransform.cs" />
+    <Compile Include="Transforms\TransformBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Genix.Imaging.snk" />
+    <None Include="app.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Settings.StyleCop" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Accord.DNN.Core\Accord.DNN.Core.csproj">
+      <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
+      <Name>Accord.DNN.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.targets" />
+  <Import Project="..\packages\leptonica.net.1.75.0.3\build\leptonica.net.targets" Condition="Exists('..\packages\leptonica.net.1.75.0.3\build\leptonica.net.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\leptonica.net.1.75.0.3\build\leptonica.net.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\leptonica.net.1.75.0.3\build\leptonica.net.targets'))" />
+  </Target>
+</Project>
