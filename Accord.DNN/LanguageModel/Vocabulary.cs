@@ -16,6 +16,7 @@ namespace Accord.DNN.LanguageModel
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -65,7 +66,7 @@ namespace Accord.DNN.LanguageModel
             foreach (string word in words)
             {
                 int length = word.Length;
-                this.maxWordLength = MKL.Max(this.maxWordLength, length);
+                this.maxWordLength = MinMax.Max(this.maxWordLength, length);
                 Vocabulary.AddWord(workNodes, word, 0, length, 1);
             }
 
@@ -105,7 +106,7 @@ namespace Accord.DNN.LanguageModel
                 }
 
                 int length = word.Length;
-                this.maxWordLength = MKL.Max(this.maxWordLength, length);
+                this.maxWordLength = MinMax.Max(this.maxWordLength, length);
                 Vocabulary.AddWord(workNodes, word, 0, length, count);
             }
 

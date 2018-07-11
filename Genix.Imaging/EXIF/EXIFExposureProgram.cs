@@ -47,7 +47,7 @@ namespace Genix.Imaging
         ActionProgram = 6,
 
         /// <summary>
-        /// The portrait mode (for closeup photos with the background out of focus) exposure program.
+        /// The portrait mode (for close up photos with the background out of focus) exposure program.
         /// </summary>
         Portrait = 7,
 

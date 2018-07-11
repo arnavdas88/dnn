@@ -17,6 +17,7 @@ namespace Accord.DNN
     using System.Text;
     using Accord.DNN.LanguageModel;
     using Accord.DNN.Learning;
+    using Genix.Core;
     using Layers;
     using Newtonsoft.Json;
 
@@ -235,7 +236,7 @@ namespace Accord.DNN
             for (int i = 0, offy = 0; i < mb; i++, offy += numAnswers)
             {
                 // copy weights into temporary buffer and sort along with their indexes
-                MKL.Copy(numAnswers, yw, offy, ywmb, 0);
+                SetCopy.Copy(numAnswers, yw, offy, ywmb, 0);
                 for (int j = 0; j < numAnswers; j++)
                 {
                     ywidx[j] = j;
@@ -246,7 +247,7 @@ namespace Accord.DNN
                 // create answer for a mini-batch item
                 List<(string, float)> mbanswers = new List<(string, float)>(numAnswers);
 
-                float probThreshold = MKL.Max(ywmb[0] - MaxConfidenceDistance, 0.0f);
+                float probThreshold = MinMax.Max(ywmb[0] - MaxConfidenceDistance, 0.0f);
                 for (int j = 0; j < numAnswers; j++)
                 {
                     float prob = ywmb[j];

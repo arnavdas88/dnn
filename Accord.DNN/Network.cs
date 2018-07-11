@@ -15,6 +15,7 @@ namespace Accord.DNN
     using System.Runtime.CompilerServices;
     using System.Text;
     using Accord.DNN.Learning;
+    using Genix.Core;
     using Layers;
     using Newtonsoft.Json;
 
@@ -250,7 +251,7 @@ namespace Accord.DNN
             session.DetachTensor(y);
             session.EndSession();
 
-            return (y, MKL.Min(loss, 100.0f));  // limit loss on top
+            return (y, MinMax.Min(loss, 100.0f));  // limit loss on top
         }
 
         /*/// <summary>

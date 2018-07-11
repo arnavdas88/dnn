@@ -6,6 +6,7 @@
 
 namespace Accord.DNN.Learning
 {
+    using Genix.Core;
     using System;
     using System.Globalization;
 
@@ -41,7 +42,7 @@ namespace Accord.DNN.Learning
 
             if (calculateGradient)
             {
-                MKL.Copy(expected.Length, ew, 0, y.Gradient, 0);
+                SetCopy.Copy(expected.Length, ew, 0, y.Gradient, 0);
             }
 
             if (y.Rank == 1)

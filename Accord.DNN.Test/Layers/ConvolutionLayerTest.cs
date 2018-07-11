@@ -6,6 +6,7 @@
     using System.Linq;
     using Accord.DNN;
     using Accord.DNN.Layers;
+    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

@@ -6,6 +6,7 @@
 
 namespace Accord.DNN.Learning
 {
+    using Genix.Core;
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -72,7 +73,7 @@ namespace Accord.DNN.Learning
             if (calculateGradient)
             {
                 float[] dyw = y.Gradient;
-                MKL.Set(y.Length, this.LSR / mbsize, dyw, 0);
+                SetCopy.Set(y.Length, this.LSR / mbsize, dyw, 0);
 
                 for (int i = 0, yi = 0; i < mb; i++, yi += mbsize)
                 {

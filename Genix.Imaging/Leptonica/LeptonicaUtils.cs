@@ -16,6 +16,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Provides integration with Leptonica.NET library.
     /// </summary>
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     internal static class LeptonicaUtils
     {
         /// <summary>

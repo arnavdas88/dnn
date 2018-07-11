@@ -9,7 +9,7 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents an image with each pixel desribed by <see cref="Single"/> value.
+    /// Represents an image with each pixel described by <see cref="Single"/> value.
     /// </summary>
     public class ImageF : Image<float>
     {

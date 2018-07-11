@@ -50,7 +50,7 @@ namespace Accord.DNN.Layers
             this.UC.Randomize(random ?? new RandomRangeGenerator(-0.08f, 0.08f));
 
             // initialize biases for update and reset gates only
-            MKL.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
+            SetCopy.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
         }
 
         /// <summary>

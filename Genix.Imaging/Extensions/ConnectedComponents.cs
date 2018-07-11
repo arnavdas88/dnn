@@ -21,7 +21,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to binarize.</param>
         /// <returns>
-        /// A new binarized <see cref="Image"/>.
+        /// A new binary <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>

@@ -197,7 +197,7 @@ namespace Genix.Imaging
 
             Image dst = new Image(image);
 
-            MKL.Set(
+            SetCopy.Set(
                 dst.Bits.Length,
                 dst.BitsPerPixel == 1 ? 0ul : ulong.MaxValue,
                 dst.Bits,
@@ -349,7 +349,7 @@ namespace Genix.Imaging
             // clear top
             if (y > 0)
             {
-                MKL.Set(y * image.Stride, white, bits, 0);
+                SetCopy.Set(y * image.Stride, white, bits, 0);
             }
 
             // clear left
@@ -377,7 +377,7 @@ namespace Genix.Imaging
             // clear bottom
             if (y + height < image.Height)
             {
-                MKL.Set((image.Height - (y + height)) * image.Stride, white, bits, (y + height) * image.Stride);
+                SetCopy.Set((image.Height - (y + height)) * image.Stride, white, bits, (y + height) * image.Stride);
             }
         }
 
@@ -409,7 +409,7 @@ namespace Genix.Imaging
 
             if (dst.BitsPerPixel == 1)
             {
-                MKL.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                SetCopy.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
 
             return new Image(image);
@@ -517,7 +517,7 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            MKL.Set(
+            SetCopy.Set(
                 image.Bits.Length,
                 image.BitsPerPixel == 1 ? ulong.MaxValue : 0ul,
                 image.Bits,

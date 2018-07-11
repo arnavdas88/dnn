@@ -194,6 +194,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="matrix.cpp" />
+    <ClCompile Include="setcopy.cpp" />
     <ClCompile Include="source\bitutils32.cpp" />
     <ClCompile Include="source\bitutils64.cpp" />
     <ClCompile Include="stdafx.cpp">

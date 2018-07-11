@@ -71,14 +71,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="BitmapExtensionsTest.cs" />
+    <Compile Include="Extensions\BitmapExtensionsTest.cs" />
     <Compile Include="Extensions\MorphologyTest.cs" />
     <Compile Include="ImageTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EditExtensionsTest.cs" />
-    <Compile Include="CopyExtensionsTest.cs" />
-    <Compile Include="ScaleTest.cs" />
-    <Compile Include="ConnectedComponentsTest.cs" />
+    <Compile Include="Extensions\EditTest.cs" />
+    <Compile Include="Extensions\CopyCropTest.cs" />
+    <Compile Include="Extensions\ScaleTest.cs" />
+    <Compile Include="Extensions\ConnectedComponentsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Imaging.Test.snk" />

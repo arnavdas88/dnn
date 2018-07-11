@@ -45,7 +45,7 @@ namespace Genix.Imaging
         ISOSpeedRatings = 34855,
 
         /// <summary>
-        /// Indicates the Opto-Electric Conversion Function (OECF) specified in ISO 14524.
+        /// Indicates the Opto-electric Conversion Function (OECF) specified in ISO 14524.
         /// </summary>
         /// <remarks>
         /// OECF is the relationship between the camera optical input and the image values.

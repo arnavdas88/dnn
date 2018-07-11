@@ -8,6 +8,7 @@
 
 namespace Accord.DNN
 {
+    using Genix.Core;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -41,7 +42,7 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -78,7 +79,7 @@ namespace Accord.DNN
                     Tensor[] ys = session.AllocateTensors(ActionName, count, x.Axes, calculateGradient);
                     for (int i = 0; i < count; i++)
                     {
-                        MKL.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
+                        SetCopy.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
                     }
 
 #if !NOLEARNING
@@ -564,7 +565,7 @@ namespace Accord.DNN
                                     if (start < 0)
                                     {
                                         int count = -start * xstride2;
-                                        MKL.Set(count, 0.0f, yw, yposk2);
+                                        SetCopy.Set(count, 0.0f, yw, yposk2);
                                         xposk2 += count;
                                         yposk2 += count;
 
@@ -573,16 +574,16 @@ namespace Accord.DNN
 
                                     if (end > x2)
                                     {
-                                        MKL.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
+                                        SetCopy.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
 
                                         end = x2;
                                     }
 
-                                    MKL.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
+                                    SetCopy.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
                                 }
                                 else
                                 {
-                                    MKL.Set(ksize2 * xstride2, 0.0f, yw, yposk);
+                                    SetCopy.Set(ksize2 * xstride2, 0.0f, yw, yposk);
                                 }
                             }
 
@@ -718,12 +719,12 @@ namespace Accord.DNN
                     if (xstride == 1)
                     {
                         int length = x.Length / count;
-                        MKL.Pack(length, xw, 0, count, yw, 0);
+                        SetCopy.Pack(length, xw, 0, count, yw, 0);
 
                         float[] wsp = new float[length];
                         for (int i = 1; i < count; i++)
                         {
-                            MKL.Pack(length, xw, i, count, wsp, 0);
+                            SetCopy.Pack(length, xw, i, count, wsp, 0);
                             MKL.Max(length, yw, 0, wsp, 0, yw, 0);
                         }
                     }
@@ -731,7 +732,7 @@ namespace Accord.DNN
                     {
                         for (int offx = 0, offy = 0, ylen = y.Length; offy < ylen; offy += xstride)
                         {
-                            MKL.Copy(xstride, xw, offx, yw, offy);
+                            SetCopy.Copy(xstride, xw, offx, yw, offy);
                             offx += xstride;
 
                             for (int i = 1; i < count; i++, offx += xstride)
@@ -823,7 +824,7 @@ namespace Accord.DNN
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    MKL.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -868,7 +869,7 @@ namespace Accord.DNN
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    MKL.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -913,7 +914,7 @@ namespace Accord.DNN
                     Tensor y = session.AllocateTensor(ActionName, shape, calculateGradient);
 
                     // simply copy tensor content
-                    MKL.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -993,7 +994,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(xstride, x.Weights, 0, yw, offy);
+                        SetCopy.Copy(xstride, x.Weights, 0, yw, offy);
                     }
 
                     offy += xstride;
@@ -1014,7 +1015,7 @@ namespace Accord.DNN
                         }
                         else
                         {
-                            MKL.Copy(xstride, x.Weights, n * xstride, yw, offy);
+                            SetCopy.Copy(xstride, x.Weights, n * xstride, yw, offy);
                         }
 
                         offy += xstride;
@@ -1039,7 +1040,7 @@ namespace Accord.DNN
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            MKL.Copy(xstride, x.Weights, offx, yw, offyy);
+                            SetCopy.Copy(xstride, x.Weights, offx, yw, offyy);
                         }
                     }
 
@@ -1076,7 +1077,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(ystride, xw, offxx, yw, offy);
+                        SetCopy.Copy(ystride, xw, offxx, yw, offy);
                     }
                 }
 
@@ -1109,7 +1110,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(ystride, xs[i].Weights, offx, yw, offy);
+                        SetCopy.Copy(ystride, xs[i].Weights, offx, yw, offy);
                     }
                 }
             }
@@ -1143,7 +1144,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(xstride0, xw, offxx, yw, offy);
+                        SetCopy.Copy(xstride0, xw, offxx, yw, offy);
                     }
                 }
             }
@@ -1176,7 +1177,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(xstride, xw, offx, yw, offy);
+                        SetCopy.Copy(xstride, xw, offx, yw, offy);
                     }
                 }
             }
@@ -1209,7 +1210,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.Copy(ystride, xw, offx, yw, offy);
+                        SetCopy.Copy(ystride, xw, offx, yw, offy);
                     }
                 }
             }

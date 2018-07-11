@@ -559,7 +559,7 @@ namespace Accord.DNN
         public Tensor Copy()
         {
             Tensor y = new Tensor("copy", this.Axes);
-            MKL.Copy(this.Length, this.Weights, 0, y.Weights, 0);
+            SetCopy.Copy(this.Length, this.Weights, 0, y.Weights, 0);
             return y;
         }
 
@@ -567,7 +567,7 @@ namespace Accord.DNN
         /// Sets all the weights in the tensor to zero.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => MKL.Set(this.Length, 0, this.Weights, 0);
+        public void Clear() => SetCopy.Set(this.Length, 0, this.Weights, 0);
 
         /// <summary>
         /// Sets all the weights in the tensor's gradient to zero.
@@ -577,7 +577,7 @@ namespace Accord.DNN
         {
             if (this.gradient != null)
             {
-                MKL.Set(this.Length, 0, this.gradient, 0);
+                SetCopy.Set(this.Length, 0, this.gradient, 0);
             }
         }
 
@@ -586,7 +586,7 @@ namespace Accord.DNN
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(float value) => MKL.Set(this.Length, value, this.Weights, 0);
+        public void Set(float value) => SetCopy.Set(this.Length, value, this.Weights, 0);
 
         /// <summary>
         /// Sets all values in the tensor to the specified values.
@@ -605,7 +605,7 @@ namespace Accord.DNN
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            MKL.Copy(this.Length, weights, 0, this.Weights, 0);
+            SetCopy.Copy(this.Length, weights, 0, this.Weights, 0);
         }
 
         /// <summary>
@@ -613,7 +613,7 @@ namespace Accord.DNN
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value) => MKL.Set(this.Length, value, this.Gradient, 0);
+        public void SetGradient(float value) => SetCopy.Set(this.Length, value, this.Gradient, 0);
 
         /// <summary>
         /// Sets all values in the tensor gradient to the specified values.
@@ -632,7 +632,7 @@ namespace Accord.DNN
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            MKL.Copy(this.Length, weights, 0, this.Gradient, 0);
+            SetCopy.Copy(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>
@@ -917,7 +917,7 @@ namespace Accord.DNN
             int m = matrixLayout == MatrixLayout.RowMajor ? axis0 : axis1;
             int n = matrixLayout == MatrixLayout.RowMajor ? axis1 : axis0;
 
-            MKL.Transpose(matrixLayout, m, n, this.Weights, 0);
+            Matrix.Transpose(matrixLayout, m, n, this.Weights, 0);
 
             this.InitializeShape(new[] { axis1, axis0 });
         }

@@ -43,7 +43,7 @@ namespace Genix.Imaging
                 image.HorizontalResolution,
                 image.VerticalResolution);
 
-            MKL.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
+            SetCopy.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
 
             return dst;
         }
@@ -224,7 +224,7 @@ namespace Genix.Imaging
                 if (image.BitsPerPixel > 1)
                 {
                     // set all image to white
-                    MKL.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                    SetCopy.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
                 }
             }
 
@@ -247,7 +247,7 @@ namespace Genix.Imaging
 
             if (stride1src == stride1dst && x == 0 && dstx == 0 && width == src.Width)
             {
-                MKL.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
+                SetCopy.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
             }
             else
             {

@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Core
 {
     /// <summary>
     /// Defines the matrix layout (column major or row major).

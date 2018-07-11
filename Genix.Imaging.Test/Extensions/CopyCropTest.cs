@@ -4,7 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class CopyExtensionsTest
+    public class CopyCropTest
     {
         [TestMethod]
         public void CopyTest1()

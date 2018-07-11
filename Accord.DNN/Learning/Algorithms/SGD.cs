@@ -6,6 +6,7 @@
 
 namespace Accord.DNN.Learning
 {
+    using Genix.Core;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
@@ -75,14 +76,14 @@ namespace Accord.DNN.Learning
                     // apply Nesterov momentum
                     // dx = velocity = momentum^2 * velocity - (1 + momentum) * learningRate * g
                     MKL.MultiplyAndAdd(gradient.Length, momentum * momentum, velocity, 0, -(1.0f + momentum) * learningRate, gradient, 0);
-                    MKL.Copy(gradient.Length, gradient, 0, velocity, 0);
+                    SetCopy.Copy(gradient.Length, gradient, 0, velocity, 0);
                 }
                 else
                 {
                     // momentum update
                     // dx = velocity = momentum * velocity - learningRate * g
                     MKL.MultiplyAndAdd(gradient.Length, momentum, velocity, 0, -learningRate, gradient, 0);
-                    MKL.Copy(gradient.Length, gradient, 0, velocity, 0);
+                    SetCopy.Copy(gradient.Length, gradient, 0, velocity, 0);
                 }
             }
             else

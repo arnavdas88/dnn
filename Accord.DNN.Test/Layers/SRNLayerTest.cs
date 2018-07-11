@@ -11,6 +11,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using Learning;
+    using Genix.Core;
 
     [TestClass]
     public class SRNLayerTest

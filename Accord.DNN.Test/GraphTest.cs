@@ -2,6 +2,7 @@
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Layers;
+    using Genix.Core;
 
     [TestClass]
     public class GraphTest

@@ -12,6 +12,7 @@ namespace Accord.DNN
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Represents matrix operations on tensors.
@@ -907,7 +908,7 @@ namespace Accord.DNN
                             MKL.Swap(ref m, ref k);
                         }
 
-                        MKL.MxV(matrixLayout, m, k, a.Weights, 0, transa, b.Weights, 0, c.Weights, 0, cleary);
+                        Matrix.MxV(matrixLayout, m, k, a.Weights, 0, transa, b.Weights, 0, c.Weights, 0, cleary);
 
 #if !NOLEARNING
                         if (calculateGradient)
@@ -923,12 +924,12 @@ namespace Accord.DNN
                                             if (!transa)
                                             {
                                                 // dA += dC * B
-                                                MKL.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0);
+                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0);
                                             }
                                             else
                                             {
                                                 // dA += B * dC
-                                                MKL.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0);
+                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0);
                                             }
                                         }
                                     }
@@ -938,7 +939,7 @@ namespace Accord.DNN
                                         lock (b)
                                         {
                                             // dB += !transa ? A' * dC : A * dC
-                                            MKL.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, false);
+                                            Matrix.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, false);
                                         }
                                     }
 
@@ -957,7 +958,7 @@ namespace Accord.DNN
                     }
                     else
                     {
-                        MKL.MxM(matrixLayout, m, k, n, a.Weights, 0, transa, b.Weights, 0, transb, c.Weights, 0, cleary);
+                        Matrix.MxM(matrixLayout, m, k, n, a.Weights, 0, transa, b.Weights, 0, transb, c.Weights, 0, cleary);
 
 #if !NOLEARNING
                         if (calculateGradient)
@@ -973,12 +974,12 @@ namespace Accord.DNN
                                             if (!transa)
                                             {
                                                 // dA += !transb ? dC * B' : dC * B
-                                                MKL.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, false);
+                                                Matrix.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, false);
                                             }
                                             else
                                             {
                                                 // dA += !transb ? B * dC' : B' * dC'
-                                                MKL.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, false);
+                                                Matrix.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, false);
                                             }
                                         }
                                     }
@@ -990,12 +991,12 @@ namespace Accord.DNN
                                             if (!transb)
                                             {
                                                 // dB += !transa ? A' * dC : A * dC
-                                                MKL.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, false);
+                                                Matrix.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, false);
                                             }
                                             else
                                             {
                                                 // dB += !transa ? dC' * A : dC' * A'
-                                                MKL.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, false);
+                                                Matrix.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, false);
                                             }
                                         }
                                     }
@@ -1003,11 +1004,11 @@ namespace Accord.DNN
                                     if (bias?.CalculateGradient ?? false)
                                     {
                                         float[] ones = new float[n];
-                                        MKL.Set(n, 1.0f, ones, 0);
+                                        SetCopy.Set(n, 1.0f, ones, 0);
 
                                         lock (bias)
                                         {
-                                            MKL.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, false);
+                                            Matrix.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, false);
                                         }
 
                                         bias.Validate();
@@ -1079,11 +1080,11 @@ namespace Accord.DNN
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        MKL.Copy(ylen, bias.Weights, 0, y.Weights, 0);
+                        SetCopy.Copy(ylen, bias.Weights, 0, y.Weights, 0);
                         cleary = false;
                     }
 
-                    MKL.MxV(matrixLayout, m, n, a.Weights, 0, transa, x.Weights, 0, y.Weights, 0, cleary);
+                    Matrix.MxV(matrixLayout, m, n, a.Weights, 0, transa, x.Weights, 0, y.Weights, 0, cleary);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -1099,11 +1100,11 @@ namespace Accord.DNN
                                     {
                                         if (transa)
                                         {
-                                            MKL.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0);
+                                            Matrix.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0);
                                         }
                                         else
                                         {
-                                            MKL.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0);
+                                            Matrix.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0);
                                         }
                                     }
 
@@ -1115,7 +1116,7 @@ namespace Accord.DNN
                                 {
                                     lock (x)
                                     {
-                                        MKL.MxV(matrixLayout, m, n, a.Weights, 0, !transa, y.Gradient, 0, x.Gradient, 0, false);
+                                        Matrix.MxV(matrixLayout, m, n, a.Weights, 0, !transa, y.Gradient, 0, x.Gradient, 0, false);
                                     }
 
                                     x.Validate();
@@ -1171,7 +1172,7 @@ namespace Accord.DNN
                     int[] axes = matrixLayout == MatrixLayout.ColumnMajor ? new[] { n, m } : new[] { m, n };
                     Tensor a = session.AllocateTensor(ActionName, axes, calculateGradient);
 
-                    MKL.VxV(matrixLayout, m, n, x.Weights, 0, y.Weights, 0, a.Weights, 0);
+                    Matrix.VxV(matrixLayout, m, n, x.Weights, 0, y.Weights, 0, a.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -1185,7 +1186,7 @@ namespace Accord.DNN
                                 {
                                     lock (x)
                                     {
-                                        MKL.MxV(matrixLayout, m, n, a.Gradient, 0, false, y.Weights, 0, x.Gradient, 0, false);
+                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, false, y.Weights, 0, x.Gradient, 0, false);
                                     }
                                 }
 
@@ -1194,7 +1195,7 @@ namespace Accord.DNN
                                 {
                                     lock (y)
                                     {
-                                        MKL.MxV(matrixLayout, m, n, a.Gradient, 0, true, x.Weights, 0, y.Gradient, 0, false);
+                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, true, x.Weights, 0, y.Gradient, 0, false);
                                     }
                                 }
                             });

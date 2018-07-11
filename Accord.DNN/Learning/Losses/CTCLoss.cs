@@ -6,6 +6,7 @@
 
 namespace Accord.DNN.Learning
 {
+    using Genix.Core;
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -50,7 +51,7 @@ namespace Accord.DNN.Learning
             {
                 if (calculateGradient)
                 {
-                    MKL.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    SetCopy.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 // not enough elements to compute
@@ -73,7 +74,7 @@ namespace Accord.DNN.Learning
             {
                 if (calculateGradient)
                 {
-                    MKL.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    SetCopy.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 return float.PositiveInfinity;

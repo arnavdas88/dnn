@@ -167,18 +167,18 @@
                 MKL.ReLUGradient(2, dy, oi, true, expected.Weights, oi, dy, oi);
 
                 // should be x' * dy
-                MKL.VxV(MatrixLayout.ColumnMajor, 3, 2, x.Weights, ii, dy, oi, expectedWG, 0);
+                Matrix.VxV(MatrixLayout.ColumnMajor, 3, 2, x.Weights, ii, dy, oi, expectedWG, 0);
 
                 // should be W' * dy
-                MKL.MxV(MatrixLayout.ColumnMajor, 3, 2, layer.W.Weights, 0, false, dy, oi, expectedDx, ii, true);
+                Matrix.MxV(MatrixLayout.ColumnMajor, 3, 2, layer.W.Weights, 0, false, dy, oi, expectedDx, ii, true);
 
                 if (oi > 0)
                 {
                     // should be x(t-1)' * dy
-                    MKL.VxV(MatrixLayout.ColumnMajor, 2, 2, expected.Weights, oi - 2, dy, oi, expectedUG, 0);
+                    Matrix.VxV(MatrixLayout.ColumnMajor, 2, 2, expected.Weights, oi - 2, dy, oi, expectedUG, 0);
 
                     // should be U' * dy
-                    MKL.MxV(MatrixLayout.ColumnMajor, 2, 2, layer.U.Weights, 0, false, dy, oi, dy, oi - 2, false);
+                    Matrix.MxV(MatrixLayout.ColumnMajor, 2, 2, layer.U.Weights, 0, false, dy, oi, dy, oi - 2, false);
                     ////MKL.MxV(MatrixLayout.RowMajor, 2, 2, layer.U.Weights, 0, false, dy, oi, dy, oi - 2, false);
                 }
 

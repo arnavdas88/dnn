@@ -400,7 +400,7 @@ namespace Accord.DNN.Learning
         [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         private IList<(string[], float)> CreateFinalAnswer(Buffers flop)
         {
-            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(MKL.Max(this.ResultCount, flop.Count));
+            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(MinMax.Max(this.ResultCount, flop.Count));
             float amax = 0.0f;
             float esum = float.NegativeInfinity;
 
@@ -554,7 +554,7 @@ namespace Accord.DNN.Learning
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Set(int[] classes, int length, int hash, float probBlank, float probNoBlank, State state)
             {
-                MKL.Copy(length, classes, 0, this.Classes, 0);
+                SetCopy.Copy(length, classes, 0, this.Classes, 0);
                 this.Length = length;
                 this.Hash = hash;
 

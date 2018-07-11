@@ -117,7 +117,7 @@ namespace Accord.DNN.Layers
 
             for (int t = 1, yi = ylen; t < T; t++, yi += ylen)
             {
-                MKL.MxV(this.MatrixLayout, ylen, ylen, uw, 0, false, yw, yi - ylen, yw, yi, false);
+                Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, false, yw, yi - ylen, yw, yi, false);
 
                 // TODO: customize activation function
                 MKL.ReLU(ylen, yw, yi, yw, yi);
@@ -139,11 +139,11 @@ namespace Accord.DNN.Layers
                             // dA += dy * x'
                             lock (this.U)
                             {
-                                MKL.VxV(this.MatrixLayout, ylen, ylen, dyw, yi, yw, yi - ylen, duw, 0);
+                                Matrix.VxV(this.MatrixLayout, ylen, ylen, dyw, yi, yw, yi - ylen, duw, 0);
                             }
 
                             // dx += A' * dy
-                            MKL.MxV(this.MatrixLayout, ylen, ylen, uw, 0, true, dyw, yi, dyw, yi - ylen, false);
+                            Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, true, dyw, yi, dyw, yi - ylen, false);
                         }
 
                         MKL.ReLUGradient(ylen, dyw, 0, true, yw, 0, dyw, 0);

@@ -138,7 +138,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to deskew.</param>
         /// <returns>
-        /// The deskewed <see cref="Image"/>.
+        /// The aligned <see cref="Image"/>.
         /// </returns>
         public static Image Deskew(this Image image)
         {

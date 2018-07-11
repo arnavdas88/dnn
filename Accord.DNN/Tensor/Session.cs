@@ -9,6 +9,7 @@
 
 namespace Accord.DNN
 {
+    using Genix.Core;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -155,7 +156,7 @@ namespace Accord.DNN
                 if (calculateGradient && stack.Count > 0)
                 {
                     float[] dw = stack.Pop();
-                    MKL.Set(length, 0.0f, dw, 0);
+                    SetCopy.Set(length, 0.0f, dw, 0);
 
                     x = new Tensor(name, shape, w, dw);
                 }

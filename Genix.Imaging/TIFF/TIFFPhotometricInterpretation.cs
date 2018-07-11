@@ -12,6 +12,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the values for the PhotometricInterpretation field.
     /// </summary>
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     public enum TIFFPhotometricInterpretation
     {
         /// <summary>
