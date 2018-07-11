@@ -550,7 +550,7 @@ namespace Accord.DNN.Imaging
 
         private static class NativeMethods
         {
-            [DllImport("Accord.DNN.CPP.dll")]
+            [DllImport("Genix.Core.Native.dll")]
             [SuppressUnmanagedCodeSecurity]
             public static extern unsafe void bytesswap_64(int n, [In] ulong[] x, int offx, [Out] byte[] y, int offy);
         }

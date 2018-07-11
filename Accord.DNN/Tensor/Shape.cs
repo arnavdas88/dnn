@@ -269,7 +269,7 @@ namespace Accord.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int[] Expand(int[] shape, int axis, int dimension)
         {
-            return ArrayHelpers.InsertAt(shape, axis, dimension);
+            return shape.InsertAt(axis, dimension);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace Accord.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int[] Remove(int[] shape, int axis)
         {
-            return ArrayHelpers.RemoveAt(shape, axis);
+            return shape.RemoveAt(axis);
         }
 
         /// <summary>

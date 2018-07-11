@@ -14,9 +14,12 @@ namespace Accord.DNN.Imaging
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using System.Text.RegularExpressions;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using Genix.Core;
 
     /// <summary>
     /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="Bitmap"/> class.
@@ -66,31 +69,20 @@ namespace Accord.DNN.Imaging
                 (int)(bitmap.HorizontalResolution + 0.5f),
                 (int)(bitmap.VerticalResolution + 0.5f));
 
-            unsafe
-            {
-                fixed (ulong* bits = image.Bits)
-                {
-                    BitmapData dstData = new BitmapData()
-                    {
-                        Width = image.Width,
-                        Height = image.Height,
-                        PixelFormat = bitmap.PixelFormat,
-                        Stride = image.Stride8,
-                        Scan0 = (IntPtr)bits
-                    };
+            BitmapData srcData = bitmap.LockBits(
+                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                ImageLockMode.ReadOnly,
+                bitmap.PixelFormat);
 
-                    BitmapData srcData = bitmap.LockBits(
-                        new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                        ImageLockMode.ReadOnly | ImageLockMode.UserInputBuffer,
-                        bitmap.PixelFormat,
-                        dstData);
+            BitmapExtensions.CopyBits(
+                image.Height,
+                srcData.Scan0,
+                Math.Abs(srcData.Stride) / sizeof(uint),
+                image.Bits,
+                image.Stride,
+                srcData.Stride < 0);
 
-                    bitmap.UnlockBits(srcData);
-                }
-            }
-
-            // swap bytes to make storage big-endian
-            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
+            bitmap.UnlockBits(srcData);
 
             return Image.OnLoaded(image, null, bitmap.Palette?.Entries);
         }
@@ -113,40 +105,10 @@ namespace Accord.DNN.Imaging
                 throw new ArgumentNullException(nameof(bitmap));
             }
 
-            Image image = new Image(
-                rect.Width,
-                rect.Height,
-                BitmapExtensions.PixelFormatToBitsPerPixel(bitmap.PixelFormat),
-                (int)(bitmap.HorizontalResolution + 0.5f),
-                (int)(bitmap.VerticalResolution + 0.5f));
-
-            unsafe
+            using (Bitmap clonedBitmap = bitmap.Clone(rect, bitmap.PixelFormat))
             {
-                fixed (ulong* bits = image.Bits)
-                {
-                    BitmapData dstData = new BitmapData()
-                    {
-                        Width = image.Width,
-                        Height = image.Height,
-                        PixelFormat = bitmap.PixelFormat,
-                        Stride = image.Stride8,
-                        Scan0 = (IntPtr)bits
-                    };
-
-                    BitmapData srcData = bitmap.LockBits(
-                        rect,
-                        ImageLockMode.ReadOnly | ImageLockMode.UserInputBuffer,
-                        bitmap.PixelFormat,
-                        dstData);
-
-                    bitmap.UnlockBits(srcData);
-                }
+                return BitmapExtensions.FromBitmap(clonedBitmap);
             }
-
-            // swap bytes to make storage big-endian
-            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
-
-            return Image.OnLoaded(image, null, bitmap.Palette?.Entries);
         }
 
         /// <summary>
@@ -178,15 +140,13 @@ namespace Accord.DNN.Imaging
                     ImageLockMode.WriteOnly,
                     pixelFormat);
 
-                CopyCrop.CopyDIB(
-                    dstData.Scan0,
-                    image.Bits,
+                BitmapExtensions.CopyBits(
                     image.Height,
-                    Math.Abs(dstData.Stride),
-                    image.Stride8,
-                    dstData.Stride < 0,
-                    false,
-                    true /* swap bytes to make storage big-endian */);
+                    image.Bits,
+                    image.Stride,
+                    dstData.Scan0,
+                    Math.Abs(dstData.Stride) / sizeof(uint),
+                    dstData.Stride < 0);
 
                 bitmap.UnlockBits(dstData);
 
@@ -332,14 +292,20 @@ namespace Accord.DNN.Imaging
                 xres.GetValueOrDefault((int)(bitmapFrame.DpiX + 0.5f)),
                 yres.GetValueOrDefault((int)(bitmapFrame.DpiY + 0.5f)));
 
-            bitmapFrame.CopyPixels(
-                System.Windows.Int32Rect.Empty,
-                image.Bits,
-                image.Stride8,
-                0);
+            int strideInBytes = (((image.Width * image.BitsPerPixel) + 31) & ~31) >> 3;
+            uint[] bits = new uint[image.Height * strideInBytes / sizeof(uint)];
+            bitmapFrame.CopyPixels(bits, strideInBytes, 0);
 
-            // swap bytes to make storage big-endian
-            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
+            int strideSrc = strideInBytes / sizeof(uint);
+            int strideDst = image.Stride;
+            int offsrc = 0;
+            int offdst = 0;
+            for (int i = 0, ii = image.Height; i < ii; i++)
+            {
+                BitUtils64.Copy32To64(strideSrc, bits, offsrc, image.Bits, offdst, true);
+                offsrc += strideSrc;
+                offdst += strideDst;
+            }
 
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
@@ -640,6 +606,91 @@ namespace Accord.DNN.Imaging
 
             // filter and sort the list - remove unused binary properties
             return new ImageMetadata(items.Distinct(new PropertyItemComparer()).OrderBy(x => x.Id));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst, bool isUpsideDown)
+        {
+            unsafe
+            {
+                uint* udst = (uint*)dst;
+
+                if (isUpsideDown)
+                {
+                    int offsrc = (height - 1) * strideSrc;
+                    int offdst = (height - 1) * strideDst;
+                    for (int i = 0; i < height; i++)
+                    {
+                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst, true);
+                        offsrc -= strideSrc;
+                        offdst -= strideDst;
+                    }
+                }
+                else if (2 * strideDst == strideSrc)
+                {
+                    NativeMethods.bits_copy_be64to32(strideDst, src, 0, udst, 0, true);
+                }
+                else
+                {
+                    int offsrc = 0;
+                    int offdst = 0;
+                    for (int i = 0; i < height; i++)
+                    {
+                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst, true);
+                        offsrc += strideSrc;
+                        offdst += strideDst;
+                    }
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, bool isUpsideDown)
+        {
+            unsafe
+            {
+                uint* usrc = (uint*)src;
+
+                if (isUpsideDown)
+                {
+                    int offsrc = (height - 1) * strideSrc;
+                    int offdst = (height - 1) * strideDst;
+                    for (int i = 0; i < height; i++)
+                    {
+                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst, true);
+                        offsrc -= strideSrc;
+                        offdst -= strideDst;
+                    }
+                }
+                else if (strideDst == 2 * strideSrc)
+                {
+                    NativeMethods.bits_copy_be32to64(height * strideDst, usrc, 0, dst, 0, true);
+                }
+                else
+                {
+                    int offsrc = 0;
+                    int offdst = 0;
+                    for (int i = 0; i < height; i++)
+                    {
+                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst, true);
+                        offsrc += strideSrc;
+                        offdst += strideDst;
+                    }
+                }
+            }
+        }
+
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void bits_copy_be64to32(int count, [In] ulong[] src, int offsrc, [Out] uint* dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void bits_copy_be32to64(int count, [In] uint* src, int offsrc, [Out] ulong[] dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
         }
 
         /// <summary>

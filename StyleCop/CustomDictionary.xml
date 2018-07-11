@@ -354,6 +354,8 @@
       <Word>offdy</Word>
       <Word>incx</Word>
       <Word>incy</Word>
+      <Word>posx</Word>
+      <Word>posy</Word>
       <Word>maskx</Word>
       <Word>masky</Word>
       <Word>cleardx</Word>
@@ -388,6 +390,10 @@
       <Word>mm</Word>
       <Word>exp</Word>
       <Word>bpp</Word>
+      <Word>utils</Word>
+      <Word>deskew</Word>
+      <Word>despeckle</Word>
+      <Word>genix</Word>
     </Recognized>
     <Deprecated>
       <!-- 
@@ -606,6 +612,10 @@
       <Acronym>JBIG</Acronym>
       <Acronym>MSB</Acronym>
       <Acronym>LSB</Acronym>
+      <Acronym>NOT</Acronym>  <!-- logical operations -->
+      <Acronym>OR</Acronym>
+      <Acronym>AND</Acronym>
+      <Acronym>XOR</Acronym>
     </CasingExceptions>
   </Acronyms>
 </Dictionary>

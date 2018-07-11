@@ -7,6 +7,7 @@
 namespace Accord.DNN.Imaging
 {
     using System;
+    using System.Drawing;
     using Leptonica;
 
     /// <summary>
@@ -119,7 +120,7 @@ namespace Accord.DNN.Imaging
 
             if (image.Width > width || image.Height > height)
             {
-                System.Drawing.Rectangle blackArea = image.BlackArea();
+                Rectangle blackArea = image.BlackArea();
                 if (!blackArea.IsEmpty && blackArea != image.Bounds)
                 {
                     image = image.Crop(blackArea);
@@ -235,7 +236,7 @@ namespace Accord.DNN.Imaging
                 image.VerticalResolution);
 
             // calculate source area to copy from
-            System.Drawing.Rectangle area = System.Drawing.Rectangle.Intersect(bounds, image.Bounds);
+            Rectangle area = Rectangle.Intersect(bounds, image.Bounds);
 
             // calculate destination area to copy to
             int dstx = area.X - bounds.X;

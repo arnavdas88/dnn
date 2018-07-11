@@ -14,6 +14,7 @@ namespace Accord.DNN
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Threading;
+    using Genix.Core;
 
     /// <summary>
     /// Represents neural net operations on tensors.

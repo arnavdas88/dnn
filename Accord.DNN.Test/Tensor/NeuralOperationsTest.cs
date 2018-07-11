@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

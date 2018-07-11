@@ -13,6 +13,7 @@ namespace Accord.DNN.Learning
     using System.Linq;
     using System.Runtime.CompilerServices;
     using DNN;
+    using Genix.Core;
     using LanguageModel;
 
     /// <summary>
@@ -453,7 +454,7 @@ namespace Accord.DNN.Learning
         /// <summary>
         /// Represents a sequence of hypotheses at input step.
         /// </summary>
-        private class Buffer : LinkedListItem<Buffer>
+        private class Buffer : LinkedCollectionItem<Buffer>
         {
             /// <summary>
             /// The initial value of <see cref="Hash"/>.
@@ -579,7 +580,7 @@ namespace Accord.DNN.Learning
         /// <summary>
         /// Manages the collection of <see cref="Buffer"/> objects at each input step.
         /// </summary>
-        private class Buffers : DNN.LinkedList<Buffer>
+        private class Buffers : Genix.Core.LinkedCollection<Buffer>
         {
             /// <summary>
             /// The <see cref="BufferManager"/> used to allocation of new  <see cref="Buffer"/> objects.

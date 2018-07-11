@@ -8,7 +8,9 @@ namespace Accord.DNN.Imaging
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Drawing;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
@@ -163,7 +165,7 @@ namespace Accord.DNN.Imaging
         /// <value>
         /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image"/>.
         /// </value>
-        public System.Drawing.Rectangle Bounds => new System.Drawing.Rectangle(0, 0, this.Width, this.Height);
+        public Rectangle Bounds => new Rectangle(0, 0, this.Width, this.Height);
 
         /// <summary>
         /// Gets the image data.
@@ -189,7 +191,7 @@ namespace Accord.DNN.Imaging
                 bits[i] = (ulong)(uint)random.Next() |
                           (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) | 
                           (ulong)(uint)random.Next() << 32 |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
+                          (random.Next(0, 2) == 0 ? BitUtils64.LSB : 0ul);
             }
         }
 
@@ -229,6 +231,12 @@ namespace Accord.DNN.Imaging
             {
                 throw new ArgumentOutOfRangeException(nameof(height), height, Properties.Resources.E_InvalidCoordinates);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void ValidateArea(Rectangle area)
+        {
+            this.ValidateArea(area.X, area.Y, area.Width, area.Height);
         }
     }
 }

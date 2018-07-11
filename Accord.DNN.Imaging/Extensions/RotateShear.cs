@@ -9,6 +9,8 @@ namespace Accord.DNN.Imaging
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using DNN;
+    using Genix.Core;
     using Leptonica;
 
     /// <summary>
@@ -42,7 +44,7 @@ namespace Accord.DNN.Imaging
                 angle -= 360.0;
             }
 
-            while (angle < 0.0)
+            while (angle <= -360.0)
             {
                 angle += 360.0;
             }
@@ -130,6 +132,131 @@ namespace Accord.DNN.Imaging
             }
 
             return dst;
+        }
+
+        /// <summary>
+        /// De-skews this <see cref="Image"/> and aligns it horizontally.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to deskew.</param>
+        /// <returns>
+        /// The deskewed <see cref="Image"/>.
+        /// </returns>
+        public static Image Deskew(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            int width = image.Width;
+            int height = image.Height;
+            int stride = image.Stride;
+            ulong[] bits = image.Bits;
+
+            // build histogram
+            ulong endMask = ulong.MaxValue << (64 - (image.WidthBits & 63));
+            float[][] histogram = new float[stride][];
+            for (int ix = 0; ix < stride; ix++)
+            {
+                float[] h = histogram[ix] = new float[height];
+                ulong mask = ix == stride - 1 ? endMask : ulong.MaxValue;
+                for (int iy = 0, off = ix; iy < height; iy++, off += stride)
+                {
+                    h[iy] = BitUtils64.CountOneBits(bits[off] & mask);
+                }
+            }
+
+            // calculate image variance
+            float angleBest = 0.0f;
+            float varianceBest = estimateSkewAngle(angleBest);
+
+            // move up or down with 1 degree interval
+            // move counterclockwise
+            for (float angle = -1.0f; angle >= -10.0f; angle -= 1.0f) 
+            {
+                float variance = estimateSkewAngle(angle);
+                if (variance <= varianceBest)
+                {
+                    break;
+                }
+
+                varianceBest = variance;
+                angleBest = angle;
+            }
+
+            if (angleBest == 0.0f)
+            {
+                // move clockwise
+                for (float angle = 1.0f; angle <= 10.0f; angle += 1.0f)
+                {
+                    float variance = estimateSkewAngle(angle);
+                    if (variance <= varianceBest)
+                    {
+                        break;
+                    }
+
+                    varianceBest = variance;
+                    angleBest = angle;
+                }
+            }
+
+            // move up or down with 0.1 degree interval
+            // move counterclockwise
+            float originalAngle = angleBest;
+            for (float angle = angleBest - 0.1f, max = angleBest - 0.9f; angle >= max; angle -= 0.1f)
+            {
+                float variance = estimateSkewAngle(angle);
+                if (variance <= varianceBest)
+                {
+                    break;
+                }
+
+                varianceBest = variance;
+                angleBest = angle;
+            }
+
+            if (originalAngle == angleBest)
+            {
+                // move clockwise
+                for (float angle = angleBest + 0.1f, max = angleBest + 0.9f; angle <= max; angle += 0.1f)
+                {
+                    float variance = estimateSkewAngle(angle);
+                    if (variance <= varianceBest)
+                    {
+                        break;
+                    }
+
+                    varianceBest = variance;
+                    angleBest = angle;
+                }
+            }
+
+            return image.Rotate(angleBest);
+
+            float estimateSkewAngle(float angle)
+            {
+                const float PiConv = 3.1415926535f / 180.0f;
+
+                int centerX = width / 2;
+                float dblTanA = (float)Math.Tan(angle * PiConv);
+
+                float[] ds = new float[height];
+
+                for (int ix = 0; ix < stride; ix++)
+                {
+                    // negative shift is down
+                    int shiftY = (int)Math.Round(dblTanA * (centerX - (ix * 64) - 32), MidpointRounding.AwayFromZero);
+
+                    MKL.Add(
+                        height - Math.Abs(shiftY),
+                        histogram[ix],
+                        shiftY < 0 ? 0 : shiftY,
+                        ds,
+                        shiftY < 0 ? -shiftY : 0);
+                }
+
+                return ds.Variance();
+            }
         }
     }
 }

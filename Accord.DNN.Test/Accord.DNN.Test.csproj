@@ -125,6 +125,10 @@
       <Project>{230d84d1-08e6-47c8-9ddd-8d730f1d93fb}</Project>
       <Name>Accord.DNN</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Accord.DNN.Test.snk" />
@@ -134,7 +138,6 @@
     <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
-    <Content Include="Data\tinyshakespeare.txt" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

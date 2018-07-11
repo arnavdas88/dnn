@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -388,7 +389,7 @@
                         {
                             for (i[2] = 0; i[2] < y.Axes[2]; i[2]++)
                             {
-                                Assert.AreEqual(xs[i[axis]][ArrayHelpers.RemoveAt(i, axis)], y[i]);
+                                Assert.AreEqual(xs[i[axis]][i.RemoveAt(axis)], y[i]);
                             }
                         }
                     }
@@ -407,7 +408,7 @@
 
                                 Assert.AreEqual(
                                     y1.Gradient[y1.Position(i)] + y2.Gradient[y2.Position(i)],
-                                    x.Gradient[x.Position(ArrayHelpers.RemoveAt(i, axis))]);
+                                    x.Gradient[x.Position(i.RemoveAt(axis))]);
                             }
                         }
                     }
@@ -472,7 +473,7 @@
                         {
                             for (i[2] = 0; i[2] < axes[2]; i[2]++)
                             {
-                                Assert.AreEqual(x[i], ys[i[axis]][ArrayHelpers.RemoveAt(i, axis)]);
+                                Assert.AreEqual(x[i], ys[i[axis]][i.RemoveAt(axis)]);
                             }
                         }
                     }
@@ -490,7 +491,7 @@
                                 Tensor y1 = ys1[i[axis]];
                                 Tensor y2 = ys2[i[axis]];
 
-                                int[] yaxes = ArrayHelpers.RemoveAt(i, axis);
+                                int[] yaxes = i.RemoveAt(axis);
                                 Assert.AreEqual(y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)], x.Gradient[x.Position(i)]);
                             }
                         }

@@ -6,9 +6,11 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using Accord.DNN;
     using Accord.DNN.Layers;
+    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
     using Learning;
@@ -288,7 +290,10 @@
         {
             const int letterSize = 5;
 
-            string alltext = File.ReadAllText(@"E:\Accord\ConvNet\Accord.DNN.Test\Data\tinyshakespeare.txt").ToUpperInvariant();
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string path = Path.Combine(Path.GetDirectoryName(assembly.Location), @"..\TestData\tinyshakespeare.txt");
+
+            string alltext = File.ReadAllText(path).ToUpperInvariant();
 
             // calculate alphabet size
             HashSet<char> chars = new HashSet<char>();

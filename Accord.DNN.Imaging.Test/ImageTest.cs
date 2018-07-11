@@ -17,7 +17,7 @@
                 image.SetPixel(64 + 37, 19, 1);
                 image.SetPixel((2 * 64) + 11, 29, 1);
 
-                Assert.AreEqual(3ul, image.Power());
+                Assert.AreEqual(3, image.Power());
             }
         }
 
@@ -44,7 +44,7 @@
             Assert.AreEqual(new System.Drawing.Rectangle(0, 0, 18, 33), image.Bounds);
             Assert.AreEqual(1u, image.GetPixel(0, 0));
             Assert.AreEqual(1u, image.GetPixel(17, 32));
-            Assert.AreEqual(2ul, image.Power());
+            Assert.AreEqual(2, image.Power());
         }
     }
 }

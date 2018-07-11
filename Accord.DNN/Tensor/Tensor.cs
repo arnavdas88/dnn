@@ -16,6 +16,7 @@ namespace Accord.DNN
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -263,6 +264,7 @@ namespace Accord.DNN
         /// <param name="name">The tensor name.</param>
         /// <param name="image">The <see cref="Imaging.Image"/> to copy weights from.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 local functions.")]
         public static Tensor FromBitmap(string name, Imaging.Image image)
         {
             if (image == null)
@@ -274,31 +276,27 @@ namespace Accord.DNN
             int width = image.Width;
             int height = image.Height;
 
-            Tensor tensor;
             switch (bitsPerPixel)
             {
                 case 1:
-                    convert1bpp();
-                    break;
+                    return convert1bpp();
 
                 case 2:
                 case 4:
                 case 8:
                 case 16:
-                    convert2to16bpp();
-                    break;
+                    return convert2to16bpp();
 
                 case 32:
-                    convert32bpp();
-                    break;
+                    return convert32bpp();
 
                 default:
                     throw new NotSupportedException();
             }
 
-            void convert1bpp()
+            Tensor convert1bpp()
             {
-                tensor = new Tensor(name, new[] { 1, width, height, 1 });
+                Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
 
                 int xstride = tensor.Strides[(int)Axis.X];
                 int ystride = tensor.Strides[(int)Axis.Y];
@@ -314,7 +312,7 @@ namespace Accord.DNN
                         ulong b = bits[offbx];
                         if (b != 0)
                         {
-                            for (ulong mask = 0x8000_0000_0000_0000ul; mask != 0 && x < width; x++, mask >>= 1, offx += xstride)
+                            for (ulong mask = BitUtils64.LSB; mask != 0 && x < width; x++, mask >>= 1, offx += xstride)
                             {
                                 if ((b & mask) != 0)
                                 {
@@ -329,11 +327,13 @@ namespace Accord.DNN
                         }
                     }
                 }
+
+                return tensor;
             }
 
-            void convert2to16bpp()
+            Tensor convert2to16bpp()
             {
-                tensor = new Tensor(name, new[] { 1, width, height, 1 });
+                Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
 
                 int xstride = tensor.Strides[(int)Axis.X];
                 int ystride = tensor.Strides[(int)Axis.Y];
@@ -365,11 +365,13 @@ namespace Accord.DNN
                         }
                     }
                 }
+
+                return tensor;
             }
 
-            void convert32bpp()
+            Tensor convert32bpp()
             {
-                tensor = new Tensor(name, new[] { 1, width, height, 3 });
+                Tensor tensor = new Tensor(name, new[] { 1, width, height, 3 });
 
                 int xstride = tensor.Strides[(int)Axis.X];
                 int ystride = tensor.Strides[(int)Axis.Y];
@@ -406,9 +408,9 @@ namespace Accord.DNN
                         }
                     }
                 }
-            }
 
-            return tensor;
+                return tensor;
+            }
         }
 
         /// <summary>

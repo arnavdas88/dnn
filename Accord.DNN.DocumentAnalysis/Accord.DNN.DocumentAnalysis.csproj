@@ -53,7 +53,7 @@
     <Compile Include="Shapes\Container.cs" />
     <Compile Include="Shapes\Line.cs" />
     <Compile Include="Shapes\Shape.cs" />
-    <Compile Include="Shapes\Text.cs" />
+    <Compile Include="Shapes\TextShape.cs" />
     <Compile Include="Shapes\TextBlock.cs" />
     <Compile Include="Shapes\TextLine.cs" />
   </ItemGroup>
@@ -74,6 +74,10 @@
     <ProjectReference Include="..\Accord.DNN.Imaging\Accord.DNN.Imaging.csproj">
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
       <Name>Accord.DNN.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

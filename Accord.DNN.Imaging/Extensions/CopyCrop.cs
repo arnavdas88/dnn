@@ -10,6 +10,7 @@ namespace Accord.DNN.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Core;
 
     /// <summary>
     /// Provides copy extension methods for the <see cref="Image"/> class.
@@ -254,80 +255,6 @@ namespace Accord.DNN.Imaging
                     BitUtils64.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
                 }
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CopyDIB(IntPtr bitsDst, ulong[] bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
-        {
-            unsafe
-            {
-                fixed (ulong* usrc = bitsSrc)
-                {
-                    CopyCrop.CopyDIB((byte*)bitsDst, (byte*)usrc, height, strideDst, strideSrc, isUpsideDown, swapWords, swapBytes);
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void CopyDIB(ulong[] bitsDst, IntPtr bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
-        {
-            unsafe
-            {
-                fixed (ulong* udst = bitsDst)
-                {
-                    CopyCrop.CopyDIB((byte*)udst, (byte*)bitsSrc, height, strideDst, strideSrc, isUpsideDown, swapWords, swapBytes);
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void CopyDIB(byte* bitsDst, byte* bitsSrc, int height, int strideDst, int strideSrc, bool isUpsideDown, bool swapWords, bool swapBytes)
-        {
-            if (isUpsideDown)
-            {
-                int count = Math.Min(strideDst, strideSrc);
-                bitsSrc += (height - 1) * strideSrc;
-                for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc -= strideSrc)
-                {
-                    NativeMethods.memcpy(bitsDst, bitsSrc, count);
-                }
-            }
-            else
-            {
-                if (strideDst == strideSrc)
-                {
-                    NativeMethods.memcpy(bitsDst, bitsSrc, height * strideDst);
-                }
-                else
-                {
-                    int count = Math.Min(strideDst, strideSrc);
-                    for (int i = 0; i < height; i++, bitsDst += strideDst, bitsSrc += strideSrc)
-                    {
-                        NativeMethods.memcpy(bitsDst, bitsSrc, count);
-                    }
-                }
-            }
-
-            if (swapWords)
-            {
-
-            }
-
-            if (swapBytes)
-            {
-                NativeMethods.bytesswap_ip_64(height * strideDst / sizeof(ulong), (ulong*)bitsDst, 0);
-            }
-        }
-
-        private static class NativeMethods
-        {
-            [DllImport("Accord.DNN.CPP.dll")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bytesswap_ip_64(int n, ulong* xy, int offxy);
-
-            [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void memcpy(void* dest, void* src, int count);
         }
     }
 }

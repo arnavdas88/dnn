@@ -11,6 +11,7 @@ namespace Accord.DNN.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Core;
 
     /// <summary>
     /// Provides editing extension methods for the <see cref="Image"/> class.
@@ -119,14 +120,13 @@ namespace Accord.DNN.Imaging
             {
                 case 1:
                     pos += x >> 6;
-                    shift = 1 * (x & 63);
                     if (color > 0)
                     {
-                        image.Bits[pos] |= 0x8000_0000_0000_0000ul >> shift;
+                        image.Bits[pos] = BitUtils64.SetBit(image.Bits[pos], x & 63);
                     }
                     else
                     {
-                        image.Bits[pos] &= ~(0x8000_0000_0000_0000ul >> shift);
+                        image.Bits[pos] = BitUtils64.ResetBit(image.Bits[pos], x & 63);
                     }
 
                     break;
@@ -135,28 +135,28 @@ namespace Accord.DNN.Imaging
                     pos += x >> 5;
                     shift = 2 * (x & 31);
                     image.Bits[pos] &= ~(0xc000_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (color & 3) << ((2 * 31) - shift);
+                    image.Bits[pos] |= (ulong)(color & 3) << ((2 * 31) - shift);
                     break;
 
                 case 4:
                     pos += x >> 4;
                     shift = 4 * (x & 15);
                     image.Bits[pos] &= ~(0xf000_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (color & 0xf) << ((4 * 15) - shift);
+                    image.Bits[pos] |= (ulong)(color & 0xf) << ((4 * 15) - shift);
                     break;
 
                 case 8:
                     pos += x >> 3;
                     shift = 8 * (x & 7);
                     image.Bits[pos] &= ~(0xff00_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (color & 0xff) << ((8 * 7) - shift);
+                    image.Bits[pos] |= (ulong)(color & 0xff) << ((8 * 7) - shift);
                     break;
 
                 case 16:
                     pos += x >> 2;
                     shift = 16 * (x & 3);
                     image.Bits[pos] &= ~(0xffff_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (color & 0xffff) << ((16 * 3) - shift);
+                    image.Bits[pos] |= (ulong)(color & 0xffff) << ((16 * 3) - shift);
                     break;
 
                 case 32:
@@ -444,25 +444,32 @@ namespace Accord.DNN.Imaging
 
             image.ValidateArea(x, y, width, height);
 
-            Image dst = image.Copy();
-
-            ulong[] bits = dst.Bits;
-            int bitCount = width * dst.BitsPerPixel;
-            int stride1 = dst.Stride1;
-
-            for (int i = 0, off = (y * stride1) + (x * dst.BitsPerPixel); i < height; i++, off += stride1)
+            if (x == 0 && y == 0 && width == image.Width && height == image.Height)
             {
-                if (dst.BitsPerPixel == 1)
-                {
-                    BitUtils64.SetBits(bitCount, bits, off);
-                }
-                else
-                {
-                    BitUtils64.ResetBits(bitCount, bits, off);
-                }
+                return image.SetBlack();
             }
+            else
+            {
+                Image dst = image.Copy();
 
-            return dst;
+                ulong[] bits = dst.Bits;
+                int count = width * dst.BitsPerPixel;
+                int stride1 = dst.Stride1;
+
+                for (int i = 0, off = (y * stride1) + (x * dst.BitsPerPixel); i < height; i++, off += stride1)
+                {
+                    if (dst.BitsPerPixel == 1)
+                    {
+                        BitUtils64.SetBits(count, bits, off);
+                    }
+                    else
+                    {
+                        BitUtils64.ResetBits(count, bits, off);
+                    }
+                }
+
+                return dst;
+            }
         }
 
         /// <summary>
@@ -489,6 +496,105 @@ namespace Accord.DNN.Imaging
         }
 
         /// <summary>
+        /// Sets all <see cref="Image"/> pixels to black color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBlackIP(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            MKL.Set(
+                image.Bits.Length,
+                image.BitsPerPixel == 1 ? ulong.MaxValue : 0ul,
+                image.Bits,
+                0);
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified area to black color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBlackIP(this Image image, int x, int y, int width, int height)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            image.ValidateArea(x, y, width, height);
+
+            if (x == 0 && y == 0 && width == image.Width && height == image.Height)
+            {
+                image.SetBlackIP();
+            }
+            else
+            {
+                ulong[] bits = image.Bits;
+                int count = width * image.BitsPerPixel;
+                int stride1 = image.Stride1;
+
+                for (int i = 0, off = (y * stride1) + (x * image.BitsPerPixel); i < height; i++, off += stride1)
+                {
+                    if (image.BitsPerPixel == 1)
+                    {
+                        BitUtils64.SetBits(count, bits, off);
+                    }
+                    else
+                    {
+                        BitUtils64.ResetBits(count, bits, off);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified area to black color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBlackIP(this Image image, System.Drawing.Rectangle rect)
+        {
+            image.SetBlackIP(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        /// <summary>
         /// Inverts all pixels in the <see cref="Image"/>.
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to invert.</param>
@@ -507,14 +613,7 @@ namespace Accord.DNN.Imaging
             }
 
             Image dst = new Image(image);
-
-            ulong[] srcbits = image.Bits;
-            ulong[] dstbits = dst.Bits;
-            for (int i = 0, ii = srcbits.Length; i < ii; i++)
-            {
-                dstbits[i] = ~srcbits[i];
-            }
-
+            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -533,11 +632,7 @@ namespace Accord.DNN.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            ulong[] bits = image.Bits;
-            for (int i = 0, ii = bits.Length; i < ii; i++)
-            {
-                bits[i] = ~bits[i];
-            }
+            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0);
         }
     }
 }

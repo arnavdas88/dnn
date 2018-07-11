@@ -7,9 +7,8 @@
 namespace Accord.DNN.Imaging
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using Leptonica;
+    using Genix.Core;
 
     /// <summary>
     /// Provides logical extension methods for the <see cref="Image"/> class.
@@ -50,16 +49,7 @@ namespace Accord.DNN.Imaging
             }
 
             Image dst = new Image(a);
-
-            ulong[] bitsdst = dst.Bits;
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsdst.Length; i < ii; i++)
-            {
-                bitsdst[i] = bitsa[i] & bitsb[i];
-            }
-
+            BitUtils64.WordsAND(a.Bits.Length, a.Bits, 0, b.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -93,13 +83,7 @@ namespace Accord.DNN.Imaging
                 throw new NotSupportedException();
             }
 
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsa.Length; i < ii; i++)
-            {
-                bitsa[i] &= bitsb[i];
-            }
+            BitUtils64.WordsAND(a.Bits.Length, b.Bits, 0, a.Bits, 0);
         }
 
         /// <summary>
@@ -136,16 +120,7 @@ namespace Accord.DNN.Imaging
             }
 
             Image dst = new Image(a);
-
-            ulong[] bitsdst = dst.Bits;
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsdst.Length; i < ii; i++)
-            {
-                bitsdst[i] = bitsa[i] | bitsb[i];
-            }
-
+            BitUtils64.WordsOR(a.Bits.Length, a.Bits, 0, b.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -179,13 +154,7 @@ namespace Accord.DNN.Imaging
                 throw new NotSupportedException();
             }
 
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsa.Length; i < ii; i++)
-            {
-                bitsa[i] |= bitsb[i];
-            }
+            BitUtils64.WordsOR(a.Bits.Length, b.Bits, 0, a.Bits, 0);
         }
 
         /// <summary>

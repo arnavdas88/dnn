@@ -17,6 +17,7 @@ namespace Accord.DNN.Layers
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>

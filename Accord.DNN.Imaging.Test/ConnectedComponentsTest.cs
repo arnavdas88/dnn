@@ -20,7 +20,7 @@
             image.RemoveConnectedComponent(components[0]);
 
             Assert.AreEqual(0u, image.GetPixel(0, 0));
-            Assert.AreEqual(0ul, image.Power());
+            Assert.AreEqual(0, image.Power());
         }
     }
 }

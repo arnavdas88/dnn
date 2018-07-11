@@ -48,23 +48,16 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitUtils32.cs" />
-    <Compile Include="BitUtils64.cs" />
-    <Compile Include="Common\ArrayHelpers.cs" />
-    <Compile Include="Common\CommonParallel.cs" />
-    <Compile Include="Common\LinkedList.cs" />
-    <Compile Include="Common\LinkedListItem.cs" />
-    <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
-    <Compile Include="Extensions\RectangleExtensions.cs" />
     <Compile Include="MatrixLayout.cs" />
     <Compile Include="MKL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
-    <Compile Include="Random\GaussianGenerator.cs" />
-    <Compile Include="Random\RandomGenerator.cs" />
-    <Compile Include="Random\RandomNumberGenerator.cs" />
-    <Compile Include="Random\RandomRangeGenerator.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Accord.DNN.Core.snk" />
@@ -75,7 +68,12 @@
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.targets" />
 </Project>

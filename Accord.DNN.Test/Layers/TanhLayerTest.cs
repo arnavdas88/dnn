@@ -84,11 +84,12 @@
             Helpers.AreArraysEqual(expected, y.Weights);
 
             // unroll the graph
-            y.SetGradient(Enumerable.Range(1, x.Length).Select(w => (float)w).ToArray());
+            float[] dy = Enumerable.Range(1, x.Length).Select(w => (float)w).ToArray();
+            y.SetGradient(dy);
             session.Unroll();
 
             Helpers.AreArraysEqual(
-                expected.Zip(y.Gradient, (w, dy) => TanhLayerTest.derivative(w) * dy).ToArray(),
+                expected.Zip(dy, (w, dw) => TanhLayerTest.derivative(w) * dw).ToArray(),
                 x.Gradient);
         }
     }

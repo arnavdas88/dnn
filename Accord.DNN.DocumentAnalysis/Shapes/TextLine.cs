@@ -14,13 +14,13 @@ namespace Accord.DNN.DocumentAnalysis
     /// Represents a horizontal text line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TextLine : Container<Text>
+    public class TextLine : Container<TextShape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLine"/> class.
         /// </summary>
-        /// <param name="texts">The collection of <see cref="Text"/> contained in this container.</param>
-        protected TextLine(IList<Text> texts) : base(texts)
+        /// <param name="texts">The collection of <see cref="TextShape"/> contained in this container.</param>
+        protected TextLine(IList<TextShape> texts) : base(texts)
         {
         }
 

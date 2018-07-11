@@ -68,9 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\Logical.cs" />
-    <Compile Include="Extensions\Morthology.cs" />
+    <Compile Include="Extensions\Morphology.cs" />
+    <Compile Include="Extensions\StructuringElement.cs" />
     <Compile Include="ImageF.cs" />
-    <Compile Include="ConnectedComponent.cs" />
+    <Compile Include="Extensions\ConnectedComponent.cs" />
     <Compile Include="EXIF\EXIFExposureProgram.cs" />
     <Compile Include="EXIF\EXIFField.cs" />
     <Compile Include="EXIF\EXIFFieldAttribute.cs" />
@@ -86,13 +87,12 @@
     <Compile Include="Extensions\ScalingOptions.cs" />
     <Compile Include="Extensions\Statistic.cs" />
     <Compile Include="Image.cs" />
-    <Compile Include="Extensions\Image1.cs" />
-    <Compile Include="ImageFormat.cs" />
-    <Compile Include="ImageMetadata.cs" />
-    <Compile Include="ImageOpen.cs" />
-    <Compile Include="ImageSave.cs" />
+    <Compile Include="OpenSave\ImageFormat.cs" />
+    <Compile Include="Metadata\ImageMetadata.cs" />
+    <Compile Include="OpenSave\ImageOpen.cs" />
+    <Compile Include="OpenSave\ImageSave.cs" />
     <Compile Include="Image{T}.cs" />
-    <Compile Include="LeptonicaUtils.cs" />
+    <Compile Include="Leptonica\LeptonicaUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
@@ -102,7 +102,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PropertyItem.cs" />
+    <Compile Include="Metadata\PropertyItem.cs" />
     <Compile Include="TIFF\TIFFCompression.cs" />
     <Compile Include="TIFF\TIFFField.cs" />
     <Compile Include="TIFF\TIFFFieldAttribute.cs" />
@@ -113,7 +113,9 @@
     <Compile Include="TIFF\TIFFPlanarConfiguration.cs" />
     <Compile Include="TIFF\TIFFResolutionUnit.cs" />
     <Compile Include="TIFF\TIFFSubfileType.cs" />
-    <Compile Include="Transforms\ShiftTransform.cs" />
+    <Compile Include="Transforms\CompositeTransform.cs" />
+    <Compile Include="Transforms\IdentityTransform.cs" />
+    <Compile Include="Transforms\MatrixTransform.cs" />
     <Compile Include="Transforms\TransformBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +142,10 @@
     <ProjectReference Include="..\Accord.DNN.Core\Accord.DNN.Core.csproj">
       <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
       <Name>Accord.DNN.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

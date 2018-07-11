@@ -9,6 +9,7 @@ namespace Accord.DNN.Layers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>

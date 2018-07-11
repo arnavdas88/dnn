@@ -11,6 +11,7 @@ namespace Accord.DNN.Layers
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>

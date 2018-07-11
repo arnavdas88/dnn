@@ -5,6 +5,7 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using Accord.DNN.LanguageModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
@@ -15,8 +16,11 @@
         [TestMethod]
         public void TestMethod1()
         {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string path = Path.Combine(Path.GetDirectoryName(assembly.Location), @"..\TestData\tinyshakespeare.txt");
+
             Vocabulary context = new Vocabulary(
-                File.ReadAllLines(@"E:\Accord\ConvNet\Accord.DNN.Test\Data\tinyshakespeare.txt")
+                File.ReadAllLines(path)
                     .Select(x => x.ToUpperInvariant())
                     .SelectMany(x => x.Split(new char[] { ' ', '.', ',', '!', '?', '-', ':', ';', '&', '\\' }, StringSplitOptions.RemoveEmptyEntries))
                     .Select(x => x.Trim('\'')),

@@ -7,6 +7,7 @@
     using Accord.DNN;
     using Accord.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     [TestClass]

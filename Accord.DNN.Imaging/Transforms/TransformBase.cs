@@ -6,7 +6,7 @@
 
 namespace Accord.DNN.Imaging
 {
-    using System.Drawing;
+    using System.Windows;
 
     /// <summary>
     /// Represents a transformation of an image. This is an abstract class.
@@ -21,10 +21,17 @@ namespace Accord.DNN.Imaging
         public abstract Point Convert(Point value);
 
         /// <summary>
-        /// Converts coordinates represented by <see cref="Rectangle"/> to coordinates on the original image.
+        /// Converts coordinates represented by <see cref="Rect"/> to coordinates on the original image.
         /// </summary>
         /// <param name="value">The coordinates to convert.</param>
         /// <returns>The converted coordinates.</returns>
-        public abstract Rectangle Convert(Rectangle value);
+        public abstract Rect Convert(Rect value);
+
+        /// <summary>
+        /// Appends the specified <see cref="TransformBase"/> to this <see cref="TransformBase"/>.
+        /// </summary>
+        /// <param name="transform">The <see cref="TransformBase"/> to append.</param>
+        /// <returns>The <see cref="TransformBase"/> that contains combined transformation.</returns>
+        public abstract TransformBase Append(TransformBase transform);
     }
 }

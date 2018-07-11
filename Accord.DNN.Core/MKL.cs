@@ -389,7 +389,6 @@ namespace Accord.DNN
             NativeMethods.mkl_copyu32(length, x, offx, y, offy);
         }
 
-
         /// <summary>
         /// Copies a range of signed 64-bit values from a array starting at the specified source index
         /// to another array starting at the specified destination index.

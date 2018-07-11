@@ -14,6 +14,7 @@ namespace Accord.DNN.Imaging
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
     /// </summary>
+    /// <typeparam name="T">The type of elements that store image bits.</typeparam>
     public class Image<T> where T : struct
     {
         /// <summary>

@@ -34,7 +34,7 @@ namespace Accord.DNN.DocumentAnalysis
             }
 
             this.shapes.AddRange(shapes);
-            this.Bounds = RectangleExtensions.Union(shapes.Select(x => x.Bounds));
+            this.Bounds = shapes.Select(x => x.Bounds).Union();
         }
 
         /// <summary>

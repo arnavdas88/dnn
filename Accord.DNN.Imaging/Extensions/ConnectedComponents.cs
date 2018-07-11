@@ -9,6 +9,7 @@ namespace Accord.DNN.Imaging
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Provides connected components extension methods for the <see cref="Image"/> class.
