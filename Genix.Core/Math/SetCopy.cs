@@ -27,6 +27,7 @@ namespace Genix.Core
         /// <param name="offx">The index in the <c>x</c> at which copying begins.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Copy(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -45,6 +46,8 @@ namespace Genix.Core
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
         /// <param name="incy">The increment for the elements of <c>y</c>.</param>
+        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "length-1", Justification = "Done in debug mode only.")]
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Copy(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
         {

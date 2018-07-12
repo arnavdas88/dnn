@@ -51,7 +51,7 @@ namespace Genix.Imaging
 
             int[] findLeft(int maxlen)
             {
-                int scanlen = MinMax.Min(width, maxlen);
+                int scanlen = Maximum.Min(width, maxlen);
                 int[] lengths = new int[height];
                 for (int iy = 0, pos = 0; iy < height; iy++, pos += stride1)
                 {
@@ -64,7 +64,7 @@ namespace Genix.Imaging
 
             int[] findRight(int maxlen)
             {
-                int scanlen = MinMax.Min(width, maxlen);
+                int scanlen = Maximum.Min(width, maxlen);
                 int[] lengths = new int[height];
                 for (int iy = 0, pos = width - 1; iy < height; iy++, pos += stride1)
                 {
@@ -77,7 +77,7 @@ namespace Genix.Imaging
 
             int[] findTop(int maxlen)
             {
-                int scanlen = MinMax.Min(height, maxlen);
+                int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
                 SetCopy.Set(lengths.Length, scanlen, lengths, 0);
 
@@ -99,7 +99,7 @@ namespace Genix.Imaging
 
             int[] findBottom(int maxlen)
             {
-                int scanlen = MinMax.Min(height, maxlen);
+                int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
                 SetCopy.Set(lengths.Length, scanlen, lengths, 0);
 

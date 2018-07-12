@@ -14,15 +14,13 @@ namespace Genix.Imaging
     /// </summary>
     public abstract class StructuringElement
     {
-        protected readonly Point BaseAnchor;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StructuringElement"/> class.
         /// </summary>
         /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
         protected StructuringElement(Point anchor)
         {
-            this.BaseAnchor = anchor;
+            this.Anchor = anchor;
         }
 
         /// <summary>
@@ -30,8 +28,16 @@ namespace Genix.Imaging
         /// </summary>
         protected StructuringElement()
         {
-            this.BaseAnchor = new Point(-1, -1);
+            this.Anchor = new Point(-1, -1);
         }
+
+        /// <summary>
+        /// Gets the anchor position within the element.
+        /// </summary>
+        /// <value>
+        /// The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.
+        /// </value>
+        public Point Anchor { get; }
 
         /// <summary>
         /// Creates a square structuring element.
@@ -168,14 +174,14 @@ namespace Genix.Imaging
             {
                 if (anchor.X == -1 && anchor.Y == -1)
                 {
-                    if (this.BaseAnchor.X == -1 && this.BaseAnchor.Y == -1)
+                    if (this.Anchor.X == -1 && this.Anchor.Y == -1)
                     {
                         anchor.X = this.width / 2;
                         anchor.Y = this.height / 2;
                     }
                     else
                     {
-                        anchor = this.BaseAnchor;
+                        anchor = this.Anchor;
                     }
                 }
 
@@ -228,14 +234,14 @@ namespace Genix.Imaging
             {
                 if (anchor.X == -1 && anchor.Y == -1)
                 {
-                    if (this.BaseAnchor.X == -1 && this.BaseAnchor.Y == -1)
+                    if (this.Anchor.X == -1 && this.Anchor.Y == -1)
                     {
                         anchor.X = this.width / 2;
                         anchor.Y = this.height / 2;
                     }
                     else
                     {
-                        anchor = this.BaseAnchor;
+                        anchor = this.Anchor;
                     }
                 }
 

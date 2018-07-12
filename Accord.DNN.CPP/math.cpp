@@ -141,64 +141,6 @@ extern "C" __declspec(dllexport) void WINAPI sigmoid_derivative2_grad(
 	}
 }
 
-extern "C" __declspec(dllexport) int WINAPI argmin(int n, const float* x, int offx)
-{
-	int win = offx;
-	float min = x[offx];
-
-	for (const int last = n + offx++; offx < last; offx++)
-	{
-		const float value = x[offx];
-		if (value < min)
-		{
-			win = offx;
-			min = value;
-		}
-	}
-
-	return win;
-}
-
-extern "C" __declspec(dllexport) int WINAPI argmax(int n, const float* x, int offx)
-{
-	int win = offx;
-	float max = x[offx];
-
-	for (const int last = n + offx++; offx < last; offx++)
-	{
-		const float value = x[offx];
-		if (value > max)
-		{
-			win = offx;
-			max = value;
-		}
-	}
-
-	return win;
-}
-
-extern "C" __declspec(dllexport) void WINAPI argminmax(int n, const float* x, int offx, int& winmin, int& winmax)
-{
-	winmin = winmax = offx;
-	float min = x[offx];
-	float max = x[offx];
-
-	for (const int last = n + offx++; offx < last; offx++)
-	{
-		const float value = x[offx];
-		if (value < min)
-		{
-			winmin = offx;
-			min = value;
-		}
-		else if (value > max)
-		{
-			winmax = offx;
-			max = value;
-		}
-	}
-}
-
 extern "C" __declspec(dllexport) void WINAPI addc(int n, float a, float* y, int offy)
 {
 	y += offy;
@@ -322,21 +264,5 @@ extern "C" __declspec(dllexport) void WINAPI abs_derivative(
 	for (int i = 0; i < n; i++)
 	{
 		dx[i] = (x[i] == y[i] ? 1.0f : -1.0f) * dy[i];
-	}
-}
-
-extern "C" __declspec(dllexport) void WINAPI minmax_derivative(
-	int n,
-	const float* x, float* dx, int offx,
-	const float* y, const float* dy, int offy)
-{
-	x += offx;
-	dx += offx;
-	y += offy;
-	dy += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		dx[i] = (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
 	}
 }

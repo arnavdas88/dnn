@@ -54,7 +54,7 @@
     </Compile>
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\MatrixLayout.cs" />
-    <Compile Include="Math\MinMax.cs" />
+    <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\SetCopy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>

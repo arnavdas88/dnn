@@ -74,6 +74,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The bit position to reset.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetBit(uint[] bits, int position)
         {
@@ -110,6 +111,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The bit position to reset.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetBit(uint[] bits, int position)
         {

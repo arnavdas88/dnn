@@ -247,7 +247,7 @@ namespace Accord.DNN
                 // create answer for a mini-batch item
                 List<(string, float)> mbanswers = new List<(string, float)>(numAnswers);
 
-                float probThreshold = MinMax.Max(ywmb[0] - MaxConfidenceDistance, 0.0f);
+                float probThreshold = Maximum.Max(ywmb[0] - MaxConfidenceDistance, 0.0f);
                 for (int j = 0; j < numAnswers; j++)
                 {
                     float prob = ywmb[j];

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Accord.DNN.DocumentAnalysis")]
+[assembly: AssemblyTitle("Genix.DocumentAnalysis")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Accord.DNN")]
+[assembly: AssemblyProduct("Genix")]
 [assembly: AssemblyCopyright("Copyright © 2018, Alexander Volgunin. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

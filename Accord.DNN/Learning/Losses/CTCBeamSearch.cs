@@ -400,7 +400,7 @@ namespace Accord.DNN.Learning
         [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         private IList<(string[], float)> CreateFinalAnswer(Buffers flop)
         {
-            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(MinMax.Max(this.ResultCount, flop.Count));
+            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(Maximum.Max(this.ResultCount, flop.Count));
             float amax = 0.0f;
             float esum = float.NegativeInfinity;
 
@@ -580,7 +580,7 @@ namespace Accord.DNN.Learning
         /// <summary>
         /// Manages the collection of <see cref="Buffer"/> objects at each input step.
         /// </summary>
-        private class Buffers : Genix.Core.LinkedCollection<Buffer>
+        private class Buffers : LinkedCollection<Buffer>
         {
             /// <summary>
             /// The <see cref="BufferManager"/> used to allocation of new  <see cref="Buffer"/> objects.

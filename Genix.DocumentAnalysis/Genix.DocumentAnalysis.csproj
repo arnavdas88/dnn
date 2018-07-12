@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BBFF999A-7FC5-4A31-9DB7-7BFF4D4DD879}</ProjectGuid>
+    <ProjectGuid>{1BE4C1F8-8CD0-498F-B67D-45D2BE1FB0CA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Accord.DNN.DocumentAnalysis</RootNamespace>
-    <AssemblyName>Accord.DNN.DocumentAnalysis</AssemblyName>
+    <RootNamespace>Genix.DocumentAnalysis</RootNamespace>
+    <AssemblyName>Genix.DocumentAnalysis</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -37,7 +37,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>DocumentAnalysis.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Genix.DocumentAnalysis.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -58,7 +58,7 @@
     <Compile Include="Shapes\TextLine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DocumentAnalysis.snk" />
+    <None Include="Genix.DocumentAnalysis.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

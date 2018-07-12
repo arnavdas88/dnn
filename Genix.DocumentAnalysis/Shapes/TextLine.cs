@@ -1,33 +1,33 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="TextBlock.cs" company="Noname, Inc.">
+// <copyright file="TextLine.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.DocumentAnalysis
+namespace Genix.DocumentAnalysis
 {
     using System.Collections.Generic;
     using System.Globalization;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents a block of text.
+    /// Represents a horizontal text line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TextBlock : Container<TextLine>
+    public class TextLine : Container<TextShape>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TextBlock"/> class.
+        /// Initializes a new instance of the <see cref="TextLine"/> class.
         /// </summary>
-        /// <param name="lines">The collection of <see cref="TextLine"/> contained in this container.</param>
-        protected TextBlock(IList<TextLine> lines) : base(lines)
+        /// <param name="texts">The collection of <see cref="TextShape"/> contained in this container.</param>
+        protected TextLine(IList<TextShape> texts) : base(texts)
         {
         }
 
         /// <inheritdoc />
         public override string ToString() => string.Format(
             CultureInfo.InvariantCulture,
-            "Text block: {0}",
+            "Text line: {0}",
             this.Bounds);
     }
 }

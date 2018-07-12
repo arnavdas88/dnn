@@ -8,12 +8,14 @@ namespace Genix.Core
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents a doubly linked list.
     /// </summary>
     /// <typeparam name="T">Specifies the item type of the linked list.</typeparam>
+    [DebuggerDisplay("Count = {Count}")]
     public class LinkedCollection<T> : IEnumerable<T> where T : LinkedCollectionItem<T>
     {
         /// <summary>

@@ -725,7 +725,7 @@ namespace Accord.DNN
                         for (int i = 1; i < count; i++)
                         {
                             SetCopy.Pack(length, xw, i, count, wsp, 0);
-                            MKL.Max(length, yw, 0, wsp, 0, yw, 0);
+                            Maximum.Max(length, yw, 0, wsp, 0, yw, 0);
                         }
                     }
                     else
@@ -737,7 +737,7 @@ namespace Accord.DNN
 
                             for (int i = 1; i < count; i++, offx += xstride)
                             {
-                                MKL.Max(xstride, yw, offy, xw, offx, yw, offy);
+                                Maximum.Max(xstride, yw, offy, xw, offx, yw, offy);
                             }
                         }
                     }

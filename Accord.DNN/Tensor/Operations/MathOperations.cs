@@ -527,7 +527,7 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Max(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Maximum.Max(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -538,12 +538,12 @@ namespace Accord.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    MKL.MinMaxDerivative(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    MKL.MinMaxDerivative(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -580,7 +580,7 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Min(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Maximum.Min(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -591,12 +591,12 @@ namespace Accord.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    MKL.MinMaxDerivative(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    MKL.MinMaxDerivative(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }

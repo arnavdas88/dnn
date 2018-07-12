@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.DocumentAnalysis
+namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;

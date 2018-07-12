@@ -66,7 +66,7 @@ namespace Accord.DNN.LanguageModel
             foreach (string word in words)
             {
                 int length = word.Length;
-                this.maxWordLength = MinMax.Max(this.maxWordLength, length);
+                this.maxWordLength = Maximum.Max(this.maxWordLength, length);
                 Vocabulary.AddWord(workNodes, word, 0, length, 1);
             }
 
@@ -106,7 +106,7 @@ namespace Accord.DNN.LanguageModel
                 }
 
                 int length = word.Length;
-                this.maxWordLength = MinMax.Max(this.maxWordLength, length);
+                this.maxWordLength = Maximum.Max(this.maxWordLength, length);
                 Vocabulary.AddWord(workNodes, word, 0, length, count);
             }
 

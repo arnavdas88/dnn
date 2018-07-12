@@ -807,7 +807,7 @@ namespace Accord.DNN
         /// The position of minimum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMin() => MKL.ArgMin(this.Length, this.Weights, 0);
+        public int ArgMin() => Maximum.ArgMin(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the position of maximum value in the tensor.
@@ -816,7 +816,7 @@ namespace Accord.DNN
         /// The position of maximum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMax() => MKL.ArgMax(this.Length, this.Weights, 0);
+        public int ArgMax() => Maximum.ArgMax(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the position of minimum and maximum values in the tensor.
@@ -825,7 +825,7 @@ namespace Accord.DNN
         /// <param name="max">The position of maximum value in the array.</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ArgMinMax(out int min, out int max) => MKL.ArgMinMax(this.Length, this.Weights, 0, out min, out max);
+        public void ArgMinMax(out int min, out int max) => Maximum.ArgMinMax(this.Length, this.Weights, 0, out min, out max);
 
         /// <summary>
         /// Returns the minimum value in the tensor.
@@ -834,7 +834,7 @@ namespace Accord.DNN
         /// The minimum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Min() => MKL.Min(this.Length, this.Weights, 0);
+        public float Min() => Maximum.Min(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the maximum value in the tensor.
@@ -843,7 +843,7 @@ namespace Accord.DNN
         /// The maximum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Max() => MKL.Max(this.Length, this.Weights, 0);
+        public float Max() => Maximum.Max(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the minimum and maximum values in the tensor.
@@ -852,7 +852,7 @@ namespace Accord.DNN
         /// <param name="max">The maximum value in the array.</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MinMax(out float min, out float max) => MKL.MinMax(this.Length, this.Weights, 0, out min, out max);
+        public void MinMax(out float min, out float max) => Maximum.MinMax(this.Length, this.Weights, 0, out min, out max);
 
         /// <summary>
         /// Computes the L1-Norm (sum of magnitudes) of the tensor elements.

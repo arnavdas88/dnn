@@ -380,7 +380,7 @@
 
                 Tensor y = network.Forward(null, x);
                 int start = y.Strides[0] * (y.Axes[(int)Axis.B] - 1);
-                int argmax = MKL.ArgMax(y.Strides[0], y.Weights, start);
+                int argmax = Maximum.ArgMax(y.Strides[0], y.Weights, start);
                 int classIndex = argmax - start;
                 char res = alphabet.ElementAt(classIndex).Key;
 

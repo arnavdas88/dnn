@@ -480,24 +480,6 @@ extern "C" __declspec(dllexport) void WINAPI mkl_sexp(
 	::vsExp(n, a + offa, y + offy);
 }
 
-extern "C" __declspec(dllexport) void WINAPI mkl_sfmax(
-	int n,
-	const float* a, int offa,
-	float* b, int offb,
-	float* y, int offy)
-{
-	::vsFmax(n, a + offa, b + offb, y + offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI mkl_sfmin(
-	int n,
-	const float* a, int offa,
-	float* b, int offb,
-	float* y, int offy)
-{
-	::vsFmin(n, a + offa, b + offb, y + offy);
-}
-
 extern "C" __declspec(dllexport) float WINAPI mkl_snrm1(
 	int n,
 	const float* x, int offx, int incx)
