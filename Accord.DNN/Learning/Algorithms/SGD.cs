@@ -6,8 +6,8 @@
 
 namespace Accord.DNN.Learning
 {
-    using Genix.Core;
     using System.Diagnostics.CodeAnalysis;
+    using Genix.Core;
 
     /// <summary>
     /// SGD (Stochastic Gradient Descent) algorithm for training neural nets.

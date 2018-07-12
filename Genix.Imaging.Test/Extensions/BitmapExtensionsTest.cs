@@ -21,12 +21,13 @@
         [TestMethod]
         public void FromBitmapTest()
         {
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            ////foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"Z:\Test\UnitTests\Image\00000013_tif.TIF"))
+                foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             {
                 ////Image deskew = image.Deskew();
 
                 ///Image dst = image.Deskew().Open(StructuringElement.Rectangle(1, 100), 1).Dilate(StructuringElement.Square(2), 1);
-                Image dst = image.Despeckle();
+                Image dst = image.CleanBorderNoise().Despeckle().Deskew();
             }
 
             foreach (bool whiteOnBlack in new bool[] { true, false })

@@ -31,10 +31,10 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="matrix.cpp">
+    <ClCompile Include="source\matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setcopy.cpp">
+    <ClCompile Include="source\setcopy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

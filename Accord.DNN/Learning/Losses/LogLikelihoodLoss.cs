@@ -6,10 +6,10 @@
 
 namespace Accord.DNN.Learning
 {
-    using Genix.Core;
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using Genix.Core;
 
     /// <summary>
     /// Negative log-likelihood loss.

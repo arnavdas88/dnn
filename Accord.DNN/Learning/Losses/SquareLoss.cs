@@ -6,9 +6,9 @@
 
 namespace Accord.DNN.Learning
 {
-    using Genix.Core;
     using System;
     using System.Globalization;
+    using Genix.Core;
 
     /// <summary>
     /// Square loss, also known as L2-loss or Euclidean loss.

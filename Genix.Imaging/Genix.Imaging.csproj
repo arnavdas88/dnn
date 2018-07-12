@@ -63,16 +63,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
     <Compile Include="Extensions\StructuringElement.cs" />
     <Compile Include="ImageF.cs" />
     <Compile Include="Extensions\ConnectedComponent.cs" />
-    <Compile Include="EXIF\EXIFExposureProgram.cs" />
-    <Compile Include="EXIF\EXIFField.cs" />
-    <Compile Include="EXIF\EXIFFieldAttribute.cs" />
-    <Compile Include="EXIF\EXIFLightSource.cs" />
-    <Compile Include="EXIF\EXIFMeteringMode.cs" />
+    <Compile Include="Metadata\EXIF\EXIFExposureProgram.cs" />
+    <Compile Include="Metadata\EXIF\EXIFField.cs" />
+    <Compile Include="Metadata\EXIF\EXIFFieldAttribute.cs" />
+    <Compile Include="Metadata\EXIF\EXIFLightSource.cs" />
+    <Compile Include="Metadata\EXIF\EXIFMeteringMode.cs" />
     <Compile Include="Extensions\Convert.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\ConnectedComponents.cs" />
@@ -99,16 +100,16 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Metadata\PropertyItem.cs" />
-    <Compile Include="TIFF\TIFFCompression.cs" />
-    <Compile Include="TIFF\TIFFField.cs" />
-    <Compile Include="TIFF\TIFFFieldAttribute.cs" />
-    <Compile Include="TIFF\TIFFFillOrder.cs" />
-    <Compile Include="TIFF\TIFFNewSubfileTypes.cs" />
-    <Compile Include="TIFF\TIFFOrientation.cs" />
-    <Compile Include="TIFF\TIFFPhotometricInterpretation.cs" />
-    <Compile Include="TIFF\TIFFPlanarConfiguration.cs" />
-    <Compile Include="TIFF\TIFFResolutionUnit.cs" />
-    <Compile Include="TIFF\TIFFSubfileType.cs" />
+    <Compile Include="Metadata\TIFF\TIFFCompression.cs" />
+    <Compile Include="Metadata\TIFF\TIFFField.cs" />
+    <Compile Include="Metadata\TIFF\TIFFFieldAttribute.cs" />
+    <Compile Include="Metadata\TIFF\TIFFFillOrder.cs" />
+    <Compile Include="Metadata\TIFF\TIFFNewSubfileTypes.cs" />
+    <Compile Include="Metadata\TIFF\TIFFOrientation.cs" />
+    <Compile Include="Metadata\TIFF\TIFFPhotometricInterpretation.cs" />
+    <Compile Include="Metadata\TIFF\TIFFPlanarConfiguration.cs" />
+    <Compile Include="Metadata\TIFF\TIFFResolutionUnit.cs" />
+    <Compile Include="Metadata\TIFF\TIFFSubfileType.cs" />
     <Compile Include="Transforms\CompositeTransform.cs" />
     <Compile Include="Transforms\IdentityTransform.cs" />
     <Compile Include="Transforms\MatrixTransform.cs" />

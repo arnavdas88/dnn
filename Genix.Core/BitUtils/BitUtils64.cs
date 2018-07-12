@@ -70,6 +70,17 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Sets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBit(ulong[] bits, int position)
+        {
+            bits[position >> 6] |= BitUtils64.LSB >> (position & 63);
+        }
+
+        /// <summary>
         /// Sets the range bits at the specified position.
         /// </summary>
         /// <param name="count">The number of bits to set.</param>
@@ -91,7 +102,18 @@ namespace Genix.Core
         public static ulong ResetBit(ulong bits, int position)
         {
             Debug.Assert(position < 64, "The bit position must be less than 64.");
-            return bits & ~(LSB >> position);
+            return bits & ~(BitUtils64.LSB >> position);
+        }
+
+        /// <summary>
+        /// Resets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ResetBit(ulong[] bits, int position)
+        {
+            bits[position >> 6] &= ~(BitUtils64.LSB >> (position & 63));
         }
 
         /// <summary>
@@ -409,6 +431,31 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Performs logical AND operation between 64-bits array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="mask">The mask to apply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsAND(int length, ulong mask, ulong[] y, int offy)
+        {
+            NativeMethods.bits_and_mask_64(length, mask, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation between 64-bits array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="mask">The mask to apply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="incy">The increment for the elements of <c>y</c></param>
+        public static void WordsAND(int length, ulong mask, ulong[] y, int offy, int incy)
+        {
+            NativeMethods.bits_and_mask_inc_64(length, mask, y, offy, incy);
+        }
+
+        /// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -523,6 +570,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or3_64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_and_mask_64(int length, [In] ulong mask, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_and_mask_inc_64(int length, [In] ulong mask, [Out] ulong[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

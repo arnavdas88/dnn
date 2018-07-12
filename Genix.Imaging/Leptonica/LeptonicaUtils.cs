@@ -149,7 +149,7 @@ namespace Genix.Imaging
                 {
                     for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                     {
-                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst, false);
+                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, false);
                     }
                 }
             }

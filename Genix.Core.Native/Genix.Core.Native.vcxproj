@@ -194,10 +194,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="matrix.cpp" />
-    <ClCompile Include="setcopy.cpp" />
     <ClCompile Include="source\bitutils32.cpp" />
     <ClCompile Include="source\bitutils64.cpp" />
+    <ClCompile Include="source\matrix.cpp" />
+    <ClCompile Include="source\setcopy.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -70,6 +70,17 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Sets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBit(uint[] bits, int position)
+        {
+            bits[position >> 5] |= BitUtils32.LSB >> (position & 31);
+        }
+
+        /// <summary>
         /// Sets the range bits at the specified position.
         /// </summary>
         /// <param name="count">The number of bits to set.</param>
@@ -92,6 +103,17 @@ namespace Genix.Core
         {
             Debug.Assert(position < 32, "The bit position must be less than 32.");
             return bits & ~(LSB >> position);
+        }
+
+        /// <summary>
+        /// Resets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ResetBit(uint[] bits, int position)
+        {
+            bits[position >> 5] &= ~(BitUtils32.LSB >> (position & 31));
         }
 
         /// <summary>
@@ -368,6 +390,31 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Performs logical AND operation between 32-bits array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="mask">The mask to apply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsAND(int length, uint mask, uint[] y, int offy)
+        {
+            NativeMethods.bits_and_mask_32(length, mask, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation between 32-bits array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="mask">The mask to apply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="incy">The increment for the elements of <c>y</c></param>
+        public static void WordsAND(int length, uint mask, uint[] y, int offy, int incy)
+        {
+            NativeMethods.bits_and_mask_inc_32(length, mask, y, offy, incy);
+        }
+
+        /// <summary>
         /// Performs logical AND operation on two 32-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -487,6 +534,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or3_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_and_mask_32(int length, [In] uint mask, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_and_mask_inc_32(int length, [In] uint mask, [Out] uint[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -36,15 +36,8 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            Image dst = new Image(
-                image.Width,
-                image.Height,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution);
-
+            Image dst = new Image(image);
             SetCopy.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
-
             return dst;
         }
 
@@ -128,12 +121,7 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            Image dst = new Image(
-                width,
-                height,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+            Image dst = new Image(width, height, image);
 
             CopyCrop.CopyArea(image, x, y, width, height, dst, 0, 0);
 
@@ -199,12 +187,7 @@ namespace Genix.Imaging
             // expand target area
             System.Drawing.Rectangle bounds = System.Drawing.Rectangle.Inflate(blackArea, dx, dy);
 
-            Image dst = new Image(
-                bounds.Width,
-                bounds.Height,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+            Image dst = new Image(bounds.Width, bounds.Height, image);
 
             if (!blackArea.IsEmpty)
             {

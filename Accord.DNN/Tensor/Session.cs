@@ -9,7 +9,6 @@
 
 namespace Accord.DNN
 {
-    using Genix.Core;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -17,6 +16,7 @@ namespace Accord.DNN
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Contains a sequence of operations performed on a <see cref="Tensor"/>.

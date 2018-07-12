@@ -6,6 +6,54 @@
     public class BitUtils64Test
     {
         [TestMethod]
+        public void SetBitsTest()
+        {
+            const int Size = 3 * 64;
+            ulong[] y = new ulong[3];
+
+            for (int count = 1; count < Size; count++)
+            {
+                for (int pos = 0; pos < Size - count; pos++)
+                {
+                    y[0] = y[1] = y[2] = 0;
+                    BitUtils64.SetBits(count, y, pos);
+
+                    Assert.AreEqual(count, BitUtils64.CountOneBits(Size, y, 0));
+
+                    Assert.AreEqual(pos, BitUtils64.BitScanOneForward(Size, y, 0));
+                    Assert.AreEqual(pos + count - 1, BitUtils64.BitScanOneReverse(Size, y, Size - 1));
+
+                    Assert.AreEqual(pos + count == Size ? -1 : pos + count, BitUtils64.BitScanZeroForward(Size - pos, y, pos));
+                    Assert.AreEqual(pos == 0 ? -1 : pos - 1, BitUtils64.BitScanZeroReverse(pos + count, y, pos + count - 1));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ResetBitsTest()
+        {
+            const int Size = 3 * 64;
+            ulong[] y = new ulong[3];
+
+            for (int count = 1; count < Size; count++)
+            {
+                for (int pos = 0; pos < Size - count; pos++)
+                {
+                    y[0] = y[1] = y[2] = ulong.MaxValue;
+                    BitUtils64.ResetBits(count, y, pos);
+
+                    Assert.AreEqual(Size - count, BitUtils64.CountOneBits(Size, y, 0));
+
+                    Assert.AreEqual(pos, BitUtils64.BitScanZeroForward(Size, y, 0));
+                    Assert.AreEqual(pos + count - 1, BitUtils64.BitScanZeroReverse(Size, y, Size - 1));
+
+                    Assert.AreEqual(pos + count == Size ? -1 : pos + count, BitUtils64.BitScanOneForward(Size, y, pos));
+                    Assert.AreEqual(pos == 0 ? -1 : pos - 1, BitUtils64.BitScanOneReverse(pos + count, y, pos + count - 1));
+                }
+            }
+        }
+
+        [TestMethod]
         public void BitsOrTest()
         {
             const int Size = 3 * 64;

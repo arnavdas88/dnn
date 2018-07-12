@@ -225,7 +225,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_one_reverse_be
 	{
 		if (*bits != BITS_MIN)
 		{
-			pos -= _bsr(*bits);
+			pos = (pos & ~BITS_MASK) + _bsr(*bits);
 			return pos >= startpos ? pos : -1;
 		}
 	}
@@ -298,7 +298,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_zero_reverse_b
 	{
 		if (*bits != BITS_MAX)
 		{
-			pos -= _bsr(~*bits);
+			pos = (pos & ~BITS_MASK) + _bsr(~*bits);
 			return pos >= startpos ? pos : -1;
 		}
 	}
@@ -668,6 +668,49 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or3_)(
 	for (int i = 0; i < length; i++)
 	{
 		y[i] = a[i] | b[i];
+	}
+}
+
+// Logical AND
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and_mask_)(
+	int length,				// number of elements to process
+	__bits mask,			// the mask to apply
+	__bits* y, 				// the destination array
+	int offy 				// the zero-based index of starting element in y
+	)
+{
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] &= mask;
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and_mask_inc_)(
+	int length,				// number of elements to process
+	__bits mask,			// the mask to apply
+	__bits* y, 				// the destination array
+	int offy, 				// the zero-based index of starting element in y
+	int incy				// the increment for the elements of y
+	)
+{
+	y += offy;
+
+	if (incy == 1)
+	{
+		for (int i = 0; i < length; i++)
+		{
+			y[i] &= mask;
+		}
+
+	}
+	else
+	{
+		for (int i = 0, yi = 0; i < length; i++, yi += incy)
+		{
+			y[yi] &= mask;
+		}
 	}
 }
 
