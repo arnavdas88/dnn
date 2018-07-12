@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.NetClassify
+namespace Genix.NetClassify
 {
     using System;
     using System.Collections.Generic;
@@ -17,9 +17,10 @@ namespace Accord.DNN.NetClassify
     using System.Runtime.ExceptionServices;
     using System.Text;
     using System.Threading;
-    using Lab;
-    using Lab.Testing;
-    using LanguageModel;
+    using Accord.DNN.Lab;
+    using Accord.DNN.Lab.Testing;
+    using Genix.DNN;
+    using Genix.DNN.LanguageModel;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

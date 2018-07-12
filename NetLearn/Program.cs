@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN.NetLearn
+namespace Genix.NetLearn
 {
     using System;
     using System.Collections.Generic;
@@ -20,8 +20,9 @@ namespace Accord.DNN.NetLearn
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Lab;
-    using Learning;
+    using Accord.DNN.Lab;
+    using Genix.DNN;
+    using Genix.DNN.Learning;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

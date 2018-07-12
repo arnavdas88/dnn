@@ -7,7 +7,7 @@
     <ProjectGuid>{53AAC793-CC1F-4B99-9781-35DEC8A363B4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Parascript.FormXtra.MachineLearning.NetClassify</RootNamespace>
+    <RootNamespace>Genix.NetClassify</RootNamespace>
     <AssemblyName>NetClassify</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -39,7 +39,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -52,7 +53,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -98,9 +100,9 @@
       <Project>{eb0918b2-2405-4732-ae91-cba582a466bc}</Project>
       <Name>Accord.DNN.Lab</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Accord.DNN\Accord.DNN.csproj">
-      <Project>{230d84d1-08e6-47c8-9ddd-8d730f1d93fb}</Project>
-      <Name>Accord.DNN</Name>
+    <ProjectReference Include="..\Genix.DNN\Genix.DNN.csproj">
+      <Project>{75e41c3e-e491-4d38-9b62-a01e90dece12}</Project>
+      <Name>Genix.DNN</Name>
     </ProjectReference>
     <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>

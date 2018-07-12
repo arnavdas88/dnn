@@ -1,6 +1,7 @@
 ﻿namespace Genix.Imaging.Test
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.IO;
 
     [TestClass]
     public class BitmapExtensionsTest
@@ -21,13 +22,23 @@
         [TestMethod]
         public void FromBitmapTest()
         {
+            DirectoryInfo di = new DirectoryInfo(@"L:\FormXtra\HCFA\DropOut\DataDim-SET1");
+            foreach (FileInfo fileInfo in di.EnumerateFiles("*.tif"))
+            {
+                foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileInfo.FullName))
+                {
+                    Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();
+                    dst.Save(Path.Combine(@"w:\temp", Path.GetFileName(fileInfo.FullName)));
+                }
+            }
+
             ////foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"Z:\Test\UnitTests\Image\00000013_tif.TIF"))
-                foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             {
                 ////Image deskew = image.Deskew();
 
                 ///Image dst = image.Deskew().Open(StructuringElement.Rectangle(1, 100), 1).Dilate(StructuringElement.Square(2), 1);
-                Image dst = image.CleanBorderNoise().Despeckle().Deskew();
+                Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();
             }
 
             foreach (bool whiteOnBlack in new bool[] { true, false })

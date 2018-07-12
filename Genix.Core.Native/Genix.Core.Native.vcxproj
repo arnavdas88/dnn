@@ -208,7 +208,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Accord.DNN.CPP.ruleset" />
     <None Include="source\bitutils.inl" />
     <None Include="source\nonlinearity.inl" />
   </ItemGroup>

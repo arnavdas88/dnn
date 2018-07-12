@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{05846038-4012-4E74-9786-E3F4997F445B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Genix.DNN.Test</RootNamespace>
+    <AssemblyName>Genix.DNN.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Genix.DNN.Test.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <Compile Include="Helpers.cs" />
+    <Compile Include="LanguageModel\CharsetTest.cs" />
+    <Compile Include="LanguageModel\RegexParserTest.cs" />
+    <Compile Include="LanguageModel\ContextTest.cs" />
+    <Compile Include="LanguageModel\VocabularyTest.cs" />
+    <Compile Include="Layers\ConcatLayerTest.cs" />
+    <Compile Include="Layers\MaxOutLayerTest.cs" />
+    <Compile Include="Layers\SigmoidLayerTest.cs" />
+    <Compile Include="Layers\TanhLayerTest.cs" />
+    <Compile Include="Layers\ReLULayerTest.cs" />
+    <Compile Include="Layers\SoftmaxLayerTest.cs" />
+    <Compile Include="Layers\MaxPoolingLayerTest.cs" />
+    <Compile Include="Layers\FullyConnectedLayerTest.cs" />
+    <Compile Include="Layers\ConvolutionLayerTest.cs" />
+    <Compile Include="Layers\DropoutLayerTest.cs" />
+    <Compile Include="Layers\LayerTest.cs" />
+    <Compile Include="Layers\InputLayerTest.cs" />
+    <Compile Include="Layers\ScaleLayerTest.cs" />
+    <Compile Include="Layers\SplitLayerTest.cs" />
+    <Compile Include="Layers\AveragePoolingLayerTest.cs" />
+    <Compile Include="Layers\LRNLayerTest.cs" />
+    <Compile Include="Layers\SRNCellTest.cs" />
+    <Compile Include="Layers\SRNLayerTest.cs" />
+    <Compile Include="Layers\LSTMCellTest.cs" />
+    <Compile Include="Layers\LSTMLayerTest.cs" />
+    <Compile Include="Layers\Map2SequenceLayerTest.cs" />
+    <Compile Include="Layers\GRUCellTest.cs" />
+    <Compile Include="Layers\GRULayerTest.cs" />
+    <Compile Include="Neuro\Net.cs" />
+    <Compile Include="Neuro\MathTest.cs" />
+    <Compile Include="Neuro\CTCTest.cs" />
+    <Compile Include="Neuro\CTCBeamSearchTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StopwatchExtensions.cs" />
+    <Compile Include="LayoutTest.cs" />
+    <Compile Include="TensorTest.cs" />
+    <Compile Include="GraphTest.cs" />
+    <Compile Include="MKLTest.cs" />
+    <Compile Include="KernelTest.cs" />
+    <Compile Include="Tensor\MathOperationsTest.cs" />
+    <Compile Include="Tensor\ArrayOperationsTest.cs" />
+    <Compile Include="Tensor\NeuralOperationsTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Accord.DNN.Core\Accord.DNN.Core.csproj">
+      <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
+      <Name>Accord.DNN.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.DNN\Genix.DNN.csproj">
+      <Project>{75e41c3e-e491-4d38-9b62-a01e90dece12}</Project>
+      <Name>Genix.DNN</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Genix.DNN.Test.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

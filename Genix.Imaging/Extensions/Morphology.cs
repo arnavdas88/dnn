@@ -8,7 +8,6 @@ namespace Genix.Imaging
 {
     using System;
     using System.Drawing;
-    using Accord.DNN;
     using Genix.Core;
 
     /// <summary>

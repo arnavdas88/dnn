@@ -204,11 +204,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="RNN.cpp" />
     <ClCompile Include="MKL.cpp" />
-    <ClCompile Include="LRN.cpp" />
     <ClCompile Include="math.cpp" />
-    <ClCompile Include="setcopy.cpp" />
     <ClCompile Include="sorting.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

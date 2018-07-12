@@ -19,6 +19,8 @@ namespace Genix.Imaging
         /// Cleans scan border noise from the <see cref="Image"/>.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to clean.</param>
+        /// <param name="maxNoiseWidth">The maximum width of the noise, in inches.</param>
+        /// <param name="maxNoiseHeight">The maximum height of the noise, in inches.</param>
         /// <returns>
         /// A new cleaned <see cref="Image"/>.
         /// </returns>
@@ -26,7 +28,7 @@ namespace Genix.Imaging
         /// <c>image</c> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image CleanBorderNoise(this Image image)
+        public static Image CleanBorderNoise(this Image image, float maxNoiseWidth, float maxNoiseHeight)
         {
             if (image == null)
             {
@@ -42,10 +44,19 @@ namespace Genix.Imaging
             SetCopy.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
             ulong[] bits = dst.Bits;
 
-            clearLeft(findLeft(200));
-            clearRight(findRight(200));
-            clearTop(findTop(200));
-            clearBottom(findBottom(200));
+            int maxwidth = (int)((maxNoiseWidth * image.HorizontalResolution) + 0.5f);
+            if (maxwidth > 0)
+            {
+                clearLeft(findLeft(maxwidth));
+                clearRight(findRight(maxwidth));
+            }
+
+            int maxheight = (int)((maxNoiseHeight * image.VerticalResolution) + 0.5f);
+            if (maxheight > 0)
+            {
+                clearTop(findTop(maxheight));
+                clearBottom(findBottom(maxheight));
+            }
 
             return dst;
 
