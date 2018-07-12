@@ -198,6 +198,7 @@
     <ClCompile Include="source\bitutils64.cpp" />
     <ClCompile Include="source\matrix.cpp" />
     <ClCompile Include="source\maximum.cpp" />
+    <ClCompile Include="source\nonlinearity.cpp" />
     <ClCompile Include="source\setcopy.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -209,6 +210,7 @@
   <ItemGroup>
     <None Include="Accord.DNN.CPP.ruleset" />
     <None Include="source\bitutils.inl" />
+    <None Include="source\nonlinearity.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

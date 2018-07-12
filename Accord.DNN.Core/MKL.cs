@@ -827,113 +827,6 @@ namespace Accord.DNN
         }
 
         /// <summary>
-        /// Computes a hyperbolic tangent nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Tanh(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.mkl_stanh(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a gradient of hyperbolic tangent nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The array that contains <see cref="MKL.Tanh"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void TanhGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
-        {
-            NativeMethods.tanh_derivative2_grad(length, dx, offdx, cleardx, y, offy, dy, offdy);
-        }
-
-        /// <summary>
-        /// Computes a gradient of hyperbolic tangent nonlinearity element wise on an array in place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains <see cref="MKL.Tanh"/> method results.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="dx">The array that contains chain gradient from next level receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void TanhGradientIP(int length, float[] x, int offx, float[] dx, int offdx)
-        {
-            NativeMethods.tanh_derivative2_grad_ip(length, x, offx, dx, offdx);
-        }
-
-        /// <summary>
-        /// Computes a sigmoid nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sigmoid(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.sigmoid(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a gradient of sigmoid nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The array that contains <see cref="Sigmoid"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SigmoidGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
-        {
-            NativeMethods.sigmoid_derivative2_grad(length, dx, offdx, cleardx, y, offy, dy, offdy);
-        }
-
-        /// <summary>
-        /// Computes a rectified linear unit nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReLU(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.relu(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a rectified linear unit tangent nonlinearity element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The array that contains <see cref="ReLU"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReLUGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
-        {
-            NativeMethods.relu_derivative2_grad(length, dx, offdx, cleardx, y, offy, dy, offdy);
-        }
-
-        /// <summary>
         /// Squares elements from one array starting at the specified index
         /// and puts results into another array starting at the specified index.
         /// </summary>
@@ -1254,10 +1147,6 @@ namespace Accord.DNN
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void mkl_stanh(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void mkl_slog(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1271,59 +1160,6 @@ namespace Accord.DNN
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern float mkl_snrm2(int n, [In] float[] x, int offx, int incx);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void relu(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void relu_derivative2_grad(
-                int n,
-                [Out] float[] dx,
-                int offdx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] float[] y,
-                int offy,
-                [In] float[] dy,
-                int offdy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void tanh_derivative2_grad(
-                int n,
-                [Out] float[] dx,
-                int offdx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] float[] y,
-                int offy,
-                [In] float[] dy,
-                int offdy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void tanh_derivative2_grad_ip(
-                int n,
-                [In] float[] x,
-                int offx,
-                [In, Out] float[] dx,
-                int offdx);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sigmoid(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sigmoid_derivative2_grad(
-                int n,
-                [Out] float[] dx,
-                int offdx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] float[] y,
-                int offy,
-                [In] float[] dy,
-                int offdy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

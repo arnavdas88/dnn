@@ -6,6 +6,7 @@
 
 namespace Accord.DNN
 {
+    using Genix.Graph;
     using Layers;
 
     internal class NetworkGraphJsonConverter : BidirectionalGraphJsonConverter<NetworkGraph, Layer, NetworkEdge>

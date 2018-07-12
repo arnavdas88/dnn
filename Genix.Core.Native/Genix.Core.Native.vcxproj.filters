@@ -40,10 +40,16 @@
     <ClCompile Include="source\maximum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\nonlinearity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Accord.DNN.CPP.ruleset" />
     <None Include="source\bitutils.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="source\nonlinearity.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

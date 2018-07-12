@@ -8,6 +8,7 @@ namespace Accord.DNN
 {
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using Genix.Graph;
     using Layers;
     using Newtonsoft.Json;
 

@@ -4,11 +4,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System;
 
-    internal class BidirectionalGraphJsonConverter<TGraph, TVertex>
+    /// <summary>
+    /// Represents a Json.NET converter for <see cref="BidirectionalGraphJsonConverter{TGraph, TVertex}"/> class.
+    /// </summary>
+    /// <typeparam name="TGraph">The type of the graph.</typeparam>
+    /// <typeparam name="TVertex">The type of the vertices.</typeparam>
+    public class BidirectionalGraphJsonConverter<TGraph, TVertex>
         : BidirectionalGraphJsonConverter<TGraph, TVertex, Edge<TVertex>>
         where TGraph : BidirectionalGraph<TVertex>
         where TVertex : ICloneable

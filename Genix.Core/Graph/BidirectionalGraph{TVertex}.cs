@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System;
 
@@ -13,7 +13,7 @@ namespace Accord.DNN
     /// where out-edge and in-edges need to be enumerated.
     /// </summary>
     /// <typeparam name="TVertex">The type of the vertices.</typeparam>
-    internal class BidirectionalGraph<TVertex> : BidirectionalGraph<TVertex, Edge<TVertex>>
+    public class BidirectionalGraph<TVertex> : BidirectionalGraph<TVertex, Edge<TVertex>>
         where TVertex : ICloneable
     {
         /// <summary>

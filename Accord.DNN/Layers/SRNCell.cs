@@ -113,14 +113,14 @@ namespace Accord.DNN.Layers
 
             // add hidden layer to the output tensor
             // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
-            MKL.ReLU(ylen, yw, 0, yw, 0);
+            Nonlinearity.ReLU(ylen, yw, 0, yw, 0);
 
             for (int t = 1, yi = ylen; t < T; t++, yi += ylen)
             {
                 Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, false, yw, yi - ylen, yw, yi, false);
 
                 // TODO: customize activation function
-                MKL.ReLU(ylen, yw, yi, yw, yi);
+                Nonlinearity.ReLU(ylen, yw, yi, yw, yi);
             }
 
             if (session.CalculateGradients)
@@ -134,7 +134,7 @@ namespace Accord.DNN.Layers
 
                         for (int t = T - 1, yi = t * ylen; t > 0; t--, yi -= ylen)
                         {
-                            MKL.ReLUGradient(ylen, dyw, yi, true, yw, yi, dyw, yi);
+                            Nonlinearity.ReLUGradient(ylen, dyw, yi, true, yw, yi, dyw, yi);
 
                             // dA += dy * x'
                             lock (this.U)
@@ -146,7 +146,7 @@ namespace Accord.DNN.Layers
                             Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, true, dyw, yi, dyw, yi - ylen, false);
                         }
 
-                        MKL.ReLUGradient(ylen, dyw, 0, true, yw, 0, dyw, 0);
+                        Nonlinearity.ReLUGradient(ylen, dyw, 0, true, yw, 0, dyw, 0);
                     });
             }
 

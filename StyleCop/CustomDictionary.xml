@@ -345,6 +345,7 @@
       <Word>y</Word>
       <Word>xy</Word>
       <Word>dy</Word>
+      <Word>dxy</Word>
       <Word>xs</Word>
       <Word>ys</Word>
       <Word>offx</Word>
@@ -352,6 +353,7 @@
       <Word>offxy</Word>
       <Word>offdx</Word>
       <Word>offdy</Word>
+      <Word>offdxy</Word>
       <Word>incx</Word>
       <Word>incy</Word>
       <Word>posx</Word>

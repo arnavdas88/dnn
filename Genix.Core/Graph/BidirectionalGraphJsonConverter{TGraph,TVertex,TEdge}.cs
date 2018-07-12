@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System;
     using System.Collections.Generic;
@@ -14,18 +14,26 @@ namespace Accord.DNN
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    internal class BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge> : JsonConverter
+    /// <summary>
+    /// Represents a Json.NET converter for <see cref="BidirectionalGraphJsonConverter{TGraph, TVertex, TEdge}"/> class.
+    /// </summary>
+    /// <typeparam name="TGraph">The type of the graph.</typeparam>
+    /// <typeparam name="TVertex">The type of the vertices.</typeparam>
+    /// <typeparam name="TEdge">The type of the edges.</typeparam>
+    public class BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge> : JsonConverter
         where TGraph : BidirectionalGraph<TVertex, TEdge>
         where TEdge : Edge<TVertex>
         where TVertex : ICloneable
     {
         private const string EdgeSeparator = "->";
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (writer == null)
@@ -74,6 +82,7 @@ namespace Accord.DNN
             writer.WriteEndObject();
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (reader == null)

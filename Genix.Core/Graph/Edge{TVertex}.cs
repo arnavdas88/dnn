@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System;
     using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Accord.DNN
     /// <typeparam name="TVertex">The type of the vertex.</typeparam>
     [JsonObject(MemberSerialization.OptIn)]
     [DebuggerDisplay("{Source} -> {Target}")]
-    internal class Edge<TVertex>
+    public class Edge<TVertex>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Edge{TVertex}"/> class.

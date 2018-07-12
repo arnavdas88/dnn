@@ -40,6 +40,9 @@
     <AssemblyOriginatorKeyFile>Genix.Core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Drawing" />
@@ -52,9 +55,20 @@
     <Compile Include="GlobalSuppressions.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
+    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
+    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex}.cs" />
+    <Compile Include="Graph\BidirectionalGraph{TVertex,TEdge}.cs" />
+    <Compile Include="Graph\BidirectionalGraph{TVertex}.cs" />
+    <Compile Include="Graph\BidirectionalVertex{TVertex,TEdge}.cs" />
+    <Compile Include="Graph\Edge{TVertex}.cs" />
+    <Compile Include="Lab\RejectCurve.cs" />
+    <Compile Include="Lab\RejectCurvePoint.cs" />
+    <Compile Include="Lab\RejectCurveTarget.cs" />
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\MatrixLayout.cs" />
     <Compile Include="Math\Maximum.cs" />
+    <Compile Include="Math\Nonlinearity.cs" />
     <Compile Include="Math\SetCopy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
@@ -75,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Core.snk" />
+    <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>

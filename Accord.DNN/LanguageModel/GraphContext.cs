@@ -11,6 +11,7 @@ namespace Accord.DNN.LanguageModel
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Text;
+    using Genix.Graph;
     using Newtonsoft.Json;
 
     /// <summary>

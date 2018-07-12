@@ -456,14 +456,6 @@ extern "C" __declspec(dllexport) void WINAPI mkl_scos_grad(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI mkl_stanh(
-	int n,
-	const float* x, int offx,
-	float* y, int offy)
-{
-	::vsTanh(n, x + offx, y + offy);
-}
-
 extern "C" __declspec(dllexport) void WINAPI mkl_slog(
 	int n,
 	const float* a, int offa,

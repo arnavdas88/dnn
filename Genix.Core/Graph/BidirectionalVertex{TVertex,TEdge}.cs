@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ namespace Accord.DNN
     /// </summary>
     /// <typeparam name="TVertex">The type of the vertex.</typeparam>
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
-    internal class BidirectionalVertex<TVertex, TEdge>
+    public class BidirectionalVertex<TVertex, TEdge>
         where TEdge : Edge<TVertex>
     {
         /// <summary>
@@ -38,12 +38,12 @@ namespace Accord.DNN
         /// Initializes a new instance of the <see cref="BidirectionalVertex{TVertex, TEdge}"/> class
         /// that is empty and has the specified initial capacity.
         /// </summary>
-        /// <param name="inpCapacity">The number of in edges that the vertex can initially store.</param>
-        /// <param name="outCapacity">The number of out edges that the vertex can initially store.</param>
-        public BidirectionalVertex(int inpCapacity, int outCapacity)
+        /// <param name="inputCapacity">The number of in edges that the vertex can initially store.</param>
+        /// <param name="outputCapacity">The number of out edges that the vertex can initially store.</param>
+        public BidirectionalVertex(int inputCapacity, int outputCapacity)
         {
-            this.inpEdges = inpCapacity > 0 ? new List<TEdge>(inpCapacity) : new List<TEdge>();
-            this.outEdges = outCapacity > 0 ? new List<TEdge>(outCapacity) : new List<TEdge>();
+            this.inpEdges = inputCapacity > 0 ? new List<TEdge>(inputCapacity) : new List<TEdge>();
+            this.outEdges = outputCapacity > 0 ? new List<TEdge>(outputCapacity) : new List<TEdge>();
         }
 
         /// <summary>

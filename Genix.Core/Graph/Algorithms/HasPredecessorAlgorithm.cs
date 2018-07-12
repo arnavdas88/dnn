@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Accord.DNN
+namespace Genix.Graph
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Accord.DNN
     /// <summary>
     /// Represents an algorithm that determines whether a vertex has a predecessor that matches the conditions defined by the specified predicate.
     /// </summary>
-    internal static class HasPredecessorAlgorithm
+    public static class HasPredecessorAlgorithm
     {
         /// <summary>
         /// Determines whether a vertex has a predecessor that matches the conditions defined by the specified predicate.

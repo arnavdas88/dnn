@@ -56,12 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassificationNetwork.cs" />
-    <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
-    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
-    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex}.cs" />
-    <Compile Include="Graph\BidirectionalGraph{TVertex}.cs" />
-    <Compile Include="Graph\Edge{TVertex}.cs" />
-    <Compile Include="Graph\BidirectionalGraph{TVertex,TEdge}.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="LanguageModel\CompositeState.cs" />
     <Compile Include="LanguageModel\NullContext.cs" />
@@ -88,7 +82,6 @@
     <Compile Include="Learning\Losses\CTCBeamSearch.cs" />
     <Compile Include="Learning\Losses\CTCLoss.cs" />
     <Compile Include="NetworkGraph\NetworkGraphJsonConverter.cs" />
-    <Compile Include="Graph\BidirectionalVertex{TVertex,TEdge}.cs" />
     <Compile Include="Layers\AveragePoolingLayer.cs" />
     <Compile Include="Layers\ConcatLayer.cs" />
     <Compile Include="Layers\LRNLayer.cs" />

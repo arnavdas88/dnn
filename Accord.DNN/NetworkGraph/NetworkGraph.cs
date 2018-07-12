@@ -13,6 +13,7 @@ namespace Accord.DNN
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Genix.Graph;
     using Layers;
     using Newtonsoft.Json;
 

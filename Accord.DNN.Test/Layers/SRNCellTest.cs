@@ -144,10 +144,10 @@
             Tensor expected = new Tensor(null, new[] { 2, 2 });
             expected.Weights[0] = MKL.DotProduct(3, layer.W.Weights, 0, x.Weights, 0) + bw[0];
             expected.Weights[1] = MKL.DotProduct(3, layer.W.Weights, 3, x.Weights, 0) + bw[1];
-            MKL.ReLU(2, expected.Weights, 0, expected.Weights, 0);
+            Nonlinearity.ReLU(2, expected.Weights, 0, expected.Weights, 0);
             expected.Weights[2] = MKL.DotProduct(3, layer.W.Weights, 0, x.Weights, 3) + bw[0] + MKL.DotProduct(2, layer.U.Weights, 0, expected.Weights, 0);
             expected.Weights[3] = MKL.DotProduct(3, layer.W.Weights, 3, x.Weights, 3) + bw[1] + MKL.DotProduct(2, layer.U.Weights, 2, expected.Weights, 0);
-            MKL.ReLU(2, expected.Weights, 2, expected.Weights, 2);
+            Nonlinearity.ReLU(2, expected.Weights, 2, expected.Weights, 2);
             Helpers.AreTensorsEqual(expected, ys[0]);
 
             // unroll the graph
@@ -164,7 +164,7 @@
 
             for (int oi = 2, ii = 3; oi >= 0; oi -= 2, ii -= 3)
             {
-                MKL.ReLUGradient(2, dy, oi, true, expected.Weights, oi, dy, oi);
+                Nonlinearity.ReLUGradient(2, dy, oi, true, expected.Weights, oi, dy, oi);
 
                 // should be x' * dy
                 Matrix.VxV(MatrixLayout.ColumnMajor, 3, 2, x.Weights, ii, dy, oi, expectedWG, 0);

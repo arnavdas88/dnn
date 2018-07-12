@@ -630,12 +630,12 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.ReLU(x.Length, x.Weights, 0, y.Weights, 0);
+                    Nonlinearity.ReLU(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.ReLUGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
+                        session.Push(ActionName, () => Nonlinearity.ReLUGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -667,12 +667,12 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Sigmoid(x.Length, x.Weights, 0, y.Weights, 0);
+                    Nonlinearity.Sigmoid(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.SigmoidGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
+                        session.Push(ActionName, () => Nonlinearity.SigmoidGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -704,12 +704,12 @@ namespace Accord.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Tanh(x.Length, x.Weights, 0, y.Weights, 0);
+                    Nonlinearity.Tanh(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.TanhGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
+                        session.Push(ActionName, () => Nonlinearity.TanhGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -735,12 +735,12 @@ namespace Accord.DNN
                 ActionName,
                 () =>
                 {
-                    MKL.Tanh(x.Length, x.Weights, 0, x.Weights, 0);
+                    Nonlinearity.Tanh(x.Length, x.Weights, 0, x.Weights, 0);
 
 #if !NOLEARNING
                     if (session.CalculateGradients && x.CalculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.TanhGradientIP(x.Length, x.Weights, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Nonlinearity.TanhGradientIP(x.Length, x.Gradient, 0, x.Weights, 0));
                     }
 #endif
 

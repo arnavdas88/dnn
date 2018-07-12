@@ -14,6 +14,7 @@ namespace Accord.DNN
     using System.Reflection;
     using System.Text.RegularExpressions;
     using Genix.Core;
+    using Genix.Graph;
     using Layers;
 
     internal class NetworkGraphBuilder
