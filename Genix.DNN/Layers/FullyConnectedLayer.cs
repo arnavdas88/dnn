@@ -7,9 +7,11 @@
 namespace Genix.DNN.Layers
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -19,33 +21,40 @@ namespace Genix.DNN.Layers
     public class FullyConnectedLayer : StochasticLayer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+)(N)$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FullyConnectedLayer(
-            int[] inputShape,
-            int numberOfNeurons,
-            MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
-            : base(
-                  FullyConnectedLayer.CalculateOutputShape(inputShape, numberOfNeurons),
-                  numberOfNeurons,
-                  matrixLayout,
-                  FullyConnectedLayer.CalculateWeightsShape(inputShape, numberOfNeurons, matrixLayout),
-                  FullyConnectedLayer.CalculateBiasesShape(numberOfNeurons),
-                  random)
+        public FullyConnectedLayer(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
         {
+            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public FullyConnectedLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, FullyConnectedLayer.ArchitecturePattern);
+            int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+
+            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class, using the existing <see cref="FullyConnectedLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="FullyConnectedLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FullyConnectedLayer(FullyConnectedLayer other) : base(other)
         {
         }
@@ -53,7 +62,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="FullyConnectedLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private FullyConnectedLayer()
         {
@@ -70,61 +78,30 @@ namespace Genix.DNN.Layers
         public override object Clone() => new FullyConnectedLayer(this);
 
         /// <summary>
-        /// Computes the dimensions of the layer's destination tensor.
+        /// Initializes the <see cref="FullyConnectedLayer"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's destination tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, int numberOfNeurons)
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="random">The random numbers generator.</param>
+        private void Initialize(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
         {
             if (inputShape == null)
             {
                 throw new ArgumentNullException(nameof(inputShape));
             }
 
-            return new[] { inputShape[(int)Axis.B], numberOfNeurons };
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's weights tensor.
-        /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateWeightsShape(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout)
-        {
+            // column-major matrix organization - each row contains all weights for one neuron
+            // row-major matrix organization - each column contains all weights for one neuron
             int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { mbsize, numberOfNeurons } :
+                new[] { numberOfNeurons, mbsize };
 
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { mbsize, numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { numberOfNeurons, mbsize };
-            }
-        }
+            int[] biasesShape = new[] { numberOfNeurons };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's biases tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's biases tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateBiasesShape(int numberOfNeurons)
-        {
-            return new[] { numberOfNeurons };
+            this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
+            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
         }
     }
 }

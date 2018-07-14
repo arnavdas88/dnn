@@ -243,10 +243,10 @@ namespace Genix.NetLearn
                                     task.Crop)
                                 .Select(bitmap =>
                                 {
-                                    if (epoch == 0)
+                                    /*if (epoch == 0)
                                     {
-                                        ////bitmap.Save("e:\\temp\\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.Id + ".bmp");
-                                    }
+                                        bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.Id + ".bmp");
+                                    }*/
 
                                     return (Tensor.FromBitmap(null, bitmap), labels);
                                 });

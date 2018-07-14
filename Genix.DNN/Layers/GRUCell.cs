@@ -16,6 +16,7 @@ namespace Genix.DNN.Layers
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -25,32 +26,34 @@ namespace Genix.DNN.Layers
     public class GRUCell : RNNCell
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+)(GRUC)$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GRUCell"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GRUCell(
-            int[] inputShape,
-            int numberOfNeurons,
-            MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
-            : base(
-                  GRUCell.CalculateOutputShape(inputShape, numberOfNeurons),
-                numberOfNeurons,
-                matrixLayout,
-                GRUCell.CalculateWeightsShape(inputShape, numberOfNeurons, matrixLayout),
-                GRUCell.CalculateHiddenWeightsShape(numberOfNeurons, matrixLayout),
-                GRUCell.CalculateBiasesShape(numberOfNeurons),
-                random)
+        public GRUCell(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
         {
-            this.UC = new Tensor("hidden weights (2)", GRUCell.CalculateCandidateWeightsShape(numberOfNeurons));
-            this.UC.Randomize(random ?? new RandomRangeGenerator(-0.08f, 0.08f));
+            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+        }
 
-            // initialize biases for update and reset gates only
-            SetCopy.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GRUCell"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public GRUCell(int[] inputShape, string architecture, RandomNumberGenerator random)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, GRUCell.ArchitecturePattern);
+            int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+
+            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
@@ -217,99 +220,49 @@ namespace Genix.DNN.Layers
 #endif
 
         /// <summary>
-        /// Computes the dimensions of the layer's destination tensor.
+        /// Initializes the <see cref="GRUCell"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's destination tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, int numberOfNeurons)
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="random">The random numbers generator.</param>
+        private void Initialize(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
         {
-            if (inputShape == null)
+            if (random == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                random = new RandomRangeGenerator(-0.08f, 0.08f);
             }
 
-            return new[] { inputShape[(int)Axis.B], numberOfNeurons };
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's weights tensor.
-        /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateWeightsShape(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout)
-        {
+            // column-major matrix organization - each row contains all weights for one neuron
+            // row-major matrix organization - each column contains all weights for one neuron
             int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { mbsize, 3 * numberOfNeurons } :
+                new[] { 3 * numberOfNeurons, mbsize };
 
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { mbsize, 3 * numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { 3 * numberOfNeurons, mbsize };
-            }
-        }
+            int[] hiddenShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { numberOfNeurons, 2 * numberOfNeurons } :
+                new[] { 2 * numberOfNeurons, numberOfNeurons };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's hidden weights tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's hidden weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateHiddenWeightsShape(int numberOfNeurons, MatrixLayout matrixLayout)
-        {
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { numberOfNeurons, 2 * numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { 2 * numberOfNeurons, numberOfNeurons };
-            }
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's candidate weights tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's candidate weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateCandidateWeightsShape(int numberOfNeurons)
-        {
-            return new[] { numberOfNeurons, numberOfNeurons };
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's biases tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's biases tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateBiasesShape(int numberOfNeurons)
-        {
             // keep all weights in single channel
-            // allocate three matrices (one for each of two gates and one for the state)
-            return new[] { 3 * numberOfNeurons };
+            // allocate four matrices (one for each of three gates and one for the state)
+            int[] biasesShape = new[] { 3 * numberOfNeurons };
+
+            this.Initialize(
+                numberOfNeurons,
+                matrixLayout,
+                weightsShape,
+                hiddenShape,
+                biasesShape,
+                random ?? new RandomRangeGenerator(-0.08f, 0.08f));
+
+            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
+
+            this.UC = new Tensor("hidden weights (2)", new[] { numberOfNeurons, numberOfNeurons });
+            this.UC.Randomize(random);
+
+            // initialize biases for update and reset gates only
+            SetCopy.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
         }
 
 #if !TENSORFLOW

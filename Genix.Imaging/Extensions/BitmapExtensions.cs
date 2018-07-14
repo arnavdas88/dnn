@@ -628,7 +628,7 @@ namespace Genix.Imaging
                 }
                 else if (2 * strideDst == strideSrc)
                 {
-                    NativeMethods.bits_copy_be64to32(strideDst, src, 0, udst, 0, true);
+                    NativeMethods.bits_copy_be64to32(height * strideDst, src, 0, udst, 0, true);
                 }
                 else
                 {
@@ -657,14 +657,14 @@ namespace Genix.Imaging
                     int offdst = (height - 1) * strideDst;
                     for (int i = 0; i < height; i++)
                     {
-                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst, true);
+                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, true);
                         offsrc -= strideSrc;
                         offdst -= strideDst;
                     }
                 }
                 else if (strideDst == 2 * strideSrc)
                 {
-                    NativeMethods.bits_copy_be32to64(height * strideDst, usrc, 0, dst, 0, true);
+                    NativeMethods.bits_copy_be32to64(height * strideSrc, usrc, 0, dst, 0, true);
                 }
                 else
                 {
@@ -672,7 +672,7 @@ namespace Genix.Imaging
                     int offdst = 0;
                     for (int i = 0; i < height; i++)
                     {
-                        NativeMethods.bits_copy_be32to64(strideDst, usrc, offsrc, dst, offdst, true);
+                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, true);
                         offsrc += strideSrc;
                         offdst += strideDst;
                     }

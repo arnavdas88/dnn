@@ -10,6 +10,7 @@ namespace Genix.DNN.Layers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -20,6 +21,11 @@ namespace Genix.DNN.Layers
     public sealed class ConvolutionLayer : StochasticLayer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+)(C)(\d+)(?:x(\d+))?(?:\+(\d+)(?:x(\d+))?\(S\))?(?:\+(-?\d+)(?:x(-?\d+))?\(P\))?$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
@@ -27,34 +33,35 @@ namespace Genix.DNN.Layers
         /// <param name="kernel">The convolution kernel.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ConvolutionLayer(
             int[] inputShape,
             int numberOfFilters,
             Kernel kernel,
             MatrixLayout matrixLayout,
             RandomNumberGenerator random)
-            : base(
-                  ConvolutionLayer.CalculateOutputShape(inputShape, numberOfFilters, kernel),
-                  numberOfFilters,
-                  matrixLayout,
-                  ConvolutionLayer.CalculateWeightsShape(inputShape, numberOfFilters, kernel, matrixLayout),
-                  ConvolutionLayer.CalculateBiasesShape(numberOfFilters),
-                  random)
         {
-            if (inputShape == null)
-            {
-                throw new ArgumentNullException(nameof(inputShape));
-            }
+            this.Initialize(inputShape, numberOfFilters, kernel, matrixLayout, random);
+        }
 
-            this.Kernel = kernel;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public ConvolutionLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, ConvolutionLayer.ArchitecturePattern);
+            int numberOfFilters = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+            Kernel kernel = Layer.ParseKernel(groups, 3, 1, true);
+
+            this.Initialize(inputShape, numberOfFilters, kernel, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class, using the existing <see cref="ConvolutionLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ConvolutionLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ConvolutionLayer(ConvolutionLayer other) : base(other)
         {
             this.Kernel = other.Kernel;
@@ -63,7 +70,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="ConvolutionLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private ConvolutionLayer()
         {
@@ -142,43 +148,48 @@ namespace Genix.DNN.Layers
         }
 
         /// <summary>
-        /// Computes the dimensions of the layer's weights tensor.
+        /// Initializes the <see cref="FullyConnectedLayer"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>
         /// <param name="kernel">The convolution kernel.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateWeightsShape(int[] inputShape, int numberOfFilters, Kernel kernel, MatrixLayout matrixLayout)
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="random">The random numbers generator.</param>
+        private void Initialize(
+            int[] inputShape,
+            int numberOfFilters,
+            Kernel kernel,
+            MatrixLayout matrixLayout,
+            RandomNumberGenerator random)
         {
+            if (inputShape == null)
+            {
+                throw new ArgumentNullException(nameof(inputShape));
+            }
+
+            if (kernel == null)
+            {
+                throw new ArgumentNullException(nameof(kernel));
+            }
+
+            // column-major matrix organization - each row contains all weights for one neuron
+            // row-major matrix organization - each column contains all weights for one neuron
             int mbsize = kernel.Size * inputShape[(int)Axis.C];
+            int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { mbsize, numberOfFilters } :
+                new[] { numberOfFilters, mbsize };
 
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { mbsize, numberOfFilters };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { numberOfFilters, mbsize };
-            }
-        }
+            int[] biasesShape = new[] { numberOfFilters };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's biases tensor.
-        /// </summary>
-        /// <param name="numberOfFilters">The number of filters in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's biases tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateBiasesShape(int numberOfFilters)
-        {
-            return new[] { numberOfFilters };
+            this.Initialize(numberOfFilters, matrixLayout, weightsShape, biasesShape, random);
+            this.Kernel = kernel;
+            this.OutputShape = new[]
+            {
+                inputShape[(int)Axis.B],
+                kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),
+                kernel.CalculateOutputHeight(inputShape[(int)Axis.Y]),
+                numberOfFilters
+            };
         }
     }
 }

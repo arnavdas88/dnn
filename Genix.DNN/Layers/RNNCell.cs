@@ -26,37 +26,14 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNCell"/> class.
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
-        /// <param name="weightsShape">The dimensions of the layer's weights tensor.</param>
-        /// <param name="hiddenShape">The dimensions of the layer's hidden weights tensor. Can be <b>null</b>.</param>
-        /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
-        /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected RNNCell(
-            int[] outputShape,
-            int numberOfNeurons,
-            MatrixLayout matrixLayout,
-            int[] weightsShape,
-            int[] hiddenShape,
-            int[] biasesShape,
-            RandomNumberGenerator random)
-            : base(outputShape, numberOfNeurons, matrixLayout, weightsShape, biasesShape, random ?? new RandomRangeGenerator(-0.08f, 0.08f))
+        protected RNNCell(int[] outputShape) : base(outputShape)
         {
-            if (hiddenShape == null)
-            {
-                throw new ArgumentNullException(nameof(hiddenShape));
-            }
-
-            this.U = new Tensor("hidden weights", hiddenShape);
-            this.U.Randomize(random ?? new RandomRangeGenerator(-0.08f, 0.08f));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RNNCell"/> class, using the existing <see cref="RNNCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="RNNCell"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected RNNCell(RNNCell other) : base(other)
         {
             this.U = other.U?.Clone() as Tensor;
@@ -65,7 +42,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="RNNCell"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected RNNCell()
         {
         }
@@ -113,6 +89,39 @@ namespace Genix.DNN.Layers
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
         {
             return base.EnumGradients().Append((this.U, 1.0f, 1.0f));
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="StochasticLayer"/>.
+        /// </summary>
+        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="weightsShape">The dimensions of the layer's weights tensor.</param>
+        /// <param name="hiddenShape">The dimensions of the layer's hidden weights tensor.</param>
+        /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
+        /// <param name="random">The random numbers generator.</param>
+        protected internal void Initialize(
+            int numberOfNeurons,
+            MatrixLayout matrixLayout,
+            int[] weightsShape,
+            int[] hiddenShape,
+            int[] biasesShape,
+            RandomNumberGenerator random)
+        {
+            if (hiddenShape == null)
+            {
+                throw new ArgumentNullException(nameof(hiddenShape));
+            }
+
+            if (random == null)
+            {
+                random = new RandomRangeGenerator(-0.08f, 0.08f);
+            }
+
+            base.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
+
+            this.U = new Tensor("hidden weights", hiddenShape);
+            this.U.Randomize(random);
         }
     }
 }

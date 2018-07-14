@@ -6,9 +6,11 @@
 
 namespace Genix.DNN.Layers
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -17,6 +19,11 @@ namespace Genix.DNN.Layers
     /// </summary>
     public sealed class DropoutLayer : Layer
     {
+        /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(D)(0\.\d+)$";
+
         /// <summary>
         /// The random numbers generator.
         /// </summary>
@@ -27,17 +34,27 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="probability">The dropout probability.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DropoutLayer(int[] inputShape, double probability) : base(1, inputShape)
         {
             this.Probability = probability;
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DropoutLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(1, inputShape)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, DropoutLayer.ArchitecturePattern);
+            this.Probability = Convert.ToDouble(groups[2].Value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DropoutLayer"/> class, using the existing <see cref="DropoutLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="DropoutLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DropoutLayer(DropoutLayer other) : base(other)
         {
             this.Probability = other.Probability;
@@ -46,7 +63,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="DropoutLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private DropoutLayer()
         {

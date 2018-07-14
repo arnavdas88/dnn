@@ -6,9 +6,13 @@
 
 namespace Genix.DNN.Layers
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -17,21 +21,37 @@ namespace Genix.DNN.Layers
     public class SplitLayer : Layer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(SP)(\d+)$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SplitLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfOutputs">The number of output tensors.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SplitLayer(int[] inputShape, int numberOfOutputs)
             : base(numberOfOutputs, inputShape)
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SplitLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public SplitLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1 /* temp */, inputShape)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, SplitLayer.ArchitecturePattern);
+            this.NumberOfOutputs = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SplitLayer"/> class, using the existing <see cref="SplitLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SplitLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SplitLayer(SplitLayer other) : base(other)
         {
         }
@@ -39,7 +59,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="SplitLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private SplitLayer()
         {

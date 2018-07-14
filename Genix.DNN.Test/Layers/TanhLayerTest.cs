@@ -1,12 +1,11 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Genix.DNN;
     using Genix.DNN.Layers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
     [TestClass]
@@ -15,43 +14,75 @@
         private static Func<float, float> activation = (x) => (float)Math.Tanh(x);
         private static Func<float, float> derivative = (x) => (1.0f - x * x);
 
-        private int[] shape;
-        private Tensor source;
-        private TanhLayer layer;
-
-        [TestInitialize]
-        public void BeforeEach()
-        {
-            this.shape = new[] { 2 };
-            this.source = new Tensor(null, this.shape, new float[] { 2, -3 });
-
-            this.layer = new TanhLayer(this.shape);
-        }
-
         [TestMethod]
         public void ConstructorTest1()
         {
-            CollectionAssert.AreEqual(this.shape, this.layer.OutputShape);
-            Assert.AreEqual("TH", this.layer.Architecture);
-        }
-
-        [TestMethod]
-        public void ConstructorTest2()
-        {
-            Layer layer2 = new TanhLayer(this.layer);
-            Assert.AreEqual(JsonConvert.SerializeObject(this.layer), JsonConvert.SerializeObject(layer2));
+            int[] shape = new[] { 2 };
+            TanhLayer layer = new TanhLayer(shape);
+            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            Assert.AreEqual("TH", layer.Architecture);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ConstructorTest2()
         {
             Assert.IsNotNull(new TanhLayer((int[])null));
         }
 
         [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { 2 };
+            TanhLayer layer = new TanhLayer(shape, "TH", null);
+
+            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            Assert.AreEqual("TH", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "THH";
+            try
+            {
+                TanhLayer layer = new TanhLayer(new[] { 2 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new TanhLayer(null, "TH", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new TanhLayer(new[] { 2 }, null, null));
+        }
+
+        [TestMethod]
         public void CopyConstructorTest1()
+        {
+            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            TanhLayer layer2 = new TanhLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new TanhLayer((TanhLayer)null));
         }
@@ -59,14 +90,16 @@
         [TestMethod]
         public void CloneTest()
         {
-            Layer layer2 = this.layer.Clone() as TanhLayer;
-            Assert.AreEqual(JsonConvert.SerializeObject(this.layer), JsonConvert.SerializeObject(layer2));
+            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            TanhLayer layer2 = layer1.Clone() as TanhLayer;
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
         [TestMethod]
         public void SerializeTest()
         {
-            string s1 = JsonConvert.SerializeObject(this.layer);
+            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            string s1 = JsonConvert.SerializeObject(layer1);
             TanhLayer layer2 = JsonConvert.DeserializeObject<TanhLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
             Assert.AreEqual(s1, s2);
@@ -75,12 +108,16 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
+            int[] shape = new[] { 2 };
+            TanhLayer layer = new TanhLayer(shape);
+
             Session session = new Session();
 
-            Tensor x = this.source.Clone() as Tensor;
-            Tensor y = this.layer.Forward(session, new[] { x })[0];
+            Tensor source = new Tensor(null, shape, new float[] { 2, -3 });
+            Tensor x = source.Clone() as Tensor;
+            Tensor y = layer.Forward(session, new[] { x })[0];
 
-            float[] expected = this.source.Weights.Select(w => TanhLayerTest.activation(w)).ToArray();
+            float[] expected = source.Weights.Select(w => TanhLayerTest.activation(w)).ToArray();
             Helpers.AreArraysEqual(expected, y.Weights);
 
             // unroll the graph

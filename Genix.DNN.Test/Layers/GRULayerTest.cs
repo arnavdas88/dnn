@@ -8,38 +8,16 @@
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
-    using Genix.Core;
+    using Genix.DNN.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using Learning;
 
     [TestClass]
     public class GRULayerTest
     {
-        [TestMethod, TestCategory("GRU")]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            const string Architecture = "20-30-40GRU";
-            GRULayer layer = (GRULayer)NetworkGraphBuilder.CreateLayer(shape, Architecture, null);
-
-            Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
-            Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
-            Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
-            Assert.AreEqual(Architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("GRU")]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            const string Architecture = "100GRU";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, Architecture, null));
-        }
-
         [TestMethod, TestCategory("GRU")]
         public void ConstructorTest1()
         {
@@ -49,18 +27,67 @@
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
             Assert.AreEqual("20-30GRU", layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { 1, 30 }, layer.OutputShape);
         }
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ConstructorTest2()
         {
             Assert.IsNotNull(new GRULayer(null, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            string architecture = "20-30-40GRU";
+            GRULayer layer = new GRULayer(shape, "20-30-40GRU", null);
+
+            Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
+            Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
+            Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("GRU")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100GRU";
+            try
+            {
+                GRULayer layer = new GRULayer(new[] { 1, 20, 20, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new GRULayer(null, "20-30GRU", null));
+        }
+
+        [TestMethod, TestCategory("GRU")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new GRULayer(new[] { 1, 20, 20, 10 }, null, null));
+        }
+
+        [TestMethod, TestCategory("GRU")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest3()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new GRULayer(shape, null, MatrixLayout.ColumnMajor, null));
@@ -68,7 +95,7 @@
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ConstructorTest5()
+        public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new GRULayer(shape, new[] { 20 }, MatrixLayout.ColumnMajor, null));
@@ -102,7 +129,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRULayer layer1 = new GRULayer(shape, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer1 = new GRULayer(shape, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             GRULayer layer2 = layer1.Clone() as GRULayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -111,7 +138,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRULayer layer1 = new GRULayer(shape, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer1 = new GRULayer(shape, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRULayer layer2 = JsonConvert.DeserializeObject<GRULayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -313,7 +340,7 @@
             // create network
             string architechture = string.Format(
                 CultureInfo.InvariantCulture,
-                "1x1x{0}~20-{1}SRN~TH~SM",
+                "1x1x{0}~20-{1}GRU~TH~SM",
                 alphabet.Count,
                 alphabet.Count + 1);
 

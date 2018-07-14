@@ -9,6 +9,7 @@ namespace Genix.DNN.Layers
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -19,19 +20,33 @@ namespace Genix.DNN.Layers
     public class SigmoidLayer : ActivationLayer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^SIG$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SigmoidLayer(int[] inputShape) : base(inputShape)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SigmoidLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public SigmoidLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(inputShape)
+        {
+            Layer.ParseArchitechture(architecture, SigmoidLayer.ArchitecturePattern);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class, using the existing <see cref="SigmoidLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SigmoidLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SigmoidLayer(SigmoidLayer other) : base(other)
         {
         }
@@ -39,7 +54,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="SigmoidLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private SigmoidLayer()
         {

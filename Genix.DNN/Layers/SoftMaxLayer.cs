@@ -6,8 +6,13 @@
 
 namespace Genix.DNN.Layers
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -17,19 +22,33 @@ namespace Genix.DNN.Layers
     public class SoftMaxLayer : LossLayer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^SM$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SoftMaxLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SoftMaxLayer(int[] inputShape) : base(inputShape)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SoftMaxLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public SoftMaxLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(inputShape)
+        {
+            Layer.ParseArchitechture(architecture, SoftMaxLayer.ArchitecturePattern);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SoftMaxLayer"/> class, using the existing <see cref="SoftMaxLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SoftMaxLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SoftMaxLayer(SoftMaxLayer other) : base(other)
         {
         }
@@ -37,7 +56,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="SoftMaxLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private SoftMaxLayer()
         {

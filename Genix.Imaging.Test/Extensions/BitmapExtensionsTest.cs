@@ -22,7 +22,7 @@
         [TestMethod]
         public void FromBitmapTest()
         {
-            DirectoryInfo di = new DirectoryInfo(@"L:\FormXtra\HCFA\DropOut\DataDim-SET1");
+            /*DirectoryInfo di = new DirectoryInfo(@"L:\FormXtra\HCFA\DropOut\DataDim-SET1");
             foreach (FileInfo fileInfo in di.EnumerateFiles("*.tif"))
             {
                 foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileInfo.FullName))
@@ -30,7 +30,7 @@
                     Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();
                     dst.Save(Path.Combine(@"w:\temp", Path.GetFileName(fileInfo.FullName)));
                 }
-            }
+            }*/
 
             ////foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"Z:\Test\UnitTests\Image\00000013_tif.TIF"))
             foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))

@@ -22,7 +22,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected RNNLayer(int[] inputShape) : base(inputShape)
         {
             this.Graph = new NetworkGraph();
@@ -32,7 +31,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNLayer"/> class, using the existing <see cref="RNNLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="RNNLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected RNNLayer(RNNLayer other) : base(other)
         {
             if (other == null)
@@ -46,10 +44,10 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="RNNLayer"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         protected RNNLayer()
         {
+            this.Graph = new NetworkGraph();
         }
 
         /// <summary>
@@ -58,7 +56,7 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The recurrent network graph.
         /// </value>
-        [JsonProperty("Graph", Order = 2)]
+        [JsonProperty("Graph", Order = 2, ObjectCreationHandling = ObjectCreationHandling.Reuse)]
         internal NetworkGraph Graph { get; private set; }
 
         /// <inheritdoc />

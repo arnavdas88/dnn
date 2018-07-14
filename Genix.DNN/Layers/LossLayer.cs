@@ -21,7 +21,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LossLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected LossLayer(int[] inputShape)
             : base(1, LossLayer.CalculateOutputShape(inputShape))
         {
@@ -32,7 +31,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LossLayer"/> class, using the existing <see cref="LossLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LossLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected LossLayer(LossLayer other) : base(other)
         {
             this.NumberOfClasses = other.NumberOfClasses;
@@ -41,7 +39,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="LossLayer"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected LossLayer()
         {
         }

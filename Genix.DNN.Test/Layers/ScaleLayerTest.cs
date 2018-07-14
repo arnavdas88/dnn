@@ -1,7 +1,7 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using Genix.DNN;
     using Genix.DNN.Layers;
@@ -11,58 +11,77 @@
     [TestClass]
     public class ScaleLayerTest
     {
-        private int[] shape;
-        private ScaleLayer layer;
-
-        [TestInitialize]
-        public void BeforeEach()
+        [TestMethod]
+        public void ConstructorTest1()
         {
-            this.shape = new[] { -1, 20, 20, 10 };
-            this.layer = new ScaleLayer(this.shape, 0.7f);
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ScaleLayer layer = new ScaleLayer(shape, 0.7f);
+
+            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            Assert.AreEqual(0.7f, layer.Alpha);
+            Assert.AreEqual("S0.7", layer.Architecture);
         }
 
         [TestMethod]
-        public void CreateLayerTest1()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
         {
-            string architecture = "S0.7";
-            this.layer = (ScaleLayer)NetworkGraphBuilder.CreateLayer(this.shape, architecture, null);
+            Assert.IsNotNull(new ScaleLayer(null, 0.7f));
+        }
 
-            Assert.AreEqual(0.7f, this.layer.Alpha);
-            Assert.AreEqual(architecture, this.layer.Architecture);
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ScaleLayer layer = new ScaleLayer(shape, "S0.7", null);
+
+            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            Assert.AreEqual("S0.7", layer.Architecture);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
+        public void ArchitechtureConstructorTest2()
         {
             string architecture = "S";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(this.shape, architecture, null));
-        }
-
-        [TestMethod]
-        public void ConstructorTest1()
-        {
-            CollectionAssert.AreEqual(this.shape, this.layer.OutputShape);
-            Assert.AreEqual("S0.7", this.layer.Architecture);
-        }
-
-        [TestMethod]
-        public void ConstructorTest2()
-        {
-            ScaleLayer layer2 = new ScaleLayer(this.layer);
-            Assert.AreEqual(JsonConvert.SerializeObject(this.layer), JsonConvert.SerializeObject(layer2));
+            try
+            {
+                ScaleLayer layer = new ScaleLayer(new[] { -1, 20, 20, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ArchitechtureConstructorTest3()
         {
-            Assert.IsNotNull(new ScaleLayer((int[])null, 0.7f));
+            Assert.IsNotNull(new ScaleLayer(null, "S0.7", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new ScaleLayer(new[] { -1, 20, 20, 10 }, null, null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            ScaleLayer layer1 = new ScaleLayer(new[] { -1, 20, 20, 10 }, 0.7f);
+            ScaleLayer layer2 = new ScaleLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new ScaleLayer((ScaleLayer)null));
         }
@@ -70,14 +89,16 @@
         [TestMethod]
         public void CloneTest()
         {
-            ScaleLayer layer2 = this.layer.Clone() as ScaleLayer;
-            Assert.AreEqual(JsonConvert.SerializeObject(this.layer), JsonConvert.SerializeObject(layer2));
+            ScaleLayer layer1 = new ScaleLayer(new[] { -1, 20, 20, 10 }, 0.7f);
+            ScaleLayer layer2 = layer1.Clone() as ScaleLayer;
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
         [TestMethod]
         public void SerializeTest()
         {
-            string s1 = JsonConvert.SerializeObject(this.layer);
+            ScaleLayer layer1 = new ScaleLayer(new[] { -1, 20, 20, 10 }, 0.7f);
+            string s1 = JsonConvert.SerializeObject(layer1);
             ScaleLayer layer2 = JsonConvert.DeserializeObject<ScaleLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
             Assert.AreEqual(s1, s2);
@@ -87,6 +108,9 @@
         [Description("Shall multiply all weights by scale factor.")]
         public void ForwardBackwardTest()
         {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ScaleLayer layer = new ScaleLayer(shape, 0.7f);
+
             for (int i = 1; i <= 3; i++)
             {
                 Session session = new Session();
@@ -96,7 +120,7 @@
 
                 Tensor y = layer.Forward(session, new[] { x })[0];
 
-                Tensor expected = new Tensor(null, x.Axes, x.Weights.Select(w => w * this.layer.Alpha).ToArray());
+                Tensor expected = new Tensor(null, x.Axes, x.Weights.Select(w => w * layer.Alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 // unroll the graph
@@ -104,7 +128,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Select(w => w * this.layer.Alpha).ToArray(),
+                    y.Gradient.Select(w => w * layer.Alpha).ToArray(),
                     x.Gradient);
             }
         }

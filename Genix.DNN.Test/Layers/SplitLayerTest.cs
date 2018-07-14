@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Globalization;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,25 +11,6 @@
     [TestClass]
     public class SplitLayerTest
     {
-        [TestMethod]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 2, 2, 2 };
-            string architecture = "SP3";
-            SplitLayer layer = (SplitLayer)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 2, 2, 2 };
-            string architecture = "SP";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, architecture, null));
-        }
-
         [TestMethod]
         public void ConstructorTest1()
         {
@@ -43,9 +24,52 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
+        public void ConstructorTest2()
         {
-            Assert.IsNotNull(new SplitLayer((int[])null, 3));
+            Assert.IsNotNull(new SplitLayer(null, 3));
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 2, 2, 2 };
+            SplitLayer layer = new SplitLayer(shape, "SP3", null);
+
+            Assert.AreEqual(3, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            Assert.AreEqual("SP3", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "SP";
+            try
+            {
+                SplitLayer layer = new SplitLayer(new[] { -1, 2, 2, 2 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new SplitLayer(null, "SP3", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new SplitLayer(new[] { -1, 2, 2, 2 }, null, null));
         }
 
         [TestMethod]

@@ -1,43 +1,19 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
+    using Genix.DNN.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using Learning;
-    using Genix.Core;
 
     [TestClass]
     public class SRNLayerTest
     {
-        [TestMethod, TestCategory("SRN")]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "20-30-40SRN";
-            SRNLayer layer = (SRNLayer)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
-            Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
-            Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("SRN")]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "100SRN";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, architecture, null));
-        }
-
         [TestMethod, TestCategory("SRN")]
         public void ConstructorTest1()
         {
@@ -47,18 +23,20 @@
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
             Assert.AreEqual("20-30SRN", layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { 1, 30 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new SRNLayer(null, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
-        {
-            Assert.IsNotNull(new SRNLayer((int[])null, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null));
-        }
-
-        [TestMethod, TestCategory("SRN")]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new SRNLayer(shape, null, MatrixLayout.ColumnMajor, null));
@@ -66,10 +44,57 @@
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ConstructorTest5()
+        public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new SRNLayer(shape, new[] { 20 }, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            string architecture = "20-30-40SRN";
+            SRNLayer layer = new SRNLayer(shape, "20-30-40SRN", null);
+
+            Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
+            Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
+            Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100SRN";
+            try
+            {
+                SRNLayer layer = new SRNLayer(new[] { 1, 20, 20, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new SRNLayer(null, "20-30SRN", null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new SRNLayer(new[] { 1, 20, 20, 10 }, null, null));
         }
 
         [TestMethod, TestCategory("SRN")]
@@ -85,7 +110,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
-            Assert.IsNotNull(new SRNLayer((SRNLayer)null));
+            Assert.IsNotNull(new SRNLayer(null));
         }
 
         [TestMethod, TestCategory("SRN")]
@@ -99,8 +124,8 @@
         [TestMethod, TestCategory("SRN")]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            SRNLayer layer1 = new SRNLayer(shape, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
+            int[] shape = new[] { -1, 2, 2, 1 };
+            SRNLayer layer1 = new SRNLayer(shape, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             SRNLayer layer2 = layer1.Clone() as SRNLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -108,8 +133,8 @@
         [TestMethod, TestCategory("SRN")]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            SRNLayer layer1 = new SRNLayer(shape, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
+            int[] shape = new[] { -1, 2, 2, 1 };
+            SRNLayer layer1 = new SRNLayer(shape, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             SRNLayer layer2 = JsonConvert.DeserializeObject<SRNLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);

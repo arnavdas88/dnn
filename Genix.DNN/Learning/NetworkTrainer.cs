@@ -234,7 +234,7 @@ namespace Genix.DNN.Learning
 
             if (batchSize > 1)
             {
-                MKL.Multiply(layer.w.Length, 1.0f / batchSize, dw, 0, dw, 0);
+                Mathematics.Multiply(layer.w.Length, 1.0f / batchSize, dw, 0, dw, 0);
             }
 
             float rateL1 = this.RateL1 * layer.RateL1Multiplier;
@@ -253,7 +253,7 @@ namespace Genix.DNN.Learning
             {
                 l2 = layer.w.L2Norm() * rateL2;
 
-                MKL.MultiplyAndAdd(layer.w.Length, rateL2, w, 0, dw, 0);
+                Mathematics.MultiplyAndAdd(layer.w.Length, rateL2, w, 0, dw, 0);
             }
 
             if (!float.IsNaN(this.ClipValue))
@@ -265,7 +265,7 @@ namespace Genix.DNN.Learning
             layer.w.Validate();
 
             // update weights
-            MKL.Add(layer.w.Length, dw, 0, w, 0);
+            Mathematics.Add(layer.w.Length, dw, 0, w, 0);
 
             // zero out gradient so that we can begin accumulating anew
             layer.w.ClearGradient();

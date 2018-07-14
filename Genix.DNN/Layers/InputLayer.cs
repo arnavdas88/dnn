@@ -12,6 +12,8 @@ namespace Genix.DNN.Layers
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -21,20 +23,42 @@ namespace Genix.DNN.Layers
     public class InputLayer : Layer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+|-1)x(\d+)x(\d+)$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="InputLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public InputLayer(int[] inputShape) : base(1, inputShape)
         {
             this.Shape = inputShape;
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InputLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public InputLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1, inputShape /* temp */)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, InputLayer.ArchitecturePattern);
+            this.Shape = this.OutputShape = new[]
+            {
+                -1,
+                Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture),
+                Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture),
+                Convert.ToInt32(groups[3].Value, CultureInfo.InvariantCulture)
+            };
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="InputLayer"/> class, using the existing <see cref="InputLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="InputLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public InputLayer(InputLayer other) : base(other)
         {
             this.Shape = other.Shape;

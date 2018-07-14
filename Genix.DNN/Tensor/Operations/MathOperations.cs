@@ -47,7 +47,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Add(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Mathematics.Add(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -61,7 +61,7 @@ namespace Genix.DNN
                                 {
                                     lock (a)
                                     {
-                                        MKL.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
+                                        Mathematics.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
                                     }
 
                                     a.Validate();
@@ -72,7 +72,7 @@ namespace Genix.DNN
                                 {
                                     lock (b)
                                     {
-                                        MKL.Add(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        Mathematics.Add(y.Length, y.Gradient, 0, b.Gradient, 0);
                                     }
 
                                     b.Validate();
@@ -112,13 +112,13 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Add(x.Length, x.Weights, 0, alpha, y.Weights, 0);
+                    Mathematics.Add(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += dy
-                        session.Push(ActionName, () => MKL.Add(y.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.Add(y.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -153,7 +153,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Subtract(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Mathematics.Subtract(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -167,7 +167,7 @@ namespace Genix.DNN
                                 {
                                     lock (a)
                                     {
-                                        MKL.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
+                                        Mathematics.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
                                     }
                                 }
 
@@ -176,7 +176,7 @@ namespace Genix.DNN
                                 {
                                     lock (b)
                                     {
-                                        MKL.Subtract(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        Mathematics.Subtract(y.Length, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });
@@ -214,7 +214,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Multiply(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Mathematics.Multiply(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -228,7 +228,7 @@ namespace Genix.DNN
                                 {
                                     lock (a)
                                     {
-                                        MKL.MultiplyAndAdd(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
+                                        Mathematics.MultiplyAndAdd(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
                                     }
                                 }
 
@@ -237,7 +237,7 @@ namespace Genix.DNN
                                 {
                                     lock (b)
                                     {
-                                        MKL.MultiplyAndAdd(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
+                                        Mathematics.MultiplyAndAdd(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });
@@ -273,12 +273,12 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Multiply(x.Length, alpha, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Multiply(x.Length, alpha, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.MultiplyAndAdd(y.Length, alpha, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.MultiplyAndAdd(y.Length, alpha, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -313,7 +313,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    MKL.Divide(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Mathematics.Divide(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -373,13 +373,13 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Square(x.Length, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Square(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += 2 * x * dy
-                        session.Push(ActionName, () => MKL.PowDerivative(x.Length, x.Weights, 0, 2.0f, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 2.0f, y.Gradient, 0));
                     }
 #endif
 
@@ -412,13 +412,13 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Pow(x.Length, x.Weights, 0, power, y.Weights, 0);
+                    Mathematics.Pow(x.Length, x.Weights, 0, power, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += p * x ^ (p - 1) * dy
-                        session.Push(ActionName, () => MKL.PowDerivative(x.Length, x.Weights, 0, power, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, power, y.Gradient, 0));
                     }
 #endif
 
@@ -450,13 +450,13 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Sqrt(x.Length, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Sqrt(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += 1 / (2 * sqrt(x)) * dy
-                        session.Push(ActionName, () => MKL.PowDerivative(x.Length, x.Weights, 0, 0.5f, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 0.5f, y.Gradient, 0));
                     }
 #endif
 
@@ -773,12 +773,12 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Sin(x.Length, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Sin(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.SinGradient(x.Length, x.Gradient, 0, false, x.Weights, 0, y.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
                     }
 #endif
 
@@ -810,12 +810,12 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Cos(x.Length, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Cos(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.CosGradient(x.Length, x.Gradient, 0, false, x.Weights, 0, y.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
                     }
 #endif
 
@@ -948,7 +948,7 @@ namespace Genix.DNN
                                     {
                                         lock (bias)
                                         {
-                                            MKL.Add(c.Length, c.Gradient, 0, bias.Gradient, 0);
+                                            Mathematics.Add(c.Length, c.Gradient, 0, bias.Gradient, 0);
                                         }
 
                                         bias.Validate();
@@ -1127,7 +1127,7 @@ namespace Genix.DNN
                                 {
                                     lock (bias)
                                     {
-                                        MKL.Add(ylen, y.Gradient, 0, bias.Gradient, 0);
+                                        Mathematics.Add(ylen, y.Gradient, 0, bias.Gradient, 0);
                                     }
 
                                     bias.Validate();

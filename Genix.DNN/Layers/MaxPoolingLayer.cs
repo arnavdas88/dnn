@@ -10,7 +10,10 @@ namespace Genix.DNN.Layers
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -19,13 +22,28 @@ namespace Genix.DNN.Layers
     public sealed class MaxPoolingLayer : PoolingLayer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(MP)(\d+)(?:x(\d+))?(?:\+(\d+)(?:x(\d+))?\(S\))?$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MaxPoolingLayer(int[] inputShape, Kernel kernel)
             : base(inputShape, kernel)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public MaxPoolingLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(inputShape, MaxPoolingLayer.KernelFromArchitecture(architecture))
         {
         }
 
@@ -33,7 +51,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class, using the existing <see cref="MaxPoolingLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="MaxPoolingLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MaxPoolingLayer(MaxPoolingLayer other) : base(other)
         {
         }
@@ -41,7 +58,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="MaxPoolingLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private MaxPoolingLayer()
         {
@@ -64,6 +80,18 @@ namespace Genix.DNN.Layers
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             return new[] { session.MaxPooling(xs[0], this.Kernel) };
+        }
+
+        /// <summary>
+        /// Extracts the pooling kernel from layer architecture.
+        /// </summary>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <returns>The pooling kernel.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Kernel KernelFromArchitecture(string architecture)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, MaxPoolingLayer.ArchitecturePattern);
+            return Layer.ParseKernel(groups, 2, null, false);
         }
     }
 }

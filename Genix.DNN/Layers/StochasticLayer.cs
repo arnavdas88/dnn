@@ -25,45 +25,17 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="StochasticLayer"/> class.
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
-        /// <param name="weightsShape">The dimensions of the layer's weights tensor.</param>
-        /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
-        /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected StochasticLayer(
-            int[] outputShape,
-            int numberOfNeurons,
-            MatrixLayout matrixLayout,
-            int[] weightsShape,
-            int[] biasesShape,
-            RandomNumberGenerator random)
-            : base(outputShape)
+        /// <remarks>
+        /// After using this constructor, the <see cref="StochasticLayer"/> should be initialized by calling <see cref="Initialize"/> method.
+        /// </remarks>
+        protected StochasticLayer(int[] outputShape) : base(outputShape)
         {
-            if (weightsShape == null)
-            {
-                throw new ArgumentNullException(nameof(weightsShape));
-            }
-
-            if (biasesShape == null)
-            {
-                throw new ArgumentNullException(nameof(biasesShape));
-            }
-
-            this.NumberOfNeurons = numberOfNeurons;
-            this.MatrixLayout = matrixLayout;
-
-            this.W = new Tensor("weights", weightsShape);
-            this.W.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt((double)numberOfNeurons / this.W.Length)));
-
-            this.B = new Tensor("biases", biasesShape);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StochasticLayer"/> class, using the existing <see cref="StochasticLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="StochasticLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected StochasticLayer(StochasticLayer other) : base(other)
         {
             if (other == null)
@@ -81,7 +53,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="StochasticLayer"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected StochasticLayer()
         {
         }
@@ -166,6 +137,40 @@ namespace Genix.DNN.Layers
         {
             yield return (this.W, 1.0f, 1.0f);
             yield return (this.B, 0.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="StochasticLayer"/>.
+        /// </summary>
+        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="weightsShape">The dimensions of the layer's weights tensor.</param>
+        /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
+        /// <param name="random">The random numbers generator.</param>
+        protected internal void Initialize(
+            int numberOfNeurons,
+            MatrixLayout matrixLayout,
+            int[] weightsShape,
+            int[] biasesShape,
+            RandomNumberGenerator random)
+        {
+            if (weightsShape == null)
+            {
+                throw new ArgumentNullException(nameof(weightsShape));
+            }
+
+            if (biasesShape == null)
+            {
+                throw new ArgumentNullException(nameof(biasesShape));
+            }
+
+            this.NumberOfNeurons = numberOfNeurons;
+            this.MatrixLayout = matrixLayout;
+
+            this.W = new Tensor("weights", weightsShape);
+            this.W.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt((double)numberOfNeurons / this.W.Length)));
+
+            this.B = new Tensor("biases", biasesShape);
         }
     }
 }

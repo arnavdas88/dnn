@@ -1,8 +1,8 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,58 +21,6 @@
             25, 26,   27, 28,   31, 32,   29, 30,
             13, 14,   15, 16,   19, 20,   17, 18,
         };
-
-        [TestMethod]
-        public void CreateLayerTest1()
-        {
-            const string Architecture = "AP2";
-            AveragePoolingLayer layer = (AveragePoolingLayer)NetworkGraphBuilder.CreateLayer(AveragePoolingLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(2, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest2()
-        {
-            const string Architecture = "AP3x2";
-            AveragePoolingLayer layer = (AveragePoolingLayer)NetworkGraphBuilder.CreateLayer(AveragePoolingLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(3, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest3()
-        {
-            const string Architecture = "AP3x2+2(S)";
-            AveragePoolingLayer layer = (AveragePoolingLayer)NetworkGraphBuilder.CreateLayer(AveragePoolingLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest4()
-        {
-            const string Architecture = "AP3x2+2x1(S)";
-            AveragePoolingLayer layer = (AveragePoolingLayer)NetworkGraphBuilder.CreateLayer(AveragePoolingLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(1, layer.Kernel.StrideY);
-        }
 
         [TestMethod]
         public void ConstructorTest1()
@@ -101,10 +49,111 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ArchitechtureConstructorTest1()
         {
-            Assert.IsNotNull(new AveragePoolingLayer((int[])null, new Kernel(2, 2, 2, 2)));
+            string architecture = "AP3x2";
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(3, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "AP3x2+2(S)";
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest3()
+        {
+            string architecture = "AP3x2+2x1(S)";
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(1, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest4()
+        {
+            string architecture = "AP2";
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(2, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest5()
+        {
+            string architecture = "AP";
+            try
+            {
+                AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest6()
+        {
+            Assert.IsNotNull(new AveragePoolingLayer(null, "AP2", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest7()
+        {
+            Assert.IsNotNull(new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, null, null));
+        }
+
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            AveragePoolingLayer layer2 = new AveragePoolingLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
+        {
+            Assert.IsNotNull(new AveragePoolingLayer(null, new Kernel(2, 2, 2, 2)));
         }
 
         [TestMethod]

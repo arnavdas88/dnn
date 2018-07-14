@@ -662,7 +662,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(Tensor x) => MKL.Add(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Add(Tensor x) => Mathematics.Add(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Subtracts all values of a tensor.
@@ -673,7 +673,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Subtract(Tensor x) => MKL.Subtract(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Subtract(Tensor x) => Mathematics.Subtract(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor by a scalar.
@@ -684,7 +684,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(float alpha) => MKL.Multiply(this.Length, alpha, this.Weights, 0, this.Weights, 0);
+        public void Multiply(float alpha) => Mathematics.Multiply(this.Length, alpha, this.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor to elements of another tensor.
@@ -695,7 +695,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor x) => MKL.Multiply(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Multiply(Tensor x) => Mathematics.Multiply(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Performs element by element multiplication of two tensors and puts results of multiplication into this tensor.
@@ -707,7 +707,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor a, Tensor b) => MKL.Multiply(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
+        public void Multiply(Tensor a, Tensor b) => Mathematics.Multiply(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Divides elements of this tensor to elements of another tensor.
@@ -718,7 +718,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Divide(Tensor x) => MKL.Divide(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Divide(Tensor x) => Mathematics.Divide(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
@@ -730,7 +730,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MultiplyAndAdd(float alpha, Tensor x) => MKL.MultiplyAndAdd(this.Length, alpha, x.Weights, 0, this.Weights, 0);
+        public void MultiplyAndAdd(float alpha, Tensor x) => Mathematics.MultiplyAndAdd(this.Length, alpha, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
@@ -743,7 +743,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MultiplyAndAdd(float alpha, Tensor x, float beta) => MKL.MultiplyAndAdd(this.Length, alpha, x.Weights, 0, beta, this.Weights, 0);
+        public void MultiplyAndAdd(float alpha, Tensor x, float beta) => Mathematics.MultiplyAndAdd(this.Length, alpha, x.Weights, 0, beta, this.Weights, 0);
 
         /// <summary>
         /// Performs element by element multiplication of two tensors and adds results of multiplication to this tensor.
@@ -755,7 +755,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MultiplyAndAdd(Tensor a, Tensor b) => MKL.MultiplyAndAdd(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
+        public void MultiplyAndAdd(Tensor a, Tensor b) => Mathematics.MultiplyAndAdd(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Randomizes all values in the tensor.

@@ -1,39 +1,19 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
+    using Accord.DNN;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using Accord.DNN;
 
     [TestClass]
     public class FullyConnectedLayerTest
     {
-        [TestMethod]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            const string Architecture = "100N";
-            FullyConnectedLayer layer = (FullyConnectedLayer)NetworkGraphBuilder.CreateLayer(shape, Architecture, null);
-
-            Assert.AreEqual(100, layer.NumberOfNeurons);
-            Assert.AreEqual(Architecture, layer.Architecture);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            const string Architecture = "N";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, Architecture, null));
-        }
-
         [TestMethod]
         public void ConstructorTest1()
         {
@@ -62,7 +42,66 @@
         }
 
         [TestMethod]
-        public void ConstructorTest2()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest3()
+        {
+            Assert.IsNotNull(new FullyConnectedLayer(null, 100, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            FullyConnectedLayer layer = new FullyConnectedLayer(new[] { -1, 10, 12, 3 }, "100N", null);
+
+            Assert.AreEqual(100, layer.NumberOfNeurons);
+            Assert.AreEqual("100N", layer.Architecture);
+
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 100, 10 * 12 * 3 }, layer.W.Axes);
+            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 100 }, layer.B.Axes);
+            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100NN";
+            try
+            {
+                FullyConnectedLayer layer = new FullyConnectedLayer(new[] { -1, 20, 20, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new FullyConnectedLayer(null, "100N", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new FullyConnectedLayer(new[] { -1, 20, 20, 10 }, null, null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
@@ -72,14 +111,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
-        {
-            Assert.IsNotNull(new FullyConnectedLayer(null, 100, MatrixLayout.ColumnMajor, null));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
+        public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new FullyConnectedLayer(null));
         }

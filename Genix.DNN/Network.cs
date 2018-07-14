@@ -246,7 +246,7 @@ namespace Genix.DNN
 
             float loss = lossFunction.Loss(y, expected, true);
 
-            MKL.Subtract(y.Length, y.Weights, 0, y.Gradient, 0, y.Gradient, 0);
+            Mathematics.Subtract(y.Length, y.Weights, 0, y.Gradient, 0, y.Gradient, 0);
             session.Unroll();
 
             session.DetachTensor(y);

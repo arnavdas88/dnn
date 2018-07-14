@@ -6,25 +6,68 @@
     using Layers;
     using Newtonsoft.Json;
     using System.Collections.Generic;
+    using System.Globalization;
 
     [TestClass]
     public class Map2SequenceLayerTest
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest1()
-        {
-            Assert.IsNotNull(new Map2SequenceLayer((int[])null));
-        }
-
-        [TestMethod]
-        public void ConstructorTest2()
         {
             int[] shape = new[] { -1, 20, 15, 10 };
             Map2SequenceLayer layer = new Map2SequenceLayer(shape);
 
             CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape);
             Assert.AreEqual("M2S", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new Map2SequenceLayer((int[])null));
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 15, 10 };
+            Map2SequenceLayer layer = new Map2SequenceLayer(shape, "M2S", null);
+
+            CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape);
+            Assert.AreEqual("M2S", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "MS";
+            try
+            {
+                Map2SequenceLayer layer = new Map2SequenceLayer(new[] { -1, 20, 15, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new Map2SequenceLayer(null, "M2S", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new Map2SequenceLayer(new[] { -1, 20, 15, 10 }, null, null));
         }
 
         [TestMethod]

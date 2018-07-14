@@ -2,39 +2,19 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
+    using Accord.DNN;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Genix.Core;
     using Newtonsoft.Json;
-    using Accord.DNN;
 
     [TestClass]
     public class SRNCellTest
     {
         private readonly RandomNumberGenerator random = new RandomGenerator();
-
-        [TestMethod, TestCategory("SRN")]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "100SRNC";
-            SRNCell layer = (SRNCell)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(100, layer.NumberOfNeurons);
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("SRN")]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "SRNC";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, architecture, null));
-        }
 
         [TestMethod, TestCategory("SRN")]
         public void ConstructorTest1()
@@ -45,10 +25,12 @@
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
                 SRNCell layer = new SRNCell(shape, numberOfNeurons, matrixLayout, null);
+
+                Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual("100SRNC", layer.Architecture);
 
+                Assert.AreEqual(1, layer.NumberOfOutputs);
                 CollectionAssert.AreEqual(new[] { 1, numberOfNeurons }, layer.OutputShape);
-                Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
@@ -68,7 +50,70 @@
         }
 
         [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new SRNCell(null, 100, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        public void ArchitechtureConstructorTest1()
+        {
+            SRNCell layer = new SRNCell(new[] { -1, 10, 12, 3 }, "100SRNC", null);
+
+            Assert.AreEqual(100, layer.NumberOfNeurons);
+            Assert.AreEqual("100SRNC", layer.Architecture);
+
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 100, 10 * 12 * 3 }, layer.W.Axes);
+            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 100, 100 }, layer.U.Axes);
+            Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 100 }, layer.B.Axes);
+            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100SRN";
+            try
+            {
+                SRNCell layer = new SRNCell(new[] { -1, 10, 12, 3 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new SRNCell(null, "100SRNC", null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new SRNCell(new[] { -1, 10, 12, 3 }, null, null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             SRNCell layer1 = new SRNCell(shape, 100, MatrixLayout.ColumnMajor, null);
@@ -78,16 +123,9 @@
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void CopyConstructorTest2()
         {
-            Assert.IsNotNull(new SRNCell((int[])null, 100, MatrixLayout.ColumnMajor, null));
-        }
-
-        [TestMethod, TestCategory("SRN")]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
-        {
-            Assert.IsNotNull(new SRNCell((SRNCell)null));
+            Assert.IsNotNull(new SRNCell(null));
         }
 
         [TestMethod, TestCategory("SRN")]
@@ -184,7 +222,7 @@
                 }
 
                 // should be dy
-                MKL.Add(2, dy, oi, expectedBG, 0);
+                Mathematics.Add(2, dy, oi, expectedBG, 0);
             }
 
             Helpers.AreArraysEqual(expectedWG, layer.W.Gradient);

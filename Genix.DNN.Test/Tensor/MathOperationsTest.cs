@@ -2340,7 +2340,7 @@
 
             Tensor expected = new Tensor(null, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2392,7 +2392,7 @@
 
             Tensor expected = new Tensor(null, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2444,7 +2444,7 @@
 
             Tensor expected = new Tensor(null, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2495,7 +2495,7 @@
 
             Tensor expected = new Tensor(null, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2547,7 +2547,7 @@
 
             Tensor expected = new Tensor(null, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2599,7 +2599,7 @@
 
             Tensor expected = new Tensor(null, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2651,7 +2651,7 @@
 
             Tensor expected = new Tensor(null, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });
@@ -2702,7 +2702,7 @@
 
             Tensor expected = new Tensor(null, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
-            MKL.Add(m, bias.Weights, 0, expected.Weights, 0);
+            Mathematics.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
 
             c.SetGradient(new float[] { 1, 2, 3 });

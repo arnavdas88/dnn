@@ -1,7 +1,7 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
+    using System.Globalization;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
@@ -30,6 +30,47 @@
         public void ConstructorTest3()
         {
             Assert.IsNotNull(new MaxOutLayer(new[] { -1, 3, 2, 4 }, 3));
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, "MO2", null);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            Assert.AreEqual(2, layer.GroupSize);
+            Assert.AreEqual("MO2", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "MO";
+            try
+            {
+                MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new MaxOutLayer(null, "MO2", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new MaxOutLayer(new[] { -1, 3, 2, 4 }, null, null));
         }
 
         [TestMethod]

@@ -234,4 +234,10 @@
   <data name="E_NegativeAxisIndex" xml:space="preserve">
     <value>The axis index must be a non-negative.</value>
   </data>
+  <data name="E_InvalidLayerArchitecture" xml:space="preserve">
+    <value>Invalid layer architecture: {0}.</value>
+  </data>
+  <data name="E_UnrecognizableLayerArchitecture" xml:space="preserve">
+    <value>Unrecognizable layer architecture: {0}.</value>
+  </data>
 </root>

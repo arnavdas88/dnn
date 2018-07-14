@@ -43,6 +43,9 @@
     <ClCompile Include="source\nonlinearity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\mathematics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source\bitutils.inl">

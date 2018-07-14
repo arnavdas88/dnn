@@ -53,7 +53,7 @@ namespace Genix.DNN
             // repeat for each item in mini-batch
             for (int i = 0, off = 0; i < mb; i++, off += stride)
             {
-                MKL.Add(stride, x.Weights, off, b.Weights, 0, y.Weights, off);
+                Mathematics.Add(stride, x.Weights, off, b.Weights, 0, y.Weights, off);
             }
 
             if (session.CalculateGradients && (x.CalculateGradient || b.CalculateGradient))
@@ -85,7 +85,7 @@ namespace Genix.DNN
 
                             /*for (int i = 0, off = 0; i < mb; i++, off += stride)
                             {
-                                MKL.Add(stride, y.Gradient, off, db.Weights, 0);
+                                Mathematics.Add(stride, y.Gradient, off, db.Weights, 0);
                             }*/
                         }
                     }
@@ -177,7 +177,7 @@ namespace Genix.DNN
                     poolNxN();
                 }
 
-                MKL.Divide(y.Length, ksize1 * ksize2, yw, 0, yw, 0);
+                Mathematics.Divide(y.Length, ksize1 * ksize2, yw, 0, yw, 0);
 
                 return y;
 
@@ -189,7 +189,7 @@ namespace Genix.DNN
                         {
                             if (ix1 + 1 < x1)
                             {
-                                MKL.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
@@ -200,7 +200,7 @@ namespace Genix.DNN
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    MKL.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
@@ -219,7 +219,7 @@ namespace Genix.DNN
                         {
                             if (ix1 + 1 < x1)
                             {
-                                MKL.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
@@ -242,11 +242,11 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                MKL.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    MKL.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
                                 }
                             }
 
@@ -259,11 +259,11 @@ namespace Genix.DNN
                                 }
                                 else
                                 {
-                                    MKL.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        MKL.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
                                     }
                                 }
                             }
@@ -316,7 +316,7 @@ namespace Genix.DNN
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
                                 {
-                                    MKL.MultiplyAndAdd(ystride2, alpha, dyw, ypos2, dxw, xpos2K);
+                                    Mathematics.MultiplyAndAdd(ystride2, alpha, dyw, ypos2, dxw, xpos2K);
                                 }
                             }
                         }
@@ -623,7 +623,7 @@ namespace Genix.DNN
                     else
 #endif
                     {
-                        MKL.Multiply(x.Length, probability, xw, 0, yw, 0);
+                        Mathematics.Multiply(x.Length, probability, xw, 0, yw, 0);
                     }
 
                     return y;
@@ -682,14 +682,14 @@ namespace Genix.DNN
                     // scale(i) = k + alpha / n * sum(x(j) ^ 2)
                     // scale will be later reused in back-propagation
                     // use output as a temporary buffer
-                    MKL.Square(x.Length, x.Weights, 0, scale.Weights, 0);
+                    Mathematics.Square(x.Length, x.Weights, 0, scale.Weights, 0);
                     NeuralOperations.LRNKernel(scale, scale.Weights, y.Weights, kernelSize);
                     scale.Set(k);
                     scale.MultiplyAndAdd(alpha / kernelSize, y);
 
                     // 2. calculate forward tensor
                     // y(i) = x(i) * scale(i) ^ -beta
-                    MKL.Pow(scale.Length, scale.Weights, 0, -beta, y.Weights, 0);
+                    Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, y.Weights, 0);
                     y.Multiply(x);
 
 #if !NOLEARNING
@@ -703,18 +703,18 @@ namespace Genix.DNN
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
-                                MKL.Multiply(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
-                                MKL.Divide(x.Length, x.Gradient, 0, scale.Weights, 0, x.Gradient, 0);
+                                Mathematics.Multiply(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Divide(x.Length, x.Gradient, 0, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
                                 work.Multiply(x);
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
-                                MKL.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
-                                MKL.Multiply(x.Length, x.Gradient, 0, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
+                                Mathematics.Multiply(x.Length, x.Gradient, 0, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
-                                MKL.MultiplyAndAdd(x.Length, -2.0f * alpha * beta / kernelSize, work.Weights, 0, x.Gradient, 0);
+                                Mathematics.MultiplyAndAdd(x.Length, -2.0f * alpha * beta / kernelSize, work.Weights, 0, x.Gradient, 0);
                             });
                     }
 #endif
@@ -769,7 +769,7 @@ namespace Genix.DNN
                         session.Push(ActionName, () => SetCopy.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
 
                         /* TODO:
-                                MKL.Add(x.Length, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0);
                                 ////MKL.Subtract(y.Length, y.Weights, 0, y.Gradient.Weights, 0, x.Gradient.Weights, 0);
                                 */
                     }

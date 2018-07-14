@@ -8,38 +8,16 @@
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
-    using Genix.Core;
+    using Genix.DNN.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using Learning;
 
     [TestClass]
     public class LSTMLayerTest
     {
-        [TestMethod, TestCategory("LSTM")]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "20-30-40LSTM";
-            LSTMLayer layer = (LSTMLayer)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
-            Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
-            Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("LSTM")]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "100LSTM";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, architecture, null));
-        }
-
         [TestMethod, TestCategory("LSTM")]
         public void ConstructorTest1()
         {
@@ -49,18 +27,20 @@
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
             Assert.AreEqual("20-30LSTM", layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { 1, 30 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new LSTMLayer(null, new[] { 20, 20 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
-        {
-            Assert.IsNotNull(new LSTMLayer((int[])null, new[] { 20, 20 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
-        }
-
-        [TestMethod, TestCategory("LSTM")]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new LSTMLayer(shape, null, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
@@ -68,10 +48,59 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ConstructorTest5()
+        public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             Assert.IsNotNull(new LSTMLayer(shape, new[] { 20 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            string architecture = "20-30-40LSTM(ForgetBias=3.6)";
+            LSTMLayer layer = new LSTMLayer(shape, architecture, null);
+
+            Assert.AreEqual(20, ((LSTMCell)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
+            Assert.AreEqual(3.6f, ((LSTMCell)layer.Graph.Vertices.ElementAt(0)).ForgetBias);
+            Assert.AreEqual(30, ((LSTMCell)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
+            Assert.AreEqual(3.6f, ((LSTMCell)layer.Graph.Vertices.ElementAt(1)).ForgetBias);
+            Assert.AreEqual(40, ((FullyConnectedLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100LSTM";
+            try
+            {
+                LSTMLayer layer = new LSTMLayer(new[] { 1, 20, 20, 10 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new LSTMLayer(null, "20-30LSTM", null));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new LSTMLayer(new[] { 1, 20, 20, 10 }, null, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
@@ -102,7 +131,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMLayer layer1 = new LSTMLayer(shape, new[] { 20, 20 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMLayer layer1 = new LSTMLayer(shape, new[] { 2, 3 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMLayer layer2 = layer1.Clone() as LSTMLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -111,7 +140,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMLayer layer1 = new LSTMLayer(shape, new[] { 20, 20 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMLayer layer1 = new LSTMLayer(shape, new[] { 2, 3 }, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             LSTMLayer layer2 = JsonConvert.DeserializeObject<LSTMLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -313,7 +342,7 @@
             // create network
             string architechture = string.Format(
                 CultureInfo.InvariantCulture,
-                "1x1x{0}~20-{1}SRN~TH~SM",
+                "1x1x{0}~20-{1}LSTM~TH~SM",
                 alphabet.Count,
                 alphabet.Count + 1);
 

@@ -1,12 +1,11 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
-    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -14,90 +13,129 @@
     public class LSTMCellTest
     {
         [TestMethod, TestCategory("LSTM")]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "100LSTMC";
-            LSTMCell layer = (LSTMCell)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(100, layer.NumberOfNeurons);
-            Assert.AreEqual(1.0f, layer.ForgetBias);
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("LSTM")]
-        public void CreateLayerTest2()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "100LSTMC(ForgetBias=2.1)";
-            LSTMCell layer = (LSTMCell)NetworkGraphBuilder.CreateLayer(shape, architecture, null);
-
-            Assert.AreEqual(100, layer.NumberOfNeurons);
-            Assert.AreEqual(2.1f, layer.ForgetBias);
-            Assert.AreEqual(architecture, layer.Architecture);
-        }
-
-        [TestMethod, TestCategory("LSTM")]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest3()
-        {
-            int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "LSTMC";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(shape, architecture, null));
-        }
-
-        [TestMethod, TestCategory("LSTM")]
         public void ConstructorTest1()
         {
             int[] shape = new[] { 1, 10, 12, 3 };
             int numberOfNeurons = 100;
+            float forgetBias = 2.0f;
 
-            LSTMCell layer = new LSTMCell(shape, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
-            Assert.AreEqual("100LSTMC", layer.Architecture);
+            foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
+            {
+                LSTMCell layer = new LSTMCell(shape, numberOfNeurons, forgetBias, matrixLayout, null);
 
-            CollectionAssert.AreEqual(new[] { 1, numberOfNeurons }, layer.OutputShape);
-            Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
+                Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
+                Assert.AreEqual(forgetBias, layer.ForgetBias);
+                Assert.AreEqual("100LSTMC(ForgetBias=2)", layer.Architecture);
 
-            CollectionAssert.AreEqual(new[] { 10 * 12 * 3, 4 * numberOfNeurons }, layer.W.Axes);
+                Assert.AreEqual(1, layer.NumberOfOutputs);
+                CollectionAssert.AreEqual(new[] { 1, numberOfNeurons }, layer.OutputShape);
+
+                CollectionAssert.AreEqual(
+                    matrixLayout == MatrixLayout.RowMajor ?
+                        new[] { 4 * numberOfNeurons, 10 * 12 * 3 } :
+                        new[] { 10 * 12 * 3, 4 * numberOfNeurons },
+                    layer.W.Axes);
+                Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+                Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+
+                CollectionAssert.AreEqual(
+                    matrixLayout == MatrixLayout.RowMajor ?
+                        new[] { 4 * numberOfNeurons, numberOfNeurons } :
+                        new[] { numberOfNeurons, 4 * numberOfNeurons },
+                    layer.U.Axes);
+                Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
+                Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+
+                CollectionAssert.AreEqual(new[] { 4 * numberOfNeurons }, layer.B.Axes);
+                Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+            }
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new LSTMCell(null, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        public void ArchitechtureConstructorTest1()
+        {
+            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, "100LSTMC(ForgetBias=3.6)", null);
+
+            Assert.AreEqual(100, layer.NumberOfNeurons);
+            Assert.AreEqual(3.6f, layer.ForgetBias);
+            Assert.AreEqual("100LSTMC(ForgetBias=3.6)", layer.Architecture);
+
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 4 * 100, 10 * 12 * 3 }, layer.W.Axes);
             Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { numberOfNeurons, 4 * numberOfNeurons }, layer.U.Axes);
+            CollectionAssert.AreEqual(new[] { 4 * 100, 100 }, layer.U.Axes);
             Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { 4 * numberOfNeurons }, layer.B.Axes);
+            CollectionAssert.AreEqual(new[] { 4 * 100 }, layer.B.Axes);
             Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
         }
 
         [TestMethod, TestCategory("LSTM")]
-        public void ConstructorTest2()
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "100LSTM";
+            try
+            {
+                LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new LSTMCell(null, "100LSTMC", null));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new LSTMCell(new[] { -1, 10, 12, 3 }, null, null));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = new LSTMCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void CopyConstructorTest2()
         {
-            Assert.IsNotNull(new LSTMCell((int[])null, 100, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null));
-        }
-
-        [TestMethod, TestCategory("LSTM")]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
-        {
-            Assert.IsNotNull(new LSTMCell((LSTMCell)null));
+            Assert.IsNotNull(new LSTMCell(null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         public void EnumGradientsTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
 
@@ -105,7 +143,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = layer1.Clone() as LSTMCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -114,7 +152,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             LSTMCell layer2 = JsonConvert.DeserializeObject<LSTMCell>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);

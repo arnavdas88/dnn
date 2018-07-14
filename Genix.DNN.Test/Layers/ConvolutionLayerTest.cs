@@ -2,36 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using Accord.DNN;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Accord.DNN;
+    using Newtonsoft.Json;
 
     [TestClass]
     public class ConvolutionLayerTest
     {
         [TestMethod]
-        public void CreateLayerTest1()
-        {
-            int[] shape = new[] { -1, 150, 24, 1 };
-            const string Architecture = "16C3+4x1(S)+-1(P)";
-            ConvolutionLayer layer = (ConvolutionLayer)NetworkGraphBuilder.CreateLayer(shape, Architecture, null);
-
-            Assert.AreEqual(16, layer.NumberOfNeurons);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(3, layer.Kernel.Height);
-            Assert.AreEqual(4, layer.Kernel.StrideX);
-            Assert.AreEqual(1, layer.Kernel.StrideY);
-            Assert.AreEqual(-1, layer.Kernel.PaddingX);
-            Assert.AreEqual(-1, layer.Kernel.PaddingY);
-            Assert.AreEqual(Architecture, layer.Architecture);
-        }
-
-        [TestMethod]
-        public void CheckShapesFiltersAndBiases()
+        public void ConstructorTest1()
         {
             int[] shape = new[] { 2, 10, 12, 3 };
             const int NumberOfFilters = 100;
@@ -41,9 +26,11 @@
             {
                 ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
 
-                CollectionAssert.AreEqual(new[] { 2, 5, 5, NumberOfFilters }, layer.OutputShape);
                 Assert.AreEqual(NumberOfFilters, layer.NumberOfNeurons);
                 Assert.AreEqual(matrixLayout, layer.MatrixLayout);
+
+                Assert.AreEqual(1, layer.NumberOfOutputs);
+                CollectionAssert.AreEqual(new[] { 2, 5, 5, NumberOfFilters }, layer.OutputShape);
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
@@ -56,6 +43,127 @@
                 CollectionAssert.AreEqual(new[] { NumberOfFilters }, layer.B.Axes);
                 Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest2()
+        {
+            Assert.IsNotNull(new ConvolutionLayer(null, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorTest3()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            Assert.IsNotNull(new ConvolutionLayer(shape, 100, null, MatrixLayout.ColumnMajor, null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        public void ArchitechtureConstructorTest1()
+        {
+            int[] shape = new[] { 2, 10, 12, 3 };
+            const string Architecture = "16C3+4x1(S)+-1(P)";
+
+            ConvolutionLayer layer = new ConvolutionLayer(shape, Architecture, null);
+
+            Assert.AreEqual(16, layer.NumberOfNeurons);
+            Assert.AreEqual(Architecture, layer.Architecture);
+
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(3, layer.Kernel.Height);
+            Assert.AreEqual(4, layer.Kernel.StrideX);
+            Assert.AreEqual(1, layer.Kernel.StrideY);
+            Assert.AreEqual(-1, layer.Kernel.PaddingX);
+            Assert.AreEqual(-1, layer.Kernel.PaddingY);
+
+            CollectionAssert.AreEqual(new[] { 2, 3, 8, 16 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 16, 9 * shape[(int)Axis.C] }, layer.W.Axes);
+            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.05f);
+
+            CollectionAssert.AreEqual(new[] { 16 }, layer.B.Axes);
+            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "16C";
+            try
+            {
+                ConvolutionLayer layer = new ConvolutionLayer(new[] { -1, 10, 12, 3 }, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new ConvolutionLayer(null, "16C3", null));
+        }
+
+        [TestMethod, TestCategory("SRN")]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new ConvolutionLayer(new[] { -1, 10, 12, 3 }, null, null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer2 = new ConvolutionLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
+        {
+            Assert.IsNotNull(new ConvolutionLayer(null));
+        }
+
+        [TestMethod]
+        public void EnumGradientsTest()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ConvolutionLayer layer = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
+            Assert.AreEqual(2, layer.EnumGradients().Count());
+        }
+
+        [TestMethod]
+        public void CloneTest()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer2 = layer1.Clone() as ConvolutionLayer;
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        public void SerializeTest()
+        {
+            int[] shape = new[] { -1, 20, 20, 10 };
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
+            string s1 = JsonConvert.SerializeObject(layer1);
+            ConvolutionLayer layer2 = JsonConvert.DeserializeObject<ConvolutionLayer>(s1);
+            string s2 = JsonConvert.SerializeObject(layer2);
+            Assert.AreEqual(s1, s2);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
@@ -318,7 +426,7 @@
                     subdy.Set(dy.Weights.Skip(dy.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
 
                     float[] dw = FullyConnectedLayerTest.CalculateDW(subx, subdy, matrixLayout);
-                    MKL.Add(res.Length, dw, 0, res, 0);
+                    Mathematics.Add(res.Length, dw, 0, res, 0);
                 }
             }
 

@@ -10,6 +10,7 @@ namespace Genix.DNN.Layers
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -18,19 +19,35 @@ namespace Genix.DNN.Layers
     public class Map2SequenceLayer : Layer
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^M2S$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Map2SequenceLayer(int[] inputShape) : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
+        public Map2SequenceLayer(int[] inputShape)
+            : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public Map2SequenceLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
+        {
+            Layer.ParseArchitechture(architecture, Map2SequenceLayer.ArchitecturePattern);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class, using the existing <see cref="Map2SequenceLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="Map2SequenceLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Map2SequenceLayer(Map2SequenceLayer other) : base(other)
         {
         }

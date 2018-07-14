@@ -1,10 +1,10 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
-    using DNN.Layers;
+    using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -14,45 +14,13 @@
         private static int[] SourceShape = new[] { -1, 24, 24, 20 };
 
         [TestMethod]
-        public void CreateLayerTest1()
-        {
-            const string Architecture = "LRN5";
-            LRNLayer layer = (LRNLayer)NetworkGraphBuilder.CreateLayer(LRNLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(5, layer.KernelSize);
-            Assert.AreEqual(LRNLayer.DefaultAlpha, layer.Alpha);
-            Assert.AreEqual(LRNLayer.DefaultBeta, layer.Beta);
-            Assert.AreEqual(LRNLayer.DefaultK, layer.K);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest2()
-        {
-            const string Architecture = "LRN7(A=0.001;B=0.5;K=3)";
-            LRNLayer layer = (LRNLayer)NetworkGraphBuilder.CreateLayer(LRNLayerTest.SourceShape, Architecture, null);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.AreEqual(7, layer.KernelSize);
-            Assert.AreEqual(0.001f, layer.Alpha);
-            Assert.AreEqual(0.5f, layer.Beta);
-            Assert.AreEqual(3f, layer.K);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CreateLayerTest3()
-        {
-            const string Architecture = "LRN";
-            Assert.IsNotNull(NetworkGraphBuilder.CreateLayer(LRNLayerTest.SourceShape, Architecture, null));
-        }
-
-        [TestMethod]
         public void ConstructorTest1()
         {
             LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, 7, 0.001f, 0.5f, 3f);
 
+            Assert.AreEqual(1, layer.NumberOfOutputs);
             CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+
             Assert.AreEqual("LRN7(A=0.001;B=0.5;K=3)", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
             Assert.AreEqual(0.001f, layer.Alpha);
@@ -65,7 +33,9 @@
         {
             LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, 7);
 
+            Assert.AreEqual(1, layer.NumberOfOutputs);
             CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+
             Assert.AreEqual("LRN7", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
             Assert.AreEqual(LRNLayer.DefaultAlpha, layer.Alpha);
@@ -77,14 +47,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
         {
-            Assert.IsNotNull(new LRNLayer((int[])null, 7));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
-        {
-            Assert.IsNotNull(new LRNLayer((LRNLayer)null));
+            Assert.IsNotNull(new LRNLayer(null, 7));
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is a parameter of the function being tested.")]
@@ -117,6 +80,85 @@
                 Assert.AreEqual(new ArgumentException(Properties.Resources.E_InvalidLRNKernelSize, "kernelSize").Message, e.Message);
                 throw;
             }
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            string Architecture = "LRN5";
+            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, Architecture, null);
+
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+
+            Assert.AreEqual(Architecture, layer.Architecture);
+            Assert.AreEqual(5, layer.KernelSize);
+            Assert.AreEqual(LRNLayer.DefaultAlpha, layer.Alpha);
+            Assert.AreEqual(LRNLayer.DefaultBeta, layer.Beta);
+            Assert.AreEqual(LRNLayer.DefaultK, layer.K);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest2()
+        {
+            string Architecture = "LRN7(A=0.001;B=0.5;K=3)";
+            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, Architecture, null);
+
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+
+            Assert.AreEqual(Architecture, layer.Architecture);
+            Assert.AreEqual(7, layer.KernelSize);
+            Assert.AreEqual(0.001f, layer.Alpha);
+            Assert.AreEqual(0.5f, layer.Beta);
+            Assert.AreEqual(3f, layer.K);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest3()
+        {
+            string architecture = "LRN";
+            try
+            {
+                LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new LRNLayer(null, "LRN5", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest5()
+        {
+            Assert.IsNotNull(new LRNLayer(LRNLayerTest.SourceShape, null, null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            LRNLayer layer1 = new LRNLayer(LRNLayerTest.SourceShape, 7);
+            LRNLayer layer2 = new LRNLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
+        {
+            Assert.IsNotNull(new LRNLayer(null));
         }
 
         [TestMethod]

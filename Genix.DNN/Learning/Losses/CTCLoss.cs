@@ -63,7 +63,7 @@ namespace Genix.DNN.Learning
 
             // convert predicted probabilities into log space
             float[] ylog = new float[y.Length];
-            MKL.Log(y.Length, y.Weights, 0, ylog, 0);
+            Mathematics.Log(y.Length, y.Weights, 0, ylog, 0);
 
             // compute alphas
             float[] alphas = new float[T * S];
@@ -89,11 +89,11 @@ namespace Genix.DNN.Learning
                 ////float logLossB = MKL.LogSumExp(betas.Weights[0], betas.Weights[1]);
 
                 // compute unnormalized gradient
-                MKL.Add(alphas.Length, alphas, 0, betas, 0, alphas, 0);
+                Mathematics.Add(alphas.Length, alphas, 0, betas, 0, alphas, 0);
                 NativeMethods.CTCReduceAlphasBetas(T, A, S, alphas, labels, y.Gradient);
-                MKL.Subtract(y.Length, y.Gradient, 0, ylog, 0, y.Gradient, 0);
-                MKL.Subtract(y.Length, y.Gradient, 0, logLossA, y.Gradient, 0);
-                MKL.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
+                Mathematics.Subtract(y.Length, y.Gradient, 0, ylog, 0, y.Gradient, 0);
+                Mathematics.Subtract(y.Length, y.Gradient, 0, logLossA, y.Gradient, 0);
+                Mathematics.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
                 MKL.Replace(y.Length, float.NaN, 0.0f, y.Gradient, 0); // NaN may come from various sources (for instance log(y) where y = 0)
 
                 Debug.Assert(!float.IsNaN(y.Gradient[0]), "Tensor contains invalid weight.");

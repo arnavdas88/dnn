@@ -21,7 +21,6 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected PoolingLayer(int[] inputShape, Kernel kernel)
             : base(1, PoolingLayer.CalculateOutputShape(inputShape, kernel))
         {
@@ -32,7 +31,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="PoolingLayer"/> class, using the existing <see cref="PoolingLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="PoolingLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected PoolingLayer(PoolingLayer other) : base(other)
         {
             this.Kernel = other.Kernel;
@@ -41,20 +39,19 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="PoolingLayer"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         protected PoolingLayer()
         {
         }
 
         /// <summary>
-        /// Gets the pooling kernel.
+        /// Gets or sets the pooling kernel.
         /// </summary>
         /// <value>
         /// The <see cref="DNN.Kernel"/> object.
         /// </value>
         [JsonProperty("Kernel")]
-        public Kernel Kernel { get; private set; }
+        public Kernel Kernel { get; protected set; }
 
         /// <summary>
         /// Computes the dimensions of the layer's output tensor.

@@ -8,7 +8,6 @@ namespace Genix.DNN.Layers
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents the layer that can be trained. This is an abstract class.
@@ -22,7 +21,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="TrainableLayer"/> class.
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected TrainableLayer(int[] outputShape)
             : base(1, outputShape)
         {
@@ -32,7 +30,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="TrainableLayer"/> class, using the existing <see cref="TrainableLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="TrainableLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected TrainableLayer(TrainableLayer other) : base(other)
         {
         }
@@ -40,7 +37,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="TrainableLayer"/> class.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected TrainableLayer()
         {
         }

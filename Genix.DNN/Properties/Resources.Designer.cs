@@ -106,6 +106,15 @@ namespace Genix.DNN.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid layer architecture: {0}..
+        /// </summary>
+        internal static string E_InvalidLayerArchitecture {
+            get {
+                return ResourceManager.GetString("E_InvalidLayerArchitecture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The number of channels in layer layout should be greater than zero..
         /// </summary>
         internal static string E_InvalidLayerChannels {
@@ -408,6 +417,15 @@ namespace Genix.DNN.Properties {
         internal static string E_NegativeAxisIndex {
             get {
                 return ResourceManager.GetString("E_NegativeAxisIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unrecognizable layer architecture: {0}..
+        /// </summary>
+        internal static string E_UnrecognizableLayerArchitecture {
+            get {
+                return ResourceManager.GetString("E_UnrecognizableLayerArchitecture", resourceCulture);
             }
         }
     }

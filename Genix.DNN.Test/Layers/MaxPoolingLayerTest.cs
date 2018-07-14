@@ -1,10 +1,9 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using DNN;
-    using Layers;
+    using System.Globalization;
+    using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -21,58 +20,6 @@
             25, 26,   27, 28,   31, 32,   29, 30,
             13, 14,   15, 16,   19, 20,   17, 18,
         };
-
-        [TestMethod]
-        public void CreateLayerTest1()
-        {
-            string architecture = "MP2";
-            MaxPoolingLayer layer = (MaxPoolingLayer)NetworkGraphBuilder.CreateLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
-
-            Assert.AreEqual(architecture, layer.Architecture);
-            Assert.AreEqual(2, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest2()
-        {
-            string architecture = "MP3x2";
-            MaxPoolingLayer layer = (MaxPoolingLayer)NetworkGraphBuilder.CreateLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
-
-            Assert.AreEqual(architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(3, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest3()
-        {
-            string architecture = "MP3x2+2(S)";
-            MaxPoolingLayer layer = (MaxPoolingLayer)NetworkGraphBuilder.CreateLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
-
-            Assert.AreEqual(architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(2, layer.Kernel.StrideY);
-        }
-
-        [TestMethod]
-        public void CreateLayerTest4()
-        {
-            string architecture = "MP3x2+2x1(S)";
-            MaxPoolingLayer layer = (MaxPoolingLayer)NetworkGraphBuilder.CreateLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
-
-            Assert.AreEqual(architecture, layer.Architecture);
-            Assert.AreEqual(3, layer.Kernel.Width);
-            Assert.AreEqual(2, layer.Kernel.Height);
-            Assert.AreEqual(2, layer.Kernel.StrideX);
-            Assert.AreEqual(1, layer.Kernel.StrideY);
-        }
 
         [TestMethod]
         public void ConstructorTest1()
@@ -101,8 +48,108 @@
         }
 
         [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            string architecture = "MP3x2";
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(3, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "MP3x2+2(S)";
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest3()
+        {
+            string architecture = "MP3x2+2x1(S)";
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(3, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(1, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        public void ArchitechtureConstructorTest4()
+        {
+            string architecture = "MP2";
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+
+            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(2, layer.Kernel.Width);
+            Assert.AreEqual(2, layer.Kernel.Height);
+            Assert.AreEqual(2, layer.Kernel.StrideX);
+            Assert.AreEqual(2, layer.Kernel.StrideY);
+            Assert.AreEqual(0, layer.Kernel.PaddingX);
+            Assert.AreEqual(0, layer.Kernel.PaddingY);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest5()
+        {
+            string architecture = "MP";
+            try
+            {
+                MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ArchitechtureConstructorTest6()
+        {
+            Assert.IsNotNull(new MaxPoolingLayer(null, "MP2", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest7()
+        {
+            Assert.IsNotNull(new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, null, null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            MaxPoolingLayer layer2 = new MaxPoolingLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new MaxPoolingLayer(null, new Kernel(2, 2, 2, 2)));
         }
@@ -111,7 +158,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest4()
         {
-            Assert.IsNotNull(new MaxPoolingLayer(null));
+            Assert.IsNotNull(new MaxPoolingLayer((MaxPoolingLayer)null));
         }
 
         [TestMethod]

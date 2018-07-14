@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,6 +14,11 @@
     {
         private static int[] InputShape1 = new[] { -1, 2, 3, 2 };
         private static int[] InputShape2 = new[] { -1, 2, 3, 3 };
+
+        private static int[] OutputShape = Shape.Reshape(
+            ConcatLayerTest.InputShape1,
+            (int)Axis.C,
+            ConcatLayerTest.InputShape1[(int)Axis.C] + ConcatLayerTest.InputShape2[(int)Axis.C]);
 
         private static float[] Weights1 = new float[]
         {
@@ -27,41 +33,84 @@
         };
 
         [TestMethod]
-        public void CreateLayerTest1()
-        {
-            const string Architecture = "CONCAT";
-            ConcatLayer layer = (ConcatLayer)NetworkGraphBuilder.CreateLayer(
-                new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 },
-                Architecture);
-
-            Assert.AreEqual(Architecture, layer.Architecture);
-        }
-
-        [TestMethod]
         public void ConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
                 new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 });
 
-            CollectionAssert.AreEqual(
-                Shape.Reshape(
-                    ConcatLayerTest.InputShape1,
-                    (int)Axis.C,
-                    ConcatLayerTest.InputShape1[(int)Axis.C] + ConcatLayerTest.InputShape2[(int)Axis.C]),
-                layer.OutputShape);
+            CollectionAssert.AreEqual(ConcatLayerTest.OutputShape, layer.OutputShape);
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest3()
+        public void ConstructorTest2()
         {
             Assert.IsNotNull(new ConcatLayer((IList<int[]>)null));
         }
 
         [TestMethod]
+        public void ArchitechtureConstructorTest1()
+        {
+            ConcatLayer layer = new ConcatLayer(
+                new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 },
+                "CONCAT",
+                null);
+
+            CollectionAssert.AreEqual(ConcatLayerTest.OutputShape, layer.OutputShape);
+            Assert.AreEqual("CONCAT", layer.Architecture);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ArchitechtureConstructorTest2()
+        {
+            string architecture = "CON";
+            try
+            {
+                ConcatLayer layer = new ConcatLayer(
+                    new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 },
+                    architecture,
+                    null);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.AreEqual(
+                    new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_InvalidLayerArchitecture, architecture), nameof(architecture)).Message,
+                    e.Message);
+                throw;
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorTest4()
+        public void ArchitechtureConstructorTest3()
+        {
+            Assert.IsNotNull(new ConcatLayer(null, "CONCAT", null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ArchitechtureConstructorTest4()
+        {
+            Assert.IsNotNull(new ConcatLayer(
+                new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 },
+                null,
+                null));
+        }
+
+        [TestMethod]
+        public void CopyConstructorTest1()
+        {
+            ConcatLayer layer1 = new ConcatLayer(
+                new int[][] { ConcatLayerTest.InputShape1, ConcatLayerTest.InputShape2 });
+            ConcatLayer layer2 = new ConcatLayer(layer1);
+            Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new ConcatLayer((ConcatLayer)null));
         }

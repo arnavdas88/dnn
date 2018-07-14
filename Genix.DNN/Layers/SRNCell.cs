@@ -14,6 +14,7 @@ namespace Genix.DNN.Layers
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -23,34 +24,44 @@ namespace Genix.DNN.Layers
     public class SRNCell : RNNCell
     {
         /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+)(SRNC)$";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SRNCell"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SRNCell(
             int[] inputShape,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator random)
-            : base(
-                SRNCell.CalculateOutputShape(inputShape, numberOfNeurons),
-                numberOfNeurons,
-                matrixLayout,
-                SRNCell.CalculateWeightsShape(inputShape, numberOfNeurons, matrixLayout),
-                SRNCell.CalculateHiddenWeightsShape(numberOfNeurons),
-                SRNCell.CalculateBiasesShape(numberOfNeurons),
-                random)
         {
+            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SRNCell"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public SRNCell(int[] inputShape, string architecture, RandomNumberGenerator random)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, SRNCell.ArchitecturePattern);
+            int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+
+            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SRNCell"/> class, using the existing <see cref="SRNCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SRNCell"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SRNCell(SRNCell other) : base(other)
         {
         }
@@ -59,7 +70,6 @@ namespace Genix.DNN.Layers
         /// Prevents a default instance of the <see cref="SRNCell"/> class from being created.
         /// </summary>
         [JsonConstructor]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private SRNCell()
         {
         }
@@ -155,75 +165,36 @@ namespace Genix.DNN.Layers
         }
 
         /// <summary>
-        /// Computes the dimensions of the layer's destination tensor.
+        /// Initializes the <see cref="SRNCell"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's destination tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, int numberOfNeurons)
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="random">The random numbers generator.</param>
+        private void Initialize(
+            int[] inputShape,
+            int numberOfNeurons,
+            MatrixLayout matrixLayout,
+            RandomNumberGenerator random)
         {
             if (inputShape == null)
             {
                 throw new ArgumentNullException(nameof(inputShape));
             }
 
-            return new[] { inputShape[(int)Axis.B], numberOfNeurons };
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's weights tensor.
-        /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateWeightsShape(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout)
-        {
+            // column-major matrix organization - each row contains all weights for one neuron
+            // row-major matrix organization - each column contains all weights for one neuron
             int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { mbsize, numberOfNeurons } :
+                new[] { numberOfNeurons, mbsize };
 
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { mbsize, numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { numberOfNeurons, mbsize };
-            }
-        }
+            int[] hiddenShape = new[] { numberOfNeurons, numberOfNeurons };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's hidden weights tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's hidden weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateHiddenWeightsShape(int numberOfNeurons)
-        {
-            // matrix is square and is the same row-major and column-major organizations
-            return new[] { numberOfNeurons, numberOfNeurons };
-        }
+            int[] biasesShape = new[] { numberOfNeurons };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's biases tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's biases tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateBiasesShape(int numberOfNeurons)
-        {
-            return new[] { numberOfNeurons };
+            this.Initialize(numberOfNeurons, matrixLayout, weightsShape, hiddenShape, biasesShape, random);
+            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
         }
     }
 }

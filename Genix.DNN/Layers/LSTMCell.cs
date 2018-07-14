@@ -17,6 +17,7 @@ namespace Genix.DNN.Layers
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
+    using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -25,6 +26,11 @@ namespace Genix.DNN.Layers
     /// </summary>
     public class LSTMCell : RNNCell
     {
+        /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(\d+)(LSTMC)(?:\(ForgetBias=((?:\d*\.)?\d+)\))?$";
+
         /// <summary>
         /// The default value for forget bias.
         /// </summary>
@@ -35,7 +41,6 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LSTMCell(int[] inputShape, int numberOfNeurons)
             : this(inputShape, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
         {
@@ -49,23 +54,31 @@ namespace Genix.DNN.Layers
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LSTMCell(
             int[] inputShape,
             int numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
             RandomNumberGenerator random)
-            : base(
-                  LSTMCell.CalculateOutputShape(inputShape, numberOfNeurons),
-                numberOfNeurons,
-                matrixLayout,
-                LSTMCell.CalculateWeightsShape(inputShape, numberOfNeurons, matrixLayout),
-                LSTMCell.CalculateHiddenWeightsShape(numberOfNeurons, matrixLayout),
-                LSTMCell.CalculateBiasesShape(numberOfNeurons),
-                random)
         {
-            this.ForgetBias = forgetBias;
+            this.Initialize(inputShape, numberOfNeurons, matrixLayout, forgetBias, random);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LSTMCell"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator random)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, LSTMCell.ArchitecturePattern);
+            int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+            float forgetBias = groups.Count >= 4 && !string.IsNullOrEmpty(groups[3].Value) ?
+                Convert.ToSingle(groups[3].Value, CultureInfo.InvariantCulture) :
+                LSTMCell.DefaultForgetBias;
+
+            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, forgetBias, random);
         }
 
         /// <summary>
@@ -73,7 +86,6 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="other">The <see cref="LSTMCell"/> to copy the data from.</param>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "The parameter is validated by the base constructor.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LSTMCell(LSTMCell other) : base(other)
         {
             this.ForgetBias = other.ForgetBias;
@@ -83,7 +95,6 @@ namespace Genix.DNN.Layers
         /// Prevents a default instance of the <see cref="LSTMCell"/> class from being created.
         /// </summary>
         [JsonConstructor]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private LSTMCell()
         {
         }
@@ -246,86 +257,45 @@ namespace Genix.DNN.Layers
 #endif
 
         /// <summary>
-        /// Computes the dimensions of the layer's destination tensor.
+        /// Initializes the <see cref="LSTMCell"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's destination tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, int numberOfNeurons)
+        /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
+        /// <param name="forgetBias">The bias added to forget gates.</param>
+        /// <param name="random">The random numbers generator.</param>
+        private void Initialize(
+            int[] inputShape,
+            int numberOfNeurons,
+            MatrixLayout matrixLayout,
+            float forgetBias,
+            RandomNumberGenerator random)
         {
-            if (inputShape == null)
-            {
-                throw new ArgumentNullException(nameof(inputShape));
-            }
-
-            return new[] { inputShape[(int)Axis.B], numberOfNeurons };
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's weights tensor.
-        /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateWeightsShape(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout)
-        {
+            // column-major matrix organization - each row contains all weights for one neuron
+            // row-major matrix organization - each column contains all weights for one neuron
             int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { mbsize, 4 * numberOfNeurons } :
+                new[] { 4 * numberOfNeurons, mbsize };
 
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { mbsize, 4 * numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { 4 * numberOfNeurons, mbsize };
-            }
-        }
+            int[] hiddenShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { numberOfNeurons, 4 * numberOfNeurons } :
+                new[] { 4 * numberOfNeurons, numberOfNeurons };
 
-        /// <summary>
-        /// Computes the dimensions of the layer's hidden weights tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix is row-major or column-major.</param>
-        /// <returns>
-        /// The dimensions of the layer's hidden weights tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateHiddenWeightsShape(int numberOfNeurons, MatrixLayout matrixLayout)
-        {
-            if (matrixLayout == MatrixLayout.ColumnMajor)
-            {
-                // column-major matrix organization - each row contains all weights for one neuron
-                return new[] { numberOfNeurons, 4 * numberOfNeurons };
-            }
-            else
-            {
-                // row-major matrix organization - each column contains all weights for one neuron
-                return new[] { 4 * numberOfNeurons, numberOfNeurons };
-            }
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's biases tensor.
-        /// </summary>
-        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        /// <returns>
-        /// The dimensions of the layer's biases tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateBiasesShape(int numberOfNeurons)
-        {
             // keep all weights in single channel
             // allocate four matrices (one for each of three gates and one for the state)
-            return new[] { 4 * numberOfNeurons };
+            int[] biasesShape = new[] { 4 * numberOfNeurons };
+
+            this.Initialize(
+                numberOfNeurons,
+                matrixLayout,
+                weightsShape,
+                hiddenShape,
+                biasesShape,
+                random ?? new RandomRangeGenerator(-0.08f, 0.08f));
+
+            this.ForgetBias = forgetBias;
+            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
         }
 
 #if !TENSORFLOW

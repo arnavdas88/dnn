@@ -48,7 +48,7 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -93,7 +93,7 @@ namespace Genix.DNN
                                 float alpha = 1.0f / count;
                                 for (int i = 0; i < count; i++)
                                 {
-                                    MKL.MultiplyAndAdd(x.Length, alpha, ys[i].Gradient, 0, x.Gradient, 0);
+                                    Mathematics.MultiplyAndAdd(x.Length, alpha, ys[i].Gradient, 0, x.Gradient, 0);
                                 }
                             });
 
@@ -654,7 +654,7 @@ namespace Genix.DNN
                                         end = x2;
                                     }
 
-                                    MKL.Add((end - start) * xstride2, dyw, yposk2, dxw, xposk2);
+                                    Mathematics.Add((end - start) * xstride2, dyw, yposk2, dxw, xposk2);
                                 }
                             }
 
@@ -831,7 +831,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensors
-                        session.Push(ActionName, () => MKL.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -876,7 +876,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => MKL.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -921,7 +921,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => MKL.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -991,7 +991,7 @@ namespace Genix.DNN
 
                     if (useGradients)
                     {
-                        MKL.Add(xstride, x.Gradient, 0, yw, offy);
+                        Mathematics.Add(xstride, x.Gradient, 0, yw, offy);
                     }
                     else
                     {
@@ -1012,7 +1012,7 @@ namespace Genix.DNN
 
                         if (useGradients)
                         {
-                            MKL.Add(xstride, x.Gradient, n * xstride, yw, offy);
+                            Mathematics.Add(xstride, x.Gradient, n * xstride, yw, offy);
                         }
                         else
                         {
@@ -1034,7 +1034,7 @@ namespace Genix.DNN
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            MKL.Add(xstride, x.Gradient, offx, yw, offyy);
+                            Mathematics.Add(xstride, x.Gradient, offx, yw, offyy);
                         }
                     }
                     else
@@ -1074,7 +1074,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        MKL.Add(ystride, xw, offxx, yw, offy);
+                        Mathematics.Add(ystride, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1107,7 +1107,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        MKL.Add(ystride, xs[i].Gradient, offx, yw, offy);
+                        Mathematics.Add(ystride, xs[i].Gradient, offx, yw, offy);
                     }
                     else
                     {
@@ -1141,7 +1141,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        MKL.Add(xstride0, xw, offxx, yw, offy);
+                        Mathematics.Add(xstride0, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1174,7 +1174,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        MKL.Add(xstride, xw, offx, yw, offy);
+                        Mathematics.Add(xstride, xw, offx, yw, offy);
                     }
                     else
                     {
@@ -1207,7 +1207,7 @@ namespace Genix.DNN
                 {
                     if (useGradients || i > 0)
                     {
-                        MKL.Add(ystride, xw, offx, yw, offy);
+                        Mathematics.Add(ystride, xw, offx, yw, offy);
                     }
                     else
                     {

@@ -10,8 +10,11 @@ namespace Genix.DNN.Layers
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using System.Text.RegularExpressions;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -19,6 +22,11 @@ namespace Genix.DNN.Layers
     /// </summary>
     public sealed class LRNLayer : Layer
     {
+        /// <summary>
+        /// The regular expression pattern that matches layer architecture.
+        /// </summary>
+        public const string ArchitecturePattern = @"^(LRN)(\d+)(?:\(A=((?:\d*\.)?\d+);B=((?:\d*\.)?\d+);K=((?:\d*\.)?\d+)\))?$";
+
         /// <summary>
         /// The default value for kernel size.
         /// </summary>
@@ -44,7 +52,6 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="kernelSize">The number of channels to normalize across. Should be odd number.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LRNLayer(int[] inputShape, int kernelSize)
             : this(inputShape, kernelSize, LRNLayer.DefaultAlpha, LRNLayer.DefaultBeta, LRNLayer.DefaultK)
         {
@@ -58,7 +65,6 @@ namespace Genix.DNN.Layers
         /// <param name="alpha">The α parameter.</param>
         /// <param name="beta">The β parameter.</param>
         /// <param name="k">The k parameter.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "This is a notation used in algorithm description.")]
         public LRNLayer(int[] inputShape, int kernelSize, float alpha, float beta, float k)
             : base(1, inputShape)
@@ -75,10 +81,36 @@ namespace Genix.DNN.Layers
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="LRNLayer"/> class, using the specified architecture.
+        /// </summary>
+        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="architecture">The layer architecture.</param>
+        /// <param name="random">The random numbers generator.</param>
+        public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1, inputShape)
+        {
+            List<Group> groups = Layer.ParseArchitechture(architecture, LRNLayer.ArchitecturePattern);
+
+            this.KernelSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
+            if (this.KernelSize < 3 || (this.KernelSize % 2) == 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidLRNKernelSize, nameof(architecture));
+            }
+
+            if (!string.IsNullOrEmpty(groups[3].Value) &&
+                !string.IsNullOrEmpty(groups[4].Value) &&
+                !string.IsNullOrEmpty(groups[5].Value))
+            {
+                this.Alpha = Convert.ToSingle(groups[3].Value, CultureInfo.InvariantCulture);
+                this.Beta = Convert.ToSingle(groups[4].Value, CultureInfo.InvariantCulture);
+                this.K = Convert.ToSingle(groups[5].Value, CultureInfo.InvariantCulture);
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="LRNLayer"/> class, using the existing <see cref="LRNLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LRNLayer"/> to copy the data from.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LRNLayer(LRNLayer other) : base(other)
         {
             this.KernelSize = other.KernelSize;
@@ -90,7 +122,6 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Prevents a default instance of the <see cref="LRNLayer"/> class from being created.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [JsonConstructor]
         private LRNLayer()
         {
