@@ -7,6 +7,13 @@
     public class MatrixTest
     {
         [TestMethod]
+        public void DotProductTest()
+        {
+            float res = Matrix.DotProduct(3, new float[] { 1, 2, 3, 4 }, 0, 1, new float[] { 5, 6, 7, 8 }, 1, 1);
+            Assert.AreEqual((1 * 6) + (2 * 7) + (3 * 8), res);
+        }
+
+        [TestMethod]
         public void VxVTest()
         {
             const int m = 3;

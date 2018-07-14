@@ -51,27 +51,27 @@
                 float[] a = new float[length];
                 float[] y = new float[length];
 
-                SetCopy.Set(length, 0.0f, a, 0);
+                Arrays.Set(length, 0.0f, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == 1.0f));
 
-                SetCopy.Set(length, float.NegativeInfinity, a, 0);
+                Arrays.Set(length, float.NegativeInfinity, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
-                SetCopy.Set(length, float.PositiveInfinity, a, 0);
+                Arrays.Set(length, float.PositiveInfinity, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
-                SetCopy.Set(length, float.MinValue, a, 0);
+                Arrays.Set(length, float.MinValue, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
-                SetCopy.Set(length, float.MaxValue, a, 0);
+                Arrays.Set(length, float.MaxValue, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
-                SetCopy.Set(length, float.NaN, a, 0);
+                Arrays.Set(length, float.NaN, a, 0);
                 Mathematics.Add(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
@@ -85,27 +85,27 @@
                 float[] a = new float[length];
                 float[] y = new float[length];
 
-                SetCopy.Set(length, 0.0f, a, 0);
+                Arrays.Set(length, 0.0f, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == -1.0f));
 
-                SetCopy.Set(length, float.NegativeInfinity, a, 0);
+                Arrays.Set(length, float.NegativeInfinity, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
-                SetCopy.Set(length, float.PositiveInfinity, a, 0);
+                Arrays.Set(length, float.PositiveInfinity, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
-                SetCopy.Set(length, float.MinValue, a, 0);
+                Arrays.Set(length, float.MinValue, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
-                SetCopy.Set(length, float.MaxValue, a, 0);
+                Arrays.Set(length, float.MaxValue, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
-                SetCopy.Set(length, float.NaN, a, 0);
+                Arrays.Set(length, float.NaN, a, 0);
                 Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }

@@ -1,6 +1,27 @@
 #include "stdafx.h"
 #include "mkl.h"
 
+extern "C" __declspec(dllexport) int WINAPI fcompare(int n,
+	const float* x, int offx,
+	const float* y, int offy)
+{
+	return ::memcmp(x + offx, y + offy, n * sizeof(float));
+}
+
+extern "C" __declspec(dllexport) int WINAPI i32compare(int n,
+	const int* x, int offx,
+	const int* y, int offy)
+{
+	return ::memcmp(x + offx, y + offy, n * sizeof(int));
+}
+
+extern "C" __declspec(dllexport) int WINAPI ccompare(int n,
+	const wchar_t* x, int offx,
+	const wchar_t* y, int offy)
+{
+	return ::memcmp(x + offx, y + offy, n * sizeof(wchar_t));
+}
+
 extern "C" __declspec(dllexport) void WINAPI copyf(
 	int n,
 	const float* x, int offx,

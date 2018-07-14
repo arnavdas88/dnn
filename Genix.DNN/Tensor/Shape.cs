@@ -11,7 +11,7 @@ namespace Genix.DNN
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Accord.DNN;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -150,7 +150,7 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(int[] shape1, int[] shape2)
         {
-            return shape1.Length == shape2.Length && MKL.Equals(shape1.Length, shape1, 0, shape2, 0);
+            return shape1.Length == shape2.Length && Arrays.Equals(shape1.Length, shape1, 0, shape2, 0);
         }
 
         /// <summary>

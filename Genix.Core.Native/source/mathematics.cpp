@@ -2,6 +2,109 @@
 #include "mkl.h"
 #include "math.h"
 
+extern "C" __declspec(dllexport) float WINAPI slogSumExp2(const float a, const float b)
+{
+	if (a == -INFINITY)
+	{
+		return b;
+	}
+
+	if (b == -INFINITY)
+	{
+		return a;
+	}
+
+	return ::log1pf(::expf(-::fabs(a - b))) + __max(a, b);
+}
+
+extern "C" __declspec(dllexport) float WINAPI slogSumExp3(const float a, const float b, const float c)
+{
+	if (a == -INFINITY)
+	{
+		return slogSumExp2(b, c);
+	}
+
+	if (b == -INFINITY)
+	{
+		return slogSumExp2(a, c);
+	}
+
+	if (c == -INFINITY)
+	{
+		return slogSumExp2(a, b);
+	}
+
+	if (a >= b && a >= c)
+	{
+		return ::log1pf(::expf(b - a) + ::expf(c - a)) + a;
+	}
+	else if (b >= a && b >= c)
+	{
+		return ::log1pf(::expf(a - b) + ::expf(c - b)) + b;
+	}
+	else
+	{
+		return ::log1pf(::expf(a - c) + ::expf(b - c)) + c;
+	}
+}
+
+// calculates absolute value of a vector element-wise
+extern "C" __declspec(dllexport) void WINAPI sabs(
+	int n,
+	const float* a, int offa,
+	float* y, int offy)
+{
+	a += offa;
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::fabsf(a[i]);
+		}
+	}
+	else
+	{
+		::vsAbs(n, a, y);
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI sabs_gradient(
+	int n,
+	const float* x, float* dx, int offx, BOOL cleardx,
+	const float* y, const float* dy, int offy)
+{
+	x += offx;
+	dx += offx;
+	y += offy;
+	dy += offy;
+
+	if (cleardx)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] = (x[i] == y[i] ? 1.0f : -1.0f) * dy[i];
+		}
+	}
+	else
+	{
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] += (x[i] == y[i] ? 1.0f : -1.0f) * dy[i];
+		}
+	}
+}
+
+// inverts vector element-wise
+extern "C" __declspec(dllexport) void WINAPI sinv(
+	int n,
+	const float* a, int offa,
+	float* y, int offy)
+{
+	::vsInv(n, a + offa, y + offy);
+}
+
 // adds scalar to vector element-wise in-place
 extern "C" __declspec(dllexport) void WINAPI saddc(
 	int n,
@@ -87,6 +190,22 @@ extern "C" __declspec(dllexport) void WINAPI sadd_inc(
 		{
 			*y = *a + *b;
 		}
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI smatchandadd(
+	int n,
+	const float* x, const float* xmask, int offx,
+	float* y, const float* ymask, int offy)
+{
+	x += offx;
+	y += offy;
+	xmask += offx;
+	ymask += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] += (xmask[i] == ymask[i] ? 1.0f : 0.0f) * x[i];
 	}
 }
 
@@ -524,5 +643,73 @@ extern "C" __declspec(dllexport) void WINAPI scos_gradient(
 		{
 			dx[i] -= ::sinf(x[i]) * dy[i];
 		}
+	}
+}
+
+// L1 normalization
+extern "C" __declspec(dllexport) float WINAPI _snrm1(
+	int n,
+	const float* x, int offx, int incx)
+{
+	x += offx;
+
+	if (n <= 32)
+	{
+		float sum = 0.0f;
+
+		if (incx == 1)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				sum += ::fabsf(x[i]);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < n; i++, x += incx)
+			{
+				sum += ::fabsf(*x);
+			}
+		}
+
+		return sum;
+	}
+	else
+	{
+		return ::cblas_sasum(n, x, incx);
+	}
+}
+
+// L2 normalization
+extern "C" __declspec(dllexport) float WINAPI _snrm2(
+	int n,
+	const float* x, int offx, int incx)
+{
+	x += offx;
+
+	if (n <= 32)
+	{
+		float sum = 0.0f;
+
+		if (incx == 1)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				sum += x[i] * x[i];
+			}
+		}
+		else
+		{
+			for (int i = 0; i < n; i++, x += incx)
+			{
+				sum += *x * *x;
+			}
+		}
+
+		return sum;
+	}
+	else
+	{
+		return ::cblas_snrm2(n, x, incx);
 	}
 }

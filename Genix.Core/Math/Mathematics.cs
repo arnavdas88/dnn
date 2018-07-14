@@ -17,6 +17,41 @@ namespace Genix.Core
     public static class Mathematics
     {
         /// <summary>
+        /// Computes absolute value of a range of values from one array starting at the specified source index
+        /// and stores results in another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to compute.</param>
+        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Abs(int length, float[] x, int offx, float[] y, int offy)
+        {
+            NativeMethods.sabs(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the derivative of the argument of the <see cref="Abs"/> method.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The <see cref="Abs"/> method input array <c>x</c>.</param>
+        /// <param name="dx">The array that contains calculated gradient for <c>x</c>.</param>
+        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
+        /// <param name="y">The <see cref="Abs"/> method output array <c>y</c>.</param>
+        /// <param name="dy">The array that contains gradient for <c>y</c>.</param>
+        /// <param name="offy">The index in the <c>y</c> and <c>dy</c> at which computation begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>dx(offx + i) += x(offx + i) == y(offy + i) ? dy(offy + i) : -dy(offy + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AbsGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] y, float[] dy, int offy)
+        {
+            NativeMethods.sabs_gradient(length, x, dx, offx, cleardx, y, dy, offy);
+        }
+
+        /// <summary>
         /// Adds a scalar value to all values of one array starting at the specified source index
         /// and stores results in another array starting at the specified destination index.
         /// </summary>
@@ -118,6 +153,27 @@ namespace Genix.Core
         public static void Add(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
         {
             NativeMethods.sadd_inc(length, a, offa, inca, b, offb, incb, y, offy, incy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array starting at the specified source index
+        /// to another array starting at the specified destination index
+        /// if values in mask arrays match.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to add.</param>
+        /// <param name="maskx">The first array that contains the data to compare.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="masky">The second array that contains the data to compare.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := y(i) + (xmask(offx + i) == ymask(offy + i) ? x(offx + i) : 0)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MatchAndAdd(int length, float[] x, float[] maskx, int offx, float[] y, float[] masky, int offy)
+        {
+            NativeMethods.smatchandadd(length, x, maskx, offx, y, masky, offy);
         }
 
         /// <summary>
@@ -529,6 +585,18 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Computes a sum of two logarithms using Log-Sum-Exp trick.
+        /// </summary>
+        /// <param name="a">The first value to add.</param>
+        /// <param name="b">The second value to add.</param>
+        /// <returns>The resulting value equal to log(exp(a) + exp(b)).</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float LogSumExp(float a, float b)
+        {
+            return NativeMethods.slogSumExp2(a, b);
+        }
+
+        /// <summary>
         /// Computes a natural logarithm element wise on one array and puts results into another array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -616,9 +684,61 @@ namespace Genix.Core
             NativeMethods.scos_gradient(length, x, dx, offx, cleardx, dy, offdy);
         }
 
+        /// <summary>
+        /// Computes the L1-Norm (sum of magnitudes) of the array elements.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The array that contains data used for computation.</param>
+        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <returns>
+        /// The L1-Norm of array elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float L1Norm(int length, float[] x, int offx, int incx)
+        {
+            return NativeMethods._snrm1(length, x, offx, incx);
+        }
+
+        /// <summary>
+        /// Computes the L2-Norm (Euclidian norm) of the array elements.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The array that contains data used for computation.</param>
+        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <returns>
+        /// The L2-Norm of array elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float L2Norm(int length, float[] x, int offx, int incx)
+        {
+            return NativeMethods._snrm2(length, x, offx, incx);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sabs(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sabs_gradient(
+                int n,
+                [In] float[] x,
+                [Out] float[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                [In] float[] y,
+                [In] float[] dy,
+                int offy);
+
+            /*[DllImport(NativeMethods.DllName)]
+             [SuppressUnmanagedCodeSecurity]
+             public static extern void sinv(int n, [In] float[] a, int offa, [Out] float[] y, int offy);*/
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -635,6 +755,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void sadd_inc(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void smatchandadd(int n, [In] float[] x, [In] float[] xmask, int offx, [Out] float[] y, [In] float[] ymask, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -694,6 +818,10 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern float slogSumExp2(float a, float b);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern void slog(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -729,6 +857,14 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool cleardx,
                 [In] float[] dy,
                 int offdy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float _snrm1(int n, [In] float[] x, int offx, int incx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float _snrm2(int n, [In] float[] x, int offx, int incx);
         }
     }
 }

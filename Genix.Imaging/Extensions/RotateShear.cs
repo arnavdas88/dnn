@@ -8,7 +8,6 @@ namespace Genix.Imaging
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Accord.DNN;
     using Genix.Core;
     using Leptonica;
 

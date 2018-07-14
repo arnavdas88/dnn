@@ -42,7 +42,7 @@ namespace Genix.DNN.Learning
 
             if (calculateGradient)
             {
-                SetCopy.Copy(expected.Length, ew, 0, y.Gradient, 0);
+                Arrays.Copy(expected.Length, ew, 0, y.Gradient, 0);
             }
 
             if (y.Rank == 1)

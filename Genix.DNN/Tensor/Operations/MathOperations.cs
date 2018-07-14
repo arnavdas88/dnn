@@ -12,7 +12,6 @@ namespace Genix.DNN
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-    using Accord.DNN;
     using Genix.Core;
 
     /// <summary>
@@ -488,12 +487,12 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    MKL.Abs(x.Length, x.Weights, 0, y.Weights, 0);
+                    Mathematics.Abs(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => MKL.AbsDerivative(x.Length, x.Weights, x.Gradient, 0, y.Weights, y.Gradient, 0));
+                        session.Push(ActionName, () => Mathematics.AbsGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -539,12 +538,12 @@ namespace Genix.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -592,12 +591,12 @@ namespace Genix.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, y.Weights, y.Gradient, 0);
+                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -862,7 +861,7 @@ namespace Genix.DNN
                     int k = a.Axes[0];
                     if (matrixLayout == MatrixLayout.RowMajor ^ transa)
                     {
-                        MKL.Swap(ref m, ref k);
+                        Swapping.Swap(ref m, ref k);
                     }
 
                     // get dimensions of matrix b
@@ -875,7 +874,7 @@ namespace Genix.DNN
                     int n = b.Axes[0];
                     if (matrixLayout == MatrixLayout.RowMajor ^ transb)
                     {
-                        MKL.Swap(ref n, ref k2);
+                        Swapping.Swap(ref n, ref k2);
                     }
 
                     // inner matrix dimensions must match
@@ -897,7 +896,7 @@ namespace Genix.DNN
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        MKL.Tile(m, n, bias.Weights, 0, c.Weights, 0);
+                        Arrays.Tile(m, n, bias.Weights, 0, c.Weights, 0);
                         cleary = false;
                     }
 
@@ -906,7 +905,7 @@ namespace Genix.DNN
                         if (transa)
                         {
                             // MxV uses matrix A dimensions, while MxM uses op(A) dimensions
-                            MKL.Swap(ref m, ref k);
+                            Swapping.Swap(ref m, ref k);
                         }
 
                         Matrix.MxV(matrixLayout, m, k, a.Weights, 0, transa, b.Weights, 0, c.Weights, 0, cleary);
@@ -1005,7 +1004,7 @@ namespace Genix.DNN
                                     if (bias?.CalculateGradient ?? false)
                                     {
                                         float[] ones = new float[n];
-                                        SetCopy.Set(n, 1.0f, ones, 0);
+                                        Arrays.Set(n, 1.0f, ones, 0);
 
                                         lock (bias)
                                         {
@@ -1060,7 +1059,7 @@ namespace Genix.DNN
                     int n = a.Axes[0];
                     if (matrixLayout == MatrixLayout.RowMajor)
                     {
-                        MKL.Swap(ref m, ref n);
+                        Swapping.Swap(ref m, ref n);
                     }
 
                     // calculate x and y vectors lengths
@@ -1081,7 +1080,7 @@ namespace Genix.DNN
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        SetCopy.Copy(ylen, bias.Weights, 0, y.Weights, 0);
+                        Arrays.Copy(ylen, bias.Weights, 0, y.Weights, 0);
                         cleary = false;
                     }
 

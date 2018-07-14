@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using Accord.DNN;
     using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -386,7 +385,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => MKL.Tanh(xw)).ToArray());
+                    x.Weights.Select(xw => Nonlinearity.Tanh(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Tanh(session, x);
@@ -396,8 +395,8 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y1.Weights.Zip(y1.Gradient, (yw, dyw) => MKL.TanhDerivative2(yw) * dyw)
-                              .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => MKL.TanhDerivative2(yw) * dyw), (a, b) => a + b)
+                    y1.Weights.Zip(y1.Gradient, (yw, dyw) => Nonlinearity.TanhDerivative2(yw) * dyw)
+                              .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => Nonlinearity.TanhDerivative2(yw) * dyw), (a, b) => a + b)
                               .ToArray(),
                     x.Gradient);
             }
@@ -418,7 +417,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => MKL.Sigmoid(xw)).ToArray());
+                    x.Weights.Select(xw => Nonlinearity.Sigmoid(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Sigmoid(session, x);
@@ -428,8 +427,8 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y1.Weights.Zip(y1.Gradient, (yw, dyw) => MKL.SigmoidDerivative2(yw) * dyw)
-                              .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => MKL.SigmoidDerivative2(yw) * dyw), (a, b) => a + b)
+                    y1.Weights.Zip(y1.Gradient, (yw, dyw) => Nonlinearity.SigmoidDerivative2(yw) * dyw)
+                              .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => Nonlinearity.SigmoidDerivative2(yw) * dyw), (a, b) => a + b)
                               .ToArray(),
                     x.Gradient);
             }
@@ -1917,7 +1916,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1970,7 +1969,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2023,7 +2022,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2075,7 +2074,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2128,7 +2127,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2181,7 +2180,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2234,7 +2233,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2286,7 +2285,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            MKL.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 

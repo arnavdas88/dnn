@@ -11,7 +11,6 @@ namespace Genix.DNN.Learning
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Accord.DNN;
     using Genix.Core;
 
     /// <summary>
@@ -52,7 +51,7 @@ namespace Genix.DNN.Learning
             {
                 if (calculateGradient)
                 {
-                    SetCopy.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    Arrays.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 // not enough elements to compute
@@ -70,12 +69,12 @@ namespace Genix.DNN.Learning
             ////CTCLoss.CTCComputeAlphas(T, A, S, ylog, labels, alphas);
             NativeMethods.CTCComputeAlphas(T, A, S, ylog, labels, alphas);
 
-            float logLossA = MKL.LogSumExp(alphas[alphas.Length - 1], alphas[alphas.Length - 2]);
+            float logLossA = Mathematics.LogSumExp(alphas[alphas.Length - 1], alphas[alphas.Length - 2]);
             if (float.IsNegativeInfinity(logLossA))
             {
                 if (calculateGradient)
                 {
-                    SetCopy.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    Arrays.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 return float.PositiveInfinity;
@@ -94,7 +93,7 @@ namespace Genix.DNN.Learning
                 Mathematics.Subtract(y.Length, y.Gradient, 0, ylog, 0, y.Gradient, 0);
                 Mathematics.Subtract(y.Length, y.Gradient, 0, logLossA, y.Gradient, 0);
                 Mathematics.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
-                MKL.Replace(y.Length, float.NaN, 0.0f, y.Gradient, 0); // NaN may come from various sources (for instance log(y) where y = 0)
+                Arrays.Replace(y.Length, float.NaN, 0.0f, y.Gradient, 0); // NaN may come from various sources (for instance log(y) where y = 0)
 
                 Debug.Assert(!float.IsNaN(y.Gradient[0]), "Tensor contains invalid weight.");
             }

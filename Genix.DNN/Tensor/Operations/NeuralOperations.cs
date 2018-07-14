@@ -14,7 +14,6 @@ namespace Genix.DNN
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Threading;
-    using Accord.DNN;
     using Genix.Core;
 
     /// <summary>
@@ -193,7 +192,7 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Arrays.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
 
                             for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
@@ -204,7 +203,7 @@ namespace Genix.DNN
                                 }
                                 else
                                 {
-                                    SetCopy.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Arrays.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                             }
                         }
@@ -223,7 +222,7 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                Arrays.Copy(xstride1, xw, xpos1, yw, ypos1);
                             }
                         }
                     }
@@ -238,7 +237,7 @@ namespace Genix.DNN
                             int ix1e = Maximum.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Arrays.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
                             else
                             {
@@ -255,7 +254,7 @@ namespace Genix.DNN
                                 int ix2e = Maximum.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
-                                    SetCopy.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Arrays.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                                 else
                                 {
@@ -421,7 +420,7 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Arrays.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
 
                             for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
@@ -432,7 +431,7 @@ namespace Genix.DNN
                                 }
                                 else
                                 {
-                                    SetCopy.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Arrays.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                             }
                         }
@@ -451,7 +450,7 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                Arrays.Copy(xstride1, xw, xpos1, yw, ypos1);
                             }
                         }
                     }
@@ -468,7 +467,7 @@ namespace Genix.DNN
                             int ix1e = Maximum.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
-                                SetCopy.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Arrays.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
                             else
                             {
@@ -485,7 +484,7 @@ namespace Genix.DNN
                                 int ix2e = Maximum.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
-                                    SetCopy.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Arrays.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                                 else
                                 {
@@ -548,7 +547,7 @@ namespace Genix.DNN
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
                                 {
                                     // cycle inside the kernel
-                                    MKL.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
+                                    Mathematics.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
                                 }
                             }
                         }
@@ -747,7 +746,7 @@ namespace Genix.DNN
 
                     if (x.Rank == 1)
                     {
-                        MKL.SoftMax(x.Length, x.Weights, 0, y.Weights, 0);
+                        Maximum.SoftMax(x.Length, x.Weights, 0, y.Weights, 0);
                     }
                     else
                     {
@@ -759,14 +758,14 @@ namespace Genix.DNN
 
                         for (int b = 0, bi = 0; b < mb; b++, bi += stride)
                         {
-                            MKL.SoftMax(stride, xw, bi, yw, bi);
+                            Maximum.SoftMax(stride, xw, bi, yw, bi);
                         }
                     }
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => SetCopy.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Arrays.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
 
                         /* TODO:
                                 Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0);

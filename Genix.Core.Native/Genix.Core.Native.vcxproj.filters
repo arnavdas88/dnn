@@ -34,9 +34,6 @@
     <ClCompile Include="source\matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\setcopy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\maximum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,6 +41,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\mathematics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\arrays.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sorting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SetCopy.cs" company="Noname, Inc.">
+// <copyright file="Arrays.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -15,10 +15,61 @@ namespace Genix.Core
     using System.Security;
 
     /// <summary>
-    /// Provides set and copy operations.
+    /// Provides array manipulation methods.
     /// </summary>
-    public static class SetCopy
+    public static class Arrays
     {
+        /// <summary>
+        /// Determines whether the two array contain same data.
+        /// </summary>
+        /// <param name="length">The number of elements to check.</param>
+        /// <param name="x">The first array to compare.</param>
+        /// <param name="offx">The index in the <c>x</c> at which comparing begins.</param>
+        /// <param name="y">The second array to compare.</param>
+        /// <param name="offy">The index in the <c>y</c> at which comparing begins.</param>
+        /// <returns>
+        /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return NativeMethods.fcompare(length, x, offx, y, offy) == 0;
+        }
+
+        /// <summary>
+        /// Determines whether the two array contain same data.
+        /// </summary>
+        /// <param name="length">The number of elements to check.</param>
+        /// <param name="x">The first array to compare.</param>
+        /// <param name="offx">The index in the <c>x</c> at which comparing begins.</param>
+        /// <param name="y">The second array to compare.</param>
+        /// <param name="offy">The index in the <c>y</c> at which comparing begins.</param>
+        /// <returns>
+        /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int length, int[] x, int offx, int[] y, int offy)
+        {
+            return NativeMethods.i32compare(length, x, offx, y, offy) == 0;
+        }
+
+        /// <summary>
+        /// Determines whether the two arrays contain same data.
+        /// </summary>
+        /// <param name="length">The number of elements to check.</param>
+        /// <param name="x">The first array to compare.</param>
+        /// <param name="offx">The index in the <c>x</c> at which comparing begins.</param>
+        /// <param name="y">The second array to compare.</param>
+        /// <param name="offy">The index in the <c>y</c> at which comparing begins.</param>
+        /// <returns>
+        /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int length, char[] x, int offx, char[] y, int offy)
+        {
+            return NativeMethods.ccompare(length, x, offx, y, offy) == 0;
+        }
+
         /// <summary>
         /// Copies a range of values from a array starting at the specified source index to another array starting at the specified destination index.
         /// </summary>
@@ -244,9 +295,155 @@ namespace Genix.Core
             NativeMethods.unpack(length, a, offa, y, offy, incy);
         }
 
+        /// <summary>
+        /// Clips array values to a specified minimum and maximum values.
+        /// </summary>
+        /// <param name="length">The number of elements to clip.</param>
+        /// <param name="minValue">The minimum value to clip by.</param>
+        /// <param name="maxValue">The maximum value to clip by.</param>
+        /// <param name="x">The array that contains the data to clip.</param>
+        /// <param name="offx">The index in the <c>x</c> at which clipping begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>x(offx + i) := min(max(x(offx + i), minValue), maxValue)</c>.
+        /// </remarks>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Clip(int length, float minValue, float maxValue, float[] x, int offx)
+        {
+            if (!float.IsNaN(minValue))
+            {
+                for (int i = offx, ii = offx + length; i < ii; i++)
+                {
+                    x[i] = x[i] > minValue ? x[i] : minValue;
+                }
+            }
+
+            if (!float.IsNaN(maxValue))
+            {
+                for (int i = offx, ii = offx + length; i < ii; i++)
+                {
+                    x[i] = x[i] < maxValue ? x[i] : maxValue;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies a range of values from a array starting at the specified source index
+        /// to another array starting at the specified destination index
+        /// specified number of times.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="count">The number of times to copy <c>x</c>.</param>
+        /// <param name="x">The array that contains the data to copy.</param>
+        /// <param name="offx">The index in the <c>x</c> at which copying begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which copying begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Tile(int length, int count, float[] x, int offx, float[] y, int offy)
+        {
+            for (int i = 0; i < count; i++, offy += length)
+            {
+                Arrays.Copy(length, x, offx, y, offy);
+            }
+        }
+
+        /// <summary>
+        /// Replaces all occurrences of the specified value in the array with another specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to replace.</param>
+        /// <param name="oldValue">The value to be replaced.</param>
+        /// <param name="newValue">The value to replace all occurrences of <c>oldValue</c>.</param>
+        /// <param name="y">The array that contains the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which replacement begins.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Replace(int length, float oldValue, float newValue, float[] y, int offy)
+        {
+            if (float.IsNaN(oldValue))
+            {
+                for (int i = offy, ii = offy + length; i < ii; i++)
+                {
+                    if (float.IsNaN(y[i]))
+                    {
+                        y[i] = newValue;
+                    }
+                }
+            }
+            else if (float.IsNegativeInfinity(oldValue))
+            {
+                for (int i = offy, ii = offy + length; i < ii; i++)
+                {
+                    if (float.IsNegativeInfinity(y[i]))
+                    {
+                        y[i] = newValue;
+                    }
+                }
+            }
+            else if (float.IsPositiveInfinity(oldValue))
+            {
+                for (int i = offy, ii = offy + length; i < ii; i++)
+                {
+                    if (float.IsPositiveInfinity(y[i]))
+                    {
+                        y[i] = newValue;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = offy, ii = offy + length; i < ii; i++)
+                {
+                    if (y[i] == oldValue)
+                    {
+                        y[i] = newValue;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sorts the elements in a range of elements in an array.
+        /// </summary>
+        /// <param name="length">The number of elements in the range to sort.</param>
+        /// <param name="x">The array to sort.</param>
+        /// <param name="offx">The index in the <c>x</c> at which sorting begins.</param>
+        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        public static void Sort(int length, float[] x, int offx, bool ascending)
+        {
+            NativeMethods.fqsort(length, x, offx, ascending);
+        }
+
+        /// <summary>
+        /// Sorts the elements in a range of elements in a pair of arrays
+        /// (one contains the keys and the other contains the corresponding items)
+        /// based on the keys in the first array.
+        /// </summary>
+        /// <param name="length">The number of elements in the range to sort.</param>
+        /// <param name="x">The array that contains the keys to sort.</param>
+        /// <param name="offx">The index in the <c>x</c> at which sorting begins.</param>
+        /// <param name="y">The array that contains the items that correspond to each of the keys in the <c>x</c>.</param>
+        /// <param name="offy">The index in the <c>y</c> at which sorting begins.</param>
+        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        public static void Sort(int length, float[] x, int offx, int[] y, int offy, bool ascending)
+        {
+            NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int fcompare(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int i32compare(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int ccompare(int n, [In] char[] x, int offx, [Out] char[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -307,6 +504,24 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void unpack(int n, [In] float[] a, int offa, [Out] float[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void fqsort(
+                int n,
+                [In, Out] float[] x,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool ascending);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void fqsortv(
+                int n,
+                [In, Out] float[] x,
+                int offx,
+                [In, Out] int[] y,
+                int offy,
+                [MarshalAs(UnmanagedType.Bool)] bool ascending);
         }
     }
 }

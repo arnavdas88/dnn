@@ -156,7 +156,7 @@ namespace Genix.DNN
                 if (calculateGradient && stack.Count > 0)
                 {
                     float[] dw = stack.Pop();
-                    SetCopy.Set(length, 0.0f, dw, 0);
+                    Arrays.Set(length, 0.0f, dw, 0);
 
                     x = new Tensor(name, shape, w, dw);
                 }

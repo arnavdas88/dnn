@@ -12,7 +12,6 @@ namespace Genix.DNN.Learning
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Accord.DNN;
     using DNN;
     using Genix.Core;
     using LanguageModel;
@@ -180,7 +179,7 @@ namespace Genix.DNN.Learning
                     cls[off + i] = i;
                 }
 
-                MKL.Sort(A, ylog, off, cls, off, false);
+                Arrays.Sort(A, ylog, off, cls, off, false);
             }
 
             // initialize first buffer
@@ -424,7 +423,7 @@ namespace Genix.DNN.Learning
                         continue;
                     }
 
-                    esum = MKL.LogSumExp(esum, prob);
+                    esum = Mathematics.LogSumExp(esum, prob);
 
                     int length = buffer.Length;
                     int[] cls = buffer.Classes;
@@ -555,14 +554,13 @@ namespace Genix.DNN.Learning
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Set(int[] classes, int length, int hash, float probBlank, float probNoBlank, State state)
             {
-                SetCopy.Copy(length, classes, 0, this.Classes, 0);
+                Arrays.Copy(length, classes, 0, this.Classes, 0);
                 this.Length = length;
                 this.Hash = hash;
 
                 this.ProbBlank = probBlank;
                 this.ProbNoBlank = probNoBlank;
-                this.Prob = MKL.LogSumExp(probBlank, probNoBlank);
-                ////this.Prob = CTCBeamSearch.LogSumExp(probBlank, probNoBlank);
+                this.Prob = Mathematics.LogSumExp(probBlank, probNoBlank);
 
                 this.State = state;
             }
@@ -570,9 +568,9 @@ namespace Genix.DNN.Learning
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Update(float probBlank, float probNoBlank, State state)
             {
-                this.ProbBlank = MKL.LogSumExp(this.ProbBlank, probBlank);
-                this.ProbNoBlank = MKL.LogSumExp(this.ProbNoBlank, probNoBlank);
-                this.Prob = MKL.LogSumExp(this.ProbBlank, this.ProbNoBlank);
+                this.ProbBlank = Mathematics.LogSumExp(this.ProbBlank, probBlank);
+                this.ProbNoBlank = Mathematics.LogSumExp(this.ProbNoBlank, probNoBlank);
+                this.Prob = Mathematics.LogSumExp(this.ProbBlank, this.ProbNoBlank);
 
                 this.State = CompositeState.Create(this.State, state);
             }
@@ -617,7 +615,7 @@ namespace Genix.DNN.Learning
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Add(int[] classes, int length, int hash, float probBlank, float probNoBlank, State state)
             {
-                float prob = MKL.LogSumExp(probBlank, probNoBlank);
+                float prob = Mathematics.LogSumExp(probBlank, probNoBlank);
 
                 // search the matching buffer
                 Buffer after = null;
@@ -626,7 +624,7 @@ namespace Genix.DNN.Learning
                     if (buffer.Length == length &&
                         buffer.Hash == hash &&
                         buffer.Classes[0] == classes[0] &&
-                        MKL.Equals(length, buffer.Classes, 0, classes, 0))
+                        Arrays.Equals(length, buffer.Classes, 0, classes, 0))
                     {
                         // update buffer
                         buffer.Update(probBlank, probNoBlank, state);

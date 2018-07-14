@@ -73,7 +73,7 @@ namespace Genix.DNN.Learning
             if (calculateGradient)
             {
                 float[] dyw = y.Gradient;
-                SetCopy.Set(y.Length, this.LSR / mbsize, dyw, 0);
+                Arrays.Set(y.Length, this.LSR / mbsize, dyw, 0);
 
                 for (int i = 0, yi = 0; i < mb; i++, yi += mbsize)
                 {

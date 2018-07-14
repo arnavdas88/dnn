@@ -15,7 +15,6 @@ namespace Genix.DNN
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Text;
-    using Accord.DNN;
     using Genix.Core;
     using Genix.DNN.LanguageModel;
     using Genix.DNN.Learning;
@@ -237,13 +236,13 @@ namespace Genix.DNN
             for (int i = 0, offy = 0; i < mb; i++, offy += numAnswers)
             {
                 // copy weights into temporary buffer and sort along with their indexes
-                SetCopy.Copy(numAnswers, yw, offy, ywmb, 0);
+                Arrays.Copy(numAnswers, yw, offy, ywmb, 0);
                 for (int j = 0; j < numAnswers; j++)
                 {
                     ywidx[j] = j;
                 }
 
-                MKL.Sort(numAnswers, ywmb, 0, ywidx, 0, false);
+                Arrays.Sort(numAnswers, ywmb, 0, ywidx, 0, false);
 
                 // create answer for a mini-batch item
                 List<(string, float)> mbanswers = new List<(string, float)>(numAnswers);

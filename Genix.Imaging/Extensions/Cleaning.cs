@@ -41,7 +41,7 @@ namespace Genix.Imaging
             int stride = image.Stride;
 
             Image dst = new Image(image);
-            SetCopy.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
+            Arrays.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
             ulong[] bits = dst.Bits;
 
             int maxwidth = (int)((maxNoiseWidth * image.HorizontalResolution) + 0.5f);
@@ -90,7 +90,7 @@ namespace Genix.Imaging
             {
                 int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
-                SetCopy.Set(lengths.Length, scanlen, lengths, 0);
+                Arrays.Set(lengths.Length, scanlen, lengths, 0);
 
                 for (int ix = 0; ix < width; ix++)
                 {
@@ -112,7 +112,7 @@ namespace Genix.Imaging
             {
                 int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
-                SetCopy.Set(lengths.Length, scanlen, lengths, 0);
+                Arrays.Set(lengths.Length, scanlen, lengths, 0);
 
                 int size = stride * height;
                 for (int ix = 0; ix < width; ix++)

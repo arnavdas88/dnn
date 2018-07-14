@@ -271,7 +271,7 @@ namespace Genix.Imaging
 
             if (cleanMask)
             {
-                SetCopy.Set(mask.Length, 0, mask, 0);
+                Arrays.Set(mask.Length, 0, mask, 0);
             }
 
             if (bits == null)
@@ -312,7 +312,7 @@ namespace Genix.Imaging
 
             if (cleanMask)
             {
-                SetCopy.Set(mask.Length, ulong.MaxValue, mask, 0);
+                Arrays.Set(mask.Length, ulong.MaxValue, mask, 0);
             }
 
             if (bits == null)

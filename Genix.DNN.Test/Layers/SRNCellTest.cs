@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using Accord.DNN;
     using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
@@ -181,11 +180,11 @@
 
             float[] bw = layer.B.Weights;
             Tensor expected = new Tensor(null, new[] { 2, 2 });
-            expected.Weights[0] = MKL.DotProduct(3, layer.W.Weights, 0, x.Weights, 0) + bw[0];
-            expected.Weights[1] = MKL.DotProduct(3, layer.W.Weights, 3, x.Weights, 0) + bw[1];
+            expected.Weights[0] = Matrix.DotProduct(3, layer.W.Weights, 0, x.Weights, 0) + bw[0];
+            expected.Weights[1] = Matrix.DotProduct(3, layer.W.Weights, 3, x.Weights, 0) + bw[1];
             Nonlinearity.ReLU(2, expected.Weights, 0, expected.Weights, 0);
-            expected.Weights[2] = MKL.DotProduct(3, layer.W.Weights, 0, x.Weights, 3) + bw[0] + MKL.DotProduct(2, layer.U.Weights, 0, expected.Weights, 0);
-            expected.Weights[3] = MKL.DotProduct(3, layer.W.Weights, 3, x.Weights, 3) + bw[1] + MKL.DotProduct(2, layer.U.Weights, 2, expected.Weights, 0);
+            expected.Weights[2] = Matrix.DotProduct(3, layer.W.Weights, 0, x.Weights, 3) + bw[0] + Matrix.DotProduct(2, layer.U.Weights, 0, expected.Weights, 0);
+            expected.Weights[3] = Matrix.DotProduct(3, layer.W.Weights, 3, x.Weights, 3) + bw[1] + Matrix.DotProduct(2, layer.U.Weights, 2, expected.Weights, 0);
             Nonlinearity.ReLU(2, expected.Weights, 2, expected.Weights, 2);
             Helpers.AreTensorsEqual(expected, ys[0]);
 

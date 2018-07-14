@@ -16,6 +16,44 @@ namespace Genix.Core
     public static class Matrix
     {
         /// <summary>
+        /// Calculates a dot product between values from one array starting at the specified index
+        /// and values from another array starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first array that contains the data.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <returns>
+        /// The calculated dot product value.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float DotProduct(int length, float[] a, int offa, float[] b, int offb)
+        {
+            return NativeMethods._sdot(length, a, offa, 1, b, offb, 1);
+        }
+
+        /// <summary>
+        /// Calculates a dot product between values from one array starting at the specified index
+        /// and values from another array starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first array that contains the data.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="inca">the increment for the elements of <c>a</c>.</param>
+        /// <param name="b">The second array that contains the data.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="incb">the increment for the elements of <c>b</c>.</param>
+        /// <returns>
+        /// The calculated dot product value.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float DotProduct(int length, float[] a, int offa, int inca, float[] b, int offb, int incb)
+        {
+            return NativeMethods._sdot(length, a, offa, inca, b, offb, incb);
+        }
+
+        /// <summary>
         /// Performs a rank-1 update of a general matrix.
         /// The operation is defined as A := x*y'+ A.
         /// </summary>
@@ -102,6 +140,10 @@ namespace Genix.Core
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float _sdot(int n, [In] float[] x, int offx, int incx, [In] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

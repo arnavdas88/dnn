@@ -20,7 +20,7 @@ void __forceinline swap(int* data, int i, int j)
 	}
 }
 
-static void qsortf_asc(float* keys, const int lo, const int hi)
+static void fqsort_asc(float* keys, const int lo, const int hi)
 {
 	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
@@ -41,16 +41,16 @@ static void qsortf_asc(float* keys, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		qsortf_asc(keys, lo, j);
+		fqsort_asc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		qsortf_asc(keys, i, hi);
+		fqsort_asc(keys, i, hi);
 	}
 }
 
-static void qsortf_asc(float* keys, int* values, const int lo, const int hi)
+static void fqsort_asc(float* keys, int* values, const int lo, const int hi)
 {
 	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
@@ -72,16 +72,16 @@ static void qsortf_asc(float* keys, int* values, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		qsortf_asc(keys, lo, j);
+		fqsort_asc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		qsortf_asc(keys, i, hi);
+		fqsort_asc(keys, i, hi);
 	}
 }
 
-static void qsortf_desc(float* keys, const int lo, const int hi)
+static void fqsort_desc(float* keys, const int lo, const int hi)
 {
 	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
@@ -102,16 +102,16 @@ static void qsortf_desc(float* keys, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		qsortf_desc(keys, lo, j);
+		fqsort_desc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		qsortf_desc(keys, i, hi);
+		fqsort_desc(keys, i, hi);
 	}
 }
 
-static void qsortf_desc(float* keys, int* values, const int lo, const int hi)
+static void fqsort_desc(float* keys, int* values, const int lo, const int hi)
 {
 	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
@@ -133,16 +133,16 @@ static void qsortf_desc(float* keys, int* values, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		qsortf_desc(keys, values, lo, j);
+		fqsort_desc(keys, values, lo, j);
 	}
 
 	if (i < hi)
 	{
-		qsortf_desc(keys, values, i, hi);
+		fqsort_desc(keys, values, i, hi);
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI qsortf(
+extern "C" __declspec(dllexport) void WINAPI fqsort(
 	const int n,
 	float* x, const int offx,
 	BOOL ascending)
@@ -151,15 +151,15 @@ extern "C" __declspec(dllexport) void WINAPI qsortf(
 
 	if (ascending)
 	{
-		::qsortf_asc(x, 0, n - 1);
+		::fqsort_asc(x, 0, n - 1);
 	}
 	else
 	{
-		::qsortf_desc(x, 0, n - 1);
+		::fqsort_desc(x, 0, n - 1);
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI qsortfv(
+extern "C" __declspec(dllexport) void WINAPI fqsortv(
 	const int n,
 	float* x, const int offx,
 	int* y, const int offy,
@@ -170,10 +170,10 @@ extern "C" __declspec(dllexport) void WINAPI qsortfv(
 
 	if (ascending)
 	{
-		::qsortf_asc(x, y, 0, n - 1);
+		::fqsort_asc(x, y, 0, n - 1);
 	}
 	else
 	{
-		::qsortf_desc(x, y, 0, n - 1);
+		::fqsort_desc(x, y, 0, n - 1);
 	}
 }

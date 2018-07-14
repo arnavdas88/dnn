@@ -16,7 +16,6 @@ namespace Genix.DNN
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using Accord.DNN;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -560,7 +559,7 @@ namespace Genix.DNN
         public Tensor Copy()
         {
             Tensor y = new Tensor("copy", this.Axes);
-            SetCopy.Copy(this.Length, this.Weights, 0, y.Weights, 0);
+            Arrays.Copy(this.Length, this.Weights, 0, y.Weights, 0);
             return y;
         }
 
@@ -568,7 +567,7 @@ namespace Genix.DNN
         /// Sets all the weights in the tensor to zero.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => SetCopy.Set(this.Length, 0, this.Weights, 0);
+        public void Clear() => Arrays.Set(this.Length, 0, this.Weights, 0);
 
         /// <summary>
         /// Sets all the weights in the tensor's gradient to zero.
@@ -578,7 +577,7 @@ namespace Genix.DNN
         {
             if (this.gradient != null)
             {
-                SetCopy.Set(this.Length, 0, this.gradient, 0);
+                Arrays.Set(this.Length, 0, this.gradient, 0);
             }
         }
 
@@ -587,7 +586,7 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(float value) => SetCopy.Set(this.Length, value, this.Weights, 0);
+        public void Set(float value) => Arrays.Set(this.Length, value, this.Weights, 0);
 
         /// <summary>
         /// Sets all values in the tensor to the specified values.
@@ -606,7 +605,7 @@ namespace Genix.DNN
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            SetCopy.Copy(this.Length, weights, 0, this.Weights, 0);
+            Arrays.Copy(this.Length, weights, 0, this.Weights, 0);
         }
 
         /// <summary>
@@ -614,7 +613,7 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value) => SetCopy.Set(this.Length, value, this.Gradient, 0);
+        public void SetGradient(float value) => Arrays.Set(this.Length, value, this.Gradient, 0);
 
         /// <summary>
         /// Sets all values in the tensor gradient to the specified values.
@@ -633,7 +632,7 @@ namespace Genix.DNN
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            SetCopy.Copy(this.Length, weights, 0, this.Gradient, 0);
+            Arrays.Copy(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>
@@ -644,14 +643,14 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Replace(float oldValue, float newValue)
         {
-            MKL.Replace(this.Length, oldValue, newValue, this.Weights, 0);
+            Arrays.Replace(this.Length, oldValue, newValue, this.Weights, 0);
         }
 
         /// <summary>
         /// Computes absolute value of elements of the tensor.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Abs() => MKL.Abs(this.Length, this.Weights, 0, this.Weights, 0);
+        public void Abs() => Mathematics.Abs(this.Length, this.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values from a tensor.
@@ -862,7 +861,7 @@ namespace Genix.DNN
         /// The L1-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L1Norm() => MKL.L1Norm(this.Length, this.Weights, 0, 1);
+        public float L1Norm() => Mathematics.L1Norm(this.Length, this.Weights, 0, 1);
 
         /// <summary>
         /// Computes the L2-Norm (Euclidian norm) of the tensor elements.
@@ -871,7 +870,7 @@ namespace Genix.DNN
         /// The L2-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L2Norm() => MKL.L2Norm(this.Length, this.Weights, 0, 1);
+        public float L2Norm() => Mathematics.L2Norm(this.Length, this.Weights, 0, 1);
 
         /// <summary>
         /// Clips tensor values to a specified minimum and maximum values.
@@ -884,7 +883,7 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clip(float minValue, float maxValue)
         {
-            MKL.Clip(this.Length, minValue, maxValue, this.Weights, 0);
+            Arrays.Clip(this.Length, minValue, maxValue, this.Weights, 0);
         }
 
         /// <summary>
@@ -898,7 +897,7 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClipGradient(float minValue, float maxValue)
         {
-            MKL.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
+            Arrays.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
         }
 
         /// <summary>

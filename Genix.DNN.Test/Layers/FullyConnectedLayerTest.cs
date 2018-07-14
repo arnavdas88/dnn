@@ -4,7 +4,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
-    using Accord.DNN;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.Core;
@@ -213,7 +212,7 @@
 
             return Enumerable.Range(0, numberOfNeurons).Select(neuron =>
             {
-                return MKL.DotProduct(
+                return Matrix.DotProduct(
                     count,
                     matrixLayout == MatrixLayout.RowMajor ?
                         Enumerable.Range(neuron * count, count).Select(i => w[i]).ToArray() :

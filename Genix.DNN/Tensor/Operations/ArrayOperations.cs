@@ -14,7 +14,6 @@ namespace Genix.DNN
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Accord.DNN;
     using Genix.Core;
 
     /// <summary>
@@ -43,7 +42,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -80,7 +79,7 @@ namespace Genix.DNN
                     Tensor[] ys = session.AllocateTensors(ActionName, count, x.Axes, calculateGradient);
                     for (int i = 0; i < count; i++)
                     {
-                        SetCopy.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
+                        Arrays.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
                     }
 
 #if !NOLEARNING
@@ -566,7 +565,7 @@ namespace Genix.DNN
                                     if (start < 0)
                                     {
                                         int count = -start * xstride2;
-                                        SetCopy.Set(count, 0.0f, yw, yposk2);
+                                        Arrays.Set(count, 0.0f, yw, yposk2);
                                         xposk2 += count;
                                         yposk2 += count;
 
@@ -575,16 +574,16 @@ namespace Genix.DNN
 
                                     if (end > x2)
                                     {
-                                        SetCopy.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
+                                        Arrays.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
 
                                         end = x2;
                                     }
 
-                                    SetCopy.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
+                                    Arrays.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
                                 }
                                 else
                                 {
-                                    SetCopy.Set(ksize2 * xstride2, 0.0f, yw, yposk);
+                                    Arrays.Set(ksize2 * xstride2, 0.0f, yw, yposk);
                                 }
                             }
 
@@ -720,12 +719,12 @@ namespace Genix.DNN
                     if (xstride == 1)
                     {
                         int length = x.Length / count;
-                        SetCopy.Pack(length, xw, 0, count, yw, 0);
+                        Arrays.Pack(length, xw, 0, count, yw, 0);
 
                         float[] wsp = new float[length];
                         for (int i = 1; i < count; i++)
                         {
-                            SetCopy.Pack(length, xw, i, count, wsp, 0);
+                            Arrays.Pack(length, xw, i, count, wsp, 0);
                             Maximum.Max(length, yw, 0, wsp, 0, yw, 0);
                         }
                     }
@@ -733,7 +732,7 @@ namespace Genix.DNN
                     {
                         for (int offx = 0, offy = 0, ylen = y.Length; offy < ylen; offy += xstride)
                         {
-                            SetCopy.Copy(xstride, xw, offx, yw, offy);
+                            Arrays.Copy(xstride, xw, offx, yw, offy);
                             offx += xstride;
 
                             for (int i = 1; i < count; i++, offx += xstride)
@@ -772,7 +771,7 @@ namespace Genix.DNN
                                     {
                                         for (int i = 0; i < count; i++, xpos += xstride)
                                         {
-                                            MKL.MatchAndAdd(xstride, dyw, yw, ypos, dxw, xw, xpos);
+                                            Mathematics.MatchAndAdd(xstride, dyw, yw, ypos, dxw, xw, xpos);
                                         }
                                     }
                                 }
@@ -825,7 +824,7 @@ namespace Genix.DNN
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -870,7 +869,7 @@ namespace Genix.DNN
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -915,7 +914,7 @@ namespace Genix.DNN
                     Tensor y = session.AllocateTensor(ActionName, shape, calculateGradient);
 
                     // simply copy tensor content
-                    SetCopy.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -995,7 +994,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(xstride, x.Weights, 0, yw, offy);
+                        Arrays.Copy(xstride, x.Weights, 0, yw, offy);
                     }
 
                     offy += xstride;
@@ -1041,7 +1040,7 @@ namespace Genix.DNN
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            SetCopy.Copy(xstride, x.Weights, offx, yw, offyy);
+                            Arrays.Copy(xstride, x.Weights, offx, yw, offyy);
                         }
                     }
 
@@ -1078,7 +1077,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(ystride, xw, offxx, yw, offy);
+                        Arrays.Copy(ystride, xw, offxx, yw, offy);
                     }
                 }
 
@@ -1111,7 +1110,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(ystride, xs[i].Weights, offx, yw, offy);
+                        Arrays.Copy(ystride, xs[i].Weights, offx, yw, offy);
                     }
                 }
             }
@@ -1145,7 +1144,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(xstride0, xw, offxx, yw, offy);
+                        Arrays.Copy(xstride0, xw, offxx, yw, offy);
                     }
                 }
             }
@@ -1178,7 +1177,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(xstride, xw, offx, yw, offy);
+                        Arrays.Copy(xstride, xw, offx, yw, offy);
                     }
                 }
             }
@@ -1211,7 +1210,7 @@ namespace Genix.DNN
                     }
                     else
                     {
-                        SetCopy.Copy(ystride, xw, offx, yw, offy);
+                        Arrays.Copy(ystride, xw, offx, yw, offy);
                     }
                 }
             }

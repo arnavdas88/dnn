@@ -1,6 +1,41 @@
 #include "stdafx.h"
 #include "mkl.h"
 
+extern "C" __declspec(dllexport) float WINAPI _sdot(
+	int n,
+	const float* x, int offx, int incx,
+	const float* y, int offy, int incy)
+{
+	x += offx;
+	y += offy;
+
+	if (n <= 32)
+	{
+		float res = 0.0f;
+
+		if (incx == 1 && incy == 1)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				res += x[i] * y[i];
+			}
+		}
+		else
+		{
+			for (int i = 0, xi = 0, yi = 0; i < n; i++, xi += incx, yi += incy)
+			{
+				res += x[xi] * y[yi];
+			}
+		}
+
+		return res;
+	}
+	else
+	{
+		return ::cblas_sdot(n, x, incx, y, incy);
+	}
+}
+
 extern "C" __declspec(dllexport) void WINAPI matrix_vv(
 	BOOL rowmajor,
 	int m, int n,

@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
@@ -179,6 +180,7 @@ namespace Genix.Core
         /// <param name="x">One of the <see cref="MKL.Min"/> of <see cref="MKL.Max"/> methods input arrays <c>a</c> or <c>b</c>.</param>
         /// <param name="dx">The array that contains calculated gradient for <c>x</c>.</param>
         /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
         /// <param name="y">The <see cref="MKL.Min"/> of <see cref="MKL.Max"/> methods output array <c>y</c>.</param>
         /// <param name="dy">The array that contains gradient for <c>y</c>.</param>
         /// <param name="offy">The index in the <c>y</c> and <c>dy</c> at which calculation begins.</param>
@@ -186,9 +188,9 @@ namespace Genix.Core
         /// The method performs operation defined as <c>dx(offx + i) += x(offx + i) == y(offy + i) ? dy(offy + i) : 0</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MinMaxGradient(int length, float[] x, float[] dx, int offx, float[] y, float[] dy, int offy)
+        public static void MinMaxGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] y, float[] dy, int offy)
         {
-            NativeMethods.minmax_gradient(length, x, dx, offx, y, dy, offy);
+            NativeMethods.minmax_gradient(length, x, dx, offx, cleardx, y, dy, offy);
         }
 
         /// <summary>
@@ -286,6 +288,37 @@ namespace Genix.Core
             NativeMethods.argminmax(length, x, offx, out min, out max);
         }
 
+        /// <summary>
+        /// Calculates softmax probabilities for values in one array and stores calculated values in another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The array that contains data used for computation.</param>
+        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="y">The array that receives calculated probabilities. Can be <b>null</b>.</param>
+        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SoftMax(int length, float[] x, int offx, float[] y, int offy)
+        {
+            // compute max activation
+            float amax = Maximum.Max(length, x, offx);
+
+            // compute exponentials (carefully to not blow up)
+            float esum = 0.0f;
+            for (int i = 0; i < length; i++)
+            {
+                float e = (float)Math.Exp(x[offx + i] - amax);
+                esum += e;
+                y[offy + i] = e;
+            }
+
+            // normalize and output to sum to one
+            if (esum != 0.0f)
+            {
+                Mathematics.Divide(length, esum, y, offy, y, offy);
+            }
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -300,7 +333,15 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void minmax_gradient(int n, [In] float[] x, [Out] float[] dx, int offx, [In] float[] y, [In] float[] dy, int offy);
+            public static extern void minmax_gradient(
+                int n,
+                [In] float[] x,
+                [Out] float[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                [In] float[] y,
+                [In] float[] dy,
+                int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

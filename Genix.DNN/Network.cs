@@ -14,10 +14,9 @@ namespace Genix.DNN
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using Accord.DNN;
     using Genix.Core;
+    using Genix.DNN.Layers;
     using Genix.DNN.Learning;
-    using Layers;
     using Newtonsoft.Json;
 
     /// <summary>

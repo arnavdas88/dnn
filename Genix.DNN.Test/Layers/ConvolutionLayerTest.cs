@@ -5,7 +5,6 @@
     using System.Globalization;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using Accord.DNN;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.Core;

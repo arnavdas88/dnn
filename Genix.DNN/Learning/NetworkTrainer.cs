@@ -12,9 +12,8 @@ namespace Genix.DNN.Learning
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Accord.DNN;
     using Genix.Core;
-    using Layers;
+    using Genix.DNN.Layers;
 
     /// <summary>
     /// Represents a basic trainer for neural nets.

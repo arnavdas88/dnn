@@ -34,7 +34,7 @@ namespace Genix.Imaging
             }
 
             Image dst = new Image(image);
-            SetCopy.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
+            Arrays.Copy(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -204,7 +204,7 @@ namespace Genix.Imaging
                 if (image.BitsPerPixel > 1)
                 {
                     // set all image to white
-                    SetCopy.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                    Arrays.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
                 }
             }
 
@@ -227,7 +227,7 @@ namespace Genix.Imaging
 
             if (stride1src == stride1dst && x == 0 && dstx == 0 && width == src.Width)
             {
-                SetCopy.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
+                Arrays.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
             }
             else
             {

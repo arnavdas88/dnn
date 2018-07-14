@@ -72,7 +72,8 @@
     <Compile Include="Math\MatrixLayout.cs" />
     <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\Nonlinearity.cs" />
-    <Compile Include="Math\SetCopy.cs" />
+    <Compile Include="Math\Arrays.cs" />
+    <Compile Include="Math\Swapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>

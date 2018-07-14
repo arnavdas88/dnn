@@ -152,10 +152,6 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Accord.DNN.Core\Accord.DNN.Core.csproj">
-      <Project>{2b717da4-eb9d-47d6-8d74-dc1fded6b193}</Project>
-      <Name>Accord.DNN.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>

@@ -24,7 +24,7 @@ extern "C" __declspec(dllexport) void WINAPI max(
 
 extern "C" __declspec(dllexport) void WINAPI minmax_gradient(
 	int n,
-	const float* x, float* dx, int offx,
+	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* y, const float* dy, int offy)
 {
 	x += offx;
@@ -32,9 +32,19 @@ extern "C" __declspec(dllexport) void WINAPI minmax_gradient(
 	y += offy;
 	dy += offy;
 
-	for (int i = 0; i < n; i++)
+	if (cleardx)
 	{
-		dx[i] = (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] = (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
+		}
+	}
+	else
+	{
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] += (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
+		}
 	}
 }
 

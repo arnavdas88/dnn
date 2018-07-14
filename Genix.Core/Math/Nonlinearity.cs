@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -44,6 +45,33 @@ namespace Genix.Core
         public static void ReLUGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
         {
             NativeMethods.relu_gradient2(length, dx, offdx, cleardx, y, offy, dy, offdy);
+        }
+
+        /// <summary>
+        /// Computes a sigmoid nonlinearity of the specified angle. S(x) = 1 / (1 + e^-x).
+        /// </summary>
+        /// <param name="value">The value to compute.</param>
+        /// <returns>
+        /// The sigmoid of <c>value</c>. 
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Sigmoid(float value)
+        {
+            return 1.0f / (1.0f + (float)Math.Exp(-value));
+        }
+
+        /// <summary>
+        /// Computes a derivative of a sigmoid nonlinearity of the specified angle.
+        /// The method takes the result of <see cref="MKL.Sigmoid(Single)"/> method as an argument.
+        /// </summary>
+        /// <param name="value">The value to compute.</param>
+        /// <returns>
+        /// The derivative of a sigmoid of <c>value</c>. 
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float SigmoidDerivative2(float value)
+        {
+            return value * (1.0f - value);
         }
 
         /// <summary>
@@ -89,6 +117,33 @@ namespace Genix.Core
         public static void Tanh(int length, float[] x, int offx, float[] y, int offy)
         {
             NativeMethods._tanh(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a hyperbolic tangent of the specified value.
+        /// </summary>
+        /// <param name="value">The value to compute.</param>
+        /// <returns>
+        /// The hyperbolic tangent of <c>value</c>. 
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Tanh(float value)
+        {
+            return (float)Math.Tanh(value);
+        }
+
+        /// <summary>
+        /// Computes a derivative of a hyperbolic tangent of the specified value.
+        /// The method takes the result of <see cref="MKL.Tanh(Single)"/> method as an argument.
+        /// </summary>
+        /// <param name="value">The value to compute.</param>
+        /// <returns>
+        /// The derivative of a hyperbolic tangent of <c>value</c>. 
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float TanhDerivative2(float value)
+        {
+            return 1.0f - (value * value);
         }
 
         /// <summary>
