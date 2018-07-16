@@ -371,7 +371,7 @@ namespace Genix.Core
         /// <param name="offx">The starting element position in <c>x</c>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <c>y</c>.</param>
-        public static void WordOR(int length, uint[] x, int offx, uint[] y, int offy)
+        public static void WordsOR(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_or2_32(length, x, offx, y, offy);
         }
@@ -386,9 +386,45 @@ namespace Genix.Core
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <c>y</c>.</param>
-        public static void WordOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.bits_or3_32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on three 32-bits arrays element-wise and puts the results into another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
+        {
+            NativeMethods.bits_or4_32(length, a, offa, b, offb, c, offc, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on four 32-bits arrays element-wise and puts the results into another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="d">The fourth source array.</param>
+        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
+        {
+            NativeMethods.bits_or5_32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
         }
 
         /// <summary>
@@ -437,7 +473,7 @@ namespace Genix.Core
         /// <param name="offx">The starting element position in <c>x</c>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <c>y</c>.</param>
-        public static void WordAND(int length, uint[] x, int offx, uint[] y, int offy)
+        public static void WordsAND(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_and2_32(length, x, offx, y, offy);
         }
@@ -452,7 +488,7 @@ namespace Genix.Core
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <c>y</c>.</param>
-        public static void WordAND(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        public static void WordsAND(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.bits_and3_32(length, a, offa, b, offb, y, offy);
         }
@@ -536,6 +572,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or3_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_or4_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_or5_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

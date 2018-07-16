@@ -8,6 +8,7 @@ namespace Genix.Imaging
 {
     using System;
     using System.Drawing;
+    using Genix.Core;
     using Leptonica;
 
     /// <summary>
@@ -228,12 +229,7 @@ namespace Genix.Imaging
                 throw new ArgumentException("The new image height is invalid.");
             }
 
-            Image dst = new Image(
-                bounds.Width,
-                bounds.Height,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+            Image dst = new Image(bounds.Width, bounds.Height, image);
 
             // calculate source area to copy from
             Rectangle area = Rectangle.Intersect(bounds, image.Bounds);
@@ -248,6 +244,151 @@ namespace Genix.Imaging
             {
                 // set frame to white
                 dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Reduces the height of the <see cref="Image"/> by the factor of 2.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to downscale.</param>
+        /// <returns>The scaled <see cref="Image"/>.</returns>
+        public static Image Reduce1x2(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new NotSupportedException();
+            }
+
+            Image dst = new Image(
+                image.Width,
+                (image.Height + 1) >> 1,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 2);
+
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
+
+            int offsrc = 0;
+            int offdst = 0;
+            for (int i = 0, ii = image.Height >> 1; i < ii; i++, offsrc += 2 * stride, offdst += stride)
+            {
+                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+            }
+
+            if ((image.Height & 1) != 0)
+            {
+                Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Reduces the height of the <see cref="Image"/> by the factor of 3.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to downscale.</param>
+        /// <returns>The scaled <see cref="Image"/>.</returns>
+        public static Image Reduce1x3(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new NotSupportedException();
+            }
+
+            Image dst = new Image(
+                image.Width,
+                (image.Height + 2) / 3,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 3);
+
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
+
+            int offsrc = 0;
+            int offdst = 0;
+            for (int i = 0, ii = image.Height / 3; i < ii; i++, offsrc += 3 * stride, offdst += stride)
+            {
+                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+            }
+
+            switch (image.Height % 3)
+            {
+                case 1:
+                    Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+                    break;
+
+                case 2:
+                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    break;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Reduces the height of the <see cref="Image"/> by the factor of 4.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to downscale.</param>
+        /// <returns>The scaled <see cref="Image"/>.</returns>
+        public static Image Reduce1x4(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new NotSupportedException();
+            }
+
+            Image dst = new Image(
+                image.Width,
+                (image.Height + 3) / 4,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 4);
+
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
+            ulong[] bitsdst = dst.Bits;
+
+            int offsrc = 0;
+            int offdst = 0;
+            for (int i = 0, ii = image.Height / 4; i < ii; i++, offsrc += 4 * stride, offdst += stride)
+            {
+                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
+            }
+
+            switch (image.Height % 4)
+            {
+                case 1:
+                    Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+                    break;
+
+                case 2:
+                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    break;
+
+                case 3:
+                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+                    break;
             }
 
             return dst;

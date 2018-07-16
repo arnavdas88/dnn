@@ -204,9 +204,7 @@ namespace Genix.DNN.Learning
             // flip between buffers
             for (int t = 1, off = A; t < T; t++, off += A)
             {
-                Buffers temp = flip;
-                flip = flop;
-                flop = temp;
+                Swapping.Swap(ref flip, ref flop);
 
                 for (Buffer buffer = flip.Head; buffer != null; buffer = buffer.Next)
                 {
@@ -309,9 +307,7 @@ namespace Genix.DNN.Learning
             // flip between buffers
             for (int t = 1, off = A; t < T; t++, off += A)
             {
-                Buffers temp = flip;
-                flip = flop;
-                flop = temp;
+                Swapping.Swap(ref flip, ref flop);
 
                 for (Buffer buffer = flip.Head; buffer != null; buffer = buffer.Next)
                 {

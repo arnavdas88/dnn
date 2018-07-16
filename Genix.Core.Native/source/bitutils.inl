@@ -671,6 +671,55 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or3_)(
 	}
 }
 
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or4_)(
+	int length,				// number of elements to process
+	const __bits* a, 		// the first source array
+	int offa, 				// the zero-based index of starting element in a
+	const __bits* b, 		// the second source array
+	int offb, 				// the zero-based index of starting element in b
+	const __bits* c, 		// the third source array
+	int offc, 				// the zero-based index of starting element in c
+	__bits* y, 				// the destination array
+	int offy 				// the zero-based index of starting element in y
+	)
+{
+	a += offa;
+	b += offb;
+	c += offc;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] = a[i] | b[i] | c[i];
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or5_)(
+	int length,				// number of elements to process
+	const __bits* a, 		// the first source array
+	int offa, 				// the zero-based index of starting element in a
+	const __bits* b, 		// the second source array
+	int offb, 				// the zero-based index of starting element in b
+	const __bits* c, 		// the third source array
+	int offc, 				// the zero-based index of starting element in c
+	const __bits* d, 		// the fourth source array
+	int offd, 				// the zero-based index of starting element in d
+	__bits* y, 				// the destination array
+	int offy 				// the zero-based index of starting element in y
+	)
+{
+	a += offa;
+	b += offb;
+	c += offc;
+	d += offd;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] = a[i] | b[i] | c[i] | d[i];
+	}
+}
+
 // Logical AND
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and_mask_)(
 	int length,				// number of elements to process

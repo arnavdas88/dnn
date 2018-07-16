@@ -17,17 +17,16 @@ namespace Genix.Imaging
     public static class ConnectedComponents
     {
         /// <summary>
-        /// Converts this <see cref="Image"/> from gray scale to black-and-white.
+        /// Finds connected components on the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to binarize.</param>
+        /// <param name="image">The <see cref="Image"/> to find the connected components on.</param>
         /// <returns>
-        /// A new binary <see cref="Image"/>.
+        /// A set of <see cref="ConnectedComponent"/> objects found.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<ConnectedComponent> FindConnectedComponents(this Image image)
+        public static ISet<ConnectedComponent> FindConnectedComponents(this Image image)
         {
             if (image == null)
             {
@@ -39,49 +38,83 @@ namespace Genix.Imaging
                 throw new NotSupportedException();
             }
 
-            List<ConnectedComponent> all = new List<ConnectedComponent>();
-            List<ConnectedComponent> last = new List<ConnectedComponent>();
-            List<ConnectedComponent> current = new List<ConnectedComponent>();
+            HashSet<ConnectedComponent> all = new HashSet<ConnectedComponent>();
+            HashSet<ConnectedComponent> last = new HashSet<ConnectedComponent>();
+            HashSet<ConnectedComponent> current = new HashSet<ConnectedComponent>();
+            HashSet<ConnectedComponent> merges = new HashSet<ConnectedComponent>();
 
+            int width = image.Width;
+            int height = image.Height;
+            int stride1 = image.Stride1;
             ulong[] bits = image.Bits;
-            for (int y = 0, startpos = 0; y < image.Height; y++, startpos += image.Stride1)
-            {
-                current.Clear();
 
+            for (int y = 0, ypos = 0; y < height; y++, ypos += stride1)
+            {
                 // find intervals
-                for (int pos = startpos, endpos = startpos + image.Width; pos < endpos;)
+                for (int xpos = ypos, xposend = ypos + width; xpos < xposend;)
                 {
-                    int index1 = BitUtils64.BitScanOneForward(endpos - pos, bits, pos);
-                    if (index1 == -1)
+                    int start = BitUtils64.BitScanOneForward(xposend - xpos, bits, xpos);
+                    if (start == -1)
                     {
                         break;
                     }
 
-                    int index2 = BitUtils64.BitScanZeroForward(endpos - index1 - 1, bits, index1 + 1);
-                    if (index2 == -1)
+                    int end = BitUtils64.BitScanZeroForward(xposend - (start + 1), bits, start + 1);
+                    if (end == -1)
                     {
-                        index2 = endpos;
+                        end = xposend;
                     }
-
-                    pos = index2 + 1;
 
                     // merge interval
-                    int start = index1 - startpos;
-                    int length = index2 - index1;
-                    ConnectedComponent component = ConnectedComponents.MergeComponent(all, last, y, start, length);
-                    if (current.IndexOf(component) == -1)
-                    {
-                        current.Add(component);
-                    }
+                    current.Add(mergeComponent(y, start - ypos, end - start));
+
+                    xpos = end + 1;
                 }
 
                 // rotate lines
-                List<ConnectedComponent> temp = last;
-                last = current;
-                current = temp;
+                Swapping.Swap(ref last, ref current);
+                current.Clear();
             }
 
             return all;
+
+            ConnectedComponent mergeComponent(int y, int start, int length)
+            {
+                ConnectedComponent component = null;
+
+                foreach (ConnectedComponent lastComponent in last)
+                {
+                    if (lastComponent.SegmentTouchesBottom(y, start, length))
+                    {
+                        if (component == null)
+                        {
+                            lastComponent.AddStroke(y, start, length);
+                        }
+                        else
+                        {
+                            lastComponent.MergeWith(component);
+                            merges.Add(component);
+                        }
+
+                        component = lastComponent;
+                    }
+                }
+
+                if (component == null)
+                {
+                    component = new ConnectedComponent(y, start, length);
+                    all.Add(component);
+                }
+
+                if (merges.Count > 0)
+                {
+                    all.ExceptWith(merges);
+                    last.ExceptWith(merges);
+                    merges.Clear();
+                }
+
+                return component;
+            }
         }
 
         /// <summary>
@@ -403,41 +436,6 @@ namespace Genix.Imaging
             }
 
             return dst;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ConnectedComponent MergeComponent(List<ConnectedComponent> all, List<ConnectedComponent> last, int y, int start, int length)
-        {
-            ConnectedComponent component = null;
-
-            for (int i = 0; i < last.Count; i++)
-            {
-                ConnectedComponent lastComponent = last[i];
-                if (lastComponent.SegmentTouchesBottom(y, start, length))
-                {
-                    if (component == null)
-                    {
-                        lastComponent.AddSegment(y, start, length);
-
-                        component = lastComponent;
-                    }
-                    else
-                    {
-                        component.Merge(lastComponent);
-
-                        all.Remove(lastComponent);
-                        last.RemoveAt(i--);
-                    }
-                }
-            }
-
-            if (component == null)
-            {
-                component = new ConnectedComponent(y, start, length);
-                all.Add(component);
-            }
-
-            return component;
         }
     }
 }

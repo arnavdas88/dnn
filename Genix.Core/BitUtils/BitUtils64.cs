@@ -420,6 +420,42 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Performs logical OR operation on three 64-bits arrays element-wise and puts the results into another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
+        {
+            NativeMethods.bits_or4_64(length, a, offa, b, offb, c, offc, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on four 64-bits arrays element-wise and puts the results into another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="d">The fourth source array.</param>
+        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
+        {
+            NativeMethods.bits_or5_64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
+        }
+
+        /// <summary>
         /// Performs logical AND operation on two 64-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -572,6 +608,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or3_64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_or4_64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_or5_64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
