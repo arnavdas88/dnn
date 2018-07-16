@@ -81,6 +81,21 @@ namespace System
         }
 
         /// <summary>
+        /// Swaps two elements of the array at the specified positions.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
+        /// <param name="array">The array to swap.</param>
+        /// <param name="position1">The position of the first element.</param>
+        /// <param name="position2">The position of the second element.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Swap<T>(this T[] array, int position1, int position2)
+        {
+            T temp = array[position1];
+            array[position1] = array[position2];
+            array[position2] = temp;
+        }
+
+        /// <summary>
         /// Calculates a variance (second central moment) of a sequence of <see cref="Single"/> values.
         /// </summary>
         /// <param name="source">A sequence of <see cref="Single"/> values to calculate the variance of.</param>
