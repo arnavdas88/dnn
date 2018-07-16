@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accord.DNN.Lab", "Accord.DNN.Lab\Accord.DNN.Lab.csproj", "{EB0918B2-2405-4732-AE91-CBA582A466BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Core", "Genix.Core\Genix.Core.csproj", "{50B5352B-F996-4E14-8A1A-C7096F42E321}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F91D6D7-D55A-42A2-94B1-67568CE6E446} = {2F91D6D7-D55A-42A2-94B1-67568CE6E446}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.Core.Native", "Genix.Core.Native\Genix.Core.Native.vcxproj", "{2F91D6D7-D55A-42A2-94B1-67568CE6E446}"
 EndProject
@@ -22,6 +25,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DocumentAnalysis", "Genix.DocumentAnalysis\Genix.DocumentAnalysis.csproj", "{1BE4C1F8-8CD0-498F-B67D-45D2BE1FB0CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DNN", "Genix.DNN\Genix.DNN.csproj", "{75E41C3E-E491-4D38-9B62-A01E90DECE12}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2618FBA0-59A8-4B06-BEBB-751FEC31A29D} = {2618FBA0-59A8-4B06-BEBB-751FEC31A29D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DNN.Test", "Genix.DNN.Test\Genix.DNN.Test.csproj", "{05846038-4012-4E74-9786-E3F4997F445B}"
 EndProject

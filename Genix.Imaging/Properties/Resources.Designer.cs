@@ -97,6 +97,15 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot draw on the canvas..
+        /// </summary>
+        internal static string E_InvalidCanvasOperation {
+            get {
+                return ResourceManager.GetString("E_InvalidCanvasOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The image coordinates are out of bounds..
         /// </summary>
         internal static string E_InvalidCoordinates {
