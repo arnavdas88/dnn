@@ -21,6 +21,7 @@ namespace Genix.NetClassify
     using Accord.DNN.Lab.Testing;
     using Genix.DNN;
     using Genix.DNN.LanguageModel;
+    using Genix.Lab;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

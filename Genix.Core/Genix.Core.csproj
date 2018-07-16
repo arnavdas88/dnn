@@ -64,6 +64,11 @@
     <Compile Include="Graph\BidirectionalGraph{TVertex}.cs" />
     <Compile Include="Graph\BidirectionalVertex{TVertex,TEdge}.cs" />
     <Compile Include="Graph\Edge{TVertex}.cs" />
+    <Compile Include="Lab\ClassificationResult.cs" />
+    <Compile Include="Lab\ClassificationStatistics.cs" />
+    <Compile Include="Lab\ClassStatistics.cs" />
+    <Compile Include="Lab\ClassSummary.cs" />
+    <Compile Include="Lab\ConfusionMatrix.cs" />
     <Compile Include="Lab\RejectCurve.cs" />
     <Compile Include="Lab\RejectCurvePoint.cs" />
     <Compile Include="Lab\RejectCurveTarget.cs" />
@@ -89,6 +94,7 @@
     <Compile Include="System.Drawing\RectangleExtensions.cs" />
     <Compile Include="System.IO\DirectoryInfoExtensions.cs" />
     <Compile Include="System\ArrayExtensions.cs" />
+    <Compile Include="System\StringExtensions.cs" />
     <Compile Include="Threading\CommonParallel.cs" />
   </ItemGroup>
   <ItemGroup>
