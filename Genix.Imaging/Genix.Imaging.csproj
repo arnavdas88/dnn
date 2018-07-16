@@ -73,6 +73,11 @@
     <Compile Include="Extensions\StructuringElement.cs" />
     <Compile Include="ImageF.cs" />
     <Compile Include="Extensions\ConnectedComponent.cs" />
+    <Compile Include="Lab\CanvasDataProvider.cs" />
+    <Compile Include="Lab\ImageDistortion.cs" />
+    <Compile Include="Lab\TestImage.cs" />
+    <Compile Include="Lab\TestImageProvider.cs" />
+    <Compile Include="Lab\DirectoryDataProvider.cs" />
     <Compile Include="Metadata\EXIF\EXIFExposureProgram.cs" />
     <Compile Include="Metadata\EXIF\EXIFField.cs" />
     <Compile Include="Metadata\EXIF\EXIFFieldAttribute.cs" />

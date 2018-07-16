@@ -96,10 +96,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Accord.DNN.Lab\Accord.DNN.Lab.csproj">
-      <Project>{eb0918b2-2405-4732-ae91-cba582a466bc}</Project>
-      <Name>Accord.DNN.Lab</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>

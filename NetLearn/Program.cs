@@ -20,9 +20,9 @@ namespace Genix.NetLearn
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Accord.DNN.Lab;
     using Genix.DNN;
     using Genix.DNN.Learning;
+    using Genix.Imaging.Lab;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -161,7 +161,7 @@ namespace Genix.NetLearn
         {
             Program.WriteLine(logFile, "Learning...");
 
-            ImageFilter filter = new ImageFilter();
+            ImageDistortion filter = new ImageDistortion();
             Stopwatch timer = new Stopwatch();
 
             Program.WriteLine(logFile, "  Epochs: {0}", task.Epochs);
@@ -175,7 +175,7 @@ namespace Genix.NetLearn
             Program.WriteLine(logFile, "  Crop: {0}", task.Crop);
 
             int[] shape = net.InputShape;
-            using (DataProvider<string> dataProvider = task.CreateDataProvider(net, 0, 2 * shape[(int)Axis.Y]))
+            using (TestImageProvider<string> dataProvider = task.CreateTestImageProvider(net))
             {
                 ////int n = 0;
                 for (int epoch = 0; epoch < task.Epochs; epoch++)
@@ -758,9 +758,16 @@ namespace Genix.NetLearn
                 return tasks;
             }
 
-            public DataProvider<string> CreateDataProvider(ClassificationNetwork network, int width, int height)
+            public TestImageProvider<string> CreateTestImageProvider(ClassificationNetwork network)
             {
-                return DataProvider<string>.CreateFromJson(network, width, height, this.TaskParameters.DataProvider);
+                int[] shape = network.InputShape;
+
+                return TestImageProvider<string>.CreateFromJson(
+                    0,
+                    2 * shape[(int)Axis.Y],
+                    network.Classes,
+                    network.BlankClass,
+                    this.TaskParameters.DataProvider);
             }
 
             private ClassificationNetworkTrainer CreateTrainer()

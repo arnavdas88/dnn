@@ -17,9 +17,9 @@ namespace Genix.NetClassify
     using System.Runtime.ExceptionServices;
     using System.Text;
     using System.Threading;
-    using Accord.DNN.Lab;
     using Genix.DNN;
     using Genix.DNN.LanguageModel;
+    using Genix.Imaging.Lab;
     using Genix.Lab;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -110,12 +110,12 @@ namespace Genix.NetClassify
 
             List<ClassificationResult> results = new List<ClassificationResult>();
 
-            using (DataProvider<string> dataProvider = options.CreateDataProvider(network))
+            using (TestImageProvider<string> dataProvider = options.CreateTestImageProvider(network))
             {
                 Context model = Context.FromRegex(@"\d{1,5}", CultureInfo.InvariantCulture);
 
                 ////int n = 0;
-                foreach (SampleImage sample in dataProvider.Generate(null))
+                foreach (TestImage sample in dataProvider.Generate(null))
                 {
                     Interlocked.Increment(ref Program.totalImages);
 
@@ -303,9 +303,16 @@ namespace Genix.NetClassify
                 return options;
             }
 
-            public DataProvider<string> CreateDataProvider(ClassificationNetwork network)
+            public TestImageProvider<string> CreateTestImageProvider(ClassificationNetwork network)
             {
-                return DataProvider<string>.CreateFromJson(network, null, null, this.Configuration.DataProvider);
+                int[] shape = network.InputShape;
+
+                return TestImageProvider<string>.CreateFromJson(
+                    shape[(int)Axis.X],
+                    shape[(int)Axis.Y],
+                    network.Classes,
+                    network.BlankClass,
+                    this.Configuration.DataProvider);
             }
         }
 
