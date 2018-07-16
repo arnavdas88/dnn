@@ -18,7 +18,6 @@ namespace Genix.NetClassify
     using System.Text;
     using System.Threading;
     using Accord.DNN.Lab;
-    using Accord.DNN.Lab.Testing;
     using Genix.DNN;
     using Genix.DNN.LanguageModel;
     using Genix.Lab;

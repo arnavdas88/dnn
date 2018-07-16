@@ -72,6 +72,8 @@
     <Compile Include="Lab\RejectCurve.cs" />
     <Compile Include="Lab\RejectCurvePoint.cs" />
     <Compile Include="Lab\RejectCurveTarget.cs" />
+    <Compile Include="Lab\TestReport.cs" />
+    <Compile Include="Lab\TestReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Mathematics.cs" />
     <Compile Include="Math\Matrix.cs" />

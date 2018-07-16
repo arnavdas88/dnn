@@ -511,8 +511,6 @@ namespace Genix.Lab
             /// </summary>
             /// <param name="filePath">A file path.</param>
             /// <param name="frameIndex">A zero-based index of this image in the TIFF file.</param>
-            /// <param name="useFullPathAsKey">Flag, directing to use full path as key.</param>
-            /// <param name="orderIndex">Order index of this file.</param>
             public FileKey(string filePath, int? frameIndex)
             {
                 this.FilePath = filePath.ToUpperInvariant();
@@ -577,25 +575,17 @@ namespace Genix.Lab
             private string[] data = null;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="FileData"/> class, using the file path.
+            /// Initializes a new instance of the <see cref="FileData"/> class.
             /// </summary>
-            /// <param name="filePath">A file path.</param>
-            /// <param name="frameIndex">A zero-based index of this image in the TIFF file.</param>
-            /// <param name="useFullPathAsKey">Flag, directing to use full path as key.</param>
-            /// <param name="orderIndex">Order index of this file.</param>
             public FileData()
             {
             }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="FileData"/> class, using the file path and truth data.
+            /// Initializes a new instance of the <see cref="FileData"/> class.
             /// </summary>
-            /// <param name="filePath">A file path.</param>
-            /// <param name="frameIndex">A zero-based index of this image in the TIFF file.</param>
             /// <param name="data">Truth data.</param>
             /// <param name="fieldCount">A number of fields in the truth file.</param>
-            /// <param name="useFullPathAsKey">Flag, directing to use full path as key.</param>
-            /// <param name="orderIndex">Order index of this file.</param>
             public FileData(IEnumerable<string> data, int fieldCount)
             {
                 this.data = data.Take(fieldCount).Select(x => x.Trim().ToUpperInvariant()).ToArray();
