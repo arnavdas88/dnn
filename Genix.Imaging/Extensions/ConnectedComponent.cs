@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+#define NEW
+
 namespace Genix.Imaging
 {
     using System;
@@ -20,6 +22,8 @@ namespace Genix.Imaging
     public class ConnectedComponent
     {
         private static readonly int[][] EmptyStrokes = new int[0][];
+
+        private readonly List<int> intervals = new List<int>();
 
         private Rectangle bounds = Rectangle.Empty;
         private int[][] strokes = ConnectedComponent.EmptyStrokes;
@@ -47,7 +51,7 @@ namespace Genix.Imaging
                 if (this.power == -1)
                 {
                     int sum = 0;
-
+#if NEW
                     int[][] values = this.strokes;
                     for (int i = 0, ii = values.Length; i < ii; i++)
                     {
@@ -57,7 +61,12 @@ namespace Genix.Imaging
                             sum += intervals[j];
                         }
                     }
-
+#else
+                    for (int i = 0; i < this.intervals.Count; i += 3)
+                    {
+                        sum += this.intervals[i + 2];
+                    }
+#endif
                     this.power = sum;
                 }
 
@@ -81,6 +90,7 @@ namespace Genix.Imaging
         /// <param name="length">The length of the stroke.</param>
         public void AddStroke(int y, int x, int length)
         {
+#if NEW
             // insert new horizontal line
             if (this.strokes.Length == 0)
             {
@@ -100,10 +110,24 @@ namespace Genix.Imaging
 
             // insert stroke into the line
             ConnectedComponent.InsertStroke(ref this.strokes[y - this.bounds.Y], x, length);
+#else
+            // find insertion point
+            int pivot = this.FindInsertionPoint(y, x, 0);
+
+            // insert
+            this.AddSegment(pivot, y, x, length);
+#endif
         }
 
+        /// <summary>
+        /// Returns a collection of strokes in this <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of strokes in this <see cref="ConnectedComponent"/>.
+        /// </returns>
         public IEnumerable<(int y, int x, int length)> EnumStrokes()
         {
+#if NEW
             int[][] values1 = this.strokes;
             for (int i = 0, ii = values1.Length, y = this.bounds.Y; i < ii; i++, y++)
             {
@@ -113,6 +137,12 @@ namespace Genix.Imaging
                     yield return (y, values2[j], values2[j + 1]);
                 }
             }
+#else
+            for (int i = 0; i < this.intervals.Count; i += 3)
+            {
+                yield return (this.intervals[i], this.intervals[i + 1], this.intervals[i + 2]);
+            }
+#endif
         }
 
         /// <summary>
@@ -121,9 +151,24 @@ namespace Genix.Imaging
         /// <param name="component">The <see cref="ConnectedComponent"/> to merge with.</param>
         public void MergeWith(ConnectedComponent component)
         {
+#if NEW
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
+            }
+
+            // pre-allocate stroke holders
+            if (component.bounds.Y < this.bounds.Y || component.bounds.Bottom > this.bounds.Bottom)
+            {
+                int y1 = Maximum.Min(component.bounds.Y, this.bounds.Y);
+                int y2 = Maximum.Max(component.bounds.Bottom, this.bounds.Bottom);
+
+                int[][] newstrokes = new int[y2 - y1][];
+                Array.Copy(this.strokes, 0, newstrokes, this.bounds.Y - y1, this.bounds.Height);
+                this.strokes = newstrokes;
+
+                // update position
+                this.bounds.Union(component.bounds);
             }
 
             int[][] values1 = component.strokes;
@@ -135,10 +180,26 @@ namespace Genix.Imaging
                     this.AddStroke(y, values2[j], values2[j + 1]);
                 }
             }
+#else
+            int pivot = 0;
+            for (int i = 0; i < component.intervals.Count; i += 3)
+            {
+                int y = component.intervals[i];
+                int x = component.intervals[i + 1];
+                int length = component.intervals[i + 2];
+
+                // find insertion point
+                pivot = this.FindInsertionPoint(y, x, pivot);
+
+                // insert
+                this.AddSegment(pivot, y, x, length);
+            }
+#endif
         }
 
         internal bool TouchesBottom(int y, int x, int length)
         {
+#if NEW
             if (this.strokes.Length > 0 && this.bounds.Y < y && y <= this.bounds.Bottom)
             {
                 int[] values = this.strokes[y - 1 - this.bounds.Y];
@@ -150,10 +211,30 @@ namespace Genix.Imaging
                     }
                 }
             }
+#else
+            for (int i = this.intervals.Count - 3; i >= 0; i -= 3)
+            {
+                int baseY = this.intervals[i];
+
+                if (baseY == y - 1)
+                {
+                    int baseX = this.intervals[i + 1];
+                    int baseLength = this.intervals[i + 2];
+                    if ((x >= baseX && x < baseX + baseLength) || (baseX >= x && baseX < x + length))
+                    {
+                        return true;
+                    }
+                }
+                else if (baseY < y - 1)
+                {
+                    break;
+                }
+            }
+#endif
 
             return false;
         }
-
+#if NEW
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ExpandStrokes(ref int[][] strokes, int position, int count)
         {
@@ -282,5 +363,49 @@ namespace Genix.Imaging
 
             line = newline;
         }
+#else
+        private int FindInsertionPoint(int y, int x, int startPosition)
+        {
+            int low = startPosition;
+            int high = this.intervals.Count - 3;
+
+            while (high - low > 4 * 3)
+            {
+                int mid = (((high + low) / 2) / 3) * 3;
+                if (y < this.intervals[mid] || (y == this.intervals[mid] && x < this.intervals[mid + 1]))
+                {
+                    high = mid;
+                }
+                else
+                {
+                    low = mid + 3;
+                }
+            }
+
+            int pivot = 0;
+            for (pivot = low; pivot <= high; pivot += 3)
+            {
+                if (y < this.intervals[pivot] || (y == this.intervals[pivot] && x < this.intervals[pivot + 1]))
+                {
+                    break;
+                }
+            }
+
+            return pivot;
+        }
+
+        private void AddSegment(int pivot, int y, int x, int length)
+        {
+            this.intervals.Insert(pivot, y);
+            this.intervals.Insert(pivot + 1, x);
+            this.intervals.Insert(pivot + 2, length);
+
+            // update power
+            if (this.power != -1)
+            {
+                this.power += length;
+            }
+        }
+#endif
     }
 }

@@ -6,6 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Imaging;
     using System.Drawing;
+    using System.Diagnostics;
 
     [TestClass]
     public class ConnectedComponentsTest
@@ -58,6 +59,31 @@
 
             Assert.AreEqual(0u, image.GetPixel(0, 0));
             Assert.AreEqual(0, image.Power());
+        }
+
+        [TestMethod]
+        public void XXXTest()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\DNN\dnn\4506-T.tif"))
+            {
+                stopwatch.Start();
+                for (int i = 0; i < 1; i++)
+                {
+                    ISet<ConnectedComponent> components = image.FindConnectedComponents();
+
+                    ////int sum1 = image.Power();
+                    ////int sum2 = components.Sum(x => x.Power);
+                }
+
+                stopwatch.Stop();
+
+                Console.WriteLine(stopwatch.ElapsedMilliseconds);
+
+                ////int sum1 = image.Power();
+                ////int sum2 = components.Sum(x => x.Power);
+            }
         }
     }
 }

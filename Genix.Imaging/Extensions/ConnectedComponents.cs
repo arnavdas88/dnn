@@ -100,6 +100,10 @@ namespace Genix.Imaging
 
                         component = lastComponent;
                     }
+                    else if (start + length > lastComponent.Bounds.Right)
+                    {
+                        break;
+                    }
                 }
 
                 if (component == null)
