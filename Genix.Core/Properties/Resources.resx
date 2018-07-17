@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="E_InvalidRectangleHeight" xml:space="preserve">
+    <value>The rectangle height is negative.</value>
+  </data>
+  <data name="E_InvalidRectangleWidth" xml:space="preserve">
+    <value>The rectangle width is negative.</value>
+  </data>
   <data name="E_SequenceIsEmpty" xml:space="preserve">
     <value>The sequence contains no elements.</value>
   </data>

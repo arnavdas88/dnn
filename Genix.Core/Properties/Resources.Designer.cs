@@ -61,6 +61,24 @@ namespace Genix.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The rectangle height is negative..
+        /// </summary>
+        internal static string E_InvalidRectangleHeight {
+            get {
+                return ResourceManager.GetString("E_InvalidRectangleHeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The rectangle width is negative..
+        /// </summary>
+        internal static string E_InvalidRectangleWidth {
+            get {
+                return ResourceManager.GetString("E_InvalidRectangleWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sequence contains no elements..
         /// </summary>
         internal static string E_SequenceIsEmpty {

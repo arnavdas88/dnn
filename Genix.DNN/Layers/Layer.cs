@@ -254,7 +254,7 @@ namespace Genix.DNN.Layers
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="pattern">The regular expression pattern that matches layer architecture.</param>
         /// <returns>The collection of regular expression groups.</returns>
-        protected internal static List<Group> ParseArchitechture(string architecture, string pattern)
+        private protected static List<Group> ParseArchitechture(string architecture, string pattern)
         {
             if (architecture == null)
             {
@@ -285,7 +285,7 @@ namespace Genix.DNN.Layers
         /// <param name="defaultStride">The default value for stride parameter.</param>
         /// <param name="padding">Determines whether padding should be parsed.</param>
         /// <returns>The <see cref="Kernel"/> object this method creates.</returns>
-        protected internal static Kernel ParseKernel(IList<Group> groups, int startingGroup, int? defaultStride, bool padding)
+        private protected static Kernel ParseKernel(IList<Group> groups, int startingGroup, int? defaultStride, bool padding)
         {
             int width = Convert.ToInt32(groups[startingGroup].Value, CultureInfo.InvariantCulture);
             int height = !string.IsNullOrEmpty(groups[startingGroup + 1].Value) ? Convert.ToInt32(groups[startingGroup + 1].Value, CultureInfo.InvariantCulture) : width;

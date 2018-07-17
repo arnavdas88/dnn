@@ -1,7 +1,9 @@
 ﻿namespace Genix.Imaging.Test
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class BitmapExtensionsTest
@@ -36,6 +38,13 @@
             foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             {
                 ////Image deskew = image.Deskew();
+                ISet<ConnectedComponent> components = image.FindConnectedComponents();
+
+                int sum1 = image.Power();
+                int sum2 = components.Sum(x => x.Power);
+
+                ////image.RemoveConnectedComponents(components);
+                ////image.Save("z:\\xxxxxxxxx.tif");
 
                 ///Image dst = image.Deskew().Open(StructuringElement.Rectangle(1, 100), 1).Dilate(StructuringElement.Square(2), 1);
                 Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();

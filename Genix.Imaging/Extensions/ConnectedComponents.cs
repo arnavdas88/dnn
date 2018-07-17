@@ -8,6 +8,8 @@ namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
 
@@ -84,7 +86,7 @@ namespace Genix.Imaging
 
                 foreach (ConnectedComponent lastComponent in last)
                 {
-                    if (lastComponent.SegmentTouchesBottom(y, start, length))
+                    if (lastComponent.TouchesBottom(y, start, length))
                     {
                         if (component == null)
                         {
@@ -154,17 +156,12 @@ namespace Genix.Imaging
                 throw new NotSupportedException();
             }
 
-            IList<int> intervals = component.Intervals;
             ulong[] bits = image.Bits;
             int stride1 = image.Stride1;
 
-            for (int i = 0, count = intervals.Count; i < count; i += 3)
+            foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                int y = intervals[i];
-                int x = intervals[i + 1];
-                int c = intervals[i + 2];
-
-                BitUtils64.SetBits(c, bits, (y * stride1) + x);
+                BitUtils64.SetBits(length, bits, (y * stride1) + x);
             }
         }
 
@@ -238,17 +235,12 @@ namespace Genix.Imaging
                 throw new NotSupportedException();
             }
 
-            IList<int> intervals = component.Intervals;
             ulong[] bits = image.Bits;
             int stride1 = image.Stride1;
 
-            for (int i = 0, count = intervals.Count; i < count; i += 3)
+            foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                int y = intervals[i];
-                int x = intervals[i + 1];
-                int c = intervals[i + 2];
-
-                BitUtils64.ResetBits(c, bits, (y * stride1) + x);
+                BitUtils64.ResetBits(length, bits, (y * stride1) + x);
             }
         }
 
@@ -325,10 +317,11 @@ namespace Genix.Imaging
                 throw new NotSupportedException();
             }
 
-            component.GetBounds(out int left, out int top, out int width, out int height);
+            // calculate area to crop
+            Rectangle bounds = component.Bounds;
 
             // allocate new image
-            Image dst = new Image(width, height, image);
+            Image dst = new Image(bounds.Width, bounds.Height, image);
 
             ulong[] bitssrc = image.Bits;
             ulong[] bitsdst = dst.Bits;
@@ -336,14 +329,9 @@ namespace Genix.Imaging
             int stridedst = dst.Stride;
 
             // copy bits
-            IList<int> intervals = component.Intervals;
-            for (int i = 0, count = intervals.Count; i < count; i += 3)
+            foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                int y = intervals[i];
-                int x = intervals[i + 1];
-                int c = intervals[i + 2];
-
-                BitUtils64.CopyBits(c, bitssrc, (y * stridesrc) + x, bitsdst, ((y - top) * stridedst) + x - left);
+                BitUtils64.CopyBits(length, bitssrc, (y * stridesrc) + x, bitsdst, ((y - bounds.Y) * stridedst) + x - bounds.X);
             }
 
             return dst;
@@ -390,31 +378,14 @@ namespace Genix.Imaging
             }
 
             // calculate area to crop
-            int left = int.MaxValue;
-            int top = int.MaxValue;
-            int right = 0;
-            int bottom = 0;
-
-            foreach (ConnectedComponent component in components)
-            {
-                if (component.Intervals.Count > 0)
-                {
-                    component.GetBounds(out int x, out int y, out int width, out int height);
-
-                    left = Math.Min(left, x);
-                    top = Math.Min(top, y);
-                    right = Math.Max(right, x + width);
-                    bottom = Math.Max(bottom, y + height);
-                }
-            }
-
-            if (left == int.MaxValue || top == int.MaxValue)
+            Rectangle bounds = RectangleExtensions.Union(components.Select(x => x.Bounds));
+            if (bounds.IsEmpty)
             {
                 return new Image(1, 1, image);
             }
 
             // allocate new image
-            Image dst = new Image(right - left, bottom - top, image);
+            Image dst = new Image(bounds.Width, bounds.Height, image);
 
             ulong[] bitssrc = image.Bits;
             ulong[] bitsdst = dst.Bits;
@@ -424,14 +395,9 @@ namespace Genix.Imaging
             // copy bits
             foreach (ConnectedComponent component in components)
             {
-                IList<int> intervals = component.Intervals;
-                for (int i = 0, count = intervals.Count; i < count; i += 3)
+                foreach ((int y, int x, int length) in component.EnumStrokes())
                 {
-                    int y = intervals[i];
-                    int x = intervals[i + 1];
-                    int c = intervals[i + 2];
-
-                    BitUtils64.CopyBits(c, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - top) * stridedst1) + x - left);
+                    BitUtils64.CopyBits(length, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - bounds.Y) * stridedst1) + x - bounds.X);
                 }
             }
 

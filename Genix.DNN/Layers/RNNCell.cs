@@ -100,7 +100,7 @@ namespace Genix.DNN.Layers
         /// <param name="hiddenShape">The dimensions of the layer's hidden weights tensor.</param>
         /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
         /// <param name="random">The random numbers generator.</param>
-        protected internal void Initialize(
+        private protected void Initialize(
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             int[] weightsShape,
