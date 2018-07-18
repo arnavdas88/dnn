@@ -94,6 +94,10 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50B5352B-F996-4E14-8A1A-C7096F42E321}</Project>
+      <Name>Genix.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
       <Name>Genix.Imaging</Name>

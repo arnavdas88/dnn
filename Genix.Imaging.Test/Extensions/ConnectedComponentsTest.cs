@@ -2,11 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Imaging;
     using System.Drawing;
     using System.Diagnostics;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Genix.Core;
+    using Genix.Imaging;
 
     [TestClass]
     public class ConnectedComponentsTest
@@ -66,7 +67,7 @@
         {
             Stopwatch stopwatch = new Stopwatch();
 
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\DNN\dnn\4506-T.tif"))
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             {
                 stopwatch.Start();
                 for (int i = 0; i < 1; i++)
@@ -75,6 +76,14 @@
 
                     ////int sum1 = image.Power();
                     ////int sum2 = components.Sum(x => x.Power);
+
+                    QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(image.Bounds);
+                    foreach (ConnectedComponent component in components)
+                    {
+                        quadtree.Insert(component, component.Bounds);
+                    }
+
+                    int count = quadtree.GetNodes().Count();
                 }
 
                 stopwatch.Stop();
