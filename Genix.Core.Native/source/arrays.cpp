@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <math.h>
 #include "mkl.h"
 
 extern "C" __declspec(dllexport) int WINAPI fcompare(int n,
@@ -144,6 +145,42 @@ extern "C" __declspec(dllexport) void WINAPI seti64(
 	for (int i = 0; i < n; i++)
 	{
 		y[i] = a;
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI sreplace(
+	int n,
+	const float* x, int offx,
+	float oldValue,
+	float newValue,
+	float* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	if (_isnanf(oldValue))
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = _isnanf(x[i]) ? newValue : x[i];
+		}
+	}
+	else
+	{
+		// two different versions for debug and release
+		// in debug mode, we need to explicitly compare with nan
+		// in release mode, it is done by vectorization functions
+#ifdef _DEBUG
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = x[i] == oldValue && !_isnanf(x[i]) ? newValue : x[i];
+		}
+#else
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = x[i] == oldValue ? newValue : x[i];
+		}
+#endif
 	}
 }
 

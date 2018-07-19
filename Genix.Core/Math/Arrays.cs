@@ -312,18 +312,12 @@ namespace Genix.Core
         {
             if (!float.IsNaN(minValue))
             {
-                for (int i = offx, ii = offx + length; i < ii; i++)
-                {
-                    x[i] = x[i] > minValue ? x[i] : minValue;
-                }
+                Maximum.Min(length, x, offx, minValue, x, offx);
             }
 
             if (!float.IsNaN(maxValue))
             {
-                for (int i = offx, ii = offx + length; i < ii; i++)
-                {
-                    x[i] = x[i] < maxValue ? x[i] : maxValue;
-                }
+                Maximum.Max(length, x, offx, maxValue, x, offx);
             }
         }
 
@@ -351,54 +345,25 @@ namespace Genix.Core
         /// Replaces all occurrences of the specified value in the array with another specified value.
         /// </summary>
         /// <param name="length">The number of elements to replace.</param>
+        /// <param name="x">The array that contains the data to replace.</param>
+        /// <param name="offx">The index in the <c>x</c> at which replacing begins.</param>
         /// <param name="oldValue">The value to be replaced.</param>
         /// <param name="newValue">The value to replace all occurrences of <c>oldValue</c>.</param>
-        /// <param name="y">The array that contains the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which replacement begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which replacing begins.</param>
+        /// <remarks>
+        /// <para>
+        /// The method replaces all occurrences of <c>oldValue</c> in <c>x</c> with <c>newValue</c> and puts the results in <c>y</c>.
+        /// </para>
+        /// <para>
+        /// To remove <see cref="float.NaN"/> from the array call this method with <c>oldValue</c> of <see cref="float.NaN"/>.
+        /// </para>
+        /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Replace(int length, float oldValue, float newValue, float[] y, int offy)
+        public static void Replace(int length, float[] x, int offx, float oldValue, float newValue, float[] y, int offy)
         {
-            if (float.IsNaN(oldValue))
-            {
-                for (int i = offy, ii = offy + length; i < ii; i++)
-                {
-                    if (float.IsNaN(y[i]))
-                    {
-                        y[i] = newValue;
-                    }
-                }
-            }
-            else if (float.IsNegativeInfinity(oldValue))
-            {
-                for (int i = offy, ii = offy + length; i < ii; i++)
-                {
-                    if (float.IsNegativeInfinity(y[i]))
-                    {
-                        y[i] = newValue;
-                    }
-                }
-            }
-            else if (float.IsPositiveInfinity(oldValue))
-            {
-                for (int i = offy, ii = offy + length; i < ii; i++)
-                {
-                    if (float.IsPositiveInfinity(y[i]))
-                    {
-                        y[i] = newValue;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = offy, ii = offy + length; i < ii; i++)
-                {
-                    if (y[i] == oldValue)
-                    {
-                        y[i] = newValue;
-                    }
-                }
-            }
+            NativeMethods.sreplace(length, x, offx, oldValue, newValue, y, offy);
         }
 
         /// <summary>
@@ -496,6 +461,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName, EntryPoint = "seti64")]
             [SuppressUnmanagedCodeSecurity]
             public static extern void setu64(int n, ulong a, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sreplace(int n, [In] float[] x, int offx, float oldValue, float newValue, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

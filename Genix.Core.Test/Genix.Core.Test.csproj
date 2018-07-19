@@ -61,6 +61,7 @@
     <Compile Include="BitUtils\BitUtils64Test.cs" />
     <Compile Include="Math\MatrixTest.cs" />
     <Compile Include="Math\MathematicsTest.cs" />
+    <Compile Include="Math\ArraysTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>

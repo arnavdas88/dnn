@@ -93,7 +93,10 @@ namespace Genix.DNN.Learning
                 Mathematics.Subtract(y.Length, y.Gradient, 0, ylog, 0, y.Gradient, 0);
                 Mathematics.Subtract(y.Length, y.Gradient, 0, logLossA, y.Gradient, 0);
                 Mathematics.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
-                Arrays.Replace(y.Length, float.NaN, 0.0f, y.Gradient, 0); // NaN may come from various sources (for instance log(y) where y = 0)
+
+                // remove NaN
+                // NaN may come from various sources (for instance log(y) where y = 0)
+                Arrays.Replace(y.Length, y.Gradient, 0, float.NaN, 0.0f, y.Gradient, 0); 
 
                 Debug.Assert(!float.IsNaN(y.Gradient[0]), "Tensor contains invalid weight.");
             }

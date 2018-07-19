@@ -142,6 +142,21 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Calculates a smaller of each element of an array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first array that contains the data.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The scalar value.</param>
+        /// <param name="y">The array that receives the computed data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Min(int length, float[] a, int offa, float b, float[] y, int offy)
+        {
+            NativeMethods.sminc(length, a, offa, b, y, offy);
+        }
+
+        /// <summary>
         /// Calculates a smaller of each pair of elements of the two array arguments.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -154,7 +169,22 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Min(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.min(length, a, offa, b, offb, y, offy);
+            NativeMethods.smin(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Calculates a larger of each element of an array and a scalar value.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first array that contains the data.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The scalar value.</param>
+        /// <param name="y">The array that receives the computed data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Max(int length, float[] a, int offa, float b, float[] y, int offy)
+        {
+            NativeMethods.smaxc(length, a, offa, b, y, offy);
         }
 
         /// <summary>
@@ -170,7 +200,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Max(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.max(length, a, offa, b, offb, y, offy);
+            NativeMethods.smax(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -190,7 +220,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void MinMaxGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] y, float[] dy, int offy)
         {
-            NativeMethods.minmax_gradient(length, x, dx, offx, cleardx, y, dy, offy);
+            NativeMethods.sminmax_gradient(length, x, dx, offx, cleardx, y, dy, offy);
         }
 
         /// <summary>
@@ -255,7 +285,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ArgMin(int length, float[] x, int offx)
         {
-            return NativeMethods.argmin(length, x, offx);
+            return NativeMethods.sargmin(length, x, offx);
         }
 
         /// <summary>
@@ -270,7 +300,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ArgMax(int length, float[] x, int offx)
         {
-            return NativeMethods.argmax(length, x, offx);
+            return NativeMethods.sargmax(length, x, offx);
         }
 
         /// <summary>
@@ -285,7 +315,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgMinMax(int length, float[] x, int offx, out int min, out int max)
         {
-            NativeMethods.argminmax(length, x, offx, out min, out max);
+            NativeMethods.sargminmax(length, x, offx, out min, out max);
         }
 
         /// <summary>
@@ -325,15 +355,23 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void min(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void sminc(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void max(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void smin(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void minmax_gradient(
+            public static extern void smaxc(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void smax(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sminmax_gradient(
                 int n,
                 [In] float[] x,
                 [Out] float[] dx,
@@ -345,15 +383,15 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int argmin(int n, [In] float[] x, int offx);
+            public static extern int sargmin(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int argmax(int n, [In] float[] x, int offx);
+            public static extern int sargmax(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void argminmax(int n, [In] float[] x, int offx, out int winmin, out int winmax);
+            public static extern void sargminmax(int n, [In] float[] x, int offx, out int winmin, out int winmax);
         }
     }
 }

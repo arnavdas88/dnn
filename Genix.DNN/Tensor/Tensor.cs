@@ -643,7 +643,7 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Replace(float oldValue, float newValue)
         {
-            Arrays.Replace(this.Length, oldValue, newValue, this.Weights, 0);
+            Arrays.Replace(this.Length, this.Weights, 0, oldValue, newValue, this.Weights, 0);
         }
 
         /// <summary>
