@@ -57,6 +57,7 @@
     <Compile Include="Collections\LinkedCollection.cs" />
     <Compile Include="Collections\LinkedCollectionItem.cs" />
     <Compile Include="Collections\QuadTree.cs" />
+    <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="GlobalSuppressions.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
@@ -100,6 +101,7 @@
     <Compile Include="System.Drawing\RectangleExtensions.cs" />
     <Compile Include="System.IO\DirectoryInfoExtensions.cs" />
     <Compile Include="System\ArrayExtensions.cs" />
+    <Compile Include="System\Int32Extensions.cs" />
     <Compile Include="System\StringExtensions.cs" />
     <Compile Include="Threading\CommonParallel.cs" />
   </ItemGroup>

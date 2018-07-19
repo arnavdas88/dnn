@@ -19,14 +19,16 @@ namespace Genix.Imaging
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
     /// </summary>
     [DebuggerDisplay("{Bounds}")]
-    public class ConnectedComponent
+    public class ConnectedComponent : IBoundedObject
     {
+#if NEW
         private static readonly int[][] EmptyStrokes = new int[0][];
-
+        private int[][] strokes = ConnectedComponent.EmptyStrokes;
+#else
         private readonly List<int> intervals = new List<int>();
+#endif
 
         private Rectangle bounds = Rectangle.Empty;
-        private int[][] strokes = ConnectedComponent.EmptyStrokes;
         private int power = -1;
 
         internal ConnectedComponent(int y, int x, int length)
@@ -256,7 +258,8 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool StrokesIntersect(int x1, int width1, int x2, int width2)
         {
-            return (x2 >= x1 && x2 < x1 + width1) || (x1 >= x2 && x1 < x2 + width2);
+            ////return (x2 >= x1 && x2 < x1 + width1) || (x1 >= x2 && x1 < x2 + width2);
+            return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
         }
 
         private static void InsertStroke(ref int[] line, int x, int length)

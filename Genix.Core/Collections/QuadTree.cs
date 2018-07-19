@@ -10,7 +10,6 @@ namespace Genix.Core
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Drawing;
-    using System.Linq;
 
     /// <summary>
     /// This class efficiently stores and retrieves arbitrarily sized and positioned
@@ -20,168 +19,122 @@ namespace Genix.Core
     /// of those objects is handled as a separate argument to Insert.
     /// </summary>
     /// <typeparam name="T">The type of elements in the tree.</typeparam>
-    public class QuadTree<T> where T : class
+    public class QuadTree<T> where T : class, IBoundedObject
     {
-        ////private readonly IDictionary<T, Quadrant> table = new Dictionary<T, Quadrant>();
-        private readonly Quadrant root;
+        private readonly Point center;
 
-        public QuadTree(Rectangle bounds)
+        private readonly int minWidth;
+        private readonly int minHeight;
+        private readonly bool splittable;
+
+        // nodes that overlap the sub quadrant boundaries.
+        private HashSet<T> ownNodes = null;
+        private HashSet<T> nodes = null;
+
+        // The quadrant is subdivided when nodes are inserted that are 
+        // completely contained within those subdivisions.
+        private QuadTree<T> nw;
+        private QuadTree<T> ne;
+        private QuadTree<T> sw;
+        private QuadTree<T> se;
+        private bool split = false;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuadTree{T}"/> class, using the specified bounds.
+        /// All nodes stored inside this tree will fit inside this bounds.
+        /// </summary>
+        /// <param name="bounds">The bounds of this tree.</param>
+        public QuadTree(Rectangle bounds) : this(null, bounds, 64, 64)
         {
-            this.root = new Quadrant(null, bounds);
         }
 
         /// <summary>
-        /// Gets the tree bounds.
+        /// Initializes a new instance of the <see cref="QuadTree{T}"/> class,
+        /// using the specified bounds and a collection of nodes.
+        /// All nodes stored inside this tree will fit inside this bounds.
         /// </summary>
-        /// <value>
-        /// The overall tree bounds.
-        /// </value>
-        /// <remarks>
-        /// This determines the overall quad-tree indexing strategy.
-        /// </remarks>
-        public Rectangle Bounds => this.root.Bounds;
+        /// <param name="bounds">The bounds of this tree.</param>
+        /// <param name="nodes">The nodes to insert.</param>
+        public QuadTree(Rectangle bounds, IEnumerable<T> nodes) : this(bounds)
+        {
+            this.Insert(nodes);
+        }
 
         /// <summary>
-        /// Insert a node with specified bounds into this QuadTree.
+        /// Initializes a new instance of the <see cref="QuadTree{T}"/> class.
+        /// </summary>
+        /// <param name="parent">The parent <see cref="QuadTree{T}"/> (if any).</param>
+        /// <param name="bounds">The bounds of this tree.</param>
+        /// <param name="minWidth">The minimum width of a quadrant that allows splitting.</param>
+        /// <param name="minHeight">The minimum height of a quadrant that allows splitting.</param>
+        internal QuadTree(QuadTree<T> parent, Rectangle bounds, int minWidth, int minHeight)
+        {
+            this.Parent = parent;
+            Debug.Assert(bounds.Width != 0 && bounds.Height != 0, "Cannot have empty bound");
+
+            this.Bounds = bounds;
+            this.center = new Point((bounds.Left + bounds.Right) / 2, (bounds.Top + bounds.Bottom) / 2);
+            this.minWidth = minWidth;
+            this.minHeight = minHeight;
+            this.splittable = bounds.Width >= minWidth && bounds.Height >= minHeight;
+        }
+
+        /// <summary>
+        /// Gets the parent <see cref="QuadTree{T}"/>.
+        /// </summary>
+        /// <value>
+        /// The parent <see cref="QuadTree{T}"/>, or <b>null</b> if this is the root.
+        /// </value>
+        public QuadTree<T> Parent { get; }
+
+        /// <summary>
+        /// Gets the bounds of this <see cref="QuadTree{T}"/>.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Rectangle"/> that contains overall tree bounds.
+        /// </value>
+        public Rectangle Bounds { get; }
+
+        /// <summary>
+        /// Inserts a node into this <see cref="QuadTree{T}"/>.
         /// </summary>
         /// <param name="node">The node to insert.</param>
-        /// <param name="bounds">The bounds of this node.</param>
-        public void Insert(T node, Rectangle bounds)
+        public void Insert(T node)
         {
+            if (node == null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
+            Rectangle bounds = node.Bounds;
             if (bounds.Width == 0 || bounds.Height == 0)
             {
                 ////throw new ArgumentException(Properties.Resources.BoundsMustBeNonZero);
             }
 
-            /*this.table[node] =*/
-            this.root.Insert(node, bounds);
-        }
-
-        /// <summary>
-        /// Returns all nodes in this tree.
-        /// The nodes are returned in pretty much random order as far as the caller is concerned.
-        /// </summary>
-        /// <returns>
-        /// The sequence of nodes.
-        /// </returns>
-        public IEnumerable<T> GetNodes()
-        {
-            return this.root.GetNodes();
-        }
-
-        /// <summary>
-        /// Get a list of the nodes that intersect the specified bounds.
-        /// </summary>
-        /// <param name="bounds">The bounds to test.</param>
-        /// <returns>
-        /// List of zero or mode nodes found inside the specified bounds.
-        /// </returns>
-        public IEnumerable<T> GetNodes(Rectangle bounds)
-        {
-            return bounds.IsEmpty ? Enumerable.Empty<T>() : this.root.GetNodes(bounds);
-        }
-
-        /// <summary>
-        /// Get a list of the nodes that intersect the specified bounds.
-        /// </summary>
-        /// <param name="bounds">The bounds to test.</param>
-        /// <returns>
-        /// List of zero or mode nodes found inside the specified bounds.
-        /// </returns>
-        public bool HasNodes(Rectangle bounds)
-        {
-            return !bounds.IsEmpty && this.root.HasNodes(bounds);
-        }
-
-        /*
-        /// <summary>
-        /// Remove the specified node from this QuadTree.
-        /// </summary>
-        /// <param name="node">The node to remove.</param>
-        /// <returns>
-        /// <b>true</b> if the node was found and removed; otherwise, <b>false</b>.
-        /// </returns>
-        public bool Remove(T node)
-        {
-            if (this.table != null)
+            // check that new node does not cover quadrant center
+            // otherwise, store it into quadrant own nodes
+            if (!this.splittable ||
+                (bounds.X < this.center.X && this.center.X < bounds.Right) ||
+                (bounds.Y < this.center.Y && this.center.Y < bounds.Bottom))
             {
-                Quadrant parent = null;
-
-                if (this.table.TryGetValue(node, out parent))
+                if (this.ownNodes == null)
                 {
-                    parent.RemoveNode(node);
-                    this.table.Remove(node);
-                    return true;
+                    this.ownNodes = new HashSet<T>();
                 }
+
+                this.ownNodes.Add(node);
             }
-
-            return false;
-        }*/
-
-        /// <summary>
-        /// The canvas is split up into four Quadrants and objects are stored in the quadrant that contains them
-        /// and each quadrant is split up into four child Quadrants recursively.  Objects that overlap more than
-        /// one quadrant are stored in the this.nodes list for this Quadrant.
-        /// </summary>
-        private class Quadrant
-        {
-            // nodes that overlap the sub quadrant boundaries.
-            private Dictionary<T, Rectangle> nodes = null;
-
-            private readonly int centerX;
-            private readonly int centerY;
-            private readonly bool splittable;
-
-            // The quadrant is subdivided when nodes are inserted that are 
-            // completely contained within those subdivisions.
-            private Quadrant nw;
-            private Quadrant ne;
-            private Quadrant sw;
-            private Quadrant se;
-            private bool split = false;
-
-            /// <summary>
-            /// Construct new Quadrant with a specified bounds all nodes stored inside this quadrant
-            /// will fit inside this bounds.  
-            /// </summary>
-            /// <param name="parent">The parent quadrant (if any)</param>
-            /// <param name="bounds">The bounds of this quadrant</param>
-            public Quadrant(Quadrant parent, Rectangle bounds)
-            {
-                this.Parent = parent;
-                Debug.Assert(bounds.Width != 0 && bounds.Height != 0, "Cannot have empty bound");
-
-                this.Bounds = bounds;
-                this.centerX = (bounds.Left + bounds.Right) / 2;
-                this.centerY = (bounds.Top + bounds.Bottom) / 2;
-                this.splittable = bounds.Width >= 64 && bounds.Height >= 64;
-            }
-
-            /// <summary>
-            /// The parent Quadrant or null if this is the root.
-            /// </summary>
-            public Quadrant Parent { get; }
-
-            /// <summary>
-            /// The bounds of this quadrant.
-            /// </summary>
-            public Rectangle Bounds { get; }
-
-            /// <summary>
-            /// Insert the specified node.
-            /// </summary>
-            /// <param name="node">The node.</param>
-            /// <param name="bounds">The bounds of that node.</param>
-            public void Insert(T node, Rectangle bounds)
+            else
             {
                 if (this.splittable)
                 {
                     if (this.nodes?.Count + 1 > 16)
                     {
                         // split the quadrant
-                        foreach (KeyValuePair<T, Rectangle> kvp in this.nodes)
+                        foreach (T n in this.nodes)
                         {
-                            this.InsertIntoTree(kvp.Key, kvp.Value);
+                            this.InsertIntoTree(n);
                         }
 
                         this.nodes = null;
@@ -190,7 +143,7 @@ namespace Genix.Core
 
                     if (this.split)
                     {
-                        this.InsertIntoTree(node, bounds);
+                        this.InsertIntoTree(node);
                         return;
                     }
                 }
@@ -198,29 +151,56 @@ namespace Genix.Core
                 // add to this quadrant
                 if (this.nodes == null)
                 {
-                    this.nodes = new Dictionary<T, Rectangle>();
+                    this.nodes = new HashSet<T>();
                 }
 
-                this.nodes[node] = bounds;
+                this.nodes.Add(node);
+            }
+        }
+
+        /// <summary>
+        /// Inserts a range of nodes into this <see cref="QuadTree{T}"/>.
+        /// </summary>
+        /// <param name="nodes">The nodes to insert.</param>
+        public void Insert(IEnumerable<T> nodes)
+        {
+            if (nodes == null)
+            {
+                throw new ArgumentNullException(nameof(nodes));
             }
 
-            /// <summary>
-            /// Returns all nodes in this quadrant.
-            /// The nodes are returned in pretty much random order as far as the caller is concerned.
-            /// </summary>
-            /// <returns>
-            /// The sequence of nodes.
-            /// </returns>
-            public IEnumerable<T> GetNodes()
-            {
-                if (this.nodes != null)
-                {
-                    foreach (T node in this.nodes.Keys)
-                    {
-                        yield return node;
-                    }
-                }
+            foreach (T node in nodes)
+            { 
+                this.Insert(node);
+            }
+        }
 
+        /// <summary>
+        /// Returns all nodes in this <see cref="QuadTree{T}"/>.
+        /// The nodes are returned in pretty much random order as far as the caller is concerned.
+        /// </summary>
+        /// <returns>
+        /// The sequence of nodes.
+        /// </returns>
+        public IEnumerable<T> GetNodes()
+        {
+            if (this.ownNodes != null)
+            {
+                foreach (T node in this.ownNodes)
+                {
+                    yield return node;
+                }
+            }
+
+            if (this.nodes != null)
+            {
+                foreach (T node in this.nodes)
+                {
+                    yield return node;
+                }
+            }
+            else
+            {
                 // See if any child quadrants completely contain this node.
                 if (this.nw != null)
                 {
@@ -254,26 +234,45 @@ namespace Genix.Core
                     }
                 }
             }
+        }
 
-            /// <summary>
-            /// Returns all nodes in this quadrant that intersect the specified bounds.
-            /// The nodes are returned in pretty much random order as far as the caller is concerned.
-            /// </summary>
-            /// <param name="nodes">List of nodes found in the specified bounds</param>
-            /// <param name="bounds">The bounds that contains the nodes you want returned</param>
-            public IEnumerable<T> GetNodes(Rectangle bounds)
+        /// <summary>
+        /// Returns all nodes in this <see cref="QuadTree{T}"/> that intersect the specified bounds.
+        /// </summary>
+        /// <param name="bounds">The bounds to test.</param>
+        /// <returns>
+        /// The sequence of nodes found inside the specified bounds.
+        /// </returns>
+        public IEnumerable<T> GetNodes(Rectangle bounds)
+        {
+            if (bounds.Width == 0 || bounds.Height == 0)
             {
-                if (this.nodes != null)
+                yield break;
+            }
+
+            if (this.ownNodes != null)
+            {
+                foreach (T node in this.ownNodes)
                 {
-                    foreach (KeyValuePair<T, Rectangle> kvp in this.nodes)
+                    if (node.Bounds.IntersectsWith(bounds))
                     {
-                        if (kvp.Value.IntersectsWith(bounds))
-                        {
-                            yield return kvp.Key;
-                        }
+                        yield return node;
                     }
                 }
+            }
 
+            if (this.nodes != null)
+            {
+                foreach (T node in this.nodes)
+                {
+                    if (node.Bounds.IntersectsWith(bounds))
+                    {
+                        yield return node;
+                    }
+                }
+            }
+            else
+            {
                 // See if any child quadrants completely contain this node.
                 if (this.nw != null && this.nw.Bounds.IntersectsWith(bounds))
                 {
@@ -307,25 +306,47 @@ namespace Genix.Core
                     }
                 }
             }
+        }
 
-            /// <summary>
-            /// Return true if there are any nodes in this Quadrant that intersect the specified bounds.
-            /// </summary>
-            /// <param name="bounds">The bounds to test.</param>
-            /// <returns>boolean</returns>
-            public bool HasNodes(Rectangle bounds)
+        /// <summary>
+        /// Determines whether the this <see cref="QuadTree{T}"/> has nodes that intersect the specified bounds.
+        /// </summary>
+        /// <param name="bounds">The bounds to test.</param>
+        /// <returns>
+        /// <b>true</b> if this <see cref="QuadTree{T}"/> has nodes that intersect the specified bounds; otherwise, <b>false</b>.
+        /// </returns>
+        public bool HasNodes(Rectangle bounds)
+        {
+            if (bounds.Width == 0 || bounds.Height == 0)
             {
-                if (this.nodes != null)
+                return false;
+            }
+
+            if (this.ownNodes != null)
+            {
+                foreach (T node in this.ownNodes)
                 {
-                    foreach (Rectangle value in this.nodes.Values)
+                    if (node.Bounds.IntersectsWith(bounds))
                     {
-                        if (value.IntersectsWith(bounds))
-                        {
-                            return true;
-                        }
+                        return true;
+                    }
+                }
+            }
+
+            if (this.nodes != null)
+            {
+                foreach (T node in this.nodes)
+                {
+                    if (node.Bounds.IntersectsWith(bounds))
+                    {
+                        return true;
                     }
                 }
 
+                return false;
+            }
+            else
+            {
                 bool found = false;
 
                 // See if any child quadrants completely contain this node.
@@ -351,77 +372,112 @@ namespace Genix.Core
 
                 return found;
             }
+        }
 
-            /*
-            /// <summary>
-            /// Remove the specified node from this Quadrant.
-            /// </summary>
-            /// <param name="node">The node to remove.</param>
-            /// <returns><b>true</b> if the node was found and removed; otherwise, <b>false</b>.</returns>
-            public bool RemoveNode(T node)
+        /*
+        /// <summary>
+        /// Remove the specified node from this QuadTree.
+        /// </summary>
+        /// <param name="node">The node to remove.</param>
+        /// <returns>
+        /// <b>true</b> if the node was found and removed; otherwise, <b>false</b>.
+        /// </returns>
+        public bool Remove(T node)
+        {
+            if (this.table != null)
             {
-                return this.nodes != null ? this.nodes.Remove(node) : false;
-            }*/
+                Quadrant parent = null;
 
-            private void InsertIntoTree(T node, Rectangle bounds)
-            {
-                if (bounds.X < this.centerX)
+                if (this.table.TryGetValue(node, out parent))
                 {
-                    if (bounds.Y < this.centerY)
-                    {
-                        // top-left quadrant
-                        if (this.nw == null)
-                        {
-                            this.nw = new Quadrant(
-                                this,
-                                Rectangle.FromLTRB(this.Bounds.Left, this.Bounds.Top, this.centerX, this.centerY));
-                        }
+                    parent.RemoveNode(node);
+                    this.table.Remove(node);
+                    return true;
+                }
+            }
 
-                        this.nw.Insert(node, bounds);
-                    }
-                    else
-                    {
-                        // bottom-left quadrant
-                        if (this.sw == null)
-                        {
-                            this.sw = new Quadrant(
-                                this,
-                                Rectangle.FromLTRB(this.Bounds.Left, this.centerY, this.centerX, this.Bounds.Bottom));
-                        }
+            return false;
+        }*/
 
-                        this.sw.Insert(node, bounds);
+        /*
+        /// <summary>
+        /// Remove the specified node from this Quadrant.
+        /// </summary>
+        /// <param name="node">The node to remove.</param>
+        /// <returns><b>true</b> if the node was found and removed; otherwise, <b>false</b>.</returns>
+        public bool RemoveNode(T node)
+        {
+            return this.nodes != null ? this.nodes.Remove(node) : false;
+        }*/
+
+        private void InsertIntoTree(T node)
+        {
+            Rectangle bounds = node.Bounds;
+
+            if (bounds.X < this.center.X)
+            {
+                if (bounds.Y < this.center.Y)
+                {
+                    // top-left quadrant
+                    if (this.nw == null)
+                    {
+                        this.nw = new QuadTree<T>(
+                            this,
+                            Rectangle.FromLTRB(this.Bounds.Left, this.Bounds.Top, this.center.X, this.center.Y),
+                            this.minWidth,
+                            this.minHeight);
                     }
+
+                    this.nw.Insert(node);
                 }
                 else
                 {
-                    if (bounds.Y < this.centerY)
+                    // bottom-left quadrant
+                    if (this.sw == null)
                     {
-                        // top-right quadrant
-                        if (this.ne == null)
-                        {
-                            this.ne = new Quadrant(
-                                this,
-                                Rectangle.FromLTRB(this.centerX, this.Bounds.Top, this.Bounds.Right, this.centerY));
-                        }
-
-                        this.ne.Insert(node, bounds);
+                        this.sw = new QuadTree<T>(
+                            this,
+                            Rectangle.FromLTRB(this.Bounds.Left, this.center.Y, this.center.X, this.Bounds.Bottom),
+                            this.minWidth,
+                            this.minHeight);
                     }
-                    else
-                    {
-                        // bottom-right quadrant
-                        if (this.se == null)
-                        {
-                            this.se = new Quadrant(
-                                this,
-                                Rectangle.FromLTRB(this.centerX, this.centerY, this.Bounds.Right, this.Bounds.Bottom));
-                        }
 
-                        this.se.Insert(node, bounds);
-                    }
+                    this.sw.Insert(node);
                 }
-
-                this.split = true;
             }
+            else
+            {
+                if (bounds.Y < this.center.Y)
+                {
+                    // top-right quadrant
+                    if (this.ne == null)
+                    {
+                        this.ne = new QuadTree<T>(
+                            this,
+                            Rectangle.FromLTRB(this.center.X, this.Bounds.Top, this.Bounds.Right, this.center.Y),
+                            this.minWidth,
+                            this.minHeight);
+                    }
+
+                    this.ne.Insert(node);
+                }
+                else
+                {
+                    // bottom-right quadrant
+                    if (this.se == null)
+                    {
+                        this.se = new QuadTree<T>(
+                            this,
+                            Rectangle.FromLTRB(this.center.X, this.center.Y, this.Bounds.Right, this.Bounds.Bottom),
+                            this.minWidth,
+                            this.minHeight);
+                    }
+
+                    this.se.Insert(node);
+                }
+            }
+
+            this.split = true;
         }
     }
 }

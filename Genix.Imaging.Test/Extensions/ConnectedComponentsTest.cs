@@ -65,30 +65,27 @@
         [TestMethod]
         public void XXXTest()
         {
+            const int Count = 5;
             Stopwatch stopwatch = new Stopwatch();
 
             foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             {
                 stopwatch.Start();
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < Count; i++)
                 {
-                    ISet<ConnectedComponent> components = image.FindConnectedComponents();
+                    ISet<ConnectedComponent> components = image.Despeckle().FindConnectedComponents();
 
                     ////int sum1 = image.Power();
                     ////int sum2 = components.Sum(x => x.Power);
 
-                    QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(image.Bounds);
-                    foreach (ConnectedComponent component in components)
-                    {
-                        quadtree.Insert(component, component.Bounds);
-                    }
+                    QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(image.Bounds, components);
 
                     int count = quadtree.GetNodes().Count();
                 }
 
                 stopwatch.Stop();
 
-                Console.WriteLine(stopwatch.ElapsedMilliseconds);
+                Console.WriteLine(stopwatch.ElapsedMilliseconds / Count);
 
                 ////int sum1 = image.Power();
                 ////int sum2 = components.Sum(x => x.Power);
