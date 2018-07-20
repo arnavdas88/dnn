@@ -8,6 +8,7 @@ namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Drawing;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -41,9 +42,8 @@ namespace Genix.Imaging
             }
 
             HashSet<ConnectedComponent> all = new HashSet<ConnectedComponent>();
-            HashSet<ConnectedComponent> last = new HashSet<ConnectedComponent>();
+            List<ConnectedComponent> last = new List<ConnectedComponent>();
             HashSet<ConnectedComponent> current = new HashSet<ConnectedComponent>();
-            HashSet<ConnectedComponent> merges = new HashSet<ConnectedComponent>();
 
             int width = image.Width;
             int height = image.Height;
@@ -52,6 +52,16 @@ namespace Genix.Imaging
 
             for (int y = 0, ypos = 0; y < height; y++, ypos += stride1)
             {
+                // prepare new line
+                last.Clear();
+
+                if (current.Count > 0)
+                {
+                    last.AddRange(current);
+                    last.Sort(ConnectedComponentComparer.Default);
+                    current.Clear();
+                }
+
                 // find intervals
                 for (int xpos = ypos, xposend = ypos + width; xpos < xposend;)
                 {
@@ -68,59 +78,52 @@ namespace Genix.Imaging
                     }
 
                     // merge interval
-                    current.Add(mergeComponent(y, start - ypos, end - start));
-
+                    mergeComponent(start - ypos, end - start);
                     xpos = end + 1;
-                }
 
-                // rotate lines
-                Swapping.Swap(ref last, ref current);
-                current.Clear();
+                    void mergeComponent(int x, int length)
+                    {
+                        ConnectedComponent component = null;
+
+                        for (int i = 0, ii = last.Count; i < ii; i++)
+                        {
+                            ConnectedComponent lastComponent = last[i];
+                            if (lastComponent.TouchesBottom(y, x, length))
+                            {
+                                if (component == null)
+                                {
+                                    lastComponent.AddStroke(y, x, length);
+                                    component = lastComponent;
+                                }
+                                else
+                                {
+                                    component.MergeWith(lastComponent, false);
+                                    all.Remove(lastComponent);
+                                    current.Remove(lastComponent);
+                                    last.RemoveAt(i--);
+                                    ii--;
+                                }
+                            }
+                            else if (x + length < lastComponent.Bounds.Left)
+                            {
+                                // all remaining strokes from previous line are to the left of this one
+                                // we can stop matching
+                                break;
+                            }
+                        }
+
+                        if (component == null)
+                        {
+                            component = new ConnectedComponent(y, x, length);
+                            all.Add(component);
+                        }
+
+                        current.Add(component);
+                    }
+                }
             }
 
             return all;
-
-            ConnectedComponent mergeComponent(int y, int start, int length)
-            {
-                ConnectedComponent component = null;
-
-                foreach (ConnectedComponent lastComponent in last)
-                {
-                    if (lastComponent.TouchesBottom(y, start, length))
-                    {
-                        if (component == null)
-                        {
-                            lastComponent.AddStroke(y, start, length);
-                        }
-                        else
-                        {
-                            lastComponent.MergeWith(component);
-                            merges.Add(component);
-                        }
-
-                        component = lastComponent;
-                    }
-                    /*else if (start + length > lastComponent.Bounds.Right && component != null)
-                    {
-                        break;
-                    }*/
-                }
-
-                if (component == null)
-                {
-                    component = new ConnectedComponent(y, start, length);
-                    all.Add(component);
-                }
-
-                if (merges.Count > 0)
-                {
-                    all.ExceptWith(merges);
-                    last.ExceptWith(merges);
-                    merges.Clear();
-                }
-
-                return component;
-            }
         }
 
         /// <summary>
@@ -406,6 +409,33 @@ namespace Genix.Imaging
             }
 
             return dst;
+        }
+
+        private sealed class ConnectedComponentComparer : IComparer<ConnectedComponent>
+        {
+            public static ConnectedComponentComparer Default = new ConnectedComponentComparer();
+
+            public int Compare(ConnectedComponent x, ConnectedComponent y)
+            {
+                if (x == y)
+                {
+                    return 0;
+                }
+
+                int res = x.Bounds.X - y.Bounds.X;
+                if (res == 0)
+                {
+                    res = x.Bounds.Y - y.Bounds.Y;
+                }
+
+                if (res == 0)
+                {
+                    res = x.GetHashCode() - y.GetHashCode();
+                }
+
+                Debug.Assert(res != 0, "Method cannot return zero.");
+                return res;
+            }
         }
     }
 }

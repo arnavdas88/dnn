@@ -176,6 +176,43 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Remove the specified node from this  <see cref="QuadTree{T}"/>.
+        /// </summary>
+        /// <param name="node">The node to remove.</param>
+        /// <returns>
+        /// <b>true</b> if the node was found and removed; otherwise, <b>false</b>.
+        /// </returns>
+        public bool Remove(T node)
+        {
+            // look in own nodes first
+            if (this.ownNodes != null && this.ownNodes.Remove(node))
+            {
+                return true;
+            }
+
+            if (this.nodes != null)
+            {
+                return this.nodes.Remove(node);
+            }
+            else
+            {
+                QuadTree<T> quadrant;
+
+                Rectangle bounds = node.Bounds;
+                if (bounds.X < this.center.X)
+                {
+                    quadrant = bounds.Y < this.center.Y ? this.nw : this.sw;
+                }
+                else
+                {
+                    quadrant = bounds.Y < this.center.Y ? this.ne : this.se;
+                }
+
+                return quadrant != null && quadrant.Remove(node);
+            }
+        }
+
+        /// <summary>
         /// Returns all nodes in this <see cref="QuadTree{T}"/>.
         /// The nodes are returned in pretty much random order as far as the caller is concerned.
         /// </summary>
@@ -218,17 +255,17 @@ namespace Genix.Core
                     }
                 }
 
-                if (this.sw != null)
+                if (this.se != null)
                 {
-                    foreach (T node in this.sw.GetNodes())
+                    foreach (T node in this.se.GetNodes())
                     {
                         yield return node;
                     }
                 }
 
-                if (this.se != null)
+                if (this.sw != null)
                 {
-                    foreach (T node in this.se.GetNodes())
+                    foreach (T node in this.sw.GetNodes())
                     {
                         yield return node;
                     }
@@ -290,17 +327,17 @@ namespace Genix.Core
                     }
                 }
 
-                if (this.sw != null && this.sw.Bounds.IntersectsWith(bounds))
+                if (this.se != null && this.se.Bounds.IntersectsWith(bounds))
                 {
-                    foreach (T node in this.sw.GetNodes(bounds))
+                    foreach (T node in this.se.GetNodes(bounds))
                     {
                         yield return node;
                     }
                 }
 
-                if (this.se != null && this.se.Bounds.IntersectsWith(bounds))
+                if (this.sw != null && this.sw.Bounds.IntersectsWith(bounds))
                 {
-                    foreach (T node in this.se.GetNodes(bounds))
+                    foreach (T node in this.sw.GetNodes(bounds))
                     {
                         yield return node;
                     }
@@ -360,55 +397,19 @@ namespace Genix.Core
                     found = this.ne.HasNodes(bounds);
                 }
 
-                if (!found && this.sw != null && this.sw.Bounds.IntersectsWith(bounds))
-                {
-                    found = this.sw.HasNodes(bounds);
-                }
-
                 if (!found && this.se != null && this.se.Bounds.IntersectsWith(bounds))
                 {
                     found = this.se.HasNodes(bounds);
                 }
 
+                if (!found && this.sw != null && this.sw.Bounds.IntersectsWith(bounds))
+                {
+                    found = this.sw.HasNodes(bounds);
+                }
+
                 return found;
             }
         }
-
-        /*
-        /// <summary>
-        /// Remove the specified node from this QuadTree.
-        /// </summary>
-        /// <param name="node">The node to remove.</param>
-        /// <returns>
-        /// <b>true</b> if the node was found and removed; otherwise, <b>false</b>.
-        /// </returns>
-        public bool Remove(T node)
-        {
-            if (this.table != null)
-            {
-                Quadrant parent = null;
-
-                if (this.table.TryGetValue(node, out parent))
-                {
-                    parent.RemoveNode(node);
-                    this.table.Remove(node);
-                    return true;
-                }
-            }
-
-            return false;
-        }*/
-
-        /*
-        /// <summary>
-        /// Remove the specified node from this Quadrant.
-        /// </summary>
-        /// <param name="node">The node to remove.</param>
-        /// <returns><b>true</b> if the node was found and removed; otherwise, <b>false</b>.</returns>
-        public bool RemoveNode(T node)
-        {
-            return this.nodes != null ? this.nodes.Remove(node) : false;
-        }*/
 
         private void InsertIntoTree(T node)
         {

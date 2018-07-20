@@ -209,13 +209,13 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to analyze.</param>
         /// <returns>
-        /// A collection of histogram bins.
+        /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] HistogramY(this Image image)
+        public static Histogram HistogramY(this Image image)
         {
             if (image == null)
             {
@@ -234,13 +234,13 @@ namespace Genix.Imaging
         /// <param name="width">The width, in pixels, of the area.</param>
         /// <param name="height">The height, in pixels, of the area.</param>
         /// <returns>
-        /// A collection of histogram bins.
+        /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] HistogramY(this Image image, int x, int y, int width, int height)
+        public static Histogram HistogramY(this Image image, int x, int y, int width, int height)
         {
             if (image == null)
             {
@@ -257,11 +257,11 @@ namespace Genix.Imaging
             int stride1 = image.Stride1;
             ulong[] bits = image.Bits;
 
-            int[] histogram = new int[height];
+            Histogram histogram = new Histogram(height);
 
             for (int i = 0, pos = (y * stride1) + x; i < height; i++, pos += stride1)
             {
-                histogram[i] = BitUtils64.CountOneBits(width, bits, pos);
+                histogram.Increment(i, BitUtils64.CountOneBits(width, bits, pos));
             }
 
             return histogram;
@@ -273,13 +273,13 @@ namespace Genix.Imaging
         /// <param name="image">The <see cref="Image"/> to analyze.</param>
         /// <param name="area">The area on <c>image</c> to calculate histogram for.</param>
         /// <returns>
-        /// A collection of histogram bins.
+        /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] HistogramY(this Image image, Rectangle area)
+        public static Histogram HistogramY(this Image image, Rectangle area)
         {
             return Statistic.HistogramY(image, area.X, area.Y, area.Width, area.Height);
         }

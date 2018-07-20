@@ -4,14 +4,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-#define NEW
-
 namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Drawing;
+    using System.Globalization;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
 
@@ -21,12 +21,9 @@ namespace Genix.Imaging
     [DebuggerDisplay("{Bounds}")]
     public class ConnectedComponent : IBoundedObject
     {
-#if NEW
-        private static readonly int[][] EmptyStrokes = new int[0][];
-        private int[][] strokes = ConnectedComponent.EmptyStrokes;
-#else
-        private readonly List<int> intervals = new List<int>();
-#endif
+        private static readonly Stroke[][] EmptyStrokes = new Stroke[0][];
+        [DebuggerDisplay("{FormattedStrokes}")]
+        private Stroke[][] strokes = ConnectedComponent.EmptyStrokes;
 
         private Rectangle bounds = Rectangle.Empty;
         private int power = -1;
@@ -53,22 +50,13 @@ namespace Genix.Imaging
                 if (this.power == -1)
                 {
                     int sum = 0;
-#if NEW
-                    int[][] values = this.strokes;
-                    for (int i = 0, ii = values.Length; i < ii; i++)
+
+                    Stroke[][] lines = this.strokes;
+                    for (int i = 0, ii = lines.Length; i < ii; i++)
                     {
-                        int[] intervals = values[i];
-                        for (int j = 1, jj = intervals.Length; j < jj; j += 2)
-                        {
-                            sum += intervals[j];
-                        }
+                        sum += ConnectedComponent.LinePower(lines[i]);
                     }
-#else
-                    for (int i = 0; i < this.intervals.Count; i += 3)
-                    {
-                        sum += this.intervals[i + 2];
-                    }
-#endif
+
                     this.power = sum;
                 }
 
@@ -84,6 +72,66 @@ namespace Genix.Imaging
         /// </value>
         public Rectangle Bounds => this.bounds;
 
+        private string FormattedStrokes =>
+            string.Join(
+                Environment.NewLine,
+                this.strokes.Select((x, i) => string.Format(CultureInfo.InvariantCulture, "{0}: {1}", this.bounds.Y + i, string.Join(" ", x))));
+
+        /// <summary>
+        /// Calculates a power histogram for the collection of <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>components</c> is <b>null</b>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Histogram PowerHistogram(IEnumerable<ConnectedComponent> components)
+        {
+            if (components == null)
+            {
+                throw new ArgumentNullException(nameof(components));
+            }
+
+            int maxPower = components.Max(x => x.Power);
+            return new Histogram(maxPower + 1, components.Select(x => x.Power));
+        }
+
+        /// <summary>
+        /// Calculates a horizontal histogram for the collection of <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <param name="bounds">The bounds of the area on which connected component were located.</param>
+        /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>components</c> is <b>null</b>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Histogram HistogramY(Rectangle bounds, IEnumerable<ConnectedComponent> components)
+        {
+            if (components == null)
+            {
+                throw new ArgumentNullException(nameof(components));
+            }
+
+            Histogram histogram = new Histogram(bounds.Height);
+
+            foreach (ConnectedComponent component in components)
+            {
+                Stroke[][] lines = component.strokes;
+                for (int i = 0, ii = lines.Length, iy = component.bounds.Y - bounds.Y; i < ii; i++, iy++)
+                {
+                    histogram.Increment(iy, ConnectedComponent.LinePower(lines[i]));
+                }
+            }
+
+            return histogram;
+        }
+
         /// <summary>
         /// Adds a stroke to this <see cref="ConnectedComponent"/>.
         /// </summary>
@@ -92,11 +140,10 @@ namespace Genix.Imaging
         /// <param name="length">The length of the stroke.</param>
         public void AddStroke(int y, int x, int length)
         {
-#if NEW
             // insert new horizontal line
             if (this.strokes.Length == 0)
             {
-                this.strokes = new int[1][];
+                this.strokes = new Stroke[1][];
             }
             else if (y < this.bounds.Y)
             {
@@ -111,14 +158,9 @@ namespace Genix.Imaging
             this.bounds.Union(x, y, length, 1);
 
             // insert stroke into the line
-            ConnectedComponent.InsertStroke(ref this.strokes[y - this.bounds.Y], x, length);
-#else
-            // find insertion point
-            int pivot = this.FindInsertionPoint(y, x, 0);
-
-            // insert
-            this.AddSegment(pivot, y, x, length);
-#endif
+            ref Stroke[] line = ref this.strokes[y - this.bounds.Y];
+            ////ConnectedComponent.InsertStroke(ref line, x, length);
+            line = ConnectedComponent.AppendStroke(line, x, length);
         }
 
         /// <summary>
@@ -129,31 +171,24 @@ namespace Genix.Imaging
         /// </returns>
         public IEnumerable<(int y, int x, int length)> EnumStrokes()
         {
-#if NEW
-            int[][] values1 = this.strokes;
-            for (int i = 0, ii = values1.Length, y = this.bounds.Y; i < ii; i++, y++)
+            Stroke[][] lines = this.strokes;
+            for (int i = 0, ii = lines.Length, y = this.bounds.Y; i < ii; i++, y++)
             {
-                int[] values2 = values1[i];
-                for (int j = 0, jj = values2.Length; j < jj; j += 2)
+                Stroke[] line = lines[i];
+                for (int j = 0, jj = line.Length; j < jj; j++)
                 {
-                    yield return (y, values2[j], values2[j + 1]);
+                    yield return (y, line[j].X, line[j].Length);
                 }
             }
-#else
-            for (int i = 0; i < this.intervals.Count; i += 3)
-            {
-                yield return (this.intervals[i], this.intervals[i + 1], this.intervals[i + 2]);
-            }
-#endif
         }
 
         /// <summary>
         /// Merges this <see cref="ConnectedComponent"/> with the specified <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <param name="component">The <see cref="ConnectedComponent"/> to merge with.</param>
-        public void MergeWith(ConnectedComponent component)
+        /// <param name="checkIntersectingStrokes">Determines whether the method should check for intersecting strokes in two merging components.</param>
+        public void MergeWith(ConnectedComponent component, bool checkIntersectingStrokes)
         {
-#if NEW
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
@@ -165,7 +200,7 @@ namespace Genix.Imaging
                 int y1 = Maximum.Min(component.bounds.Y, this.bounds.Y);
                 int y2 = Maximum.Max(component.bounds.Bottom, this.bounds.Bottom);
 
-                int[][] newstrokes = new int[y2 - y1][];
+                Stroke[][] newstrokes = new Stroke[y2 - y1][];
                 Array.Copy(this.strokes, 0, newstrokes, this.bounds.Y - y1, this.bounds.Height);
                 this.strokes = newstrokes;
 
@@ -173,74 +208,49 @@ namespace Genix.Imaging
                 this.bounds.Union(component.bounds);
             }
 
-            int[][] values1 = component.strokes;
-            for (int i = 0, ii = values1.Length, y = component.bounds.Y; i < ii; i++, y++)
+            Stroke[][] lines = component.strokes;
+            if (checkIntersectingStrokes)
             {
-                int[] values2 = values1[i];
-                for (int j = 0, jj = values2.Length; j < jj; j += 2)
+                for (int i = 0, ii = lines.Length, y = component.bounds.Y; i < ii; i++, y++)
                 {
-                    this.AddStroke(y, values2[j], values2[j + 1]);
+                    Stroke[] line = lines[i];
+                    for (int j = 0, jj = line.Length; j < jj; j++)
+                    {
+                        this.AddStroke(y, line[j].X, line[j].Length);
+                    }
                 }
             }
-#else
-            int pivot = 0;
-            for (int i = 0; i < component.intervals.Count; i += 3)
+            else
             {
-                int y = component.intervals[i];
-                int x = component.intervals[i + 1];
-                int length = component.intervals[i + 2];
-
-                // find insertion point
-                pivot = this.FindInsertionPoint(y, x, pivot);
-
-                // insert
-                this.AddSegment(pivot, y, x, length);
+                for (int i = 0, ii = lines.Length, y = component.bounds.Y; i < ii; i++, y++)
+                {
+                    ref Stroke[] thisline = ref this.strokes[y - this.bounds.Y];
+                    thisline = ConnectedComponent.MergeLines(thisline, lines[i]);
+                }
             }
-#endif
         }
 
         internal bool TouchesBottom(int y, int x, int length)
         {
-#if NEW
             if (this.strokes.Length > 0 && this.bounds.Y < y && y <= this.bounds.Bottom)
             {
-                int[] values = this.strokes[y - 1 - this.bounds.Y];
-                for (int i = 0, ii = values.Length; i < ii; i += 2)
+                Stroke[] line = this.strokes[y - 1 - this.bounds.Y];
+                for (int i = 0, ii = line.Length; i < ii; i++)
                 {
-                    if (ConnectedComponent.StrokesIntersect(values[i], values[i + 1], x, length))
+                    if (ConnectedComponent.StrokesIntersect(line[i].X, line[i].Length, x, length))
                     {
                         return true;
                     }
                 }
             }
-#else
-            for (int i = this.intervals.Count - 3; i >= 0; i -= 3)
-            {
-                int baseY = this.intervals[i];
-
-                if (baseY == y - 1)
-                {
-                    int baseX = this.intervals[i + 1];
-                    int baseLength = this.intervals[i + 2];
-                    if ((x >= baseX && x < baseX + baseLength) || (baseX >= x && baseX < x + length))
-                    {
-                        return true;
-                    }
-                }
-                else if (baseY < y - 1)
-                {
-                    break;
-                }
-            }
-#endif
 
             return false;
         }
-#if NEW
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ExpandStrokes(ref int[][] strokes, int position, int count)
+        private static void ExpandStrokes(ref Stroke[][] strokes, int position, int count)
         {
-            int[][] newstrokes = new int[strokes.Length + count][];
+            Stroke[][] newstrokes = new Stroke[strokes.Length + count][];
 
             if (position > 0)
             {
@@ -258,30 +268,29 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool StrokesIntersect(int x1, int width1, int x2, int width2)
         {
-            ////return (x2 >= x1 && x2 < x1 + width1) || (x1 >= x2 && x1 < x2 + width2);
             return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
         }
 
-        private static void InsertStroke(ref int[] line, int x, int length)
+        private static void InsertStroke(ref Stroke[] line, int x, int length)
         {
             if (line == null || line.Length == 0)
             {
-                line = new int[] { x, length };
+                line = new Stroke[] { new Stroke() { X = x, Length = length } };
             }
             else
             {
                 int x2 = x + length;
-                for (int i = 0, ii = line.Length; i < ii; i += 2)
+                for (int i = 0, ii = line.Length; i < ii; i++)
                 {
-                    int linex1 = line[i];
-                    int linelength = line[i + 1];
+                    int linex1 = line[i].X;
+                    int linelength = line[i].Length;
 
                     if (x2 < linex1)
                     {
                         // insert before the stroke
-                        ConnectedComponent.ExpandLine(ref line, i);
-                        line[i] = x;
-                        line[i + 1] = length;
+                        line = ConnectedComponent.ExpandLine(line, i);
+                        line[i].X = x;
+                        line[i].Length = length;
                         break;
                     }
                     else if (ConnectedComponent.StrokesIntersect(x, length, linex1, linelength))
@@ -289,20 +298,20 @@ namespace Genix.Imaging
                         int linex2 = linex1 + linelength;
 
                         // merge with the stroke
-                        line[i] = Maximum.Min(x, linex1);
-                        line[i + 1] = Maximum.Max(x2, linex2) - line[i];
+                        line[i].X = Maximum.Min(x, linex1);
+                        line[i].Length = Maximum.Max(x2, linex2) - line[i].X;
 
                         // check whether following strokes intersect with a new expanded one
                         if (x2 > linex2)
                         {
-                            linex1 = line[i];
-                            linelength = line[i + 1];
+                            linex1 = line[i].X;
+                            linelength = line[i].Length;
                             linex2 = linex1 + linelength;
 
                             int lastj = -1;
-                            for (int j = i + 2; j < ii; j += 2)
+                            for (int j = i + 1; j < ii; j++)
                             {
-                                if (!ConnectedComponent.StrokesIntersect(linex1, linelength, line[j], line[j + 1]))
+                                if (!ConnectedComponent.StrokesIntersect(linex1, linelength, line[j].X, line[j].Length))
                                 {
                                     break;
                                 }
@@ -312,103 +321,138 @@ namespace Genix.Imaging
 
                             if (lastj != -1)
                             {
-                                line[i + 1] = Maximum.Max(linex2, line[lastj + 1]) - linex1;
-                                ConnectedComponent.ShrinkLine(ref line, i + 2, lastj - i);
+                                line[i].Length = Maximum.Max(linex2, line[lastj].Length) - linex1;
+                                line = ConnectedComponent.ShrinkLine(line, i + 1, lastj - i);
                             }
                         }
 
                         break;
                     }
-                    else if (i + 2 == ii)
+                    else if (i + 1 == ii)
                     {
                         // insert after last stroke
-                        ConnectedComponent.ExpandLine(ref line, ii);
-                        line[ii] = x;
-                        line[ii + 1] = length;
+                        line = ConnectedComponent.ExpandLine(line, ii);
+                        line[ii].X = x;
+                        line[ii].Length = length;
                         break;
                     }
                 }
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ExpandLine(ref int[] line, int position)
+        private static Stroke[] AppendStroke(Stroke[] line, int x, int length)
         {
-            int[] newline = new int[line.Length + 2];
+            if (line == null || line.Length == 0)
+            {
+                return new Stroke[] { new Stroke() { X = x, Length = length } };
+            }
+
+            int ii = line.Length;
+            Stroke[] newline = ConnectedComponent.ExpandLine(line, ii);
+            newline[ii].X = x;
+            newline[ii].Length = length;
+
+            return newline;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Stroke[] ExpandLine(Stroke[] line, int position)
+        {
+            Stroke[] newline = new Stroke[line.Length + 1];
 
             if (position > 0)
             {
-                Arrays.Copy(position, line, 0, newline, 0);
+                Array.Copy(line, 0, newline, 0, position);
             }
 
             if (position < line.Length)
             {
-                Arrays.Copy(line.Length - position, line, position, newline, position + 2);
+                Array.Copy(line, position, newline, position + 1, line.Length - position);
             }
 
-            line = newline;
+            return newline;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ShrinkLine(ref int[] line, int position, int count)
+        private static Stroke[] ShrinkLine(Stroke[] line, int position, int count)
         {
-            int[] newline = new int[line.Length - count];
+            Stroke[] newline = new Stroke[line.Length - count];
 
             if (position > 0)
             {
-                Arrays.Copy(position, line, 0, newline, 0);
+                Array.Copy(line, 0, newline, 0, position);
             }
 
             if (position + count < line.Length)
             {
-                Arrays.Copy(line.Length - (position + count), line, position + count, newline, position);
+                Array.Copy(line, position + count, newline, position, line.Length - (position + count));
             }
 
-            line = newline;
+            return newline;
         }
-#else
-        private int FindInsertionPoint(int y, int x, int startPosition)
-        {
-            int low = startPosition;
-            int high = this.intervals.Count - 3;
 
-            while (high - low > 4 * 3)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Stroke[] MergeLines(Stroke[] line1, Stroke[] line2)
+        {
+            int ii1 = line1 != null ? line1.Length : 0;
+            int ii2 = line2 != null ? line2.Length : 0;
+            Stroke[] newline = new Stroke[ii1 + ii2];
+
+            int i1 = 0;
+            int i2 = 0;
+            int i = 0;
+            while (i1 < ii1 && i2 < ii2)
             {
-                int mid = (((high + low) / 2) / 3) * 3;
-                if (y < this.intervals[mid] || (y == this.intervals[mid] && x < this.intervals[mid + 1]))
+                if (line1[i1].X <= line2[i2].X)
                 {
-                    high = mid;
+                    newline[i++] = line1[i1++];
                 }
                 else
                 {
-                    low = mid + 3;
+                    newline[i++] = line2[i2++];
                 }
             }
 
-            int pivot = 0;
-            for (pivot = low; pivot <= high; pivot += 3)
+            while (i1 < ii1)
             {
-                if (y < this.intervals[pivot] || (y == this.intervals[pivot] && x < this.intervals[pivot + 1]))
-                {
-                    break;
-                }
+                newline[i++] = line1[i1++];
             }
 
-            return pivot;
+            while (i2 < ii2)
+            {
+                newline[i++] = line2[i2++];
+            }
+
+            return newline;
         }
 
-        private void AddSegment(int pivot, int y, int x, int length)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int LinePower(Stroke[] line)
         {
-            this.intervals.Insert(pivot, y);
-            this.intervals.Insert(pivot + 1, x);
-            this.intervals.Insert(pivot + 2, length);
+            int sum = 0;
 
-            // update power
-            if (this.power != -1)
+            for (int i = 0, ii = line.Length; i < ii; i++)
             {
-                this.power += length;
+                sum += line[i].Length;
             }
+
+            return sum;
         }
-#endif
+
+        [DebuggerDisplay("{X} {Length}")]
+        private struct Stroke
+        {
+            public int X;
+
+            public int Length;
+
+            /// <inheritdoc />
+            public override string ToString() =>
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} {1}",
+                    this.X,
+                    this.Length);
+        }
     }
 }

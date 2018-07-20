@@ -6,6 +6,7 @@
 
 namespace Genix.DocumentAnalysis
 {
+    using Genix.Core;
     using Genix.Imaging;
 
     /// <summary>
@@ -15,7 +16,7 @@ namespace Genix.DocumentAnalysis
     {
         public static void DetectVerticalLines(Image image)
         {
-            int[] histy = image.HistogramY();
+            Histogram histy = image.HistogramY();
         }
     }
 }
