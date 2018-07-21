@@ -96,10 +96,22 @@ namespace Genix.Core
         public Rectangle Bounds { get; }
 
         /// <summary>
+        /// Gets the number of nodes in this <see cref="QuadTree{T}"/> and all its subtrees.
+        /// </summary>
+        /// <value>
+        /// The number of nodes in this <see cref="QuadTree{T}"/> and all its subtrees.
+        /// </value>
+        public int Count { get; private set; }
+
+        /// <summary>
         /// Inserts a node into this <see cref="QuadTree{T}"/>.
         /// </summary>
         /// <param name="node">The node to insert.</param>
-        public void Insert(T node)
+        /// <returns>
+        /// <b>true</b> if the element is added to the <see cref="QuadTree{T}"/> object;
+        /// <b>false</b> if the element is already present.
+        /// </returns>
+        public bool Insert(T node)
         {
             if (node == null)
             {
@@ -112,49 +124,121 @@ namespace Genix.Core
                 ////throw new ArgumentException(Properties.Resources.BoundsMustBeNonZero);
             }
 
+            bool inserted = false;
+
             // check that new node does not cover quadrant center
             // otherwise, store it into quadrant own nodes
             if (!this.splittable ||
                 (bounds.X < this.center.X && this.center.X < bounds.Right) ||
                 (bounds.Y < this.center.Y && this.center.Y < bounds.Bottom))
             {
-                if (this.ownNodes == null)
-                {
-                    this.ownNodes = new HashSet<T>();
-                }
-
-                this.ownNodes.Add(node);
+                inserted = insert(ref this.ownNodes);
+            }
+            else if (this.split)
+            {
+                inserted = insertIntoTree(node);
             }
             else
             {
-                if (this.splittable)
+                inserted = insert(ref this.nodes);
+
+                // try split the quadrant
+                if (inserted && this.splittable && this.nodes?.Count > 16)
                 {
-                    if (this.nodes?.Count + 1 > 16)
+                    foreach (T n in this.nodes)
                     {
-                        // split the quadrant
-                        foreach (T n in this.nodes)
+                        insertIntoTree(n);
+                    }
+
+                    this.nodes = null;
+                    this.split = true;
+                }
+            }
+
+            // increment the number of nodes
+            if (inserted)
+            {
+                this.Count++;
+            }
+
+            return inserted;
+
+            bool insert(ref HashSet<T> set)
+            {
+                if (set == null)
+                {
+                    set = new HashSet<T>();
+                }
+
+                return set.Add(node);
+            }
+
+            bool insertIntoTree(T nodeToInsert)
+            {
+                Rectangle nodeToInsertBounds = nodeToInsert.Bounds;
+
+                if (nodeToInsertBounds.X < this.center.X)
+                {
+                    if (nodeToInsertBounds.Y < this.center.Y)
+                    {
+                        // top-left quadrant
+                        if (this.nw == null)
                         {
-                            this.InsertIntoTree(n);
+                            this.nw = new QuadTree<T>(
+                                this,
+                                Rectangle.FromLTRB(this.Bounds.Left, this.Bounds.Top, this.center.X, this.center.Y),
+                                this.minWidth,
+                                this.minHeight);
                         }
 
-                        this.nodes = null;
-                        this.split = true;
+                        return this.nw.Insert(nodeToInsert);
                     }
-
-                    if (this.split)
+                    else
                     {
-                        this.InsertIntoTree(node);
-                        return;
+                        // bottom-left quadrant
+                        if (this.sw == null)
+                        {
+                            this.sw = new QuadTree<T>(
+                                this,
+                                Rectangle.FromLTRB(this.Bounds.Left, this.center.Y, this.center.X, this.Bounds.Bottom),
+                                this.minWidth,
+                                this.minHeight);
+                        }
+
+                        return this.sw.Insert(nodeToInsert);
                     }
                 }
-
-                // add to this quadrant
-                if (this.nodes == null)
+                else
                 {
-                    this.nodes = new HashSet<T>();
-                }
+                    if (nodeToInsertBounds.Y < this.center.Y)
+                    {
+                        // top-right quadrant
+                        if (this.ne == null)
+                        {
+                            this.ne = new QuadTree<T>(
+                                this,
+                                Rectangle.FromLTRB(this.center.X, this.Bounds.Top, this.Bounds.Right, this.center.Y),
+                                this.minWidth,
+                                this.minHeight);
+                        }
 
-                this.nodes.Add(node);
+                        return this.ne.Insert(nodeToInsert);
+                    }
+                    else
+                    {
+                        // bottom-right quadrant
+                        if (this.se == null)
+                        {
+                            this.se = new QuadTree<T>(
+                                this,
+                                Rectangle.FromLTRB(this.center.X, this.center.Y, this.Bounds.Right, this.Bounds.Bottom),
+                                this.minWidth,
+                                this.minHeight);
+                        }
+
+                        return this.se.Insert(nodeToInsert);
+                    }
+                }
             }
         }
 
@@ -162,17 +246,26 @@ namespace Genix.Core
         /// Inserts a range of nodes into this <see cref="QuadTree{T}"/>.
         /// </summary>
         /// <param name="nodes">The nodes to insert.</param>
-        public void Insert(IEnumerable<T> nodes)
+        /// <returns>
+        /// The number of inserted nodes.
+        /// </returns>
+        public int Insert(IEnumerable<T> nodes)
         {
             if (nodes == null)
             {
                 throw new ArgumentNullException(nameof(nodes));
             }
 
+            int count = 0;
             foreach (T node in nodes)
-            { 
-                this.Insert(node);
+            {
+                if (this.Insert(node))
+                {
+                    count++;
+                }
             }
+
+            return count;
         }
 
         /// <summary>
@@ -184,32 +277,81 @@ namespace Genix.Core
         /// </returns>
         public bool Remove(T node)
         {
+            bool found = false;
+
             // look in own nodes first
-            if (this.ownNodes != null && this.ownNodes.Remove(node))
+            if (this.ownNodes != null)
             {
-                return true;
-            }
+                found = this.ownNodes.Remove(node);
 
-            if (this.nodes != null)
-            {
-                return this.nodes.Remove(node);
-            }
-            else
-            {
-                QuadTree<T> quadrant;
-
-                Rectangle bounds = node.Bounds;
-                if (bounds.X < this.center.X)
+                if (found && this.ownNodes.Count == 0)
                 {
-                    quadrant = bounds.Y < this.center.Y ? this.nw : this.sw;
+                    this.ownNodes = null;
+                }
+            }
+
+            if (!found)
+            {
+                if (this.nodes != null)
+                {
+                    found = this.nodes.Remove(node);
+
+                    if (found && this.nodes.Count == 0)
+                    {
+                        this.nodes = null;
+                    }
                 }
                 else
                 {
-                    quadrant = bounds.Y < this.center.Y ? this.ne : this.se;
-                }
+                    QuadTree<T> quadrant;
 
-                return quadrant != null && quadrant.Remove(node);
+                    Rectangle bounds = node.Bounds;
+                    if (bounds.X < this.center.X)
+                    {
+                        quadrant = bounds.Y < this.center.Y ? this.nw : this.sw;
+                    }
+                    else
+                    {
+                        quadrant = bounds.Y < this.center.Y ? this.ne : this.se;
+                    }
+
+                    found = quadrant != null && quadrant.Remove(node);
+                }
             }
+
+            // decrement the number of nodes
+            if (found)
+            {
+                this.Count--;
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// Removes a range of nodes into this <see cref="QuadTree{T}"/>.
+        /// </summary>
+        /// <param name="nodes">The nodes to remove.</param>
+        /// <returns>
+        /// The number of removed nodes.
+        /// </returns>
+        public int Remove(IEnumerable<T> nodes)
+        {
+            if (nodes == null)
+            {
+                throw new ArgumentNullException(nameof(nodes));
+            }
+
+            int count = 0;
+            foreach (T node in nodes)
+            {
+                if (this.Remove(node))
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -409,76 +551,6 @@ namespace Genix.Core
 
                 return found;
             }
-        }
-
-        private void InsertIntoTree(T node)
-        {
-            Rectangle bounds = node.Bounds;
-
-            if (bounds.X < this.center.X)
-            {
-                if (bounds.Y < this.center.Y)
-                {
-                    // top-left quadrant
-                    if (this.nw == null)
-                    {
-                        this.nw = new QuadTree<T>(
-                            this,
-                            Rectangle.FromLTRB(this.Bounds.Left, this.Bounds.Top, this.center.X, this.center.Y),
-                            this.minWidth,
-                            this.minHeight);
-                    }
-
-                    this.nw.Insert(node);
-                }
-                else
-                {
-                    // bottom-left quadrant
-                    if (this.sw == null)
-                    {
-                        this.sw = new QuadTree<T>(
-                            this,
-                            Rectangle.FromLTRB(this.Bounds.Left, this.center.Y, this.center.X, this.Bounds.Bottom),
-                            this.minWidth,
-                            this.minHeight);
-                    }
-
-                    this.sw.Insert(node);
-                }
-            }
-            else
-            {
-                if (bounds.Y < this.center.Y)
-                {
-                    // top-right quadrant
-                    if (this.ne == null)
-                    {
-                        this.ne = new QuadTree<T>(
-                            this,
-                            Rectangle.FromLTRB(this.center.X, this.Bounds.Top, this.Bounds.Right, this.center.Y),
-                            this.minWidth,
-                            this.minHeight);
-                    }
-
-                    this.ne.Insert(node);
-                }
-                else
-                {
-                    // bottom-right quadrant
-                    if (this.se == null)
-                    {
-                        this.se = new QuadTree<T>(
-                            this,
-                            Rectangle.FromLTRB(this.center.X, this.center.Y, this.Bounds.Right, this.Bounds.Bottom),
-                            this.minWidth,
-                            this.minHeight);
-                    }
-
-                    this.se.Insert(node);
-                }
-            }
-
-            this.split = true;
         }
     }
 }

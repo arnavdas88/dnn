@@ -274,7 +274,37 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Returns the position of minimum value in the array.
+        /// Returns the position of minimum value in the array of 32-bit integers.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The array that contains data used for evaluation.</param>
+        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <returns>
+        /// The position of minimum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ArgMin(int length, int[] x, int offx)
+        {
+            return NativeMethods.i32argmin(length, x, offx);
+        }
+
+        /// <summary>
+        /// Returns the position of maximum value in the array of 32-bit integers.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The array that contains data used for evaluation.</param>
+        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <returns>
+        /// The position of maximum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ArgMax(int length, int[] x, int offx)
+        {
+            return NativeMethods.i32argmax(length, x, offx);
+        }
+
+        /// <summary>
+        /// Returns the position of minimum value in the array of floats.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
@@ -289,7 +319,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Returns the position of maximum value in the array.
+        /// Returns the position of maximum value in the array of floats.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
@@ -380,6 +410,14 @@ namespace Genix.Core
                 [In] float[] y,
                 [In] float[] dy,
                 int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int i32argmin(int n, [In] int[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int i32argmax(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -80,6 +80,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Calculates a power histogram for the collection of <see cref="ConnectedComponent"/>.
         /// </summary>
+        /// <param name="maxWidth">The maximum power of components to put into histogram. -1 to use all components.</param>
         /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
@@ -87,22 +88,28 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <c>components</c> is <b>null</b>
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Histogram PowerHistogram(IEnumerable<ConnectedComponent> components)
+        public static Histogram PowerHistogram(int maxPower, IEnumerable<ConnectedComponent> components)
         {
             if (components == null)
             {
                 throw new ArgumentNullException(nameof(components));
             }
 
-            int maxPower = components.Max(x => x.Power);
-            return new Histogram(maxPower + 1, components.Select(x => x.Power));
+            if (maxPower == -1)
+            {
+                maxPower = components.Max(x => x.Power);
+                return new Histogram(maxPower + 1, components.Select(x => x.Power));
+            }
+            else
+            {
+                return new Histogram(maxPower + 1, components.Select(x => x.Power).Where(x => x <= maxPower));
+            }
         }
 
         /// <summary>
-        /// Calculates a horizontal histogram for the collection of <see cref="ConnectedComponent"/>.
+        /// Calculates a width histogram for the collection of <see cref="ConnectedComponent"/>.
         /// </summary>
-        /// <param name="bounds">The bounds of the area on which connected component were located.</param>
+        /// <param name="maxWidth">The maximum width of components to put into histogram. -1 to use all components.</param>
         /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
@@ -110,26 +117,51 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <c>components</c> is <b>null</b>
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Histogram HistogramY(Rectangle bounds, IEnumerable<ConnectedComponent> components)
+        public static Histogram WidthHistogram(int maxWidth, IEnumerable<ConnectedComponent> components)
         {
             if (components == null)
             {
                 throw new ArgumentNullException(nameof(components));
             }
 
-            Histogram histogram = new Histogram(bounds.Height);
-
-            foreach (ConnectedComponent component in components)
+            if (maxWidth == -1)
             {
-                Stroke[][] lines = component.strokes;
-                for (int i = 0, ii = lines.Length, iy = component.bounds.Y - bounds.Y; i < ii; i++, iy++)
-                {
-                    histogram.Increment(iy, ConnectedComponent.LinePower(lines[i]));
-                }
+                maxWidth = components.Max(x => x.Bounds.Width);
+                return new Histogram(maxWidth + 1, components.Select(x => x.Bounds.Width));
+            }
+            else
+            {
+                return new Histogram(maxWidth + 1, components.Select(x => x.Bounds.Width).Where(x => x <= maxWidth));
+            }
+        }
+
+        /// <summary>
+        /// Calculates a height histogram for the collection of <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <param name="maxHeight">The maximum height of components to put into histogram. -1 to use all components.</param>
+        /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>components</c> is <b>null</b>
+        /// </exception>
+        public static Histogram HeightHistogram(int maxHeight, IEnumerable<ConnectedComponent> components)
+        {
+            if (components == null)
+            {
+                throw new ArgumentNullException(nameof(components));
             }
 
-            return histogram;
+            if (maxHeight == -1)
+            {
+                maxHeight = components.Max(x => x.Bounds.Height);
+                return new Histogram(maxHeight + 1, components.Select(x => x.Bounds.Height));
+            }
+            else
+            {
+                return new Histogram(maxHeight + 1, components.Select(x => x.Bounds.Height).Where(x => x <= maxHeight));
+            }
         }
 
         /// <summary>

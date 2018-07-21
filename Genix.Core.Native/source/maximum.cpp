@@ -82,60 +82,89 @@ extern "C" __declspec(dllexport) void WINAPI sminmax_gradient(
 	}
 }
 
-extern "C" __declspec(dllexport) int WINAPI sargmin(int n, const float* x, int offx)
+template<typename T> int __forceinline __argmin(int n, const T* x, int offx)
 {
-	int win = offx;
-	float min = x[offx];
+	x += offx;
 
-	for (const int last = n + offx++; offx < last; offx++)
+	int win = 0;
+	T min = x[0];
+
+	for (int i = 1; i < n; i++)
 	{
-		const float value = x[offx];
+		const T value = x[i];
 		if (value < min)
 		{
-			win = offx;
+			win = i;
 			min = value;
 		}
 	}
 
-	return win;
+	return offx + win;
+}
+
+template<typename T> int __forceinline __argmax(int n, const T* x, int offx)
+{
+	x += offx;
+
+	int win = 0;
+	T max = x[0];
+
+	for (int i = 1; i < n; i++)
+	{
+		const T value = x[i];
+		if (value > max)
+		{
+			win = i;
+			max = value;
+		}
+	}
+
+	return offx + win;
+}
+
+extern "C" __declspec(dllexport) int WINAPI i32argmin(int n, const int* x, int offx)
+{
+	return __argmin<int>(n, x, offx);
+}
+
+extern "C" __declspec(dllexport) int WINAPI i32argmax(int n, const int* x, int offx)
+{
+	return __argmax<int>(n, x, offx);
+}
+
+extern "C" __declspec(dllexport) int WINAPI sargmin(int n, const float* x, int offx)
+{
+	return __argmin<float>(n, x, offx);
 }
 
 extern "C" __declspec(dllexport) int WINAPI sargmax(int n, const float* x, int offx)
 {
-	int win = offx;
-	float max = x[offx];
-
-	for (const int last = n + offx++; offx < last; offx++)
-	{
-		const float value = x[offx];
-		if (value > max)
-		{
-			win = offx;
-			max = value;
-		}
-	}
-
-	return win;
+	return __argmax<float>(n, x, offx);
 }
 
 extern "C" __declspec(dllexport) void WINAPI sargminmax(int n, const float* x, int offx, int& winmin, int& winmax)
 {
-	winmin = winmax = offx;
-	float min = x[offx];
-	float max = x[offx];
+	x += offx;
 
-	for (const int last = n + offx++; offx < last; offx++)
+	winmin = winmax = 0;
+	float min = x[0];
+	float max = x[0];
+
+	for (int i = 1; i < n; i++)
 	{
-		const float value = x[offx];
+		const float value = x[i];
 		if (value < min)
 		{
-			winmin = offx;
+			winmin = i;
 			min = value;
 		}
 		else if (value > max)
 		{
-			winmax = offx;
+			winmax = i;
 			max = value;
 		}
 	}
+
+	winmin += offx;
+	winmax += offx;
 }

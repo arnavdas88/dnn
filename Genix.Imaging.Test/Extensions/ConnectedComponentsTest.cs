@@ -72,12 +72,40 @@
             {
                 ////Histogram hist1 = image.HistogramY();
 
-                Imaging.Image workImage = image/*.Despeckle().CleanBorderNoise(0.5f, 0.5f).Reduce1x2()*/;
+                Imaging.Image workImage = image.Despeckle().CleanBorderNoise(0.5f, 0.5f)/*.Reduce1x2()*/;
 
                 stopwatch.Start();
                 for (int i = 0; i < Count; i++)
                 {
                     ISet<ConnectedComponent> components = workImage.FindConnectedComponents();
+
+                    Histogram histp = ConnectedComponent.PowerHistogram(1000, components);
+                    Histogram histw = ConnectedComponent.WidthHistogram(100, components);
+                    Histogram histh = ConnectedComponent.HeightHistogram(100, components);
+
+                    QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(workImage.Bounds, components.Where(x => x.Bounds.Height < 100));
+
+                    Imaging.Image show = new Imaging.Image(workImage.Width, workImage.Height, 1, 200, 200);
+                    Imaging.Image show2 = workImage.Copy();
+
+                    int argmaxh = histh.ArgMax();
+                    while (true)
+                    {
+                        ConnectedComponent candidate = components.FirstOrDefault(x => x.Bounds.Height == argmaxh);
+                        if (candidate == null)
+                        {
+                            break;
+                        }
+
+                        IList<ConnectedComponent> neighbors = quadtree.GetNodes(new Rectangle(0, candidate.Bounds.Y, workImage.Width, candidate.Bounds.Height)).ToList();
+
+                        show.AddConnectedComponents(neighbors);
+                        show2.RemoveConnectedComponents(neighbors);
+
+                        components.ExceptWith(neighbors);
+                        quadtree.Remove(neighbors);
+                    }
+
                     ////IList<ConnectedComponentOld> components2 = workImage.FindConnectedComponentsOld();
                     ////workImage.RemoveConnectedComponents(components);
                     ////List<ConnectedComponent> components1 = workImage.FindConnectedComponents().OrderBy(x => x, new ConnectedComponentComparer()).ToList();

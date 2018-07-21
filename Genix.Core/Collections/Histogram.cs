@@ -167,7 +167,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="value">The value which bin to increment.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(int value) => this.Increment(this.BinIndex(value));
+        public void Add(int value) => this.bins[this.BinIndex(value)]++;
 
         /// <summary>
         /// Increments the bin that corresponds to the specified value by the specified count.
@@ -175,7 +175,31 @@ namespace Genix.Core
         /// <param name="value">The value which bin to increment.</param>
         /// <param name="count">The value of increment.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(int value, int count) => this.Increment(this.BinIndex(value), count);
+        public void Add(int value, int count) => this.bins[this.BinIndex(value)] += count;
+
+        /// <summary>
+        /// Returns the zero-based index of the first bin that contains minimum value.
+        /// </summary>
+        /// <returns>
+        /// The zero-based index of the first bin that contains minimum value.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ArgMin()
+        {
+            return Maximum.ArgMin(this.bins.Length, this.bins, 0);
+        }
+
+        /// <summary>
+        /// Returns the zero-based index of the first bin that contains maximum value.
+        /// </summary>
+        /// <returns>
+        /// The zero-based index of the first bin that contains maximum value.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ArgMax()
+        {
+            return Maximum.ArgMax(this.bins.Length, this.bins, 0);
+        }
 
         private int BinIndex(int value)
         {
