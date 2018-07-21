@@ -80,7 +80,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Calculates a power histogram for the collection of <see cref="ConnectedComponent"/>.
         /// </summary>
-        /// <param name="maxWidth">The maximum power of components to put into histogram. -1 to use all components.</param>
+        /// <param name="maxPower">The maximum power of components to put into histogram. -1 to use all components.</param>
         /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to calculate the histogram for.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
@@ -163,6 +163,9 @@ namespace Genix.Imaging
                 return new Histogram(maxHeight + 1, components.Select(x => x.Bounds.Height).Where(x => x <= maxHeight));
             }
         }
+
+        /// <inheritdoc />
+        public override string ToString() => this.Bounds.ToString();
 
         /// <summary>
         /// Adds a stroke to this <see cref="ConnectedComponent"/>.
@@ -262,21 +265,10 @@ namespace Genix.Imaging
             }
         }
 
-        internal bool TouchesBottom(int y, int x, int length)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool StrokesIntersect(int x1, int width1, int x2, int width2)
         {
-            if (this.strokes.Length > 0 && this.bounds.Y < y && y <= this.bounds.Bottom)
-            {
-                Stroke[] line = this.strokes[y - 1 - this.bounds.Y];
-                for (int i = 0, ii = line.Length; i < ii; i++)
-                {
-                    if (ConnectedComponent.StrokesIntersect(line[i].X, line[i].Length, x, length))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -297,13 +289,7 @@ namespace Genix.Imaging
             strokes = newstrokes;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool StrokesIntersect(int x1, int width1, int x2, int width2)
-        {
-            return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
-        }
-
-        private static void InsertStroke(ref Stroke[] line, int x, int length)
+        /*private static void InsertStroke(ref Stroke[] line, int x, int length)
         {
             if (line == null || line.Length == 0)
             {
@@ -370,7 +356,7 @@ namespace Genix.Imaging
                     }
                 }
             }
-        }
+        }*/
 
         private static Stroke[] AppendStroke(Stroke[] line, int x, int length)
         {
@@ -405,7 +391,7 @@ namespace Genix.Imaging
             return newline;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /*[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Stroke[] ShrinkLine(Stroke[] line, int position, int count)
         {
             Stroke[] newline = new Stroke[line.Length - count];
@@ -421,7 +407,7 @@ namespace Genix.Imaging
             }
 
             return newline;
-        }
+        }*/
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Stroke[] MergeLines(Stroke[] line1, Stroke[] line2)

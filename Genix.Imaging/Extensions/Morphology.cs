@@ -11,6 +11,7 @@ namespace Genix.Imaging
     using System.Diagnostics;
     using System.Drawing;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Genix.Core;
 
     /// <summary>
@@ -288,8 +289,8 @@ namespace Genix.Imaging
             }
 
             HashSet<ConnectedComponent> all = new HashSet<ConnectedComponent>();
-            List<ConnectedComponent> last = new List<ConnectedComponent>();
-            HashSet<ConnectedComponent> current = new HashSet<ConnectedComponent>();
+            List<Stroke> last = new List<Stroke>();
+            List<Stroke> current = new List<Stroke>();
 
             int width = image.Width;
             int height = image.Height;
@@ -298,17 +299,8 @@ namespace Genix.Imaging
 
             for (int y = 0, ypos = 0; y < height; y++, ypos += stride1)
             {
-                // prepare new line
-                last.Clear();
-
-                if (current.Count > 0)
-                {
-                    last.AddRange(current);
-                    last.Sort(ConnectedComponentComparer.Default);
-                    current.Clear();
-                }
-
                 // find intervals
+                int lastIndex = 0;
                 for (int xpos = ypos, xposend = ypos + width; xpos < xposend;)
                 {
                     int start = BitUtils64.BitScanOneForward(xposend - xpos, bits, xpos);
@@ -324,33 +316,67 @@ namespace Genix.Imaging
                     }
 
                     // merge interval
-                    mergeComponent(start - ypos, end - start);
+                    mergeStroke(start - ypos, end - start);
                     xpos = end + 1;
 
-                    void mergeComponent(int x, int length)
+                    void mergeStroke(int x, int length)
                     {
+                        // the component we will attach the stroke to
                         ConnectedComponent component = null;
 
-                        for (int i = 0, ii = last.Count; i < ii; i++)
+                        // start matching from the position we stopped at last time
+                        for (int i = lastIndex, x2 = x + length, ii = last.Count; i < ii; i++)
                         {
-                            ConnectedComponent lastComponent = last[i];
-                            if (lastComponent.TouchesBottom(y, x, length))
+                            Stroke lastStroke = last[i];
+                            if (ConnectedComponent.StrokesIntersect(lastStroke.X, lastStroke.Length, x, length))
                             {
                                 if (component == null)
                                 {
-                                    lastComponent.AddStroke(y, x, length);
-                                    component = lastComponent;
+                                    component = lastStroke.Component;
+                                    component.AddStroke(y, x, length);
                                 }
                                 else
                                 {
-                                    component.MergeWith(lastComponent, false);
-                                    all.Remove(lastComponent);
-                                    current.Remove(lastComponent);
-                                    last.RemoveAt(i--);
-                                    ii--;
+                                    ConnectedComponent anotherComponent = lastStroke.Component;
+                                    if (anotherComponent != component)
+                                    {
+                                        // merge components if strokes touches more than one components
+                                        component.MergeWith(anotherComponent, false);
+
+                                        // remove merged component from the set
+                                        all.Remove(anotherComponent);
+
+                                        // replace merged component in previous line
+                                        replaceComponent(last, i);
+
+                                        // replace merged component in this line
+                                        replaceComponent(current, current.Count);
+
+                                        void replaceComponent(List<Stroke> strokes, int anchorPosition)
+                                        {
+                                            Rectangle anotherBounds = anotherComponent.Bounds;
+                                            for (int j = anchorPosition, jj = strokes.Count; j < jj && strokes[j].X <= anotherBounds.Right; j++)
+                                            {
+                                                if (strokes[j].Component == anotherComponent)
+                                                {
+                                                    strokes[j].Component = component;
+                                                }
+                                            }
+
+                                            for (int j = anchorPosition - 1; j >= 0 && strokes[j].X2 >= anotherBounds.X; j--)
+                                            {
+                                                if (strokes[j].Component == anotherComponent)
+                                                {
+                                                    strokes[j].Component = component;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+
+                                lastIndex = i;
                             }
-                            else if (x + length < lastComponent.Bounds.Left)
+                            else if (x2 < lastStroke.X)
                             {
                                 // all remaining strokes from previous line are to the left of this one
                                 // we can stop matching
@@ -364,11 +390,15 @@ namespace Genix.Imaging
                             all.Add(component);
                         }
 
-                        current.Add(component);
+                        current.Add(new Stroke(x, length, component));
                     }
                 }
+
+                Swapping.Swap(ref current, ref last);
+                current.Clear();
             }
 
+            Debug.Assert(image.Power() == all.Sum(x => x.Power), "The number of pixels on image and in components must match.");
             return all;
         }
 
@@ -733,30 +763,30 @@ namespace Genix.Imaging
             }
         }
 
-        private sealed class ConnectedComponentComparer : IComparer<ConnectedComponent>
+        [DebuggerDisplay("{X} {Length} {Component}")]
+        private sealed class Stroke
         {
-            public static ConnectedComponentComparer Default = new ConnectedComponentComparer();
+            private readonly int x;
+            private readonly int length;
+            private ConnectedComponent component;
 
-            public int Compare(ConnectedComponent x, ConnectedComponent y)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public Stroke(int x, int length, ConnectedComponent component)
             {
-                if (x == y)
-                {
-                    return 0;
-                }
+                this.x = x;
+                this.length = length;
+                this.component = component;
+            }
 
-                int res = x.Bounds.X - y.Bounds.X;
-                if (res == 0)
-                {
-                    res = x.Bounds.Y - y.Bounds.Y;
-                }
+            public int X => this.x;
 
-                if (res == 0)
-                {
-                    res = x.GetHashCode() - y.GetHashCode();
-                }
+            public int Length => this.length;
 
-                Debug.Assert(res != 0, "Method cannot return zero.");
-                return res;
+            public int X2 => this.x + this.length;
+
+            public ConnectedComponent Component {
+                get => this.component;
+                set => this.component = value;
             }
         }
     }
