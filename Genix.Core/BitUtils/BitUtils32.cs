@@ -493,6 +493,47 @@ namespace Genix.Core
             NativeMethods.bits_and3_32(length, a, offa, b, offb, y, offy);
         }
 
+        /// <summary>
+        /// Performs logical XOR operation on two 32-bits arrays bit-wise.
+        /// </summary>
+        /// <param name="count">The number of bits to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        public static void BitsXOR(int count, uint[] x, int posx, uint[] y, int posy)
+        {
+            NativeMethods.bits_xor2_be32(count, x, posx, y, posy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two 32-bits arrays element-wise.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsXOR(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.bits_xor2_32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two 32-bits arrays element-wise and puts the results into another array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        public static void WordsXOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.bits_xor3_32(length, a, offa, b, offb, y, offy);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -600,6 +641,18 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and3_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_xor2_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_xor2_be32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_xor3_32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
         }
     }
 }

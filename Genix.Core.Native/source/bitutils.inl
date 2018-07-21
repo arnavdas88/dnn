@@ -519,6 +519,117 @@ extern "C" __declspec(dllexport) __bits WINAPI BITS_METHOD(bits_count_)(
 	return sum;
 }
 
+// Logical operations
+template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forceinline __bits_logical_be(
+	int count,				// number of bits to process
+	const __bits* x, 		// the source array
+	int posx, 				// the zero-based index of starting bit in x
+	__bits* y, 				// the destination array
+	int posy 				// the zero-based index of starting bit in y
+)
+{
+	x += (posx >> BITS_SHIFT);
+	posx &= BITS_MASK;
+
+	y += (posy >> BITS_SHIFT);
+	posy &= BITS_MASK;
+
+	// one word only
+	if (posy + count <= BITS_COUNT)
+	{
+		const int shift = posy - posx;
+		const __bits x0 = shift >= 0 ?
+			x[0] >> shift :
+			(posx + count <= BITS_COUNT ? x[0] << -shift : _shiftleft(x[1], x[0], -shift));
+		const __bits mask = CLEAR_MASK_RANGE_BE(posy, count);
+		T3(y[0], x0, mask);
+
+		return;
+	}
+
+	// if destination position does not start on word boundary
+	// copy right part of the word from the source
+	if (posy != 0)
+	{
+		const int shift = posy - posx;
+		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
+		const __bits mask = CLEAR_MASK_RIGHT_BE(posy);
+		T3(y[0], x0, mask);
+
+		count -= BITS_COUNT - posy;
+
+		posx += BITS_COUNT - posy;
+		x += (posx >> BITS_SHIFT);
+		posx &= BITS_MASK;
+
+		y++;
+		posy = 0;
+	}
+
+	// copy center
+	int wordcount = count >> BITS_SHIFT;
+	count &= BITS_MASK;
+
+	if (wordcount > 0)
+	{
+		if (posx == 0)
+		{
+			for (int i = 0; i < wordcount; i++)
+			{
+				T2(y[i], x[i]);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < wordcount; i++)
+			{
+				T2(y[i], _shiftleft(x[i + 1], x[i], posx));
+			}
+		}
+	}
+
+	// copy right side
+	if (count > 0)
+	{
+		x += wordcount;
+		y += wordcount;
+
+		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
+		const __bits mask = CLEAR_MASK_LEFT_BE(count);
+		T3(y[0], x0, mask);
+	}
+}
+
+void __forceinline logical_or2(__bits &result, __bits value)
+{
+	result |= value;
+}
+
+void __forceinline logical_or3(__bits &result, __bits value, __bits mask)
+{
+	result |= value & ~mask;
+}
+
+void __forceinline logical_and2(__bits &result, __bits value)
+{
+	result &= value;
+}
+
+void __forceinline logical_and3(__bits &result, __bits value, __bits mask)
+{
+	result &= value | mask;
+}
+
+void __forceinline logical_xor2(__bits &result, __bits value)
+{
+	result ^= value;
+}
+
+void __forceinline logical_xor3(__bits &result, __bits value, __bits mask)
+{
+	result ^= value & ~mask;
+}
+
 // Logical NOT
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_not1_)(
 	int length,				// number of elements to process
@@ -579,7 +690,8 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or2_be)(
 	int posy 				// the zero-based index of starting bit in y
 	)
 {
-	x += (posx >> BITS_SHIFT);
+	__bits_logical_be<logical_or2, logical_or3>(count, x, posx, y, posy);
+	/*x += (posx >> BITS_SHIFT);
 	posx &= BITS_MASK;
 
 	y += (posy >> BITS_SHIFT);
@@ -648,7 +760,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or2_be)(
 		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
 		const __bits mask = CLEAR_MASK_LEFT_BE(count);
 		y[0] |= x0 & ~mask;
-	}
+	}*/
 }
 
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or3_)(
@@ -790,7 +902,8 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and2_be)(
 	int posy 				// the zero-based index of starting bit in y
 	)
 {
-	x += (posx >> BITS_SHIFT);
+	__bits_logical_be<logical_and2, logical_and3>(count, x, posx, y, posy);
+	/*x += (posx >> BITS_SHIFT);
 	posx &= BITS_MASK;
 
 	y += (posy >> BITS_SHIFT);
@@ -859,7 +972,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and2_be)(
 		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
 		const __bits mask = CLEAR_MASK_LEFT_BE(count);
 		y[0] &= x0 | mask;
-	}
+	}*/
 }
 
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and3_)(
@@ -879,5 +992,54 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and3_)(
 	for (int i = 0; i < length; i++)
 	{
 		y[i] = a[i] & b[i];
+	}
+}
+
+// Logical XOR
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_xor2_)(
+	int length,				// number of elements to process
+	const __bits* x, 		// the source array
+	int offx, 				// the zero-based index of starting element in x
+	__bits* y, 				// the destination array
+	int offy 				// the zero-based index of starting element in y
+	)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] ^= x[i];
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_xor2_be)(
+	int count,				// number of bits to process
+	const __bits* x, 		// the source array
+	int posx, 				// the zero-based index of starting bit in x
+	__bits* y, 				// the destination array
+	int posy 				// the zero-based index of starting bit in y
+	)
+{
+	__bits_logical_be<logical_xor2, logical_xor3>(count, x, posx, y, posy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_xor3_)(
+	int length,				// number of elements to process
+	const __bits* a, 		// the first source array
+	int offa, 				// the zero-based index of starting element in a
+	const __bits* b, 		// the second source array
+	int offb, 				// the zero-based index of starting element in b
+	__bits* y, 				// the destination array
+	int offy 				// the zero-based index of starting element in y
+	)
+{
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] = a[i] ^ b[i];
 	}
 }

@@ -191,16 +191,7 @@ namespace Genix.Imaging
             }
 
             Image dst = new Image(a);
-
-            ulong[] bitsdst = dst.Bits;
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsdst.Length; i < ii; i++)
-            {
-                bitsdst[i] = bitsa[i] ^ bitsb[i];
-            }
-
+            BitUtils64.WordsXOR(a.Bits.Length, a.Bits, 0, b.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -234,13 +225,7 @@ namespace Genix.Imaging
                 throw new NotSupportedException();
             }
 
-            ulong[] bitsa = a.Bits;
-            ulong[] bitsb = b.Bits;
-
-            for (int i = 0, ii = bitsa.Length; i < ii; i++)
-            {
-                bitsa[i] ^= bitsb[i];
-            }
+            BitUtils64.WordsXOR(a.Bits.Length, b.Bits, 0, a.Bits, 0);
         }
     }
 }
