@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
@@ -52,15 +53,93 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of one array starting at the specified source index
+        /// Adds a scalar value to all values of one array of 32-bit integers starting at the specified source index
         /// and stores results in another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to subtract from.</param>
-        /// <param name="offx">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="x">The first array that contains the data to add to.</param>
+        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.i32addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of one array of 32-bit unsigned integers starting at the specified source index
+        /// and stores results in another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The first array that contains the data to add to.</param>
+        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.ui32addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of one array of 64-bit integers starting at the specified source index
+        /// and stores results in another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The first array that contains the data to add to.</param>
+        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.i64addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of one array of 64-bit unsigned integers starting at the specified source index
+        /// and stores results in another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The first array that contains the data to add to.</param>
+        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.ui64addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of one array of floats starting at the specified source index
+        /// and stores results in another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The first array that contains the data to add to.</param>
+        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -71,12 +150,78 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of array starting at the specified index.
+        /// Adds a scalar value to all values of array of 32-bit integers starting at the specified index.
         /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, int alpha, int[] y, int offy)
+        {
+            NativeMethods.i32addc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of array of unsigned 32-bit integers starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.ui32addc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of array of 64-bit integers starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, long alpha, long[] y, int offy)
+        {
+            NativeMethods.i64addc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of array of unsigned 64-bit integers starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.ui64addc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a scalar value to all values of array of singles starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -87,13 +232,91 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a range of values from one array starting at the specified source index to another array starting at the specified destination index.
+        /// Adds a range of values from one array of 32-bit integers starting at the specified source index
+        /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, int[] x, int offx, int[] y, int offy)
+        {
+            NativeMethods.i32add(length, y, offy, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 32-bit unsigned integers starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to add.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.ui32add(length, y, offy, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 64-bit integers starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to add.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, long[] x, int offx, long[] y, int offy)
+        {
+            NativeMethods.i64add(length, y, offy, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 64-bit unsigned integers starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to add.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.ui64add(length, y, offy, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of floats starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains the data to add.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -117,7 +340,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a range of values from one array starting at the specified index
+        /// Adds a range of values from one array of 32-bit integers starting at the specified index
         /// to another array starting at the specified index
         /// and stores results in third array starting at the specified destination index.
         /// </summary>
@@ -128,6 +351,95 @@ namespace Genix.Core
         /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
+        {
+            NativeMethods.i32add(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 32-bit unsigned integers starting at the specified index
+        /// to another array starting at the specified index
+        /// and stores results in third array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="a">The first array that contains the data to add.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data to add.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.ui32add(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 64-bit integers starting at the specified index
+        /// to another array starting at the specified index
+        /// and stores results in third array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="a">The first array that contains the data to add.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data to add.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
+        {
+            NativeMethods.i64add(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of 64-bit unsigned integers starting at the specified index
+        /// to another array starting at the specified index
+        /// and stores results in third array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="a">The first array that contains the data to add.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data to add.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.ui64add(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a range of values from one array of floats starting at the specified index
+        /// to another array starting at the specified index
+        /// and stores results in third array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="a">The first array that contains the data to add.</param>
+        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data to add.</param>
+        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
@@ -716,6 +1028,98 @@ namespace Genix.Core
             return NativeMethods._snrm2(length, x, offx, incx);
         }
 
+        /// <summary>
+        /// Computes the sum of all elements in the array of 32-bit integers.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Sum(int length, int[] x, int offx)
+        {
+            return NativeMethods.i32sum(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the sum of all elements in the array of 32-bit unsigned integers.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static uint Sum(int length, uint[] x, int offx)
+        {
+            return NativeMethods.ui32sum(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the sum of all elements in the array of 64-bit integers.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long Sum(int length, long[] x, int offx)
+        {
+            return NativeMethods.i64sum(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the sum of all elements in the array of 64-bit unsigned integers.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static ulong Sum(int length, ulong[] x, int offx)
+        {
+            return NativeMethods.ui64sum(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the sum of all elements in the array of floats.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Sum(int length, float[] x, int offx)
+        {
+            return NativeMethods.ssum(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the variance of all elements in the array of floats.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <c>x</c> at which calculation begins.</param>
+        /// <returns>
+        /// The variance of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Variance(int length, float[] x, int offx)
+        {
+            return NativeMethods.svariance(length, x, offx);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -742,11 +1146,59 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void saddc(int n, float a, [Out] float[] y, int offy);
+            public static extern void i32addc(int n, int a, [In, Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui32addc(int n, uint a, [In, Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64addc(int n, long a, [In, Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui64addc(int n, ulong a, [In, Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void saddc(int n, float a, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32addxc(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui32addxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64addxc(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui64addxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void saddxc(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32add(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui32add(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64add(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ui64add(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -865,6 +1317,30 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern float _snrm2(int n, [In] float[] x, int offx, int incx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int i32sum(int n, [In] int[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern uint ui32sum(int n, [In] uint[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern long i64sum(int n, [In] long[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern ulong ui64sum(int n, [In] ulong[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float ssum(int n, [In] float[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float svariance(int n, [In] float[] x, int offx);
         }
     }
 }

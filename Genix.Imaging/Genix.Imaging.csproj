@@ -72,6 +72,7 @@
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
+    <Compile Include="Extensions\Operators.cs" />
     <Compile Include="Extensions\StructuringElement.cs" />
     <Compile Include="ImageF.cs" />
     <Compile Include="Extensions\ConnectedComponent.cs" />

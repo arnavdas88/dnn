@@ -8,6 +8,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Genix.Core;
     using Genix.Imaging;
+    using Genix.DocumentAnalysis;
 
     [TestClass]
     public class ConnectedComponentsTest
@@ -68,18 +69,23 @@
             const int Count = 1;
             Stopwatch stopwatch = new Stopwatch();
 
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\DNN\dnn\4506-T.tif"))
             {
                 ////Histogram hist1 = image.HistogramY();
 
-                Imaging.Image workImage = image.Despeckle().CleanBorderNoise(0.5f, 0.5f)/*.Reduce1x2()*/;
+                Imaging.Image workImage = image/*.Despeckle().CleanBorderNoise(0.5f, 0.5f).Reduce1x2()*/;
 
                 stopwatch.Start();
                 for (int i = 0; i < Count; i++)
                 {
-                    ISet<ConnectedComponent> components = workImage.FindConnectedComponents();
+                    Imaging.Image cleanedImage = LineDetector.FindAndRemoveLines(image.Deskew(), new LineDetectionOptions(), out IList<Line> lines);
 
-                    Histogram histp = ConnectedComponent.PowerHistogram(1000, components);
+                    ////ISet<ConnectedComponent> components = workImage.FindConnectedComponents();
+
+                    ////List<ConnectedComponent> components1 = workImage.FindConnectedComponents().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
+                    ////List<ConnectedComponent> components2 = workImage.FindConnectedComponentsNew().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
+
+                    /*Histogram histp = ConnectedComponent.PowerHistogram(1000, components);
                     Histogram histw = ConnectedComponent.WidthHistogram(100, components);
                     Histogram histh = ConnectedComponent.HeightHistogram(100, components);
 
@@ -104,7 +110,7 @@
 
                         components.ExceptWith(neighbors);
                         quadtree.Remove(neighbors);
-                    }
+                    }*/
 
                     ////IList<ConnectedComponentOld> components2 = workImage.FindConnectedComponentsOld();
                     ////workImage.RemoveConnectedComponents(components);
@@ -114,9 +120,9 @@
                     /*Histogram hist = ConnectedComponent.PowerHistogram(components);
                     Histogram histH = new Histogram(workImage.Bounds.Height + 1, components.Select(x => x.Bounds.Height));*/
 
-                    int sum1 = image.Power();
-                    int sum2 = components.Sum(x => x.Power);
-                    /*int sum3 = components2.Sum(x => x.Power);*/
+                    ////int sum1 = image.Power();
+                    ////int sum2 = components1.Sum(x => x.Power);
+                    ////int sum3 = components2.Sum(x => x.Power);
 
                     /*QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(workImage.Bounds, components);
 
@@ -128,7 +134,7 @@
 
                 stopwatch.Stop();
 
-                Console.WriteLine(stopwatch.ElapsedMilliseconds / Count);
+                Console.WriteLine((float)stopwatch.ElapsedMilliseconds / Count);
 
                 ////int sum1 = image.Power();
                 ////int sum2 = components.Sum(x => x.Power);

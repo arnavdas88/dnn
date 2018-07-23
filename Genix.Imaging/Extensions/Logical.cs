@@ -15,7 +15,7 @@ namespace Genix.Imaging
     /// </summary>
     public static class Logical
     {
-        /// <summary>
+         /// <summary>
         /// Performs logical AND operation on two images.
         /// </summary>
         /// <param name="a">The first <see cref="Image"/>.</param>
@@ -29,7 +29,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image And(this Image a, Image b)
+        public static Image AND(this Image a, Image b)
         {
             if (a == null)
             {
@@ -100,7 +100,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Or(this Image a, Image b)
+        public static Image OR(this Image a, Image b)
         {
             if (a == null)
             {
@@ -171,7 +171,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Xor(this Image a, Image b)
+        public static Image XOR(this Image a, Image b)
         {
             if (a == null)
             {

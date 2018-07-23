@@ -106,10 +106,10 @@ extern "C" __declspec(dllexport) void WINAPI sinv(
 }
 
 // adds scalar to vector element-wise in-place
-extern "C" __declspec(dllexport) void WINAPI saddc(
+template<typename T> void __forceinline __addc(
 	int n,
-	float a,
-	float* y, int offy)
+	T a,
+	T* y, int offy)
 {
 	y += offy;
 
@@ -119,12 +119,52 @@ extern "C" __declspec(dllexport) void WINAPI saddc(
 	}
 }
 
-// adds scalar to vector element-wise and puts results into another vector
-extern "C" __declspec(dllexport) void WINAPI saddxc(
+extern "C" __declspec(dllexport) void WINAPI i32addc(
 	int n,
-	const float* x, int offx,
+	__int32 a,
+	__int32* y, int offy)
+{
+	__addc(n, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui32addc(
+	int n,
+	unsigned __int32 a,
+	unsigned __int32* y, int offy)
+{
+	__addc(n, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI i64addc(
+	int n,
+	__int64 a,
+	__int64* y, int offy)
+{
+	__addc(n, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui64addc(
+	int n,
+	unsigned __int64 a,
+	unsigned __int64* y, int offy)
+{
+	__addc(n, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI saddc(
+	int n,
 	float a,
 	float* y, int offy)
+{
+	__addc(n, a, y, offy);
+}
+
+// adds scalar to vector element-wise and puts results into another vector
+template<typename T> void __forceinline __addxc(
+	int n,
+	const T* x, int offx,
+	T a,
+	T* y, int offy)
 {
 	x += offx;
 	y += offy;
@@ -135,27 +175,117 @@ extern "C" __declspec(dllexport) void WINAPI saddxc(
 	}
 }
 
+extern "C" __declspec(dllexport) void WINAPI i32addxc(
+	int n,
+	const __int32* x, int offx,
+	__int32 a,
+	__int32* y, int offy)
+{
+	__addxc(n, x, offx, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui32addxc(
+	int n,
+	const unsigned __int32* x, int offx,
+	unsigned __int32 a,
+	unsigned __int32* y, int offy)
+{
+	__addxc(n, x, offx, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI i64addxc(
+	int n,
+	const __int64* x, int offx,
+	__int64 a,
+	__int64* y, int offy)
+{
+	__addxc(n, x, offx, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui64addxc(
+	int n,
+	const unsigned __int64* x, int offx,
+	unsigned __int64 a,
+	unsigned __int64* y, int offy)
+{
+	__addxc(n, x, offx, a, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI saddxc(
+	int n,
+	const float* x, int offx,
+	float a,
+	float* y, int offy)
+{
+	__addxc(n, x, offx, a, y, offy);
+}
+
 // adds two vectors element-wise
+template<typename T> void __forceinline __add(
+	int n,
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
+{
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = a[i] + b[i];
+	}
+}
+
+extern "C" __declspec(dllexport) void WINAPI i32add(
+	int n,
+	const __int32* a, int offa,
+	const __int32* b, int offb,
+	__int32* y, int offy)
+{
+	__add(n, a, offa, b, offb, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui32add(
+	int n,
+	const unsigned __int32* a, int offa,
+	const unsigned __int32* b, int offb,
+	unsigned __int32* y, int offy)
+{
+	__add(n, a, offa, b, offb, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI i64add(
+	int n,
+	const __int64* a, int offa,
+	const __int64* b, int offb,
+	__int64* y, int offy)
+{
+	__add(n, a, offa, b, offb, y, offy);
+}
+
+extern "C" __declspec(dllexport) void WINAPI ui64add(
+	int n,
+	const unsigned __int64* a, int offa,
+	const unsigned __int64* b, int offb,
+	unsigned __int64* y, int offy)
+{
+	__add(n, a, offa, b, offb, y, offy);
+}
+
 extern "C" __declspec(dllexport) void WINAPI sadd(
 	int n,
 	const float* a, int offa,
 	const float* b, int offb,
 	float* y, int offy)
 {
-	a += offa;
-	b += offb;
-	y += offy;
-
 	if (n <= 32)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = a[i] + b[i];
-		}
+		__add(n, a, offa, b, offb, y, offy);
 	}
 	else
 	{
-		::vsAdd(n, a, b, y);
+		::vsAdd(n, a + offa, b + offb, y + offy);
 	}
 }
 
@@ -713,3 +843,42 @@ extern "C" __declspec(dllexport) float WINAPI _snrm2(
 		return ::cblas_snrm2(n, x, incx);
 	}
 }
+
+// sum(x)
+template<typename T> T __forceinline __sum(int n, T* x, int offx)
+{
+	x += offx;
+
+	T sum = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		sum += x[i];
+	}
+
+	return sum;
+}
+
+extern "C" __declspec(dllexport) __int32 WINAPI i32sum(int n, __int32* x, int offx) { return __sum(n, x, offx); }
+extern "C" __declspec(dllexport) __int64 WINAPI i64sum(int n, __int64* x, int offx) { return __sum(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int32 WINAPI ui32sum(int n, unsigned __int32* x, int offx) { return __sum(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int64 WINAPI ui64sum(int n, unsigned __int64* x, int offx) { return __sum(n, x, offx); }
+extern "C" __declspec(dllexport) float WINAPI ssum(int n, float* x, int offx) { return __sum(n, x, offx); }
+
+// variance x
+template<typename T> T __forceinline __variance(int n, T* x, int offx)
+{
+	x += offx;
+
+	T mean = __sum(n, x, 0) / n;
+
+	T variance = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		T delta = x[i] - mean;
+		variance += delta * delta;
+	}
+
+	return variance / n;
+}
+
+extern "C" __declspec(dllexport) float WINAPI svariance(int n, float* x, int offx) { return __variance(n, x, offx); }

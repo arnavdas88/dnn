@@ -6,6 +6,7 @@
 
 namespace System
 {
+    using Genix.Core;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -96,16 +97,32 @@ namespace System
         }
 
         /// <summary>
-        /// Calculates a variance (second central moment) of a sequence of <see cref="Single"/> values.
+        /// Computes the sum of all elements in the array of floats.
         /// </summary>
-        /// <param name="source">A sequence of <see cref="Single"/> values to calculate the variance of.</param>
-        /// <returns>The variance of the values in the sequence.</returns>
+        /// <param name="source">The array of <see cref="Single"/> values to calculate the sum of.</param>
+        /// <returns>
+        /// The sum of all elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Sum(this float[] source)
+        {
+            return Mathematics.Sum(source.Length, source, 0);
+        }
+
+        /// <summary>
+        /// Computes the variance of all elements in the array of floats.
+        /// </summary>
+        /// <param name="source">The array of <see cref="Single"/> values to calculate the variance.</param>
+        /// <returns>
+        /// The variance of all elements in the array.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>source</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// <c>source</c> contains no elements.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Variance(this float[] source)
         {
             if (source == null)
@@ -113,28 +130,12 @@ namespace System
                 throw new ArgumentNullException(nameof(source));
             }
 
-            int length = source.Length;
-            if (length == 0)
+            if (source.Length == 0)
             {
                 throw new InvalidOperationException(Genix.Core.Properties.Resources.E_SequenceIsEmpty);
             }
 
-            float mean = 0.0f;
-            for (int i = 0; i < length; i++)
-            {
-                mean += source[i];
-            }
-
-            mean /= length;
-
-            float variance = 0.0f;
-            for (int i = 0; i < length; i++)
-            {
-                float delta = source[i] - mean;
-                variance += delta * delta;
-            }
-
-            return variance / length;
+            return Mathematics.Variance(source.Length, source, 0);
         }
     }
 }

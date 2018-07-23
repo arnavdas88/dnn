@@ -54,10 +54,17 @@
   <ItemGroup>
     <Compile Include="ImageEnhancing\ImageEnhancing.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancingOptions.cs" />
+    <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Shapes\Container.cs" />
     <Compile Include="Shapes\Line.cs" />
+    <Compile Include="Shapes\LineTypes.cs" />
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\TextShape.cs" />
     <Compile Include="Shapes\TextBlock.cs" />
@@ -81,6 +88,12 @@
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
       <Name>Genix.Imaging</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -15,7 +15,7 @@ namespace Genix.DocumentAnalysis
     /// Represents a straight line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class Line : Shape
+    public class Line : Shape
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Line"/> class.
@@ -23,11 +23,13 @@ namespace Genix.DocumentAnalysis
         /// <param name="begin">The starting point of the line.</param>
         /// <param name="end">The ending point of the line.</param>
         /// <param name="width">The line width, in pixels.</param>
-        protected Line(Point begin, Point end, int width)
+        /// <param name="types">The line types.</param>
+        public Line(Point begin, Point end, int width, LineTypes types)
         {
             this.Begin = begin;
             this.End = end;
             this.Width = width;
+            this.Types = types;
 
             this.Bounds = Rectangle.FromLTRB(
                 Math.Min(begin.X, end.X),
@@ -62,6 +64,15 @@ namespace Genix.DocumentAnalysis
         /// </value>
         [JsonProperty("width")]
         public int Width { get; }
+
+        /// <summary>
+        /// Gets the line type.
+        /// </summary>
+        /// <value>
+        /// The line width, in pixels.
+        /// </value>
+        [JsonProperty("types")]
+        public LineTypes Types { get; }
 
         /// <inheritdoc />
         public override string ToString() => string.Format(
