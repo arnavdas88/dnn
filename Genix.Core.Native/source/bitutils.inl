@@ -143,22 +143,22 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bit_scan_reverse_be)(__b
 }
 
 // clears n left (least-significant) bits
-#define CLEAR_MASK_LEFT_BE(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == BITS_COUNT ? BITS_MIN : BITS_MAX >> (n))
+#define CLEAR_MASK_LSB_BE(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == BITS_COUNT ? BITS_MIN : BITS_MAX >> (n))
 
 // clears right (most-significant) bits starting from nth bit
-#define CLEAR_MASK_RIGHT_BE(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == 0 ? BITS_MIN : BITS_MAX << (BITS_COUNT - (n)))
+#define CLEAR_MASK_MSB_BE(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == 0 ? BITS_MIN : BITS_MAX << (BITS_COUNT - (n)))
 
 // clears c (least-significant) bits starting from nth bit
-#define CLEAR_MASK_RANGE_BE(n, c)			(CLEAR_MASK_RIGHT_BE(n) | CLEAR_MASK_LEFT_BE(n + c))
+#define CLEAR_MASK_RANGE_BE(n, c)			(CLEAR_MASK_MSB_BE(n) | CLEAR_MASK_LSB_BE(n + c))
 
 // sets n left (least-significant) bits
-#define SET_MASK_LEFT_BE(n)					CLEAR_MASK_RIGHT_BE(n)
+#define SET_MASK_LSB_BE(n)					CLEAR_MASK_MSB_BE(n)
 
 // sets right (most-significant) bits starting from nth bit
-#define SET_MASK_RIGHT_BE(n)				CLEAR_MASK_LEFT_BE(n)
+#define SET_MASK_MSB_BE(n)					CLEAR_MASK_LSB_BE(n)
 
 // sets c (least-significant) bits starting from nth bit
-#define SET_MASK_RANGE_BE(n, c)				(SET_MASK_RIGHT_BE(n) & SET_MASK_LEFT_BE(n + c))
+#define SET_MASK_RANGE_BE(n, c)				(SET_MASK_MSB_BE(n) & SET_MASK_LSB_BE(n + c))
 
 // Searches the range of values for a first set bit (1) for big-endian architecture.
 extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_one_forward_be)(
@@ -173,7 +173,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_one_forward_be
 	const int roundpos = pos & ~BITS_MASK;
 	if (pos > roundpos)
 	{
-		const __bits b = *bits & CLEAR_MASK_LEFT_BE(pos - roundpos);
+		const __bits b = *bits & CLEAR_MASK_LSB_BE(pos - roundpos);
 		if (b != BITS_MIN)
 		{
 			pos = roundpos + _bsf(b);
@@ -209,7 +209,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_one_reverse_be
 	const int roundpos = pos & ~BITS_MASK;
 	if (pos - roundpos != BITS_MASK)
 	{
-		const __bits b = *bits & CLEAR_MASK_RIGHT_BE(pos - roundpos);
+		const __bits b = *bits & CLEAR_MASK_MSB_BE(pos - roundpos);
 		if (b != BITS_MIN)
 		{
 			pos = roundpos + _bsr(b);
@@ -246,7 +246,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_zero_forward_b
 	const int roundpos = pos & ~BITS_MASK;
 	if (pos > roundpos)
 	{
-		const __bits b = *bits | SET_MASK_LEFT_BE(pos - roundpos);
+		const __bits b = *bits | SET_MASK_LSB_BE(pos - roundpos);
 		if (b != BITS_MAX)
 		{
 			pos = roundpos + _bsf(~b);
@@ -282,7 +282,7 @@ extern "C" __declspec(dllexport) int WINAPI BITS_METHOD(bits_scan_zero_reverse_b
 	const int roundpos = pos & ~BITS_MASK;
 	if (pos - roundpos != BITS_MASK)
 	{
-		const __bits b = *bits | SET_MASK_RIGHT_BE(pos - roundpos);
+		const __bits b = *bits | SET_MASK_MSB_BE(pos - roundpos);
 		if (b != BITS_MAX)
 		{
 			pos = roundpos + _bsr(~b);
@@ -326,7 +326,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_reset_be)(
 		// clear left side
 		if (pos > 0)
 		{
-			*bits++ &= CLEAR_MASK_RIGHT_BE(pos);
+			*bits++ &= CLEAR_MASK_MSB_BE(pos);
 			count -= BITS_COUNT - pos;
 		}
 
@@ -341,7 +341,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_reset_be)(
 		count &= BITS_MASK;
 		if (count > 0)
 		{
-			bits[wordcount] &= CLEAR_MASK_LEFT_BE(count);
+			bits[wordcount] &= CLEAR_MASK_LSB_BE(count);
 		}
 	}
 }
@@ -366,7 +366,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_set_be)(
 		// fill left side
 		if (pos > 0)
 		{
-			*bits++ |= SET_MASK_RIGHT_BE(pos);
+			*bits++ |= SET_MASK_MSB_BE(pos);
 			count -= BITS_COUNT - pos;
 		}
 
@@ -381,7 +381,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_set_be)(
 		count &= BITS_MASK;
 		if (count > 0)
 		{
-			bits[wordcount] |= SET_MASK_LEFT_BE(count);
+			bits[wordcount] |= SET_MASK_LSB_BE(count);
 		}
 	}
 }
@@ -420,7 +420,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_copy_be)(
 	{
 		const int shift = posy - posx;
 		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
-		const __bits mask = CLEAR_MASK_RIGHT_BE(posy);
+		const __bits mask = CLEAR_MASK_MSB_BE(posy);
 		y[0] = (y[0] & mask) | (x0 & ~mask);
 
 		count -= BITS_COUNT - posy;
@@ -459,7 +459,7 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_copy_be)(
 		y += wordcount;
 
 		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
-		const __bits mask = CLEAR_MASK_LEFT_BE(count);
+		const __bits mask = CLEAR_MASK_LSB_BE(count);
 		y[0] = (y[0] & mask) | (x0 & ~mask);
 	}
 }
@@ -494,7 +494,7 @@ extern "C" __declspec(dllexport) __bits WINAPI BITS_METHOD(bits_count_)(
 		// count left side
 		if (pos > 0)
 		{
-			sum += _popcnt(*bits++ & CLEAR_MASK_LEFT_BE(pos));
+			sum += _popcnt(*bits++ & CLEAR_MASK_LSB_BE(pos));
 			count -= BITS_COUNT - pos;
 		}
 
@@ -512,7 +512,7 @@ extern "C" __declspec(dllexport) __bits WINAPI BITS_METHOD(bits_count_)(
 		count &= BITS_MASK;
 		if (count > 0)
 		{
-			sum += _popcnt(bits[wordcount] & CLEAR_MASK_RIGHT_BE(count));
+			sum += _popcnt(bits[wordcount] & CLEAR_MASK_MSB_BE(count));
 		}
 	}
 
@@ -553,7 +553,7 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 	{
 		const int shift = posy - posx;
 		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
-		const __bits mask = CLEAR_MASK_RIGHT_BE(posy);
+		const __bits mask = CLEAR_MASK_MSB_BE(posy);
 		T3(y[0], x0, mask);
 
 		count -= BITS_COUNT - posy;
@@ -595,7 +595,7 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 		y += wordcount;
 
 		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
-		const __bits mask = CLEAR_MASK_LEFT_BE(count);
+		const __bits mask = CLEAR_MASK_LSB_BE(count);
 		T3(y[0], x0, mask);
 	}
 }
@@ -691,76 +691,6 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or2_be)(
 	)
 {
 	__bits_logical_be<logical_or2, logical_or3>(count, x, posx, y, posy);
-	/*x += (posx >> BITS_SHIFT);
-	posx &= BITS_MASK;
-
-	y += (posy >> BITS_SHIFT);
-	posy &= BITS_MASK;
-
-	// one word only
-	if (posy + count <= BITS_COUNT)
-	{
-		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ?
-			x[0] >> shift :
-			(posx + count <= BITS_COUNT ? x[0] << -shift : _shiftleft(x[1], x[0], -shift));
-		const __bits mask = CLEAR_MASK_RANGE_BE(posy, count);
-		y[0] |= x0 & ~mask;
-
-		return;
-	}
-
-	// if destination position does not start on word boundary
-	// copy right part of the word from the source
-	if (posy != 0)
-	{
-		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
-		const __bits mask = CLEAR_MASK_RIGHT_BE(posy);
-		y[0] |= x0 & ~mask;
-
-		count -= BITS_COUNT - posy;
-
-		posx += BITS_COUNT - posy;
-		x += (posx >> BITS_SHIFT);
-		posx &= BITS_MASK;
-
-		y++;
-		posy = 0;
-	}
-
-	// copy center
-	int wordcount = count >> BITS_SHIFT;
-	count &= BITS_MASK;
-
-	if (wordcount > 0)
-	{
-		if (posx == 0)
-		{
-			for (int i = 0; i < wordcount; i++)
-			{
-				y[i] |= x[i];
-			}
-		}
-		else
-		{
-			for (int i = 0; i < wordcount; i++)
-			{
-				y[i] |= _shiftleft(x[i + 1], x[i], posx);
-			}
-		}
-	}
-
-	// copy right side
-	if (count > 0)
-	{
-		x += wordcount;
-		y += wordcount;
-
-		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
-		const __bits mask = CLEAR_MASK_LEFT_BE(count);
-		y[0] |= x0 & ~mask;
-	}*/
 }
 
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_or3_)(
@@ -903,76 +833,6 @@ extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and2_be)(
 	)
 {
 	__bits_logical_be<logical_and2, logical_and3>(count, x, posx, y, posy);
-	/*x += (posx >> BITS_SHIFT);
-	posx &= BITS_MASK;
-
-	y += (posy >> BITS_SHIFT);
-	posy &= BITS_MASK;
-
-	// one word only
-	if (posy + count <= BITS_COUNT)
-	{
-		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ?
-			x[0] >> shift :
-			(posx + count <= BITS_COUNT ? x[0] << -shift : _shiftleft(x[1], x[0], -shift));
-		const __bits mask = CLEAR_MASK_RANGE_BE(posy, count);
-		y[0] &= x0 | mask;
-
-		return;
-	}
-
-	// if destination position does not start on word boundary
-	// copy right part of the word from the source
-	if (posy != 0)
-	{
-		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
-		const __bits mask = CLEAR_MASK_RIGHT_BE(posy);
-		y[0] &= x0 | mask;
-
-		count -= BITS_COUNT - posy;
-
-		posx += BITS_COUNT - posy;
-		x += (posx >> BITS_SHIFT);
-		posx &= BITS_MASK;
-
-		y++;
-		posy = 0;
-	}
-
-	// copy center
-	int wordcount = count >> BITS_SHIFT;
-	count &= BITS_MASK;
-
-	if (wordcount > 0)
-	{
-		if (posx == 0)
-		{
-			for (int i = 0; i < wordcount; i++)
-			{
-				y[i] &= x[i];
-			}
-		}
-		else
-		{
-			for (int i = 0; i < wordcount; i++)
-			{
-				y[i] &= _shiftleft(x[i + 1], x[i], posx);
-			}
-		}
-	}
-
-	// copy right side
-	if (count > 0)
-	{
-		x += wordcount;
-		y += wordcount;
-
-		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
-		const __bits mask = CLEAR_MASK_LEFT_BE(count);
-		y[0] &= x0 | mask;
-	}*/
 }
 
 extern "C" __declspec(dllexport) void WINAPI BITS_METHOD(bits_and3_)(
