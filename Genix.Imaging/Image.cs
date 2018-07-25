@@ -178,6 +178,14 @@ namespace Genix.Imaging
         public ulong[] Bits { get; }
 
         /// <summary>
+        /// Gets the mask that clears ending unused bits in the stride.
+        /// </summary>
+        /// <value>
+        /// The mask that clears ending unused bits in the stride.
+        /// </value>
+        internal ulong EndMask => ulong.MaxValue << (64 - (this.WidthBits & 63));
+
+        /// <summary>
         /// Randomizes all colors in the <see cref="Image"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

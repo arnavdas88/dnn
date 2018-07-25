@@ -190,7 +190,7 @@ namespace Genix.Imaging
 
             if (invert)
             {
-                image.InvertIP();
+                image.NOTIP();
             }
 
             return image;
@@ -207,28 +207,25 @@ namespace Genix.Imaging
                         switch (orientation)
                         {
                             case TIFFOrientation.TopRight:
-                                ////this.Rotate180();
-                                ////this.FlipVert();
+                                image = image.RotateFlip(RotateFlip.Rotate180FlipY);
                                 break;
                             case TIFFOrientation.BottomRight:
-                                ////this.Rotate180();
+                                image = image.RotateFlip(RotateFlip.Rotate180FlipNone);
                                 break;
                             case TIFFOrientation.BottomLeft:
-                                ////this.FlipHorz();
+                                image = image.RotateFlip(RotateFlip.RotateNoneFlipX);
                                 break;
                             case TIFFOrientation.LeftTop:
-                                ////this.Rotate90(false);
-                                ////this.FlipVert();
+                                image = image.RotateFlip(RotateFlip.Rotate270FlipY);
                                 break;
                             case TIFFOrientation.RightTop:
-                                ////this.Rotate90(true);
+                                image = image.RotateFlip(RotateFlip.Rotate90FlipNone);
                                 break;
                             case TIFFOrientation.RightBottom:
-                                ////this.Rotate90(true);
-                                ////this.FlipVert();
+                                image = image.RotateFlip(RotateFlip.Rotate90FlipY);
                                 break;
                             case TIFFOrientation.LeftBottom:
-                                ////this.Rotate90(false);
+                                image = image.RotateFlip(RotateFlip.Rotate270FlipNone);
                                 break;
 
                             case TIFFOrientation.TopLeft:

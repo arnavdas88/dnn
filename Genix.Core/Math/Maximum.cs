@@ -80,6 +80,40 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Returns the larger of three single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Max(float a, float b, float c)
+        {
+            float ab = Maximum.Max(a, b);
+            return Maximum.Max(ab, c);
+        }
+
+        /// <summary>
+        /// Returns the larger of four single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Max(float a, float b, float c, float d)
+        {
+            float ab = Maximum.Max(a, b);
+            float cd = Maximum.Max(c, d);
+            return Maximum.Max(ab, cd);
+        }
+
+        /// <summary>
         /// Returns the smaller of two 32-bit signed integers.
         /// </summary>
         /// <param name="a">The first of two 32-bit signed integers to compare.</param>
@@ -139,6 +173,40 @@ namespace Genix.Core
         public static float Min(float a, float b)
         {
             return a <= b ? a : b;
+        }
+
+        /// <summary>
+        /// Returns the smaller of three single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Min(float a, float b, float c)
+        {
+            float ab = Maximum.Min(a, b);
+            return Maximum.Min(ab, c);
+        }
+
+        /// <summary>
+        /// Returns the smaller of four single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Min(float a, float b, float c, float d)
+        {
+            float ab = Maximum.Min(a, b);
+            float cd = Maximum.Min(c, d);
+            return Maximum.Min(ab, cd);
         }
 
         /// <summary>

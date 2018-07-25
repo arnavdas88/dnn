@@ -160,6 +160,24 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This operation supports binary (1bpp) images only..
+        /// </summary>
+        internal static string E_UnsupportedDepth_1bpp {
+            get {
+                return ResourceManager.GetString("E_UnsupportedDepth_1bpp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This operation supports gray (8bpp) images only..
+        /// </summary>
+        internal static string E_UnsupportedDepth_8bpp {
+            get {
+                return ResourceManager.GetString("E_UnsupportedDepth_8bpp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The image format is not supported..
         /// </summary>
         internal static string E_UnsupportedImageFormat {

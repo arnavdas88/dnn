@@ -44,7 +44,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             ulong[] bits = image.Bits;
@@ -87,7 +87,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             int width = image.Width;
@@ -111,7 +111,7 @@ namespace Genix.Imaging
             }
 
             // calculate left
-            ulong endMask = ulong.MaxValue << (64 - (image.WidthBits & 63));
+            ulong endMask = image.EndMask;
             int left = findLeft(out int leftColumn, out ulong leftMask);
             if (left == -1)
             {
@@ -249,7 +249,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             image.ValidateArea(x, y, width, height);

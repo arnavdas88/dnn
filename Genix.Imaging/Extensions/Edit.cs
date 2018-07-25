@@ -43,36 +43,8 @@ namespace Genix.Imaging
 
             image.ValidatePosition(x, y);
 
-            int pos = y * image.Stride;
-            switch (image.BitsPerPixel)
-            {
-                case 1:
-                    pos += x >> 6;
-                    return (uint)(image.Bits[pos] >> (1 * (63 - (x & 63)))) & 1;
-
-                case 2:
-                    pos += x >> 5;
-                    return (uint)(image.Bits[pos] >> (2 * (31 - (x & 31)))) & 3;
-
-                case 4:
-                    pos += x >> 4;
-                    return (uint)(image.Bits[pos] >> (4 * (15 - (x & 15)))) & 0xf;
-
-                case 8:
-                    pos += x >> 3;
-                    return (uint)(image.Bits[pos] >> (8 * (7 - (x & 7)))) & 0xff;
-
-                case 16:
-                    pos += x >> 2;
-                    return (uint)(image.Bits[pos] >> (16 * (3 - (x & 3)))) & 0xffff;
-
-                case 32:
-                    pos += x >> 1;
-                    return (uint)(image.Bits[pos] >> (32 * (1 - (x & 1)))) & 0xffff_ffff;
-
-                default:
-                    throw new InvalidOperationException(Properties.Resources.E_InvalidDepth);
-            }
+            int xpos = x * image.BitsPerPixel;
+            return (uint)BitUtils64.GetBits(image.Bits[(y * image.Stride) + (xpos >> 6)], xpos & 63, image.BitsPerPixel);
         }
 
         /// <summary>
@@ -111,60 +83,22 @@ namespace Genix.Imaging
 
             image.ValidatePosition(x, y);
 
-            int pos = y * image.Stride;
-            int shift;
-            switch (image.BitsPerPixel)
+            int xpos = x * image.BitsPerPixel;
+            int pos = (y * image.Stride) + (xpos >> 6);
+            if (image.BitsPerPixel == 1)
             {
-                case 1:
-                    pos += x >> 6;
-                    if (color > 0)
-                    {
-                        image.Bits[pos] = BitUtils64.SetBit(image.Bits[pos], x & 63);
-                    }
-                    else
-                    {
-                        image.Bits[pos] = BitUtils64.ResetBit(image.Bits[pos], x & 63);
-                    }
-
-                    break;
-
-                case 2:
-                    pos += x >> 5;
-                    shift = 2 * (x & 31);
-                    image.Bits[pos] &= ~(0xc000_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (ulong)(color & 3) << ((2 * 31) - shift);
-                    break;
-
-                case 4:
-                    pos += x >> 4;
-                    shift = 4 * (x & 15);
-                    image.Bits[pos] &= ~(0xf000_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (ulong)(color & 0xf) << ((4 * 15) - shift);
-                    break;
-
-                case 8:
-                    pos += x >> 3;
-                    shift = 8 * (x & 7);
-                    image.Bits[pos] &= ~(0xff00_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (ulong)(color & 0xff) << ((8 * 7) - shift);
-                    break;
-
-                case 16:
-                    pos += x >> 2;
-                    shift = 16 * (x & 3);
-                    image.Bits[pos] &= ~(0xffff_0000_0000_0000ul >> shift);
-                    image.Bits[pos] |= (ulong)(color & 0xffff) << ((16 * 3) - shift);
-                    break;
-
-                case 32:
-                    pos += x >> 1;
-                    shift = 32 * (x & 1);
-                    image.Bits[pos] &= ~(0xffff_ffff_0000_0000ul >> shift);
-                    image.Bits[pos] |= (ulong)color << ((32 * 1) - shift);
-                    break;
-
-                default:
-                    throw new InvalidOperationException(Properties.Resources.E_InvalidDepth);
+                if (color > 0)
+                {
+                    image.Bits[pos] = BitUtils64.SetBit(image.Bits[pos], xpos & 63);
+                }
+                else
+                {
+                    image.Bits[pos] = BitUtils64.ResetBit(image.Bits[pos], xpos & 63);
+                }
+            }
+            else
+            {
+                image.Bits[pos] = BitUtils64.CopyBits(image.Bits[pos], xpos & 63, image.BitsPerPixel, color);
             }
         }
 
@@ -589,47 +523,6 @@ namespace Genix.Imaging
         public static void SetBlackIP(this Image image, System.Drawing.Rectangle rect)
         {
             image.SetBlackIP(rect.X, rect.Y, rect.Width, rect.Height);
-        }
-
-        /// <summary>
-        /// Inverts all pixels in the <see cref="Image"/>.
-        /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to invert.</param>
-        /// <returns>
-        /// A new inverted <see cref="Image"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Invert(this Image image)
-        {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            Image dst = new Image(image);
-            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
-            return dst;
-        }
-
-        /// <summary>
-        /// Inverts all pixels in the <see cref="Image"/>.
-        /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to invert.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void InvertIP(this Image image)
-        {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0);
         }
     }
 }

@@ -1,0 +1,153 @@
+#include "stdafx.h"
+#include <stdlib.h>
+////#include "ipp.h"
+
+GENIXAPI(void, reversebits)(const int length, unsigned __int64* x, const int offx)
+{
+	x += offx;
+
+	// reshuffle 64-bits at a time
+	for (int i = 0; i < length; i++)
+	{
+		const unsigned __int64 bits = x[i];
+		x[i] =
+			((bits >> 7) & 0x0101010101010101ul) |
+			((bits >> 5) & 0x0202020202020202ul) |
+			((bits >> 3) & 0x0404040404040404ul) |
+			((bits >> 1) & 0x0808080808080808ul) |
+			((bits << 1) & 0x1010101010101010ul) |
+			((bits << 3) & 0x2020202020202020ul) |
+			((bits << 5) & 0x4040404040404040ul) |
+			((bits << 6) & 0x8080808080808080ul);
+	}
+}
+
+GENIXAPI(int, _convert1to8)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8 value0,
+	const unsigned __int8 value1)
+{
+	/*return ippiBinToGray_1u8u_C1R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		0,
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		{ width, height },
+		255,
+		0);*/
+
+	unsigned __int64* map = (unsigned __int64*)::malloc(256 * sizeof(unsigned __int64));
+	if (map == NULL)
+	{
+		// insufficient memory available
+		return 1;
+	}
+
+	const unsigned __int64 values[2] = { value0, value1 };
+	for (int i = 0; i < 256; i++)
+	{
+		map[i] =
+			(values[(i >> 7) & 1] << (7 * 8)) |
+			(values[(i >> 6) & 1] << (6 * 8)) |
+			(values[(i >> 5) & 1] << (5 * 8)) |
+			(values[(i >> 4) & 1] << (4 * 8)) |
+			(values[(i >> 3) & 1] << (3 * 8)) |
+			(values[(i >> 2) & 1] << (2 * 8)) |
+			(values[(i >> 1) & 1] << (1 * 8)) |
+			values[i & 1];
+	}
+
+	const int width64 = width / 64;
+	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	{
+		// convert 8 bits at a time
+		for (int x = 0, offxsrc = offysrc, offxdst = offydst; x < width;)
+		{
+			const unsigned __int64 b = src[offxsrc++];
+
+			for (int shift = 64 - 8; shift >= 0 && x < width; shift -= 8, x += 8)
+			{
+				dst[offxdst++] = map[(b >> shift) & 0xff];
+			}
+		}
+	}
+
+	::free(map);
+
+	return 0;
+}
+
+unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, int threshold)
+{
+	unsigned __int8 result = 0;
+
+	result |= ((int((bits >> 56) & 0xff) - threshold) >> 24) & 0x80;
+	result |= ((int((bits >> 48) & 0xff) - threshold) >> 25) & 0x40;
+	result |= ((int((bits >> 40) & 0xff) - threshold) >> 26) & 0x20;
+	result |= ((int((bits >> 32) & 0xff) - threshold) >> 27) & 0x10;
+
+	result |= ((int((bits >> 24) & 0xff) - threshold) >> 28) & 0x08;
+	result |= ((int((bits >> 16) & 0xff) - threshold) >> 29) & 0x04;
+	result |= ((int((bits >> 8) & 0xff) - threshold) >> 30) & 0x02;
+	result |= ((int((bits >> 0) & 0xff) - threshold) >> 31) & 0x01;
+
+	return result;
+}
+
+GENIXAPI(int, _convert8to1)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8 threshold)
+{
+	/*return ippiGrayToBin_8u1u_C1R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		0,
+		{ width, height },
+		threshold);
+
+	reversebits(height * stridedst, dst, 0);
+
+	return 0;*/
+
+	int width64 = width & ~63;
+	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	{
+		int offxsrc = offysrc;
+		int offxdst = offydst;
+
+		// convert 64 bits at a time
+		int x = 0;
+		for (; x < width64; x += 64, offxdst++, offxsrc += 8)
+		{
+			dst[offxdst] =
+				(bits8to1(src[offxsrc + 0], threshold) << 56) |
+				(bits8to1(src[offxsrc + 1], threshold) << 48) |
+				(bits8to1(src[offxsrc + 2], threshold) << 40) |
+				(bits8to1(src[offxsrc + 3], threshold) << 32) |
+				(bits8to1(src[offxsrc + 4], threshold) << 24) |
+				(bits8to1(src[offxsrc + 5], threshold) << 16) |
+				(bits8to1(src[offxsrc + 6], threshold) << 8) |
+				(bits8to1(src[offxsrc + 7], threshold) << 0);
+		}
+
+		// convert remaining bits
+		if (x < width)
+		{
+			dst[offxdst] = 0;
+			for (int shift = 64 - 8; x < width; shift -= 8, x += 8, offxsrc++)
+			{
+				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << shift;
+			}
+		}
+	}
+
+	return 0;
+}
+

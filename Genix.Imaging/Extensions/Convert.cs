@@ -9,6 +9,9 @@ namespace Genix.Imaging
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
+    using Genix.Core;
     using Leptonica;
 
     /// <summary>
@@ -77,7 +80,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
@@ -87,45 +90,102 @@ namespace Genix.Imaging
                 image.HorizontalResolution,
                 image.VerticalResolution);
 
-            int width = image.Width;
-            int height = image.Height;
-
-            ulong[] bitssrc = image.Bits;
-            ulong[] bitsdst = dst.Bits;
-
-            int stridesrc = image.Stride;
-            int stridedst = dst.Stride;
-
-            // build conversion table
-            uint[] values = { value0, value1 };
-            ulong[] map = new ulong[256];
-            for (int i = 0; i < 256; i++)
+            if (NativeMethods._convert1to8(
+                image.Width,
+                image.Height,
+                image.Bits,
+                image.Stride,
+                dst.Bits,
+                dst.Stride,
+                value0,
+                value1) != 0)
             {
-                map[i] = (values[(i >> 7) & 1] << 56) |
-                         (values[(i >> 6) & 1] << 48) |
-                         (values[(i >> 5) & 1] << 40) |
-                         (values[(i >> 4) & 1] << 32) |
-                         (values[(i >> 3) & 1] << 24) |
-                         (values[(i >> 2) & 1] << 16) |
-                         (values[(i >> 1) & 1] << 8) |
-                         values[i & 1];
-            }
-
-            for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
-            {
-                for (int x = 0, offxsrc = offysrc, offxdst = offydst; x < width;)
-                {
-                    ulong b = bitssrc[offxsrc++];
-
-                    // convert 8 bits at a time
-                    for (int i = 64 - 8; i >= 0 && x < width; i -= 8, x += 8)
-                    {
-                        bitsdst[offxdst++] = map[(b >> i) & 0xff];
-                    }
-                }
+                throw new OutOfMemoryException();
             }
 
             return dst;
+        }
+
+        /// <summary>
+        /// Converts this <see cref="Image"/> from gray scale to black-and-white.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to convert.</param>
+        /// <param name="threshold">The threshold level.</param>
+        /// <returns>
+        /// A new binary <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0.
+        /// </para>
+        /// <para>
+        /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Image Convert8To1(this Image image, byte threshold)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 8)
+            {
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            Image dst = new Image(
+                image.Width,
+                image.Height,
+                1,
+                image.HorizontalResolution,
+                image.VerticalResolution);
+
+            if (NativeMethods._convert8to1(
+                image.Width,
+                image.Height,
+                image.Bits,
+                image.Stride,
+                dst.Bits,
+                dst.Stride,
+                threshold) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.Imaging.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert1to8(
+                int width,
+                int height,
+                [In] ulong[] src,
+                int srcstride,
+                [Out] ulong[] dst,
+                int dststride,
+                byte value0,
+                byte value1);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert8to1(
+                int width,
+                int height,
+                [In] ulong[] src,
+                int srcstride,
+                [Out] ulong[] dst,
+                int dststride,
+                byte threshold);
         }
     }
 }

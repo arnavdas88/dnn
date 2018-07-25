@@ -43,7 +43,7 @@ namespace Genix.Core
         /// Gets the specified number of bits at the specified position.
         /// </summary>
         /// <param name="bits">The bits to examine.</param>
-        /// <param name="position">The bits index; in the range of 0 - 15.</param>
+        /// <param name="position">The bits index; in the range of 0 - 31.</param>
         /// <param name="count">The number of bits to get.</param>
         /// <returns>
         /// The value at the index specified.
@@ -52,7 +52,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint GetBits(uint bits, int position, int count)
         {
-            Debug.Assert(position + count < 32, "The position+count must be less than 32.");
+            Debug.Assert(position + count <= 64, "The position+count must be less than or equal to 64.");
             return (bits >> (32 - (position + count))) & (uint.MaxValue >> (32 - count));
         }
 
@@ -67,6 +67,26 @@ namespace Genix.Core
         {
             Debug.Assert(position < 32, "The bit position must be less than 32.");
             return bits | (LSB >> position);
+        }
+
+        /// <summary>
+        /// Set the specified number of bits at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The bits index; in the range of 0 - 31.</param>
+        /// <param name="count">The number of bits to set.</param>
+        /// <returns>The changed bits.</returns>
+        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "32-count", Justification = "Do not validate for performance. Use assert instead.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint SetBits(uint bits, int position, int count)
+        {
+            Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 64.");
+            uint mask = position == 0 ?
+                uint.MaxValue << (32 - count) :
+                position + count == 32 ?
+                    uint.MaxValue >> position :
+                    (uint.MaxValue >> position) & (uint.MaxValue << (32 - (position + count)));
+            return bits | mask;
         }
 
         /// <summary>
@@ -128,6 +148,27 @@ namespace Genix.Core
         public static void ResetBits(int count, uint[] bits, int position)
         {
             NativeMethods.bits_reset_be32(count, bits, position);
+        }
+
+        /// <summary>
+        /// Copies the specified number of bits to the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The bits index; in the range of 0 - 31.</param>
+        /// <param name="count">The number of bits to set.</param>
+        /// <param name="source">The bits to copy.</param>
+        /// <returns>The changed bits.</returns>
+        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "64-count", Justification = "Do not validate for performance. Use assert instead.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong CopyBits(uint bits, int position, int count, uint source)
+        {
+            Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 32.");
+            uint mask = position == 0 ?
+                uint.MaxValue << (32 - count) :
+                position + count == 32 ?
+                    uint.MaxValue >> position :
+                    (uint.MaxValue >> position) & (uint.MaxValue << (32 - (position + count)));
+            return (bits & ~mask) | ((source << (32 - (position + count))) & mask);
         }
 
         /// <summary>

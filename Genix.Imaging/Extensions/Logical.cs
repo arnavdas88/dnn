@@ -15,7 +15,48 @@ namespace Genix.Imaging
     /// </summary>
     public static class Logical
     {
-         /// <summary>
+        /// <summary>
+        /// Inverts all pixels in the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to invert.</param>
+        /// <returns>
+        /// A new inverted <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Image NOT(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            Image dst = new Image(image);
+            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0, dst.Bits, 0);
+            return dst;
+        }
+
+        /// <summary>
+        /// Inverts all pixels in the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to invert.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void NOTIP(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0);
+        }
+
+        /// <summary>
         /// Performs logical AND operation on two images.
         /// </summary>
         /// <param name="a">The first <see cref="Image"/>.</param>
@@ -64,7 +105,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AndIP(this Image a, Image b)
+        public static void ANDIP(this Image a, Image b)
         {
             if (a == null)
             {
@@ -135,7 +176,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void OrIP(this Image a, Image b)
+        public static void ORIP(this Image a, Image b)
         {
             if (a == null)
             {
@@ -206,7 +247,7 @@ namespace Genix.Imaging
         /// <para><c>b</c> is <b>null</b></para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void XorIP(this Image a, Image b)
+        public static void XORIP(this Image a, Image b)
         {
             if (a == null)
             {

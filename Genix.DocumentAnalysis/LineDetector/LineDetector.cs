@@ -86,7 +86,7 @@ namespace Genix.DocumentAnalysis
                     workImage.HorizontalResolution,
                     workImage.VerticalResolution);
                 mask.AddConnectedComponents(components);
-                mask.AndIP(image);
+                mask.ANDIP(image);
 
                 // apply mask
                 cleanedImage = image ^ mask;

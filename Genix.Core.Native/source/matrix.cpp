@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "mkl.h"
 
-extern "C" __declspec(dllexport) float WINAPI _sdot(
+GENIXAPI(float, _sdot)(
 	int n,
 	const float* x, int offx, int incx,
 	const float* y, int offy, int incy)
@@ -36,7 +36,7 @@ extern "C" __declspec(dllexport) float WINAPI _sdot(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI matrix_vv(
+GENIXAPI(void, matrix_vv)(
 	BOOL rowmajor,
 	int m, int n,
 	const float* x, int offx,
@@ -58,7 +58,7 @@ extern "C" __declspec(dllexport) void WINAPI matrix_vv(
 		lda);
 }
 
-extern "C" __declspec(dllexport) void WINAPI matrix_mv(
+GENIXAPI(void, matrix_mv)(
 	BOOL rowmajor,
 	int m, int n,
 	const float* a, int offa, BOOL transa,
@@ -82,7 +82,7 @@ extern "C" __declspec(dllexport) void WINAPI matrix_mv(
 		1);
 }
 
-extern "C" __declspec(dllexport) void WINAPI matrix_mm(
+GENIXAPI(void, matrix_mm)(
 	BOOL rowmajor,
 	int m, int k, int n,
 	const float* a, int offa, BOOL transa,
@@ -110,7 +110,7 @@ extern "C" __declspec(dllexport) void WINAPI matrix_mm(
 		ldc);
 }
 
-extern "C" __declspec(dllexport) void WINAPI matrix_transpose(
+GENIXAPI(void, matrix_transpose)(
 	BOOL rowmajor,
 	int rows, int cols,
 	float* ab, int offab)

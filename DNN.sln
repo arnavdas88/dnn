@@ -17,6 +17,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Core.Test", "Genix.Core.Test\Genix.Core.Test.csproj", "{68EA097C-7764-4EB6-BB37-34FC8EC673FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Imaging", "Genix.Imaging\Genix.Imaging.csproj", "{D19A13BA-1C8F-4CEB-840C-D485D0936D56}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8AF9EF19-E3F0-4904-82AC-89058117455C} = {8AF9EF19-E3F0-4904-82AC-89058117455C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Imaging.Test", "Genix.Imaging.Test\Genix.Imaging.Test.csproj", "{C3F7181D-F341-4080-B947-745F3408C51D}"
 EndProject
@@ -36,6 +39,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Test2", "Genix.Test2\Genix.Test2.csproj", "{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.Imaging.Native", "Genix.Imaging.Native\Genix.Imaging.Native.vcxproj", "{8AF9EF19-E3F0-4904-82AC-89058117455C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -233,6 +238,18 @@ Global
 		{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA}.Release|x64.Build.0 = Release|Any CPU
 		{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA}.Release|x86.Build.0 = Release|Any CPU
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|ARM.ActiveCfg = Debug|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|x64.ActiveCfg = Debug|x64
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|x64.Build.0 = Debug|x64
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|x86.ActiveCfg = Debug|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Debug|x86.Build.0 = Debug|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|ARM.ActiveCfg = Release|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|x64.ActiveCfg = Release|x64
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|x64.Build.0 = Release|x64
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|x86.ActiveCfg = Release|Win32
+		{8AF9EF19-E3F0-4904-82AC-89058117455C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,6 +261,7 @@ Global
 		{05846038-4012-4E74-9786-E3F4997F445B} = {4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}
 		{2618FBA0-59A8-4B06-BEBB-751FEC31A29D} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
 		{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA} = {4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}
+		{8AF9EF19-E3F0-4904-82AC-89058117455C} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D80916AC-677F-4083-B57A-3562C04772D2}

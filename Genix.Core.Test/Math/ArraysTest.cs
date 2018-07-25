@@ -72,5 +72,40 @@
                 newValues.Skip(3).ToArray(),
                 "PositiveInfinity");
         }
+
+        [TestMethod]
+        public void SwapTest()
+        {
+            const int Length = 64 + 47;
+            Random random = new Random(0);
+
+            // initialize data
+            int[] array1 = new int[Length];
+            int[] array2 = new int[Length];
+            for (int i = 0; i < Length; i++)
+            {
+                array1[i] = random.Next();
+                array2[i] = random.Next();
+            }
+
+            // create test set
+            int[] workarray1 = array1.ToArray();
+            int[] workarray2 = array2.ToArray();
+
+            // test
+            for (int i = 0; i < Length; i++)
+            {
+                Assert.AreEqual(array1[i], workarray1[i]);
+                Assert.AreEqual(array2[i], workarray2[i]);
+            }
+            Arrays.Swap(Length, workarray1, 0, workarray2, 0);
+            for (int i = 0; i < Length; i++)
+            {
+                Assert.AreEqual(array2[i], workarray1[i]);
+                Assert.AreEqual(array1[i], workarray2[i]);
+            }
+            Assert.IsTrue(Arrays.Equals(Length, workarray1, 0, array2, 0));
+            Assert.IsTrue(Arrays.Equals(Length, workarray2, 0, array1, 0));
+        }
     }
 }

@@ -190,7 +190,7 @@
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
-                Image invertedImage = image.Invert();
+                Image invertedImage = image.NOT();
 
                 for (int x = 0; x < invertedImage.Width; x++)
                 {
@@ -205,7 +205,7 @@
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
         public void InvertTestNull1()
         {
-            Assert.IsNull(Edit.Invert(null));
+            Assert.IsNull(Logical.NOT(null));
         }
     }
 }

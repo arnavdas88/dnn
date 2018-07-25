@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Canvas.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
+    <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
     <Compile Include="Extensions\Operators.cs" />
@@ -91,7 +92,7 @@
     <Compile Include="Extensions\CopyCrop.cs" />
     <Compile Include="Extensions\Edit.cs" />
     <Compile Include="Extensions\Libtiff.cs" />
-    <Compile Include="Extensions\RotateShear.cs" />
+    <Compile Include="Extensions\Transform.cs" />
     <Compile Include="Extensions\ScalingOptions.cs" />
     <Compile Include="Extensions\Statistic.cs" />
     <Compile Include="Image.cs" />

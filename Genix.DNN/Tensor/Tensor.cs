@@ -672,7 +672,7 @@ namespace Genix.DNN
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Subtract(Tensor x) => Mathematics.Subtract(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Sub(Tensor x) => Mathematics.Sub(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor by a scalar.

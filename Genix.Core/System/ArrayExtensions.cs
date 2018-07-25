@@ -6,8 +6,8 @@
 
 namespace System
 {
-    using Genix.Core;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Provides extension methods for the <see cref="Array"/> class.
@@ -94,6 +94,150 @@ namespace System
             T temp = array[position1];
             array[position1] = array[position2];
             array[position2] = temp;
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 32-bit integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(this int[] srcdst, int alpha)
+        {
+            Mathematics.AddC(srcdst.Length, alpha, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 32-bit unsigned integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AddC(this uint[] srcdst, uint alpha)
+        {
+            Mathematics.AddC(srcdst.Length, alpha, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 64-bit integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(this long[] srcdst, long alpha)
+        {
+            Mathematics.AddC(srcdst.Length, alpha, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 64-bit unsigned integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AddC(this ulong[] srcdst, ulong alpha)
+        {
+            Mathematics.AddC(srcdst.Length, alpha, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of floats.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(this float[] srcdst, float alpha)
+        {
+            Mathematics.AddC(srcdst.Length, alpha, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of 32-bit integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="src">The array that contains source data.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += src(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(this int[] srcdst, int[] src)
+        {
+            Mathematics.Add(srcdst.Length, src, 0, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of 32-bit unsigned integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="src">The array that contains source data.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += src(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(this uint[] srcdst, uint[] src)
+        {
+            Mathematics.Add(srcdst.Length, src, 0, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of 64-bit integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="src">The array that contains source data.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += src(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(this long[] srcdst, long[] src)
+        {
+            Mathematics.Add(srcdst.Length, src, 0, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of 64-bit unsigned integers.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="src">The array that contains source data.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += src(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Add(this ulong[] srcdst, ulong[] src)
+        {
+            Mathematics.Add(srcdst.Length, src, 0, srcdst, 0);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of floats.
+        /// </summary>
+        /// <param name="srcdst">The array that contains source and destination data.</param>
+        /// <param name="src">The array that contains source data.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>srcdst(i) += src(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add(this float[] srcdst, float[] src)
+        {
+            Mathematics.Add(srcdst.Length, src, 0, srcdst, 0);
         }
 
         /// <summary>

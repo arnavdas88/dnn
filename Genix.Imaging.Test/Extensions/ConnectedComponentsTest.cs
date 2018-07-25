@@ -1,14 +1,10 @@
 ﻿namespace Genix.Imaging.Test
 {
-    using System;
     using System.Collections.Generic;
     using System.Drawing;
-    using System.Diagnostics;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Genix.Core;
     using Genix.Imaging;
-    using Genix.DocumentAnalysis;
 
     [TestClass]
     public class ConnectedComponentsTest
@@ -61,93 +57,6 @@
 
             Assert.AreEqual(0u, image.GetPixel(0, 0));
             Assert.AreEqual(0, image.Power());
-        }
-
-        [TestMethod]
-        public void XXXTest()
-        {
-            const int Count = 1;
-            Stopwatch stopwatch = new Stopwatch();
-
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\DNN\dnn\4506-T.tif"))
-            {
-                ////Histogram hist1 = image.HistogramY();
-
-                Imaging.Image workImage = image/*.Despeckle().CleanBorderNoise(0.5f, 0.5f).Reduce1x2()*/;
-
-                stopwatch.Start();
-                for (int i = 0; i < Count; i++)
-                {
-                    Imaging.Image cleanedImage = LineDetector.FindAndRemoveLines(image.Deskew(), new LineDetectionOptions(), out IList<Line> lines);
-
-                    ////ISet<ConnectedComponent> components = workImage.FindConnectedComponents();
-
-                    ////List<ConnectedComponent> components1 = workImage.FindConnectedComponents().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
-                    ////List<ConnectedComponent> components2 = workImage.FindConnectedComponentsNew().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
-
-                    /*Histogram histp = ConnectedComponent.PowerHistogram(1000, components);
-                    Histogram histw = ConnectedComponent.WidthHistogram(100, components);
-                    Histogram histh = ConnectedComponent.HeightHistogram(100, components);
-
-                    QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(workImage.Bounds, components.Where(x => x.Bounds.Height < 100));
-
-                    Imaging.Image show = new Imaging.Image(workImage.Width, workImage.Height, 1, 200, 200);
-                    Imaging.Image show2 = workImage.Copy();
-
-                    int argmaxh = histh.ArgMax();
-                    while (true)
-                    {
-                        ConnectedComponent candidate = components.FirstOrDefault(x => x.Bounds.Height == argmaxh);
-                        if (candidate == null)
-                        {
-                            break;
-                        }
-
-                        IList<ConnectedComponent> neighbors = quadtree.GetNodes(new Rectangle(0, candidate.Bounds.Y, workImage.Width, candidate.Bounds.Height)).ToList();
-
-                        show.AddConnectedComponents(neighbors);
-                        show2.RemoveConnectedComponents(neighbors);
-
-                        components.ExceptWith(neighbors);
-                        quadtree.Remove(neighbors);
-                    }*/
-
-                    ////IList<ConnectedComponentOld> components2 = workImage.FindConnectedComponentsOld();
-                    ////workImage.RemoveConnectedComponents(components);
-                    ////List<ConnectedComponent> components1 = workImage.FindConnectedComponents().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
-                    ////List<ConnectedComponent> components2 = workImage.FindConnectedComponentsOld().OrderBy(x => x, new ConnectedComponentComparer()).ToList();
-
-                    /*Histogram hist = ConnectedComponent.PowerHistogram(components);
-                    Histogram histH = new Histogram(workImage.Bounds.Height + 1, components.Select(x => x.Bounds.Height));*/
-
-                    ////int sum1 = image.Power();
-                    ////int sum2 = components1.Sum(x => x.Power);
-                    ////int sum3 = components2.Sum(x => x.Power);
-
-                    /*QuadTree<ConnectedComponent> quadtree = new QuadTree<ConnectedComponent>(workImage.Bounds, components);
-
-                    int count = quadtree.GetNodes().Count();
-
-                    Histogram hist2 = ConnectedComponent.HistogramY(workImage.Bounds, components.Where(x => x.Bounds.Width <= 30 && x.Bounds.Height <= 30));
-                    ////CollectionAssert.AreEqual(hist1.Bins, hist2.Bins);*/
-                }
-
-                stopwatch.Stop();
-
-                Console.WriteLine((float)stopwatch.ElapsedMilliseconds / Count);
-
-                ////int sum1 = image.Power();
-                ////int sum2 = components.Sum(x => x.Power);
-            }
-        }
-
-        private sealed class ConnectedComponentComparer : IComparer<ConnectedComponent>
-        {
-            public int Compare(ConnectedComponent x, ConnectedComponent y)
-            {
-                int res = x.Bounds.Y - y.Bounds.Y;
-                return res != 0 ? res : x.Bounds.X - y.Bounds.X;
-            }
         }
     }
 }

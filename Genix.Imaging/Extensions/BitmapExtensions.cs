@@ -310,7 +310,7 @@ namespace Genix.Imaging
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
             {
-                image.InvertIP();
+                image.NOTIP();
                 metadata.RemovePropertyItem((int)TIFFField.PhotometricInterpretation);
             }
 

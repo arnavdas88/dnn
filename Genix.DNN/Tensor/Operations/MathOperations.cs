@@ -111,7 +111,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Add(x.Length, x.Weights, 0, alpha, y.Weights, 0);
+                    Mathematics.AddC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -152,7 +152,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Mathematics.Subtract(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Mathematics.Sub(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -175,7 +175,7 @@ namespace Genix.DNN
                                 {
                                     lock (b)
                                     {
-                                        Mathematics.Subtract(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        Mathematics.Sub(y.Length, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });

@@ -7,7 +7,10 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Diagnostics;
     using System.Drawing;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using Genix.Core;
     using Leptonica;
 
@@ -66,8 +69,51 @@ namespace Genix.Imaging
                 return image.Copy();
             }
 
-            if (image.BitsPerPixel == 1 && width > 16 && height > 16 && options.HasFlag(ScalingOptions.Upscale1Bpp))
+            System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
+            matrix.Scale((double)width / image.Width, (double)height / image.Height);
+
+            image = image.Affine(matrix);
+            Debug.Assert(width == image.Width && height == image.Height, "Image dimensions are wrong.");
+            return image;
+#if false
+
+            if (image.BitsPerPixel == 1 &&
+                width > 16 &&
+                height > 16 &&
+                options.HasFlag(ScalingOptions.Upscale1Bpp))
             {
+#if true
+                Image image8bpp = image.Convert1To8(255, 0);
+                Image imageScaled = new Image(width, height, image8bpp);
+
+                // swap bytes to little-endian and back
+                BitUtils64.BiteSwap(image8bpp.Bits.Length, image8bpp.Bits, 0);
+                if (NativeMethods.scale8(
+                    image8bpp.Width,
+                    image8bpp.Height,
+                    image8bpp.Stride,
+                    image8bpp.Bits,
+                    imageScaled.Width,
+                    imageScaled.Height,
+                    imageScaled.Stride,
+                    imageScaled.Bits) != 0)
+                {
+                    throw new OutOfMemoryException();
+                }
+
+                BitUtils64.BiteSwap(imageScaled.Bits.Length, imageScaled.Bits, 0);
+
+                using (Pix pixs = imageScaled.CreatePix())
+                {
+                    using (Pix pixd = pixs.pixOtsu(false))
+                    {
+                        if (pixd != null)
+                        {
+                            return pixd.CreateImage(image.HorizontalResolution, image.VerticalResolution);
+                        }
+                    }
+                }
+#else
                 using (Pix pixs = image.Convert1To8(255, 0).CreatePix())
                 {
                     using (Pix pixd1 = pixs.pixScaleToSize(width, height))
@@ -81,6 +127,7 @@ namespace Genix.Imaging
                         }
                     }
                 }
+#endif
             }
 
             using (Pix pixs = image.CreatePix())
@@ -90,6 +137,7 @@ namespace Genix.Imaging
                     return pixd.CreateImage(image.HorizontalResolution, image.VerticalResolution);
                 }
             }
+#endif
         }
 
         /// <summary>
@@ -263,7 +311,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
@@ -306,7 +354,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
@@ -355,7 +403,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
@@ -392,6 +440,23 @@ namespace Genix.Imaging
             }
 
             return dst;
+        }
+
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.Imaging.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int scale8(
+                int widthsrc,
+                int heightsrc,
+                int stridesrc,
+                [In] ulong[] src,
+                int widthdst,
+                int heightdst,
+                int stridedst,
+                [Out] ulong[] dst);
         }
     }
 }

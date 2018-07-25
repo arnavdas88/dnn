@@ -44,7 +44,7 @@
         }
 
         [TestMethod]
-        public void AddScalarTest()
+        public void AddCTest()
         {
             foreach (int length in new[] { 24, 128 })
             {
@@ -52,33 +52,33 @@
                 float[] y = new float[length];
 
                 Arrays.Set(length, 0.0f, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == 1.0f));
 
                 Arrays.Set(length, float.NegativeInfinity, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
                 Arrays.Set(length, float.PositiveInfinity, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
                 Arrays.Set(length, float.MinValue, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
                 Arrays.Set(length, float.MaxValue, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
                 Arrays.Set(length, float.NaN, a, 0);
-                Mathematics.Add(length, a, 0, 1.0f, y, 0);
+                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
         }
 
         [TestMethod]
-        public void SubtractScalarTest()
+        public void SubCTest()
         {
             foreach (int length in new[] { 24, 128 })
             {
@@ -86,27 +86,27 @@
                 float[] y = new float[length];
 
                 Arrays.Set(length, 0.0f, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == -1.0f));
 
                 Arrays.Set(length, float.NegativeInfinity, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
                 Arrays.Set(length, float.PositiveInfinity, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
                 Arrays.Set(length, float.MinValue, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
                 Arrays.Set(length, float.MaxValue, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
                 Arrays.Set(length, float.NaN, a, 0);
-                Mathematics.Subtract(length, a, 0, 1.0f, y, 0);
+                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
         }

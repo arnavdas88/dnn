@@ -1,8 +1,8 @@
 #include "stdafx.h"
+#include <math.h>
 #include "mkl.h"
-#include "math.h"
 
-extern "C" __declspec(dllexport) float WINAPI slogSumExp2(const float a, const float b)
+GENIXAPI(float, slogSumExp2)(const float a, const float b)
 {
 	if (a == -INFINITY)
 	{
@@ -14,10 +14,17 @@ extern "C" __declspec(dllexport) float WINAPI slogSumExp2(const float a, const f
 		return a;
 	}
 
-	return ::log1pf(::expf(-::fabs(a - b))) + __max(a, b);
+	if (a >= b)
+	{
+		return ::log1pf(::expf(b - a)) + a;
+	}
+	else
+	{
+		return ::log1pf(::expf(a - b)) + b;
+	}
 }
 
-extern "C" __declspec(dllexport) float WINAPI slogSumExp3(const float a, const float b, const float c)
+GENIXAPI(float, slogSumExp3)(const float a, const float b, const float c)
 {
 	if (a == -INFINITY)
 	{
@@ -49,7 +56,7 @@ extern "C" __declspec(dllexport) float WINAPI slogSumExp3(const float a, const f
 }
 
 // calculates absolute value of a vector element-wise
-extern "C" __declspec(dllexport) void WINAPI sabs(
+GENIXAPI(void, sabs)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -70,7 +77,7 @@ extern "C" __declspec(dllexport) void WINAPI sabs(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI sabs_gradient(
+GENIXAPI(void, sabs_gradient)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* y, const float* dy, int offy)
@@ -97,7 +104,7 @@ extern "C" __declspec(dllexport) void WINAPI sabs_gradient(
 }
 
 // inverts vector element-wise
-extern "C" __declspec(dllexport) void WINAPI sinv(
+GENIXAPI(void, sinv)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -105,7 +112,7 @@ extern "C" __declspec(dllexport) void WINAPI sinv(
 	::vsInv(n, a + offa, y + offy);
 }
 
-// adds scalar to vector element-wise in-place
+// Adds a constant value to each element of a vector in-place.
 template<typename T> void __forceinline __addc(
 	int n,
 	T a,
@@ -119,47 +126,13 @@ template<typename T> void __forceinline __addc(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI i32addc(
-	int n,
-	__int32 a,
-	__int32* y, int offy)
-{
-	__addc(n, a, y, offy);
-}
+GENIXAPI(void, i32addc)(int n, __int32 a, __int32* y, int offy) { __addc(n, a, y, offy); }
+GENIXAPI(void, i64addc)(int n, __int64 a, __int64* y, int offy) { __addc(n, a, y, offy); }
+GENIXAPI(void, u32addc)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __addc(n, a, y, offy); }
+GENIXAPI(void, u64addc)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __addc(n, a, y, offy); }
+GENIXAPI(void, saddc)(int n, float a, float* y, int offy) { __addc(n, a, y, offy); }
 
-extern "C" __declspec(dllexport) void WINAPI ui32addc(
-	int n,
-	unsigned __int32 a,
-	unsigned __int32* y, int offy)
-{
-	__addc(n, a, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI i64addc(
-	int n,
-	__int64 a,
-	__int64* y, int offy)
-{
-	__addc(n, a, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI ui64addc(
-	int n,
-	unsigned __int64 a,
-	unsigned __int64* y, int offy)
-{
-	__addc(n, a, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI saddc(
-	int n,
-	float a,
-	float* y, int offy)
-{
-	__addc(n, a, y, offy);
-}
-
-// adds scalar to vector element-wise and puts results into another vector
+// Adds a constant value to each element of a vector not in-place.
 template<typename T> void __forceinline __addxc(
 	int n,
 	const T* x, int offx,
@@ -175,53 +148,89 @@ template<typename T> void __forceinline __addxc(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI i32addxc(
+GENIXAPI(void, i32addxc)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __addxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, i64addxc)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __addxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, u32addxc)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __addxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, u64addxc)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __addxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, saddxc)(int n, const float* x, int offx, float a, float* y, int offy) { __addxc(n, x, offx, a, y, offy); }
+
+// Subtracts a constant value from each element of a vector in-place.
+template<typename T> void __forceinline __subc(
 	int n,
-	const __int32* x, int offx,
-	__int32 a,
-	__int32* y, int offy)
+	T a,
+	T* y, int offy)
 {
-	__addxc(n, x, offx, a, y, offy);
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] -= a;
+	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI ui32addxc(
+GENIXAPI(void, i32subc)(int n, __int32 a, __int32* y, int offy) { __subc(n, a, y, offy); }
+GENIXAPI(void, i64subc)(int n, __int64 a, __int64* y, int offy) { __subc(n, a, y, offy); }
+GENIXAPI(void, u32subc)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __subc(n, a, y, offy); }
+GENIXAPI(void, u64subc)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __subc(n, a, y, offy); }
+GENIXAPI(void, ssubc)(int n, float a, float* y, int offy) { __subc(n, a, y, offy); }
+
+// Subtracts a constant value from each element of a vector not in-place.
+template<typename T> void __forceinline __subxc(
 	int n,
-	const unsigned __int32* x, int offx,
-	unsigned __int32 a,
-	unsigned __int32* y, int offy)
+	const T* x, int offx,
+	T a,
+	T* y, int offy)
 {
-	__addxc(n, x, offx, a, y, offy);
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = x[i] - a;
+	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI i64addxc(
-	int n,
-	const __int64* x, int offx,
-	__int64 a,
-	__int64* y, int offy)
-{
-	__addxc(n, x, offx, a, y, offy);
-}
+GENIXAPI(void, i32subxc)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __subxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, i64subxc)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __subxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, u32subxc)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __subxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, u64subxc)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __subxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, ssubxc)(int n, const float* x, int offx, float a, float* y, int offy) { __subxc(n, x, offx, a, y, offy); }
 
-extern "C" __declspec(dllexport) void WINAPI ui64addxc(
-	int n,
-	const unsigned __int64* x, int offx,
-	unsigned __int64 a,
-	unsigned __int64* y, int offy)
-{
-	__addxc(n, x, offx, a, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI saddxc(
-	int n,
-	const float* x, int offx,
-	float a,
-	float* y, int offy)
-{
-	__addxc(n, x, offx, a, y, offy);
-}
-
-// adds two vectors element-wise
+// Adds the elements of two vectors in-place.
 template<typename T> void __forceinline __add(
+	int n,
+	const T* x, int offx,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] += x[i];
+	}
+}
+
+GENIXAPI(void, i32add)(int n, const __int32* x, int offx, __int32* y, int offy) { __add(n, x, offx, y, offy); }
+GENIXAPI(void, i64add)(int n, const __int64* x, int offx, __int64* y, int offy) { __add(n, x, offx, y, offy); }
+GENIXAPI(void, u32add)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __add(n, x, offx, y, offy); }
+GENIXAPI(void, u64add)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __add(n, x, offx, y, offy); }
+GENIXAPI(void, sadd)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__add(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vsAdd(n, y, x, y);
+	}
+}
+
+// Adds the elements of two vectors not in-place.
+template<typename T> void __forceinline __addx(
 	int n,
 	const T* a, int offa,
 	const T* b, int offb,
@@ -237,51 +246,15 @@ template<typename T> void __forceinline __add(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI i32add(
-	int n,
-	const __int32* a, int offa,
-	const __int32* b, int offb,
-	__int32* y, int offy)
-{
-	__add(n, a, offa, b, offb, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI ui32add(
-	int n,
-	const unsigned __int32* a, int offa,
-	const unsigned __int32* b, int offb,
-	unsigned __int32* y, int offy)
-{
-	__add(n, a, offa, b, offb, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI i64add(
-	int n,
-	const __int64* a, int offa,
-	const __int64* b, int offb,
-	__int64* y, int offy)
-{
-	__add(n, a, offa, b, offb, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI ui64add(
-	int n,
-	const unsigned __int64* a, int offa,
-	const unsigned __int64* b, int offb,
-	unsigned __int64* y, int offy)
-{
-	__add(n, a, offa, b, offb, y, offy);
-}
-
-extern "C" __declspec(dllexport) void WINAPI sadd(
-	int n,
-	const float* a, int offa,
-	const float* b, int offb,
-	float* y, int offy)
+GENIXAPI(void, i32addx)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __addx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, i64addx)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __addx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, u32addx)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __addx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, u64addx)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __addx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, saddx)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
 {
 	if (n <= 32)
 	{
-		__add(n, a, offa, b, offb, y, offy);
+		__addx(n, a, offa, b, offb, y, offy);
 	}
 	else
 	{
@@ -289,8 +262,8 @@ extern "C" __declspec(dllexport) void WINAPI sadd(
 	}
 }
 
-// adds two vectors element-wise with increment
-extern "C" __declspec(dllexport) void WINAPI sadd_inc(
+// Adds the elements of two vectors with increment not in-place.
+GENIXAPI(void, sadd_inc)(
 	int n,
 	const float* a, int offa, int inca,
 	const float* b, int offb, int incb,
@@ -323,7 +296,7 @@ extern "C" __declspec(dllexport) void WINAPI sadd_inc(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI smatchandadd(
+GENIXAPI(void, smatchandadd)(
 	int n,
 	const float* x, const float* xmask, int offx,
 	float* y, const float* ymask, int offy)
@@ -339,8 +312,74 @@ extern "C" __declspec(dllexport) void WINAPI smatchandadd(
 	}
 }
 
-// subtracts two vectors element-wise
-extern "C" __declspec(dllexport) void WINAPI ssub(
+// Subtracts the elements of two vectors in-place.
+template<typename T> void __forceinline __sub(
+	int n,
+	const T* x, int offx,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] -= x[i];
+	}
+}
+
+GENIXAPI(void, i32sub)(int n, const __int32* x, int offx, __int32* y, int offy) { __sub(n, x, offx, y, offy); }
+GENIXAPI(void, i64sub)(int n, const __int64* x, int offx, __int64* y, int offy) { __sub(n, x, offx, y, offy); }
+GENIXAPI(void, u32sub)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __sub(n, x, offx, y, offy); }
+GENIXAPI(void, u64sub)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __sub(n, x, offx, y, offy); }
+GENIXAPI(void, ssub)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sub(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vsSub(n, y, x, y);
+	}
+}
+
+// Subtracts the elements of two vectors not in-place.
+template<typename T> void __forceinline __subx(
+	int n,
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
+{
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = a[i] - b[i];
+	}
+}
+
+GENIXAPI(void, i32subx)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __subx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, i64subx)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __subx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, u32subx)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __subx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, u64subx)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __subx(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, ssubx)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__subx(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vsSub(n, a + offa, b + offb, y + offy);
+	}
+}
+
+// Subtracts the elements of two vectors with increment not in-place.
+GENIXAPI(void, ssub_inc)(
 	int n,
 	const float* a, int offa, int inca,
 	const float* b, int offb, int incb,
@@ -373,8 +412,37 @@ extern "C" __declspec(dllexport) void WINAPI ssub(
 	}
 }
 
-// multiplies vector element-wise by a scalar in-place
-extern "C" __declspec(dllexport) void WINAPI smulc(
+// Multiplies each element of a vector by a constant value in-place.
+template<typename T> void __forceinline __mulc(
+	int n,
+	T a,
+	T* y, int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] *= a;
+	}
+}
+
+GENIXAPI(void, i32mulc)(int n, __int32 a, __int32* y, int offy) { __mulc(n, a, y, offy); }
+GENIXAPI(void, i64mulc)(int n, __int64 a, __int64* y, int offy) { __mulc(n, a, y, offy); }
+GENIXAPI(void, ui32mulc)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __mulc(n, a, y, offy); }
+GENIXAPI(void, ui64mulc)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __mulc(n, a, y, offy); }
+GENIXAPI(void, smulc)(int n, float a, float* y, int offy)
+{
+	if (n <= 256)
+	{
+		__mulc(n, a, y, offy);
+	}
+	else
+	{
+		::cblas_sscal(n, a, y + offy, 1);
+	}
+}
+
+GENIXAPI(void, smulc_inc)(
 	int n,
 	float a,
 	float* x, int offx, int incx)
@@ -406,7 +474,7 @@ extern "C" __declspec(dllexport) void WINAPI smulc(
 }
 
 // multiplies vector element-wise by a scalar and puts results into another vector
-extern "C" __declspec(dllexport) void WINAPI smulxc(int n,
+GENIXAPI(void, smulxc)(int n,
 	const float* x, int offx, int incx,
 	float a,
 	float* y, int offy, int incy)
@@ -431,7 +499,7 @@ extern "C" __declspec(dllexport) void WINAPI smulxc(int n,
 }
 
 // multiplies two vectors element-wise
-extern "C" __declspec(dllexport) void WINAPI smul(
+GENIXAPI(void, smul)(
 	int n,
 	const float* a, int offa,
 	const float* b, int offb,
@@ -455,7 +523,7 @@ extern "C" __declspec(dllexport) void WINAPI smul(
 }
 
 // multiplies two vectors element-wise and adds results to another vector
-extern "C" __declspec(dllexport) void WINAPI smuladd(
+GENIXAPI(void, smuladd)(
 	int n,
 	const float* a, int offa,
 	const float* b, int offb,
@@ -472,7 +540,7 @@ extern "C" __declspec(dllexport) void WINAPI smuladd(
 }
 
 // divides two vectors element-wise
-extern "C" __declspec(dllexport) void WINAPI sdiv(
+GENIXAPI(void, sdiv)(
 	int n,
 	const float* a, int offa, int inca,
 	const float* b, int offb, int incb,
@@ -506,7 +574,7 @@ extern "C" __declspec(dllexport) void WINAPI sdiv(
 }
 
 // y += a * x
-extern "C" __declspec(dllexport) void WINAPI _saxpy(
+GENIXAPI(void, _saxpy)(
 	int n,
 	float a,
 	const float* x, int offx, int incx,
@@ -539,7 +607,7 @@ extern "C" __declspec(dllexport) void WINAPI _saxpy(
 }
 
 // y = a * x + b * y
-extern "C" __declspec(dllexport) void WINAPI _saxpby(
+GENIXAPI(void, _saxpby)(
 	int n,
 	float a,
 	const float* x, int offx, int incx,
@@ -573,7 +641,7 @@ extern "C" __declspec(dllexport) void WINAPI _saxpby(
 }
 
 // y = a * a
-extern "C" __declspec(dllexport) void WINAPI ssqr(
+GENIXAPI(void, ssqr)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -595,7 +663,7 @@ extern "C" __declspec(dllexport) void WINAPI ssqr(
 }
 
 // y = a ^ 1/2
-extern "C" __declspec(dllexport) void WINAPI ssqrt(
+GENIXAPI(void, ssqrt)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -617,7 +685,7 @@ extern "C" __declspec(dllexport) void WINAPI ssqrt(
 }
 
 // y = a ^ b
-extern "C" __declspec(dllexport) void WINAPI spowx(
+GENIXAPI(void, spowx)(
 	int n,
 	const float* a, int offa,
 	float b,
@@ -640,7 +708,7 @@ extern "C" __declspec(dllexport) void WINAPI spowx(
 }
 
 // y += (a ^ b)'
-extern "C" __declspec(dllexport) void WINAPI powx_gradient(
+GENIXAPI(void, powx_gradient)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	float power,
@@ -689,7 +757,7 @@ extern "C" __declspec(dllexport) void WINAPI powx_gradient(
 }
 
 // y = ln(a)
-extern "C" __declspec(dllexport) void WINAPI slog(
+GENIXAPI(void, slog)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -698,7 +766,7 @@ extern "C" __declspec(dllexport) void WINAPI slog(
 }
 
 // y = exp(a)
-extern "C" __declspec(dllexport) void WINAPI sexp(
+GENIXAPI(void, sexp)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -707,7 +775,7 @@ extern "C" __declspec(dllexport) void WINAPI sexp(
 }
 
 // y = sin(a)
-extern "C" __declspec(dllexport) void WINAPI ssin(
+GENIXAPI(void, ssin)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -716,7 +784,7 @@ extern "C" __declspec(dllexport) void WINAPI ssin(
 }
 
 // y += sin(a)'
-extern "C" __declspec(dllexport) void WINAPI ssin_gradient(
+GENIXAPI(void, ssin_gradient)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
@@ -742,7 +810,7 @@ extern "C" __declspec(dllexport) void WINAPI ssin_gradient(
 }
 
 // y = cos(a)
-extern "C" __declspec(dllexport) void WINAPI scos(
+GENIXAPI(void, scos)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -751,7 +819,7 @@ extern "C" __declspec(dllexport) void WINAPI scos(
 }
 
 // y += cos(a)'
-extern "C" __declspec(dllexport) void WINAPI scos_gradient(
+GENIXAPI(void, scos_gradient)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
@@ -777,7 +845,7 @@ extern "C" __declspec(dllexport) void WINAPI scos_gradient(
 }
 
 // L1 normalization
-extern "C" __declspec(dllexport) float WINAPI _snrm1(
+GENIXAPI(float, _snrm1)(
 	int n,
 	const float* x, int offx, int incx)
 {
@@ -811,7 +879,7 @@ extern "C" __declspec(dllexport) float WINAPI _snrm1(
 }
 
 // L2 normalization
-extern "C" __declspec(dllexport) float WINAPI _snrm2(
+GENIXAPI(float, _snrm2)(
 	int n,
 	const float* x, int offx, int incx)
 {
@@ -858,11 +926,11 @@ template<typename T> T __forceinline __sum(int n, T* x, int offx)
 	return sum;
 }
 
-extern "C" __declspec(dllexport) __int32 WINAPI i32sum(int n, __int32* x, int offx) { return __sum(n, x, offx); }
-extern "C" __declspec(dllexport) __int64 WINAPI i64sum(int n, __int64* x, int offx) { return __sum(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int32 WINAPI ui32sum(int n, unsigned __int32* x, int offx) { return __sum(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int64 WINAPI ui64sum(int n, unsigned __int64* x, int offx) { return __sum(n, x, offx); }
-extern "C" __declspec(dllexport) float WINAPI ssum(int n, float* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int32, i32sum)(int n, __int32* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int64, i64sum)(int n, __int64* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(unsigned __int32, ui32sum)(int n, unsigned __int32* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(unsigned __int64, ui64sum)(int n, unsigned __int64* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(float, ssum)(int n, float* x, int offx) { return __sum(n, x, offx); }
 
 // variance x
 template<typename T> T __forceinline __variance(int n, T* x, int offx)
@@ -881,4 +949,4 @@ template<typename T> T __forceinline __variance(int n, T* x, int offx)
 	return variance / n;
 }
 
-extern "C" __declspec(dllexport) float WINAPI svariance(int n, float* x, int offx) { return __variance(n, x, offx); }
+GENIXAPI(float, svariance)(int n, float* x, int offx) { return __variance(n, x, offx); }

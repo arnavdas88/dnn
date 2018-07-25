@@ -23,9 +23,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains the data to compute.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Abs(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -36,13 +36,13 @@ namespace Genix.Core
         /// Computes the derivative of the argument of the <see cref="Abs"/> method.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="x">The <see cref="Abs"/> method input array <c>x</c>.</param>
-        /// <param name="dx">The array that contains calculated gradient for <c>x</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="x">The <see cref="Abs"/> method input array <paramref name="x"/>.</param>
+        /// <param name="dx">The array that contains calculated gradient for <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The <see cref="Abs"/> method output array <c>y</c>.</param>
-        /// <param name="dy">The array that contains gradient for <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> and <c>dy</c> at which computation begins.</param>
+        /// <param name="y">The <see cref="Abs"/> method output array <paramref name="y"/>.</param>
+        /// <param name="dy">The array that contains gradient for <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> and <c>dy</c> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>dx(offx + i) += x(offx + i) == y(offy + i) ? dy(offy + i) : -dy(offy + i)</c>.
         /// </remarks>
@@ -53,211 +53,378 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of one array of 32-bit integers starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to add to.</param>
-        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
-        /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, int[] x, int offx, int alpha, int[] y, int offy)
-        {
-            NativeMethods.i32addxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds a scalar value to all values of one array of 32-bit unsigned integers starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to add to.</param>
-        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
-        /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Add(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
-        {
-            NativeMethods.ui32addxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds a scalar value to all values of one array of 64-bit integers starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to add to.</param>
-        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
-        /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, long[] x, int offx, long alpha, long[] y, int offy)
-        {
-            NativeMethods.i64addxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds a scalar value to all values of one array of 64-bit unsigned integers starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to add to.</param>
-        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
-        /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Add(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
-        {
-            NativeMethods.ui64addxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds a scalar value to all values of one array of floats starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to add to.</param>
-        /// <param name="offx">The index in the <c>a</c> at which adding begins.</param>
-        /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, float[] x, int offx, float alpha, float[] y, int offy)
-        {
-            NativeMethods.saddxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds a scalar value to all values of array of 32-bit integers starting at the specified index.
+        /// Adds a constant value to each element of an array of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, int alpha, int[] y, int offy)
+        public static void AddC(int length, int alpha, int[] y, int offy)
         {
             NativeMethods.i32addc(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of array of unsigned 32-bit integers starting at the specified index.
+        /// Adds a constant value to each element of an array of 32-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void Add(int length, uint alpha, uint[] y, int offy)
+        public static void AddC(int length, uint alpha, uint[] y, int offy)
         {
-            NativeMethods.ui32addc(length, alpha, y, offy);
+            NativeMethods.u32addc(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of array of 64-bit integers starting at the specified index.
+        /// Adds a constant value to each element of an array of 64-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, long alpha, long[] y, int offy)
+        public static void AddC(int length, long alpha, long[] y, int offy)
         {
             NativeMethods.i64addc(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of array of unsigned 64-bit integers starting at the specified index.
+        /// Adds a constant value to each element of an array of 64-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void Add(int length, ulong alpha, ulong[] y, int offy)
+        public static void AddC(int length, ulong alpha, ulong[] y, int offy)
         {
-            NativeMethods.ui64addc(length, alpha, y, offy);
+            NativeMethods.u64addc(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a scalar value to all values of array of singles starting at the specified index.
+        /// Adds a constant value to each element of an array of floats in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, float alpha, float[] y, int offy)
+        public static void AddC(int length, float alpha, float[] y, int offy)
         {
             NativeMethods.saddc(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 32-bit integers starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// Adds a constant value to each element of an array of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.i32addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 32-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AddC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.u32addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 64-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.i64addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of 64-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AddC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.u64addxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds a constant value to each element of an array of floats not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.saddxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, int alpha, int[] y, int offy)
+        {
+            NativeMethods.i32subc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.u32subc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, long alpha, long[] y, int offy)
+        {
+            NativeMethods.i64subc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.u64subc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of floats in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, float alpha, float[] y, int offy)
+        {
+            NativeMethods.ssubc(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.i32subxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.u32subxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.i64subxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.u64subxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of floats not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.ssubxc(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds the elements of two arrays of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, int[] x, int offx, int[] y, int offy)
         {
-            NativeMethods.i32add(length, y, offy, x, offx, y, offy);
+            NativeMethods.i32add(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 32-bit unsigned integers starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// Adds the elements of two arrays of 32-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -265,36 +432,34 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, uint[] x, int offx, uint[] y, int offy)
         {
-            NativeMethods.ui32add(length, y, offy, x, offx, y, offy);
+            NativeMethods.u32add(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 64-bit integers starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// Adds the elements of two arrays of 64-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, long[] x, int offx, long[] y, int offy)
         {
-            NativeMethods.i64add(length, y, offy, x, offx, y, offy);
+            NativeMethods.i64add(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 64-bit unsigned integers starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// Adds the elements of two arrays of 64-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -302,37 +467,36 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.ui64add(length, y, offy, x, offx, y, offy);
+            NativeMethods.u64add(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of floats starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// Adds the elements of two arrays of floats in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.sadd(length, y, offy, x, offx, y, offy);
+            NativeMethods.sadd(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array starting at the specified source index to another array starting at the specified destination index.
+        /// Adds the elements of two arrays of floats with increment in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
-        /// <param name="incx">The increment for the elements of <c>x</c>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
         {
@@ -340,38 +504,34 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 32-bit integers starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
         {
-            NativeMethods.i32add(length, a, offa, b, offb, y, offy);
+            NativeMethods.i32addx(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 32-bit unsigned integers starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -379,42 +539,38 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
-            NativeMethods.ui32add(length, a, offa, b, offb, y, offy);
+            NativeMethods.u32addx(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 64-bit integers starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
         {
-            NativeMethods.i64add(length, a, offa, b, offb, y, offy);
+            NativeMethods.i64addx(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of 64-bit unsigned integers starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -422,49 +578,264 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
-            NativeMethods.ui64add(length, a, offa, b, offb, y, offy);
+            NativeMethods.u64addx(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array of floats starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.sadd(length, a, offa, b, offb, y, offy);
+            NativeMethods.saddx(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Adds a range of values from one array starting at the specified index
-        /// to another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
+        /// Adds the elements of two arrays of floats with increment not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains the data to add.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="inca">The increment for the elements of <c>a</c>.</param>
-        /// <param name="b">The second array that contains the data to add.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="incb">The increment for the elements of <c>b</c>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
         {
             NativeMethods.sadd_inc(length, a, offa, inca, b, offb, incb, y, offy, incy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, int[] x, int offx, int[] y, int offy)
+        {
+            NativeMethods.i32sub(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 32-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Sub(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.u32sub(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 64-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, long[] x, int offx, long[] y, int offy)
+        {
+            NativeMethods.i64sub(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 64-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Sub(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.u64sub(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of floats in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, float[] x, int offx, float[] y, int offy)
+        {
+            NativeMethods.ssub(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of floats with increment in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
+        {
+            NativeMethods.ssub_inc(length, y, offy, incy, x, offx, incx, y, offy, incy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 32-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
+        {
+            NativeMethods.i32subx(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 32-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Sub(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.u32subx(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 64-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
+        {
+            NativeMethods.i64subx(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of 64-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Sub(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.u64subx(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of floats not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.ssubx(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts the elements of two arrays of floats with increment not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sub(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
+        {
+            NativeMethods.ssub_inc(length, a, offa, inca, b, offb, incb, y, offy, incy);
         }
 
         /// <summary>
@@ -475,10 +846,10 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="maskx">The first array that contains the data to compare.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="masky">The second array that contains the data to compare.</param>
-        /// <param name="offy">The index in the <c>y</c> at which adding begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := y(i) + (xmask(offx + i) == ymask(offy + i) ? x(offx + i) : 0)</c>.
         /// </remarks>
@@ -489,107 +860,17 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Subtracts a scalar value to all values of one array starting at the specified source index
-        /// and stores results in another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first array that contains the data to subtract from.</param>
-        /// <param name="offx">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Subtract(int length, float[] x, int offx, float alpha, float[] y, int offy)
-        {
-            NativeMethods.saddxc(length, x, offx, -alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a range of values from one array starting at the specified source index
-        /// from another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains the data to subtract.</param>
-        /// <param name="offx">The index in the <c>x</c> at which subtraction begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Subtract(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.ssub(length, y, offy, 1, x, offx, 1, y, offy, 1);
-        }
-
-        /// <summary>
-        /// Subtracts a range of values from one array starting at the specified source index 
-        /// from another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains the data to subtract.</param>
-        /// <param name="offx">The index in the <c>x</c> at which subtraction begins.</param>
-        /// <param name="incx">The increment for the elements of <c>x</c>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Subtract(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods.ssub(length, y, offy, incy, x, offx, incx, y, offy, incy);
-        }
-
-        /// <summary>
-        /// Subtracts a range of values from one array starting at the specified index
-        /// from another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains the data to subtract.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="b">The second array that contains the data to subtract.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Subtract(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
-        {
-            NativeMethods.ssub(length, a, offa, 1, b, offb, 1, y, offy, 1);
-        }
-
-        /// <summary>
-        /// Subtracts a range of values from one array starting at the specified index
-        /// from another array starting at the specified index
-        /// and stores results in third array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains the data to subtract.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="inca">The increment for the elements of <c>a</c>.</param>
-        /// <param name="b">The second array that contains the data to subtract.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="incb">The increment for the elements of <c>b</c>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which subtraction begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Subtract(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
-        {
-            NativeMethods.ssub(length, a, offa, inca, b, offb, incb, y, offy, incy);
-        }
-
-        /// <summary>
         /// Multiplies elements of one array starting at the specified index
         /// to elements of another array starting at the specified index
         /// and puts results into destination array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <c>a</c>.</param>
-        /// <param name="offa">The index in the <c>a</c> at which computation begins.</param>
-        /// <param name="b">The input array <c>b</c>.</param>
-        /// <param name="offb">The index in the <c>b</c> at which computation begins.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="a">The input array <paramref name="a"/>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
+        /// <param name="b">The input array <paramref name="b"/>.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -605,9 +886,9 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to multiply.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x</c>.
         /// </remarks>
@@ -623,11 +904,11 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to multiply.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">The increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x</c>.
         /// </remarks>
@@ -643,12 +924,12 @@ namespace Genix.Core
         /// and puts results into destination array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <c>a</c>.</param>
-        /// <param name="offa">The index in the <c>a</c> at which computation begins.</param>
-        /// <param name="b">The input array <c>b</c>.</param>
-        /// <param name="offb">The index in the <c>b</c> at which computation begins.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="a">The input array <paramref name="a"/>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
+        /// <param name="b">The input array <paramref name="b"/>.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := a(offa + i) / b(offb + i)</c>.
         /// </remarks>
@@ -664,15 +945,15 @@ namespace Genix.Core
         /// and puts results into destination array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <c>a</c>.</param>
-        /// <param name="offa">The index in the <c>a</c> at which computation begins.</param>
-        /// <param name="inca">the increment for the elements of <c>a</c>.</param>
-        /// <param name="b">The input array <c>b</c>.</param>
-        /// <param name="offb">The index in the <c>b</c> at which computation begins.</param>
-        /// <param name="incb">the increment for the elements of <c>b</c>.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="incy">the increment for the elements of <c>y</c>.</param>
+        /// <param name="a">The input array <paramref name="a"/>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
+        /// <param name="inca">the increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The input array <paramref name="b"/>.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
+        /// <param name="incb">the increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i * incy) := a(offa + i * inca) / b(offb + i * incb)</c>.
         /// </remarks>
@@ -688,9 +969,9 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to divide.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := x / alpha</c>.
         /// </remarks>
@@ -706,11 +987,11 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to divide.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">The increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := x / alpha</c>.
         /// </remarks>
@@ -726,12 +1007,12 @@ namespace Genix.Core
         /// and adds results to the destination array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <c>a</c>.</param>
-        /// <param name="offa">The index in the <c>a</c> at which computation begins.</param>
-        /// <param name="b">The input array <c>b</c>.</param>
-        /// <param name="offb">The index in the <c>b</c> at which computation begins.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="a">The input array <paramref name="a"/>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
+        /// <param name="b">The input array <paramref name="b"/>.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -748,9 +1029,9 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + y</c>.
         /// </remarks>
@@ -766,10 +1047,10 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + beta * y</c>.
         /// </remarks>
@@ -785,12 +1066,12 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="incy">the increment for the elements of <c>y</c>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + beta * y</c>.
         /// </remarks>
@@ -807,11 +1088,11 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="alpha">The scalar <c>alpha</c>.</param>
         /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
-        /// <param name="incy">the increment for the elements of <c>y</c>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + y</c>.
         /// </remarks>
@@ -826,10 +1107,10 @@ namespace Genix.Core
         /// and puts results into another array starting at the specified index.
         /// </summary>
         /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <c>x</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="x">The input array <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
         /// </remarks>
@@ -844,10 +1125,10 @@ namespace Genix.Core
         /// and puts results into another array starting at the specified index.
         /// </summary>
         /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <c>x</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="x">The input array <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := sqrt(x(offx + i))</c>.
         /// </remarks>
@@ -862,11 +1143,11 @@ namespace Genix.Core
         /// and puts results into another array starting at the specified index.
         /// </summary>
         /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <c>x</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="x">The input array <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="power">The constant value for power.</param>
-        /// <param name="y">The output array <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="y">The output array <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
         /// </remarks>
@@ -880,9 +1161,9 @@ namespace Genix.Core
         /// Computes the derivative of <see cref="Pow"/> method.
         /// </summary>
         /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <c>x</c>.</param>
+        /// <param name="x">The input array <paramref name="x"/>.</param>
         /// <param name="dx">The output array <c>dx</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
         /// <param name="power">The constant value for power.</param>
         /// <param name="dy">The chain gradient array <c>dy</c>.</param>
@@ -913,9 +1194,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Log(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -927,9 +1208,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Exp(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -941,9 +1222,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sin(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -956,7 +1237,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains <see cref="MKL.Sin"/> method input.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
         /// <param name="dy">The array that contains chain gradient from next level.</param>
         /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
@@ -971,9 +1252,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Cos(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -986,7 +1267,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains <see cref="MKL.Cos"/> method input.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
         /// <param name="dy">The array that contains chain gradient from next level.</param>
         /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
@@ -1001,8 +1282,8 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <returns>
         /// The L1-Norm of array elements in the array.
         /// </returns>
@@ -1017,8 +1298,8 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
+        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <returns>
         /// The L2-Norm of array elements in the array.
         /// </returns>
@@ -1033,7 +1314,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1048,7 +1329,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1064,7 +1345,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1079,7 +1360,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1095,7 +1376,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which adding begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1110,7 +1391,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <c>x</c> at which calculation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which calculation begins.</param>
         /// <returns>
         /// The variance of elements in the array.
         /// </returns>
@@ -1150,7 +1431,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui32addc(int n, uint a, [In, Out] uint[] y, int offy);
+            public static extern void u32addc(int n, uint a, [In, Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1158,7 +1439,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui64addc(int n, ulong a, [In, Out] ulong[] y, int offy);
+            public static extern void u64addc(int n, ulong a, [In, Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1170,7 +1451,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui32addxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+            public static extern void u32addxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1178,7 +1459,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui64addxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+            public static extern void u64addxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1186,23 +1467,83 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32add(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+            public static extern void i32subc(int n, int a, [In, Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui32add(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+            public static extern void u32subc(int n, uint a, [In, Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64add(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+            public static extern void i64subc(int n, long a, [In, Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ui64add(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+            public static extern void u64subc(int n, ulong a, [In, Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void sadd(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void ssubc(int n, float a, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32subxc(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u32subxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64subxc(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u64subxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ssubxc(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32add(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u32add(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64add(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u64add(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sadd(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32addx(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u32addx(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64addx(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u64addx(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void saddx(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1214,11 +1555,51 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssub(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
+            public static extern void i32sub(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u32sub(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64sub(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u64sub(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ssub(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i32subx(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u32subx(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void i64subx(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void u64subx(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ssubx(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void ssub_inc(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
 
             /*[DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void smulc(int n, float a, [In, Out] float[] x, int offx, int incx);*/
+            public static extern void smulc_inc(int n, float a, [In, Out] float[] x, int offx, int incx);*/
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

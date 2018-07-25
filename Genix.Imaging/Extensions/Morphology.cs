@@ -285,7 +285,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             HashSet<ConnectedComponent> all = new HashSet<ConnectedComponent>();
@@ -435,7 +435,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             ulong[] bits = image.Bits;
@@ -512,7 +512,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             ulong[] bits = image.Bits;
@@ -592,7 +592,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             // calculate area to crop
@@ -651,7 +651,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             // calculate area to crop
