@@ -183,7 +183,7 @@ namespace Genix.Imaging
         /// <value>
         /// The mask that clears ending unused bits in the stride.
         /// </value>
-        internal ulong EndMask => ulong.MaxValue << (64 - (this.WidthBits & 63));
+        internal ulong EndMask => ~(ulong.MaxValue << (this.WidthBits & 63));
 
         /// <summary>
         /// Randomizes all colors in the <see cref="Image"/>.
@@ -199,7 +199,7 @@ namespace Genix.Imaging
                 bits[i] = (ulong)(uint)random.Next() |
                           (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) | 
                           (ulong)(uint)random.Next() << 32 |
-                          (random.Next(0, 2) == 0 ? BitUtils64.LSB : 0ul);
+                          (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
             }
         }
 

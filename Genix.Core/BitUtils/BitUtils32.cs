@@ -14,7 +14,7 @@ namespace Genix.Core
     using System.Security;
 
     /// <summary>
-    /// Provides bit manipulation methods for 32-bit big-endian architecture.
+    /// Provides bit manipulation methods for 32-bit little-endian architecture.
     /// </summary>
     [CLSCompliant(false)]
     public static class BitUtils32
@@ -22,7 +22,7 @@ namespace Genix.Core
         /// <summary>
         /// The first bit.
         /// </summary>
-        public const uint LSB = 0x8000_0000;
+        public const uint LSB = 1;
 
         /// <summary>
         /// Examines the bit at the specified position, and returns the value of that bit.
@@ -36,7 +36,7 @@ namespace Genix.Core
         public static bool TestBit(uint bits, int position)
         {
             Debug.Assert(position < 32, "The bit position must be less than 32.");
-            return (bits & (LSB >> position)) != 0;
+            return (bits & (LSB << position)) != 0;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint GetBits(uint bits, int position, int count)
         {
-            Debug.Assert(position + count <= 64, "The position+count must be less than or equal to 64.");
-            return (bits >> (32 - (position + count))) & (uint.MaxValue >> (32 - count));
+            Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 32.");
+            return (bits >> position) & ~(uint.MaxValue << count);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Genix.Core
         public static uint SetBit(uint bits, int position)
         {
             Debug.Assert(position < 32, "The bit position must be less than 32.");
-            return bits | (LSB >> position);
+            return bits | (LSB << position);
         }
 
         /// <summary>
@@ -80,12 +80,10 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint SetBits(uint bits, int position, int count)
         {
-            Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 64.");
-            uint mask = position == 0 ?
-                uint.MaxValue << (32 - count) :
-                position + count == 32 ?
-                    uint.MaxValue >> position :
-                    (uint.MaxValue >> position) & (uint.MaxValue << (32 - (position + count)));
+            Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 32.");
+            uint mask = position + count == 32 ?
+                uint.MaxValue << position :
+                (uint.MaxValue << position) & ~(uint.MaxValue << (position + count));
             return bits | mask;
         }
 
@@ -98,7 +96,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetBit(uint[] bits, int position)
         {
-            bits[position >> 5] |= BitUtils32.LSB >> (position & 31);
+            bits[position >> 5] |= BitUtils32.LSB << (position & 31);
         }
 
         /// <summary>
@@ -123,7 +121,7 @@ namespace Genix.Core
         public static uint ResetBit(uint bits, int position)
         {
             Debug.Assert(position < 32, "The bit position must be less than 32.");
-            return bits & ~(LSB >> position);
+            return bits & ~(LSB << position);
         }
 
         /// <summary>
@@ -135,7 +133,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetBit(uint[] bits, int position)
         {
-            bits[position >> 5] &= ~(BitUtils32.LSB >> (position & 31));
+            bits[position >> 5] &= ~(BitUtils32.LSB << (position & 31));
         }
 
         /// <summary>
@@ -163,12 +161,10 @@ namespace Genix.Core
         public static ulong CopyBits(uint bits, int position, int count, uint source)
         {
             Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 32.");
-            uint mask = position == 0 ?
-                uint.MaxValue << (32 - count) :
-                position + count == 32 ?
-                    uint.MaxValue >> position :
-                    (uint.MaxValue >> position) & (uint.MaxValue << (32 - (position + count)));
-            return (bits & ~mask) | ((source << (32 - (position + count))) & mask);
+            uint mask = position + count == 32 ?
+                uint.MaxValue << position :
+                (uint.MaxValue << position) & ~(uint.MaxValue << (position + count));
+            return (bits & ~mask) | ((source << position) & mask);
         }
 
         /// <summary>
@@ -346,7 +342,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="xy">The integers to reverse byte order.</param>
-        /// <param name="offxy">The index in the <c>xy</c> at which swapping begins.</param>
+        /// <param name="offxy">The index in the <paramref name="xy"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void BiteSwap(int length, uint[] xy, int offxy)
         {
@@ -358,9 +354,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The integers to reverse byte order.</param>
-        /// <param name="offx">The index in the <c>x</c> at which swapping begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
         /// <param name="y">The integers that receive swapped bytes.</param>
-        /// <param name="offy">The index in the <c>y</c> at which swapping begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void BiteSwap(int length, uint[] x, int offx, uint[] y, int offy)
         {
@@ -368,11 +364,37 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Reverses the order of bits in each byte an array of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of integers to swap.</param>
+        /// <param name="xy">The integers to reverse bit order.</param>
+        /// <param name="offxy">The index in the <paramref name="xy"/> at which swapping begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, uint[] xy, int offxy)
+        {
+            NativeMethods.bits_reverse_ip_32(length, xy, offxy);
+        }
+
+        /// <summary>
+        /// Reverses the order of bits in each byte an array of 32-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of integers to swap.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.bits_reverse_32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
         /// Performs logical NOT operation on single 32-bits array element-wise.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="xy">The source array.</param>
-        /// <param name="offxy">The starting element position in <c>xy</c>.</param>
+        /// <param name="offxy">The starting element position in <paramref name="xy"/>.</param>
         public static void WordsNOT(int length, uint[] xy, int offxy)
         {
             NativeMethods.bits_not1_32(length, xy, offxy);
@@ -383,9 +405,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsNOT(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_not2_32(length, x, offx, y, offy);
@@ -396,9 +418,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
             NativeMethods.bits_or2_u_32(count, x, posx, y, posy);
@@ -409,9 +431,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_or2_32(length, x, offx, y, offy);
@@ -426,7 +448,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.bits_or3_32(length, a, offa, b, offb, y, offy);
@@ -443,7 +465,7 @@ namespace Genix.Core
         /// <param name="c">The third source array.</param>
         /// <param name="offc">The starting element position in <c>c</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
         {
             NativeMethods.bits_or4_32(length, a, offa, b, offb, c, offc, y, offy);
@@ -462,7 +484,7 @@ namespace Genix.Core
         /// <param name="d">The fourth source array.</param>
         /// <param name="offd">The starting element position in <c>d</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
         {
             NativeMethods.bits_or5_32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
@@ -474,7 +496,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, uint mask, uint[] y, int offy)
         {
             NativeMethods.bits_and_mask_32(length, mask, y, offy);
@@ -486,8 +508,8 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c></param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/></param>
         public static void WordsAND(int length, uint mask, uint[] y, int offy, int incy)
         {
             NativeMethods.bits_and_mask_inc_32(length, mask, y, offy, incy);
@@ -498,9 +520,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsAND(int count, uint[] x, int posx, uint[] y, int posy)
         {
             NativeMethods.bits_and2_u_32(count, x, posx, y, posy);
@@ -511,9 +533,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_and2_32(length, x, offx, y, offy);
@@ -528,7 +550,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.bits_and3_32(length, a, offa, b, offb, y, offy);
@@ -539,9 +561,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsXOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
             NativeMethods.bits_xor2_u_32(count, x, posx, y, posy);
@@ -552,9 +574,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsXOR(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.bits_xor2_32(length, x, offx, y, offy);
@@ -569,7 +591,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsXOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.bits_xor3_32(length, a, offa, b, offb, y, offy);
@@ -634,6 +656,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern uint bits_count_32(int count, [In] uint[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_reverse_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_reverse_ip_32(int length, [In, Out] uint[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

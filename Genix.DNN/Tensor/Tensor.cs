@@ -312,7 +312,7 @@ namespace Genix.DNN
                         ulong b = bits[offbx];
                         if (b != 0)
                         {
-                            for (ulong mask = BitUtils64.LSB; mask != 0 && x < width; x++, mask >>= 1, offx += xstride)
+                            for (ulong mask = BitUtils64.LSB; mask != 0 && x < width; x++, mask <<= 1, offx += xstride)
                             {
                                 if ((b & mask) != 0)
                                 {

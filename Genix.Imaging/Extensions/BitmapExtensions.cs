@@ -77,10 +77,11 @@ namespace Genix.Imaging
             BitmapExtensions.CopyBits(
                 image.Height,
                 srcData.Scan0,
-                Math.Abs(srcData.Stride) / sizeof(uint),
+                Math.Abs(srcData.Stride),
                 image.Bits,
-                image.Stride,
-                srcData.Stride < 0);
+                image.Stride8,
+                srcData.Stride < 0,
+                image.BitsPerPixel == 1);
 
             bitmap.UnlockBits(srcData);
 
@@ -143,10 +144,11 @@ namespace Genix.Imaging
                 BitmapExtensions.CopyBits(
                     image.Height,
                     image.Bits,
-                    image.Stride,
+                    image.Stride8,
                     dstData.Scan0,
-                    Math.Abs(dstData.Stride) / sizeof(uint),
-                    dstData.Stride < 0);
+                    Math.Abs(dstData.Stride),
+                    dstData.Stride < 0,
+                    image.BitsPerPixel == 1);
 
                 bitmap.UnlockBits(dstData);
 
@@ -221,15 +223,18 @@ namespace Genix.Imaging
                 pixelFormat,
                 bitmapPalette);
 
-            // swap bytes to make storage little-endian
-            ulong[] bits = new ulong[image.Bits.Length];
-            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0, bits, 0);
-
-            bitmapSource.WritePixels(
-                new System.Windows.Int32Rect(0, 0, image.Width, image.Height),
-                bits,
-                image.Stride8,
-                0);
+            System.Windows.Int32Rect sourceRect = new System.Windows.Int32Rect(0, 0, image.Width, image.Height);
+            if (image.BitsPerPixel == 1)
+            {
+                // swap bits to make storage big-endian
+                ulong[] bits = new ulong[image.Bits.Length];
+                BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0, bits, 0);
+                bitmapSource.WritePixels(sourceRect, bits, image.Stride8, 0);
+            }
+            else
+            {
+                bitmapSource.WritePixels(sourceRect, image.Bits, image.Stride8, 0);
+            }
 
             return BitmapFrame.Create(bitmapSource);
         }
@@ -296,16 +301,13 @@ namespace Genix.Imaging
             uint[] bits = new uint[image.Height * strideInBytes / sizeof(uint)];
             bitmapFrame.CopyPixels(bits, strideInBytes, 0);
 
-            int strideSrc = strideInBytes / sizeof(uint);
-            int strideDst = image.Stride;
-            int offsrc = 0;
-            int offdst = 0;
-            for (int i = 0, ii = image.Height; i < ii; i++)
-            {
-                BitUtils64.Copy32To64(strideSrc, bits, offsrc, image.Bits, offdst, true);
-                offsrc += strideSrc;
-                offdst += strideDst;
-            }
+            BitmapExtensions.CopyBits(
+                image.Height,
+                bits,
+                strideInBytes,
+                image.Bits,
+                image.Stride8,
+                image.BitsPerPixel == 1);
 
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
@@ -609,7 +611,7 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst, bool isUpsideDown)
+        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst, bool isUpsideDown, bool swapBits)
         {
             unsafe
             {
@@ -619,33 +621,53 @@ namespace Genix.Imaging
                 {
                     int offsrc = (height - 1) * strideSrc;
                     int offdst = (height - 1) * strideDst;
-                    for (int i = 0; i < height; i++)
+                    for (int i = 0; i < height; i++, offsrc -= strideSrc, offdst -= strideDst)
                     {
-                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst, true);
-                        offsrc -= strideSrc;
-                        offdst -= strideDst;
+                        NativeMethods.copy_m2u(strideDst, src, offsrc, udst, offdst);
                     }
                 }
-                else if (2 * strideDst == strideSrc)
+                else if (strideDst == strideSrc)
                 {
-                    NativeMethods.bits_copy_be64to32(height * strideDst, src, 0, udst, 0, true);
+                    NativeMethods.copy_m2u(height * strideDst, src, 0, udst, 0);
                 }
                 else
                 {
-                    int offsrc = 0;
-                    int offdst = 0;
-                    for (int i = 0; i < height; i++)
+                    for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                     {
-                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst, true);
-                        offsrc += strideSrc;
-                        offdst += strideDst;
+                        NativeMethods.copy_m2u(strideDst, src, offsrc, udst, offdst);
                     }
+                }
+
+                if (swapBits)
+                {
+                    NativeMethods.bits_reverse_ip_32(height * strideDst / sizeof(uint), udst, 0);
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, bool isUpsideDown)
+        private static void CopyBits(int height, uint[] src, int strideSrc, ulong[] dst, int strideDst, bool swapBits)
+        {
+            if (strideDst == strideSrc)
+            {
+                NativeMethods.copy_m2m(height * strideSrc, src, 0, dst, 0);
+            }
+            else
+            {
+                for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
+                {
+                    NativeMethods.copy_m2m(strideSrc, src, offsrc, dst, offdst);
+                }
+            }
+
+            if (swapBits)
+            {
+                BitUtils64.BitSwap(dst.Length, dst, 0);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, bool isUpsideDown, bool swapBits)
         {
             unsafe
             {
@@ -655,28 +677,27 @@ namespace Genix.Imaging
                 {
                     int offsrc = (height - 1) * strideSrc;
                     int offdst = (height - 1) * strideDst;
-                    for (int i = 0; i < height; i++)
+                    for (int i = 0; i < height; i++, offsrc -= strideSrc, offdst -= strideDst)
                     {
-                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, true);
-                        offsrc -= strideSrc;
-                        offdst -= strideDst;
+                        NativeMethods.copy_u2m(strideSrc, usrc, offsrc, dst, offdst);
                     }
                 }
-                else if (strideDst == 2 * strideSrc)
+                else if (strideDst == strideSrc)
                 {
-                    NativeMethods.bits_copy_be32to64(height * strideSrc, usrc, 0, dst, 0, true);
+                    NativeMethods.copy_u2m(height * strideSrc, usrc, 0, dst, 0);
                 }
                 else
                 {
-                    int offsrc = 0;
-                    int offdst = 0;
-                    for (int i = 0; i < height; i++)
+                    for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                     {
-                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, true);
-                        offsrc += strideSrc;
-                        offdst += strideDst;
+                        NativeMethods.copy_u2m(strideSrc, usrc, offsrc, dst, offdst);
                     }
                 }
+            }
+
+            if (swapBits)
+            {
+                BitUtils64.BitSwap(dst.Length, dst, 0);
             }
         }
 
@@ -684,13 +705,25 @@ namespace Genix.Imaging
         {
             private const string DllName = "Genix.Core.Native.dll";
 
-            [DllImport(NativeMethods.DllName)]
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bits_copy_be64to32(int count, [In] ulong[] src, int offsrc, [Out] uint* dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern unsafe void copy_u2m(int n, [In] uint* x, int offx, [Out] ulong[] dst, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void copy_m2m(int n, [In] uint[] x, int offx, [Out] ulong[] dst, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void copy_m2u(int n, [In] ulong[] x, int offx, [Out] uint* dst, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void copy_m2m(int n, [In] ulong[] x, int offx, [Out] uint[] dst, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bits_copy_be32to64(int count, [In] uint* src, int offsrc, [Out] ulong[] dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern unsafe void bits_reverse_ip_32(int length, [In, Out] uint* xy, int offxy);
         }
 
         /// <summary>

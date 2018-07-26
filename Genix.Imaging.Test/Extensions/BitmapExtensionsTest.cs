@@ -1,8 +1,5 @@
 ﻿namespace Genix.Imaging.Test
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -11,45 +8,32 @@
         [TestMethod]
         public void ToBitmapTest()
         {
-            Image image = new Image(20, 35, 1, 200, 200);
-            image.SetPixel(1, 1, 1);
-            image.SetPixel(18, 33, 1);
+            foreach (int bitsPerPixel in new[] { 1, /*4,*/ 8, /*16,*/ 32 })
+            {
+                Image image = new Image(64 + 47, 35, bitsPerPixel, 200, 200);
+                image.SetWhiteIP();
 
-            System.Drawing.Bitmap bitmap = image.ToBitmap();
+                image.SetPixel(11, 1, 1);
+                image.SetPixel(67, 15, 1);
+                image.SetPixel(93, 33, 1);
 
-            Assert.AreEqual(System.Drawing.Color.Black.ToArgb(), bitmap.GetPixel(1, 1).ToArgb());
-            Assert.AreEqual(System.Drawing.Color.Black.ToArgb(), bitmap.GetPixel(18, 33).ToArgb());
+                System.Drawing.Bitmap bitmap = image.ToBitmap();
+
+                int color = bitsPerPixel == 1 ?
+                    System.Drawing.Color.Black.ToArgb() :
+                    bitsPerPixel == 8 ?
+                        System.Drawing.Color.FromArgb(1, 1, 1).ToArgb() :
+                        System.Drawing.Color.FromArgb(0, 0, 1).ToArgb();
+
+                Assert.AreEqual(color, bitmap.GetPixel(11, 1).ToArgb());
+                Assert.AreEqual(color, bitmap.GetPixel(67, 15).ToArgb());
+                Assert.AreEqual(color, bitmap.GetPixel(93, 33).ToArgb());
+            }
         }
 
         [TestMethod]
         public void FromBitmapTest()
         {
-            /*DirectoryInfo di = new DirectoryInfo(@"L:\FormXtra\HCFA\DropOut\DataDim-SET1");
-            foreach (FileInfo fileInfo in di.EnumerateFiles("*.tif"))
-            {
-                foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileInfo.FullName))
-                {
-                    Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();
-                    dst.Save(Path.Combine(@"w:\temp", Path.GetFileName(fileInfo.FullName)));
-                }
-            }*/
-
-            ////foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"Z:\Test\UnitTests\Image\00000013_tif.TIF"))
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            {
-                ////Image deskew = image.Deskew();
-                ISet<ConnectedComponent> components = image.FindConnectedComponents();
-
-                int sum1 = image.Power();
-                int sum2 = components.Sum(x => x.Power);
-
-                ////image.RemoveConnectedComponents(components);
-                ////image.Save("z:\\xxxxxxxxx.tif");
-
-                ///Image dst = image.Deskew().Open(StructuringElement.Rectangle(1, 100), 1).Dilate(StructuringElement.Square(2), 1);
-                Image dst = image.Despeckle().CleanBorderNoise(0.5f, 0.5f).Deskew();
-            }
-
             foreach (bool whiteOnBlack in new bool[] { true, false })
             {
                 using (System.Drawing.Bitmap bitmap = BitmapExtensionsTest.Create1bppIndexed(20, 35, whiteOnBlack))
@@ -70,87 +54,6 @@
                 }
             }
         }
-
-#if false
-        [TestMethod]
-        public void CropTest()
-        {
-            foreach (bool whiteOnBlack in new bool[] { true, false })
-            {
-                Bitmap src = BitmapExtensionsTest.Create1bppIndexed(10, 20, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 5, 9, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 6, 10, whiteOnBlack);
-
-                Bitmap dst = BitmapExtensions.Crop(src, 2, 3, 6, 15);
-                Assert.AreEqual(6, dst.Width);
-                Assert.AreEqual(15, dst.Height);
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(3, 6).ToArgb());
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(4, 7).ToArgb());
-            }
-        }
-
-        [TestMethod]
-        public void InflateTest1()
-        {
-            foreach (bool whiteOnBlack in new bool[] { true, false })
-            {
-                Bitmap src = BitmapExtensionsTest.Create1bppIndexed(10, 20, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 5, 9, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 6, 10, whiteOnBlack);
-
-                Bitmap dst = BitmapExtensions.Inflate(src, 1, 2, 3, 4);
-                Assert.AreEqual(14, dst.Width);
-                Assert.AreEqual(26, dst.Height);
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(6, 11).ToArgb());
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(7, 12).ToArgb());
-            }
-        }
-
-        [TestMethod]
-        public void InflateTest2()
-        {
-            Bitmap src = new Bitmap(10, 20);
-            src.SetPixel(5, 9, Color.Black);
-            src.SetPixel(6, 10, Color.White);
-
-            Bitmap dst = BitmapExtensions.Inflate(src, -1, -2, -3, -4);
-            Assert.AreEqual(6, dst.Width);
-            Assert.AreEqual(14, dst.Height);
-            Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(4, 7).ToArgb());
-            Assert.AreEqual(Color.White.ToArgb(), dst.GetPixel(5, 8).ToArgb());
-        }
-
-        [TestMethod]
-        public void BlackAreaTest()
-        {
-            foreach (bool whiteOnBlack in new bool[] { true, false })
-            {
-                Bitmap src = BitmapExtensionsTest.Create1bppIndexed(10, 20, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 5, 9, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 8, 15, whiteOnBlack);
-
-                Rectangle blackArea = BitmapExtensions.BlackArea(src);
-                Assert.AreEqual(new Rectangle(5, 9, 4, 7), blackArea);
-            }
-        }
-
-        [TestMethod]
-        public void RemoveWhiteMarginTest()
-        {
-            foreach (bool whiteOnBlack in new bool[] { true, false })
-            {
-                Bitmap src = BitmapExtensionsTest.Create1bppIndexed(10, 20, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 5, 9, whiteOnBlack);
-                BitmapExtensionsTest.SetPixelIndexed(src, 8, 15, whiteOnBlack);
-
-                Bitmap dst = BitmapExtensions.RemoveWhiteMargin(src, 1, 2);
-                Assert.AreEqual(6, dst.Width);
-                Assert.AreEqual(11, dst.Height);
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(1, 2).ToArgb());
-                Assert.AreEqual(Color.Black.ToArgb(), dst.GetPixel(4, 8).ToArgb());
-            }
-        }
-#endif
 
         private static System.Drawing.Bitmap Create1bppIndexed(int width, int height, bool whiteOnBlack)
         {

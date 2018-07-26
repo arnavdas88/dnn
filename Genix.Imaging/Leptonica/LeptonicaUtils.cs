@@ -11,6 +11,7 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Core;
     using Leptonica;
 
     /// <summary>
@@ -36,9 +37,9 @@ namespace Genix.Imaging
                 LeptonicaUtils.CopyBits(
                     image.Height,
                     image.Bits,
-                    image.Stride,
+                    image.Stride8,
                     pix.pixGetData(),
-                    pix.Wpl);
+                    pix.Wpl * sizeof(uint));
             }
             catch
             {
@@ -61,9 +62,9 @@ namespace Genix.Imaging
             LeptonicaUtils.CopyBits(
                 image.Height,
                 pix.pixGetData(),
-                pix.Wpl,
+                pix.Wpl * sizeof(uint),
                 image.Bits,
-                image.Stride);
+                image.Stride8);
 
             return image;
         }
@@ -120,17 +121,20 @@ namespace Genix.Imaging
             {
                 uint* udst = (uint*)dst;
 
-                if (strideDst == 2 * strideSrc)
+                if (strideDst == strideSrc)
                 {
-                    NativeMethods.bits_copy_be64to32(height * strideDst, src, 0, udst, 0, false);
+                    NativeMethods.copy_m2u(height * strideSrc, src, 0, udst, 0);
                 }
                 else
                 {
                     for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                     {
-                        NativeMethods.bits_copy_be64to32(strideDst, src, offsrc, udst, offdst, false);
+                        NativeMethods.copy_m2u(strideDst, src, offsrc, udst, offdst);
                     }
                 }
+
+                NativeMethods.bytesswap_ip_32(height * strideDst / sizeof(uint), udst, 0);
+                NativeMethods.bits_reverse_ip_32(height * strideDst / sizeof(uint), udst, 0);
             }
         }
 
@@ -141,31 +145,42 @@ namespace Genix.Imaging
             {
                 uint* usrc = (uint*)src;
 
-                if (2 * strideDst == strideSrc)
+                if (strideDst == strideSrc)
                 {
-                    NativeMethods.bits_copy_be32to64(height * strideSrc, usrc, 0, dst, 0, false);
+                    NativeMethods.copy_u2m(height * strideSrc, usrc, 0, dst, 0);
                 }
                 else
                 {
                     for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                     {
-                        NativeMethods.bits_copy_be32to64(strideSrc, usrc, offsrc, dst, offdst, false);
+                        NativeMethods.copy_u2m(strideSrc, usrc, offsrc, dst, offdst);
                     }
                 }
             }
+
+            BitUtils64.BiteSwap(dst.Length, dst, 0);
+            BitUtils64.BitSwap(dst.Length, dst, 0);
         }
 
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
-            [DllImport(NativeMethods.DllName)]
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bits_copy_be64to32(int count, [In] ulong[] src, int offsrc, [Out] uint* dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern unsafe void copy_u2m(int n, [In] uint* x, int offx, [Out] ulong[] dst, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void copy_m2u(int n, [In] ulong[] x, int offx, [Out] uint* dst, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bits_copy_be32to64(int count, [In] uint* src, int offsrc, [Out] ulong[] dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern unsafe void bytesswap_ip_32(int n, [In, Out] uint* xy, int offxy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern unsafe void bits_reverse_ip_32(int length, [In, Out] uint* xy, int offxy);
         }
     }
 }

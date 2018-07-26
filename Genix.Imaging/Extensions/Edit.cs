@@ -127,11 +127,10 @@ namespace Genix.Imaging
 
             Image dst = new Image(image);
 
-            Arrays.Set(
-                dst.Bits.Length,
-                dst.BitsPerPixel == 1 ? 0ul : ulong.MaxValue,
-                dst.Bits,
-                0);
+            if (dst.BitsPerPixel != 1)
+            {
+                Arrays.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+            }
 
             return dst;
         }
@@ -165,25 +164,16 @@ namespace Genix.Imaging
 
             image.ValidateArea(x, y, width, height);
 
-            Image dst = image.Copy();
-
-            ulong[] bits = dst.Bits;
-            int bitCount = width * dst.BitsPerPixel;
-            int stride1 = dst.Stride1;
-
-            for (int i = 0, off = (y * stride1) + (x * dst.BitsPerPixel); i < height; i++, off += stride1)
+            if (x == 0 && y == 0 && width == image.Width && height == image.Height)
             {
-                if (dst.BitsPerPixel == 1)
-                {
-                    BitUtils64.ResetBits(bitCount, bits, off);
-                }
-                else
-                {
-                    BitUtils64.SetBits(bitCount, bits, off);
-                }
+                return image.SetWhite();
             }
-
-            return dst;
+            else
+            {
+                Image dst = image.Copy();
+                dst.SetWhiteIP(x, y, width, height);
+                return dst;
+            }
         }
 
         /// <summary>
@@ -207,6 +197,105 @@ namespace Genix.Imaging
         public static Image SetWhite(this Image image, System.Drawing.Rectangle rect)
         {
             return image.SetWhite(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels to white color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetWhiteIP(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            Arrays.Set(
+                image.Bits.Length,
+                image.BitsPerPixel == 1 ? 0ul : ulong.MaxValue,
+                image.Bits,
+                0);
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified area to white color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetWhiteIP(this Image image, int x, int y, int width, int height)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            image.ValidateArea(x, y, width, height);
+
+            if (x == 0 && y == 0 && width == image.Width && height == image.Height)
+            {
+                image.SetWhiteIP();
+            }
+            else
+            {
+                ulong[] bits = image.Bits;
+                int count = width * image.BitsPerPixel;
+                int stride1 = image.Stride1;
+
+                for (int i = 0, off = (y * stride1) + (x * image.BitsPerPixel); i < height; i++, off += stride1)
+                {
+                    if (image.BitsPerPixel == 1)
+                    {
+                        BitUtils64.ResetBits(count, bits, off);
+                    }
+                    else
+                    {
+                        BitUtils64.SetBits(count, bits, off);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified area to white color.
+        /// </summary>
+        /// <param name="image">The existing <see cref="Image"/> to fill.</param>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 1; otherwise, the white color is 0;
+        /// <c>color</c> > 0 sets the bit on.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetWhiteIP(this Image image, System.Drawing.Rectangle rect)
+        {
+            image.SetWhiteIP(rect.X, rect.Y, rect.Width, rect.Height);
         }
 
         /// <summary>
@@ -382,23 +471,7 @@ namespace Genix.Imaging
             else
             {
                 Image dst = image.Copy();
-
-                ulong[] bits = dst.Bits;
-                int count = width * dst.BitsPerPixel;
-                int stride1 = dst.Stride1;
-
-                for (int i = 0, off = (y * stride1) + (x * dst.BitsPerPixel); i < height; i++, off += stride1)
-                {
-                    if (dst.BitsPerPixel == 1)
-                    {
-                        BitUtils64.SetBits(count, bits, off);
-                    }
-                    else
-                    {
-                        BitUtils64.ResetBits(count, bits, off);
-                    }
-                }
-
+                dst.SetBlackIP(x, y, width, height);
                 return dst;
             }
         }

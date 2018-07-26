@@ -28,19 +28,12 @@ __forceinline void _stdcall _set(int n, __bits a, __bits* y)
 #define _byteswap			_byteswap_ulong
 #endif
 
-#if BITS_COUNT == 64
-#ifdef _WIN64
-#define _shiftleft			__shiftleft128
+#if BITS_COUNT == 64 && defined(_WIN64)
+#define _shiftright			__shiftright128
 #else
-constexpr __forceinline __bits _shiftleft(__bits LowPart, __bits HighPart, unsigned char Shift)
+__bits __forceinline _shiftright(__bits LowPart, __bits HighPart, unsigned char Shift)
 {
-	return (HighPart << Shift) | (LowPart >> (BITS_COUNT - Shift));
-}
-#endif
-#elif BITS_COUNT == 32
-constexpr __forceinline __bits _shiftleft(__bits LowPart, __bits HighPart, unsigned char Shift)
-{
-	return (HighPart << Shift) | (LowPart >> (BITS_COUNT - Shift));
+	return (LowPart >> Shift) | (HighPart << (BITS_COUNT - Shift));
 }
 #endif
 
@@ -48,10 +41,9 @@ constexpr __forceinline __bits _shiftleft(__bits LowPart, __bits HighPart, unsig
 #ifdef _WIN64
 #define _popcnt				__popcnt64
 #else
-__forceinline unsigned __int64 _popcnt(unsigned __int64 value)
+unsigned __int64 __forceinline _popcnt(unsigned __int64 value)
 {
-	return gsl::narrow_cast<unsigned __int64>(__popcnt(gsl::narrow_cast<unsigned>(value))) +
-		__popcnt(gsl::narrow_cast<unsigned>(value >> 32));
+	return (unsigned __int64)(__popcnt(unsigned(value))) + __popcnt((unsigned)(value >> 32));
 }
 #endif
 #elif BITS_COUNT == 32
@@ -66,14 +58,14 @@ __forceinline int _bsf(__bits v)
 	unsigned long index;
 #if BITS_COUNT == 64
 #ifdef _WIN64
-	_BitScanReverse64(&index, v);
+	_BitScanForward64(&index, v);
 #else
-	_InlineBitScanReverse64(&index, v);
+	_InlineBitScanForward64(&index, v);
 #endif
 #elif BITS_COUNT == 32
-	_BitScanReverse(&index, v);
+	_BitScanForward(&index, v);
 #endif
-	return BITS_COUNT - 1 - index;
+	return index;
 }
 
 // Searches the source operand for the most significant set bit.
@@ -84,14 +76,14 @@ __forceinline int _bsr(__bits v)
 	unsigned long index;
 #if BITS_COUNT == 64
 #ifdef _WIN64
-	_BitScanForward64(&index, v);
+	_BitScanReverse64(&index, v);
 #else
-	_InlineBitScanForward64(&index, v);
+	_InlineBitScanReverse64(&index, v);
 #endif
 #elif BITS_COUNT == 32
-	_BitScanForward(&index, v);
+	_BitScanReverse(&index, v);
 #endif
-	return BITS_COUNT - 1 - index;
+	return index;
 }
 
 // Reverses the order of bytes in an 64-bit integer.
@@ -130,37 +122,37 @@ BITSAPI(void, bytesswap)(
 	}
 }
 
-// Searches the value for a first set bit (1) for big-endian architecture.
+// Searches the value for a first set bit (1) for little-endian architecture.
 BITSAPI(int, bit_scan_forward)(__bits bits)
 {
 	return _bsf(bits);
 }
 
-// Searches the value for a last set bit (1) for big-endian architecture.
+// Searches the value for a last set bit (1) for little-endian architecture.
 BITSAPI(int, bit_scan_reverse)(__bits bits)
 {
 	return _bsr(bits);
 }
 
-// clears n left (least-significant) bits
-#define CLEAR_MASK_LSB(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == BITS_COUNT ? BITS_MIN : BITS_MAX >> (n))
+// clears n least-significant bits
+#define CLEAR_MASK_LSB(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == BITS_COUNT ? BITS_MIN : BITS_MAX << (n))
 
-// clears right (most-significant) bits starting from nth bit
-#define CLEAR_MASK_MSB(n)				(assert(n >= 0 && n <= BITS_COUNT), (n) == 0 ? BITS_MIN : BITS_MAX << (BITS_COUNT - (n)))
+// clears all most-significant bits starting from nth bit
+#define CLEAR_MASK_MSB(n)				(~CLEAR_MASK_LSB(n))
 
-// clears c (least-significant) bits starting from nth bit
-#define CLEAR_MASK_RANGE(n, c)			(CLEAR_MASK_MSB(n) | CLEAR_MASK_LSB(n + c))
+// clears c least-significant bits starting from nth bit
+#define CLEAR_MASK_RANGE(n, c)			(CLEAR_MASK_LSB(n) ^ CLEAR_MASK_MSB(n + c))
 
-// sets n left (least-significant) bits
-#define SET_MASK_LSB(n)					CLEAR_MASK_MSB(n)
+// sets n least-significant bits
+#define SET_MASK_LSB(n)					(~CLEAR_MASK_LSB(n))
 
-// sets right (most-significant) bits starting from nth bit
-#define SET_MASK_MSB(n)					CLEAR_MASK_LSB(n)
+// sets all most-significant bits starting from nth bit
+#define SET_MASK_MSB(n)					(~CLEAR_MASK_MSB(n))
 
-// sets c (least-significant) bits starting from nth bit
-#define SET_MASK_RANGE(n, c)			(SET_MASK_MSB(n) & SET_MASK_LSB(n + c))
+// sets c least-significant bits starting from nth bit
+#define SET_MASK_RANGE(n, c)			(~CLEAR_MASK_RANGE(n, c))
 
-// Searches the range of values for a first set bit (1) for big-endian architecture.
+// Searches the range of values for a first set bit (1) for little-endian architecture.
 BITSAPI(int, bits_scan_one_forward)(
 	int count,
 	const __bits* bits,
@@ -196,7 +188,7 @@ BITSAPI(int, bits_scan_one_forward)(
 	return -1;
 }
 
-// Searches the range of values for a last set bit (1) for big-endian architecture.
+// Searches the range of values for a last set bit (1) for little-endian architecture.
 BITSAPI(int, bits_scan_one_reverse)(
 	int count,
 	const __bits* bits,
@@ -233,7 +225,7 @@ BITSAPI(int, bits_scan_one_reverse)(
 	return -1;
 }
 
-// Searches the range of values for a first reset bit (0) for big-endian architecture.
+// Searches the range of values for a first reset bit (0) for little-endian architecture.
 BITSAPI(int, bits_scan_zero_forward)(
 	int count,
 	const __bits* bits,
@@ -269,7 +261,7 @@ BITSAPI(int, bits_scan_zero_forward)(
 	return -1;
 }
 
-// Searches the range of values for a last reset bit (0) for big-endian architecture.
+// Searches the range of values for a last reset bit (0) for little-endian architecture.
 BITSAPI(int, bits_scan_zero_reverse)(
 	int count,
 	const __bits* bits,
@@ -306,7 +298,7 @@ BITSAPI(int, bits_scan_zero_reverse)(
 	return -1;
 }
 
-// Clears the range of bits for big-endian architecture.
+// Clears the range of bits for little-endian architecture.
 BITSAPI(void, bits_reset)(
 	int count,			// number of bits to clear
 	__bits* bits,		// the bits to clear
@@ -346,7 +338,7 @@ BITSAPI(void, bits_reset)(
 	}
 }
 
-// Sets the range of bits for big-endian architecture.
+// Sets the range of bits for little-endian architecture.
 BITSAPI(void, bits_set)(
 	int count,			// number of bits to set
 	__bits* bits,		// the bits to set
@@ -406,8 +398,8 @@ BITSAPI(void, bits_copy)(
 	{
 		const int shift = posy - posx;
 		const __bits x0 = shift >= 0 ?
-			x[0] >> shift :
-			(posx + count <= BITS_COUNT ? x[0] << -shift : _shiftleft(x[1], x[0], -shift));
+			x[0] << shift :
+			(posx + count <= BITS_COUNT ? x[0] >> -shift : _shiftright(x[0], x[1], -shift));
 		const __bits mask = CLEAR_MASK_RANGE(posy, count);
 		y[0] = (y[0] & mask) | (x0 & ~mask);
 
@@ -419,7 +411,7 @@ BITSAPI(void, bits_copy)(
 	if (posy != 0)
 	{
 		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
+		const __bits x0 = shift >= 0 ? x[0] << shift : _shiftright(x[0], x[1], -shift);
 		const __bits mask = CLEAR_MASK_MSB(posy);
 		y[0] = (y[0] & mask) | (x0 & ~mask);
 
@@ -447,7 +439,7 @@ BITSAPI(void, bits_copy)(
 		{
 			for (int i = 0; i < wordcount; i++)
 			{
-				y[i] = _shiftleft(x[i + 1], x[i], posx);
+				y[i] = _shiftright(x[i], x[i + 1], posx);
 			}
 		}
 	}
@@ -458,7 +450,7 @@ BITSAPI(void, bits_copy)(
 		x += wordcount;
 		y += wordcount;
 
-		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
+		const __bits x0 = posx + count <= BITS_COUNT ? x[0] >> posx : _shiftright(x[0], x[1], posx);
 		const __bits mask = CLEAR_MASK_LSB(count);
 		y[0] = (y[0] & mask) | (x0 & ~mask);
 	}
@@ -519,6 +511,59 @@ BITSAPI(__bits, bits_count)(
 	return sum;
 }
 
+// reshuffle n-bits at a time
+__forceinline __bits _bitswap(const __bits bits)
+{
+#if BITS_COUNT == 64
+	return
+		((bits >> 7) & 0x0101010101010101ul) |
+		((bits >> 5) & 0x0202020202020202ul) |
+		((bits >> 3) & 0x0404040404040404ul) |
+		((bits >> 1) & 0x0808080808080808ul) |
+		((bits << 1) & 0x1010101010101010ul) |
+		((bits << 3) & 0x2020202020202020ul) |
+		((bits << 5) & 0x4040404040404040ul) |
+		((bits << 7) & 0x8080808080808080ul);
+#else
+	return
+		((bits >> 7) & 0x01010101ul) |
+		((bits >> 5) & 0x02020202ul) |
+		((bits >> 3) & 0x04040404ul) |
+		((bits >> 1) & 0x08080808ul) |
+		((bits << 1) & 0x10101010ul) |
+		((bits << 3) & 0x20202020ul) |
+		((bits << 5) & 0x40404040ul) |
+		((bits << 7) & 0x80808080ul);
+#endif
+}
+
+BITSAPI(void, bits_reverse)(
+	const int length,
+	const __bits* x, const int offx,
+	__bits* y, const int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] = _bitswap(x[i]);
+	}
+}
+
+BITSAPI(void, bits_reverse_ip)(
+	const int length,
+	__bits* xy,
+	const int offxy)
+{
+	xy += offxy;
+
+	for (int i = 0; i < length; i++)
+	{
+		xy[i] = _bitswap(xy[i]);
+	}
+}
+
 // Logical operations
 template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forceinline __bits_logical(
 	int count,				// number of bits to process
@@ -539,8 +584,8 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 	{
 		const int shift = posy - posx;
 		const __bits x0 = shift >= 0 ?
-			x[0] >> shift :
-			(posx + count <= BITS_COUNT ? x[0] << -shift : _shiftleft(x[1], x[0], -shift));
+			x[0] << shift :
+			(posx + count <= BITS_COUNT ? x[0] >> -shift : _shiftright(x[0], x[1], -shift));
 		const __bits mask = CLEAR_MASK_RANGE(posy, count);
 		T3(y[0], x0, mask);
 
@@ -552,7 +597,7 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 	if (posy != 0)
 	{
 		const int shift = posy - posx;
-		const __bits x0 = shift >= 0 ? x[0] >> shift : _shiftleft(x[1], x[0], -shift);
+		const __bits x0 = shift >= 0 ? x[0] << shift : _shiftright(x[0], x[1], -shift);
 		const __bits mask = CLEAR_MASK_MSB(posy);
 		T3(y[0], x0, mask);
 
@@ -583,7 +628,7 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 		{
 			for (int i = 0; i < wordcount; i++)
 			{
-				T2(y[i], _shiftleft(x[i + 1], x[i], posx));
+				T2(y[i], _shiftright(x[i], x[i + 1], posx));
 			}
 		}
 	}
@@ -594,7 +639,7 @@ template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forc
 		x += wordcount;
 		y += wordcount;
 
-		const __bits x0 = posx + count <= BITS_COUNT ? x[0] << posx : _shiftleft(x[1], x[0], posx);
+		const __bits x0 = posx + count <= BITS_COUNT ? x[0] >> posx : _shiftright(x[0], x[1], posx);
 		const __bits mask = CLEAR_MASK_LSB(count);
 		T3(y[0], x0, mask);
 	}

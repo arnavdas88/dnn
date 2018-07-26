@@ -94,7 +94,7 @@ namespace Genix.Imaging
 
                 for (int ix = 0; ix < width; ix++)
                 {
-                    ulong mask = BitUtils64.LSB >> (ix & 63);
+                    ulong mask = BitUtils64.SetBit(0, ix & 63);
                     for (int iy = 0, off = ix >> 6; iy < scanlen; iy++, off += stride)
                     {
                         if ((bits[off] & mask) == 0)
@@ -117,7 +117,7 @@ namespace Genix.Imaging
                 int size = stride * height;
                 for (int ix = 0; ix < width; ix++)
                 {
-                    ulong mask = BitUtils64.LSB >> (ix & 63);
+                    ulong mask = BitUtils64.SetBit(0, ix & 63);
                     for (int iy = 0, off = size - stride + (ix >> 6); iy < scanlen; iy++, off -= stride)
                     {
                         if ((bits[off] & mask) == 0)
@@ -162,7 +162,8 @@ namespace Genix.Imaging
                     int len = lengths[ix];
                     if (len != 0)
                     {
-                        BitUtils64.WordsAND(len, ~(BitUtils64.LSB >> (ix & 63)), bits, ix >> 6, stride);
+                        ulong mask = ~BitUtils64.SetBit(0, ix & 63);
+                        BitUtils64.WordsAND(len, mask, bits, ix >> 6, stride);
                     }
                 }
             }
@@ -175,7 +176,8 @@ namespace Genix.Imaging
                     int len = lengths[ix];
                     if (len != 0)
                     {
-                        BitUtils64.WordsAND(len, ~(BitUtils64.LSB >> (ix & 63)), bits, size - (len * stride) + (ix >> 6), stride);
+                        ulong mask = ~BitUtils64.SetBit(0, ix & 63);
+                        BitUtils64.WordsAND(len, mask, bits, size - (len * stride) + (ix >> 6), stride);
                     }
                 }
             }

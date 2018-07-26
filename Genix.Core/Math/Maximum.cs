@@ -34,9 +34,9 @@ namespace Genix.Core
         /// <summary>
         /// Returns the larger of three 32-bit signed integers.
         /// </summary>
-        /// <param name="a">The first of two 32-bit signed integers to compare.</param>
-        /// <param name="b">The second of two 32-bit signed integers to compare.</param>
-        /// <param name="c">The third of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of three 32-bit signed integers to compare.</param>
+        /// <param name="b">The second of three 32-bit signed integers to compare.</param>
+        /// <param name="c">The third of three 32-bit signed integers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
         /// </returns>
@@ -50,10 +50,10 @@ namespace Genix.Core
         /// <summary>
         /// Returns the larger of four 32-bit signed integers.
         /// </summary>
-        /// <param name="a">The first of two 32-bit signed integers to compare.</param>
-        /// <param name="b">The second of two 32-bit signed integers to compare.</param>
-        /// <param name="c">The third of two 32-bit signed integers to compare.</param>
-        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of four 32-bit signed integers to compare.</param>
+        /// <param name="b">The second of four 32-bit signed integers to compare.</param>
+        /// <param name="c">The third of four 32-bit signed integers to compare.</param>
+        /// <param name="d">The forth of four 32-bit signed integers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
         /// </returns>
@@ -82,9 +82,9 @@ namespace Genix.Core
         /// <summary>
         /// Returns the larger of three single-precision floating-point numbers.
         /// </summary>
-        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
-        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
-        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <param name="a">The first of three single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of three single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of three single-precision floating-point numbers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
         /// </returns>
@@ -98,10 +98,10 @@ namespace Genix.Core
         /// <summary>
         /// Returns the larger of four single-precision floating-point numbers.
         /// </summary>
-        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
-        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
-        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
-        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of four single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of four single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of four single-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of four single-precision floating-point numbers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
         /// </returns>
@@ -110,6 +110,54 @@ namespace Genix.Core
         {
             float ab = Maximum.Max(a, b);
             float cd = Maximum.Max(c, d);
+            return Maximum.Max(ab, cd);
+        }
+
+        /// <summary>
+        /// Returns the larger of two double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Max(double a, double b)
+        {
+            return a >= b ? a : b;
+        }
+
+        /// <summary>
+        /// Returns the larger of three double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of three double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of three double-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of three double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Max(double a, double b, double c)
+        {
+            double ab = Maximum.Max(a, b);
+            return Maximum.Max(ab, c);
+        }
+
+        /// <summary>
+        /// Returns the larger of four double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of four double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of four double-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of four double-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of four double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Max(double a, double b, double c, double d)
+        {
+            double ab = Maximum.Max(a, b);
+            double cd = Maximum.Max(c, d);
             return Maximum.Max(ab, cd);
         }
 
@@ -130,9 +178,9 @@ namespace Genix.Core
         /// <summary>
         /// Returns the smaller of three 32-bit signed integers.
         /// </summary>
-        /// <param name="a">The first of two 32-bit signed integers to compare.</param>
-        /// <param name="b">The second of two 32-bit signed integers to compare.</param>
-        /// <param name="c">The third of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of three 32-bit signed integers to compare.</param>
+        /// <param name="b">The second of three 32-bit signed integers to compare.</param>
+        /// <param name="c">The third of three 32-bit signed integers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
         /// </returns>
@@ -146,10 +194,10 @@ namespace Genix.Core
         /// <summary>
         /// Returns the smaller of four 32-bit signed integers.
         /// </summary>
-        /// <param name="a">The first of two 32-bit signed integers to compare.</param>
-        /// <param name="b">The second of two 32-bit signed integers to compare.</param>
-        /// <param name="c">The third of two 32-bit signed integers to compare.</param>
-        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of four 32-bit signed integers to compare.</param>
+        /// <param name="b">The second of four 32-bit signed integers to compare.</param>
+        /// <param name="c">The third of four 32-bit signed integers to compare.</param>
+        /// <param name="d">The forth of four 32-bit signed integers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
         /// </returns>
@@ -178,9 +226,9 @@ namespace Genix.Core
         /// <summary>
         /// Returns the smaller of three single-precision floating-point numbers.
         /// </summary>
-        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
-        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
-        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
+        /// <param name="a">The first of three single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of three single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of three single-precision floating-point numbers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
         /// </returns>
@@ -194,10 +242,10 @@ namespace Genix.Core
         /// <summary>
         /// Returns the smaller of four single-precision floating-point numbers.
         /// </summary>
-        /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
-        /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
-        /// <param name="c">The third of two single-precision floating-point numbers to compare.</param>
-        /// <param name="d">The forth of two 32-bit signed integers to compare.</param>
+        /// <param name="a">The first of four single-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of four single-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of four single-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of four single-precision floating-point numbers to compare.</param>
         /// <returns>
         /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
         /// </returns>
@@ -206,6 +254,54 @@ namespace Genix.Core
         {
             float ab = Maximum.Min(a, b);
             float cd = Maximum.Min(c, d);
+            return Maximum.Min(ab, cd);
+        }
+
+        /// <summary>
+        /// Returns the smaller of two double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of two double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of two double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Min(double a, double b)
+        {
+            return a <= b ? a : b;
+        }
+
+        /// <summary>
+        /// Returns the smaller of three double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of three double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of three double-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of three double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Min(double a, double b, double c)
+        {
+            double ab = Maximum.Min(a, b);
+            return Maximum.Min(ab, c);
+        }
+
+        /// <summary>
+        /// Returns the smaller of four double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="a">The first of four double-precision floating-point numbers to compare.</param>
+        /// <param name="b">The second of four double-precision floating-point numbers to compare.</param>
+        /// <param name="c">The third of four double-precision floating-point numbers to compare.</param>
+        /// <param name="d">The forth of four double-precision floating-point numbers to compare.</param>
+        /// <returns>
+        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Min(double a, double b, double c, double d)
+        {
+            double ab = Maximum.Min(a, b);
+            double cd = Maximum.Min(c, d);
             return Maximum.Min(ab, cd);
         }
 

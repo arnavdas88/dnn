@@ -11,23 +11,24 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
             {
-                uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
+                uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)~(ulong.MaxValue << bitsPerPixel);
                 uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
 
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
+                image.SetBlack();
 
-                for (int x = 0; x < image.Width; x++)
+                for (int y = 0; y < image.Height; y++)
                 {
-                    for (int y = 0; y < image.Height; y++)
+                    for (int x = 0; x < image.Width; x++)
                     {
                         image.SetPixel(x, y, whiteColor);
                         Assert.AreEqual(whiteColor, image.GetPixel(x, y));
                     }
                 }
 
-                for (int x = 0; x < image.Width; x++)
+                for (int y = 0; y < image.Height; y++)
                 {
-                    for (int y = 0; y < image.Height; y++)
+                    for (int x = 0; x < image.Width; x++)
                     {
                         image.SetPixel(x, y, blackColor);
                         Assert.AreEqual(blackColor, image.GetPixel(x, y));

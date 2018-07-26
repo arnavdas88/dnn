@@ -87,7 +87,6 @@ namespace Genix.Imaging
                 Image imageScaled = new Image(width, height, image8bpp);
 
                 // swap bytes to little-endian and back
-                BitUtils64.BiteSwap(image8bpp.Bits.Length, image8bpp.Bits, 0);
                 if (NativeMethods.scale8(
                     image8bpp.Width,
                     image8bpp.Height,
@@ -100,8 +99,6 @@ namespace Genix.Imaging
                 {
                     throw new OutOfMemoryException();
                 }
-
-                BitUtils64.BiteSwap(imageScaled.Bits.Length, imageScaled.Bits, 0);
 
                 using (Pix pixs = imageScaled.CreatePix())
                 {

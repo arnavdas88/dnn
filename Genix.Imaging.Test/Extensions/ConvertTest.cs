@@ -7,7 +7,7 @@
     public class ConvertTest
     {
         [TestMethod]
-        public void Convert1to8Test()
+        public void Convert1to8Test1()
         {
             // image is:
             // 1 0 0 0 0 1 0 0   0 1
@@ -28,6 +28,25 @@
             Assert.AreEqual(255u, result.GetPixel(7, 0));
             Assert.AreEqual(255u, result.GetPixel(8, 0));
             Assert.AreEqual(0u, result.GetPixel(9, 0));
+        }
+
+        [TestMethod]
+        public void Convert1to8Test2()
+        {
+            Image image1 = new Image(2000, 3000, 1, 200, 200);
+            image1.Randomize();
+
+            Image image2 = image1.Convert1To8(255, 0);
+            for (int iy = 0; iy < image1.Height; iy++)
+            {
+                for (int ix = 0; ix < image1.Width; ix++)
+                {
+                    uint color1 = image1.GetPixel(ix, iy);
+                    uint color2 = image2.GetPixel(ix, iy);
+
+                    Assert.IsTrue((color1 == 1 && color2 == 0) || (color1 == 0 && color2 == 255));
+                }
+            }
         }
 
         [TestMethod]

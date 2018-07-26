@@ -24,6 +24,7 @@ template<typename T> void __forceinline __copy(
 	::memcpy(y + offy, x + offx, n * sizeof(T));
 }
 
+GENIXAPI(void, i8copy)(int n, const __int8* x, int offx, __int8* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, i16copy)(int n, const __int16* x, int offx, __int16* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, i32copy)(int n, const __int32* x, int offx, __int32* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, i64copy)(int n, const __int64* x, int offx, __int64* y, int offy) { __copy(n, x, offx, y, offy); }

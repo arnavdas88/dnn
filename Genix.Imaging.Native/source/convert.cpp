@@ -8,26 +8,6 @@
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
-GENIXAPI(void, reversebits)(const int length, unsigned __int64* x, const int offx)
-{
-	x += offx;
-
-	// reshuffle 64-bits at a time
-	for (int i = 0; i < length; i++)
-	{
-		const unsigned __int64 bits = x[i];
-		x[i] =
-			((bits >> 7) & 0x0101010101010101ul) |
-			((bits >> 5) & 0x0202020202020202ul) |
-			((bits >> 3) & 0x0404040404040404ul) |
-			((bits >> 1) & 0x0808080808080808ul) |
-			((bits << 1) & 0x1010101010101010ul) |
-			((bits << 3) & 0x2020202020202020ul) |
-			((bits << 5) & 0x4040404040404040ul) |
-			((bits << 7) & 0x8080808080808080ul);
-	}
-}
-
 GENIXAPI(int, _convert1to8)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
@@ -63,20 +43,37 @@ GENIXAPI(int, _convert1to8)(
 			(values[(i >> 3) & 1] << (3 * 8)) |
 			(values[(i >> 2) & 1] << (2 * 8)) |
 			(values[(i >> 1) & 1] << (1 * 8)) |
-			values[i & 1];
+			(values[(i >> 0) & 1] << (0 * 8));
 	}
 
-	const int width64 = width / 64;
+	const int width64 = width & ~63;
 	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
 	{
-		// convert 8 bits at a time
-		for (int x = 0, offxsrc = offysrc, offxdst = offydst; x < width;)
-		{
-			const unsigned __int64 b = src[offxsrc++];
+		int offxsrc = offysrc;
+		int offxdst = offydst;
 
-			for (int shift = 64 - 8; shift >= 0 && x < width; shift -= 8, x += 8)
+		// convert 64 bits at a time
+		int x = 0;
+		for (; x < width64; x += 64, offxdst += 8, offxsrc++)
+		{
+			const unsigned __int64 b = src[offxsrc];
+			dst[offxdst + 0] = map[(b >> 0) & 0xff];
+			dst[offxdst + 1] = map[(b >> 8) & 0xff];
+			dst[offxdst + 2] = map[(b >> 16) & 0xff];
+			dst[offxdst + 3] = map[(b >> 24) & 0xff];
+			dst[offxdst + 4] = map[(b >> 32) & 0xff];
+			dst[offxdst + 5] = map[(b >> 40) & 0xff];
+			dst[offxdst + 6] = map[(b >> 48) & 0xff];
+			dst[offxdst + 7] = map[(b >> 56) & 0xff];
+		}
+
+		// convert remaining bits
+		if (x < width)
+		{
+			const unsigned __int64 b = src[offxsrc];
+			for (; x < width; x += 8, offxdst++)
 			{
-				dst[offxdst++] = map[(b >> shift) & 0xff];
+				dst[offxdst] = map[(b >> (x & 63)) & 0xff];
 			}
 		}
 	}
@@ -118,11 +115,9 @@ GENIXAPI(int, _convert8to1)(
 		{ width, height },
 		threshold);
 
-	reversebits(height * stridedst, dst, 0);
-
 	return 0;*/
 
-	int width64 = width & ~63;
+	const int width64 = width & ~63;
 	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
 	{
 		int offxsrc = offysrc;
@@ -133,23 +128,23 @@ GENIXAPI(int, _convert8to1)(
 		for (; x < width64; x += 64, offxdst++, offxsrc += 8)
 		{
 			dst[offxdst] =
-				(bits8to1(src[offxsrc + 0], threshold) << 56) |
-				(bits8to1(src[offxsrc + 1], threshold) << 48) |
-				(bits8to1(src[offxsrc + 2], threshold) << 40) |
-				(bits8to1(src[offxsrc + 3], threshold) << 32) |
-				(bits8to1(src[offxsrc + 4], threshold) << 24) |
-				(bits8to1(src[offxsrc + 5], threshold) << 16) |
-				(bits8to1(src[offxsrc + 6], threshold) << 8) |
-				(bits8to1(src[offxsrc + 7], threshold) << 0);
+				(bits8to1(src[offxsrc + 0], threshold) << 0) |
+				(bits8to1(src[offxsrc + 1], threshold) << 8) |
+				(bits8to1(src[offxsrc + 2], threshold) << 16) |
+				(bits8to1(src[offxsrc + 3], threshold) << 24) |
+				(bits8to1(src[offxsrc + 4], threshold) << 32) |
+				(bits8to1(src[offxsrc + 5], threshold) << 40) |
+				(bits8to1(src[offxsrc + 6], threshold) << 48) |
+				(bits8to1(src[offxsrc + 7], threshold) << 56);
 		}
 
 		// convert remaining bits
 		if (x < width)
 		{
 			dst[offxdst] = 0;
-			for (int shift = 64 - 8; x < width; shift -= 8, x += 8, offxsrc++)
+			for (; x < width; x += 8, offxsrc++)
 			{
-				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << shift;
+				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << (x & 63);
 			}
 		}
 	}

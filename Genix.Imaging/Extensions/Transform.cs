@@ -44,17 +44,17 @@ namespace Genix.Imaging
             }
 
             // calculate new image size and position
-            PointF tr = transformPoint(image.Width - 1, 0);
-            PointF br = transformPoint(image.Width - 1, image.Height - 1);
-            PointF bl = transformPoint(0, image.Height - 1);
+            System.Windows.Point tr = transformPoint(image.Width - 1, 0);
+            System.Windows.Point br = transformPoint(image.Width - 1, image.Height - 1);
+            System.Windows.Point bl = transformPoint(0, image.Height - 1);
 
-            float x1dst = Maximum.Min(bl.X, tr.X, br.X, 0.0f);
-            float x2dst = Maximum.Max(bl.X, tr.X, br.X, 0.0f);
-            float y1dst = Maximum.Min(bl.Y, tr.Y, br.Y, 0.0f);
-            float y2dst = Maximum.Max(bl.Y, tr.Y, br.Y, 0.0f);
+            double x1dst = Maximum.Min(bl.X, tr.X, br.X, 0.0);
+            double x2dst = Maximum.Max(bl.X, tr.X, br.X, 0.0);
+            double y1dst = Maximum.Min(bl.Y, tr.Y, br.Y, 0.0);
+            double y2dst = Maximum.Max(bl.Y, tr.Y, br.Y, 0.0);
 
-            int widthdst = (int)Math.Ceiling(x2dst - x1dst) + 1;
-            int heightdst = (int)Math.Ceiling(y2dst - y1dst) + 1;
+            int widthdst = (int)Math.Round(x2dst - x1dst, MidpointRounding.AwayFromZero) + 1;
+            int heightdst = (int)Math.Round(y2dst - y1dst, MidpointRounding.AwayFromZero) + 1;
 
             // translate matrix so the transformed image fits into new frame
             matrix.OffsetX = -Maximum.Min(x1dst, x2dst);
@@ -69,9 +69,6 @@ namespace Genix.Imaging
             }
 
             Image transformedImage = new Image(widthdst, heightdst, image);
-
-            // swap bytes to little-endian and back
-            BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
 
             if (NativeMethods.affine(
                 image.BitsPerPixel,
@@ -93,8 +90,6 @@ namespace Genix.Imaging
                 throw new OutOfMemoryException();
             }
 
-            BitUtils64.BiteSwap(transformedImage.Bits.Length, transformedImage.Bits, 0);
-
             // convert back to 1bpp
             if (convert1bpp)
             {
@@ -113,11 +108,11 @@ namespace Genix.Imaging
 
             return transformedImage;
 
-            PointF transformPoint(int ptx, int pty)
+            System.Windows.Point transformPoint(int ptx, int pty)
             {
-                return new PointF(
-                    (float)((matrix.M11 * ptx) + (matrix.M12 * pty) + matrix.OffsetX),
-                    (float)((matrix.M21 * ptx) + (matrix.M22 * pty) + matrix.OffsetY));
+                return new System.Windows.Point(
+                    (matrix.M11 * ptx) + (matrix.M12 * pty) + matrix.OffsetX,
+                    (matrix.M21 * ptx) + (matrix.M22 * pty) + matrix.OffsetY);
             }
         }
 

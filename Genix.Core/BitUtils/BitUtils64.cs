@@ -14,7 +14,7 @@ namespace Genix.Core
     using System.Security;
 
     /// <summary>
-    /// Provides bit manipulation methods for 64-bit big-endian architecture.
+    /// Provides bit manipulation methods for 64-bit little-endian architecture.
     /// </summary>
     [CLSCompliant(false)]
     public static class BitUtils64
@@ -22,7 +22,7 @@ namespace Genix.Core
         /// <summary>
         /// The first bit.
         /// </summary>
-        public const ulong LSB = 0x8000_0000_0000_0000ul;
+        public const ulong LSB = 1ul;
 
         /// <summary>
         /// Examines the bit at the specified position, and returns the value of that bit.
@@ -36,7 +36,7 @@ namespace Genix.Core
         public static bool TestBit(ulong bits, int position)
         {
             Debug.Assert(position < 64, "The bit position must be less than 64.");
-            return (bits & (LSB >> position)) != 0;
+            return (bits & (LSB << position)) != 0;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Genix.Core
         public static ulong GetBits(ulong bits, int position, int count)
         {
             Debug.Assert(position + count <= 64, "The position+count must be less than or equal to 64.");
-            return (bits >> (64 - (position + count))) & (ulong.MaxValue >> (64 - count));
+            return (bits >> position) & ~(ulong.MaxValue << count);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Genix.Core
         public static ulong SetBit(ulong bits, int position)
         {
             Debug.Assert(position < 64, "The bit position must be less than 64.");
-            return bits | (LSB >> position);
+            return bits | (LSB << position);
         }
 
         /// <summary>
@@ -81,11 +81,9 @@ namespace Genix.Core
         public static ulong SetBits(ulong bits, int position, int count)
         {
             Debug.Assert(position + count <= 64, "The position+count must be less than or equal to 64.");
-            ulong mask = position == 0 ?
-                ulong.MaxValue << (64 - count) :
-                position + count == 64 ?
-                    ulong.MaxValue >> position :
-                    (ulong.MaxValue >> position) & (ulong.MaxValue << (64 - (position + count)));
+            ulong mask = position + count == 64 ?
+                ulong.MaxValue << position :
+                (ulong.MaxValue << position) & ~(ulong.MaxValue << (position + count));
             return bits | mask;
         }
 
@@ -98,7 +96,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetBit(ulong[] bits, int position)
         {
-            bits[position >> 6] |= BitUtils64.LSB >> (position & 63);
+            bits[position >> 6] |= BitUtils64.LSB << (position & 63);
         }
 
         /// <summary>
@@ -123,7 +121,7 @@ namespace Genix.Core
         public static ulong ResetBit(ulong bits, int position)
         {
             Debug.Assert(position < 64, "The bit position must be less than 64.");
-            return bits & ~(BitUtils64.LSB >> position);
+            return bits & ~(BitUtils64.LSB << position);
         }
 
         /// <summary>
@@ -135,7 +133,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetBit(ulong[] bits, int position)
         {
-            bits[position >> 6] &= ~(BitUtils64.LSB >> (position & 63));
+            bits[position >> 6] &= ~(BitUtils64.LSB << (position & 63));
         }
 
         /// <summary>
@@ -163,12 +161,10 @@ namespace Genix.Core
         public static ulong CopyBits(ulong bits, int position, int count, ulong source)
         {
             Debug.Assert(position + count <= 64, "The position+count must be less than or equal to 64.");
-            ulong mask = position == 0 ?
-                ulong.MaxValue << (64 - count) :
-                position + count == 64 ?
-                    ulong.MaxValue >> position :
-                    (ulong.MaxValue >> position) & (ulong.MaxValue << (64 - (position + count)));
-            return (bits & ~mask) | ((source << (64 - (position + count))) & mask);
+            ulong mask = position + count == 64 ?
+                ulong.MaxValue << position :
+                (ulong.MaxValue << position) & ~(ulong.MaxValue << (position + count));
+            return (bits & ~mask) | ((source << position) & mask);
         }
 
         /// <summary>
@@ -346,7 +342,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="xy">The integers to reverse byte order.</param>
-        /// <param name="offxy">The index in the <c>xy</c> at which swapping begins.</param>
+        /// <param name="offxy">The index in the <paramref name="xy"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void BiteSwap(int length, ulong[] xy, int offxy)
         {
@@ -358,9 +354,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The integers to reverse byte order.</param>
-        /// <param name="offx">The index in the <c>x</c> at which swapping begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
         /// <param name="y">The integers that receive swapped bytes.</param>
-        /// <param name="offy">The index in the <c>y</c> at which swapping begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void BiteSwap(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
@@ -368,31 +364,29 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Copies the 64-bits array into 32-bits array.
+        /// Reverses the order of bits in each byte an array of 64-bit integers in-place.
         /// </summary>
-        /// <param name="count">The number of 32-bit words to copy.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
-        /// <param name="swapBytes">Determines whether the bytes should be swapped while copying.</param>
-        public static void Copy64To32(int count, ulong[] x, int offx, uint[] y, int offy, bool swapBytes)
+        /// <param name="length">The number of integers to swap.</param>
+        /// <param name="xy">The integers to reverse bit order.</param>
+        /// <param name="offxy">The index in the <paramref name="xy"/> at which swapping begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, ulong[] xy, int offxy)
         {
-            NativeMethods.bits_copy_be64to32(count, x, offx, y, offy, swapBytes);
+            NativeMethods.bits_reverse_ip_64(length, xy, offxy);
         }
 
         /// <summary>
-        /// Copies the 32-bits array into 64-bits array.
+        /// Reverses the order of bits in each byte an array of 32-bit integers not-in-place.
         /// </summary>
-        /// <param name="count">The number of 32-bit words to copy.</param>
+        /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
-        /// <param name="swapBytes">Determines whether the bytes should be swapped while copying.</param>
-        public static void Copy32To64(int count, uint[] x, int offx, ulong[] y, int offy, bool swapBytes)
+        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.bits_copy_be32to64(count, x, offx, y, offy, swapBytes);
+            NativeMethods.bits_reverse_64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -400,7 +394,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="xy">The source array.</param>
-        /// <param name="offxy">The starting element position in <c>xy</c>.</param>
+        /// <param name="offxy">The starting element position in <paramref name="xy"/>.</param>
         public static void WordsNOT(int length, ulong[] xy, int offxy)
         {
             NativeMethods.bits_not1_64(length, xy, offxy);
@@ -411,9 +405,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsNOT(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.bits_not2_64(length, x, offx, y, offy);
@@ -424,9 +418,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsOR(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_or2_u_64(count, x, posx, y, posy);
@@ -437,9 +431,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.bits_or2_64(length, x, offx, y, offy);
@@ -454,7 +448,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.bits_or3_64(length, a, offa, b, offb, y, offy);
@@ -471,7 +465,7 @@ namespace Genix.Core
         /// <param name="c">The third source array.</param>
         /// <param name="offc">The starting element position in <c>c</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
         {
             NativeMethods.bits_or4_64(length, a, offa, b, offb, c, offc, y, offy);
@@ -490,7 +484,7 @@ namespace Genix.Core
         /// <param name="d">The fourth source array.</param>
         /// <param name="offd">The starting element position in <c>d</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
         {
             NativeMethods.bits_or5_64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
@@ -501,9 +495,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsAND(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_and2_u_64(count, x, posx, y, posy);
@@ -515,7 +509,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, ulong mask, ulong[] y, int offy)
         {
             NativeMethods.bits_and_mask_64(length, mask, y, offy);
@@ -527,8 +521,8 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
-        /// <param name="incy">The increment for the elements of <c>y</c></param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/></param>
         public static void WordsAND(int length, ulong mask, ulong[] y, int offy, int incy)
         {
             NativeMethods.bits_and_mask_inc_64(length, mask, y, offy, incy);
@@ -539,9 +533,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.bits_and2_64(length, x, offx, y, offy);
@@ -556,7 +550,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsAND(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.bits_and3_64(length, a, offa, b, offb, y, offy);
@@ -567,9 +561,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="posx">The starting bit position in <c>x</c>.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="posy">The starting bit position in <c>y</c>.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
         public static void BitsXOR(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_xor2_u_64(count, x, posx, y, posy);
@@ -580,9 +574,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <c>x</c>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsXOR(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.bits_xor2_64(length, x, offx, y, offy);
@@ -597,7 +591,7 @@ namespace Genix.Core
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting element position in <c>b</c>.</param>
         /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <c>y</c>.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         public static void WordsXOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.bits_xor3_64(length, a, offa, b, offb, y, offy);
@@ -665,11 +659,11 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_copy_be64to32(int count, [In] ulong[] src, int offsrc, [Out] uint[] dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern void bits_reverse_64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_copy_be32to64(int count, [In] uint[] src, int offsrc, [Out] ulong[] dst, int offdst, [MarshalAs(UnmanagedType.Bool)] bool swapBytes);
+            public static extern void bits_reverse_ip_64(int length, [In, Out] ulong[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
