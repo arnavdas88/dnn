@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include <stdlib.h>
-////#include "ipp.h"
+#include "ipp.h"
+
+/* Next two defines are created to simplify code reading and understanding */
+#define EXIT_MAIN exitLine:                                  /* Label for Exit */
+#define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
+
+/* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
 GENIXAPI(void, reversebits)(const int length, unsigned __int64* x, const int offx)
 {
@@ -18,7 +24,7 @@ GENIXAPI(void, reversebits)(const int length, unsigned __int64* x, const int off
 			((bits << 1) & 0x1010101010101010ul) |
 			((bits << 3) & 0x2020202020202020ul) |
 			((bits << 5) & 0x4040404040404040ul) |
-			((bits << 6) & 0x8080808080808080ul);
+			((bits << 7) & 0x8080808080808080ul);
 	}
 }
 
@@ -149,5 +155,103 @@ GENIXAPI(int, _convert8to1)(
 	}
 
 	return 0;
+}
+
+GENIXAPI(int, otsu)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const int sx, const int sy,
+	const int smoothx, const int smoothy)
+{
+	IppStatus status = ippStsNoErr;
+	Ipp8u* pThresholds = NULL;
+	Ipp8u* pFilterBoxBorderBuffer = NULL;
+
+	// Calculate tile size
+	////sx = __max(sx, 16);
+	////sy = __max(sy, 16);
+	int nx = __max(1, width / sx);
+	int ny = __max(1, height / sy);
+
+	// Allocate thresholds
+	pThresholds = (Ipp8u*)ippsMalloc_8u(nx * ny);
+	if (pThresholds == NULL)
+	{
+		// insufficient memory available
+		status = ippStsNoMemErr;
+		goto exitLine;
+	}
+
+	// Compute the threshold array for the tiles
+	for (int iy = 0, offy = 0, ithresh = 0; iy < ny; iy++, offy += sy)
+	{
+		const int th = iy + 1 == ny ? height - offy : sy;
+
+		for (int ix = 0, offx = 0; ix < nx; ix++, offx += sx)
+		{
+			const int tw = ix + 1 == nx ? width - offx : sx;
+
+			check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
+				(const Ipp8u*)(src + (offy * stridesrc)),
+				stridesrc,
+				{ tw, th },
+				&pThresholds[ithresh++]));
+		}
+	}
+
+	// Optionally smooth the threshold array
+	if (smoothx > 0 || smoothy > 0)
+	{
+		// kernel too large; reducing!
+		if (nx < (2 * smoothx) + 1 || ny < (2 * smoothy) + 1)
+		{
+			//smoothx = __min(smoothx, (nx - 1) / 2);
+			//smoothy = __min(smoothy, (ny - 1) / 2);
+		}
+
+		if (smoothx > 0 || smoothy > 0)
+		{
+			IppiSize roiSize = { nx, ny };
+			IppiSize maskSize = { smoothx, smoothy };
+			int iBufSize = 0;
+
+			check_sts(status = ippiFilterBoxBorderGetBufferSize(
+				roiSize,
+				maskSize,
+				ipp8u,
+				1,
+				&iBufSize));
+
+			pFilterBoxBorderBuffer = ippsMalloc_8u(iBufSize);
+
+			check_sts(status = ippiFilterBoxBorder_8u_C1R(
+				pThresholds,
+				nx,
+				pThresholds,
+				nx,
+				roiSize,
+				maskSize,
+				ippBorderRepl,
+				NULL,
+				pFilterBoxBorderBuffer));
+		}
+	}
+
+	// Apply the threshold
+	for (int iy = 0, offy = 0, ithresh = 0; iy < ny; iy++, offy += sy)
+	{
+		const int th = iy + 1 == ny ? height - offy : sy;
+
+		for (int ix = 0, offx = 0; ix < nx; ix++, offx += sx)
+		{
+			const int tw = ix + 1 == nx ? width - offx : sx;
+		}
+	}
+
+	EXIT_MAIN
+	ippsFree(pFilterBoxBorderBuffer);
+	ippsFree(pThresholds);
+	return (int)status;
 }
 

@@ -170,9 +170,9 @@ namespace Genix.Imaging
                 int width,
                 int height,
                 [In] ulong[] src,
-                int srcstride,
+                int stridesrc,
                 [Out] ulong[] dst,
-                int dststride,
+                int stridedst,
                 byte value0,
                 byte value1);
 
@@ -182,10 +182,24 @@ namespace Genix.Imaging
                 int width,
                 int height,
                 [In] ulong[] src,
-                int srcstride,
+                int stridesrc,
                 [Out] ulong[] dst,
-                int dststride,
+                int stridedst,
                 byte threshold);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int otsu(
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                int sx,
+                int sy,
+                int smoothx,
+                int smoothy);
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetBits(int count, ulong[] bits, int position)
         {
-            NativeMethods.bits_set_be64(count, bits, position);
+            NativeMethods.bits_set_64(count, bits, position);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetBits(int count, ulong[] bits, int position)
         {
-            NativeMethods.bits_reset_be64(count, bits, position);
+            NativeMethods.bits_reset_64(count, bits, position);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyBits(int count, ulong[] source, int sourcePosition, ulong[] destination, int destinationPosition)
         {
-            NativeMethods.bits_copy_be64(count, source, sourcePosition, destination, destinationPosition);
+            NativeMethods.bits_copy_64(count, source, sourcePosition, destination, destinationPosition);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneForward(ulong bits)
         {
-            return NativeMethods.bit_scan_forward_be64(bits);
+            return NativeMethods.bit_scan_forward_64(bits);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneReverse(ulong bits)
         {
-            return NativeMethods.bit_scan_reverse_be64(bits);
+            return NativeMethods.bit_scan_reverse_64(bits);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneForward(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_forward_be64(count, bits, position);
+            return NativeMethods.bits_scan_one_forward_64(count, bits, position);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneReverse(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_reverse_be64(count, bits, position);
+            return NativeMethods.bits_scan_one_reverse_64(count, bits, position);
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanZeroForward(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_forward_be64(count, bits, position);
+            return NativeMethods.bits_scan_zero_forward_64(count, bits, position);
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanZeroReverse(int count, ulong[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_reverse_be64(count, bits, position);
+            return NativeMethods.bits_scan_zero_reverse_64(count, bits, position);
         }
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsOR(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
-            NativeMethods.bits_or2_be64(count, x, posx, y, posy);
+            NativeMethods.bits_or2_u_64(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -506,7 +506,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsAND(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
-            NativeMethods.bits_and2_be64(count, x, posx, y, posy);
+            NativeMethods.bits_and2_u_64(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsXOR(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
-            NativeMethods.bits_xor2_be64(count, x, posx, y, posy);
+            NativeMethods.bits_xor2_u_64(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -621,39 +621,39 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_forward_be64(ulong bits);
+            public static extern int bit_scan_forward_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_reverse_be64(ulong bits);
+            public static extern int bit_scan_reverse_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_forward_be64(int count, ulong[] bits, int pos);
+            public static extern int bits_scan_one_forward_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_reverse_be64(int count, ulong[] bits, int pos);
+            public static extern int bits_scan_one_reverse_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_forward_be64(int count, ulong[] bits, int pos);
+            public static extern int bits_scan_zero_forward_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_reverse_be64(int count, ulong[] bits, int pos);
+            public static extern int bits_scan_zero_reverse_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_reset_be64(int count, [In, Out] ulong[] bits, int pos);
+            public static extern void bits_reset_64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_set_be64(int count, [In, Out] ulong[] bits, int pos);
+            public static extern void bits_set_64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_copy_be64(int count, [In] ulong[] bitssrc, int possrc, [Out] ulong[] bitsdst, int posdst);
+            public static extern void bits_copy_64(int count, [In] ulong[] bitssrc, int possrc, [Out] ulong[] bitsdst, int posdst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -685,7 +685,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_or2_be64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
+            public static extern void bits_or2_u_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -713,7 +713,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_and2_be64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
+            public static extern void bits_and2_u_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -725,7 +725,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_xor2_be64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
+            public static extern void bits_xor2_u_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

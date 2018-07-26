@@ -110,7 +110,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetBits(int count, uint[] bits, int position)
         {
-            NativeMethods.bits_set_be32(count, bits, position);
+            NativeMethods.bits_set_32(count, bits, position);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetBits(int count, uint[] bits, int position)
         {
-            NativeMethods.bits_reset_be32(count, bits, position);
+            NativeMethods.bits_reset_32(count, bits, position);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyBits(int count, uint[] source, int sourcePosition, uint[] destination, int destinationPosition)
         {
-            NativeMethods.bits_copy_be32(count, source, sourcePosition, destination, destinationPosition);
+            NativeMethods.bits_copy_32(count, source, sourcePosition, destination, destinationPosition);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneForward(uint bits)
         {
-            return NativeMethods.bit_scan_forward_be32(bits);
+            return NativeMethods.bit_scan_forward_32(bits);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneReverse(uint bits)
         {
-            return NativeMethods.bit_scan_reverse_be32(bits);
+            return NativeMethods.bit_scan_reverse_32(bits);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneForward(int count, uint[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_forward_be32(count, bits, position);
+            return NativeMethods.bits_scan_one_forward_32(count, bits, position);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanOneReverse(int count, uint[] bits, int position)
         {
-            return NativeMethods.bits_scan_one_reverse_be32(count, bits, position);
+            return NativeMethods.bits_scan_one_reverse_32(count, bits, position);
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanZeroForward(int count, uint[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_forward_be32(count, bits, position);
+            return NativeMethods.bits_scan_zero_forward_32(count, bits, position);
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BitScanZeroReverse(int count, uint[] bits, int position)
         {
-            return NativeMethods.bits_scan_zero_reverse_be32(count, bits, position);
+            return NativeMethods.bits_scan_zero_reverse_32(count, bits, position);
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
-            NativeMethods.bits_or2_be32(count, x, posx, y, posy);
+            NativeMethods.bits_or2_u_32(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsAND(int count, uint[] x, int posx, uint[] y, int posy)
         {
-            NativeMethods.bits_and2_be32(count, x, posx, y, posy);
+            NativeMethods.bits_and2_u_32(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -544,7 +544,7 @@ namespace Genix.Core
         /// <param name="posy">The starting bit position in <c>y</c>.</param>
         public static void BitsXOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
-            NativeMethods.bits_xor2_be32(count, x, posx, y, posy);
+            NativeMethods.bits_xor2_u_32(count, x, posx, y, posy);
         }
 
         /// <summary>
@@ -593,39 +593,39 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_forward_be32(uint bits);
+            public static extern int bit_scan_forward_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bit_scan_reverse_be32(uint bits);
+            public static extern int bit_scan_reverse_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_forward_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_one_forward_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_one_reverse_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_one_reverse_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_forward_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_zero_forward_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int bits_scan_zero_reverse_be32(int count, uint[] bits, int pos);
+            public static extern int bits_scan_zero_reverse_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_reset_be32(int count, [In, Out] uint[] bits, int pos);
+            public static extern void bits_reset_32(int count, [In, Out] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_set_be32(int count, [In, Out] uint[] bits, int pos);
+            public static extern void bits_set_32(int count, [In, Out] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_copy_be32(int count, [In] uint[] bitssrc, int possrc, [Out] uint[] bitsdst, int posdst);
+            public static extern void bits_copy_32(int count, [In] uint[] bitssrc, int possrc, [Out] uint[] bitsdst, int posdst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -649,7 +649,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_or2_be32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
+            public static extern void bits_or2_u_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -677,7 +677,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_and2_be32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
+            public static extern void bits_and2_u_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -689,7 +689,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_xor2_be32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
+            public static extern void bits_xor2_u_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
