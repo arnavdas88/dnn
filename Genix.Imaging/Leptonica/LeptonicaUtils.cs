@@ -39,7 +39,8 @@ namespace Genix.Imaging
                     image.Bits,
                     image.Stride8,
                     pix.pixGetData(),
-                    pix.Wpl * sizeof(uint));
+                    pix.Wpl * sizeof(uint),
+                    image.BitsPerPixel == 1);
             }
             catch
             {
@@ -64,7 +65,8 @@ namespace Genix.Imaging
                 pix.pixGetData(),
                 pix.Wpl * sizeof(uint),
                 image.Bits,
-                image.Stride8);
+                image.Stride8,
+                image.BitsPerPixel == 1);
 
             return image;
         }
@@ -115,7 +117,7 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst)
+        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst, bool swapBits)
         {
             unsafe
             {
@@ -134,16 +136,23 @@ namespace Genix.Imaging
                 }
 
                 NativeMethods.bytesswap_ip_32(height * strideDst / sizeof(uint), udst, 0);
-                NativeMethods.bits_reverse_ip_32(height * strideDst / sizeof(uint), udst, 0);
+
+                if (swapBits)
+                {
+                    NativeMethods.bits_reverse_ip_32(height * strideDst / sizeof(uint), udst, 0);
+                }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst)
+        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, bool swapBits)
         {
             unsafe
             {
                 uint* usrc = (uint*)src;
+
+                // !!!! after this operation Leptonica image is invalid
+                NativeMethods.bytesswap_ip_32(height * strideSrc / sizeof(uint), usrc, 0);
 
                 if (strideDst == strideSrc)
                 {
@@ -158,8 +167,12 @@ namespace Genix.Imaging
                 }
             }
 
-            BitUtils64.BiteSwap(dst.Length, dst, 0);
-            BitUtils64.BitSwap(dst.Length, dst, 0);
+            ////BitUtils64.BiteSwap(dst.Length, dst, 0);
+
+            if (swapBits)
+            {
+                BitUtils64.BitSwap(dst.Length, dst, 0);
+            }
         }
 
         private static class NativeMethods
