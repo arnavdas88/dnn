@@ -21,6 +21,7 @@ namespace Genix.NetLearn
     using System.Threading;
     using System.Threading.Tasks;
     using Genix.DNN;
+    using Genix.DNN.Imaging;
     using Genix.DNN.Learning;
     using Genix.Imaging.Lab;
     using Newtonsoft.Json;
@@ -248,7 +249,7 @@ namespace Genix.NetLearn
                                         bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.Id + ".bmp");
                                     }*/
 
-                                    return (Tensor.FromBitmap(null, bitmap), labels);
+                                    return (bitmap.ToTensor(null), labels);
                                 });
                         });
                 }

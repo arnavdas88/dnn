@@ -91,6 +91,10 @@
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Genix.DNN.Imaging\Genix.DNN.Imaging.csproj">
+      <Project>{90ab3206-dd81-433d-b55e-95649d150253}</Project>
+      <Name>Genix.DNN.Imaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Genix.DNN\Genix.DNN.csproj">
       <Project>{75e41c3e-e491-4d38-9b62-a01e90dece12}</Project>
       <Name>Genix.DNN</Name>

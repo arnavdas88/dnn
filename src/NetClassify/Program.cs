@@ -18,6 +18,7 @@ namespace Genix.NetClassify
     using System.Text;
     using System.Threading;
     using Genix.DNN;
+    using Genix.DNN.Imaging;
     using Genix.DNN.LanguageModel;
     using Genix.Imaging.Lab;
     using Genix.Lab;
@@ -126,7 +127,7 @@ namespace Genix.NetClassify
 
                     Program.localTimeCounter.Restart();
 
-                    Tensor x = Tensor.FromBitmap(null, sample.Image);
+                    Tensor x = sample.Image.ToTensor(null);
                     ////(IList<IList<ClassificationNetworkResult>> answers, _) = network.Execute(x);
                     (IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 

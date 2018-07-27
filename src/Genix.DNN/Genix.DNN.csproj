@@ -44,7 +44,6 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,10 +145,6 @@
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
-      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
-      <Name>Genix.Imaging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
