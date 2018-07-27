@@ -4,6 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+#if false
 namespace Genix.Imaging
 {
     using System;
@@ -197,3 +198,4 @@ namespace Genix.Imaging
         }
     }
 }
+#endif

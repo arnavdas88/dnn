@@ -7,12 +7,10 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Drawing;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
-    using Leptonica;
 
     /// <summary>
     /// Provides various transformation methods like rotation and mirroring for the <see cref="Image"/> class.

@@ -12,7 +12,6 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
-    using Leptonica;
 
     /// <summary>
     /// Provides scaling extension methods for the <see cref="Image"/> class.

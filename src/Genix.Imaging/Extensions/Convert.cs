@@ -7,12 +7,10 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Core;
-    using Leptonica;
+    ////using Leptonica;
 
     /// <summary>
     /// Provides conversion extension methods for the <see cref="Image"/> class.
@@ -115,8 +113,6 @@ namespace Genix.Imaging
                 image.Stride,
                 dst.Bits,
                 dst.Stride,
-                /*image.Width,
-                image.Height,*/
                 64,
                 128,
                 2,
@@ -124,7 +120,7 @@ namespace Genix.Imaging
 
             return dst;
 
-            try
+            /*try
             {
                 using (Pix pixs = image.CreatePix())
                 {
@@ -137,7 +133,7 @@ namespace Genix.Imaging
             catch (Exception e)
             {
                 throw new InvalidOperationException("Cannot binarize the image.", e);
-            }
+            }*/
         }
 
         /// <summary>
