@@ -8,48 +8,6 @@
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
-GENIXAPI(int, affine_rotate_coeff)(
-	const int widthsrc, const int heightsrc,
-	const int widthdst, const int heightdst,
-	const double angle,
-	double* c00, double* c01, double* c02,
-	double* c10, double* c11, double* c12)
-{
-	IppStatus status = ippStsNoErr;
-
-	IppiSize srcSize = { widthsrc, heightsrc };
-	IppiSize dstSize = { widthdst, heightdst };
-	double xCenterSrc = widthsrc / 2;
-	double yCenterSrc = heightsrc / 2;
-	double xCenterDst = widthdst / 2;
-	double yCenterDst = heightdst / 2;
-	double coeffs[2][3];
-
-	/* Get transform */
-	double xShift;
-	double yShift;
-	check_sts(status = ippiGetRotateShift(xCenterSrc, yCenterSrc, angle, &xShift, &yShift));
-
-	double xShiftTmp;
-	double yShiftTmp;
-	check_sts(status = ippiGetRotateShift(1.0, 1.0, angle, &xShiftTmp, &yShiftTmp));
-
-	xShift += xShiftTmp; yShift += yShiftTmp;
-	xShift += xCenterDst - xCenterSrc;
-	yShift += yCenterDst - yCenterSrc;
-	check_sts(status = ippiGetRotateTransform(angle, xShift, yShift, coeffs));
-
-	*c00 = coeffs[0][0];
-	*c01 = coeffs[0][1];
-	*c02 = coeffs[0][2];
-	*c10 = coeffs[1][0];
-	*c11 = coeffs[1][1];
-	*c12 = coeffs[1][2];
-
-	EXIT_MAIN
-	return (int)status;
-}
-
 GENIXAPI(int, affine)(
 	const int bitsPerPixel,
 	const int widthsrc, const int heightsrc, const int stridesrc, const unsigned __int64* src,

@@ -20,6 +20,65 @@ namespace Genix.Imaging
     public static class Convert
     {
         /// <summary>
+        /// Normalizes the <see cref="Image"/> intensity be mapping the image
+        /// so that the background is near the specified value.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> which background to normalize.</param>
+        /// <param name="threshold">The threshold to determine foreground.</param>
+        /// <param name="sx">The tile width.</param>
+        /// <param name="sy">The tile height.</param>
+        /// <returns>
+        /// A new normalized <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <c>image</c> is <b>null</b>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Image NormalizeBackground(this Image image, byte threshold, int sx, int sy)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 8)
+            {
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            // generate foreground mask
+            Image mask = image.Convert8To1(threshold)
+                              .Dilate(StructuringElement.Rectangle(7, 1), 1)
+                              .Dilate(StructuringElement.Rectangle(1, 7), 1)
+                              .Convert1To8(255, 0);
+
+            // use mask to remove foreground pixels from original image
+            Image values = image & mask;
+
+            // generate map
+            //int wd = (image.Width + sx - 1) / sx;
+            //int hd = (image.Height + sy - 1) / sy;
+
+            int nx = image.Width / sx;
+            int ny = image.Height / sy;
+            int[] map = new int[ny * nx];
+
+            for (int iy = 0, ty = 0, imap = 0; iy < ny; iy++, ty += sy)
+            {
+                int th = iy + 1 == ny ? image.Height - ty : sy;
+
+                for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
+                {
+                    int tw = ix + 1 == nx ? image.Width - tx : sx;
+
+                    map[imap++] = values.Power(tx, ty, tw, th);
+                }
+            }
+
+            return image;
+        }
+
+        /// <summary>
         /// Converts this <see cref="Image"/> from gray scale to black-and-white.
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to binarize.</param>
@@ -39,8 +98,31 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel != 8)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
+
+            Image dst = new Image(
+                image.Width,
+                image.Height,
+                1,
+                image.HorizontalResolution,
+                image.VerticalResolution);
+
+            NativeMethods.otsu(
+                image.Width,
+                image.Height,
+                image.Bits,
+                image.Stride,
+                dst.Bits,
+                dst.Stride,
+                /*image.Width,
+                image.Height,*/
+                64,
+                128,
+                2,
+                2);
+
+            return dst;
 
             try
             {
@@ -119,10 +201,10 @@ namespace Genix.Imaging
         /// </exception>
         /// <remarks>
         /// <para>
-        /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0.
+        /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0 (white).
         /// </para>
         /// <para>
-        /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1.
+        /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1 (black).
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -146,6 +228,8 @@ namespace Genix.Imaging
                 image.VerticalResolution);
 
             if (NativeMethods._convert8to1(
+                0,
+                0,
                 image.Width,
                 image.Height,
                 image.Bits,
@@ -179,6 +263,8 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to1(
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src,

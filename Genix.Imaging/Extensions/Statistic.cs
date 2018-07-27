@@ -24,7 +24,7 @@ namespace Genix.Imaging
         /// The number of black pixels on the bitmap.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <para>
@@ -42,22 +42,81 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
+            return image.Power(0, 0, image.Width, image.Height);
+        }
+
+        /// <summary>
+        /// Returns the number of black pixels withing specified area of this <see cref="Image"/> .
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="width">The width, in pixels, of the area.</param>
+        /// <param name="height">The height, in pixels, of the area.</param>
+        /// <returns>
+        /// The number of black pixels on the bitmap.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>
+        /// The <see cref="Image.BitsPerPixel"/> is not 1.
+        /// </para>
+        /// </exception>
+        /// <remarks>
+        /// This method supports black-and-white images only and will throw an exception if called on gray-scale or color images.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Power(this Image image, int x, int y, int width, int height)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
             if (image.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
+            image.ValidateArea(x, y, width, height);
+
             ulong[] bits = image.Bits;
-            int stride1 = image.Stride1;
-            int width = image.WidthBits;
+            int stride = image.Stride1;
 
             int sum = 0;
-            for (int i = 0, ii = image.Height, pos = 0; i < ii; i++, pos += stride1)
+            for (int iy = 0, pos = (y * stride) + x; iy < height; iy++, pos += stride)
             {
                 sum += BitUtils64.CountOneBits(width, bits, pos);
             }
 
             return sum;
+        }
+
+        /// <summary>
+        /// Returns the number of black pixels withing specified area of this <see cref="Image"/> .
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="area">The area on <paramref name="image"/> to calculate histogram for.</param>
+        /// <returns>
+        /// The number of black pixels on the bitmap.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>
+        /// The <see cref="Image.BitsPerPixel"/> is not 1.
+        /// </para>
+        /// </exception>
+        /// <remarks>
+        /// This method supports black-and-white images only and will throw an exception if called on gray-scale or color images.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Power(this Image image, Rectangle area)
+        {
+            return Statistic.Power(image, area.X, area.Y, area.Width, area.Height);
         }
 
         /// <summary>
@@ -69,7 +128,7 @@ namespace Genix.Imaging
         /// <b>Rectangle.Empty</b> if the image does not have black pixels.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The image is not black-and-white.
@@ -212,7 +271,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image)
@@ -237,7 +296,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image, int x, int y, int width, int height)
@@ -271,12 +330,12 @@ namespace Genix.Imaging
         /// Calculates a horizontal histogram for the specified area of the <see cref="Image"/>.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to analyze.</param>
-        /// <param name="area">The area on <c>image</c> to calculate histogram for.</param>
+        /// <param name="area">The area on <paramref name="image"/> to calculate histogram for.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image, Rectangle area)

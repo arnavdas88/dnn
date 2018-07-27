@@ -101,6 +101,7 @@ unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, int thresho
 }
 
 GENIXAPI(int, _convert8to1)(
+	const int x, const int y,
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst,
@@ -117,15 +118,18 @@ GENIXAPI(int, _convert8to1)(
 
 	return 0;*/
 
+	src += (y * stridesrc) + (x / 8);
+	dst += (y * stridedst) + (x / 64);
+
 	const int width64 = width & ~63;
-	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	for (int iy = 0, offysrc = 0, offydst = 0; iy < height; iy++, offysrc += stridesrc, offydst += stridedst)
 	{
 		int offxsrc = offysrc;
 		int offxdst = offydst;
 
 		// convert 64 bits at a time
-		int x = 0;
-		for (; x < width64; x += 64, offxdst++, offxsrc += 8)
+		int ix = 0;
+		for (; ix < width64; ix += 64, offxdst++, offxsrc += 8)
 		{
 			dst[offxdst] =
 				(bits8to1(src[offxsrc + 0], threshold) << 0) |
@@ -139,12 +143,12 @@ GENIXAPI(int, _convert8to1)(
 		}
 
 		// convert remaining bits
-		if (x < width)
+		if (ix < width)
 		{
 			dst[offxdst] = 0;
-			for (; x < width; x += 8, offxsrc++)
+			for (; ix < width; ix += 8, offxsrc++)
 			{
-				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << (x & 63);
+				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << (ix & 63);
 			}
 		}
 	}
@@ -156,91 +160,128 @@ GENIXAPI(int, otsu)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst,
-	const int sx, const int sy,
-	const int smoothx, const int smoothy)
+	int sx, int sy,
+	int smoothx, int smoothy)
 {
 	IppStatus status = ippStsNoErr;
 	Ipp8u* pThresholds = NULL;
 	Ipp8u* pFilterBoxBorderBuffer = NULL;
 
 	// Calculate tile size
-	////sx = __max(sx, 16);
-	////sy = __max(sy, 16);
+	sx = __max(((sx + 7) / 8) * 8, 16);	// horizontal tile size must be rounded to 8 pixels
+	sy = __max(sy, 16);
 	int nx = __max(1, width / sx);
 	int ny = __max(1, height / sy);
 
-	// Allocate thresholds
-	pThresholds = (Ipp8u*)ippsMalloc_8u(nx * ny);
-	if (pThresholds == NULL)
+	if (nx == 1 && ny == 1)
 	{
-		// insufficient memory available
-		status = ippStsNoMemErr;
-		goto exitLine;
+		Ipp8u threshold = 0;
+
+		// Compute the threshold
+		check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
+			(const Ipp8u*)src,
+			stridesrc * sizeof(unsigned __int64),
+			{ width, height },
+			&threshold));
+
+		// Apply the threshold
+		check_sts(status = _convert8to1(
+			0,
+			0,
+			width,
+			height,
+			src,
+			stridesrc,
+			dst,
+			stridedst,
+			threshold));
 	}
-
-	// Compute the threshold array for the tiles
-	for (int iy = 0, offy = 0, ithresh = 0; iy < ny; iy++, offy += sy)
+	else
 	{
-		const int th = iy + 1 == ny ? height - offy : sy;
-
-		for (int ix = 0, offx = 0; ix < nx; ix++, offx += sx)
+		// Allocate thresholds
+		pThresholds = (Ipp8u*)ippsMalloc_8u(nx * ny);
+		if (pThresholds == NULL)
 		{
-			const int tw = ix + 1 == nx ? width - offx : sx;
-
-			check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
-				(const Ipp8u*)(src + (offy * stridesrc)),
-				stridesrc,
-				{ tw, th },
-				&pThresholds[ithresh++]));
-		}
-	}
-
-	// Optionally smooth the threshold array
-	if (smoothx > 0 || smoothy > 0)
-	{
-		// kernel too large; reducing!
-		if (nx < (2 * smoothx) + 1 || ny < (2 * smoothy) + 1)
-		{
-			//smoothx = __min(smoothx, (nx - 1) / 2);
-			//smoothy = __min(smoothy, (ny - 1) / 2);
+			// insufficient memory available
+			status = ippStsNoMemErr;
+			goto exitLine;
 		}
 
+		// Compute the threshold array for the tiles
+		for (int iy = 0, ty = 0, ithresh = 0; iy < ny; iy++, ty += sy)
+		{
+			const int th = iy + 1 == ny ? height - ty : sy;
+
+			for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
+			{
+				const int tw = ix + 1 == nx ? width - tx : sx;
+
+				check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
+					(const Ipp8u*)(src + (ty * stridesrc)) + (tx >> 3),
+					stridesrc * sizeof(unsigned __int64),
+					{ tw, th },
+					&pThresholds[ithresh++]));
+			}
+		}
+
+		// Optionally smooth the threshold array
 		if (smoothx > 0 || smoothy > 0)
 		{
-			IppiSize roiSize = { nx, ny };
-			IppiSize maskSize = { smoothx, smoothy };
-			int iBufSize = 0;
+			// kernel too large; reducing!
+			if (nx < (2 * smoothx) + 1 || ny < (2 * smoothy) + 1)
+			{
+				smoothx = __min(smoothx, (nx - 1) / 2);
+				smoothy = __min(smoothy, (ny - 1) / 2);
+			}
 
-			check_sts(status = ippiFilterBoxBorderGetBufferSize(
-				roiSize,
-				maskSize,
-				ipp8u,
-				1,
-				&iBufSize));
+			if (smoothx > 0 || smoothy > 0)
+			{
+				IppiSize roiSize = { nx, ny };
+				IppiSize maskSize = { (2 * smoothx) + 1, (2 * smoothy) + 1 };
+				int iBufSize = 0;
 
-			pFilterBoxBorderBuffer = ippsMalloc_8u(iBufSize);
+				check_sts(status = ippiFilterBoxBorderGetBufferSize(
+					roiSize,
+					maskSize,
+					ipp8u,
+					1,
+					&iBufSize));
 
-			check_sts(status = ippiFilterBoxBorder_8u_C1R(
-				pThresholds,
-				nx,
-				pThresholds,
-				nx,
-				roiSize,
-				maskSize,
-				ippBorderRepl,
-				NULL,
-				pFilterBoxBorderBuffer));
+				pFilterBoxBorderBuffer = ippsMalloc_8u(iBufSize);
+
+				check_sts(status = ippiFilterBoxBorder_8u_C1R(
+					pThresholds,
+					nx,
+					pThresholds,
+					nx,
+					roiSize,
+					maskSize,
+					ippBorderRepl,
+					NULL,
+					pFilterBoxBorderBuffer));
+			}
 		}
-	}
 
-	// Apply the threshold
-	for (int iy = 0, offy = 0, ithresh = 0; iy < ny; iy++, offy += sy)
-	{
-		const int th = iy + 1 == ny ? height - offy : sy;
-
-		for (int ix = 0, offx = 0; ix < nx; ix++, offx += sx)
+		// Apply the threshold
+		for (int iy = 0, ty = 0, ithresh = 0; iy < ny; iy++, ty += sy)
 		{
-			const int tw = ix + 1 == nx ? width - offx : sx;
+			const int th = iy + 1 == ny ? height - ty : sy;
+
+			for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
+			{
+				const int tw = ix + 1 == nx ? width - tx : sx;
+
+				check_sts(status = _convert8to1(
+					tx,
+					ty,
+					tw,
+					th,
+					src,
+					stridesrc,
+					dst,
+					stridedst,
+					pThresholds[ithresh++]));
+			}
 		}
 	}
 
