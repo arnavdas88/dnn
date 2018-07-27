@@ -6,6 +6,7 @@
 
 namespace Genix.Imaging
 {
+    using Genix.Core;
     using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
@@ -22,9 +23,9 @@ namespace Genix.Imaging
         /// so that the background is near the specified value.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> which background to normalize.</param>
-        /// <param name="threshold">The threshold to determine foreground.</param>
-        /// <param name="sx">The tile width.</param>
-        /// <param name="sy">The tile height.</param>
+        //// <param name="threshold">The threshold to determine foreground.</param>
+        //// <param name="sx">The tile width.</param>
+        //// <param name="sy">The tile height.</param>
         /// <returns>
         /// A new normalized <see cref="Image"/>.
         /// </returns>
@@ -32,7 +33,7 @@ namespace Genix.Imaging
         /// <c>image</c> is <b>null</b>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image NormalizeBackground(this Image image, byte threshold, int sx, int sy)
+        public static Image NormalizeBackground(this Image image/*, byte threshold, int sx, int sy*/)
         {
             if (image == null)
             {
@@ -43,6 +44,13 @@ namespace Genix.Imaging
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
+
+            int sx = 64;
+            int sy = 128;
+            byte threshold = 128;
+
+            Histogram ghist = image.GrayHistogram();
+            Histogram vhist = image.HistogramY();
 
             // generate foreground mask
             Image mask = image.Convert8To1(threshold)

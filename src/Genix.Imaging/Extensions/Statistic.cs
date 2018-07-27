@@ -32,7 +32,7 @@ namespace Genix.Imaging
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <remarks>
         /// This method supports binary and gray images only and will throw an exception otherwise.
@@ -66,7 +66,7 @@ namespace Genix.Imaging
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -115,7 +115,7 @@ namespace Genix.Imaging
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -274,15 +274,142 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Calculates a horizontal histogram for the <see cref="Image"/>.
+        /// Calculates a color intensity histogram of the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Histogram GrayHistogram(this Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            return image.GrayHistogram(0, 0, image.Width, image.Height);
+        }
+
+        /// <summary>
+        /// Calculates a color intensity histogram of the <see cref="Image"/>
+        /// withing a rectangular area specified by a pair of coordinates, a width, and a height.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
+        /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="width">The width, in pixels, of the area.</param>
+        /// <param name="height">The height, in pixels, of the area.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Histogram GrayHistogram(this Image image, int x, int y, int width, int height)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            image.ValidateArea(x, y, width, height);
+
+            Histogram histogram = new Histogram(1 << image.BitsPerPixel);
+
+            switch (image.BitsPerPixel)
+            {
+                case 1:
+                    histogram[1] = (int)image.Power(x, y, width, height);
+                    histogram[0] = (image.Width * image.Height) - histogram[1];
+                    break;
+
+                case 8:
+                    NativeMethods.grayhist_8bpp(x, y, width, height, image.Bits, image.Stride, histogram.Bins);
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        image.BitsPerPixel));
+            }
+
+            return histogram;
+        }
+
+        /// <summary>
+        /// Calculates a color intensity histogram of the <see cref="Image"/>
+        /// withing a rectangular area specified by a <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Histogram GrayHistogram(this Image image, Rectangle area)
+        {
+            return Statistic.GrayHistogram(image, area.X, area.Y, area.Width, area.Height);
+        }
+
+        /// <summary>
+        /// Calculates an intensity histogram of the <see cref="Image"/> along its x-axis.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
+        /// <returns>
+        /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is <paramref name="image"/>.<see cref="Image.Height"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image)
         {
@@ -295,19 +422,30 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Calculates a horizontal histogram for the specified area of the <see cref="Image"/>.
+        /// Calculates an intensity histogram of the <see cref="Image"/> along its x-axis 
+        /// withing a rectangular area specified by a pair of coordinates, a width, and a height.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
         /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
         /// <param name="width">The width, in pixels, of the area.</param>
         /// <param name="height">The height, in pixels, of the area.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is <paramref name="height"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image, int x, int y, int width, int height)
         {
@@ -316,37 +454,52 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
-            if (image.BitsPerPixel != 1)
-            {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
-            }
-
             image.ValidateArea(x, y, width, height);
-
-            int stride1 = image.Stride1;
-            ulong[] bits = image.Bits;
 
             Histogram histogram = new Histogram(height);
 
-            for (int i = 0, pos = (y * stride1) + x; i < height; i++, pos += stride1)
+            switch (image.BitsPerPixel)
             {
-                histogram.Increment(i, BitUtils64.CountOneBits(width, bits, pos));
+                case 1:
+                    NativeMethods.vhist_1bpp(x, y, width, height, image.Bits, image.Stride, histogram.Bins);
+                    break;
+
+                case 8:
+                    NativeMethods.vhist_8bpp(x, y, width, height, image.Bits, image.Stride, histogram.Bins);
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        image.BitsPerPixel));
             }
 
             return histogram;
         }
 
         /// <summary>
-        /// Calculates a horizontal histogram for the specified area of the <see cref="Image"/>.
+        /// Calculates an intensity histogram of the <see cref="Image"/> along its x-axis 
+        /// withing a rectangular area specified by a <see cref="Rectangle"/> struct.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
-        /// <param name="area">The area on <paramref name="image"/> to calculate histogram for.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the histogram for.</param>
+        /// <param name="area">The width, height, and location of the area.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
+        /// The histogram size is <paramref name="area"/>.<see cref="Rectangle.Height"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// The <paramref name="image"/>.<see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports binary and gray images only and will throw an exception otherwise.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Histogram HistogramY(this Image image, Rectangle area)
         {
@@ -376,6 +529,39 @@ namespace Genix.Imaging
                 int height,
                 [In] ulong[] bits,
                 int stride);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void grayhist_8bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride,
+                [Out] int[] hist);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void vhist_1bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride,
+                [Out] int[] hist);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void vhist_8bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride,
+                [Out] int[] hist);
         }
     }
 }

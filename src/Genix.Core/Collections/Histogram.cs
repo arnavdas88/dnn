@@ -141,11 +141,15 @@ namespace Genix.Core
         public int Count => this.bins.Length;
 
         /// <summary>
-        /// Gets the value of the specified bin in this <see cref="Histogram"/>.
+        /// Gets or sets the value of the specified bin in this <see cref="Histogram"/>.
         /// </summary>
         /// <param name="bin">The zero-based index of the bin.</param>
         /// <returns>The number of cases in the bin.</returns>
-        public int this[int bin] => this.bins[bin];
+        public int this[int bin]
+        {
+            get => this.bins[bin];
+            set => this.bins[bin] = value;
+        }
 
         /// <summary>
         /// Increments the specified bin by one.

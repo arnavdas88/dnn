@@ -913,7 +913,7 @@ GENIXAPI(float, _snrm2)(
 }
 
 // sum(x)
-template<typename T> T __forceinline __sum(const int n, const T* x, const int offx)
+template<typename T, typename TArg> T __forceinline __sum(const int n, const TArg* x, const int offx)
 {
 	x += offx;
 
@@ -926,19 +926,37 @@ template<typename T> T __forceinline __sum(const int n, const T* x, const int of
 	return sum;
 }
 
-GENIXAPI(__int32, sum_u8)(const int n, const unsigned __int8* x, int offx) { return __sum(n, x, offx); }
-GENIXAPI(__int32, sum_s32)(const int n, const __int32* x, const int offx) { return __sum(n, x, offx); }
-GENIXAPI(__int64, sum_s64)(const int n, const __int64* x, const int offx) { return __sum(n, x, offx); }
-GENIXAPI(unsigned __int32, sum_u32)(const int n, const unsigned __int32* x, const int offx) { return __sum(n, x, offx); }
-GENIXAPI(unsigned __int64, sum_u64)(const int n, const unsigned __int64* x, const int offx) { return __sum(n, x, offx); }
-GENIXAPI(float, sum_f32)(const int n, const float* x, const int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int32, sum_u8)(const int n, const unsigned __int8* x, int offx)
+{
+	return __sum<__int32, unsigned __int8>(n, x, offx);
+}
+GENIXAPI(__int32, sum_s32)(const int n, const __int32* x, const int offx)
+{
+	return __sum<__int32, __int32>(n, x, offx);
+}
+GENIXAPI(__int64, sum_s64)(const int n, const __int64* x, const int offx)
+{
+	return __sum<__int64, __int64>(n, x, offx);
+}
+GENIXAPI(unsigned __int32, sum_u32)(const int n, const unsigned __int32* x, const int offx)
+{
+	return __sum<unsigned __int32, unsigned __int32>(n, x, offx);
+}
+GENIXAPI(unsigned __int64, sum_u64)(const int n, const unsigned __int64* x, const int offx)
+{
+	return __sum<unsigned __int64, unsigned __int64>(n, x, offx);
+}
+GENIXAPI(float, sum_f32)(const int n, const float* x, const int offx)
+{
+	return __sum<float, float>(n, x, offx);
+}
 
 // variance x
 template<typename T> T __forceinline __variance(int n, T* x, int offx)
 {
 	x += offx;
 
-	T mean = __sum(n, x, 0) / n;
+	T mean = __sum<T, T>(n, x, 0) / n;
 
 	T variance = T(0);
 	for (int i = 0; i < n; i++)

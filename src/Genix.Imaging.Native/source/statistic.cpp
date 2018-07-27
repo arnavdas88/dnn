@@ -33,3 +33,46 @@ GENIXAPI(__int64, power_8bpp)(
 
 	return (__int64)sum;
 }
+
+GENIXAPI(void, grayhist_8bpp)(
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride,
+	__int32* hist)
+{
+	const int stridebytes = stride * 8;	// 8 bytes per word
+	const unsigned __int8* bits_u8 = ((const unsigned __int8*)bits) + (ptrdiff_t(y) * stridebytes) + x;
+
+	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
+	{
+		for (int ix = 0; ix < width; ix++)
+		{
+			hist[bits_u8[ix]] ++;
+		}
+	}
+}
+
+GENIXAPI(void, vhist_1bpp)(
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride,
+	__int32* hist)
+{
+	const int stridebits = stride * 64;	// 64 bits per word
+
+	for (int iy = 0, pos = (y * stridebits) + x; iy < height; iy++, pos += stridebits)
+	{
+		hist[iy] = (int)::bits_count_64(width, bits, pos);
+	}
+}
+
+GENIXAPI(void, vhist_8bpp)(
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride,
+	__int32* hist)
+{
+	const int stridebytes = stride * 8;	// 8 bytes per word
+
+	for (int iy = 0, pos = (y * stridebytes) + x; iy < height; iy++, pos += stridebytes)
+	{
+		hist[iy] = ::sum_u8(width, (const unsigned __int8*)bits, pos);
+	}
+}
