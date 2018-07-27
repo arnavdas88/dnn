@@ -913,7 +913,7 @@ GENIXAPI(float, _snrm2)(
 }
 
 // sum(x)
-template<typename T> T __forceinline __sum(int n, T* x, int offx)
+template<typename T> T __forceinline __sum(const int n, const T* x, const int offx)
 {
 	x += offx;
 
@@ -926,11 +926,12 @@ template<typename T> T __forceinline __sum(int n, T* x, int offx)
 	return sum;
 }
 
-GENIXAPI(__int32, i32sum)(int n, __int32* x, int offx) { return __sum(n, x, offx); }
-GENIXAPI(__int64, i64sum)(int n, __int64* x, int offx) { return __sum(n, x, offx); }
-GENIXAPI(unsigned __int32, ui32sum)(int n, unsigned __int32* x, int offx) { return __sum(n, x, offx); }
-GENIXAPI(unsigned __int64, ui64sum)(int n, unsigned __int64* x, int offx) { return __sum(n, x, offx); }
-GENIXAPI(float, ssum)(int n, float* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int32, sum_u8)(const int n, const unsigned __int8* x, int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int32, sum_s32)(const int n, const __int32* x, const int offx) { return __sum(n, x, offx); }
+GENIXAPI(__int64, sum_s64)(const int n, const __int64* x, const int offx) { return __sum(n, x, offx); }
+GENIXAPI(unsigned __int32, sum_u32)(const int n, const unsigned __int32* x, const int offx) { return __sum(n, x, offx); }
+GENIXAPI(unsigned __int64, sum_u64)(const int n, const unsigned __int64* x, const int offx) { return __sum(n, x, offx); }
+GENIXAPI(float, sum_f32)(const int n, const float* x, const int offx) { return __sum(n, x, offx); }
 
 // variance x
 template<typename T> T __forceinline __variance(int n, T* x, int offx)

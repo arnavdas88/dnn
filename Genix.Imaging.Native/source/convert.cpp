@@ -118,8 +118,8 @@ GENIXAPI(int, _convert8to1)(
 
 	return 0;*/
 
-	src += (y * stridesrc) + (x / 8);
-	dst += (y * stridedst) + (x / 64);
+	src += (ptrdiff_t(y) * stridesrc) + (x / 8);
+	dst += (ptrdiff_t(y) * stridedst) + (x / 64);
 
 	const int width64 = width & ~63;
 	for (int iy = 0, offysrc = 0, offydst = 0; iy < height; iy++, offysrc += stridesrc, offydst += stridedst)
@@ -217,7 +217,7 @@ GENIXAPI(int, otsu)(
 				const int tw = ix + 1 == nx ? width - tx : sx;
 
 				check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
-					(const Ipp8u*)(src + (ty * stridesrc)) + (tx >> 3),
+					(const Ipp8u*)(src + (ptrdiff_t(ty) * stridesrc)) + (tx >> 3),
 					stridesrc * sizeof(unsigned __int64),
 					{ tw, th },
 					&pThresholds[ithresh++]));

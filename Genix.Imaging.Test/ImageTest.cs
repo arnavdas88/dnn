@@ -6,20 +6,39 @@
     [TestClass]
     public class ImageTest
     {
+        /// <summary>
+        /// Calculates intensity of binary image (sum of black pixels).
+        /// </summary>
         [TestMethod]
-        public void PowerTest()
+        public void PowerTest1()
         {
-            ////foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
-            {
-                Image image = new Image((64 * 2) + 23, 43, 1, 200, 200);
-                image.SetWhiteIP();
+            Image image = new Image((64 * 2) + 23, 43, 1, 200, 200);
+            image.SetWhiteIP();
 
-                image.SetPixel(5, 9, 1);
-                image.SetPixel(64 + 37, 19, 1);
-                image.SetPixel((2 * 64) + 11, 29, 1);
+            image.SetPixel(5, 9, 1);
+            image.SetPixel(64 + 37, 19, 1);
+            image.SetPixel((2 * 64) + 11, 29, 1);
 
-                Assert.AreEqual(3, image.Power());
-            }
+            Assert.AreEqual(3, image.Power());
+            Assert.AreEqual(2, image.Power(5, 9, 134, 20));
+            Assert.AreEqual(3, image.Power(5, 9, 135, 21));
+        }
+
+        /// <summary>
+        /// Calculates intensity of binary image (sum of pixel values).
+        /// </summary>
+        [TestMethod]
+        public void PowerTest2()
+        {
+            Image image = new Image((64 * 2) + 23, 43, 8, 200, 200);
+
+            image.SetPixel(5, 9, 255);
+            image.SetPixel(64 + 37, 19, 128);
+            image.SetPixel((2 * 64) + 11, 29, 64);
+
+            Assert.AreEqual(255 + 128 + 64, image.Power());
+            Assert.AreEqual(255 + 128, image.Power(5, 9, 134, 20));
+            Assert.AreEqual(255 + 128 + 64, image.Power(5, 9, 135, 21));
         }
 
         [TestMethod]

@@ -56,12 +56,12 @@ namespace Genix.Imaging
             Image values = image & mask;
 
             // generate map
-            //int wd = (image.Width + sx - 1) / sx;
-            //int hd = (image.Height + sy - 1) / sy;
+            ////int wd = (image.Width + sx - 1) / sx;
+            ////int hd = (image.Height + sy - 1) / sy;
 
             int nx = image.Width / sx;
             int ny = image.Height / sy;
-            int[] map = new int[ny * nx];
+            long[] map = new long[ny * nx];
 
             for (int iy = 0, ty = 0, imap = 0; iy < ny; iy++, ty += sy)
             {

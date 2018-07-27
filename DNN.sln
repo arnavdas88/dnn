@@ -41,6 +41,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Test2", "Genix.Test2\Genix.Test2.csproj", "{BFE370A1-9DCE-47C2-BCFF-0DC54044A0BA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.Imaging.Native", "Genix.Imaging.Native\Genix.Imaging.Native.vcxproj", "{8AF9EF19-E3F0-4904-82AC-89058117455C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F91D6D7-D55A-42A2-94B1-67568CE6E446} = {2F91D6D7-D55A-42A2-94B1-67568CE6E446}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

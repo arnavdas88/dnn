@@ -8,7 +8,10 @@ namespace Genix.Imaging
 {
     using System;
     using System.Drawing;
+    using System.Globalization;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using Genix.Core;
 
     /// <summary>
@@ -17,25 +20,25 @@ namespace Genix.Imaging
     public static class Statistic
     {
         /// <summary>
-        /// Returns the number of black pixels on this <see cref="Image"/>.
+        /// Calculates the <see cref="Image"/> intensity.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the intensity for.</param>
         /// <returns>
-        /// The number of black pixels on the bitmap.
+        /// The image intensity.
+        /// For black-and-white images it is the number of black pixels on the bitmap.
+        /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <para>
-        /// The <see cref="Image.BitsPerPixel"/> is not 1.
-        /// </para>
+        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <remarks>
-        /// This method supports black-and-white images only and will throw an exception if called on gray-scale or color images.
+        /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Power(this Image image)
+        public static long Power(this Image image)
         {
             if (image == null)
             {
@@ -46,75 +49,82 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Returns the number of black pixels withing specified area of this <see cref="Image"/> .
+        /// Calculates the <see cref="Image"/> intensity withing a rectangular area
+        /// specified by a pair of coordinates, a width, and a height.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the intensity for.</param>
         /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
         /// <param name="width">The width, in pixels, of the area.</param>
         /// <param name="height">The height, in pixels, of the area.</param>
         /// <returns>
-        /// The number of black pixels on the bitmap.
+        /// The image intensity within the specified area.
+        /// For black-and-white images it is the number of black pixels.
+        /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <para>
-        /// The <see cref="Image.BitsPerPixel"/> is not 1.
-        /// </para>
+        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
         /// </exception>
         /// <remarks>
-        /// This method supports black-and-white images only and will throw an exception if called on gray-scale or color images.
+        /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Power(this Image image, int x, int y, int width, int height)
+        public static long Power(this Image image, int x, int y, int width, int height)
         {
             if (image == null)
             {
                 throw new ArgumentNullException(nameof(image));
             }
 
-            if (image.BitsPerPixel != 1)
-            {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
-            }
-
             image.ValidateArea(x, y, width, height);
 
-            ulong[] bits = image.Bits;
-            int stride = image.Stride1;
-
-            int sum = 0;
-            for (int iy = 0, pos = (y * stride) + x; iy < height; iy++, pos += stride)
+            switch (image.BitsPerPixel)
             {
-                sum += BitUtils64.CountOneBits(width, bits, pos);
-            }
+                case 1:
+                    return NativeMethods.power_1bpp(x, y, width, height, image.Bits, image.Stride);
 
-            return sum;
+                case 8:
+                    return NativeMethods.power_8bpp(x, y, width, height, image.Bits, image.Stride);
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        image.BitsPerPixel));
+            }
         }
 
         /// <summary>
-        /// Returns the number of black pixels withing specified area of this <see cref="Image"/> .
+        /// Calculates the <see cref="Image"/> intensity withing a rectangular area
+        /// specified by a <see cref="Rectangle"/> struct.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to analyze.</param>
-        /// <param name="area">The area on <paramref name="image"/> to calculate histogram for.</param>
+        /// <param name="image">The <see cref="Image"/> to calculate the intensity for.</param>
+        /// <param name="area">The width, height, and location of the area.</param>
         /// <returns>
-        /// The number of black pixels on the bitmap.
+        /// The image intensity within the specified area.
+        /// For black-and-white images it is the number of black pixels.
+        /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <para>
-        /// The <see cref="Image.BitsPerPixel"/> is not 1.
-        /// </para>
+        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
         /// </exception>
         /// <remarks>
-        /// This method supports black-and-white images only and will throw an exception if called on gray-scale or color images.
+        /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Power(this Image image, Rectangle area)
+        public static long Power(this Image image, Rectangle area)
         {
             return Statistic.Power(image, area.X, area.Y, area.Width, area.Height);
         }
@@ -341,6 +351,31 @@ namespace Genix.Imaging
         public static Histogram HistogramY(this Image image, Rectangle area)
         {
             return Statistic.HistogramY(image, area.X, area.Y, area.Width, area.Height);
+        }
+
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.Imaging.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern long power_1bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern long power_8bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride);
         }
     }
 }

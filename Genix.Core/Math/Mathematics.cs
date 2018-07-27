@@ -1310,6 +1310,21 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Computes the sum of all elements in the array of 8-bit unsigned integers.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The array that contains data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <returns>
+        /// The sum of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Sum(int length, byte[] x, int offx)
+        {
+            return NativeMethods.sum_u8(length, x, offx);
+        }
+
+        /// <summary>
         /// Computes the sum of all elements in the array of 32-bit integers.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -1321,7 +1336,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Sum(int length, int[] x, int offx)
         {
-            return NativeMethods.i32sum(length, x, offx);
+            return NativeMethods.sum_s32(length, x, offx);
         }
 
         /// <summary>
@@ -1337,7 +1352,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static uint Sum(int length, uint[] x, int offx)
         {
-            return NativeMethods.ui32sum(length, x, offx);
+            return NativeMethods.sum_u32(length, x, offx);
         }
 
         /// <summary>
@@ -1352,7 +1367,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Sum(int length, long[] x, int offx)
         {
-            return NativeMethods.i64sum(length, x, offx);
+            return NativeMethods.sum_s64(length, x, offx);
         }
 
         /// <summary>
@@ -1368,7 +1383,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static ulong Sum(int length, ulong[] x, int offx)
         {
-            return NativeMethods.ui64sum(length, x, offx);
+            return NativeMethods.sum_u64(length, x, offx);
         }
 
         /// <summary>
@@ -1383,7 +1398,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sum(int length, float[] x, int offx)
         {
-            return NativeMethods.ssum(length, x, offx);
+            return NativeMethods.sum_f32(length, x, offx);
         }
 
         /// <summary>
@@ -1701,23 +1716,27 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern int i32sum(int n, [In] int[] x, int offx);
+            public static extern int sum_u8(int n, [In] byte[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern uint ui32sum(int n, [In] uint[] x, int offx);
+            public static extern int sum_s32(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern long i64sum(int n, [In] long[] x, int offx);
+            public static extern uint sum_u32(int n, [In] uint[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern ulong ui64sum(int n, [In] ulong[] x, int offx);
+            public static extern long sum_s64(int n, [In] long[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern float ssum(int n, [In] float[] x, int offx);
+            public static extern ulong sum_u64(int n, [In] ulong[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float sum_f32(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
