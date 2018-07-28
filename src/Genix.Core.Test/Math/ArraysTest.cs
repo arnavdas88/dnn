@@ -98,12 +98,14 @@
                 Assert.AreEqual(array1[i], workarray1[i]);
                 Assert.AreEqual(array2[i], workarray2[i]);
             }
+
             Arrays.Swap(Length, workarray1, 0, workarray2, 0);
             for (int i = 0; i < Length; i++)
             {
                 Assert.AreEqual(array2[i], workarray1[i]);
                 Assert.AreEqual(array1[i], workarray2[i]);
             }
+
             Assert.IsTrue(Arrays.Equals(Length, workarray1, 0, array2, 0));
             Assert.IsTrue(Arrays.Equals(Length, workarray2, 0, array1, 0));
         }

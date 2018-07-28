@@ -25,7 +25,7 @@
             // column-major
             // [1]
             // [2] x [4, 5]
-            // [3]   
+            // [3]
             float[] a = new float[m * n];
             Matrix.VxV(MatrixLayout.ColumnMajor, m, n, x, 0, y, 0, a, 0);
 
@@ -43,7 +43,7 @@
             // row-major
             // [1]
             // [2] x [4, 5]
-            // [3]   
+            // [3]
             a = new float[m * n];
             Matrix.VxV(MatrixLayout.RowMajor, m, n, x, 0, y, 0, a, 0);
 

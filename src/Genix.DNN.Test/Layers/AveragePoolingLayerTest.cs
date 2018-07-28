@@ -11,9 +11,9 @@
     [TestClass]
     public class AveragePoolingLayerTest
     {
-        private static int[] SourceShape = new[] { -1, 5, 4, 2 };
+        private static int[] sourceShape = new[] { -1, 5, 4, 2 };
 
-        private static float[] Weights = new float[]
+        private static float[] weights = new float[]
         {
             1,  2,     3,  4,    7,  8,    5,  6,
             19, 20,   21, 22,   25, 26,   23, 24,
@@ -25,7 +25,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
             Assert.AreEqual("AP2", layer.Architecture);
@@ -38,7 +38,7 @@
         [TestMethod]
         public void ConstructorTest2()
         {
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
             Assert.AreEqual("AP3x2+1x2(S)", layer.Architecture);
@@ -52,7 +52,7 @@
         public void ArchitechtureConstructorTest1()
         {
             string architecture = "AP3x2";
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -67,7 +67,7 @@
         public void ArchitechtureConstructorTest2()
         {
             string architecture = "AP3x2+2(S)";
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -82,7 +82,7 @@
         public void ArchitechtureConstructorTest3()
         {
             string architecture = "AP3x2+2x1(S)";
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -97,7 +97,7 @@
         public void ArchitechtureConstructorTest4()
         {
             string architecture = "AP2";
-            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+            AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(2, layer.Kernel.Width);
@@ -115,7 +115,7 @@
             string architecture = "AP";
             try
             {
-                AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, architecture, null);
+                AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -137,14 +137,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitechtureConstructorTest7()
         {
-            Assert.IsNotNull(new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, null, null));
+            Assert.IsNotNull(new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, null, null));
         }
-
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
             AveragePoolingLayer layer2 = new AveragePoolingLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -166,7 +165,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
             AveragePoolingLayer layer2 = layer1.Clone() as AveragePoolingLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -174,7 +173,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
             string s1 = JsonConvert.SerializeObject(layer1);
             AveragePoolingLayer layer2 = JsonConvert.DeserializeObject<AveragePoolingLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -186,12 +185,12 @@
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest2X2X2X2()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 3, 2, 2 });
             expectedTemp.Set(new float[]
@@ -243,12 +242,12 @@
         [Description("Filter 2x2, stride 1x1.")]
         public void ForwardBackwardTest2X2X1X1()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(2, 2, 1, 1));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 4, 3, 2 });
             expectedTemp.Set(new float[]
@@ -302,12 +301,12 @@
         [Description("Filter 3x3, stride 3x3.")]
         public void ForwardBackwardTest3X3X3X3()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 3, 3, 3));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 3, 3));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
             expectedTemp.Set(new float[]
@@ -357,12 +356,12 @@
         [Description("Filter 3x3, stride 2x2.")]
         public void ForwardBackwardTest3X3X2X2()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 3, 2, 2));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
             expectedTemp.Set(new float[]
@@ -412,12 +411,12 @@
         [Description("Filter 3x3, stride 1x1.")]
         public void ForwardBackwardTest3X3X1X1()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(3, 3, 1, 1));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 3, 2, 2 });
             expectedTemp.Set(new float[]
@@ -469,12 +468,12 @@
         [Description("Filter 4x4, stride 4x4.")]
         public void ForwardBackwardTest4X4X4X4()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(4, 4, 4, 4));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(4, 4, 4, 4));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 1, 2 });
             expectedTemp.Set(new float[]
@@ -524,12 +523,12 @@
         [Description("Filter 4x4, stride 1x1.")]
         public void ForwardBackwardTest4X4X1X1()
         {
-            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.SourceShape, new Kernel(4, 4, 1, 1));
+            Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(4, 4, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(AveragePoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 1, 2 });
             expectedTemp.Set(new float[]

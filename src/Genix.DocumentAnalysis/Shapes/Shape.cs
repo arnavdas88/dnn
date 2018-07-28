@@ -33,7 +33,7 @@ namespace Genix.DocumentAnalysis
         }
 
         /// <summary>
-        /// Gets the shape boundaries.
+        /// Gets or sets the shape boundaries.
         /// </summary>
         /// <value>
         /// The <see cref="Rectangle"/> that contains shape boundaries.

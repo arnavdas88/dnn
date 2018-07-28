@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\managed.props" />
+  <Import Project="..\managedtest.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -94,7 +94,7 @@
     <Compile Include="Layers\Map2SequenceLayerTest.cs" />
     <Compile Include="Layers\GRUCellTest.cs" />
     <Compile Include="Layers\GRULayerTest.cs" />
-    <Compile Include="Neuro\Net.cs" />
+    <Compile Include="Neuro\NetTest.cs" />
     <Compile Include="Neuro\MathTest.cs" />
     <Compile Include="Neuro\CTCTest.cs" />
     <Compile Include="Neuro\CTCBeamSearchTest.cs" />
@@ -122,11 +122,6 @@
     <None Include="Genix.DNN.Test.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
@@ -138,11 +133,4 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

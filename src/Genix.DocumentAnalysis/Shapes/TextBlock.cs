@@ -20,7 +20,8 @@ namespace Genix.DocumentAnalysis
         /// Initializes a new instance of the <see cref="TextBlock"/> class.
         /// </summary>
         /// <param name="lines">The collection of <see cref="TextLine"/> contained in this container.</param>
-        protected TextBlock(IList<TextLine> lines) : base(lines)
+        protected TextBlock(IList<TextLine> lines)
+            : base(lines)
         {
         }
 

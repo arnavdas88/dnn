@@ -12,7 +12,7 @@
     public class TanhLayerTest
     {
         private static Func<float, float> activation = (x) => (float)Math.Tanh(x);
-        private static Func<float, float> derivative = (x) => (1.0f - x * x);
+        private static Func<float, float> derivative = (x) => (1.0f - (x * x));
 
         [TestMethod]
         public void ConstructorTest1()

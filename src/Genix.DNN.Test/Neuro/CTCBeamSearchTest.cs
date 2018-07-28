@@ -1,11 +1,10 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Learning;
     using System.Collections.Generic;
     using Genix.DNN.LanguageModel;
+    using Learning;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CTCBeamSearchTest
@@ -19,7 +18,8 @@
             string[] classes = new string[] { "@", "A" };
 
             Tensor a = new Tensor(null, new[] { 2, 2 });
-            a.Set(new float[] {
+            a.Set(new float[]
+            {
                 0.2f, 0.5f,
                 0.1f, 0.7f
             });
@@ -30,7 +30,7 @@
             float normalizer =
                 path(A, A) +
                 path(A, X) +
-                path(X, A); 
+                path(X, A);
 
             float path(int v1, int v2)
             {
@@ -49,7 +49,8 @@
             string[] classes = new string[] { "@", "A", "B" };
 
             Tensor a = new Tensor(null, new[] { 3, 3 });
-            a.Set(new float[] {
+            a.Set(new float[]
+            {
                 0.2f, 0.5f, 0.3f,
                 0.1f, 0.7f, 0.2f,
                 0.1f, 0.3f, 0.6f
@@ -64,7 +65,7 @@
                 path(A, B, X) +
                 path(A, X, B) +
 
-                path(X, A, B); 
+                path(X, A, B);
 
             float path(int v1, int v2, int v3)
             {
@@ -84,7 +85,8 @@
             string[] classes = new string[] { "@", "A", "B" };
 
             Tensor a = new Tensor(null, new[] { 4, 3 });
-            a.Set(new float[] {
+            a.Set(new float[]
+            {
                 0.2f, 0.5f, 0.3f,
                 0.1f, 0.7f, 0.2f,
                 0.1f, 0.3f, 0.6f,
@@ -99,10 +101,10 @@
 
                 path(A, B, B, B) +
                 path(A, B, B, X) +
-                //path(A, B, X, B) +
+                ////path(A, B, X, B) +
                 path(A, B, X, X) +
 
-                //path(A, X, A, B) +
+                ////path(A, X, A, B) +
                 path(A, X, B, B) +
                 path(A, X, B, X) +
                 path(A, X, X, B) +
@@ -112,7 +114,7 @@
                 path(X, A, B, X) +
                 path(X, A, X, B) +
 
-                path(X, X, A, B); 
+                path(X, X, A, B);
 
             float path(int v1, int v2, int v3, int v4)
             {

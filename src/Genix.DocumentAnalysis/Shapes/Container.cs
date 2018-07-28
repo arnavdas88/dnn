@@ -16,14 +16,17 @@ namespace Genix.DocumentAnalysis
     /// <summary>
     /// Represents a shape that contains other shapes. This is an abstract class.
     /// </summary>
+    /// <typeparam name="T">The type of the elements in the container.</typeparam>
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class Container<T> : Shape where T : Shape
+    public abstract class Container<T>
+        : Shape
+        where T : Shape
     {
         [JsonProperty("shapes")]
         private readonly List<T> shapes = new List<T>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Container"/> class.
+        /// Initializes a new instance of the <see cref="Container{T}"/> class.
         /// </summary>
         /// <param name="shapes">The shapes contained in this container.</param>
         protected Container(IList<T> shapes)

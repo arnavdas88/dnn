@@ -182,7 +182,7 @@
                 }
 
                 return (input, expected);
-            };
+            }
 
             // train the network
             SquareLoss loss = new SquareLoss();

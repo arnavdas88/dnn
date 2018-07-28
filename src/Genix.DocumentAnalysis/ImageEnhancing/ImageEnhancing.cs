@@ -18,6 +18,7 @@ namespace Genix.DocumentAnalysis
         /// Improves image quality.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to enhance.</param>
+        /// <param name="options">The image enhancing options.</param>
         /// <returns>The enhanced <see cref="Image"/>.</returns>
         public static Image Enhance(Image image, ImageEnhancingOptions options)
         {

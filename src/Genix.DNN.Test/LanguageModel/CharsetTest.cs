@@ -3,11 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Genix.DNN.LanguageModel;
-    using Newtonsoft.Json;
     using System.IO;
+    using System.Linq;
+    using Genix.DNN.LanguageModel;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
 
     [TestClass]
     public class CharsetTest

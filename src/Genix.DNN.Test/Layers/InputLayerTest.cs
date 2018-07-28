@@ -2,11 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using System.Globalization;
 
     [TestClass]
     public class InputLayerTest

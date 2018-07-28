@@ -1,9 +1,8 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Learning;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CTCTest
@@ -40,7 +39,8 @@
             const int T = 5;
 
             Tensor y = new Tensor(null, new[] { T, L });
-            y.Set(new float[] {
+            y.Set(new float[]
+            {
                 0.633766f, 0.221185f, 0.0917319f, 0.0129757f, 0.0142857f, 0.0260553f,
                 0.111121f, 0.588392f, 0.278779f, 0.0055756f, 0.00569609f, 0.010436f,
                 0.0357786f, 0.633813f, 0.321418f, 0.00249248f, 0.00272882f, 0.0037688f,
@@ -51,15 +51,16 @@
             CTCLoss loss = new CTCLoss() { BlankLabelIndex = 5 };
 
             int[] labels = { 0, 1, 2, 1, 0/*, 0, 1, 1, 0*/ };
-            float expected = -(float)Math.Log(y.Weights[0 * L + labels[0]] *
-                                              y.Weights[1 * L + labels[1]] *
-                                              y.Weights[2 * L + labels[2]] *
-                                              y.Weights[3 * L + labels[3]] *
-                                              y.Weights[4 * L + labels[4]]);
+            float expected = -(float)Math.Log(y.Weights[(0 * L) + labels[0]] *
+                                              y.Weights[(1 * L) + labels[1]] *
+                                              y.Weights[(2 * L) + labels[2]] *
+                                              y.Weights[(3 * L) + labels[3]] *
+                                              y.Weights[(4 * L) + labels[4]]);
 
             float score = loss.Loss(y, labels, true);
             Helpers.AreArraysEqual(
-                new float[] {
+                new float[]
+                {
                     1, 0, 0, 0, 0, 0,
                     0, 1, 0, 0, 0, 0,
                     0, 0, 1, 0, 0, 0,
@@ -76,7 +77,8 @@
             const int T = 5;
 
             Tensor y = new Tensor(null, new[] { T, L });
-            y.Set(new float[] {
+            y.Set(new float[]
+            {
                 0.30176f, 0.28562f, 0.0831517f, 0.0862751f, 0.0816851f, 0.161508f,
                 0.24082f, 0.397533f, 0.0557226f, 0.0546814f, 0.0557528f, 0.19549f,
                 0.230246f, 0.450868f, 0.0389607f, 0.038309f, 0.0391602f, 0.202456f,
@@ -92,7 +94,8 @@
             float score = loss.Loss(y, labels, true);
             Assert.AreEqual(expected, score, 1e-4);
             Helpers.AreArraysEqual(
-                new float[] {
+                new float[]
+                {
                     1, 0, 0, 0, 0, 0,
                     0, 1, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 1,

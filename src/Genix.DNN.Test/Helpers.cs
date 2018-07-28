@@ -12,7 +12,8 @@
         /// </summary>
         /// <typeparam name="T">The type of the object to create.</typeparam>
         /// <returns>The object this method creates.</returns>
-        public static T CreateClassWithPrivateConstructor<T>() where T : class
+        public static T CreateClassWithPrivateConstructor<T>()
+            where T : class
         {
             var constructor = typeof(T).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null);
             return (T)constructor.Invoke(null);

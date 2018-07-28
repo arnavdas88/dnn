@@ -20,7 +20,8 @@ namespace Genix.DocumentAnalysis
         /// Initializes a new instance of the <see cref="TextLine"/> class.
         /// </summary>
         /// <param name="texts">The collection of <see cref="TextShape"/> contained in this container.</param>
-        protected TextLine(IList<TextShape> texts) : base(texts)
+        protected TextLine(IList<TextShape> texts)
+            : base(texts)
         {
         }
 

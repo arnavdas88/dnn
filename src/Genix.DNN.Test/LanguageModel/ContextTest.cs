@@ -1,9 +1,9 @@
 ﻿namespace Genix.DNN.Test
 {
-    using System.Globalization;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Genix.DNN.LanguageModel;
     using System;
+    using System.Globalization;
+    using Genix.DNN.LanguageModel;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class ContextTest

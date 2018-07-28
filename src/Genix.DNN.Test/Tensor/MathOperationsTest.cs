@@ -19,8 +19,8 @@
             {
                 Tensor a = new Tensor(null, new[] { length });
                 Tensor b = new Tensor(null, new[] { length });
-                a.Randomize(random);
-                b.Randomize(random);
+                a.Randomize(this.random);
+                b.Randomize(this.random);
 
                 // simple multiplication
                 Tensor y = MathOperations.Add(session, a, b);
@@ -31,7 +31,7 @@
                     a.Weights.Zip(b.Weights, (aw, bw) => aw + bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreGradientsEqual(y, a);
@@ -48,7 +48,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 // simple multiplication
                 Tensor y = MathOperations.Add(session, x, alpha);
@@ -59,7 +59,7 @@
                     x.Weights.Select(xw => xw + alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(y.Gradient.Select(dyw => dyw).ToArray(), x.Gradient);
@@ -75,8 +75,8 @@
             {
                 Tensor a = new Tensor(null, new[] { length });
                 Tensor b = new Tensor(null, new[] { length });
-                a.Randomize(random);
-                b.Randomize(random);
+                a.Randomize(this.random);
+                b.Randomize(this.random);
 
                 // simple multiplication
                 Tensor y = MathOperations.Subtract(session, a, b);
@@ -87,7 +87,7 @@
                     a.Weights.Zip(b.Weights, (aw, bw) => aw - bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(y.Gradient, a.Gradient);
@@ -103,11 +103,11 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 // simple multiplication
                 Tensor y = MathOperations.Multiply(session, x, 2.0f);
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
 
                 Tensor expected = new Tensor(
                     null,
@@ -130,8 +130,8 @@
             {
                 Tensor a = new Tensor(null, new[] { length });
                 Tensor b = new Tensor(null, new[] { length });
-                a.Randomize(random);
-                b.Randomize(random);
+                a.Randomize(this.random);
+                b.Randomize(this.random);
 
                 // simple multiplication
                 Tensor y = MathOperations.Multiply(session, a, b);
@@ -142,7 +142,7 @@
                     a.Weights.Zip(b.Weights, (aw, bw) => aw * bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -163,7 +163,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y = MathOperations.Square(session, x);
 
@@ -173,7 +173,7 @@
                     x.Weights.Select(xw => xw * xw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -191,7 +191,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y = MathOperations.Pow(session, x, power);
 
@@ -201,7 +201,7 @@
                     x.Weights.Select(xw => (float)Math.Pow(xw, power)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -218,7 +218,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y = MathOperations.Sqrt(session, x);
 
@@ -228,7 +228,7 @@
                     x.Weights.Select(xw => (float)Math.Sqrt(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -245,7 +245,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y = MathOperations.Abs(session, x);
 
@@ -255,7 +255,7 @@
                     x.Weights.Select(xw => Math.Abs(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -273,8 +273,8 @@
             {
                 Tensor a = new Tensor(null, new[] { length });
                 Tensor b = new Tensor(null, new[] { length });
-                a.Randomize(random);
-                b.Randomize(random);
+                a.Randomize(this.random);
+                b.Randomize(this.random);
 
                 Tensor y = MathOperations.Max(session, a, b);
 
@@ -284,7 +284,7 @@
                     a.Weights.Zip(b.Weights, (aw, bw) => Math.Max(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -310,8 +310,8 @@
             {
                 Tensor a = new Tensor(null, new[] { length });
                 Tensor b = new Tensor(null, new[] { length });
-                a.Randomize(random);
-                b.Randomize(random);
+                a.Randomize(this.random);
+                b.Randomize(this.random);
 
                 Tensor y = MathOperations.Min(session, a, b);
 
@@ -321,7 +321,7 @@
                     a.Weights.Zip(b.Weights, (aw, bw) => Math.Min(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
-                y.RandomizeGradient(random);
+                y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -346,7 +346,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.ReLU(session, x);
 
@@ -358,8 +358,8 @@
 
                 Tensor y2 = MathOperations.ReLU(session, x);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -378,7 +378,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Tanh(session, x);
 
@@ -390,8 +390,8 @@
 
                 Tensor y2 = MathOperations.Tanh(session, x);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -410,7 +410,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Sigmoid(session, x);
 
@@ -422,8 +422,8 @@
 
                 Tensor y2 = MathOperations.Sigmoid(session, x);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -442,7 +442,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Sin(session, x);
 
@@ -454,8 +454,8 @@
 
                 Tensor y2 = MathOperations.Sin(session, x);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -474,7 +474,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Cos(session, x);
 
@@ -486,8 +486,8 @@
 
                 Tensor y2 = MathOperations.Cos(session, x);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -515,7 +515,7 @@
             // column-major
             // [1]
             // [2] x [4, 5]
-            // [3]   
+            // [3]
             Tensor a = MathOperations.VxV(session, MatrixLayout.ColumnMajor, x, y);
 
             Tensor expected = new Tensor(
@@ -538,7 +538,7 @@
             // dx += dA * y
             // [1, 4]
             // [2, 5] x [4]
-            // [3, 6]   [5] 
+            // [3, 6]   [5]
             Helpers.AreArraysEqual(
                 new float[]
                 {
@@ -551,7 +551,7 @@
             // dy += dA' * x
             // [1, 2, 3]   [1]
             // [4, 5, 6] x [2]
-            //             [3] 
+            //             [3]
             Helpers.AreArraysEqual(
                 new float[]
                 {
@@ -578,7 +578,7 @@
             // row-major
             // [1]
             // [2] x [4, 5]
-            // [3]   
+            // [3]
             Tensor a = MathOperations.VxV(session, MatrixLayout.RowMajor, x, y);
 
             Tensor expected = new Tensor(
@@ -601,7 +601,7 @@
             // dx += dA * y
             // [1, 2]
             // [3, 4] x [4]
-            // [5, 6]   [5] 
+            // [5, 6]   [5]
             Helpers.AreArraysEqual(
                 new float[]
                 {
@@ -614,7 +614,7 @@
             // dy += dA' * x
             // [1, 3, 5]   [1]
             // [2, 4, 6] x [2]
-            //             [3] 
+            //             [3]
             Helpers.AreArraysEqual(
                 new float[]
                 {
@@ -1302,8 +1302,8 @@
             // C = A' * B'
             // [1, 5, 9 ]'   [21, 23, 25, 27]'
             // [2, 6, 10]  x [22, 24, 26, 28]
-            // [3, 7, 11]     
-            // [4, 8, 12]     
+            // [3, 7, 11]
+            // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, null);
 
             Tensor expected = new Tensor(null, new[] { n, m });
@@ -1323,9 +1323,9 @@
 
             // dB += dC' * A'
             // [1, 4]'   [1, 5, 9 ]'
-            // [2, 5]  x [2, 6, 10] 
-            // [3, 6]    [3, 7, 11] 
-            //           [4, 8, 12] 
+            // [2, 5]  x [2, 6, 10]
+            // [3, 6]    [3, 7, 11]
+            //           [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
             Helpers.AreArraysEqual(expectedDB, b.Gradient);
@@ -1489,8 +1489,8 @@
             // C = A' * B'
             // [1,  2,  3 ]'   [21, 22, 23, 24]'
             // [4,  5,  6 ]  x [25, 26, 27, 28]
-            // [7,  8,  9 ]     
-            // [10, 11, 12]     
+            // [7,  8,  9 ]
+            // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, null);
 
             Tensor expected = new Tensor(null, new[] { m, n });
@@ -1676,8 +1676,8 @@
             // C = A' * B'
             // [1, 5, 9 ]'
             // [2, 6, 10]  x [21, 22, 23, 24]'
-            // [3, 7, 11]     
-            // [4, 8, 12]     
+            // [3, 7, 11]
+            // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, null);
 
             Tensor expected = new Tensor(null, new[] { n, m });
@@ -1697,9 +1697,9 @@
 
             // dB += dC' * A'
             // [1]'   [1, 5, 9 ]'
-            // [2]  x [2, 6, 10] 
-            // [3]    [3, 7, 11] 
-            //        [4, 8, 12] 
+            // [2]  x [2, 6, 10]
+            // [3]    [3, 7, 11]
+            //        [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
             Helpers.AreArraysEqual(expectedDB, b.Gradient);
@@ -2070,7 +2070,7 @@
             // [1, 5, 9 ]'   [21, 23, 25, 27]'   [1, 1]
             // [2, 6, 10]  x [22, 24, 26, 28]  + [2, 2]
             // [3, 7, 11]                        [3, 3]
-            // [4, 8, 12]     
+            // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
@@ -2091,9 +2091,9 @@
 
             // dB += dC' * A'
             // [1, 4]'   [1, 5, 9 ]'
-            // [2, 5]  x [2, 6, 10] 
-            // [3, 6]    [3, 7, 11] 
-            //           [4, 8, 12] 
+            // [2, 5]  x [2, 6, 10]
+            // [3, 6]    [3, 7, 11]
+            //           [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
             Helpers.AreArraysEqual(expectedDB, b.Gradient);
@@ -2281,7 +2281,7 @@
             // [1,  2,  3 ]'   [21, 22, 23, 24]'   [1, 1]
             // [4,  5,  6 ]  x [25, 26, 27, 28]  + [2, 2]
             // [7,  8,  9 ]                        [3, 3]
-            // [10, 11, 12]     
+            // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
@@ -2489,7 +2489,7 @@
             // [1, 5, 9 ]'                       [1]
             // [2, 6, 10]  x [21, 22, 23, 24]' + [2]
             // [3, 7, 11]                        [3]
-            // [4, 8, 12]     
+            // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
@@ -2510,9 +2510,9 @@
 
             // dB += dC' * A'
             // [1]'   [1, 5, 9 ]'
-            // [2]  x [2, 6, 10] 
-            // [3]    [3, 7, 11] 
-            //        [4, 8, 12] 
+            // [2]  x [2, 6, 10]
+            // [3]    [3, 7, 11]
+            //        [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
             Helpers.AreArraysEqual(expectedDB, b.Gradient);

@@ -1,8 +1,8 @@
 ﻿namespace Genix.DNN.Test
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Layers;
     using Genix.Core;
+    using Layers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class GraphTest

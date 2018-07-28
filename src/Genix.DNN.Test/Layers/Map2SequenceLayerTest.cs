@@ -1,12 +1,10 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Layers;
-    using Newtonsoft.Json;
-    using System.Collections.Generic;
     using System.Globalization;
+    using Layers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
 
     [TestClass]
     public class Map2SequenceLayerTest

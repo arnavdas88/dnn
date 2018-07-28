@@ -124,7 +124,7 @@
             Session session = new Session();
 
             Tensor x = new Tensor(null, new[] { 1024 });
-            x.Randomize(random);
+            x.Randomize(this.random);
             float xsum = x.Weights.Sum();
 
             Tensor y1 = NeuralOperations.Dropout(session, x, this.random, P);
@@ -133,8 +133,8 @@
             Assert.AreEqual(P * xsum, y1.Weights.Sum(), 0.02f * xsum);
             Assert.AreEqual(P * xsum, y2.Weights.Sum(), 0.02f * xsum);
 
-            y1.RandomizeGradient(random);
-            y2.RandomizeGradient(random);
+            y1.RandomizeGradient(this.random);
+            y2.RandomizeGradient(this.random);
             session.Unroll();
 
             Helpers.AreArraysEqual(

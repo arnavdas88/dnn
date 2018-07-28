@@ -211,7 +211,9 @@ namespace Genix.NetLearn
                     Program.WriteLine(logFile, string.Empty);
                 }
 
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
                 IEnumerable<(Tensor, string[])> generateSamples(int epoch)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
                 {
                     return dataProvider
                         .Generate(null).ToList()
@@ -468,9 +470,10 @@ namespace Genix.NetLearn
         /// <summary>
         /// Writes program debug information to event log.
         /// </summary>
+        /// <param name="stream">The stream to write debug information to.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "No need, this is an internal module, used for testing purposes.")]
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", Justification = "Calling GC methods is required for accurate calculation of memory usage.")]
-        private static void WriteDebugInformation(StreamWriter logFile)
+        private static void WriteDebugInformation(StreamWriter stream)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -494,7 +497,7 @@ namespace Genix.NetLearn
                 peakWorkingSet,
                 virtualSize);
 
-            Program.Write(logFile, s);
+            Program.Write(stream, s);
         }
 
         /// <summary>

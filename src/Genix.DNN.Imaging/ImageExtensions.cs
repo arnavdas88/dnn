@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Tensor.cs" company="Noname, Inc.">
+// <copyright file="ImageExtensions.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -172,11 +172,11 @@ namespace Genix.DNN.Imaging
         }
 
         /// <summary>
-        /// Converts the <see cref="Tensor"/> to a <see cref="Bitmap"/>.
+        /// Converts the <see cref="Tensor"/> to a <see cref="System.Drawing.Bitmap"/>.
         /// </summary>
         /// <param name="tensor">The <see cref="Tensor"/> to convert.</param>
         /// <returns>
-        /// The <see cref="Bitmap"/> this method creates.
+        /// The <see cref="System.Drawing.Bitmap"/> this method creates.
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
         public static System.Drawing.Bitmap ToBitmap(this Tensor tensor)

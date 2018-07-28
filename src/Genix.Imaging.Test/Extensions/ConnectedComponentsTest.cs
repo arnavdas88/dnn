@@ -3,8 +3,8 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Genix.Imaging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class ConnectedComponentsTest

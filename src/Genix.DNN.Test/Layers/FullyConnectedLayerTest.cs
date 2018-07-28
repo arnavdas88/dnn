@@ -4,9 +4,9 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
-    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -147,7 +147,8 @@
                 FullyConnectedLayer layer = new FullyConnectedLayer(shape, NumberOfNeurons, matrixLayout, null);
                 ////layer.SetLearningMode(true);
 
-                layer.W.Set(new float[] {
+                layer.W.Set(new float[]
+                {
                     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                     21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
                 });

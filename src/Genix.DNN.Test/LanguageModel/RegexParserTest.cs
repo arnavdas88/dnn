@@ -1,13 +1,6 @@
 ﻿namespace Genix.DNN.Test
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Genix.DNN.LanguageModel;
-    using Newtonsoft.Json;
-    using System.IO;
 
     [TestClass]
     public class RegexParserTest

@@ -225,7 +225,7 @@
             }
 
             Helpers.AreArraysEqual(expectedWG, layer.W.Gradient);
-            //Helpers.AreArraysEqual(expectedUG, layer.U.Gradient);
+            ////Helpers.AreArraysEqual(expectedUG, layer.U.Gradient);
             Helpers.AreArraysEqual(expectedBG, layer.B.Gradient);
             Helpers.AreArraysEqual(expectedDx, x.Gradient);
         }

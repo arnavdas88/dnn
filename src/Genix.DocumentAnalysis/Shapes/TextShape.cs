@@ -20,7 +20,8 @@ namespace Genix.DocumentAnalysis
         /// Initializes a new instance of the <see cref="TextShape"/> class.
         /// </summary>
         /// <param name="bounds">The shape position.</param>
-        protected TextShape(Rectangle bounds) : base(bounds)
+        protected TextShape(Rectangle bounds)
+            : base(bounds)
         {
         }
 

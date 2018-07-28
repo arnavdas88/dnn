@@ -11,15 +11,15 @@
     [TestClass]
     public class LRNLayerTest
     {
-        private static int[] SourceShape = new[] { -1, 24, 24, 20 };
+        private static int[] sourceShape = new[] { -1, 24, 24, 20 };
 
         [TestMethod]
         public void ConstructorTest1()
         {
-            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, 7, 0.001f, 0.5f, 3f);
+            LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, 7, 0.001f, 0.5f, 3f);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
 
             Assert.AreEqual("LRN7(A=0.001;B=0.5;K=3)", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -31,10 +31,10 @@
         [TestMethod]
         public void ConstructorTest2()
         {
-            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, 7);
+            LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, 7);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
 
             Assert.AreEqual("LRN7", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -57,7 +57,7 @@
         {
             try
             {
-                Assert.IsNotNull(new LRNLayer(LRNLayerTest.SourceShape, 0));
+                Assert.IsNotNull(new LRNLayer(LRNLayerTest.sourceShape, 0));
             }
             catch (ArgumentException e)
             {
@@ -73,7 +73,7 @@
         {
             try
             {
-                Assert.IsNotNull(new LRNLayer(LRNLayerTest.SourceShape, 2));
+                Assert.IsNotNull(new LRNLayer(LRNLayerTest.sourceShape, 2));
             }
             catch (ArgumentException e)
             {
@@ -85,11 +85,11 @@
         [TestMethod]
         public void ArchitechtureConstructorTest1()
         {
-            string Architecture = "LRN5";
-            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, Architecture, null);
+            const string Architecture = "LRN5";
+            LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
 
             Assert.AreEqual(Architecture, layer.Architecture);
             Assert.AreEqual(5, layer.KernelSize);
@@ -101,11 +101,11 @@
         [TestMethod]
         public void ArchitechtureConstructorTest2()
         {
-            string Architecture = "LRN7(A=0.001;B=0.5;K=3)";
-            LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, Architecture, null);
+            const string Architecture = "LRN7(A=0.001;B=0.5;K=3)";
+            LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.SourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
 
             Assert.AreEqual(Architecture, layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -121,7 +121,7 @@
             string architecture = "LRN";
             try
             {
-                LRNLayer layer = new LRNLayer(LRNLayerTest.SourceShape, architecture, null);
+                LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -143,13 +143,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitechtureConstructorTest5()
         {
-            Assert.IsNotNull(new LRNLayer(LRNLayerTest.SourceShape, null, null));
+            Assert.IsNotNull(new LRNLayer(LRNLayerTest.sourceShape, null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            LRNLayer layer1 = new LRNLayer(LRNLayerTest.SourceShape, 7);
+            LRNLayer layer1 = new LRNLayer(LRNLayerTest.sourceShape, 7);
             LRNLayer layer2 = new LRNLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -164,7 +164,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            LRNLayer layer1 = new LRNLayer(LRNLayerTest.SourceShape, 7);
+            LRNLayer layer1 = new LRNLayer(LRNLayerTest.sourceShape, 7);
             LRNLayer layer2 = layer1.Clone() as LRNLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -172,7 +172,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            LRNLayer layer1 = new LRNLayer(LRNLayerTest.SourceShape, 7);
+            LRNLayer layer1 = new LRNLayer(LRNLayerTest.sourceShape, 7);
             string s1 = JsonConvert.SerializeObject(layer1);
             LRNLayer layer2 = JsonConvert.DeserializeObject<LRNLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -241,7 +241,7 @@
 
         private static float Forward(LRNLayer layer, params float[] xs)
         {
-            float scale = layer.K + layer.Alpha * xs.Sum(x => x * x) / layer.KernelSize;
+            float scale = layer.K + (layer.Alpha * xs.Sum(x => x * x) / layer.KernelSize);
             return xs[0] * (float)Math.Pow(scale, -layer.Beta);
         }
     }

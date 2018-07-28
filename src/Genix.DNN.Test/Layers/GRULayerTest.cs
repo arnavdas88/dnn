@@ -190,7 +190,7 @@
                 }
 
                 return (input, truth);
-            };
+            }
 
             // train the network
             NetworkTrainer<int[]> trainer = new NetworkTrainer<int[]>()
@@ -272,7 +272,7 @@
                 }
 
                 return (input, expected);
-            };
+            }
 
             // train the network
             SquareLoss loss = new SquareLoss();
@@ -401,6 +401,7 @@
                 {
                     Arrays.Copy(letterSize, letters.Weights, alphabet[w1[i]] * letterSize, x.Weights, i * letterSize);
                 }
+
                 /*                Tensor x = Tensor.OneHot(
                                     new Layout(network.InputLayout, w1.Length),
                                     w1.Select(ch => alphabet[ch]).ToList());*/

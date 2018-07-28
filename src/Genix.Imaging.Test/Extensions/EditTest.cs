@@ -4,7 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class EditExtensionsTest
+    public class EditTest
     {
         [TestMethod]
         public void GetPixelSetPixelTest1()

@@ -10,9 +10,9 @@
     [TestClass]
     public class MaxPoolingLayerTest
     {
-        private static int[] SourceShape = new[] { -1, 5, 4, 2 };
+        private static int[] sourceShape = new[] { -1, 5, 4, 2 };
 
-        private static float[] Weights = new float[]
+        private static float[] weights = new float[]
         {
             1,  2,     3,  4,    7,  8,    5,  6,
             19, 20,   21, 22,   25, 26,   23, 24,
@@ -24,7 +24,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
             Assert.AreEqual("MP2", layer.Architecture);
@@ -37,7 +37,7 @@
         [TestMethod]
         public void ConstructorTest2()
         {
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
             Assert.AreEqual("MP3x2+1x2(S)", layer.Architecture);
@@ -51,7 +51,7 @@
         public void ArchitechtureConstructorTest1()
         {
             string architecture = "MP3x2";
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -66,7 +66,7 @@
         public void ArchitechtureConstructorTest2()
         {
             string architecture = "MP3x2+2(S)";
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -81,7 +81,7 @@
         public void ArchitechtureConstructorTest3()
         {
             string architecture = "MP3x2+2x1(S)";
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
@@ -96,7 +96,7 @@
         public void ArchitechtureConstructorTest4()
         {
             string architecture = "MP2";
-            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+            MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
 
             Assert.AreEqual(architecture, layer.Architecture);
             Assert.AreEqual(2, layer.Kernel.Width);
@@ -114,7 +114,7 @@
             string architecture = "MP";
             try
             {
-                MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, architecture, null);
+                MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -136,13 +136,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitechtureConstructorTest7()
         {
-            Assert.IsNotNull(new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, null, null));
+            Assert.IsNotNull(new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 2, 1, 2));
+            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
             MaxPoolingLayer layer2 = new MaxPoolingLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -164,7 +164,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
             MaxPoolingLayer layer2 = layer1.Clone() as MaxPoolingLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -172,7 +172,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            MaxPoolingLayer layer1 = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
             string s1 = JsonConvert.SerializeObject(layer1);
             MaxPoolingLayer layer2 = JsonConvert.DeserializeObject<MaxPoolingLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -184,12 +184,12 @@
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest2X2X2X2()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(2, 2, 2, 2));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 3, 2, 2 });
             expectedTemp.Set(new float[]
@@ -233,12 +233,12 @@
         [Description("Filter 2x2, stride 1x1.")]
         public void ForwardBackwardTest2X2X1X1()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(2, 2, 1, 1));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 4, 3, 2 });
             expectedTemp.Set(new float[]
@@ -283,12 +283,12 @@
         [Description("Filter 3x3, stride 3x3.")]
         public void ForwardBackwardTest3X3X3X3()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 3, 3, 3));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 3, 3));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
             expectedTemp.Set(new float[]
@@ -331,12 +331,12 @@
         [Description("Filter 3x3, stride 2x2.")]
         public void ForwardBackwardTest3X3X2X2()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 3, 2, 2));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 2, 2));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
             expectedTemp.Set(new float[]
@@ -379,12 +379,12 @@
         [Description("Filter 3x3, stride 1x1.")]
         public void ForwardBackwardTest3X3X1X1()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(3, 3, 1, 1));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 3, 2, 2 });
             expectedTemp.Set(new float[]
@@ -428,12 +428,12 @@
         [Description("Filter 4x4, stride 4x4.")]
         public void ForwardBackwardTest4X4X4X4()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(4, 4, 4, 4));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(4, 4, 4, 4));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 1, 2 });
             expectedTemp.Set(new float[]
@@ -476,12 +476,12 @@
         [Description("Filter 4x4, stride 1x1.")]
         public void ForwardBackwardTest4X4X1X1()
         {
-            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.SourceShape, new Kernel(4, 4, 1, 1));
+            Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(4, 4, 1, 1));
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.SourceShape, (int)Axis.B, 1));
-            xTemp.Set(MaxPoolingLayerTest.Weights);
+            Tensor xTemp = new Tensor(null, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            xTemp.Set(MaxPoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 1, 2 });
             expectedTemp.Set(new float[]

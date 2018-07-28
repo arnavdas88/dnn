@@ -11,7 +11,8 @@
     public class SoftMaxLayerTest
     {
         private static float[] weights = new float[] { 0.2f, -0.3f, 0.8f, 0.4f };
-        private static float[] activations = new float[] {
+        private static float[] activations = new float[]
+        {
             0.215051353f,
             0.130435243f,
             0.39184913f,

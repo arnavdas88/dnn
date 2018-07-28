@@ -1,4 +1,4 @@
-﻿namespace Genix.Core.Test.Math
+﻿namespace Genix.Core.Test
 {
     using System;
     using System.Linq;
@@ -18,8 +18,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                float[] x = random.Generate(length, null);
-                float[] y0 = random.Generate(length, null);
+                float[] x = this.random.Generate(length, null);
+                float[] y0 = this.random.Generate(length, null);
 
                 float[] y = y0.ToArray();
                 Mathematics.Add(length, x, 0, y, 0);

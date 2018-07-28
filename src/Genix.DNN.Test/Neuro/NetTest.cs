@@ -1,17 +1,13 @@
 ﻿namespace Genix.DNN.Test
 {
     using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Genix.DNN;
-    using Genix.DNN.Layers;
     using Genix.DNN.Learning;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
-    using System.Globalization;
 
     [TestClass]
     public class NetTest
@@ -22,7 +18,7 @@
         [TestInitialize]
         public void BeforeEach()
         {
-            this.net = ClassificationNetwork.FromArchitecture("10x10x2~5N~5N~3N", classes);
+            this.net = ClassificationNetwork.FromArchitecture("10x10x2~5N~5N~3N", this.classes);
         }
 
         [TestMethod]
@@ -75,7 +71,7 @@
         [Description("should forward prop volumes to probabilities")]
         public void ForwardToProbability()
         {
-            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x2~5N~5N~3N", classes);
+            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x2~5N~5N~3N", this.classes);
 
             Tensor x = new Tensor(null, new[] { 1, 1, 1, 2 });
             x.Set(new float[] { 0.2f, -0.3f });
@@ -107,7 +103,7 @@
                 Momentum = 0.0f
             };
 
-            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x2~5N~5N~3N", classes);
+            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x2~5N~5N~3N", this.classes);
 
             // lets test 100 random point and label settings
             // note that this should work since l2 and l1 regularization are off
@@ -117,7 +113,7 @@
                 int gti = (int)Math.Floor(random.NextDouble() * 3);
 
                 Tensor x = new Tensor(null, new[] { 1, 1, 1, 2 });
-                x.Set(new float[] { (float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1 });
+                x.Set(new float[] { ((float)random.NextDouble() * 2) - 1, ((float)random.NextDouble() * 2) - 1 });
 
                 Tensor pv = network.Forward(null, x).Clone() as Tensor;
 

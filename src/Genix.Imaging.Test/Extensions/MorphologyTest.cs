@@ -1,7 +1,7 @@
 ﻿namespace Genix.Imaging.Test
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Globalization;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class MorphologyTest

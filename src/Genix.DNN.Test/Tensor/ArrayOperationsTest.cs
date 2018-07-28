@@ -21,7 +21,7 @@
             foreach (int length in new[] { 24, 128 })
             {
                 Tensor x = new Tensor(null, new[] { 1, 1, 1, length });
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Copy(session, x);
                 Helpers.AreTensorsEqual(x, y1);
@@ -29,8 +29,8 @@
                 Tensor y2 = ArrayOperations.Copy(session, x);
                 Helpers.AreTensorsEqual(x, y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
@@ -49,8 +49,8 @@
             {
                 Tensor x1 = new Tensor(null, axes);
                 Tensor x2 = new Tensor(null, Shape.Reshape(axes, axis, axes[axis] + 1));
-                x1.Randomize(random);
-                x2.Randomize(random);
+                x1.Randomize(this.random);
+                x2.Randomize(this.random);
                 Tensor[] xs = new[] { x1, x2 };
 
                 Tensor y1 = ArrayOperations.Concat(session, xs, axis);
@@ -59,14 +59,14 @@
                 Tensor y2 = ArrayOperations.Concat(session, xs, axis);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
                 void validate(Tensor y)
                 {
-                    int[] yaxes = Shape.Reshape(axes, axis, 2 * axes[axis] + 1);
+                    int[] yaxes = Shape.Reshape(axes, axis, (2 * axes[axis]) + 1);
                     CollectionAssert.AreEqual(yaxes, y.Axes);
 
                     int[] i = new int[3];
@@ -83,7 +83,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -103,7 +103,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -132,7 +132,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
                 int[] sizes = new[] { axes[axis] / 2, axes[axis] - (axes[axis] / 2) };
 
                 IList<Tensor> ys1 = ArrayOperations.Split(session, x, axis, sizes);
@@ -143,12 +143,12 @@
 
                 foreach (Tensor y in ys1)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 foreach (Tensor y in ys2)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 session.Unroll();
@@ -178,7 +178,7 @@
 
                         start += y.Axes[axis];
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -207,7 +207,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -237,7 +237,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 IList<Tensor> ys1 = ArrayOperations.Split(session, x, axis, numsplits);
                 validate(ys1);
@@ -247,12 +247,12 @@
 
                 foreach (Tensor y in ys1)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 foreach (Tensor y in ys2)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 session.Unroll();
@@ -284,7 +284,7 @@
 
                         count++;
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -313,7 +313,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -332,7 +332,6 @@
                 throw;
             }
         }
-
 
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is an argument of tested method.")]
         [TestMethod, ExpectedException(typeof(ArgumentException))]
@@ -363,7 +362,7 @@
                 for (int i = 0; i < N; i++)
                 {
                     xs[i] = new Tensor(null, axes);
-                    xs[i].Randomize(random);
+                    xs[i].Randomize(this.random);
                 }
 
                 Tensor y1 = ArrayOperations.Stack(session, xs, axis);
@@ -372,8 +371,8 @@
                 Tensor y2 = ArrayOperations.Stack(session, xs, axis);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -393,7 +392,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -412,7 +411,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -441,7 +440,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 IList<Tensor> ys1 = ArrayOperations.Unstack(session, x, axis);
                 validate(ys1);
@@ -451,12 +450,12 @@
 
                 foreach (Tensor y in ys1)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 foreach (Tensor y in ys2)
                 {
-                    y.RandomizeGradient(random);
+                    y.RandomizeGradient(this.random);
                 }
 
                 session.Unroll();
@@ -477,7 +476,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -496,7 +495,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -526,7 +525,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Tile(session, x, axis, count);
                 validate(y1);
@@ -534,8 +533,8 @@
                 Tensor y2 = ArrayOperations.Tile(session, x, axis, count);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -558,7 +557,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -579,7 +578,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -609,7 +608,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Untile(session, x, axis, count);
                 validate(y1);
@@ -617,8 +616,8 @@
                 Tensor y2 = ArrayOperations.Untile(session, x, axis, count);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -644,7 +643,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -662,7 +661,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -692,7 +691,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.MaxReduce(session, x, axis, count);
                 validate(y1);
@@ -700,8 +699,8 @@
                 Tensor y2 = ArrayOperations.MaxReduce(session, x, axis, count);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -730,7 +729,7 @@
                             }
                         }
                     }
-                };
+                }
 
                 void validateGradient()
                 {
@@ -750,7 +749,7 @@
                             }
                         }
                     }
-                };
+                }
             }
         }
 
@@ -781,7 +780,7 @@
                 int[] newaxes = axes.ToArray();
                 newaxes[axis] = 1;
                 Tensor x = new Tensor(null, newaxes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Squeeze(session, x, axis);
                 validate(y1);
@@ -789,8 +788,8 @@
                 Tensor y2 = ArrayOperations.Squeeze(session, x, axis);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -798,14 +797,14 @@
                 {
                     CollectionAssert.AreEqual(Shape.Remove(axes, axis), y.Axes);
                     Helpers.AreArraysEqual(x.Weights, y.Weights);
-                };
+                }
 
                 void validateGradient()
                 {
                     Helpers.AreArraysEqual(
                         y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                         x.Gradient);
-                };
+                }
             }
         }
 
@@ -866,7 +865,7 @@
             for (int axis = 0; axis < axes.Length; axis++)
             {
                 Tensor x = new Tensor(null, axes);
-                x.Randomize(random);
+                x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Expand(session, x, axis);
                 validate(y1);
@@ -874,8 +873,8 @@
                 Tensor y2 = ArrayOperations.Expand(session, x, axis);
                 validate(y2);
 
-                y1.RandomizeGradient(random);
-                y2.RandomizeGradient(random);
+                y1.RandomizeGradient(this.random);
+                y2.RandomizeGradient(this.random);
                 session.Unroll();
                 validateGradient();
 
@@ -883,14 +882,14 @@
                 {
                     CollectionAssert.AreEqual(Shape.Expand(axes, axis, 1), y.Axes);
                     Helpers.AreArraysEqual(x.Weights, y.Weights);
-                };
+                }
 
                 void validateGradient()
                 {
                     Helpers.AreArraysEqual(
                         y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                         x.Gradient);
-                };
+                }
             }
         }
 
@@ -919,7 +918,7 @@
             Session session = new Session();
 
             Tensor x = new Tensor(null, axes);
-            x.Randomize(random);
+            x.Randomize(this.random);
 
             Tensor y1 = ArrayOperations.Reshape(session, x, axes1);
             validate(y1, axes1);
@@ -927,8 +926,8 @@
             Tensor y2 = ArrayOperations.Reshape(session, x, axes2);
             validate(y2, axes2);
 
-            y1.RandomizeGradient(random);
-            y2.RandomizeGradient(random);
+            y1.RandomizeGradient(this.random);
+            y2.RandomizeGradient(this.random);
             session.Unroll();
             validateGradient();
 
@@ -936,14 +935,14 @@
             {
                 CollectionAssert.AreEqual(yaxes, y.Axes);
                 Helpers.AreArraysEqual(x.Weights, y.Weights);
-            };
+            }
 
             void validateGradient()
             {
                 Helpers.AreArraysEqual(
                     y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                     x.Gradient);
-            };
+            }
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "This is an argument of tested method.")]

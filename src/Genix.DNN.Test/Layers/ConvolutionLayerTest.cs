@@ -2,12 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
-    using Genix.Core;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -178,7 +178,8 @@
                 ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
                 CollectionAssert.AreEqual(new[] { -1, 2, 2, NumberOfFilters }, layer.OutputShape);
 
-                layer.W.Set(new float[] {
+                layer.W.Set(new float[]
+                {
                     1, 2, 3, 4,
                     5, 6, 7, 8
                 });
@@ -186,7 +187,8 @@
                 layer.B.Set(new float[] { 1, 2 });
 
                 Tensor xTemp = new Tensor(null, new[] { 1, 2, 3, 2 });
-                xTemp.Set(new float[] {
+                xTemp.Set(new float[]
+                {
                     1,  2,   3,  4,
                     5,  6,   7,  8,
                     9, 10,  11, 12
@@ -196,7 +198,8 @@
                 expectedTemp.Set(ConvolutionLayerTest.CalculateConvolution(layer.W, xTemp, layer.B, kernel, NumberOfFilters, matrixLayout));
 
                 Tensor dyTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
-                dyTemp.Set(new float[] {
+                dyTemp.Set(new float[]
+                {
                     1, 2,  3, 4,
                     5, 6,  7, 8
                 });
@@ -255,7 +258,8 @@
                 ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
                 CollectionAssert.AreEqual(new[] { -1, 4, 4, NumberOfFilters }, layer.OutputShape);
 
-                layer.W.Set(new float[] {
+                layer.W.Set(new float[]
+                {
                     1, 2, 3, 4,
                     5, 6, 7, 8
                 });
@@ -263,7 +267,8 @@
                 layer.B.Set(new float[] { 1, 2 });
 
                 Tensor xTemp = new Tensor(null, new[] { 1, 2, 3, 2 });
-                xTemp.Set(new float[] {
+                xTemp.Set(new float[]
+                {
                     1,  2,   3,  4,
                     5,  6,   7,  8,
                     9, 10,  11, 12
@@ -273,7 +278,8 @@
                 expectedTemp.Set(ConvolutionLayerTest.CalculateConvolution(layer.W, xTemp, layer.B, kernel, NumberOfFilters, matrixLayout));
 
                 Tensor dyTemp = new Tensor(null, new[] { 1, 4, 4, 2 });
-                dyTemp.Set(new float[] {
+                dyTemp.Set(new float[]
+                {
                      1,  2,   3,  4,   5,  6,   7,  8,
                      9, 10,  11, 12,  13, 14,  15, 16,
                     17, 18,  19, 20,  21, 22,  23, 24,
