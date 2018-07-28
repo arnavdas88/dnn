@@ -350,8 +350,8 @@ namespace Genix.Core
             return new ParallelOptions
             {
                 MaxDegreeOfParallelism = CommonParallel.maxDegreeOfParallelism,
-                CancellationToken = cancellationToken/*,
-                TaskScheduler = Control.TaskScheduler,*/
+                CancellationToken = cancellationToken,
+                ////TaskScheduler = Control.TaskScheduler,
             };
         }
     }

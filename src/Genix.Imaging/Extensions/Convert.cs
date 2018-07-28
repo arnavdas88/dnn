@@ -31,7 +31,7 @@ namespace Genix.Imaging
         /// A new normalized <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image NormalizeBackground(this Image image/*, byte threshold, int sx, int sy*/)
@@ -93,7 +93,7 @@ namespace Genix.Imaging
         /// A new binary <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Binarize(this Image image)
@@ -155,7 +155,7 @@ namespace Genix.Imaging
         /// A new gray scale <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Convert1To8(this Image image, byte value0, byte value1)
@@ -202,7 +202,7 @@ namespace Genix.Imaging
         /// A new binary <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>

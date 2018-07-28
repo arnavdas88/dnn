@@ -36,6 +36,6 @@ namespace Genix.DNN
         /// The channel axis.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "C", Justification = "Represents axis name.")]
-        C = 3
+        C = 3,
     }
 }

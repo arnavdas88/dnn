@@ -501,19 +501,19 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = stack(calculateGradient);
+                    Tensor y = Stack(calculateGradient);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => gradient(y));
+                        session.Push(ActionName, () => Gradient(y));
                     }
 #endif
 
                     return y;
                 });
 
-            Tensor stack(bool calculateGradient)
+            Tensor Stack(bool calculateGradient)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;
@@ -596,7 +596,7 @@ namespace Genix.DNN
             }
 
 #if !NOLEARNING
-            void gradient(Tensor y)
+            void Gradient(Tensor y)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;

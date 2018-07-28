@@ -522,7 +522,7 @@ namespace Genix.Core
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/></param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         public static void WordsAND(int length, ulong mask, ulong[] y, int offy, int incy)
         {
             NativeMethods.bits_and_mask_inc_64(length, mask, y, offy, incy);

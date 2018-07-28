@@ -532,7 +532,7 @@ namespace Genix.DNN
             /// </returns>
             public virtual object Clone() => new ComponentVertex(this.Key, this.Architecture)
             {
-                Layer = this.Layer?.Clone() as Layer
+                Layer = this.Layer?.Clone() as Layer,
             };
         }
     }

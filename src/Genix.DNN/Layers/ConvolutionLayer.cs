@@ -144,7 +144,7 @@ namespace Genix.DNN.Layers
                 inputShape[(int)Axis.B],
                 kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),
                 kernel.CalculateOutputHeight(inputShape[(int)Axis.Y]),
-                numberOfFilters
+                numberOfFilters,
             };
         }
 
@@ -189,7 +189,7 @@ namespace Genix.DNN.Layers
                 inputShape[(int)Axis.B],
                 kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),
                 kernel.CalculateOutputHeight(inputShape[(int)Axis.Y]),
-                numberOfFilters
+                numberOfFilters,
             };
         }
     }

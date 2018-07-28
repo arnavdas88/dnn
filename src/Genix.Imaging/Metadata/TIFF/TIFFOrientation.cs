@@ -11,7 +11,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the values for the Orientation field.
     /// </summary>
-     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "This enumeration does not have zero value.")]
+    [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "This enumeration does not have zero value.")]
     public enum TIFFOrientation
     {
         /// <summary>
@@ -52,6 +52,6 @@ namespace Genix.Imaging
         /// <summary>
         /// The 0th row represents the visual left-hand side of the image, and the 0th column represents the visual bottom.
         /// </summary>
-        LeftBottom = 8
+        LeftBottom = 8,
     }
 }

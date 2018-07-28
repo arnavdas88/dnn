@@ -27,6 +27,6 @@ namespace Genix.Imaging
         /// <summary>
         /// A single page of a multi-page image.
         /// </summary>
-        PageOfMultipage = 3
+        PageOfMultipage = 3,
     }
 }

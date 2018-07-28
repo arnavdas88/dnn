@@ -25,7 +25,7 @@ namespace Genix.Imaging
         /// The color of the specified pixel.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para><c>x</c> is less than 0, or greater than or equal to <see cref="Image.Width"/>.</para>
@@ -55,7 +55,7 @@ namespace Genix.Imaging
         /// <param name="y">The y-coordinate of the pixel to retrieve.</param>
         /// <param name="color">The color to assign to the specified pixel.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para><c>x</c> is less than 0, or greater than or equal to <see cref="Image.Width"/>.</para>
@@ -110,11 +110,11 @@ namespace Genix.Imaging
         /// A new cleared <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
-        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1;
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1.
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -147,11 +147,11 @@ namespace Genix.Imaging
         /// A new cleared <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
-        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1;
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1.
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -185,7 +185,7 @@ namespace Genix.Imaging
         /// A new cleared <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -204,7 +204,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to fill.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -236,7 +236,7 @@ namespace Genix.Imaging
         /// <param name="width">The width of the area.</param>
         /// <param name="height">The height of the area.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -284,7 +284,7 @@ namespace Genix.Imaging
         /// <param name="image">The existing <see cref="Image"/> to fill.</param>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -310,11 +310,11 @@ namespace Genix.Imaging
         /// A new cleared <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
-        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1;
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1.
         /// </para>
         /// </remarks>
         public static Image SetWhiteBorder(this Image image, int x, int y, int width, int height)
@@ -346,11 +346,11 @@ namespace Genix.Imaging
         /// <param name="width">The width of the area.</param>
         /// <param name="height">The height of the area.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
-        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1;
+        /// For <see cref="Image.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image.BitsPerPixel"/> - 1.
         /// </para>
         /// </remarks>
         public static void SetWhiteBorderIP(this Image image, int x, int y, int width, int height)
@@ -408,7 +408,7 @@ namespace Genix.Imaging
         /// A new filled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -446,7 +446,7 @@ namespace Genix.Imaging
         /// A new filled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -485,7 +485,7 @@ namespace Genix.Imaging
         /// A new filled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -504,7 +504,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to fill.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -536,7 +536,7 @@ namespace Genix.Imaging
         /// <param name="width">The width of the area.</param>
         /// <param name="height">The height of the area.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -584,7 +584,7 @@ namespace Genix.Imaging
         /// <param name="image">The existing <see cref="Image"/> to fill.</param>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <remarks>
         /// <para>

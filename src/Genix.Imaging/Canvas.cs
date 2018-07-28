@@ -76,7 +76,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Finalizes an instance of the <see cref="Canvas"/> class.
         /// </summary>
-         ~Canvas()
+        ~Canvas()
         {
             if (!this.disposed)
             {

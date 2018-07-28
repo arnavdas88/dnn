@@ -25,7 +25,7 @@ namespace Genix.Imaging
         /// A new cleaned <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image CleanBorderNoise(this Image image, float maxNoiseWidth, float maxNoiseHeight)
@@ -47,20 +47,20 @@ namespace Genix.Imaging
             int maxwidth = (int)((maxNoiseWidth * image.HorizontalResolution) + 0.5f);
             if (maxwidth > 0)
             {
-                clearLeft(findLeft(maxwidth));
-                clearRight(findRight(maxwidth));
+                ClearLeft(FindLeft(maxwidth));
+                ClearRight(FindRight(maxwidth));
             }
 
             int maxheight = (int)((maxNoiseHeight * image.VerticalResolution) + 0.5f);
             if (maxheight > 0)
             {
-                clearTop(findTop(maxheight));
-                clearBottom(findBottom(maxheight));
+                ClearTop(FindTop(maxheight));
+                ClearBottom(FindBottom(maxheight));
             }
 
             return dst;
 
-            int[] findLeft(int maxlen)
+            int[] FindLeft(int maxlen)
             {
                 int scanlen = Maximum.Min(width, maxlen);
                 int[] lengths = new int[height];
@@ -73,7 +73,7 @@ namespace Genix.Imaging
                 return lengths;
             }
 
-            int[] findRight(int maxlen)
+            int[] FindRight(int maxlen)
             {
                 int scanlen = Maximum.Min(width, maxlen);
                 int[] lengths = new int[height];
@@ -86,7 +86,7 @@ namespace Genix.Imaging
                 return lengths;
             }
 
-            int[] findTop(int maxlen)
+            int[] FindTop(int maxlen)
             {
                 int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
@@ -108,7 +108,7 @@ namespace Genix.Imaging
                 return lengths;
             }
 
-            int[] findBottom(int maxlen)
+            int[] FindBottom(int maxlen)
             {
                 int scanlen = Maximum.Min(height, maxlen);
                 int[] lengths = new int[width];
@@ -131,7 +131,7 @@ namespace Genix.Imaging
                 return lengths;
             }
 
-            void clearLeft(int[] lengths)
+            void ClearLeft(int[] lengths)
             {
                 for (int iy = 0, off = 0; iy < height; iy++, off += stride1)
                 {
@@ -143,7 +143,7 @@ namespace Genix.Imaging
                 }
             }
 
-            void clearRight(int[] lengths)
+            void ClearRight(int[] lengths)
             {
                 for (int iy = 0, off = width; iy < height; iy++, off += stride1)
                 {
@@ -155,7 +155,7 @@ namespace Genix.Imaging
                 }
             }
 
-            void clearTop(int[] lengths)
+            void ClearTop(int[] lengths)
             {
                 for (int ix = 0; ix < width; ix++)
                 {
@@ -168,7 +168,7 @@ namespace Genix.Imaging
                 }
             }
 
-            void clearBottom(int[] lengths)
+            void ClearBottom(int[] lengths)
             {
                 int size = stride * height;
                 for (int ix = 0; ix < width; ix++)

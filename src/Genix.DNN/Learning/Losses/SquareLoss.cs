@@ -47,7 +47,7 @@ namespace Genix.DNN.Learning
 
             if (y.Rank == 1)
             {
-                return calculate(expected.Length, 0, 0);
+                return Calculate(expected.Length, 0, 0);
             }
             else
             {
@@ -57,13 +57,13 @@ namespace Genix.DNN.Learning
                 float loss = 0.0f;
                 for (int i = 0, yi = 0, ei = 0; i < mb; i++, yi += mbsize, ei += mbsize)
                 {
-                    loss += calculate(mbsize, yi, ei);
+                    loss += Calculate(mbsize, yi, ei);
                 }
 
                 return loss / mb;
             }
 
-            float calculate(int length, int offy, int offe)
+            float Calculate(int length, int offy, int offe)
             {
                 float sum = 0.0f;
                 for (int i = 0; i < length; i++)

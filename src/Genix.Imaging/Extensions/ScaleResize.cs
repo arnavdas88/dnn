@@ -28,7 +28,7 @@ namespace Genix.Imaging
         /// A new scaled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         public static Image Scale(this Image image, double scaleFactor, ScalingOptions options)
         {
@@ -54,7 +54,7 @@ namespace Genix.Imaging
         /// A new scaled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         public static Image ScaleToSize(this Image image, int width, int height, ScalingOptions options)
         {
@@ -147,7 +147,7 @@ namespace Genix.Imaging
         /// A new scaled <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// The operation cannot be performed on the image with current color depth.
@@ -207,7 +207,7 @@ namespace Genix.Imaging
         /// A new resized <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         public static Image Resize(this Image image, int width, int height)
         {
@@ -242,7 +242,7 @@ namespace Genix.Imaging
         /// A new inflated <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>Result width is less than or equal to zero.</para>

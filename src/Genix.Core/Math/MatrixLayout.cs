@@ -19,6 +19,6 @@ namespace Genix.Core
         /// <summary>
         /// The matrix layout is row major.
         /// </summary>
-        RowMajor = 1
+        RowMajor = 1,
     }
 }

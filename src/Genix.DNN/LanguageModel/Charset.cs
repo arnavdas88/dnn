@@ -70,10 +70,8 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public Charset(IEnumerable<(char, int)> characters, int minRepeatCount, int maxRepeatCount)
             : base(minRepeatCount, maxRepeatCount)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (characters == null)
             {
@@ -111,9 +109,7 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public Charset(IEnumerable<(char, float)> characters, int minRepeatCount, int maxRepeatCount)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             : base(minRepeatCount, maxRepeatCount)
         {
             if (characters == null)

@@ -468,7 +468,7 @@ namespace Genix.Lab
                     if (this.fields != null)
                     {
                         writer.Write(",");
-                        writer.Write(string.Join(",", this.fields.Select(x => qualifyString(x))));
+                        writer.Write(string.Join(",", this.fields.Select(x => QualifyString(x))));
                     }
 
                     writer.Write(Environment.NewLine);
@@ -488,14 +488,14 @@ namespace Genix.Lab
                             if (kvp.Value.Data != null)
                             {
                                 writer.Write(",");
-                                writer.WriteLine(string.Join(",", kvp.Value.Data.Select(x => qualifyString(x ?? string.Empty))));
+                                writer.WriteLine(string.Join(",", kvp.Value.Data.Select(x => QualifyString(x ?? string.Empty))));
                             }
                         }
                     }
                 }
             }
 
-            string qualifyString(string text)
+            string QualifyString(string text)
             {
                 return (text.IndexOf(',') == -1) ? text : '"' + text.Replace("\"", "\"\"") + '"';
             }

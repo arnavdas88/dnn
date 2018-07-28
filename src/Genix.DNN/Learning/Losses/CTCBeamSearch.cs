@@ -12,9 +12,9 @@ namespace Genix.DNN.Learning
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using DNN;
     using Genix.Core;
-    using LanguageModel;
+    using Genix.DNN;
+    using Genix.DNN.LanguageModel;
 
     /// <summary>
     /// Performs a beam search decoding the logits.
@@ -133,9 +133,7 @@ namespace Genix.DNN.Learning
         /// <returns>The collection of decoded class sequences along with their weights.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to return results.")]
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public IList<(string[] Classes, float Probability)> BeamSearch(Tensor y)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (y == null)
             {
@@ -171,9 +169,9 @@ namespace Genix.DNN.Learning
         }
 
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
-#pragma warning disable SA1313 // Parameter names must begin with lower-case letter
+#pragma warning disable SA1313 // Variable names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog)
-#pragma warning restore SA1313 // Parameter names must begin with lower-case letter
+#pragma warning restore SA1313 // Variable names must begin with lower-case letter
         {
             // create array that contains classes indexes
             // and then sort both probabilities and indexes
@@ -283,9 +281,9 @@ namespace Genix.DNN.Learning
         }
 
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
-#pragma warning disable SA1313 // Parameter names must begin with lower-case letter
+#pragma warning disable SA1313 // Variable names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog, Context context)
-#pragma warning restore SA1313 // Parameter names must begin with lower-case letter
+#pragma warning restore SA1313 // Variable names must begin with lower-case letter
         {
             State initialState = context.InitialState;
 
@@ -401,13 +399,9 @@ namespace Genix.DNN.Learning
             return idx;
         }
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private IList<(string[], float)> CreateFinalAnswer(Buffers flop)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string[] Classes, float Prob)> final = new List<(string[], float)>(Maximum.Max(this.ResultCount, flop.Count));
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             float amax = 0.0f;
             float esum = float.NegativeInfinity;
 
@@ -451,9 +445,7 @@ namespace Genix.DNN.Learning
             {
                 for (int i = 0; i < final.Count; i++)
                 {
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
                     final[i] = (final[i].Classes, (float)Math.Exp(final[i].Prob - esum));
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
                 }
             }
 

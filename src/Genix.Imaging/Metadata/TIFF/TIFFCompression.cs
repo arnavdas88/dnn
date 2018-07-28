@@ -132,6 +132,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Deflate (PKZIP-style Deflate encoding) (experimental).
         /// </summary>
-        DeflateExperimental = 32946
+        DeflateExperimental = 32946,
     }
 }

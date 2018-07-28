@@ -62,8 +62,6 @@ namespace Genix.DNN.Layers
         /// Returns a collection of trainable weights along with their gradients.
         /// </summary>
         /// <returns>The sequence of tuples that contains gradient tensors.</returns>
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal abstract IEnumerable<(Tensor, float, float)> EnumGradients();
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
     }
 }

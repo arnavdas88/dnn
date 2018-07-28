@@ -32,6 +32,6 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// All the lines.
         /// </summary>
-        All = Horizontal | Vertical
+        All = Horizontal | Vertical,
     }
 }

@@ -23,7 +23,7 @@ namespace Genix.Imaging
         /// A new inverted <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image NOT(this Image image)
@@ -43,7 +43,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to invert.</param>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NOTIP(this Image image)
@@ -65,9 +65,9 @@ namespace Genix.Imaging
         /// The <see cref="Image"/> that receives the data.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image AND(this Image a, Image b)
@@ -100,9 +100,9 @@ namespace Genix.Imaging
         /// <param name="a">The first <see cref="Image"/>.</param>
         /// <param name="b">The second <see cref="Image"/>.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ANDIP(this Image a, Image b)
@@ -136,9 +136,9 @@ namespace Genix.Imaging
         /// The <see cref="Image"/> that receives the data.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image OR(this Image a, Image b)
@@ -171,9 +171,9 @@ namespace Genix.Imaging
         /// <param name="a">The first <see cref="Image"/>.</param>
         /// <param name="b">The second <see cref="Image"/>.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ORIP(this Image a, Image b)
@@ -207,9 +207,9 @@ namespace Genix.Imaging
         /// The <see cref="Image"/> that receives the data.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image XOR(this Image a, Image b)
@@ -242,9 +242,9 @@ namespace Genix.Imaging
         /// <param name="a">The first <see cref="Image"/>.</param>
         /// <param name="b">The second <see cref="Image"/>.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>a</c> is <b>null</b></para>
+        /// <para><c>a</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>b</c> is <b>null</b></para>
+        /// <para><c>b</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void XORIP(this Image a, Image b)

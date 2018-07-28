@@ -251,7 +251,7 @@ namespace Genix.Graph
                     edges.Add(new List<string>()
                     {
                         verticesCodes[edge.Source],
-                        verticesCodes[edge.Target]
+                        verticesCodes[edge.Target],
                     });
                 }
 

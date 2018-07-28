@@ -32,6 +32,6 @@ namespace Genix.Imaging
         ///  PhotometricInterpretation describes the type of data stored in each component plane.
         ///  For example, RGB data is stored with the Red components in one component plane, the Green in another, and the Blue in another.
         /// </summary>
-        Planar = 2
+        Planar = 2,
     }
 }

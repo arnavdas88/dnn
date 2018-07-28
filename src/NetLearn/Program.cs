@@ -83,7 +83,7 @@ namespace Genix.NetLearn
                                     task.OutputFileName,
                                     options.TestConfigFileName),
                                 UseShellExecute = false,
-                                WorkingDirectory = System.Environment.CurrentDirectory
+                                WorkingDirectory = System.Environment.CurrentDirectory,
                             };
 
                             Process.Start(processStartInfo);
@@ -191,7 +191,7 @@ namespace Genix.NetLearn
                     TrainingResult result = task.Trainer.RunEpoch(
                         epoch,
                         net,
-                        generateSamples(epoch),
+                        GenerateSamples(epoch),
                         task.Algorithm,
                         task.Loss,
                         cancellationToken);
@@ -211,9 +211,7 @@ namespace Genix.NetLearn
                     Program.WriteLine(logFile, string.Empty);
                 }
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
-                IEnumerable<(Tensor, string[])> generateSamples(int epoch)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
+                IEnumerable<(Tensor, string[])> GenerateSamples(int epoch)
                 {
                     return dataProvider
                         .Generate(null).ToList()

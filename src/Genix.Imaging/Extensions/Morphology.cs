@@ -274,7 +274,7 @@ namespace Genix.Imaging
         /// A set of <see cref="ConnectedComponent"/> objects found.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         public static ISet<ConnectedComponent> FindConnectedComponents(this Image image)
         {
@@ -316,10 +316,10 @@ namespace Genix.Imaging
                     }
 
                     // merge interval
-                    mergeStroke(start - ypos, end - start);
+                    MergeStroke(start - ypos, end - start);
                     xpos = end + 1;
 
-                    void mergeStroke(int x, int length)
+                    void MergeStroke(int x, int length)
                     {
                         // the component we will attach the stroke to
                         ConnectedComponent component = null;
@@ -347,12 +347,12 @@ namespace Genix.Imaging
                                         all.Remove(anotherComponent);
 
                                         // replace merged component in previous line
-                                        replaceComponent(last, i);
+                                        ReplaceComponent(last, i);
 
                                         // replace merged component in this line
-                                        replaceComponent(current, current.Count);
+                                        ReplaceComponent(current, current.Count);
 
-                                        void replaceComponent(List<Stroke> strokes, int anchorPosition)
+                                        void ReplaceComponent(List<Stroke> strokes, int anchorPosition)
                                         {
                                             Rectangle anotherBounds = anotherComponent.Bounds;
                                             for (int j = anchorPosition, jj = strokes.Count; j < jj && strokes[j].X <= anotherBounds.Right; j++)
@@ -408,15 +408,9 @@ namespace Genix.Imaging
         /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="component">The <see cref="ConnectedComponent"/> to add.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>component</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>component</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.
@@ -453,15 +447,9 @@ namespace Genix.Imaging
         /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to add.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>components</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>components</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.
@@ -485,15 +473,9 @@ namespace Genix.Imaging
         /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="component">The <see cref="ConnectedComponent"/> to remove.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>component</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>component</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.
@@ -530,15 +512,9 @@ namespace Genix.Imaging
         /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to remove.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>components</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>components</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.
@@ -565,15 +541,9 @@ namespace Genix.Imaging
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>component</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>component</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.
@@ -624,15 +594,9 @@ namespace Genix.Imaging
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para>
-        /// <c>image</c> is <b>null</b>
-        /// </para>
-        /// <para>
-        /// -or
-        /// </para>
-        /// <para>
-        /// <c>component</c> is <b>null</b>
-        /// </para>
+        /// <para><c>image</c> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><c>components</c> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <see cref="Image.BitsPerPixel"/> is not 1.

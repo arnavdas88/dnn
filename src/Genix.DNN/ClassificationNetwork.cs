@@ -17,8 +17,8 @@ namespace Genix.DNN
     using System.Text;
     using Genix.Core;
     using Genix.DNN.LanguageModel;
+    using Genix.DNN.Layers;
     using Genix.DNN.Learning;
-    using Layers;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -220,11 +220,7 @@ namespace Genix.DNN
         /// The object that contains the computed results and tensor.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public (IList<IList<(string Answer, float Probability)>> Answers, Tensor Y) Execute(Tensor x)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             const float MaxConfidenceDistance = 0.5f;
 
@@ -234,9 +230,7 @@ namespace Genix.DNN
             int mb = y.Rank == 1 ? 1 : y.Axes[0];
             int numAnswers = y.Rank == 1 ? y.Length : y.Strides[0];
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<IList<(string, float)>> answers = new List<IList<(string, float)>>(mb);
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
             float[] ywmb = new float[numAnswers];
             int[] ywidx = new int[numAnswers];
@@ -252,9 +246,7 @@ namespace Genix.DNN
                 Arrays.Sort(numAnswers, ywmb, 0, ywidx, 0, false);
 
                 // create answer for a mini-batch item
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
                 List<(string, float)> mbanswers = new List<(string, float)>(numAnswers);
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
                 float probThreshold = Maximum.Max(ywmb[0] - MaxConfidenceDistance, 0.0f);
                 for (int j = 0; j < numAnswers; j++)
@@ -285,20 +277,14 @@ namespace Genix.DNN
         /// The object that contains the computed results and tensor.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public (IList<(string Answer, float Probability)> Answers, Tensor Y) ExecuteSequence(Tensor x, Context model)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             Tensor y = this.Forward(null, x);
 
             CTCBeamSearch bs = new CTCBeamSearch(this.classes, model);
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             IList<(string[], float)> results = bs.BeamSearch(y);
             List<(string, float)> answers = new List<(string, float)>(results.Count);
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
             for (int i = 0, ii = results.Count; i < ii; i++)
             {
@@ -329,7 +315,7 @@ namespace Genix.DNN
                 {
                     Tensor mask = new Tensor("mask", new[] { this.classes.Count })
                     {
-                        CalculateGradient = false
+                        CalculateGradient = false,
                     };
 
                     float[] maskw = mask.Weights;

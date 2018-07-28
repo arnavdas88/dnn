@@ -23,7 +23,7 @@ namespace Genix.Imaging
         /// A new <see cref="Image"/> that is a copy of this instance.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Copy(this Image image)
@@ -50,9 +50,9 @@ namespace Genix.Imaging
         /// <param name="srcx">The x-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
         /// <param name="srcy">The y-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b></para>
+        /// <para><c>image</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>source</c> is <b>null</b></para>
+        /// <para><c>source</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyIP(this Image image, int x, int y, int width, int height, Image source, int srcx, int srcy)
@@ -86,9 +86,9 @@ namespace Genix.Imaging
         /// <param name="source">The <see cref="Image"/> to copy from.</param>
         /// <param name="origin">The coordinates, in pixels, of the upper-left corner of the source rectangle.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b></para>
+        /// <para><c>image</c> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><c>source</c> is <b>null</b></para>
+        /// <para><c>source</c> is <b>null</b>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyIP(this Image image, System.Drawing.Rectangle area, Image source, System.Drawing.Point origin)
@@ -108,7 +108,7 @@ namespace Genix.Imaging
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Crop(this Image image, int x, int y, int width, int height)
@@ -134,7 +134,7 @@ namespace Genix.Imaging
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para><see cref="System.Drawing.Rectangle.Width"/> is less than or equal to zero.</para>
@@ -157,7 +157,7 @@ namespace Genix.Imaging
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <para>

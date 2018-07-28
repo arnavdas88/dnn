@@ -56,7 +56,7 @@ namespace Genix.DNN.Layers
 
             List<int> numberOfNeurons = new List<int>()
             {
-                Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture)
+                Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture),
             };
 
             foreach (Capture capture in groups[2].Captures)

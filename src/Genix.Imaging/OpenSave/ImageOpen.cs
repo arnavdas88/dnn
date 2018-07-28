@@ -79,9 +79,7 @@ namespace Genix.Imaging
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromFile(string fileName)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             return new LoadedImages(fileName);
         }
@@ -102,9 +100,7 @@ namespace Genix.Imaging
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromMemory(byte[] buffer)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (buffer == null)
             {
@@ -132,9 +128,7 @@ namespace Genix.Imaging
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromMemory(byte[] buffer, int index, int count)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (buffer == null)
             {
@@ -160,9 +154,7 @@ namespace Genix.Imaging
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromStream(Stream stream)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (stream == null)
             {
@@ -321,9 +313,7 @@ namespace Genix.Imaging
             }*/
         }
 #endif
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private class LoadedImages : IEnumerable<(Image, int?, ImageMetadata)>
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             private readonly string fileName;
 
@@ -350,9 +340,7 @@ namespace Genix.Imaging
                 this.stream = stream;
             }
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             IEnumerator<(Image, int?, ImageMetadata)> IEnumerable<(Image, int?, ImageMetadata)>.GetEnumerator()
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             {
                 if (!string.IsNullOrEmpty(this.fileName))
                 {
@@ -373,9 +361,7 @@ namespace Genix.Imaging
                 return new Enumerator(this.stream);
             }
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             private class Enumerator : IEnumerator<(Image, int?, ImageMetadata)>, IEnumerator
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             {
                 private readonly bool ownStream;
                 private readonly Stream stream;
@@ -430,9 +416,7 @@ namespace Genix.Imaging
                     this.decoder = Enumerator.CreateDecoder(this.stream);
                 }
 
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
                 public (Image, int?, ImageMetadata) Current
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
                 {
                     get
                     {

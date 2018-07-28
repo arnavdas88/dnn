@@ -27,9 +27,7 @@ namespace Genix.Imaging.Lab
 
         ////private readonly List<Tuple<string, bool, Truth, string>> data = new List<Tuple<string, bool, Truth, string>>();
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private readonly List<(string Path, Truth Truth, string[] Labels)> samples = new List<(string, Truth, string[])>();
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
@@ -150,7 +148,7 @@ namespace Genix.Imaging.Lab
         /// </summary>
         /// <param name="labels">The labels to generate samples for.</param>
         /// <returns>The sequence of samples. Each sample consist of image and a ground truth.</returns>
-         public override IEnumerable<TestImage> Generate(ISet<string> labels)
+        public override IEnumerable<TestImage> Generate(ISet<string> labels)
         {
             /*Truth truth = Truth.FromFile(@"Z:\Test\Recognition\English\Numeric\MachinePrint\truth.txt");
 
@@ -169,9 +167,7 @@ namespace Genix.Imaging.Lab
 
             ILookup<string, string> lookup = labels?.ToLookup(x => x);
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string, Truth, string[])> completeSamples = new List<(string, Truth, string[])>(this.samples.Count);
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
             while (this.samples.Count > 0)
             {
@@ -224,9 +220,7 @@ namespace Genix.Imaging.Lab
             }
         }
 
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private IEnumerable<(Genix.Imaging.Image, int?)> LoadImage(string fileName)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             foreach ((Genix.Imaging.Image image, int? frameIndex, _) in Genix.Imaging.Image.FromFile(fileName))
             {

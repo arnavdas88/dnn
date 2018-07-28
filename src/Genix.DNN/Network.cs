@@ -236,9 +236,7 @@ namespace Genix.DNN
         /// The tuple that contains computed output <see cref="Tensor"/> and calculated loss.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         internal (Tensor Y, float Loss) LearnOne<TExpected>(Session session, Tensor x, TExpected expected, ILoss<TExpected> lossFunction)
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             session = session ?? new Session();
 

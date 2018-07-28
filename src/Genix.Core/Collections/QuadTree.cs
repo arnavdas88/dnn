@@ -135,22 +135,22 @@ namespace Genix.Core
                 (bounds.X < this.center.X && this.center.X < bounds.Right) ||
                 (bounds.Y < this.center.Y && this.center.Y < bounds.Bottom))
             {
-                inserted = insert(ref this.ownNodes);
+                inserted = Insert(ref this.ownNodes);
             }
             else if (this.split)
             {
-                inserted = insertIntoTree(node);
+                inserted = InsertIntoTree(node);
             }
             else
             {
-                inserted = insert(ref this.nodes);
+                inserted = Insert(ref this.nodes);
 
                 // try split the quadrant
                 if (inserted && this.splittable && this.nodes?.Count > 16)
                 {
                     foreach (T n in this.nodes)
                     {
-                        insertIntoTree(n);
+                        InsertIntoTree(n);
                     }
 
                     this.nodes = null;
@@ -166,7 +166,7 @@ namespace Genix.Core
 
             return inserted;
 
-            bool insert(ref HashSet<T> set)
+            bool Insert(ref HashSet<T> set)
             {
                 if (set == null)
                 {
@@ -176,7 +176,7 @@ namespace Genix.Core
                 return set.Add(node);
             }
 
-            bool insertIntoTree(T nodeToInsert)
+            bool InsertIntoTree(T nodeToInsert)
             {
                 Rectangle nodeToInsertBounds = nodeToInsert.Bounds;
 

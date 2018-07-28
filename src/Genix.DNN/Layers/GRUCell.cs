@@ -94,7 +94,7 @@ namespace Genix.DNN.Layers
         public override object Clone() => new GRUCell(this);
 
         /// <inheritdoc />
-         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             // GRU formula is:
@@ -118,7 +118,6 @@ namespace Genix.DNN.Layers
 
             return new[] { session.Stack(states, 0) };
 #else
-
 #pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = g.Axes[(int)Axis.B];            // number of vectors in time sequence
 #pragma warning restore SA1312 // Variable names must begin with lower-case letter
@@ -173,9 +172,7 @@ namespace Genix.DNN.Layers
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             return base.EnumGradients().Append((this.UC, 1.0f, 1.0f));
         }

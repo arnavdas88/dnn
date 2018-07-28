@@ -134,9 +134,7 @@ namespace Genix.DNN.Layers
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             yield return (this.W, 1.0f, 1.0f);
             yield return (this.B, 0.0f, 0.0f);

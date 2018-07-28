@@ -75,7 +75,6 @@ namespace Genix.DNN.Learning
         /// The <see cref="TrainingResult"/> object that contains training results for the epoch.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need a sequence of generic arguments here.")]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public TrainingResult RunEpoch(
             Network net,
             IEnumerable<(Tensor, TExpected)> input,
@@ -83,7 +82,6 @@ namespace Genix.DNN.Learning
             ITrainingAlgorithm algorithm,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (net == null)
             {
@@ -96,9 +94,7 @@ namespace Genix.DNN.Learning
 
             int totalSamples = 0;
             int batchCount = 0;
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             foreach (IList<(Tensor, TExpected)> batch in Partitioner.Partition(input, this.BatchSize))
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -124,7 +120,7 @@ namespace Genix.DNN.Learning
             {
                 CostLoss = costLoss / totalSamples,
                 L1Loss = lossL1 / batchCount,
-                L2Loss = lossL2 / batchCount
+                L2Loss = lossL2 / batchCount,
             };
         }
 
@@ -138,13 +134,11 @@ namespace Genix.DNN.Learning
         /// <returns>
         /// The calculated loss.
         /// </returns>
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private static float LearnBatch(
             Network network,
             IList<(Tensor X, TExpected Expected)> samples,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             float costLoss = 0.0f;
             object syncObject = new object();
@@ -175,7 +169,6 @@ namespace Genix.DNN.Learning
             return costLoss;
         }
 
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         private (float, float) UpdateLayers(
             Network net,
             int epoch,
@@ -183,7 +176,6 @@ namespace Genix.DNN.Learning
             int totalSamples,
             ITrainingAlgorithm algorithm,
             CancellationToken cancellationToken)
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             object syncObject = new object();
             float lossL1 = 0.0f;
@@ -218,14 +210,12 @@ namespace Genix.DNN.Learning
         /// <param name="totalSamples">The total number of samples processed to the moment.</param>
         /// <param name="algorithm">The training algorithm.</param>
         /// <returns>The tuple that contains L1 and L2 losses.</returns>
-#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         private (float, float) LearnLayerWeights(
             int epoch,
             (Tensor w, float RateL1Multiplier, float RateL2Multiplier) layer,
             int batchSize,
             int totalSamples,
             ITrainingAlgorithm algorithm)
-#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             float l1 = 0.0f;
             float l2 = 0.0f;

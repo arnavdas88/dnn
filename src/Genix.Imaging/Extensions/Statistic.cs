@@ -127,14 +127,14 @@ namespace Genix.Imaging
             ulong[] bits = this.Bits;
 
             // calculate top
-            int top = findTop();
+            int top = FindTop();
             if (top < 0)
             {
                 return Rectangle.Empty;
             }
 
             // calculate bottom
-            int bottom = findBottom();
+            int bottom = FindBottom();
             if (bottom < top)
             {
                 throw new InvalidOperationException("Something went wrong.");
@@ -142,14 +142,14 @@ namespace Genix.Imaging
 
             // calculate left
             ulong endMask = this.EndMask;
-            int left = findLeft(out int leftColumn, out ulong leftMask);
+            int left = FindLeft(out int leftColumn, out ulong leftMask);
             if (left == -1)
             {
                 throw new InvalidOperationException("Something went wrong.");
             }
 
             // calculate right
-            int right = findRight();
+            int right = FindRight();
             if (right < left)
             {
                 throw new InvalidOperationException("Something went wrong.");
@@ -157,7 +157,7 @@ namespace Genix.Imaging
 
             return Rectangle.FromLTRB(left, top, right + 1, bottom + 1);
 
-            int findTop()
+            int FindTop()
             {
                 for (int i = 0, off = 0; i < height; i++, off += stride1)
                 {
@@ -170,7 +170,7 @@ namespace Genix.Imaging
                 return -1;
             }
 
-            int findBottom()
+            int FindBottom()
             {
                 for (int i = height - 1, off = i * stride1; i >= 0; i--, off -= stride1)
                 {
@@ -183,14 +183,14 @@ namespace Genix.Imaging
                 return -1;
             }
 
-            int findLeft(out int resultColumn, out ulong resultMask)
+            int FindLeft(out int resultColumn, out ulong resultMask)
             {
                 resultColumn = 0;
                 resultMask = 0;
 
                 for (int i = 0; i < stride; i++)
                 {
-                    ulong mask = columnBlackMask(i);
+                    ulong mask = ColumnBlackMask(i);
                     if (mask != 0ul)
                     {
                         resultColumn = i;
@@ -202,11 +202,11 @@ namespace Genix.Imaging
                 return -1;
             }
 
-            int findRight()
+            int FindRight()
             {
                 for (int i = stride - 1; i >= 0; i--)
                 {
-                    ulong mask = i == leftColumn ? leftMask : columnBlackMask(i);
+                    ulong mask = i == leftColumn ? leftMask : ColumnBlackMask(i);
                     if (mask != 0ul)
                     {
                         return (i * 64) + BitUtils64.BitScanOneReverse(mask);
@@ -216,7 +216,7 @@ namespace Genix.Imaging
                 return -1;
             }
 
-            ulong columnBlackMask(int column)
+            ulong ColumnBlackMask(int column)
             {
                 ulong mask = 0;
 

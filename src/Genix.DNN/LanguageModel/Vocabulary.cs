@@ -89,9 +89,7 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public Vocabulary(IEnumerable<(string, int)> words, int minRepeatCount, int maxRepeatCount)
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             : base(minRepeatCount, maxRepeatCount)
         {
             if (words == null)
@@ -639,22 +637,20 @@ namespace Genix.DNN.LanguageModel
                     {
                         /*if (Vocabulary.Separator != (char)0)
                         {*/
-                        repeatStates = new Dictionary<char, State>()
-                        {
-                            {
+                        VocabularyState state = new VocabularyState(
                                 Vocabulary.Separator,
-                                new VocabularyState(
-                                    Vocabulary.Separator,
-                                    false,
-                                    false,
-                                    1.0f,
-                                    0.0f,
-                                    false,
-                                    repeatCount + 1,
-                                    context,
-                                    Vocabulary.SeekToBegin)
-                            }
-                        };
+                                false,
+                                false,
+                                1.0f,
+                                0.0f,
+                                false,
+                                repeatCount + 1,
+                                context,
+                                Vocabulary.SeekToBegin);
+
+                        repeatStates = new Dictionary<char, State>();
+                        repeatStates.Add(Vocabulary.Separator, state);
+
                         /*}
                         else
                         {

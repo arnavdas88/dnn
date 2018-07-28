@@ -26,7 +26,7 @@ namespace Genix.Imaging
         /// A new transformed <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Affine(this Image image, System.Windows.Media.Matrix matrix)
@@ -42,9 +42,9 @@ namespace Genix.Imaging
             }
 
             // calculate new image size and position
-            System.Windows.Point tr = transformPoint(image.Width - 1, 0);
-            System.Windows.Point br = transformPoint(image.Width - 1, image.Height - 1);
-            System.Windows.Point bl = transformPoint(0, image.Height - 1);
+            System.Windows.Point tr = TransformPoint(image.Width - 1, 0);
+            System.Windows.Point br = TransformPoint(image.Width - 1, image.Height - 1);
+            System.Windows.Point bl = TransformPoint(0, image.Height - 1);
 
             double x1dst = Maximum.Min(bl.X, tr.X, br.X, 0.0);
             double x2dst = Maximum.Max(bl.X, tr.X, br.X, 0.0);
@@ -106,7 +106,7 @@ namespace Genix.Imaging
 
             return transformedImage;
 
-            System.Windows.Point transformPoint(int ptx, int pty)
+            System.Windows.Point TransformPoint(int ptx, int pty)
             {
                 return new System.Windows.Point(
                     (matrix.M11 * ptx) + (matrix.M12 * pty) + matrix.OffsetX,
@@ -123,7 +123,7 @@ namespace Genix.Imaging
         /// A new rotated <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Rotate(this Image image, double angle)
@@ -216,7 +216,7 @@ namespace Genix.Imaging
         /// A new sheared <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>
+        /// <c>image</c> is <b>null</b>.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Image Shear(this Image image, double shearTan)
@@ -298,13 +298,13 @@ namespace Genix.Imaging
 
             // calculate image variance
             float angleBest = 0.0f;
-            float varianceBest = estimateSkewAngle(angleBest);
+            float varianceBest = EstimateSkewAngle(angleBest);
 
             // move up or down with 1 degree interval
             // move counterclockwise
             for (float angle = -1.0f; angle >= -10.0f; angle -= 1.0f)
             {
-                float variance = estimateSkewAngle(angle);
+                float variance = EstimateSkewAngle(angle);
                 if (variance <= varianceBest)
                 {
                     break;
@@ -319,7 +319,7 @@ namespace Genix.Imaging
                 // move clockwise
                 for (float angle = 1.0f; angle <= 10.0f; angle += 1.0f)
                 {
-                    float variance = estimateSkewAngle(angle);
+                    float variance = EstimateSkewAngle(angle);
                     if (variance <= varianceBest)
                     {
                         break;
@@ -335,7 +335,7 @@ namespace Genix.Imaging
             float originalAngle = angleBest;
             for (float angle = angleBest - 0.1f, max = angleBest - 0.9f; angle >= max; angle -= 0.1f)
             {
-                float variance = estimateSkewAngle(angle);
+                float variance = EstimateSkewAngle(angle);
                 if (variance <= varianceBest)
                 {
                     break;
@@ -350,7 +350,7 @@ namespace Genix.Imaging
                 // move clockwise
                 for (float angle = angleBest + 0.1f, max = angleBest + 0.9f; angle <= max; angle += 0.1f)
                 {
-                    float variance = estimateSkewAngle(angle);
+                    float variance = EstimateSkewAngle(angle);
                     if (variance <= varianceBest)
                     {
                         break;
@@ -363,7 +363,7 @@ namespace Genix.Imaging
 
             return image.Rotate(-angleBest);
 
-            float estimateSkewAngle(float angle)
+            float EstimateSkewAngle(float angle)
             {
                 const float PiConv = 3.1415926535f / 180.0f;
 

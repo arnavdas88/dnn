@@ -29,7 +29,7 @@ namespace Genix.Imaging
             { ".GIF", ImageFormat.Gif },
             { ".PNG", ImageFormat.Png },
             { ".BMP", ImageFormat.Bmp },
-            { ".DIB", ImageFormat.Bmp }
+            { ".DIB", ImageFormat.Bmp },
         };
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace Genix.Imaging
                 case ImageFormat.Jpeg:
                     return new JpegBitmapEncoder()
                     {
-                        QualityLevel = 100
+                        QualityLevel = 100,
                     };
 
                 case ImageFormat.Png:

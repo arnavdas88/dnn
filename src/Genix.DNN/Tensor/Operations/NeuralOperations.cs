@@ -119,19 +119,19 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = pool(calculateGradient);
+                    Tensor y = Pool(calculateGradient);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => gradient(y));
+                        session.Push(ActionName, () => Gradient(y));
                     }
 #endif
 
                     return y;
                 });
 
-            Tensor pool(bool calculateGradient)
+            Tensor Pool(bool calculateGradient)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;
@@ -165,22 +165,22 @@ namespace Genix.DNN
 
                 if (ksize1 == 2 && ksize2 == 2)
                 {
-                    pool2x2();
+                    Pool2x2();
                 }
                 else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
                 {
-                    pool2x1();
+                    Pool2x1();
                 }
                 else
                 {
-                    poolNxN();
+                    PoolNxN();
                 }
 
                 Mathematics.Divide(y.Length, ksize1 * ksize2, yw, 0, yw, 0);
 
                 return y;
 
-                void pool2x2()
+                void Pool2x2()
                 {
                     for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                     {
@@ -210,7 +210,7 @@ namespace Genix.DNN
                     }
                 }
 
-                void pool2x1()
+                void Pool2x1()
                 {
                     for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                     {
@@ -228,7 +228,7 @@ namespace Genix.DNN
                     }
                 }
 
-                void poolNxN()
+                void PoolNxN()
                 {
                     for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                     {
@@ -272,7 +272,7 @@ namespace Genix.DNN
             }
 
 #if !NOLEARNING
-            void gradient(Tensor y)
+            void Gradient(Tensor y)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;
@@ -349,19 +349,19 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = pool(calculateGradient);
+                    Tensor y = Pool(calculateGradient);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => gradient(y));
+                        session.Push(ActionName, () => Gradient(y));
                     }
 #endif
 
                     return y;
                 });
 
-            Tensor pool(bool calculateGradient)
+            Tensor Pool(bool calculateGradient)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;
@@ -393,20 +393,20 @@ namespace Genix.DNN
 
                 if (ksize1 == 2 && ksize2 == 2)
                 {
-                    pool2x2();
+                    Pool2x2();
                 }
                 else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
                 {
-                    pool2x1();
+                    Pool2x1();
                 }
                 else
                 {
-                    poolNxN();
+                    PoolNxN();
                 }
 
                 return y;
 
-                void pool2x2()
+                void Pool2x2()
                 {
                     float[] wspw = new float[xstride1];
 
@@ -438,7 +438,7 @@ namespace Genix.DNN
                     }
                 }
 
-                void pool2x1()
+                void Pool2x1()
                 {
                     for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                     {
@@ -456,7 +456,7 @@ namespace Genix.DNN
                     }
                 }
 
-                void poolNxN()
+                void PoolNxN()
                 {
                     float[] wspw = new float[xstride1];
 
@@ -502,7 +502,7 @@ namespace Genix.DNN
             }
 
 #if !NOLEARNING
-            void gradient(Tensor y)
+            void Gradient(Tensor y)
             {
                 int ksize1 = kernel.Width;
                 int ksize2 = kernel.Height;

@@ -108,7 +108,7 @@ namespace Genix.DNN.LanguageModel
                         {
                             token = new CharacterToken()
                             {
-                                Character = ch
+                                Character = ch,
                             };
 
                             if (TryParseQuantifier(ref pos, out minlen, out maxlen))
@@ -524,7 +524,7 @@ namespace Genix.DNN.LanguageModel
                     {
                         Character = this.Characters.First(),
                         MinCount = this.MinCount,
-                        MaxCount = this.MaxCount
+                        MaxCount = this.MaxCount,
                     }
                     : (Token)this;
             }
@@ -556,7 +556,7 @@ namespace Genix.DNN.LanguageModel
                     {
                         Text = this.Texts.First(),
                         MinCount = this.MinCount,
-                        MaxCount = this.MaxCount
+                        MaxCount = this.MaxCount,
                     }
                     : (Token)this;
             }
@@ -636,7 +636,7 @@ namespace Genix.DNN.LanguageModel
                         CharsetToken charsetToken = new CharsetToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         charsetToken.Characters.Add(characterToken1.Character);
@@ -657,7 +657,7 @@ namespace Genix.DNN.LanguageModel
                         WordsToken wordsToken = new WordsToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         wordsToken.Texts.Add(new string(characterToken1.Character, 1));
@@ -695,7 +695,7 @@ namespace Genix.DNN.LanguageModel
                         WordsToken wordsToken = new WordsToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         wordsToken.Texts.UnionWith(charsetToken1.Characters.Select(x => new string(x, 1)));
@@ -719,7 +719,7 @@ namespace Genix.DNN.LanguageModel
                         WordsToken wordsToken = new WordsToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         wordsToken.Texts.Add(wordToken1.Text);
@@ -733,7 +733,7 @@ namespace Genix.DNN.LanguageModel
                         WordsToken wordsToken = new WordsToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         wordsToken.Texts.Add(wordToken1.Text);
@@ -747,7 +747,7 @@ namespace Genix.DNN.LanguageModel
                         WordsToken wordsToken = new WordsToken()
                         {
                             MinCount = token1.MinCount,
-                            MaxCount = token2.MaxCount
+                            MaxCount = token2.MaxCount,
                         };
 
                         wordsToken.Texts.Add(wordToken1.Text);
@@ -826,7 +826,7 @@ namespace Genix.DNN.LanguageModel
                 return graph;
             }
 
-             public override Token Optimize()
+            public override Token Optimize()
             {
                 base.Optimize();
 
@@ -862,7 +862,7 @@ namespace Genix.DNN.LanguageModel
                     {
                         unionToken = new WordToken()
                         {
-                            Text = new string(new char[] { characterToken1.Character, characterToken2.Character })
+                            Text = new string(new char[] { characterToken1.Character, characterToken2.Character }),
                         };
                         return true;
                     }
@@ -870,7 +870,7 @@ namespace Genix.DNN.LanguageModel
                     {
                         unionToken = new WordToken()
                         {
-                            Text = characterToken1.Character + wordToken2.Text
+                            Text = characterToken1.Character + wordToken2.Text,
                         };
                         return true;
                     }

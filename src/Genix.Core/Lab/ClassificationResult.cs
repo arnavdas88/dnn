@@ -186,7 +186,7 @@ namespace Genix.Lab
                 {
                     ClassificationResult answer = new ClassificationResult()
                     {
-                        FileName = split[0]
+                        FileName = split[0],
                     };
 
                     if (!string.IsNullOrEmpty(split[1]))

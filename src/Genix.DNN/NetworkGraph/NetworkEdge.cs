@@ -8,8 +8,8 @@ namespace Genix.DNN
 {
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using Genix.DNN.Layers;
     using Genix.Graph;
-    using Layers;
     using Newtonsoft.Json;
 
     /// <summary>

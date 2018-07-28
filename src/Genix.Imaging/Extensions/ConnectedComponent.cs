@@ -86,7 +86,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>
+        /// <c>components</c> is <b>null</b>.
         /// </exception>
         public static Histogram PowerHistogram(int maxPower, IEnumerable<ConnectedComponent> components)
         {
@@ -115,7 +115,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>
+        /// <c>components</c> is <b>null</b>.
         /// </exception>
         public static Histogram WidthHistogram(int maxWidth, IEnumerable<ConnectedComponent> components)
         {
@@ -144,7 +144,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>
+        /// <c>components</c> is <b>null</b>.
         /// </exception>
         public static Histogram HeightHistogram(int maxHeight, IEnumerable<ConnectedComponent> components)
         {
@@ -204,9 +204,7 @@ namespace Genix.Imaging
         /// <returns>
         /// The collection of strokes in this <see cref="ConnectedComponent"/>.
         /// </returns>
-#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public IEnumerable<(int y, int x, int length)> EnumStrokes()
-#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             Stroke[][] lines = this.strokes;
             for (int i = 0, ii = lines.Length, y = this.bounds.Y; i < ii; i++, y++)

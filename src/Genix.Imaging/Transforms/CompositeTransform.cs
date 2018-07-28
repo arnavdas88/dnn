@@ -26,7 +26,7 @@ namespace Genix.Imaging
         /// Initializes a new instance of the <see cref="CompositeTransform"/> class.
         /// </summary>
         /// <param name="transforms">The collection of transformations.</param>
-         public CompositeTransform(IEnumerable<TransformBase> transforms)
+        public CompositeTransform(IEnumerable<TransformBase> transforms)
         {
             if (transforms == null)
             {
@@ -34,9 +34,9 @@ namespace Genix.Imaging
             }
 
             TransformBase last = null;
-            append(transforms);
+            Append(transforms);
 
-            void append(IEnumerable<TransformBase> collection)
+            void Append(IEnumerable<TransformBase> collection)
             {
                 foreach (TransformBase transform in transforms)
                 {
@@ -50,7 +50,7 @@ namespace Genix.Imaging
                     }
                     else if (transform is CompositeTransform compositeTransform)
                     {
-                        append(compositeTransform.transforms);
+                        Append(compositeTransform.transforms);
                     }
                     else
                     {

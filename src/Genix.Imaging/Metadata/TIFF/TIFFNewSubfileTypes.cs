@@ -30,6 +30,6 @@ namespace Genix.Imaging
         /// Bit 2 is 1 if the image defines a transparency mask for another image in this TIFF file.
         /// The PhotometricInterpretation value must be 4, designating a transparency mask.
         /// </summary>
-        TransparencyMask = 4
+        TransparencyMask = 4,
     }
 }

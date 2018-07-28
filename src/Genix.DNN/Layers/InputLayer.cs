@@ -52,7 +52,7 @@ namespace Genix.DNN.Layers
                 -1,
                 Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture),
                 Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture),
-                Convert.ToInt32(groups[3].Value, CultureInfo.InvariantCulture)
+                Convert.ToInt32(groups[3].Value, CultureInfo.InvariantCulture),
             };
         }
 

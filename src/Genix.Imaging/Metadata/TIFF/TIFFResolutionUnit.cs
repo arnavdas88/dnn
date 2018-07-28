@@ -29,6 +29,6 @@ namespace Genix.Imaging
         /// <summary>
         /// The unit of measurement is centimeter.
         /// </summary>
-        Centimeters = 3
+        Centimeters = 3,
     }
 }

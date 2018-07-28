@@ -37,22 +37,22 @@ namespace Genix.DNN.Imaging
             switch (bitsPerPixel)
             {
                 case 1:
-                    return convert1bpp();
+                    return Convert1bpp();
 
                 case 2:
                 case 4:
                 case 8:
                 case 16:
-                    return convert2to16bpp();
+                    return Convert2to16bpp();
 
                 case 32:
-                    return convert32bpp();
+                    return Convert32bpp();
 
                 default:
                     throw new NotSupportedException();
             }
 
-            Tensor convert1bpp()
+            Tensor Convert1bpp()
             {
                 Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
 
@@ -89,7 +89,7 @@ namespace Genix.DNN.Imaging
                 return tensor;
             }
 
-            Tensor convert2to16bpp()
+            Tensor Convert2to16bpp()
             {
                 Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
 
@@ -127,7 +127,7 @@ namespace Genix.DNN.Imaging
                 return tensor;
             }
 
-            Tensor convert32bpp()
+            Tensor Convert32bpp()
             {
                 Tensor tensor = new Tensor(name, new[] { 1, width, height, 3 });
 

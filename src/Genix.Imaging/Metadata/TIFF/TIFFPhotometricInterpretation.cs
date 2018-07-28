@@ -12,7 +12,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the values for the PhotometricInterpretation field.
     /// </summary>
-     public enum TIFFPhotometricInterpretation
+    public enum TIFFPhotometricInterpretation
     {
         /// <summary>
         /// WhiteIsZero.
@@ -114,6 +114,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Linear Raw.
         /// </summary>
-        LinearRaw = 34892
+        LinearRaw = 34892,
     }
 }
