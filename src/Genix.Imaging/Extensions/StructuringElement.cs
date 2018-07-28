@@ -163,7 +163,8 @@ namespace Genix.Imaging
             /// <param name="width">The width of the structuring element.</param>
             /// <param name="height">The height of the structuring element.</param>
             /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
-            public RectangleStructuringElement(int width, int height, Point anchor) : base(anchor)
+            public RectangleStructuringElement(int width, int height, Point anchor)
+                : base(anchor)
             {
                 this.width = width;
                 this.height = height;
@@ -223,7 +224,8 @@ namespace Genix.Imaging
             /// <param name="width">The width of the structuring element.</param>
             /// <param name="height">The height of the structuring element.</param>
             /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
-            public CrossStructuringElement(int width, int height, Point anchor) : base(anchor)
+            public CrossStructuringElement(int width, int height, Point anchor)
+                : base(anchor)
             {
                 this.width = width;
                 this.height = height;

@@ -1,4 +1,10 @@
-﻿namespace Genix.Imaging.Lab
+﻿// -----------------------------------------------------------------------
+// <copyright file="DirectoryDataProvider.cs" company="Noname, Inc.">
+// Copyright (c) 2018, Alexander Volgunin. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace Genix.Imaging.Lab
 {
     using System;
     using System.Collections.Generic;
@@ -24,7 +30,7 @@
         private readonly List<(string Path, Truth Truth, string[] Labels)> samples = new List<(string, Truth, string[])>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CanvasDataProvider"/> class.
+        /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
         /// </summary>
         /// <param name="width">The sample width, in pixels.</param>
         /// <param name="height">The sample height, in pixels.</param>
@@ -193,7 +199,31 @@
             this.samples.AddRange(completeSamples);
         }
 
+        private static IEnumerable<string> ListDirectory(string path, bool recursive)
+        {
+            // process all files in the directory
+            DirectoryInfo di = new DirectoryInfo(path);
+            foreach (FileInfo fileInfo in di.EnumerateFilesByExtensions(Genix.Imaging.Image.SupportedFileExtensions.ToArray()))
+            {
+                yield return fileInfo.FullName;
+            }
+
+            // process sub-directories
+            if (recursive)
+            {
+                foreach (DirectoryInfo sdi in di.GetDirectories())
+                {
+                    foreach (string s in DirectoryDataProvider.ListDirectory(sdi.FullName, true))
+                    {
+                        yield return s;
+                    }
+                }
+            }
+        }
+
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private IEnumerable<(Genix.Imaging.Image, int?)> LoadImage(string fileName)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             foreach ((Genix.Imaging.Image image, int? frameIndex, _) in Genix.Imaging.Image.FromFile(fileName))
             {
@@ -220,28 +250,6 @@
                 result = result.FitToSize(this.Width > 0 ? this.Width : result.Width, this.Height, ScalingOptions.None);
 
                 yield return (result, frameIndex);
-            }
-        }
-
-        private static IEnumerable<string> ListDirectory(string path, bool recursive)
-        {
-            // process all files in the directory
-            DirectoryInfo di = new DirectoryInfo(path);
-            foreach (FileInfo fileInfo in di.EnumerateFilesByExtensions(Genix.Imaging.Image.SupportedFileExtensions.ToArray()))
-            {
-                yield return fileInfo.FullName;
-            }
-
-            // process sub-directories
-            if (recursive)
-            {
-                foreach (DirectoryInfo sdi in di.GetDirectories())
-                {
-                    foreach (string s in DirectoryDataProvider.ListDirectory(sdi.FullName, true))
-                    {
-                        yield return s;
-                    }
-                }
             }
         }
     }

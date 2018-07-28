@@ -1,4 +1,11 @@
 #include "stdafx.h"
+#include "ipp.h"
+
+/* Next two defines are created to simplify code reading and understanding */
+#define EXIT_MAIN exitLine:                                  /* Label for Exit */
+#define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
+
+/* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
 // from Genix.Core.Native.dll
 extern "C" __declspec(dllimport) unsigned __int64 WINAPI bits_count_64(int count, const unsigned __int64* bits, int pos);
@@ -24,12 +31,16 @@ GENIXAPI(__int64, power_8bpp)(
 	const unsigned __int64* bits, const int stride)
 {
 	const int stridebytes = stride * 8;	// 8 bytes per word
+	const unsigned __int8* bits_u8 = ((const unsigned __int8*)bits) + (ptrdiff_t(y) * stridebytes) + x;
 
-	unsigned __int64 sum = 0;
-	for (int iy = 0, pos = (y * stridebytes) + x; iy < height; iy++, pos += stridebytes)
+	Ipp64f sum = 0;
+	ippiSum_8u_C1R(bits_u8, stridebytes, { width, height }, &sum);
+
+	/*unsigned __int64 sum = 0;
+	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
 	{
-		sum += (unsigned __int64)::sum_u8(width, (const unsigned __int8*)bits, pos);
-	}
+		sum += (unsigned __int64)::sum_u8(width, bits_u8, 0);
+	}*/
 
 	return (__int64)sum;
 }
@@ -70,9 +81,10 @@ GENIXAPI(void, vhist_8bpp)(
 	__int32* hist)
 {
 	const int stridebytes = stride * 8;	// 8 bytes per word
+	const unsigned __int8* bits_u8 = ((const unsigned __int8*)bits) + (ptrdiff_t(y) * stridebytes) + x;
 
-	for (int iy = 0, pos = (y * stridebytes) + x; iy < height; iy++, pos += stridebytes)
+	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
 	{
-		hist[iy] = ::sum_u8(width, (const unsigned __int8*)bits, pos);
+		hist[iy] = ::sum_u8(width, bits_u8, 0);
 	}
 }

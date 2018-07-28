@@ -186,14 +186,14 @@ namespace Genix.Imaging
         /// </remarks>
         FocalLength = 37386,
 
-        /*FlashEnergy_TIFFEP = 0x920b, //// TIFF-EP 
-        SpacialFrequencyResponse = 0x920c, //// TIFF-EP 
-        Noise = 0x920d, //// TIFF-EP 
-        FocalPlaneXResolution_TIFFEP = 0x920e, //// TIFF-EP 
-        FocalPlaneYResolution_TIFFEP = 0x920f, //// TIFF-EP 
-        FocalPlaneResolutionUnit_TIFFEP = 0x9210, //// TIFF-EP 
-        ImageName = 0x9211, //// TIFF-EP 
-        SecurityClassification = 0x9212, //// TIFF-EP 
+        /*FlashEnergy_TIFFEP = 0x920b, //// TIFF-EP
+        SpacialFrequencyResponse = 0x920c, //// TIFF-EP
+        Noise = 0x920d, //// TIFF-EP
+        FocalPlaneXResolution_TIFFEP = 0x920e, //// TIFF-EP
+        FocalPlaneYResolution_TIFFEP = 0x920f, //// TIFF-EP
+        FocalPlaneResolutionUnit_TIFFEP = 0x9210, //// TIFF-EP
+        ImageName = 0x9211, //// TIFF-EP
+        SecurityClassification = 0x9212, //// TIFF-EP
 
         ImageHistory = 0x9213, // TIFF-EP null separated list*/
 
@@ -508,7 +508,7 @@ namespace Genix.Imaging
         MakerNoteSafety = 0xc635, // Ifd0
 
         // The Spec says BestQualityScale is 0xc635 but it appears to be wrong
-        ////BestQualityScale                = 0xc635, // RawIfd 
+        ////BestQualityScale                = 0xc635, // RawIfd
         BestQualityScale = 0xc63c, // RawIfd  this looks like the correct value
 
         CalibrationIlluminant1 = 0xc65a, // Ifd0

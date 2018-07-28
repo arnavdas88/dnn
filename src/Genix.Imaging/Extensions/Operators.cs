@@ -6,6 +6,9 @@
 
 namespace Genix.Imaging
 {
+    /// <content>
+    /// Provides operators for the <see cref="Image"/> class.
+    /// </content>
     public partial class Image
     {
         /// <summary>

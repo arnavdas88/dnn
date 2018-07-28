@@ -15,7 +15,8 @@ namespace Genix.Imaging
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
     /// </summary>
     /// <typeparam name="T">The type of elements that store image bits.</typeparam>
-    public class Image<T> where T : struct
+    public class Image<T>
+        where T : struct
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Image{T}"/> class.
@@ -62,22 +63,24 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(int width, int height, Image<T> image) : this(
-            width,
-            height,
-            image.BitsPerPixel,
-            image.HorizontalResolution,
-            image.VerticalResolution)
+        internal Image(int width, int height, Image<T> image)
+            : this(
+                width,
+                height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution)
         {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(Image<T> image) : this(
-            image.Width,
-            image.Height,
-            image.BitsPerPixel,
-            image.HorizontalResolution,
-            image.VerticalResolution)
+        internal Image(Image<T> image)
+            : this(
+                image.Width,
+                image.Height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution)
         {
         }
 
@@ -106,7 +109,7 @@ namespace Genix.Imaging
         public int BitsPerPixel { get; }
 
         /// <summary>
-        /// Gets the offset, in <see cref="sizeof(T)"/>, between the beginning of one scan line and the next.
+        /// Gets the offset, in sizes of <typeparamref name="T"/>, between the beginning of one scan line and the next.
         /// </summary>
         /// <value>
         /// The integer that specifies the offset between the beginning of one scan line and the next.

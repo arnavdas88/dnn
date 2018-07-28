@@ -73,7 +73,10 @@ namespace Genix.Imaging
             }
         }
 
-        ~Canvas()
+        /// <summary>
+        /// Finalizes an instance of the <see cref="Canvas"/> class.
+        /// </summary>
+         ~Canvas()
         {
             if (!this.disposed)
             {
@@ -89,7 +92,7 @@ namespace Genix.Imaging
         /// <remarks>
         /// <para>
         /// This method frees all unmanaged resources used by the object.
-        /// The method invokes the protected <see cref="Dispose(Boolean)"/> method with the <c>disposing</c> parameter set to <b>true</b>.
+        /// The method invokes the protected <see cref="Dispose(bool)"/> method with the <c>disposing</c> parameter set to <b>true</b>.
         /// </para>
         /// <para>
         /// Call <b>Dispose</b> when you are finished using the object.
@@ -365,7 +368,10 @@ namespace Genix.Imaging
 
             public struct Rect
             {
-                public int Left, Top, Right, Bottom;
+                public int Left;
+                public int Top;
+                public int Right;
+                public int Bottom;
 
                 public Rect(int left, int top, int right, int bottom)
                 {
@@ -433,7 +439,7 @@ namespace Genix.Imaging
             }
 
             /// <summary>
-            /// Gets a value that indicates whether the handle is invalid.
+            /// Gets a value indicating whether the handle is invalid.
             /// </summary>
             /// <value>
             /// <b>true</b> if the handle is not valid; otherwise, <b>false</b>.
@@ -499,7 +505,7 @@ namespace Genix.Imaging
             }
 
             /// <summary>
-            /// Gets a value that indicates whether the handle is invalid.
+            /// Gets a value indicating whether the handle is invalid.
             /// </summary>
             /// <value>
             /// <b>true</b> if the handle is not valid; otherwise, <b>false</b>.

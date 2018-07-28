@@ -13,6 +13,9 @@ namespace Genix.Imaging
     using System.Linq;
     using System.Windows.Media.Imaging;
 
+    /// <content>
+    /// Provides file saving for the <see cref="Image"/> class.
+    /// </content>
     public partial class Image
     {
         private static readonly Dictionary<string, ImageFormat> MapFormats = new Dictionary<string, ImageFormat>()
@@ -33,7 +36,7 @@ namespace Genix.Imaging
         /// Gets an collection of supported image file extensions.
         /// </summary>
         /// <value>
-        /// A collection of <see cref="String"/> objects that represents the image file extensions.
+        /// A collection of <see cref="string"/> objects that represents the image file extensions.
         /// </value>
         public static ReadOnlyCollection<string> SupportedFileExtensions
         {

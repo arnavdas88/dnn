@@ -47,7 +47,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="propertyId">The identifier of the property item to get.</param>
         /// <returns>
-        /// The <see cref="Object"/> that contains property item value if the property item exists; otherwise, <b>null</b>.
+        /// The <see cref="object"/> that contains property item value if the property item exists; otherwise, <b>null</b>.
         /// </returns>
         public object GetPropertyItem(int propertyId)
         {

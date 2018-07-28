@@ -47,7 +47,8 @@ namespace Genix.Imaging
                 }
             }
 
-            T GetTIFFAttribute<T>() where T : Attribute
+            T GetTIFFAttribute<T>()
+                where T : Attribute
             {
                 if (!Enum.IsDefined(typeof(TIFFField), propertyId))
                 {
@@ -63,7 +64,7 @@ namespace Genix.Imaging
         /// Gets the identifier of the property item.
         /// </summary>
         /// <value>
-        /// An <see cref="Int32"/> that contains the property item identifier.
+        /// An <see cref="int"/> that contains the property item identifier.
         /// </value>
         public int Id { get; }
 
@@ -71,7 +72,7 @@ namespace Genix.Imaging
         /// Gets the value of the property item.
         /// </summary>
         /// <value>
-        /// An <see cref="Object"/> that contains the property item value.
+        /// An <see cref="object"/> that contains the property item value.
         /// </value>
         public object Value { get; internal set; }
 

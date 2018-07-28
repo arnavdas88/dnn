@@ -60,22 +60,24 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(int width, int height, Image image) : this(
-            width,
-            height,
-            image.BitsPerPixel,
-            image.HorizontalResolution,
-            image.VerticalResolution)
+        internal Image(int width, int height, Image image)
+            : this(
+                width,
+                height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution)
         {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(Image image) : this(
-            image.Width,
-            image.Height,
-            image.BitsPerPixel,
-            image.HorizontalResolution,
-            image.VerticalResolution)
+        internal Image(Image image)
+            : this(
+                image.Width,
+                image.Height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution)
         {
         }
 
@@ -197,7 +199,7 @@ namespace Genix.Imaging
             for (int i = 0, ii = bits.Length; i < ii; i++)
             {
                 bits[i] = (ulong)(uint)random.Next() |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) | 
+                          (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) |
                           (ulong)(uint)random.Next() << 32 |
                           (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
             }

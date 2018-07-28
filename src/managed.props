@@ -14,5 +14,4 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
   </PropertyGroup>
-  <Import Project=".\packages\StyleCop.MSBuild.5.0.0\build\StyleCop.MSBuild.targets" />
 </Project>

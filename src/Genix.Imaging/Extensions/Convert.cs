@@ -6,11 +6,11 @@
 
 namespace Genix.Imaging
 {
-    using Genix.Core;
     using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Core;
     ////using Leptonica;
 
     /// <summary>
@@ -18,14 +18,15 @@ namespace Genix.Imaging
     /// </summary>
     public static class Convert
     {
+        //// <param name="threshold">The threshold to determine foreground.</param>
+        //// <param name="sx">The tile width.</param>
+        //// <param name="sy">The tile height.</param>
+
         /// <summary>
         /// Normalizes the <see cref="Image"/> intensity be mapping the image
         /// so that the background is near the specified value.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> which background to normalize.</param>
-        //// <param name="threshold">The threshold to determine foreground.</param>
-        //// <param name="sx">The tile width.</param>
-        //// <param name="sy">The tile height.</param>
         /// <returns>
         /// A new normalized <see cref="Image"/>.
         /// </returns>

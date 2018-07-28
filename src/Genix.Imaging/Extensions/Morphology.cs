@@ -784,7 +784,8 @@ namespace Genix.Imaging
 
             public int X2 => this.x + this.length;
 
-            public ConnectedComponent Component {
+            public ConnectedComponent Component
+            {
                 get => this.component;
                 set => this.component = value;
             }

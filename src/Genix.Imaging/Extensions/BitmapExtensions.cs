@@ -27,7 +27,7 @@ namespace Genix.Imaging
     public static class BitmapExtensions
     {
         private static readonly Dictionary<string, string> MetadataConversionTable = new Dictionary<string, string>()
-        { 
+        {
             // TIFF Metadata
             { "/ifd/{ushort=330}", "/ifd/thumb" },
             { "/ifd/{ushort=700}", "/ifd/xmp" },
@@ -240,7 +240,9 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         internal static (Image Image, ImageMetadata Metadata) FromBitmapFrame(this BitmapFrame bitmapFrame)
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             if (bitmapFrame == null)
             {
@@ -525,7 +527,9 @@ namespace Genix.Imaging
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Do not allow metadata reading exceptions to pass to application layer.")]
         private static ImageMetadata ReadBitmapMetadata(BitmapMetadata bitmapMetadata)
         {
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string, object)> metadata = new List<(string, object)>();
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             ParseBitmapMetadata(bitmapMetadata, string.Empty);
 
             void ParseBitmapMetadata(BitmapMetadata parentMetadata, string parentQuery)
@@ -558,7 +562,9 @@ namespace Genix.Imaging
             List<PropertyItem> items = new List<PropertyItem>();
 
             // convert extracted pieces of metadata
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string, object)> unusedItems = new List<(string, object)>();
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             foreach ((string key, object value) item in metadata)
             {
                 string key = item.key;

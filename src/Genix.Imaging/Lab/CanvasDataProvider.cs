@@ -92,7 +92,7 @@ namespace Genix.Imaging.Lab
         /// Gets the fonts used in generation.
         /// </summary>
         /// <value>
-        /// The <see cref="IList{string}"/> collection that contains font names.
+        /// The <see cref="IList{T}"/> collection that contains font names.
         /// </value>
         [JsonProperty("fonts", ObjectCreationHandling = ObjectCreationHandling.Reuse)]
         public IList<string> Fonts { get; } = new List<string>();
@@ -128,7 +128,7 @@ namespace Genix.Imaging.Lab
         /// Gets the classes used for text generation.
         /// </summary>
         /// <value>
-        /// The <see cref="ReadOnlyCollection{string}"/> collection that contains the classes.
+        /// The <see cref="ReadOnlyCollection{T}"/> collection that contains the classes.
         /// </value>
         public ReadOnlyCollection<string> Classes => new ReadOnlyCollection<string>(this.classes);
 

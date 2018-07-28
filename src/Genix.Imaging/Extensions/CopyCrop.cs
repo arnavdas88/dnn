@@ -148,7 +148,7 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Crops the <see cref="Image"/> using rectangle calculated by <see cref="ImageExtensions.BlackArea"/> method.
+        /// Crops the <see cref="Image"/> using rectangle calculated by <see cref="Image.BlackArea"/> method.
         /// </summary>
         /// <param name="image">The existing <see cref="Image"/> to modify.</param>
         /// <param name="dx">The amount by which to expand or shrink the left and right sides of the image black area.</param>

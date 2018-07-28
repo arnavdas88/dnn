@@ -25,7 +25,7 @@ namespace Genix.Imaging.Lab
         /// Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
         /// </summary>
         /// <remarks>
-        /// This member overrides <see cref="Object.Finalize"/>, and more complete documentation might be available in that topic.
+        /// This member overrides <see cref="object.Finalize"/>, and more complete documentation might be available in that topic.
         /// </remarks>
         ~TestImageProvider()
         {
@@ -142,7 +142,7 @@ namespace Genix.Imaging.Lab
         /// <remarks>
         /// <para>
         /// This method frees all unmanaged resources used by the object.
-        /// The method invokes the protected <see cref="Dispose(Boolean)"/> method with the <c>disposing</c> parameter set to <b>true</b>.
+        /// The method invokes the protected <see cref="Dispose(bool)"/> method with the <c>disposing</c> parameter set to <b>true</b>.
         /// </para>
         /// <para>
         /// Call <b>Dispose</b> when you are finished using the object.

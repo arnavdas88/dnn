@@ -293,14 +293,14 @@ namespace Genix.Imaging
         /// <para>
         /// This field defines a Red-Green-Blue color map (often called a lookup table) for palette-color images.
         /// In a palette-color image, a pixel value is used to index into an RGB lookup table.
-        /// For example, a palette-color pixel having a value of 0 would be displayed according to the 0th Red, Green, Blue triplet. 
+        /// For example, a palette-color pixel having a value of 0 would be displayed according to the 0th Red, Green, Blue triplet.
         /// </para>
         /// <para>
         /// In a TIFF ColorMap, all the Red values come first, followed by the Green values, then the Blue values.
         /// The number of values for each color is 2**BitsPerSample.
         /// Therefore, the ColorMap field for an 8-bit palette-color image would have 3 * 256 values.
         /// The width of each value is 16 bits, as implied by the type of SHORT. 0 represents the minimum intensity,
-        /// and 65535 represents the maximum intensity. Black is represented by 0,0,0, and white by 65535, 65535, 65535. 
+        /// and 65535 represents the maximum intensity. Black is represented by 0,0,0, and white by 65535, 65535, 65535.
         /// </para>
         /// <para>
         /// ColorMap must be included in all palette-color images.
