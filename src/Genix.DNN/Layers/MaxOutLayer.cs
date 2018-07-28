@@ -66,7 +66,8 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="other">The <see cref="MaxOutLayer"/> to copy the data from.</param>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Validated by the base constructor.")]
-        public MaxOutLayer(MaxOutLayer other) : base(other)
+        public MaxOutLayer(MaxOutLayer other)
+            : base(other)
         {
             this.GroupSize = other.GroupSize;
         }

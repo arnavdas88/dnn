@@ -24,7 +24,8 @@ namespace Genix.DNN
         /// <param name="source">The source vertex.</param>
         /// <param name="target">The target vertex.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public NetworkEdge(Layer source, Layer target) : base(source, target)
+        public NetworkEdge(Layer source, Layer target)
+            : base(source, target)
         {
         }
 

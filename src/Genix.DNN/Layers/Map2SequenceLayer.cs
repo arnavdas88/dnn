@@ -48,7 +48,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class, using the existing <see cref="Map2SequenceLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="Map2SequenceLayer"/> to copy the data from.</param>
-        public Map2SequenceLayer(Map2SequenceLayer other) : base(other)
+        public Map2SequenceLayer(Map2SequenceLayer other)
+            : base(other)
         {
         }
 

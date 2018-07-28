@@ -104,7 +104,12 @@ namespace Genix.DNN.LanguageModel
         /// </value>
         public bool IsTail { get; internal set; } = true;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the initial state of this <see cref="Context"/>.
+        /// </summary>
+        /// <value>
+        /// The <see cref="State"/> object.
+        /// </value>
         public abstract State InitialState { get; }
 
         /// <summary>
@@ -178,7 +183,7 @@ namespace Genix.DNN.LanguageModel
         /// Converts the context quantifier into a human-readable string.
         /// </summary>
         /// <returns>
-        /// The <see cref="String"/> that contains the context quantifier.
+        /// The <see cref="string"/> that contains the context quantifier.
         /// </returns>
         protected string QuantifierToString()
         {
@@ -255,7 +260,7 @@ namespace Genix.DNN.LanguageModel
             }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the <see cref="Char"/> is at a word ending position within current context.
+            /// Gets or sets a value indicating whether the <see cref="char"/> is at a word ending position within current context.
             /// </summary>
             /// <value>
             /// <b>true</b> if the character is at word ending position within current context; otherwise, <b>false</b>.
@@ -263,7 +268,7 @@ namespace Genix.DNN.LanguageModel
             public bool ContextWordEnd { get; protected set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the context should be repeated after this <see cref="Char"/>.
+            /// Gets or sets a value indicating whether the context should be repeated after this <see cref="char"/>.
             /// </summary>
             /// <value>
             /// <b>true</b> if the context should be repeated after this character; otherwise, <b>false</b>.
@@ -274,7 +279,7 @@ namespace Genix.DNN.LanguageModel
             /// Gets or sets the number of times the <see cref="Context"/> was repeated.
             /// </summary>
             /// <value>
-            /// The <see cref="Int32"/> that contains repetition count.
+            /// The <see cref="int"/> that contains repetition count.
             /// </value>
             public int RepeatCount { get; protected set; }
 

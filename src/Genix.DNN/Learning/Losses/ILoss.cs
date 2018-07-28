@@ -11,9 +11,9 @@ namespace Genix.DNN.Learning
     /// </summary>
     /// <remarks>
     /// <para>
-    /// In mathematical optimization, statistics, decision theory and machine learning, a loss 
-    /// function or cost function is a function that maps an event or values of one or more 
-    /// variables onto a real number intuitively representing some "cost" associated with the 
+    /// In mathematical optimization, statistics, decision theory and machine learning, a loss
+    /// function or cost function is a function that maps an event or values of one or more
+    /// variables onto a real number intuitively representing some "cost" associated with the
     /// event. An optimization problem seeks to minimize a loss function. An objective function
     /// is either a loss function or its negative (sometimes called a reward function, a profit
     /// function, a utility function, a fitness function, etc.), in which case it is to be

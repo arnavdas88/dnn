@@ -24,10 +24,12 @@ namespace Genix.Imaging.Lab
         private readonly Random random = new Random(0);
         private readonly string[] truthFileNames = new string[] { "truth.new", "truth.txt" };
         private readonly string[] truthFieldNames = new string[] { "Class##Name", "Word" };
+
         ////private readonly List<Tuple<string, bool, Truth, string>> data = new List<Tuple<string, bool, Truth, string>>();
 
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private readonly List<(string Path, Truth Truth, string[] Labels)> samples = new List<(string, Truth, string[])>();
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
@@ -148,8 +150,7 @@ namespace Genix.Imaging.Lab
         /// </summary>
         /// <param name="labels">The labels to generate samples for.</param>
         /// <returns>The sequence of samples. Each sample consist of image and a ground truth.</returns>
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
-        public override IEnumerable<TestImage> Generate(ISet<string> labels)
+         public override IEnumerable<TestImage> Generate(ISet<string> labels)
         {
             /*Truth truth = Truth.FromFile(@"Z:\Test\Recognition\English\Numeric\MachinePrint\truth.txt");
 
@@ -168,7 +169,9 @@ namespace Genix.Imaging.Lab
 
             ILookup<string, string> lookup = labels?.ToLookup(x => x);
 
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string, Truth, string[])> completeSamples = new List<(string, Truth, string[])>(this.samples.Count);
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
             while (this.samples.Count > 0)
             {

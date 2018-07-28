@@ -28,7 +28,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public SigmoidLayer(int[] inputShape) : base(inputShape)
+        public SigmoidLayer(int[] inputShape)
+            : base(inputShape)
         {
         }
 
@@ -38,7 +39,8 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public SigmoidLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(inputShape)
+        public SigmoidLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(inputShape)
         {
             Layer.ParseArchitechture(architecture, SigmoidLayer.ArchitecturePattern);
         }
@@ -47,7 +49,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class, using the existing <see cref="SigmoidLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SigmoidLayer"/> to copy the data from.</param>
-        public SigmoidLayer(SigmoidLayer other) : base(other)
+        public SigmoidLayer(SigmoidLayer other)
+            : base(other)
         {
         }
 

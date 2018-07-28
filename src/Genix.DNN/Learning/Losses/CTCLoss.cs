@@ -42,9 +42,11 @@ namespace Genix.DNN.Learning
                 throw new ArgumentNullException(nameof(expected));
             }
 
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int L = expected.Length;    // Number of labels
             int T = y.Axes[0];          // Number of mini-batches (time)
             int A = y.Strides[0];       // Number of classes (alphabet size)
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
             int[] labels = CTCLoss.InsertBlanks(expected, A, this.BlankLabelIndex, out int repeats);
             if (L + repeats > T)
@@ -58,7 +60,9 @@ namespace Genix.DNN.Learning
                 return float.PositiveInfinity;
             }
 
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int S = labels.Length;      // Number of labels with blanks
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
             // convert predicted probabilities into log space
             float[] ylog = new float[y.Length];
@@ -96,7 +100,7 @@ namespace Genix.DNN.Learning
 
                 // remove NaN
                 // NaN may come from various sources (for instance log(y) where y = 0)
-                Arrays.Replace(y.Length, y.Gradient, 0, float.NaN, 0.0f, y.Gradient, 0); 
+                Arrays.Replace(y.Length, y.Gradient, 0, float.NaN, 0.0f, y.Gradient, 0);
 
                 Debug.Assert(!float.IsNaN(y.Gradient[0]), "Tensor contains invalid weight.");
             }
@@ -106,12 +110,16 @@ namespace Genix.DNN.Learning
         }
 
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
+#pragma warning disable SA1313 // Parameter names must begin with lower-case letter
         private static int[] InsertBlanks(int[] labels, int A, int blankIndex, out int repeats)
+#pragma warning restore SA1313 // Parameter names must begin with lower-case letter
         {
             repeats = 0;
 
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int L = labels.Length;      // Number of labels
             int S = (2 * L) + 1;        // Number of labels with blanks
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
             int[] labelsWithBlanks = new int[S];
 

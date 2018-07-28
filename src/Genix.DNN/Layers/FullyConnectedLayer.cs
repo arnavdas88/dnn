@@ -55,7 +55,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class, using the existing <see cref="FullyConnectedLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="FullyConnectedLayer"/> to copy the data from.</param>
-        public FullyConnectedLayer(FullyConnectedLayer other) : base(other)
+        public FullyConnectedLayer(FullyConnectedLayer other)
+            : base(other)
         {
         }
 

@@ -107,7 +107,7 @@ namespace Genix.DNN.Layers
         /// Gets the layer architecture.
         /// </summary>
         /// <value>
-        /// The <see cref="String"/>that describes the layer architecture.
+        /// The <see cref="string"/>that describes the layer architecture.
         /// </value>
         public abstract string Architecture { get; }
 

@@ -28,7 +28,8 @@ namespace Genix.DNN.Layers
         /// <remarks>
         /// After using this constructor, the <see cref="StochasticLayer"/> should be initialized by calling <see cref="Initialize"/> method.
         /// </remarks>
-        protected StochasticLayer(int[] outputShape) : base(outputShape)
+        protected StochasticLayer(int[] outputShape)
+            : base(outputShape)
         {
         }
 
@@ -36,7 +37,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="StochasticLayer"/> class, using the existing <see cref="StochasticLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="StochasticLayer"/> to copy the data from.</param>
-        protected StochasticLayer(StochasticLayer other) : base(other)
+        protected StochasticLayer(StochasticLayer other)
+            : base(other)
         {
             if (other == null)
             {
@@ -70,7 +72,7 @@ namespace Genix.DNN.Layers
         /// Gets the value indicating the layout of weight matrices.
         /// </summary>
         /// <value>
-        /// The <see cref="DNN.MatrixLayout"/> enumeration.
+        /// The <see cref="Genix.Core.MatrixLayout"/> enumeration.
         /// </value>
         [JsonProperty("matrixLayout")]
         public MatrixLayout MatrixLayout { get; private set; }
@@ -131,9 +133,10 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             yield return (this.W, 1.0f, 1.0f);
             yield return (this.B, 0.0f, 0.0f);

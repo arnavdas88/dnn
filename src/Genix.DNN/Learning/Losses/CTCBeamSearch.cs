@@ -88,7 +88,8 @@ namespace Genix.DNN.Learning
         /// </summary>
         /// <param name="classes">The classes the network is able to classify.</param>
         /// <param name="languageModel">The language model.</param>
-        public CTCBeamSearch(IList<string> classes, Context languageModel) : this(classes)
+        public CTCBeamSearch(IList<string> classes, Context languageModel)
+            : this(classes)
         {
             this.languageModel = languageModel ?? throw new ArgumentNullException(nameof(languageModel));
         }
@@ -132,16 +133,19 @@ namespace Genix.DNN.Learning
         /// <returns>The collection of decoded class sequences along with their weights.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to return results.")]
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public IList<(string[] Classes, float Probability)> BeamSearch(Tensor y)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (y == null)
             {
                 throw new ArgumentNullException(nameof(y));
             }
 
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = y.Axes[0];          // Number of mini-batches (time)
             int A = y.Strides[0];       // Number of classes (alphabet size)
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
             // allocate buffers
             BufferManager manager = new BufferManager(T, 2 * this.BufferCount);
@@ -167,7 +171,9 @@ namespace Genix.DNN.Learning
         }
 
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
+#pragma warning disable SA1313 // Parameter names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog)
+#pragma warning restore SA1313 // Parameter names must begin with lower-case letter
         {
             // create array that contains classes indexes
             // and then sort both probabilities and indexes
@@ -277,7 +283,9 @@ namespace Genix.DNN.Learning
         }
 
         [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
+#pragma warning disable SA1313 // Parameter names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog, Context context)
+#pragma warning restore SA1313 // Parameter names must begin with lower-case letter
         {
             State initialState = context.InitialState;
 
@@ -320,7 +328,7 @@ namespace Genix.DNN.Learning
                     // repeat buffer with added blank and duplicated last character
                     float probBlank = buffer.Prob + ylog[off + this.BlankLabelIndex];
 
-                    // no length check here - 
+                    // no length check here -
                     // if prob is not neg. infinity it means there is at least one character
                     float probNoBlank = float.NegativeInfinity;
                     if (!float.IsNegativeInfinity(buffer.ProbNoBlank))
@@ -393,10 +401,13 @@ namespace Genix.DNN.Learning
             return idx;
         }
 
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private IList<(string[], float)> CreateFinalAnswer(Buffers flop)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             List<(string[] Classes, float Prob)> final = new List<(string[], float)>(Maximum.Max(this.ResultCount, flop.Count));
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             float amax = 0.0f;
             float esum = float.NegativeInfinity;
 
@@ -440,7 +451,9 @@ namespace Genix.DNN.Learning
             {
                 for (int i = 0; i < final.Count; i++)
                 {
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
                     final[i] = (final[i].Classes, (float)Math.Exp(final[i].Prob - esum));
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
                 }
             }
 
@@ -521,17 +534,14 @@ namespace Genix.DNN.Learning
                 return hash == 0 ? Buffer.InitialHash : hash;
             }
 
-            public override string ToString()
-            {
-                return string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}: {1}: {2}: {3}",
-                    ////new string(this.Classes, 0, this.Length),
-                    string.Join(" ", this.Classes.Take(this.Length)),
-                    this.Prob,
-                    this.ProbBlank,
-                    this.ProbNoBlank);
-            }
+            public override string ToString() => string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}: {1}: {2}: {3}",
+                string.Join(" ", this.Classes.Take(this.Length)),
+                this.Prob,
+                this.ProbBlank,
+                this.ProbNoBlank);
+            ////new string(this.Classes, 0, this.Length),
 
             /// <summary>
             /// Removes all the data from this <see cref="Buffer"/>.
@@ -714,7 +724,8 @@ namespace Genix.DNN.Learning
             /// <param name="maxLength">The maximum number of classes in the buffers / length of input sequence.</param>
             /// <param name="capacity">The initial number of <see cref="Buffer"/> objects that the <see cref="BufferManager"/> can contain.</param>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public BufferManager(int maxLength, int capacity) : base(capacity)
+            public BufferManager(int maxLength, int capacity)
+                : base(capacity)
             {
                 this.maxLength = maxLength;
             }

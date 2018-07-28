@@ -89,7 +89,9 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public Vocabulary(IEnumerable<(string, int)> words, int minRepeatCount, int maxRepeatCount)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             : base(minRepeatCount, maxRepeatCount)
         {
             if (words == null)
@@ -126,7 +128,8 @@ namespace Genix.DNN.LanguageModel
         /// Initializes a new instance of the <see cref="Vocabulary"/> class, using the existing <see cref="Vocabulary"/> object.
         /// </summary>
         /// <param name="other">The <see cref="Vocabulary"/> to copy the data from.</param>
-        public Vocabulary(Vocabulary other) : base(other)
+        public Vocabulary(Vocabulary other)
+            : base(other)
         {
             if (other == null)
             {
@@ -224,9 +227,9 @@ namespace Genix.DNN.LanguageModel
         }
 
         /// <summary>
-        /// Creates a graph from the specified <see cref="System.String"/>.
+        /// Creates a graph from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="Vocabulary"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="Vocabulary"/> from.</param>
         /// <returns>The <see cref="Vocabulary"/> this method creates.</returns>
         public static Vocabulary FromString(string value)
         {
@@ -536,7 +539,7 @@ namespace Genix.DNN.LanguageModel
         internal sealed class VocabularyState : ContextState
         {
             /// <summary>
-            /// <see cref="NextStates"/> method cached result.
+            /// <see cref="NextStates()"/> method cached result.
             /// </summary>
             private IDictionary<char, State> nextstates = null;
 
@@ -546,8 +549,8 @@ namespace Genix.DNN.LanguageModel
             /// <param name="character">The character that appears at the current position.</param>
             /// <param name="wordEnd">the value indicating whether the <c>character</c> is at a word ending position.</param>
             /// <param name="contextWordEnd">The value indicating whether the <c>character</c> is at a word ending position within current context.</param>
-            /// <param name="charProbability">The probability of the <see cref="Char"/> to appear at the current position.</param>
-            /// <param name="wordEndProbability">The probability of the <see cref="Char"/> to end the word at the current position.</param>
+            /// <param name="charProbability">The probability of the <see cref="char"/> to appear at the current position.</param>
+            /// <param name="wordEndProbability">The probability of the <see cref="char"/> to end the word at the current position.</param>
             /// <param name="repeatWordEnd">The value indicating whether the context should be repeated after this <c>character</c>.</param>
             /// <param name="repeatCount">The number of times the <see cref="Context"/> was repeated.</param>
             /// <param name="context">The <see cref="Vocabulary"/> this state belongs to.</param>
@@ -588,7 +591,7 @@ namespace Genix.DNN.LanguageModel
             /// Gets the position of characters that extend from the state.
             /// </summary>
             /// <value>
-            /// The zero-based index in <see cref="Vocabulary.nodes"/> array. 
+            /// The zero-based index in <see cref="Vocabulary.nodes"/> array.
             /// </value>
             public int Seek { get; private set; }
 
@@ -698,18 +701,18 @@ namespace Genix.DNN.LanguageModel
                 {
                     bool end = nodes[seek].WordEnd != 0;
 
-                    states.Add(
+                    VocabularyState state = new VocabularyState(
                         nodes[seek].Char,
-                        new VocabularyState(
-                            nodes[seek].Char,
-                            end && wordEnd,
-                            end && contextWordEnd,
-                            nodes[seek].CharFrequency,
-                            nodes[seek].WordEndFrequency,
-                            end,
-                            repeatCount,
-                            context,
-                            nodes[seek].Children));
+                        end && wordEnd,
+                        end && contextWordEnd,
+                        nodes[seek].CharFrequency,
+                        nodes[seek].WordEndFrequency,
+                        end,
+                        repeatCount,
+                        context,
+                        nodes[seek].Children);
+
+                    states.Add(nodes[seek].Char, state);
                 }
                 while (nodes[seek++].IsLast == 0);
 
@@ -732,17 +735,17 @@ namespace Genix.DNN.LanguageModel
             public char Char { get; set; }
 
             /// <summary>
-            /// The number of words that pass through this character.
+            /// Gets or sets the number of words that pass through this character.
             /// </summary>
             public int CharCount { get; set; }
 
             /// <summary>
-            /// The number of word ends at this character.
+            /// Gets or sets the number of word ends at this character.
             /// </summary>
             public int WordEndsCount { get; set; }
 
             /// <summary>
-            /// The number of tails for this character. This is a sum of this <see cref="WordEndsCount"/> and all children's <see cref="CharCount"/>.
+            /// Gets or sets the number of tails for this character. This is a sum of this <see cref="WordEndsCount"/> and all children's <see cref="CharCount"/>.
             /// </summary>
             public int TailsCount { get; set; }
 

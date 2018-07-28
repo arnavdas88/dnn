@@ -36,7 +36,8 @@ namespace Genix.DNN.LanguageModel
         /// <param name="characters">The characters to include in the generated sequences.</param>
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
-        public Charset(IEnumerable<char> characters, int minRepeatCount, int maxRepeatCount) : base(minRepeatCount, maxRepeatCount)
+        public Charset(IEnumerable<char> characters, int minRepeatCount, int maxRepeatCount)
+            : base(minRepeatCount, maxRepeatCount)
         {
             if (characters == null)
             {
@@ -69,7 +70,10 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-        public Charset(IEnumerable<(char, int)> characters, int minRepeatCount, int maxRepeatCount) : base(minRepeatCount, maxRepeatCount)
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
+        public Charset(IEnumerable<(char, int)> characters, int minRepeatCount, int maxRepeatCount)
+            : base(minRepeatCount, maxRepeatCount)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (characters == null)
             {
@@ -107,7 +111,10 @@ namespace Genix.DNN.LanguageModel
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-        public Charset(IEnumerable<(char, float)> characters, int minRepeatCount, int maxRepeatCount) : base(minRepeatCount, maxRepeatCount)
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
+        public Charset(IEnumerable<(char, float)> characters, int minRepeatCount, int maxRepeatCount)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
+            : base(minRepeatCount, maxRepeatCount)
         {
             if (characters == null)
             {
@@ -142,7 +149,8 @@ namespace Genix.DNN.LanguageModel
         /// Initializes a new instance of the <see cref="Charset"/> class, using the existing <see cref="Charset"/> object.
         /// </summary>
         /// <param name="other">The <see cref="Charset"/> to copy the data from.</param>
-        public Charset(Charset other) : base(other)
+        public Charset(Charset other)
+            : base(other)
         {
             if (other == null)
             {
@@ -211,9 +219,9 @@ namespace Genix.DNN.LanguageModel
         }
 
         /// <summary>
-        /// Creates a graph from the specified <see cref="System.String"/>.
+        /// Creates a graph from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="Charset"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="Charset"/> from.</param>
         /// <returns>The <see cref="Charset"/> this method creates.</returns>
         public static Charset FromString(string value)
         {
@@ -271,7 +279,7 @@ namespace Genix.DNN.LanguageModel
         private sealed class CharsetState : ContextState
         {
             /// <summary>
-            /// <see cref="NextStates"/> method cached result.
+            /// <see cref="NextStates()"/> method cached result.
             /// </summary>
             private IDictionary<char, State> nextstates = null;
 
@@ -281,7 +289,7 @@ namespace Genix.DNN.LanguageModel
             /// <param name="character">The character that appears at the current position.</param>
             /// <param name="wordEnd">the value indicating whether the <c>character</c> is at a word ending position.</param>
             /// <param name="contextWordEnd">The value indicating whether the <c>character</c> is at a word ending position within current context.</param>
-            /// <param name="charProbability">The probability of the <see cref="Char"/> to appear at the current position.</param>
+            /// <param name="charProbability">The probability of the <see cref="char"/> to appear at the current position.</param>
             /// <param name="wordProbability">The probability of the word in the language model.</param>
             /// <param name="repeatWordEnd">The value indicating whether the context should be repeated after this <c>character</c>.</param>
             /// <param name="repeatCount">The number of times the <see cref="Context"/> was repeated.</param>

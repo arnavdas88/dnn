@@ -68,7 +68,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="SRNLayer"/> class, using the existing <see cref="SRNLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SRNLayer"/> to copy the data from.</param>
-        public SRNLayer(SRNLayer other) : base(other)
+        public SRNLayer(SRNLayer other)
+            : base(other)
         {
         }
 

@@ -62,7 +62,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="SRNCell"/> class, using the existing <see cref="SRNCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SRNCell"/> to copy the data from.</param>
-        public SRNCell(SRNCell other) : base(other)
+        public SRNCell(SRNCell other)
+            : base(other)
         {
         }
 
@@ -97,7 +98,9 @@ namespace Genix.DNN.Layers
 
             Tensor x = xs[0];
             Tensor y = ys[0];
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = x.Axes[(int)Axis.B];        // number of vectors in time sequence*/
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
 #if TENSORFLOW
             Tensor[] hs = session.Unstack(y, 0);

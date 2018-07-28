@@ -28,7 +28,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="ReLULayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public ReLULayer(int[] inputShape) : base(inputShape)
+        public ReLULayer(int[] inputShape)
+            : base(inputShape)
         {
         }
 
@@ -38,7 +39,8 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ReLULayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(inputShape)
+        public ReLULayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(inputShape)
         {
             Layer.ParseArchitechture(architecture, ReLULayer.ArchitecturePattern);
         }
@@ -47,7 +49,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="ReLULayer"/> class, using the existing <see cref="ReLULayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ReLULayer"/> to copy the data from.</param>
-        public ReLULayer(ReLULayer other) : base(other)
+        public ReLULayer(ReLULayer other)
+            : base(other)
         {
         }
 

@@ -19,7 +19,6 @@ namespace Genix.Imaging
     /// <summary>
     /// Provides extension methods that allows integration with Libtiff.NET library.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     internal static class Libtiff
     {
         private static readonly MyTiffErrorHandler TiffErrorHandler = new MyTiffErrorHandler();

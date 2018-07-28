@@ -280,7 +280,8 @@ namespace Genix.DNN
             /// <summary>
             /// Initializes a new instance of the <see cref="ComponentGraph"/> class.
             /// </summary>
-            public ComponentGraph() : base(true, -1, -1)
+            public ComponentGraph()
+                : base(true, -1, -1)
             {
             }
 
@@ -290,7 +291,8 @@ namespace Genix.DNN
             /// </summary>
             /// <param name="other">The existing <see cref="ComponentGraph"/> to create this graph from.</param>
             /// <param name="cloneVertices">The value indicating whether the graph vertices should be cloned.</param>
-            public ComponentGraph(ComponentGraph other, bool cloneVertices) : base(other, cloneVertices)
+            public ComponentGraph(ComponentGraph other, bool cloneVertices)
+                : base(other, cloneVertices)
             {
             }
 

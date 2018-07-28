@@ -30,7 +30,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="TrainableLayer"/> class, using the existing <see cref="TrainableLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="TrainableLayer"/> to copy the data from.</param>
-        protected TrainableLayer(TrainableLayer other) : base(other)
+        protected TrainableLayer(TrainableLayer other)
+            : base(other)
         {
         }
 
@@ -61,7 +62,8 @@ namespace Genix.DNN.Layers
         /// Returns a collection of trainable weights along with their gradients.
         /// </summary>
         /// <returns>The sequence of tuples that contains gradient tensors.</returns>
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal abstract IEnumerable<(Tensor, float, float)> EnumGradients();
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
     }
 }

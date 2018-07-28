@@ -11,7 +11,6 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the values for the Compression field.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "This enumeration does not have zero value.")]
     public enum TIFFCompression
     {

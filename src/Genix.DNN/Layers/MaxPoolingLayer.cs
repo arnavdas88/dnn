@@ -51,7 +51,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class, using the existing <see cref="MaxPoolingLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="MaxPoolingLayer"/> to copy the data from.</param>
-        public MaxPoolingLayer(MaxPoolingLayer other) : base(other)
+        public MaxPoolingLayer(MaxPoolingLayer other)
+            : base(other)
         {
         }
 

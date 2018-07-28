@@ -25,7 +25,8 @@ namespace Genix.DNN
         /// <param name="height">The height of the kernel.</param>
         /// <param name="strideX">The horizontal step at which kernel is applied.</param>
         /// <param name="strideY">The vertical step at which kernel is applied.</param>
-        public Kernel(int width, int height, int strideX, int strideY) : this(width, height, strideX, strideY, 0, 0)
+        public Kernel(int width, int height, int strideX, int strideY)
+            : this(width, height, strideX, strideY, 0, 0)
         {
         }
 

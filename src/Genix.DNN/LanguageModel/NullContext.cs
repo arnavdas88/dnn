@@ -27,7 +27,8 @@ namespace Genix.DNN.LanguageModel
         /// <summary>
         /// Initializes a new instance of the <see cref="NullContext"/> class.
         /// </summary>
-        public NullContext() : base(1, 1)
+        public NullContext()
+            : base(1, 1)
         {
         }
 
@@ -35,7 +36,8 @@ namespace Genix.DNN.LanguageModel
         /// Initializes a new instance of the <see cref="NullContext"/> class, using the existing <see cref="NullContext"/> object.
         /// </summary>
         /// <param name="other">The <see cref="NullContext"/> to copy the data from.</param>
-        public NullContext(NullContext other) : base(other)
+        public NullContext(NullContext other)
+            : base(other)
         {
         }
 
@@ -74,9 +76,9 @@ namespace Genix.DNN.LanguageModel
         }
 
         /// <summary>
-        /// Creates a graph from the specified <see cref="System.String"/>.
+        /// Creates a graph from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="NullContext"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="NullContext"/> from.</param>
         /// <returns>The <see cref="NullContext"/> this method creates.</returns>
         public static NullContext FromString(string value)
         {

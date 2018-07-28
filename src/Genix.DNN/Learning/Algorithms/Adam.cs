@@ -17,8 +17,9 @@ namespace Genix.DNN.Learning
         /// <summary>
         /// The weights accumulator.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private readonly GradientAccumulators<(float[], float[])> accumulators = new GradientAccumulators<(float[], float[])>();
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
 
         /// <summary>
         /// Gets or sets the learning rate for the Adam algorithm.
@@ -56,9 +57,11 @@ namespace Genix.DNN.Learning
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Skip argument validation to improve performance.")]
         public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
         {
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
             (float[] gsum, float[] xsum) = this.accumulators.GetAccumulator(
                 gradient,
                 g => (new float[g.Length], new float[g.Length]));
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
 
             float learningRate = -this.LearningRate;
             float beta1 = this.Beta1;

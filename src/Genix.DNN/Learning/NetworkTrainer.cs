@@ -75,7 +75,7 @@ namespace Genix.DNN.Learning
         /// The <see cref="TrainingResult"/> object that contains training results for the epoch.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need a sequence of generic arguments here.")]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public TrainingResult RunEpoch(
             Network net,
             IEnumerable<(Tensor, TExpected)> input,
@@ -83,6 +83,7 @@ namespace Genix.DNN.Learning
             ITrainingAlgorithm algorithm,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (net == null)
             {
@@ -95,7 +96,9 @@ namespace Genix.DNN.Learning
 
             int totalSamples = 0;
             int batchCount = 0;
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
             foreach (IList<(Tensor, TExpected)> batch in Partitioner.Partition(input, this.BatchSize))
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -135,45 +138,44 @@ namespace Genix.DNN.Learning
         /// <returns>
         /// The calculated loss.
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private static float LearnBatch(
             Network network,
             IList<(Tensor X, TExpected Expected)> samples,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             float costLoss = 0.0f;
             object syncObject = new object();
 
-            CommonParallel.For(
-                0,
-                samples.Count,
-                ////samples.Count,
-                (a, b) =>
+            Action<int, int> body = (a, b) =>
+            {
+                Session session = new Session(true);
+
+                ////Tensor[] xs = samples.Select(x => x.X).Skip(a).Take(b - a).ToArray();
+                ////TExpected[] yes = samples.Select(x => x.Expected).Skip(a).Take(b - a).ToArray();
+
+                ////float loss = network.LearnMany(session, xs, yes, lossFunction).Loss;
+
+                float loss = 0.0f;
+                for (int i = a; i < b; i++)
                 {
-                    Session session = new Session(true);
+                    loss += network.LearnOne(session, samples[i].X, samples[i].Expected, lossFunction).Loss;
+                }
 
-                    ////Tensor[] xs = samples.Select(x => x.X).Skip(a).Take(b - a).ToArray();
-                    ////TExpected[] yes = samples.Select(x => x.Expected).Skip(a).Take(b - a).ToArray();
+                lock (syncObject)
+                {
+                    costLoss += loss;
+                }
+            };
 
-                    ////float loss = network.LearnMany(session, xs, yes, lossFunction).Loss;
-
-                    float loss = 0.0f;
-                    for (int i = a; i < b; i++)
-                    {
-                        loss += network.LearnOne(session, samples[i].X, samples[i].Expected, lossFunction).Loss;
-                    }
-
-                    lock (syncObject)
-                    {
-                        costLoss += loss;
-                    }
-                },
-                cancellationToken);
+            CommonParallel.For(0, samples.Count, /* samples.Count,*/ body, cancellationToken);
 
             return costLoss;
         }
 
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         private (float, float) UpdateLayers(
             Network net,
             int epoch,
@@ -181,6 +183,7 @@ namespace Genix.DNN.Learning
             int totalSamples,
             ITrainingAlgorithm algorithm,
             CancellationToken cancellationToken)
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             object syncObject = new object();
             float lossL1 = 0.0f;
@@ -189,10 +192,7 @@ namespace Genix.DNN.Learning
             ////foreach (StochasticLayer layer in net.Graph.Vertices.OfType<StochasticLayer>().Where(x => x.IsTrainable))
             Parallel.ForEach(
                 net.Graph.Vertices.OfType<TrainableLayer>().Where(x => x.IsTrainable),
-                new ParallelOptions()
-                {
-                    CancellationToken = cancellationToken
-                },
+                new ParallelOptions() { CancellationToken = cancellationToken },
                 layer =>
                 {
                     foreach (var wg in layer.EnumGradients())
@@ -218,12 +218,14 @@ namespace Genix.DNN.Learning
         /// <param name="totalSamples">The total number of samples processed to the moment.</param>
         /// <param name="algorithm">The training algorithm.</param>
         /// <returns>The tuple that contains L1 and L2 losses.</returns>
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         private (float, float) LearnLayerWeights(
             int epoch,
             (Tensor w, float RateL1Multiplier, float RateL2Multiplier) layer,
             int batchSize,
             int totalSamples,
             ITrainingAlgorithm algorithm)
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             float l1 = 0.0f;
             float l2 = 0.0f;

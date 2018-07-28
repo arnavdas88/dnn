@@ -593,7 +593,6 @@ namespace Genix.DNN.LanguageModel
                 return graph;
             }
 
-            [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
             public override Token Optimize()
             {
                 base.Optimize();
@@ -615,7 +614,6 @@ namespace Genix.DNN.LanguageModel
             }
 
             [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Many simple combination of four types of Context.")]
-            [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
             private static bool TryUnion(Token token1, Token token2, out Token unionToken)
             {
                 unionToken = null;
@@ -828,8 +826,7 @@ namespace Genix.DNN.LanguageModel
                 return graph;
             }
 
-            [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
-            public override Token Optimize()
+             public override Token Optimize()
             {
                 base.Optimize();
 
@@ -847,7 +844,6 @@ namespace Genix.DNN.LanguageModel
                 return tkns.Count == 1 ? tkns[0] : this;
             }
 
-            [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
             private static bool TryConcat(Token token1, Token token2, out Token unionToken)
             {
                 unionToken = null;

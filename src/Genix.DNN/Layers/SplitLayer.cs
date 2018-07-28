@@ -52,7 +52,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="SplitLayer"/> class, using the existing <see cref="SplitLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="SplitLayer"/> to copy the data from.</param>
-        public SplitLayer(SplitLayer other) : base(other)
+        public SplitLayer(SplitLayer other)
+            : base(other)
         {
         }
 

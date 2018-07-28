@@ -26,8 +26,7 @@ namespace Genix.Imaging
         /// Initializes a new instance of the <see cref="CompositeTransform"/> class.
         /// </summary>
         /// <param name="transforms">The collection of transformations.</param>
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 local functions.")]
-        public CompositeTransform(IEnumerable<TransformBase> transforms)
+         public CompositeTransform(IEnumerable<TransformBase> transforms)
         {
             if (transforms == null)
             {

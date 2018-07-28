@@ -63,7 +63,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="GRULayer"/> class, using the existing <see cref="GRULayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="GRULayer"/> to copy the data from.</param>
-        public GRULayer(GRULayer other) : base(other)
+        public GRULayer(GRULayer other)
+            : base(other)
         {
         }
 

@@ -31,7 +31,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="PoolingLayer"/> class, using the existing <see cref="PoolingLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="PoolingLayer"/> to copy the data from.</param>
-        protected PoolingLayer(PoolingLayer other) : base(other)
+        protected PoolingLayer(PoolingLayer other)
+            : base(other)
         {
             this.Kernel = other.Kernel;
         }

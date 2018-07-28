@@ -99,9 +99,9 @@ namespace Genix.DNN.LanguageModel
         }
 
         /// <summary>
-        /// Creates a graph from the specified <see cref="System.String"/>.
+        /// Creates a graph from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="GraphContext"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="GraphContext"/> from.</param>
         /// <returns>The <see cref="GraphContext"/> this method creates.</returns>
         public static GraphContext FromString(string value)
         {
@@ -163,7 +163,8 @@ namespace Genix.DNN.LanguageModel
                 this.Parent = parent;
             }
 
-            public ContextGraph(GraphContext parent, ContextGraph other) : base(other, true)
+            public ContextGraph(GraphContext parent, ContextGraph other)
+                : base(other, true)
             {
                 this.Parent = parent;
             }

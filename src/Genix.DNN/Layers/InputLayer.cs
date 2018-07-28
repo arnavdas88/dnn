@@ -31,7 +31,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="InputLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public InputLayer(int[] inputShape) : base(1, inputShape)
+        public InputLayer(int[] inputShape)
+            : base(1, inputShape)
         {
             this.Shape = inputShape;
         }
@@ -59,7 +60,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="InputLayer"/> class, using the existing <see cref="InputLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="InputLayer"/> to copy the data from.</param>
-        public InputLayer(InputLayer other) : base(other)
+        public InputLayer(InputLayer other)
+            : base(other)
         {
             this.Shape = other.Shape;
         }

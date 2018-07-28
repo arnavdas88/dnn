@@ -14,7 +14,8 @@ namespace Genix.DNN.Learning
 
     internal class GradientAccumulators<T> : ConcurrentDictionary<float[], T>
     {
-        public GradientAccumulators() : base(ReferenceEqualityComparer.Default)
+        public GradientAccumulators()
+            : base(ReferenceEqualityComparer.Default)
         {
         }
 

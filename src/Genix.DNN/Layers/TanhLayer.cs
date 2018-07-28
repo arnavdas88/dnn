@@ -14,7 +14,7 @@ namespace Genix.DNN.Layers
 
     /// <summary>
     /// Implements Tanh nonlinearity element wise
-    /// x -> tanh(x) 
+    /// x -> tanh(x)
     /// so the output is between -1 and 1.
     /// </summary>
     public class TanhLayer : ActivationLayer
@@ -28,7 +28,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="TanhLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public TanhLayer(int[] inputShape) : base(inputShape)
+        public TanhLayer(int[] inputShape)
+            : base(inputShape)
         {
         }
 
@@ -38,7 +39,8 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public TanhLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(inputShape)
+        public TanhLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(inputShape)
         {
             Layer.ParseArchitechture(architecture, TanhLayer.ArchitecturePattern);
         }
@@ -47,7 +49,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="TanhLayer"/> class, using the existing <see cref="TanhLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="TanhLayer"/> to copy the data from.</param>
-        public TanhLayer(TanhLayer other) : base(other)
+        public TanhLayer(TanhLayer other)
+            : base(other)
         {
         }
 

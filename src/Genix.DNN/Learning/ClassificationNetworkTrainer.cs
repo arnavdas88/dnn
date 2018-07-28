@@ -30,14 +30,15 @@ namespace Genix.DNN.Learning
         /// The <see cref="TrainingResult"/> object that contains training results for the epoch.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need a sequence of generic arguments here.")]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
-        public TrainingResult RunEpoch(
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
+         public TrainingResult RunEpoch(
             int epoch,
             ClassificationNetwork net,
             IEnumerable<(Tensor Data, string[] Label)> input,
             ITrainingAlgorithm algorithm,
             ILoss<int[]> lossFunction,
             CancellationToken cancellationToken)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             if (net == null)
             {
@@ -46,7 +47,9 @@ namespace Genix.DNN.Learning
 
             return this.RunEpoch(
                 net,
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
                 input.Select(x => (x.Data, x.Label.Select(truth => net.Classes.IndexOf(truth)).ToArray())),
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
                 epoch,
                 algorithm,
                 lossFunction,

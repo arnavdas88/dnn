@@ -33,7 +33,8 @@ namespace Genix.DNN
         /// <param name="name">The tensor name.</param>
         /// <param name="shape">The tensor dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape) : base(shape)
+        public Tensor(string name, int[] shape)
+            : base(shape)
         {
             this.Name = name;
             this.Weights = new float[this.Length];
@@ -47,7 +48,8 @@ namespace Genix.DNN
         /// <param name="shape">The tensor dimensions.</param>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float value) : this(name, shape)
+        public Tensor(string name, int[] shape, float value)
+            : this(name, shape)
         {
             this.Set(value);
         }
@@ -60,7 +62,8 @@ namespace Genix.DNN
         /// <param name="shape">The tensor dimensions.</param>
         /// <param name="values">The values to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float[] values) : base(shape)
+        public Tensor(string name, int[] shape, float[] values)
+            : base(shape)
         {
             if (values == null)
             {
@@ -85,7 +88,8 @@ namespace Genix.DNN
         /// <param name="values">The values to set.</param>
         /// <param name="gradient">The gradient values to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float[] values, float[] gradient) : this(name, shape, values)
+        public Tensor(string name, int[] shape, float[] values, float[] gradient)
+            : this(name, shape, values)
         {
             if (gradient == null)
             {
@@ -105,7 +109,8 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="other">The <see cref="Tensor"/> to copy the data from.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(Tensor other) : base(other)
+        public Tensor(Tensor other)
+            : base(other)
         {
             if (other == null)
             {
@@ -130,7 +135,7 @@ namespace Genix.DNN
         /// Gets the tensor name.
         /// </summary>
         /// <value>
-        /// The <see cref="String"/> that contains tensor name.
+        /// The <see cref="string"/> that contains tensor name.
         /// </value>
         [JsonProperty("Name")]
         public string Name { get; internal set; }
@@ -139,7 +144,7 @@ namespace Genix.DNN
         /// Gets the weights stored in this <see cref="Tensor"/>.
         /// </summary>
         /// <value>
-        /// The array of <see cref="Single"/>.
+        /// The array of <see cref="float"/>.
         /// </value>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Provides direct access to weights to improve performance.")]
         [JsonProperty("Weights")]
@@ -149,7 +154,7 @@ namespace Genix.DNN
         /// Gets the back-propagation gradient associated with this <see cref="Tensor"/>.
         /// </summary>
         /// <value>
-        /// The array of <see cref="Single"/>.
+        /// The array of <see cref="float"/>.
         /// </value>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Provides direct access to weights to improve performance.")]
         [JsonIgnore]
@@ -271,9 +276,9 @@ namespace Genix.DNN
         public static Tensor FromMemory(byte[] buffer) => Tensor.FromString(UTF8Encoding.UTF8.GetString(buffer));
 
         /// <summary>
-        /// Creates a <see cref="Tensor"/> from the specified <see cref="System.String"/>.
+        /// Creates a <see cref="Tensor"/> from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="Tensor"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="Tensor"/> from.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
         public static Tensor FromString(string value) => JsonConvert.DeserializeObject<Tensor>(value);
 

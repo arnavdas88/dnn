@@ -32,7 +32,8 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="other">The <see cref="ActivationLayer"/> to copy the data from.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ActivationLayer(ActivationLayer other) : base(other)
+        protected ActivationLayer(ActivationLayer other)
+            : base(other)
         {
         }
 

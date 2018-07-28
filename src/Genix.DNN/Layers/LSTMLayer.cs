@@ -67,7 +67,7 @@ namespace Genix.DNN.Layers
             float forgetBias = LSTMCell.DefaultForgetBias;
             int index = groups.FindIndex(x => x.Value == "LSTM");
             if (index != -1 && groups.Count >= index + 2 && !string.IsNullOrEmpty(groups[index + 1].Value))
-            { 
+            {
                 forgetBias = Convert.ToSingle(groups[index + 1].Value, CultureInfo.InvariantCulture);
             }
 
@@ -78,7 +78,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LSTMLayer"/> class, using the existing <see cref="LSTMLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LSTMLayer"/> to copy the data from.</param>
-        public LSTMLayer(LSTMLayer other) : base(other)
+        public LSTMLayer(LSTMLayer other)
+            : base(other)
         {
         }
 

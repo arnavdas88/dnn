@@ -62,7 +62,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class, using the existing <see cref="ConvolutionLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ConvolutionLayer"/> to copy the data from.</param>
-        public ConvolutionLayer(ConvolutionLayer other) : base(other)
+        public ConvolutionLayer(ConvolutionLayer other)
+            : base(other)
         {
             this.Kernel = other.Kernel;
         }

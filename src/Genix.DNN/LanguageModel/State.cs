@@ -118,16 +118,18 @@ namespace Genix.DNN.LanguageModel
         /// The sequence of tuples containing the word and its frequency.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public IEnumerable<(string Text, float Probability)> Enumerate()
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             char[] chars = new char[256]; // TODO: calculate max word length
 
             return this.Enumerate(chars, 0, 1.0f);
         }
 
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         private IEnumerable<(string Text, float Probability)> Enumerate(char[] value, int startIndex, float prob)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             IDictionary<char, State> nextstates = this.NextStates();
             if (nextstates != null)

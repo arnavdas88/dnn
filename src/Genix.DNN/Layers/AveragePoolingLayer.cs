@@ -50,7 +50,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="AveragePoolingLayer"/> class, using the existing <see cref="AveragePoolingLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="AveragePoolingLayer"/> to copy the data from.</param>
-        public AveragePoolingLayer(AveragePoolingLayer other) : base(other)
+        public AveragePoolingLayer(AveragePoolingLayer other)
+            : base(other)
         {
         }
 

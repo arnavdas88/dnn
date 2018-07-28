@@ -68,7 +68,7 @@ namespace Genix.DNN
         /// Gets the network architecture.
         /// </summary>
         /// <value>
-        /// The <see cref="String"/>that describes the network architecture.
+        /// The <see cref="string"/>that describes the network architecture.
         /// </value>
         [JsonProperty("Architecture", Order = 0)]
         public string Architecture => this.Graph?.ToString();
@@ -134,9 +134,9 @@ namespace Genix.DNN
         }
 
         /// <summary>
-        /// Creates a classification neural network from the specified <see cref="System.String"/>.
+        /// Creates a classification neural network from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="Network"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="Network"/> from.</param>
         /// <returns>The <see cref="Network"/> this method creates.</returns>
         public static Network FromString(string value)
         {
@@ -236,7 +236,9 @@ namespace Genix.DNN
         /// The tuple that contains computed output <see cref="Tensor"/> and calculated loss.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
         internal (Tensor Y, float Loss) LearnOne<TExpected>(Session session, Tensor x, TExpected expected, ILoss<TExpected> lossFunction)
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
             session = session ?? new Session();
 

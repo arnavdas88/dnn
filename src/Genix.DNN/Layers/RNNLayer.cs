@@ -22,7 +22,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        protected RNNLayer(int[] inputShape) : base(inputShape)
+        protected RNNLayer(int[] inputShape)
+            : base(inputShape)
         {
             this.Graph = new NetworkGraph();
         }
@@ -31,7 +32,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNLayer"/> class, using the existing <see cref="RNNLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="RNNLayer"/> to copy the data from.</param>
-        protected RNNLayer(RNNLayer other) : base(other)
+        protected RNNLayer(RNNLayer other)
+            : base(other)
         {
             if (other == null)
             {
@@ -70,9 +72,10 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             return this.Graph.Vertices.OfType<StochasticLayer>().SelectMany(x => x.EnumGradients());
         }

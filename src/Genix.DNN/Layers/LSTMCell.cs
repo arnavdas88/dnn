@@ -86,7 +86,8 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="other">The <see cref="LSTMCell"/> to copy the data from.</param>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "The parameter is validated by the base constructor.")]
-        public LSTMCell(LSTMCell other) : base(other)
+        public LSTMCell(LSTMCell other)
+            : base(other)
         {
             this.ForgetBias = other.ForgetBias;
         }
@@ -163,7 +164,10 @@ namespace Genix.DNN.Layers
 
             return new[] { session.Stack(hs, 0) };
 #else
+
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = g.Axes[(int)Axis.B];                // number of vectors in time sequence
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
             int ylen = this.NumberOfNeurons;            // number of neurons / size of output vector
 
             Tensor y = session.RunOperation(

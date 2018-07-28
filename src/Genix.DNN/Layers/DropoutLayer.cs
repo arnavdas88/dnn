@@ -34,7 +34,8 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="probability">The dropout probability.</param>
-        public DropoutLayer(int[] inputShape, double probability) : base(1, inputShape)
+        public DropoutLayer(int[] inputShape, double probability)
+            : base(1, inputShape)
         {
             this.Probability = probability;
         }
@@ -45,7 +46,8 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(1, inputShape)
+        public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1, inputShape)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, DropoutLayer.ArchitecturePattern);
             this.Probability = Convert.ToDouble(groups[2].Value, CultureInfo.InvariantCulture);
@@ -55,7 +57,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="DropoutLayer"/> class, using the existing <see cref="DropoutLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="DropoutLayer"/> to copy the data from.</param>
-        public DropoutLayer(DropoutLayer other) : base(other)
+        public DropoutLayer(DropoutLayer other)
+            : base(other)
         {
             this.Probability = other.Probability;
         }

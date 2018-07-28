@@ -11,7 +11,6 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the field in the TIFF image.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "This enumeration does not have zero value.")]
     public enum TIFFField
     {

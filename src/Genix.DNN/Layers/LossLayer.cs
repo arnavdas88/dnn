@@ -31,7 +31,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LossLayer"/> class, using the existing <see cref="LossLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LossLayer"/> to copy the data from.</param>
-        protected LossLayer(LossLayer other) : base(other)
+        protected LossLayer(LossLayer other)
+            : base(other)
         {
             this.NumberOfClasses = other.NumberOfClasses;
         }

@@ -26,7 +26,8 @@ namespace Genix.DNN
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkGraph"/> class.
         /// </summary>
-        public NetworkGraph() : base(false, -1, -1)
+        public NetworkGraph()
+            : base(false, -1, -1)
         {
         }
 
@@ -35,7 +36,8 @@ namespace Genix.DNN
         /// that is empty, has the specified initial capacity for vertices and the default initial capacity for edges.
         /// </summary>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
-        public NetworkGraph(int vertexCapacity) : base(true, vertexCapacity, -1)
+        public NetworkGraph(int vertexCapacity)
+            : base(true, vertexCapacity, -1)
         {
         }
 
@@ -45,7 +47,8 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
         /// <param name="edgeCapacity">The number of edges that the new graph can initially store.</param>
-        public NetworkGraph(int vertexCapacity, int edgeCapacity) : base(true, vertexCapacity, edgeCapacity)
+        public NetworkGraph(int vertexCapacity, int edgeCapacity)
+            : base(true, vertexCapacity, edgeCapacity)
         {
         }
 
@@ -55,7 +58,8 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="other">The existing <see cref="NetworkGraph"/> to create this graph from.</param>
         /// <param name="cloneLayers">The value indicating whether the layers should be cloned.</param>
-        public NetworkGraph(NetworkGraph other, bool cloneLayers) : base(other, cloneLayers)
+        public NetworkGraph(NetworkGraph other, bool cloneLayers)
+            : base(other, cloneLayers)
         {
         }
 
@@ -80,9 +84,9 @@ namespace Genix.DNN
         }
 
         /// <summary>
-        /// Creates a graph from the specified <see cref="System.String"/>.
+        /// Creates a graph from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="value">The <see cref="System.String"/> to read the <see cref="NetworkGraph"/> from.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="NetworkGraph"/> from.</param>
         /// <returns>The <see cref="NetworkGraph"/> this method creates.</returns>
         public static NetworkGraph FromString(string value)
         {
@@ -138,7 +142,7 @@ namespace Genix.DNN
         /// </returns>
         public bool AddEdge(Layer source, Layer target)
         {
-            return base.AddEdge(new NetworkEdge(source, target));
+            return this.AddEdge(new NetworkEdge(source, target));
         }
 
         /// <summary>
@@ -240,7 +244,6 @@ namespace Genix.DNN
                 new Dictionary<NetworkEdge, Tensor>(this.Size));
         }
 
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
         private Tensor Forward(Session session, Layer target, IList<Tensor> xs, Dictionary<NetworkEdge, Tensor> tensorMap)
         {
             while (target != null)

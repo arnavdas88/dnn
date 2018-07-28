@@ -26,7 +26,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNCell"/> class.
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        protected RNNCell(int[] outputShape) : base(outputShape)
+        protected RNNCell(int[] outputShape)
+            : base(outputShape)
         {
         }
 
@@ -34,7 +35,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNCell"/> class, using the existing <see cref="RNNCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="RNNCell"/> to copy the data from.</param>
-        protected RNNCell(RNNCell other) : base(other)
+        protected RNNCell(RNNCell other)
+            : base(other)
         {
             this.U = other.U?.Clone() as Tensor;
         }
@@ -84,9 +86,10 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             return base.EnumGradients().Append((this.U, 1.0f, 1.0f));
         }
@@ -118,7 +121,7 @@ namespace Genix.DNN.Layers
                 random = new RandomRangeGenerator(-0.08f, 0.08f);
             }
 
-            base.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
+            this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
 
             this.U = new Tensor("hidden weights", hiddenShape);
             this.U.Randomize(random);

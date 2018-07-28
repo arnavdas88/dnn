@@ -18,7 +18,6 @@ namespace Genix.Imaging
     /// <summary>
     /// Provides integration with Leptonica.NET library.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
     internal static class LeptonicaUtils
     {
         /// <summary>
@@ -72,7 +71,6 @@ namespace Genix.Imaging
             return image;
         }
 
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Use Leptonica.net naming convention.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Pix pixOtsu(this Pix pixs, bool adaptiveThreshold)
         {

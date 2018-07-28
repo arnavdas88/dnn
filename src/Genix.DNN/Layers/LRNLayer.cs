@@ -111,7 +111,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LRNLayer"/> class, using the existing <see cref="LRNLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LRNLayer"/> to copy the data from.</param>
-        public LRNLayer(LRNLayer other) : base(other)
+        public LRNLayer(LRNLayer other)
+            : base(other)
         {
             this.KernelSize = other.KernelSize;
             this.Alpha = other.Alpha;

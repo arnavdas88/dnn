@@ -62,7 +62,8 @@ namespace Genix.DNN.Layers
         /// <param name="other">The <see cref="GRUCell"/> to copy the data from.</param>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "The parameter is validated by the base constructor.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GRUCell(GRUCell other) : base(other)
+        public GRUCell(GRUCell other)
+            : base(other)
         {
             this.UC = other.UC?.Clone() as Tensor;
         }
@@ -93,8 +94,7 @@ namespace Genix.DNN.Layers
         public override object Clone() => new GRUCell(this);
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Stands for length of time sequence.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             // GRU formula is:
@@ -118,7 +118,10 @@ namespace Genix.DNN.Layers
 
             return new[] { session.Stack(states, 0) };
 #else
+
+#pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = g.Axes[(int)Axis.B];            // number of vectors in time sequence
+#pragma warning restore SA1312 // Variable names must begin with lower-case letter
             int ylen = this.NumberOfNeurons;        // number of neurons / size of output vector
 
             Tensor y = session.RunOperation(
@@ -169,9 +172,10 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:ClosingParenthesisMustBeSpacedCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 tuples.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         internal override IEnumerable<(Tensor, float, float)> EnumGradients()
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
         {
             return base.EnumGradients().Append((this.UC, 1.0f, 1.0f));
         }

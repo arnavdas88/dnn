@@ -55,7 +55,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="ConcatLayer"/> class, using the existing <see cref="ConcatLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ConcatLayer"/> to copy the data from.</param>
-        public ConcatLayer(ConcatLayer other) : base(other)
+        public ConcatLayer(ConcatLayer other)
+            : base(other)
         {
         }
 

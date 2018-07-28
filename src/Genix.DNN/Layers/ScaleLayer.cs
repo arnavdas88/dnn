@@ -30,7 +30,8 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="alpha">The scaling factor.</param>
-        public ScaleLayer(int[] inputShape, float alpha) : base(1, inputShape)
+        public ScaleLayer(int[] inputShape, float alpha)
+            : base(1, inputShape)
         {
             this.Alpha = alpha;
         }
@@ -41,7 +42,8 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ScaleLayer(int[] inputShape, string architecture, RandomNumberGenerator random) : base(1, inputShape)
+        public ScaleLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+            : base(1, inputShape)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, ScaleLayer.ArchitecturePattern);
             this.Alpha = Convert.ToSingle(groups[2].Value, CultureInfo.InvariantCulture);
@@ -51,7 +53,8 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="ScaleLayer"/> class, using the existing <see cref="ScaleLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ScaleLayer"/> to copy the data from.</param>
-        public ScaleLayer(ScaleLayer other) : base(other)
+        public ScaleLayer(ScaleLayer other)
+            : base(other)
         {
             this.Alpha = other.Alpha;
         }
