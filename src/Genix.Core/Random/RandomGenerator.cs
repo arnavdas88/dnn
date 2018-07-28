@@ -20,7 +20,8 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="RandomGenerator"/> class.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RandomGenerator() : this(new Random(0))
+        public RandomGenerator()
+            : this(new Random(0))
         {
         }
 

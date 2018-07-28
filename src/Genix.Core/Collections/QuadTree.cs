@@ -19,7 +19,8 @@ namespace Genix.Core
     /// of those objects is handled as a separate argument to Insert.
     /// </summary>
     /// <typeparam name="T">The type of elements in the tree.</typeparam>
-    public class QuadTree<T> where T : class, IBoundedObject
+    public class QuadTree<T>
+        where T : class, IBoundedObject
     {
         private readonly Point center;
 
@@ -31,7 +32,7 @@ namespace Genix.Core
         private HashSet<T> ownNodes = null;
         private HashSet<T> nodes = null;
 
-        // The quadrant is subdivided when nodes are inserted that are 
+        // The quadrant is subdivided when nodes are inserted that are
         // completely contained within those subdivisions.
         private QuadTree<T> nw;
         private QuadTree<T> ne;
@@ -44,7 +45,8 @@ namespace Genix.Core
         /// All nodes stored inside this tree will fit inside this bounds.
         /// </summary>
         /// <param name="bounds">The bounds of this tree.</param>
-        public QuadTree(Rectangle bounds) : this(null, bounds, 64, 64)
+        public QuadTree(Rectangle bounds)
+            : this(null, bounds, 64, 64)
         {
         }
 
@@ -55,7 +57,8 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bounds">The bounds of this tree.</param>
         /// <param name="nodes">The nodes to insert.</param>
-        public QuadTree(Rectangle bounds, IEnumerable<T> nodes) : this(bounds)
+        public QuadTree(Rectangle bounds, IEnumerable<T> nodes)
+            : this(bounds)
         {
             this.Insert(nodes);
         }

@@ -726,4 +726,4 @@ namespace Genix.Core
             public static extern void bits_xor3_64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
         }
     }
-} 
+}

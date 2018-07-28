@@ -243,7 +243,7 @@ namespace System
         /// <summary>
         /// Computes the sum of all elements in the array of floats.
         /// </summary>
-        /// <param name="source">The array of <see cref="Single"/> values to calculate the sum of.</param>
+        /// <param name="source">The array of <see cref="float"/> values to calculate the sum of.</param>
         /// <returns>
         /// The sum of all elements in the array.
         /// </returns>
@@ -256,7 +256,7 @@ namespace System
         /// <summary>
         /// Computes the variance of all elements in the array of floats.
         /// </summary>
-        /// <param name="source">The array of <see cref="Single"/> values to calculate the variance.</param>
+        /// <param name="source">The array of <see cref="float"/> values to calculate the variance.</param>
         /// <returns>
         /// The variance of all elements in the array.
         /// </returns>

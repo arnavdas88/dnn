@@ -81,7 +81,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Executes each of the provided actions inside a discrete, asynchronous task. 
+        /// Executes each of the provided actions inside a discrete, asynchronous task.
         /// </summary>
         /// <param name="actions">An array of actions to execute.</param>
         /// <exception cref="ArgumentException">The actions array contains a <c>null</c> element.</exception>

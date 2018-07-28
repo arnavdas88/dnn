@@ -28,7 +28,7 @@ namespace Genix.Lab
         /// Gets a name of the class this summary is for.
         /// </summary>
         /// <value>
-        /// A <see cref="String"/> that contains the class name.
+        /// A <see cref="string"/> that contains the class name.
         /// </value>
         public string ClassName { get; }
 

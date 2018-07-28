@@ -10,7 +10,7 @@ namespace Genix.Core
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents random numbers generator that generates random numbers within a specified range. 
+    /// Represents random numbers generator that generates random numbers within a specified range.
     /// </summary>
     public class RandomRangeGenerator : RandomNumberGenerator
     {
@@ -24,7 +24,8 @@ namespace Genix.Core
         /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
         /// <param name="maxValue">The exclusive upper bound of the random number returned. <c>maxValue</c> must be greater than or equal to <c>minValue</c>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RandomRangeGenerator(float minValue, float maxValue) : this(minValue, maxValue, new Random(0))
+        public RandomRangeGenerator(float minValue, float maxValue)
+            : this(minValue, maxValue, new Random(0))
         {
         }
 

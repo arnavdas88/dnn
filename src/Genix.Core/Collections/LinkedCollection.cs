@@ -16,7 +16,8 @@ namespace Genix.Core
     /// </summary>
     /// <typeparam name="T">Specifies the item type of the linked list.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
-    public class LinkedCollection<T> : IEnumerable<T> where T : LinkedCollectionItem<T>
+    public class LinkedCollection<T> : IEnumerable<T>
+        where T : LinkedCollectionItem<T>
     {
         /// <summary>
         /// The number of items in the list.

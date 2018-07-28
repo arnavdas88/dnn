@@ -48,7 +48,8 @@ namespace Genix.Core
         /// <exception cref="ArgumentException">
         /// <c>bins</c> is less or equal to zero.
         /// </exception>
-        public Histogram(int bins, IEnumerable<int> counts) : this(bins)
+        public Histogram(int bins, IEnumerable<int> counts)
+            : this(bins)
         {
             foreach (int bin in counts)
             {
@@ -64,7 +65,10 @@ namespace Genix.Core
         /// <exception cref="ArgumentException">
         /// <c>bins</c> is less or equal to zero.
         /// </exception>
-        public Histogram(int bins, IEnumerable<(int bin, int count)> counts) : this(bins)
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
+        public Histogram(int bins, IEnumerable<(int bin, int count)> counts)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
+            : this(bins)
         {
             foreach ((int bin, int count) in counts)
             {
@@ -95,7 +99,8 @@ namespace Genix.Core
         /// <param name="minValue">The lower inclusive bound of values in the histogram.</param>
         /// <param name="maxValue">The upper exclusive bound of values in the histogram.</param>
         /// <param name="values">The collection of values to initialize the histogram with.</param>
-        public Histogram(int minValue, int maxValue, IEnumerable<int> values) : this(minValue, maxValue)
+        public Histogram(int minValue, int maxValue, IEnumerable<int> values)
+            : this(minValue, maxValue)
         {
             foreach (int value in values)
             {
@@ -109,7 +114,10 @@ namespace Genix.Core
         /// <param name="minValue">The lower inclusive bound of values in the histogram.</param>
         /// <param name="maxValue">The upper exclusive bound of values in the histogram.</param>
         /// <param name="counts">The collection of (value, count) pairs to initialize the histogram with.</param>
-        public Histogram(int minValue, int maxValue, IEnumerable<(int value, int count)> counts) : this(minValue, maxValue)
+#pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
+        public Histogram(int minValue, int maxValue, IEnumerable<(int value, int count)> counts)
+#pragma warning restore SA1009 // Closing parenthesis must be spaced correctly
+            : this(minValue, maxValue)
         {
             foreach ((int value, int count) in counts)
             {

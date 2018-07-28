@@ -18,7 +18,8 @@ namespace Genix.Lab
         /// Initializes a new instance of the <see cref="RejectCurvePoint"/> struct, using the specified threshold.
         /// </summary>
         /// <param name="threshold">The threshold value.</param>
-        public RejectCurvePoint(int threshold) : this()
+        public RejectCurvePoint(int threshold)
+            : this()
         {
             this.Threshold = threshold;
         }
@@ -65,7 +66,7 @@ namespace Genix.Lab
         /// Gets the accept rate.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Double"/> structure that represents the accept rate.
+        /// A <see cref="double"/> structure that represents the accept rate.
         /// </value>
         /// <remarks>
         /// The accept rate if the <see cref="AcceptCount"/> divided by the total number of items in the curve.
@@ -76,7 +77,7 @@ namespace Genix.Lab
         /// Gets the error rate.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Double"/> structure that represents the error rate.
+        /// A <see cref="double"/> structure that represents the error rate.
         /// </value>
         /// <remarks>
         /// The error rate if the <see cref="ErrorCount"/> divided by the <see cref="AcceptCount"/>.

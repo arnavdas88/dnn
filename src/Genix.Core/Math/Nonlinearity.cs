@@ -21,9 +21,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReLU(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -35,12 +35,12 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
+        /// <param name="offdx">The index in the <paramref name="dx"/> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <paramref name="dx"/> should be cleared before operation.</param>
         /// <param name="y">The array that contains <see cref="ReLU"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
+        /// <param name="offdy">The index in the <paramref name="dy"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReLUGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
         {
@@ -52,7 +52,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="value">The value to compute.</param>
         /// <returns>
-        /// The sigmoid of <c>value</c>. 
+        /// The sigmoid of <paramref name="value"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sigmoid(float value)
@@ -62,11 +62,11 @@ namespace Genix.Core
 
         /// <summary>
         /// Computes a derivative of a sigmoid nonlinearity of the specified angle.
-        /// The method takes the result of <see cref="MKL.Sigmoid(Single)"/> method as an argument.
+        /// The method takes the result of <see cref="Nonlinearity.Sigmoid(float)"/> method as an argument.
         /// </summary>
         /// <param name="value">The value to compute.</param>
         /// <returns>
-        /// The derivative of a sigmoid of <c>value</c>. 
+        /// The derivative of a sigmoid of <paramref name="value"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float SigmoidDerivative2(float value)
@@ -79,9 +79,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sigmoid(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -93,12 +93,12 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The array that contains <see cref="Sigmoid"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offdx">The index in the <paramref name="dx"/> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <paramref name="dx"/> should be cleared before operation.</param>
+        /// <param name="y">The array that contains <see cref="Sigmoid(int, float[], int, float[], int)"/> method results.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
+        /// <param name="offdy">The index in the <paramref name="dy"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SigmoidGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
         {
@@ -110,9 +110,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Tanh(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -124,7 +124,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="value">The value to compute.</param>
         /// <returns>
-        /// The hyperbolic tangent of <c>value</c>. 
+        /// The hyperbolic tangent of <paramref name="value"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Tanh(float value)
@@ -134,11 +134,11 @@ namespace Genix.Core
 
         /// <summary>
         /// Computes a derivative of a hyperbolic tangent of the specified value.
-        /// The method takes the result of <see cref="MKL.Tanh(Single)"/> method as an argument.
+        /// The method takes the result of <see cref="Nonlinearity.Tanh(float)"/> method as an argument.
         /// </summary>
         /// <param name="value">The value to compute.</param>
         /// <returns>
-        /// The derivative of a hyperbolic tangent of <c>value</c>. 
+        /// The derivative of a hyperbolic tangent of <paramref name="value"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float TanhDerivative2(float value)
@@ -151,12 +151,12 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offdx">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The array that contains <see cref="MKL.Tanh"/> method results.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offdx">The index in the <paramref name="dx"/> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <paramref name="dx"/> should be cleared before operation.</param>
+        /// <param name="y">The array that contains <see cref="Tanh(int, float[], int, float[], int)"/> method results.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
+        /// <param name="offdy">The index in the <paramref name="dy"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void TanhGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
         {
@@ -168,9 +168,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dxy">The array that contains chain gradient from next level receives the computed gradient.</param>
-        /// <param name="offdxy">The index in the <c>dx</c> at which computation begins.</param>
-        /// <param name="y">The array that contains <see cref="MKL.Tanh"/> method results.</param>
-        /// <param name="offy">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offdxy">The index in the <paramref name="dxy"/> at which computation begins.</param>
+        /// <param name="y">The array that contains <see cref="Tanh(int, float[], int, float[], int)"/> method results.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void TanhGradientIP(int length, float[] dxy, int offdxy, float[] y, int offy)
         {

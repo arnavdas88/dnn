@@ -41,7 +41,8 @@ namespace Genix.Core
         /// <param name="mean">The distribution's mean value μ (mu).</param>
         /// <param name="standardDeviation">The distribution's standard deviation σ (sigma).</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GaussianGenerator(double mean, double standardDeviation) : this(mean, standardDeviation, new Random(0))
+        public GaussianGenerator(double mean, double standardDeviation)
+            : this(mean, standardDeviation, new Random(0))
         {
         }
 

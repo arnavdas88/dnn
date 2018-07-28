@@ -40,7 +40,7 @@ namespace Genix.Lab
         /// Gets the labels supported by the matrix.
         /// </summary>
         /// <value>
-        /// The <see cref="ReadOnlyCollection{TOutput}"/> that contains a list of labels.
+        /// The <see cref="IReadOnlyCollection{T}"/> that contains a list of labels.
         /// </value>
         public IReadOnlyCollection<string> Labels
         {

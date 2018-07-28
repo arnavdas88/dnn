@@ -50,7 +50,7 @@ namespace Genix.Lab
         /// Gets a collection of files for the current truth.
         /// </summary>
         /// <value>
-        /// A collection of <see cref="String"/> objects that represents the names of files in the truth.
+        /// A collection of <see cref="string"/> objects that represents the names of files in the truth.
         /// </value>
         public ReadOnlyCollection<string> FileNames => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.FileName).ToList());
 
@@ -58,7 +58,7 @@ namespace Genix.Lab
         /// Gets a collection of file paths for the current truth.
         /// </summary>
         /// <value>
-        /// A collection of <see cref="String"/> objects that represents the names of file paths in the truth.
+        /// A collection of <see cref="string"/> objects that represents the names of file paths in the truth.
         /// </value>
         public ReadOnlyCollection<string> FilePaths => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.FilePath).ToList());
 
@@ -66,7 +66,7 @@ namespace Genix.Lab
         /// Gets a collection of files for the current truth.
         /// </summary>
         /// <value>
-        /// A collection of <see cref="String"/> objects that represents the names of fields in the truth.
+        /// A collection of <see cref="string"/> objects that represents the names of fields in the truth.
         /// </value>
         public ReadOnlyCollection<string> Fields => new ReadOnlyCollection<string>(this.fields);
 

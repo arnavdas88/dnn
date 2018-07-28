@@ -66,7 +66,7 @@ namespace Genix.Lab
         /// Gets or sets the image file name.
         /// </summary>
         /// <value>
-        /// A <see cref="String"/> that contains the image file name.
+        /// A <see cref="string"/> that contains the image file name.
         /// </value>
         public string FileName { get; set; }
 
@@ -82,7 +82,7 @@ namespace Genix.Lab
         /// Gets or sets the classification result.
         /// </summary>
         /// <value>
-        /// A <see cref="String"/> that contains the classification result.
+        /// A <see cref="string"/> that contains the classification result.
         /// </value>
         public string Predicted { get; set; }
 
@@ -90,7 +90,7 @@ namespace Genix.Lab
         /// Gets or sets the ground truth data.
         /// </summary>
         /// <value>
-        /// The <see cref="String"/> that contains the ground truth.
+        /// The <see cref="string"/> that contains the ground truth.
         /// </value>
         public string Expected { get; set; }
 
@@ -98,7 +98,7 @@ namespace Genix.Lab
         /// Gets or sets the classification confidence level.
         /// </summary>
         /// <value>
-        /// A <see cref="Single"/> that contains the classification confidence level.
+        /// A <see cref="int"/> that contains the classification confidence level.
         /// </value>
         public int Confidence { get; set; }
 

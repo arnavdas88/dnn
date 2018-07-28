@@ -9,7 +9,7 @@ namespace System
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Provides extension methods for the <see cref="Int32"/> class.
+    /// Provides extension methods for the <see cref="int"/> class.
     /// </summary>
     public static class Int32Extensions
     {

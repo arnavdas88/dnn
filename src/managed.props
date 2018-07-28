@@ -14,4 +14,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
   </PropertyGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="$(MSBuildThisFileDirectory)\StyleCop\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)\StyleCop\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
 </Project>

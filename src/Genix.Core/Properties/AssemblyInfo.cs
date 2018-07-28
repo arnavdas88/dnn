@@ -1,4 +1,10 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="Noname, Inc.">
+// Copyright (c) 2018, Alexander Volgunin. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;

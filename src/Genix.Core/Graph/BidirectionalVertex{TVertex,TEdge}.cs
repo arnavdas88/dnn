@@ -30,7 +30,8 @@ namespace Genix.Graph
         /// Initializes a new instance of the <see cref="BidirectionalVertex{TVertex, TEdge}"/> class
         /// that is empty and has the default initial capacity.
         /// </summary>
-        public BidirectionalVertex() : this(-1, -1)
+        public BidirectionalVertex()
+            : this(-1, -1)
         {
         }
 

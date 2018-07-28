@@ -19,12 +19,14 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\Debug\Genix.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\Release\Genix.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -48,9 +50,7 @@
     <Compile Include="Collections\LinkedCollectionItem.cs" />
     <Compile Include="Collections\QuadTree.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
-    <Compile Include="GlobalSuppressions.cs">
-      <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
-    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
     <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
     <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex}.cs" />
@@ -98,12 +98,6 @@
   <ItemGroup>
     <None Include="Genix.Core.snk" />
     <None Include="packages.config" />
-    <None Include="Settings.StyleCop" />
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\StyleCop\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -111,6 +105,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.2\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

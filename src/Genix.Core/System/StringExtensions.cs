@@ -9,7 +9,7 @@ namespace System
     using System.Collections.Generic;
 
     /// <summary>
-    /// Provides extension methods for the <see cref="String"/> class.
+    /// Provides extension methods for the <see cref="string"/> class.
     /// </summary>
     public static class StringExtensions
     {
@@ -75,8 +75,8 @@ namespace System
                 return false;
             }
 
-            return s != qualifier && 
-                   s.StartsWith(qualifier, StringComparison.Ordinal) && 
+            return s != qualifier &&
+                   s.StartsWith(qualifier, StringComparison.Ordinal) &&
                    s.EndsWith(qualifier, StringComparison.Ordinal);
         }
 

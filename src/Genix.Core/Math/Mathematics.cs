@@ -1235,7 +1235,7 @@ namespace Genix.Core
         /// Computes a gradient of a sines element wise on one array and puts results into another array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains <see cref="MKL.Sin"/> method input.</param>
+        /// <param name="x">The array that contains <see cref="Mathematics.Sin"/> method input.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
         /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
@@ -1265,7 +1265,7 @@ namespace Genix.Core
         /// Computes a gradient of a cosines element wise on one array and puts results into another array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains <see cref="MKL.Cos"/> method input.</param>
+        /// <param name="x">The array that contains <see cref="Mathematics.Cos"/> method input.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
         /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
         /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>

@@ -38,7 +38,7 @@ namespace Genix.Lab
         /// Gets the total number of items that were classified.
         /// </summary>
         /// <value>
-        /// An <see cref="System.Int32"/> that contains the total number of items that were classified.
+        /// An <see cref="int"/> that contains the total number of items that were classified.
         /// </value>
         public int Count { get; private set; }
 
@@ -46,7 +46,7 @@ namespace Genix.Lab
         /// Gets the number of items that were classified correctly.
         /// </summary>
         /// <value>
-        /// An <see cref="System.Int32"/> that contains the number of items that were classified correctly.
+        /// An <see cref="int"/> that contains the number of items that were classified correctly.
         /// </value>
         public int Valid { get; private set; }
 
@@ -54,7 +54,7 @@ namespace Genix.Lab
         /// Gets the number of items that were announced as correct.
         /// </summary>
         /// <value>
-        /// An <see cref="System.Int32"/> that contains the number of items that were announced as correct.
+        /// An <see cref="int"/> that contains the number of items that were announced as correct.
         /// </value>
         public int Accepted { get; private set; }
 
@@ -62,7 +62,7 @@ namespace Genix.Lab
         /// Gets the number of items that were announced as correct but were incorrect.
         /// </summary>
         /// <value>
-        /// An <see cref="System.Int32"/> that contains the number of items that were announced as correct but were incorrect.
+        /// An <see cref="int"/> that contains the number of items that were announced as correct but were incorrect.
         /// </value>
         public int Errors { get; private set; }
 

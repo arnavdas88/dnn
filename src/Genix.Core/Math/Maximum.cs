@@ -23,13 +23,10 @@ namespace Genix.Core
         /// <param name="a">The first of two 32-bit signed integers to compare.</param>
         /// <param name="b">The second of two 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Max(int a, int b)
-        {
-            return a >= b ? a : b;
-        }
+        public static int Max(int a, int b) => a >= b ? a : b;
 
         /// <summary>
         /// Returns the larger of three 32-bit signed integers.
@@ -38,7 +35,7 @@ namespace Genix.Core
         /// <param name="b">The second of three 32-bit signed integers to compare.</param>
         /// <param name="c">The third of three 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Max(int a, int b, int c)
@@ -55,7 +52,7 @@ namespace Genix.Core
         /// <param name="c">The third of four 32-bit signed integers to compare.</param>
         /// <param name="d">The forth of four 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Max(int a, int b, int c, int d)
@@ -71,13 +68,10 @@ namespace Genix.Core
         /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
         /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Max(float a, float b)
-        {
-            return a >= b ? a : b;
-        }
+        public static float Max(float a, float b) => a >= b ? a : b;
 
         /// <summary>
         /// Returns the larger of three single-precision floating-point numbers.
@@ -86,7 +80,7 @@ namespace Genix.Core
         /// <param name="b">The second of three single-precision floating-point numbers to compare.</param>
         /// <param name="c">The third of three single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Max(float a, float b, float c)
@@ -103,7 +97,7 @@ namespace Genix.Core
         /// <param name="c">The third of four single-precision floating-point numbers to compare.</param>
         /// <param name="d">The forth of four single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Max(float a, float b, float c, float d)
@@ -119,13 +113,10 @@ namespace Genix.Core
         /// <param name="a">The first of two double-precision floating-point numbers to compare.</param>
         /// <param name="b">The second of two double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Max(double a, double b)
-        {
-            return a >= b ? a : b;
-        }
+        public static double Max(double a, double b) => a >= b ? a : b;
 
         /// <summary>
         /// Returns the larger of three double-precision floating-point numbers.
@@ -134,7 +125,7 @@ namespace Genix.Core
         /// <param name="b">The second of three double-precision floating-point numbers to compare.</param>
         /// <param name="c">The third of three double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Max(double a, double b, double c)
@@ -151,7 +142,7 @@ namespace Genix.Core
         /// <param name="c">The third of four double-precision floating-point numbers to compare.</param>
         /// <param name="d">The forth of four double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is larger.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is larger.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Max(double a, double b, double c, double d)
@@ -167,13 +158,10 @@ namespace Genix.Core
         /// <param name="a">The first of two 32-bit signed integers to compare.</param>
         /// <param name="b">The second of two 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Min(int a, int b)
-        {
-            return a <= b ? a : b;
-        }
+        public static int Min(int a, int b) => a <= b ? a : b;
 
         /// <summary>
         /// Returns the smaller of three 32-bit signed integers.
@@ -182,7 +170,7 @@ namespace Genix.Core
         /// <param name="b">The second of three 32-bit signed integers to compare.</param>
         /// <param name="c">The third of three 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Min(int a, int b, int c)
@@ -199,7 +187,7 @@ namespace Genix.Core
         /// <param name="c">The third of four 32-bit signed integers to compare.</param>
         /// <param name="d">The forth of four 32-bit signed integers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Min(int a, int b, int c, int d)
@@ -215,13 +203,10 @@ namespace Genix.Core
         /// <param name="a">The first of two single-precision floating-point numbers to compare.</param>
         /// <param name="b">The second of two single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Min(float a, float b)
-        {
-            return a <= b ? a : b;
-        }
+        public static float Min(float a, float b) => a <= b ? a : b;
 
         /// <summary>
         /// Returns the smaller of three single-precision floating-point numbers.
@@ -230,7 +215,7 @@ namespace Genix.Core
         /// <param name="b">The second of three single-precision floating-point numbers to compare.</param>
         /// <param name="c">The third of three single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(float a, float b, float c)
@@ -247,7 +232,7 @@ namespace Genix.Core
         /// <param name="c">The third of four single-precision floating-point numbers to compare.</param>
         /// <param name="d">The forth of four single-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(float a, float b, float c, float d)
@@ -263,13 +248,10 @@ namespace Genix.Core
         /// <param name="a">The first of two double-precision floating-point numbers to compare.</param>
         /// <param name="b">The second of two double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Min(double a, double b)
-        {
-            return a <= b ? a : b;
-        }
+        public static double Min(double a, double b) => a <= b ? a : b;
 
         /// <summary>
         /// Returns the smaller of three double-precision floating-point numbers.
@@ -278,7 +260,7 @@ namespace Genix.Core
         /// <param name="b">The second of three double-precision floating-point numbers to compare.</param>
         /// <param name="c">The third of three double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Min(double a, double b, double c)
@@ -295,7 +277,7 @@ namespace Genix.Core
         /// <param name="c">The third of four double-precision floating-point numbers to compare.</param>
         /// <param name="d">The forth of four double-precision floating-point numbers to compare.</param>
         /// <returns>
-        /// Parameter <c>a</c> or <c>b</c> or <c>c</c> or <c>d</c>, whichever is smaller.
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <c>c</c> or <c>d</c>, whichever is smaller.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Min(double a, double b, double c, double d)
@@ -310,10 +292,10 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
         /// <param name="b">The scalar value.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Min(int length, float[] a, int offa, float b, float[] y, int offy)
         {
@@ -325,11 +307,11 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
         /// <param name="b">The second array that contains the data.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which calculation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Min(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
@@ -341,10 +323,10 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
         /// <param name="b">The scalar value.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Max(int length, float[] a, int offa, float b, float[] y, int offy)
         {
@@ -356,11 +338,11 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
         /// <param name="b">The second array that contains the data.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which calculation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <c>y</c> at which calculation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Max(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
@@ -368,16 +350,18 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the derivative of the arguments of the <see cref="MKL.Min"/> and <see cref="MKL.Max"/> methods.
+        /// Computes the derivative of the arguments of the <see cref="Maximum.Min(int, float[], int, float[], int, float[], int)"/> and <see cref="Maximum.Max(int, float[], int, float[], int, float[], int)"/> methods.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="x">One of the <see cref="MKL.Min"/> of <see cref="MKL.Max"/> methods input arrays <c>a</c> or <c>b</c>.</param>
-        /// <param name="dx">The array that contains calculated gradient for <c>x</c>.</param>
-        /// <param name="offx">The index in the <c>x</c> and <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="y">The <see cref="MKL.Min"/> of <see cref="MKL.Max"/> methods output array <c>y</c>.</param>
-        /// <param name="dy">The array that contains gradient for <c>y</c>.</param>
-        /// <param name="offy">The index in the <c>y</c> and <c>dy</c> at which calculation begins.</param>
+        /// <param name="x">One of the <see cref="Maximum.Min(int, float[], int, float[], int, float[], int)"/> or
+        /// <see cref="Maximum.Max(int, float[], int, float[], int, float[], int)"/> methods input arrays <c>a</c> or <c>b</c>.</param>
+        /// <param name="dx">The array that contains calculated gradient for <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <paramref name="dx"/> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <paramref name="dx"/> should be cleared before operation.</param>
+        /// <param name="y">The <see cref="Maximum.Min(int, float[], int, float[], int, float[], int)"/> or
+        /// <see cref="Maximum.Max(int, float[], int, float[], int, float[], int)"/> methods output array <paramref name="y"/>.</param>
+        /// <param name="dy">The array that contains gradient for <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> and <paramref name="dy"/> at which calculation begins.</param>
         /// <remarks>
         /// The method performs operation defined as <c>dx(offx + i) += x(offx + i) == y(offy + i) ? dy(offy + i) : 0</c>.
         /// </remarks>
@@ -392,39 +376,33 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The minimum value in the array.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Min(int length, float[] x, int offx)
-        {
-            return x[Maximum.ArgMin(length, x, offx)];
-        }
+        public static float Min(int length, float[] x, int offx) => x[Maximum.ArgMin(length, x, offx)];
 
         /// <summary>
         /// Returns the maximum value in the array.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The maximum value in the array.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Max(int length, float[] x, int offx)
-        {
-            return x[Maximum.ArgMax(length, x, offx)];
-        }
+        public static float Max(int length, float[] x, int offx) => x[Maximum.ArgMax(length, x, offx)];
 
         /// <summary>
         /// Returns the minimum and maximum values in the array.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <param name="min">The minimum value in the array.</param>
         /// <param name="max">The maximum value in the array.</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
@@ -442,67 +420,55 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The position of minimum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, int[] x, int offx)
-        {
-            return NativeMethods.i32argmin(length, x, offx);
-        }
+        public static int ArgMin(int length, int[] x, int offx) => NativeMethods.i32argmin(length, x, offx);
 
         /// <summary>
         /// Returns the position of maximum value in the array of 32-bit integers.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The position of maximum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, int[] x, int offx)
-        {
-            return NativeMethods.i32argmax(length, x, offx);
-        }
+        public static int ArgMax(int length, int[] x, int offx) => NativeMethods.i32argmax(length, x, offx);
 
         /// <summary>
         /// Returns the position of minimum value in the array of floats.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The position of minimum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, float[] x, int offx)
-        {
-            return NativeMethods.sargmin(length, x, offx);
-        }
+        public static int ArgMin(int length, float[] x, int offx) => NativeMethods.sargmin(length, x, offx);
 
         /// <summary>
         /// Returns the position of maximum value in the array of floats.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <returns>
         /// The position of maximum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, float[] x, int offx)
-        {
-            return NativeMethods.sargmax(length, x, offx);
-        }
+        public static int ArgMax(int length, float[] x, int offx) => NativeMethods.sargmax(length, x, offx);
 
         /// <summary>
         /// Returns the position of minimum and maximum values in the array.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
         /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which evaluation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <param name="min">The position of minimum value in the array.</param>
         /// <param name="max">The position of maximum value in the array.</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
@@ -517,9 +483,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <c>x</c> at which computation begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives calculated probabilities. Can be <b>null</b>.</param>
-        /// <param name="offy">The index in the <c>y</c> at which computation begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SoftMax(int length, float[] x, int offx, float[] y, int offy)

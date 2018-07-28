@@ -78,7 +78,7 @@ namespace Genix.Graph
         /// </returns>
         public bool AddEdge(TVertex source, TVertex target)
         {
-            return base.AddEdge(new Edge<TVertex>(source, target));
+            return this.AddEdge(new Edge<TVertex>(source, target));
         }
     }
 }

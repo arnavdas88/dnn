@@ -19,7 +19,8 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="target">The target error rate.</param>
         /// <param name="point">The <see cref="RejectCurvePoint"/> associated with the specified target error rate.</param>
-        public RejectCurveTarget(double target, RejectCurvePoint? point) : this()
+        public RejectCurveTarget(double target, RejectCurvePoint? point)
+            : this()
         {
             this.Target = target;
             this.Point = point;
@@ -29,7 +30,7 @@ namespace Genix.Lab
         /// Gets the target error rate.
         /// </summary>
         /// <value>
-        /// A <see cref="Double"/> structure that represents the error rate.
+        /// A <see cref="double"/> structure that represents the error rate.
         /// </value>
         public double Target { get; }
 
