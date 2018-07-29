@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Convert.cs" company="Noname, Inc.">
+// <copyright file="Conversion.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -7,16 +7,15 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
     ////using Leptonica;
 
-    /// <summary>
-    /// Provides conversion extension methods for the <see cref="Image"/> class.
-    /// </summary>
-    public static class Convert
+    /// <content>
+    /// Provides conversion methods for the <see cref="Image"/> class.
+    /// </content>
+    public partial class Image
     {
         //// <param name="threshold">The threshold to determine foreground.</param>
         //// <param name="sx">The tile width.</param>
@@ -26,22 +25,12 @@ namespace Genix.Imaging
         /// Normalizes the <see cref="Image"/> intensity be mapping the image
         /// so that the background is near the specified value.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> which background to normalize.</param>
         /// <returns>
         /// A new normalized <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image NormalizeBackground(this Image image/*, byte threshold, int sx, int sy*/)
+        public Image NormalizeBackground(/*, byte threshold, int sx, int sy*/)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 8)
+            if (this.BitsPerPixel != 8)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
@@ -50,76 +39,66 @@ namespace Genix.Imaging
             int sy = 128;
             byte threshold = 128;
 
-            Histogram ghist = image.GrayHistogram();
-            Histogram vhist = image.HistogramY();
+            Histogram ghist = this.GrayHistogram();
+            Histogram vhist = this.HistogramY();
 
             // generate foreground mask
-            Image mask = image.Convert8To1(threshold)
+            Image mask = this.Convert8To1(threshold)
                               .Dilate(StructuringElement.Rectangle(7, 1), 1)
                               .Dilate(StructuringElement.Rectangle(1, 7), 1)
                               .Convert1To8(255, 0);
 
             // use mask to remove foreground pixels from original image
-            Image values = image & mask;
+            Image values = this & mask;
 
             // generate map
-            ////int wd = (image.Width + sx - 1) / sx;
-            ////int hd = (image.Height + sy - 1) / sy;
+            ////int wd = (this.Width + sx - 1) / sx;
+            ////int hd = (this.Height + sy - 1) / sy;
 
-            int nx = image.Width / sx;
-            int ny = image.Height / sy;
+            int nx = this.Width / sx;
+            int ny = this.Height / sy;
             long[] map = new long[ny * nx];
 
             for (int iy = 0, ty = 0, imap = 0; iy < ny; iy++, ty += sy)
             {
-                int th = iy + 1 == ny ? image.Height - ty : sy;
+                int th = iy + 1 == ny ? this.Height - ty : sy;
 
                 for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                 {
-                    int tw = ix + 1 == nx ? image.Width - tx : sx;
+                    int tw = ix + 1 == nx ? this.Width - tx : sx;
 
                     map[imap++] = values.Power(tx, ty, tw, th);
                 }
             }
 
-            return image;
+            return this;
         }
 
         /// <summary>
         /// Converts this <see cref="Image"/> from gray scale to black-and-white.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to binarize.</param>
         /// <returns>
         /// A new binary <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Binarize(this Image image)
+        public Image Binarize()
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 8)
+            if (this.BitsPerPixel != 8)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
 
             Image dst = new Image(
-                image.Width,
-                image.Height,
+                this.Width,
+                this.Height,
                 1,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+                this.HorizontalResolution,
+                this.VerticalResolution);
 
             NativeMethods.otsu(
-                image.Width,
-                image.Height,
-                image.Bits,
-                image.Stride,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
                 dst.Bits,
                 dst.Stride,
                 64,
@@ -131,57 +110,47 @@ namespace Genix.Imaging
 
             /*try
             {
-                using (Pix pixs = image.CreatePix())
+                using (Pix pixs = this.CreatePix())
                 {
                     using (Pix pixd = pixs.pixOtsu(false))
                     {
-                        return pixd.CreateImage(image.HorizontalResolution, image.VerticalResolution);
+                        return pixd.CreateImage(this.HorizontalResolution, this.VerticalResolution);
                     }
                 }
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Cannot binarize the image.", e);
+                throw new InvalidOperationException("Cannot binarize the this.", e);
             }*/
         }
 
         /// <summary>
-        /// Converts this <see cref="Image"/> from black-and-white to gray scale.
+        /// Converts a binary <see cref="Image"/> to gray scale.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to convert.</param>
         /// <param name="value0">8-bit value to be used for 0s pixels.</param>
         /// <param name="value1">8-bit value to be used for 1s pixels.</param>
         /// <returns>
         /// A new gray scale <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Convert1To8(this Image image, byte value0, byte value1)
+        public Image Convert1To8(byte value0, byte value1)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
-                image.Width,
-                image.Height,
+                this.Width,
+                this.Height,
                 8,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+                this.HorizontalResolution,
+                this.VerticalResolution);
 
             if (NativeMethods._convert1to8(
-                image.Width,
-                image.Height,
-                image.Bits,
-                image.Stride,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
                 dst.Bits,
                 dst.Stride,
                 value0,
@@ -194,16 +163,12 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts this <see cref="Image"/> from gray scale to black-and-white.
+        /// Converts a gray scale <see cref="Image"/> to binary.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to convert.</param>
         /// <param name="threshold">The threshold level.</param>
         /// <returns>
         /// A new binary <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
-        /// </exception>
         /// <remarks>
         /// <para>
         /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0 (white).
@@ -212,33 +177,27 @@ namespace Genix.Imaging
         /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1 (black).
         /// </para>
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Image Convert8To1(this Image image, byte threshold)
+        public Image Convert8To1(byte threshold)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 8)
+            if (this.BitsPerPixel != 8)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
 
             Image dst = new Image(
-                image.Width,
-                image.Height,
+                this.Width,
+                this.Height,
                 1,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+                this.HorizontalResolution,
+                this.VerticalResolution);
 
             if (NativeMethods._convert8to1(
                 0,
                 0,
-                image.Width,
-                image.Height,
-                image.Bits,
-                image.Stride,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
                 dst.Bits,
                 dst.Stride,
                 threshold) != 0)
@@ -249,21 +208,62 @@ namespace Genix.Imaging
             return dst;
         }
 
-        private static class NativeMethods
+        /// <summary>
+        /// Converts a color <see cref="Image"/> to gray scale using fixed transform coefficients.
+        /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// Conversion from color image to gray scale uses the following basic equation to compute luma from nonlinear gamma-corrected red, green, and blue values:
+        /// Y' = 0.299 * R' + 0.587 * G' + 0.114 * B'.
+        /// Note that the transform coefficients conform to the standard for the NTSC red, green, and blue CRT phosphors.
+        /// </para>
+        /// </remarks>
+        public Image Convert32To8()
         {
-            private const string DllName = "Genix.Imaging.Native.dll";
+            if (this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_32bpp);
+            }
 
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                1,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert32to8(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        private static partial class NativeMethods
+        {
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern int _convert1to8(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                byte value0,
-                byte value1);
+               int width,
+               int height,
+               [In] ulong[] src,
+               int stridesrc,
+               [Out] ulong[] dst,
+               int stridedst,
+               byte value0,
+               byte value1);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -277,6 +277,18 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 byte threshold);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert32to8(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -86,7 +86,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>.
+        /// <paramref name="components"/> is <b>null</b>.
         /// </exception>
         public static Histogram PowerHistogram(int maxPower, IEnumerable<ConnectedComponent> components)
         {
@@ -115,7 +115,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>.
+        /// <paramref name="components"/> is <b>null</b>.
         /// </exception>
         public static Histogram WidthHistogram(int maxWidth, IEnumerable<ConnectedComponent> components)
         {
@@ -144,7 +144,7 @@ namespace Genix.Imaging
         /// The <see cref="Histogram"/> object this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>components</c> is <b>null</b>.
+        /// <paramref name="components"/> is <b>null</b>.
         /// </exception>
         public static Histogram HeightHistogram(int maxHeight, IEnumerable<ConnectedComponent> components)
         {

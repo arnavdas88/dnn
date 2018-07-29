@@ -21,9 +21,9 @@ namespace Genix.Imaging
         /// <param name="horizontalResolution">The image horizontal resolution, in pixels per inch.</param>
         /// <param name="verticalResolution">The image vertical resolution, in pixels per inch.</param>
         /// <exception cref="System.ArgumentException">
-        /// <para><c>width</c> is less than or equal to zero.</para>
+        /// <para><paramref name="width"/> is less than or equal to zero.</para>
         /// <para>-or-</para>
-        /// <para><c>height</c> is less than or equal to zero.</para>
+        /// <para><paramref name="height"/> is less than or equal to zero.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ImageF(int width, int height, int horizontalResolution, int verticalResolution)

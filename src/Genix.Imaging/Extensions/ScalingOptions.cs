@@ -18,10 +18,5 @@ namespace Genix.Imaging
         /// None of the options.
         /// </summary>
         None = 0,
-
-        /// <summary>
-        /// Upscale 1bpp images before scaling and then binarize them after scaling.
-        /// </summary>
-        Upscale1Bpp = 1,
     }
 }

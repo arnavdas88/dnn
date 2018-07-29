@@ -28,7 +28,7 @@ namespace Genix.Imaging
         /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <remarks>
         /// This method supports binary and gray images only and will throw an exception otherwise.
@@ -50,7 +50,7 @@ namespace Genix.Imaging
         /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -89,7 +89,7 @@ namespace Genix.Imaging
         /// For gray-scale images it is the sum of all pixel values.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -239,10 +239,10 @@ namespace Genix.Imaging
         /// </summary>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
-        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
+        /// The histogram size is 2^<see cref="Image{T}.BitsPerPixel"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -263,10 +263,10 @@ namespace Genix.Imaging
         /// <param name="height">The height, in pixels, of the area.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
-        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
+        /// The histogram size is 2^<see cref="Image{T}.BitsPerPixel"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -308,10 +308,10 @@ namespace Genix.Imaging
         /// <param name="area">The width, height, and location of the area.</param>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
-        /// The histogram size is 2^<see cref="Image.BitsPerPixel"/>.
+        /// The histogram size is 2^<see cref="Image{T}.BitsPerPixel"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -327,10 +327,10 @@ namespace Genix.Imaging
         /// </summary>
         /// <returns>
         /// The <see cref="Histogram"/> object this method creates.
-        /// The histogram size is <see cref="Image.Height"/>.
+        /// The histogram size is <see cref="Image{T}.Height"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -354,7 +354,7 @@ namespace Genix.Imaging
         /// The histogram size is <paramref name="height"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -398,7 +398,7 @@ namespace Genix.Imaging
         /// The histogram size is <paramref name="area"/>.<see cref="Rectangle.Height"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
@@ -409,19 +409,17 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Histogram HistogramY(Rectangle area) => this.HistogramY(area.X, area.Y, area.Width, area.Height);
 
-        private static class NativeMethods
+        private static partial class NativeMethods
         {
-            private const string DllName = "Genix.Imaging.Native.dll";
-
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern long power_1bpp(
-                int x,
-                int y,
-                int width,
-                int height,
-                [In] ulong[] bits,
-                int stride);
+               int x,
+               int y,
+               int width,
+               int height,
+               [In] ulong[] bits,
+               int stride);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

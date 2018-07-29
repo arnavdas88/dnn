@@ -8,14 +8,16 @@ namespace Genix.Imaging
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Drawing;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
+    /// This is an abstract class.
     /// </summary>
     /// <typeparam name="T">The type of elements that store image bits.</typeparam>
-    public class Image<T>
+    public abstract class Image<T>
         where T : struct
     {
         /// <summary>
@@ -27,9 +29,9 @@ namespace Genix.Imaging
         /// <param name="horizontalResolution">The image horizontal resolution, in pixels per inch.</param>
         /// <param name="verticalResolution">The image vertical resolution, in pixels per inch.</param>
         /// <exception cref="ArgumentException">
-        /// <para><c>width</c> is less than or equal to zero.</para>
+        /// <para><paramref name="width"/> is less than or equal to zero.</para>
         /// <para>-or-</para>
-        /// <para><c>height</c> is less than or equal to zero.</para>
+        /// <para><paramref name="height"/> is less than or equal to zero.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution)
@@ -44,19 +46,18 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
             }
 
-            int sizeInBytes = Marshal.SizeOf(default(T));
-
             this.Width = width;
             this.Height = height;
             this.BitsPerPixel = bitsPerPixel;
-            this.Stride = CalculateStride();
-            this.ImageSize = this.Stride * height * sizeInBytes;
             this.HorizontalResolution = horizontalResolution;
             this.VerticalResolution = verticalResolution;
+
+            this.Stride = CalculateStride();
             this.Bits = new T[this.Stride * height];
 
             int CalculateStride()
             {
+                int sizeInBytes = Marshal.SizeOf(default(T));
                 int sizeInBits = sizeInBytes * 8;
                 return ((width * bitsPerPixel) + sizeInBits - 1) / sizeInBits;
             }
@@ -73,17 +74,6 @@ namespace Genix.Imaging
         {
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Image(Image<T> image)
-            : this(
-                image.Width,
-                image.Height,
-                image.BitsPerPixel,
-                image.HorizontalResolution,
-                image.VerticalResolution)
-        {
-        }
-
         /// <summary>
         /// Gets the width, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
@@ -91,6 +81,14 @@ namespace Genix.Imaging
         /// The width, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public int Width { get; }
+
+        /// <summary>
+        /// Gets the width, in bits, of this <see cref="Image{T}"/>.
+        /// </summary>
+        /// <value>
+        /// The width, in bits, of this <see cref="Image{T}"/>.
+        /// </value>
+        public int WidthBits => this.Width * this.BitsPerPixel;
 
         /// <summary>
         /// Gets the height, in pixels, of this <see cref="Image{T}"/>.
@@ -122,7 +120,7 @@ namespace Genix.Imaging
         /// <value>
         /// The number of bytes occupied in memory by this <see cref="Image{T}"/> bits.
         /// </value>
-        public int ImageSize { get; }
+        public int ImageSize => this.Bits.Length * Marshal.SizeOf(default(T));
 
         /// <summary>
         /// Gets the horizontal resolution, in pixels per inch, of this <see cref="Image{T}"/>.
@@ -157,7 +155,6 @@ namespace Genix.Imaging
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Provide direct access to image data.")]
         public T[] Bits { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ValidatePosition(int x, int y)
         {
             if (x < 0 || x >= this.Width)
@@ -171,7 +168,6 @@ namespace Genix.Imaging
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ValidateArea(int x, int y, int width, int height)
         {
             if (x < 0 || x >= this.Width)
@@ -194,5 +190,8 @@ namespace Genix.Imaging
                 throw new ArgumentOutOfRangeException(nameof(height), height, Properties.Resources.E_InvalidCoordinates);
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void ValidateArea(Rectangle area) => this.ValidateArea(area.X, area.Y, area.Width, area.Height);
     }
 }

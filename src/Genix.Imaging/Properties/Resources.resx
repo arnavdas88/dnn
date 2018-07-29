@@ -153,6 +153,9 @@
   <data name="E_UnsupportedDepth_1bpp" xml:space="preserve">
     <value>This operation supports binary (1bpp) images only.</value>
   </data>
+  <data name="E_UnsupportedDepth_32bpp" xml:space="preserve">
+    <value>This operation supports color (32bpp) images only.</value>
+  </data>
   <data name="E_UnsupportedDepth_8bpp" xml:space="preserve">
     <value>This operation supports gray (8bpp) images only.</value>
   </data>

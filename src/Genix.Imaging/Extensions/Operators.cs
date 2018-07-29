@@ -6,6 +6,8 @@
 
 namespace Genix.Imaging
 {
+    using System;
+
     /// <content>
     /// Provides operators for the <see cref="Image"/> class.
     /// </content>

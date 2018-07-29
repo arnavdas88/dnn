@@ -176,11 +176,11 @@ namespace Genix.Imaging.Lab
         /// <remarks>
         /// <para>
         /// This method is called by the public <see cref="Dispose()"/> method and the <see cref="Finalize"/> method.
-        /// <see cref="Dispose()"/> invokes the protected <b>Dispose(Boolean)</b> method with the <c>disposing</c> parameter set to <b>true</b>.
-        /// <see cref="Finalize"/> invokes <b>Dispose(Boolean)</b> with <c>disposing</c> set to <b>false</b>.
+        /// <see cref="Dispose()"/> invokes the protected <b>Dispose(Boolean)</b> method with the <paramref name="disposing"/> parameter set to <b>true</b>.
+        /// <see cref="Finalize"/> invokes <b>Dispose(Boolean)</b> with <paramref name="disposing"/> set to <b>false</b>.
         /// </para>
         /// <para>
-        /// When the <c>disposing</c> parameter is <b>true</b>,
+        /// When the <paramref name="disposing"/> parameter is <b>true</b>,
         /// this method releases all resources held by any managed objects that this object references.
         /// This method invokes the <see cref="Dispose()"/> method of each referenced object.
         /// </para>

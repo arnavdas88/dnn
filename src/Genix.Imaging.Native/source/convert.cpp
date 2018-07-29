@@ -156,6 +156,33 @@ GENIXAPI(int, _convert8to1)(
 	return 0;
 }
 
+GENIXAPI(int, _convert24to32)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst)
+{
+	////return ippiCopy_8u_C3AC4R()
+	return 0;
+}
+
+GENIXAPI(int, _convert32to8)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst)
+{
+	const unsigned __int8* bits_src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * sizeof(__int32));
+	unsigned __int8* bits_dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + x;
+
+	return ippiRGBToGray_8u_AC4C1R(
+		bits_src_u8,
+		stridesrc * sizeof(unsigned __int64),
+		bits_dst_u8,
+		stridedst * sizeof(unsigned __int64),
+		{ width, height });
+}
+
 GENIXAPI(int, otsu)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
@@ -286,7 +313,7 @@ GENIXAPI(int, otsu)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pFilterBoxBorderBuffer);
+		ippsFree(pFilterBoxBorderBuffer);
 	ippsFree(pThresholds);
 	return (int)status;
 }

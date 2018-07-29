@@ -50,15 +50,15 @@ namespace Genix.Imaging
         /// </list>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>fileName</c> is <b>null</b>.</para>
+        /// <para><paramref name="fileName"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// <para><c>fileName</c> is an empty string (""), contains only white space, or contains one or more invalid characters.</para>
+        /// <para><paramref name="fileName"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</para>
         /// <para>-or-</para>
-        /// <para><c>fileName</c> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.</para>
+        /// <para><paramref name="fileName"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.</para>
         /// </exception>
         /// <exception cref="FileNotFoundException">
-        /// <para>The file specified by <c>fileName</c> does not exist.</para>
+        /// <para>The file specified by <paramref name="fileName"/> does not exist.</para>
         /// </exception>
         /// <exception cref="DirectoryNotFoundException">
         /// <para>The specified path is invalid, such as being on an unmapped drive.</para>
@@ -71,7 +71,7 @@ namespace Genix.Imaging
         /// <para>The caller does not have the required permission.</para>
         /// </exception>
         /// <exception cref="FileLoadException">
-        /// <para><c>fileName</c> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in a non-NTFS environment.</para>
+        /// <para><paramref name="fileName"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in a non-NTFS environment.</para>
         /// <para>-or-</para>
         /// <para>The file does not have a valid image format.</para>
         /// <para>-or-</para>
@@ -90,7 +90,7 @@ namespace Genix.Imaging
         /// <param name="buffer">The buffer to read the <see cref="Image"/> from.</param>
         /// <returns>The <see cref="Image"/> this method creates.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>buffer</c> is <b>null</b>.
+        /// <paramref name="buffer"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// <para>The file does not have a valid image format.</para>
@@ -118,7 +118,7 @@ namespace Genix.Imaging
         /// <param name="count">The number of bytes to read.</param>
         /// <returns>The <see cref="Image"/> this method creates.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>buffer</c> is <b>null</b>.
+        /// <paramref name="buffer"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// <para>The file does not have a valid image format.</para>
@@ -144,7 +144,7 @@ namespace Genix.Imaging
         /// <param name="stream">A <see cref="Stream"/> that contains the data for this <see cref="Image"/>.</param>
         /// <returns>The <see cref="Image"/> this method creates.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>stream</c> is <b>null</b>.
+        /// <paramref name="stream"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// <para>The file does not have a valid image format.</para>
@@ -210,25 +210,25 @@ namespace Genix.Imaging
                         switch (orientation)
                         {
                             case TIFFOrientation.TopRight:
-                                image = image.RotateFlip(RotateFlip.Rotate180FlipY);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate180FlipY);
                                 break;
                             case TIFFOrientation.BottomRight:
-                                image = image.RotateFlip(RotateFlip.Rotate180FlipNone);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate180FlipNone);
                                 break;
                             case TIFFOrientation.BottomLeft:
-                                image = image.RotateFlip(RotateFlip.RotateNoneFlipX);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.RotateNoneFlipX);
                                 break;
                             case TIFFOrientation.LeftTop:
-                                image = image.RotateFlip(RotateFlip.Rotate270FlipY);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate270FlipY);
                                 break;
                             case TIFFOrientation.RightTop:
-                                image = image.RotateFlip(RotateFlip.Rotate90FlipNone);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate90FlipNone);
                                 break;
                             case TIFFOrientation.RightBottom:
-                                image = image.RotateFlip(RotateFlip.Rotate90FlipY);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate90FlipY);
                                 break;
                             case TIFFOrientation.LeftBottom:
-                                image = image.RotateFlip(RotateFlip.Rotate270FlipNone);
+                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate270FlipNone);
                                 break;
 
                             case TIFFOrientation.TopLeft:

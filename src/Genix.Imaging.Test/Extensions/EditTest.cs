@@ -37,18 +37,6 @@
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void GetPixelNull1()
-        {
-            Assert.IsNull(Edit.GetPixel(null, 0, 0));
-        }
-
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void SetPixelNull1()
-        {
-            Edit.SetPixel(null, 0, 0, 0u);
-        }
-
         [TestMethod]
         public void SetWhiteTest1()
         {
@@ -104,23 +92,13 @@
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void SetWhiteTestNull1()
-        {
-            Assert.IsNull(Edit.SetWhite(null));
-        }
-
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void SetWhiteTestNull2()
-        {
-            Assert.IsNull(Edit.SetWhite(null, 1, 2, 3, 4));
-        }
-
         [TestMethod]
         public void SetBlackTest1()
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
             {
+                uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
+
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
@@ -130,7 +108,7 @@
                 {
                     for (int y = 0; y < blackImage.Height; y++)
                     {
-                        Assert.AreEqual(0u, blackImage.GetPixel(x, y));
+                        Assert.AreEqual(blackColor, blackImage.GetPixel(x, y));
                     }
                 }
             }
@@ -169,18 +147,6 @@
             }
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void SetBlackTestNull1()
-        {
-            Assert.IsNull(Edit.SetBlack(null));
-        }
-
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void SetBlackTestNull2()
-        {
-            Assert.IsNull(Edit.SetBlack(null, 1, 2, 3, 4));
-        }
-
         [TestMethod]
         public void InvertTest1()
         {
@@ -201,12 +167,6 @@
                     }
                 }
             }
-        }
-
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void InvertTestNull1()
-        {
-            Assert.IsNull(Logical.NOT(null));
         }
     }
 }

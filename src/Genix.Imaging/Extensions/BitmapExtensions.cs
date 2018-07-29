@@ -53,7 +53,7 @@ namespace Genix.Imaging
         /// The <see cref="Image"/> this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>bitmap</c> is <b>null</b>.
+        /// <paramref name="bitmap"/> is <b>null</b>.
         /// </exception>
         public static Image FromBitmap(Bitmap bitmap)
         {
@@ -92,12 +92,12 @@ namespace Genix.Imaging
         /// Creates an <see cref="Image"/> from a specified area of an encapsulated GDI+ bitmap.
         /// </summary>
         /// <param name="bitmap">The GDI+ bitmap from which to create the <see cref="Image"/>.</param>
-        /// <param name="rect">Defines the portion of the <c>bitmap</c> to copy. Coordinates are relative to <c>bitmap</c>.</param>
+        /// <param name="rect">Defines the portion of the <paramref name="bitmap"/> to copy. Coordinates are relative to <paramref name="bitmap"/>.</param>
         /// <returns>
         /// The <see cref="Image"/> this method creates.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>bitmap</c> is <b>null</b>.
+        /// <paramref name="bitmap"/> is <b>null</b>.
         /// </exception>
         public static Image FromBitmap(Bitmap bitmap, Rectangle rect)
         {
@@ -179,7 +179,6 @@ namespace Genix.Imaging
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static BitmapFrame ToBitmapFrame(this Image image)
         {
             // calculate pixel format
@@ -239,7 +238,6 @@ namespace Genix.Imaging
             return BitmapFrame.Create(bitmapSource);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static (Image Image, ImageMetadata Metadata) FromBitmapFrame(this BitmapFrame bitmapFrame)
         {
             if (bitmapFrame == null)
@@ -749,7 +747,7 @@ namespace Genix.Imaging
             /// <param name="propertyItem">The property item for which a hash code is to be returned.</param>
             /// <returns>A hash code for the specified property item.</returns>
             /// <exception cref="ArgumentNullException">
-            /// The <c>propertyItem</c> is <b>null</b>.
+            /// The <paramref name="propertyItem"/> is <b>null</b>.
             /// </exception>
             [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             public int GetHashCode(PropertyItem propertyItem)

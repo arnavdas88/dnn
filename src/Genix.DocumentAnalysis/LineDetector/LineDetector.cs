@@ -31,7 +31,7 @@ namespace Genix.DocumentAnalysis
         /// <c>image</c> is <b>null</b>.
         /// </exception>
         /// <exception cref="NotImplementedException">
-        /// <see cref="Image.BitsPerPixel"/> is not one.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not one.
         /// </exception>
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>

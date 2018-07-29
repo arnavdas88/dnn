@@ -14,173 +14,154 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using Genix.Core;
 
-    /// <summary>
+    /// <content>
     /// Provides morphology extension methods for the <see cref="Image"/> class.
-    /// </summary>
-    public static class Morphology
+    /// </content>
+    public partial class Image
     {
         /// <summary>
-        /// Dilates an <see cref="Image"/> by using the specified structuring element.
+        /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to dilate.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <returns>
         /// The dilated <see cref="Image"/>.
         /// </returns>
-        public static Image Dilate(this Image image, StructuringElement kernel, int iterations)
+        public Image Dilate(StructuringElement kernel, int iterations)
         {
-            Image dst = CopyCrop.Copy(image);
+            Image dst = this.Copy();
             dst.DilateIP(kernel, iterations);
             return dst;
         }
 
         /// <summary>
-        /// Dilates an <see cref="Image"/> by using the specified structuring element.
+        /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to dilate.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public static void DilateIP(this Image image, StructuringElement kernel, int iterations)
+        public void DilateIP(StructuringElement kernel, int iterations)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (kernel == null)
             {
                 throw new ArgumentNullException(nameof(kernel));
             }
 
             // create mask
-            ulong[] mask = new ulong[image.Bits.Length];
+            ulong[] mask = new ulong[this.Bits.Length];
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Morphology.BuildORMask(image, kernel, null, mask, iteration > 0);
+                Image.BuildORMask(this, kernel, null, mask, iteration > 0);
 
                 // process image
-                BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+                BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
             }
         }
 
         /// <summary>
-        /// Erodes an <see cref="Image"/> by using the specified structuring element.
+        /// Erodes this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to erode.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <returns>
         /// The eroded <see cref="Image"/>.
         /// </returns>
-        public static Image Erode(this Image image, StructuringElement kernel, int iterations)
+        public Image Erode(StructuringElement kernel, int iterations)
         {
-            Image dst = CopyCrop.Copy(image);
+            Image dst = this.Copy();
             dst.ErodeIP(kernel, iterations);
             return dst;
         }
 
         /// <summary>
-        /// Erodes an <see cref="Image"/> by using the specified structuring element.
+        /// Erodes this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to erode.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public static void ErodeIP(this Image image, StructuringElement kernel, int iterations)
+        public void ErodeIP(StructuringElement kernel, int iterations)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (kernel == null)
             {
                 throw new ArgumentNullException(nameof(kernel));
             }
 
             // create mask
-            ulong[] mask = new ulong[image.Bits.Length];
+            ulong[] mask = new ulong[this.Bits.Length];
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Morphology.BuildANDMask(image, kernel, null, mask, true);
+                Image.BuildANDMask(this, kernel, null, mask, true);
 
                 // process image
-                BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+                BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
             }
         }
 
         /// <summary>
-        /// Perform morphological opening operation an <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to open.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <returns>
         /// The opened <see cref="Image"/>.
         /// </returns>
-        public static Image Open(this Image image, StructuringElement kernel, int iterations)
+        public Image Open(StructuringElement kernel, int iterations)
         {
-            Image dst = CopyCrop.Copy(image);
+            Image dst = this.Copy();
             dst.OpenIP(kernel, iterations);
             return dst;
         }
 
         /// <summary>
-        /// Perform morphological opening operation an <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to open.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public static void OpenIP(this Image image, StructuringElement kernel, int iterations)
+        public void OpenIP(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Morphology.ErodeIP(image, kernel, 1);
-                Morphology.DilateIP(image, kernel, 1);
+                this.ErodeIP(kernel, 1);
+                this.DilateIP(kernel, 1);
             }
         }
 
         /// <summary>
-        /// Perform morphological closing operation an <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to open.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <returns>
         /// The closed <see cref="Image"/>.
         /// </returns>
-        public static Image Close(this Image image, StructuringElement kernel, int iterations)
+        public Image Close(StructuringElement kernel, int iterations)
         {
-            Image dst = CopyCrop.Copy(image);
+            Image dst = this.Copy();
             dst.CloseIP(kernel, iterations);
             return dst;
         }
 
         /// <summary>
-        /// Perform morphological closing operation an <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to open.</param>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public static void CloseIP(this Image image, StructuringElement kernel, int iterations)
+        public void CloseIP(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Morphology.DilateIP(image, kernel, 1);
-                Morphology.ErodeIP(image, kernel, 1);
+                this.DilateIP(kernel, 1);
+                this.ErodeIP(kernel, 1);
             }
         }
 
         /// <summary>
         /// Removes small isolated pixels from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to cleaned.</param>
         /// <returns>
         /// The cleaned <see cref="Image"/>.
         /// </returns>
-        public static Image Despeckle(this Image image)
+        public Image Despeckle()
         {
-            Image dst = CopyCrop.Copy(image);
+            Image dst = this.Copy();
             dst.DespeckleIP();
             return dst;
         }
@@ -188,102 +169,87 @@ namespace Genix.Imaging
         /// <summary>
         /// Removes small isolated pixels from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to cleaned.</param>
-        public static void DespeckleIP(this Image image)
+        public void DespeckleIP()
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             // create masks
-            ulong[] mask = new ulong[image.Bits.Length];
-            ulong[] notbits = new ulong[image.Bits.Length];
-            BitUtils64.WordsNOT(image.Bits.Length, image.Bits, 0, notbits, 0);
+            ulong[] mask = new ulong[this.Bits.Length];
+            ulong[] notbits = new ulong[this.Bits.Length];
+            BitUtils64.WordsNOT(this.Bits.Length, this.Bits, 0, notbits, 0);
 
             // remove isolated pixels
-            Morphology.BuildORMask(image, StructuringElement.Square(3), null, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildORMask(this, StructuringElement.Square(3), null, mask, false);
+            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // 0 x 0
             // x x x
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
+            Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
+            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // 0 x 0
             // 0 0 0
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
+            Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
+            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
 
             // x 0 0
             // x x 0
             // x 0 0
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
+            Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
+            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 x
             // 0 x x
             // 0 0 x
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
-            Morphology.BuildORMask(image, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
+            Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
+            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
 
             // fill isolated gaps
-            Morphology.BuildANDMask(image, StructuringElement.Cross(3, 3), null, mask, true);
-            BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildANDMask(this, StructuringElement.Cross(3, 3), null, mask, true);
+            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // x 0 x
             // 0 0 0
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
+            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // x 0 x
             // x x x
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
+            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 x x
             // 0 0 x
             // 0 x x
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
+            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
 
             // x x 0
             // x 0 0
             // x x 0
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
-            Morphology.BuildANDMask(image, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, image.Bits, 0);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
+            Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
+            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
         }
 
         /// <summary>
-        /// Finds connected components on the <see cref="Image"/>.
+        /// Finds connected components on this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to find the connected components on.</param>
         /// <returns>
         /// A set of <see cref="ConnectedComponent"/> objects found.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
-        /// </exception>
-        public static ISet<ConnectedComponent> FindConnectedComponents(this Image image)
+        public ISet<ConnectedComponent> FindConnectedComponents()
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
@@ -292,10 +258,10 @@ namespace Genix.Imaging
             List<Stroke> last = new List<Stroke>();
             List<Stroke> current = new List<Stroke>();
 
-            int width = image.Width;
-            int height = image.Height;
-            int stride1 = image.Stride1;
-            ulong[] bits = image.Bits;
+            int width = this.Width;
+            int height = this.Height;
+            int stride1 = this.Stride1;
+            ulong[] bits = this.Bits;
 
             for (int y = 0, ypos = 0; y < height; y++, ypos += stride1)
             {
@@ -398,42 +364,34 @@ namespace Genix.Imaging
                 current.Clear();
             }
 
-            Debug.Assert(image.Power() == all.Sum(x => x.Power), "The number of pixels on image and in components must match.");
+            Debug.Assert(this.Power() == all.Sum(x => x.Power), "The number of pixels on image and in components must match.");
             return all;
         }
 
         /// <summary>
-        /// Adds black pixels contained in the <see cref="ConnectedComponent"/> to the <see cref="Image"/>.
+        /// Adds black pixels contained in the <see cref="ConnectedComponent"/> to this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="component">The <see cref="ConnectedComponent"/> to add.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>component</c> is <b>null</b>.</para>
+        /// <paramref name="component"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static void AddConnectedComponent(this Image image, ConnectedComponent component)
+        public void AddConnectedComponent(ConnectedComponent component)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
             }
 
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            ulong[] bits = image.Bits;
-            int stride1 = image.Stride1;
+            ulong[] bits = this.Bits;
+            int stride1 = this.Stride1;
 
             foreach ((int y, int x, int length) in component.EnumStrokes())
             {
@@ -442,19 +400,16 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Adds black pixels contained in the collection of <see cref="ConnectedComponent"/> objects to the <see cref="Image"/>.
+        /// Adds black pixels contained in the collection of <see cref="ConnectedComponent"/> objects to this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to add.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>components</c> is <b>null</b>.</para>
+        /// <para><paramref name="components"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static void AddConnectedComponents(this Image image, IEnumerable<ConnectedComponent> components)
+        public void AddConnectedComponents(IEnumerable<ConnectedComponent> components)
         {
             if (components == null)
             {
@@ -463,42 +418,34 @@ namespace Genix.Imaging
 
             foreach (ConnectedComponent component in components)
             {
-                image.AddConnectedComponent(component);
+                this.AddConnectedComponent(component);
             }
         }
 
         /// <summary>
-        /// Removes black pixels contained in the <see cref="ConnectedComponent"/> from the <see cref="Image"/>.
+        /// Removes black pixels contained in the <see cref="ConnectedComponent"/> from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="component">The <see cref="ConnectedComponent"/> to remove.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>component</c> is <b>null</b>.</para>
+        /// <para><paramref name="component"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static void RemoveConnectedComponent(this Image image, ConnectedComponent component)
+        public void RemoveConnectedComponent(ConnectedComponent component)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
             }
 
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            ulong[] bits = image.Bits;
-            int stride1 = image.Stride1;
+            ulong[] bits = this.Bits;
+            int stride1 = this.Stride1;
 
             foreach ((int y, int x, int length) in component.EnumStrokes())
             {
@@ -507,19 +454,16 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Removes black pixels contained in the collection of <see cref="ConnectedComponent"/> objects from the <see cref="Image"/>.
+        /// Removes black pixels contained in the collection of <see cref="ConnectedComponent"/> objects from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to edit.</param>
         /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to remove.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>components</c> is <b>null</b>.</para>
+        /// <para><paramref name="components"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static void RemoveConnectedComponents(this Image image, IEnumerable<ConnectedComponent> components)
+        public void RemoveConnectedComponents(IEnumerable<ConnectedComponent> components)
         {
             if (components == null)
             {
@@ -528,39 +472,31 @@ namespace Genix.Imaging
 
             foreach (ConnectedComponent component in components)
             {
-                image.RemoveConnectedComponent(component);
+                this.RemoveConnectedComponent(component);
             }
         }
 
         /// <summary>
-        /// Crops the black pixels contained in the <see cref="ConnectedComponent"/> from the <see cref="Image"/>.
+        /// Crops the black pixels contained in the <see cref="ConnectedComponent"/> from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to modify.</param>
         /// <param name="component">The <see cref="ConnectedComponent"/> to crop.</param>
         /// <returns>
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>component</c> is <b>null</b>.</para>
+        /// <para><paramref name="component"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static Image CropConnectedComponent(this Image image, ConnectedComponent component)
+        public Image CropConnectedComponent(ConnectedComponent component)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
             }
 
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
@@ -569,11 +505,11 @@ namespace Genix.Imaging
             Rectangle bounds = component.Bounds;
 
             // allocate new image
-            Image dst = new Image(bounds.Width, bounds.Height, image);
+            Image dst = new Image(bounds.Width, bounds.Height, this);
 
-            ulong[] bitssrc = image.Bits;
+            ulong[] bitssrc = this.Bits;
             ulong[] bitsdst = dst.Bits;
-            int stridesrc = image.Stride;
+            int stridesrc = this.Stride;
             int stridedst = dst.Stride;
 
             // copy bits
@@ -586,34 +522,26 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Crops the black pixels contained in the collection of <see cref="ConnectedComponent"/> objects from the <see cref="Image"/>.
+        /// Crops the black pixels contained in the collection of <see cref="ConnectedComponent"/> objects from this <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The existing <see cref="Image"/> to modify.</param>
         /// <param name="components">The collection of <see cref="ConnectedComponent"/> objects to crop.</param>
         /// <returns>
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><c>image</c> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><c>components</c> is <b>null</b>.</para>
+        /// <para><paramref name="components"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// <see cref="Image.BitsPerPixel"/> is not 1.
+        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
         /// </exception>
-        public static Image CropConnectedComponents(this Image image, IEnumerable<ConnectedComponent> components)
+        public Image CropConnectedComponents(IEnumerable<ConnectedComponent> components)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (components == null)
             {
                 throw new ArgumentNullException(nameof(components));
             }
 
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
@@ -622,15 +550,15 @@ namespace Genix.Imaging
             Rectangle bounds = RectangleExtensions.Union(components.Select(x => x.Bounds));
             if (bounds.IsEmpty)
             {
-                return new Image(1, 1, image);
+                return new Image(1, 1, this);
             }
 
             // allocate new image
-            Image dst = new Image(bounds.Width, bounds.Height, image);
+            Image dst = new Image(bounds.Width, bounds.Height, this);
 
-            ulong[] bitssrc = image.Bits;
+            ulong[] bitssrc = this.Bits;
             ulong[] bitsdst = dst.Bits;
-            int stridesrc1 = image.Stride1;
+            int stridesrc1 = this.Stride1;
             int stridedst1 = dst.Stride1;
 
             // copy bits

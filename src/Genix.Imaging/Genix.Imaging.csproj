@@ -75,7 +75,7 @@
     <Compile Include="Metadata\EXIF\EXIFFieldAttribute.cs" />
     <Compile Include="Metadata\EXIF\EXIFLightSource.cs" />
     <Compile Include="Metadata\EXIF\EXIFMeteringMode.cs" />
-    <Compile Include="Extensions\Convert.cs" />
+    <Compile Include="Extensions\Conversion.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\CopyCrop.cs" />
     <Compile Include="Extensions\Edit.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
-    <Compile Include="Extensions\ScaleResize.cs" />
+    <Compile Include="Extensions\Scaling.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

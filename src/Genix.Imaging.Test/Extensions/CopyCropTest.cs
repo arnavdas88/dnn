@@ -24,11 +24,5 @@
                 CollectionAssert.AreEqual(image.Bits, copyImage.Bits);
             }
         }
-
-        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void CopyTestNull1()
-        {
-            Assert.IsNull(CopyCrop.Copy(null));
-        }
     }
 }
