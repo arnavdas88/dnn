@@ -72,7 +72,7 @@
                         BitUtils64.SetBits(1, x, posx + pos);
 
                         y[0] = y[1] = y[2] = 0;
-                        BitUtils64.BitsOR(count, x, posx, y, posy);
+                        BitUtils64.OR(count, x, posx, y, posy);
 
                         Assert.AreEqual(posy + pos, BitUtils64.BitScanOneForward(Size, y, 0));
                     }
@@ -85,7 +85,7 @@
 
                         int posy = Size - count;
                         y[0] = y[1] = y[2] = 0;
-                        BitUtils64.BitsOR(count, x, posx, y, posy);
+                        BitUtils64.OR(count, x, posx, y, posy);
 
                         Assert.AreEqual(posy + pos, BitUtils64.BitScanOneForward(Size, y, 0));
                     }

@@ -132,11 +132,20 @@ namespace Genix.Imaging
         /// <returns>
         /// A new gray scale <see cref="Image"/>.
         /// </returns>
+        /// <remarks>
+        /// A simple unpacking might use <paramref name="value0"/> = 255 and <paramref name="value1"/> = 0.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
         public Image Convert1To8(byte value0, byte value1)
         {
             if (this.BitsPerPixel != 1)
             {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
@@ -163,12 +172,113 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Converts a 2-bit gray scale <see cref="Image"/> to 8-bit gray scale <see cref="Image"/>.
+        /// </summary>
+        /// <param name="value0">8-bit value to be used for 0s pixels.</param>
+        /// <param name="value1">8-bit value to be used for 1s pixels.</param>
+        /// <param name="value2">8-bit value to be used for 2s pixels.</param>
+        /// <param name="value3">8-bit value to be used for 3s pixels.</param>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking might use <paramref name="value0"/> = 255, <paramref name="value1"/> = 85 (0x55),
+        /// <paramref name="value2"/> = 170 (0xaa), and <paramref name="value3"/> = 255.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 2.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image Convert2To8(byte value0, byte value1, byte value2, byte value3)
+        {
+            if (this.BitsPerPixel != 2)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                8,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert2to8(
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                value0,
+                value1,
+                value2,
+                value3) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a 4-bit gray scale <see cref="Image"/> to 8-bit gray scale <see cref="Image"/>.
+        /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// The unpacking uses shift replication, i.e. each pixel is converted using this formula: <code>(val shl 4) | val</code>.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 4.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image Convert4To8()
+        {
+            if (this.BitsPerPixel != 4)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                8,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert4to8(
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Converts a gray scale <see cref="Image"/> to binary.
         /// </summary>
         /// <param name="threshold">The threshold level.</param>
         /// <returns>
         /// A new binary <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
         /// <remarks>
         /// <para>
         /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0 (white).
@@ -181,7 +291,7 @@ namespace Genix.Imaging
         {
             if (this.BitsPerPixel != 8)
             {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
 
             Image dst = new Image(
@@ -209,11 +319,108 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts a color <see cref="Image"/> to gray scale using fixed transform coefficients.
+        /// Converts a color 24-bit <see cref="Image"/> to gray scale using fixed transform coefficients.
         /// </summary>
         /// <returns>
         /// A new gray scale <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 24.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// Conversion from color image to gray scale uses the following basic equation to compute luma from nonlinear gamma-corrected red, green, and blue values:
+        /// Y' = 0.299 * R' + 0.587 * G' + 0.114 * B'.
+        /// Note that the transform coefficients conform to the standard for the NTSC red, green, and blue CRT phosphors.
+        /// </para>
+        /// </remarks>
+        public Image Convert24To8()
+        {
+            if (this.BitsPerPixel != 24)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                8,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert24to8(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a color 24-bit <see cref="Image"/> to a color 32-bit <see cref="Image"/> using fixed transform coefficients.
+        /// </summary>
+        /// <returns>
+        /// A new 32-bit <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 24.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image Convert24To32()
+        {
+            if (this.BitsPerPixel != 24)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                32,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert24to32(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a color 32-bit <see cref="Image"/> to gray scale using fixed transform coefficients.
+        /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
         /// <remarks>
         /// <para>
         /// Conversion from color image to gray scale uses the following basic equation to compute luma from nonlinear gamma-corrected red, green, and blue values:
@@ -225,13 +432,13 @@ namespace Genix.Imaging
         {
             if (this.BitsPerPixel != 32)
             {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_32bpp);
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
             }
 
             Image dst = new Image(
                 this.Width,
                 this.Height,
-                1,
+                8,
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
@@ -267,6 +474,30 @@ namespace Genix.Imaging
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert2to8(
+              int width,
+              int height,
+              [In] ulong[] src,
+              int stridesrc,
+              [Out] ulong[] dst,
+              int stridedst,
+              byte value0,
+              byte value1,
+              byte value2,
+              byte value3);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert4to8(
+              int width,
+              int height,
+              [In] ulong[] src,
+              int stridesrc,
+              [Out] ulong[] dst,
+              int stridedst);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to1(
                 int x,
                 int y,
@@ -277,6 +508,30 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 byte threshold);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert24to8(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert24to32(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

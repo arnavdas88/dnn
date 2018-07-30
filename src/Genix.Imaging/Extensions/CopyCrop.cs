@@ -25,7 +25,9 @@ namespace Genix.Imaging
         public Image Copy() => this.Clone(true);
 
         /// <summary>
-        /// Copies a rectangular area specified by a pair of coordinates, a width, and a height from the specified <see cref="Image"/> to the current <see cref="Image"/>.
+        /// Copies a rectangular area specified by
+        /// a pair of coordinates, a width, and a height from the specified <see cref="Image"/>
+        /// to the current <see cref="Image"/> in-place.
         /// </summary>
         /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the destination rectangle.</param>
@@ -36,6 +38,10 @@ namespace Genix.Imaging
         /// <param name="srcy">The y-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="source"/> and this <see cref="Image"/> are not the same.
         /// </exception>
         public void CopyIP(int x, int y, int width, int height, Image source, int srcx, int srcy)
         {
@@ -49,14 +55,16 @@ namespace Genix.Imaging
 
             if (this.BitsPerPixel != source.BitsPerPixel)
             {
-                throw new ArgumentException("The image depth in source and destination images must match.");
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
             Image.CopyArea(source, srcx, srcy, width, height, this, x, y);
         }
 
         /// <summary>
-        /// Copies a rectangular area specified by a pair of coordinates, a width, and a height from the specified <see cref="Image"/> to the current <see cref="Image"/>.
+        /// Copies a rectangular area specified by
+        /// by a <see cref="System.Drawing.Rectangle"/> struct from the specified <see cref="Image"/>
+        /// to the current <see cref="Image"/> in-place.
         /// </summary>
         /// <param name="area">The coordinates, in pixels, of the destination rectangle.</param>
         /// <param name="source">The <see cref="Image"/> to copy from.</param>

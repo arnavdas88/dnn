@@ -466,6 +466,278 @@ namespace Genix.Core
             NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
         }
 
+        /// <summary>
+        /// Performs logical AND operation on two 32-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AND(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.and_ip_u32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AND(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.and_u32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on two 32-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.or_ip_u32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on two 32-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.or_u32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on three 32-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
+        {
+            NativeMethods.or3_u32(length, a, offa, b, offb, c, offc, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on four 32-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="d">The fourth source array.</param>
+        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
+        {
+            NativeMethods.or4_u32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two 32-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void XOR(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.xor_ip_u32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void XOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.xor_u32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two 64-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AND(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.and_ip_u64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void AND(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.and_u64(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on two 64-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.or_ip_u64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on two 64-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.or_u64(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on three 64-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
+        {
+            NativeMethods.or3_u64(length, a, offa, b, offb, c, offc, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on four 64-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="d">The fourth source array.</param>
+        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
+        {
+            NativeMethods.or4_u64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two 64-bits arrays element-wise in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void XOR(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.xor_ip_u64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void XOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.xor_u64(length, a, offa, b, offb, y, offy);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -583,6 +855,70 @@ namespace Genix.Core
                 [In, Out] int[] y,
                 int offy,
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void and_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void and_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or3_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or4_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void xor_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void xor_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void and_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void and_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or3_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void or4_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void xor_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void xor_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
         }
     }
 }

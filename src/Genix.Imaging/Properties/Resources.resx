@@ -129,6 +129,9 @@
   <data name="E_CannotLoadImage" xml:space="preserve">
     <value>Could not load the specified image file '{0}'.</value>
   </data>
+  <data name="E_DepthNotTheSame" xml:space="preserve">
+    <value>The images must have the same depth.</value>
+  </data>
   <data name="E_InvalidCanvasOperation" xml:space="preserve">
     <value>Cannot draw on the canvas.</value>
   </data>

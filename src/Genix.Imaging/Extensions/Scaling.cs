@@ -276,7 +276,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = this.Height >> 1; i < ii; i++, offsrc += 2 * stride, offdst += stride)
             {
-                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
             }
 
             if ((this.Height & 1) != 0)
@@ -313,7 +313,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = this.Height / 3; i < ii; i++, offsrc += 3 * stride, offdst += stride)
             {
-                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+                Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
             }
 
             switch (this.Height % 3)
@@ -323,7 +323,7 @@ namespace Genix.Imaging
                     break;
 
                 case 2:
-                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
                     break;
             }
 
@@ -356,7 +356,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = this.Height / 4; i < ii; i++, offsrc += 4 * stride, offdst += stride)
             {
-                BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
+                Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
             }
 
             switch (this.Height % 4)
@@ -366,11 +366,11 @@ namespace Genix.Imaging
                     break;
 
                 case 2:
-                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
                     break;
 
                 case 3:
-                    BitUtils64.WordsOR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+                    Arrays.OR(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
                     break;
             }
 

@@ -709,25 +709,7 @@ BITSAPI(void, bits_not2)(
 }
 
 // Logical OR
-BITSAPI(void, bits_or2)(
-	int length,				// number of elements to process
-	const __bits* x, 		// the source array
-	int offx, 				// the zero-based index of starting element in x
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] |= x[i];
-	}
-}
-
-// Logical OR
-BITSAPI(void, bits_or2_u)(
+BITSAPI(void, bits_or)(
 	int count,				// number of bits to process
 	const __bits* x, 		// the source array
 	int posx, 				// the zero-based index of starting bit in x
@@ -736,75 +718,6 @@ BITSAPI(void, bits_or2_u)(
 	)
 {
 	__bits_logical<logical_or2, logical_or3>(count, x, posx, y, posy);
-}
-
-BITSAPI(void, bits_or3)(
-	int length,				// number of elements to process
-	const __bits* a, 		// the first source array
-	int offa, 				// the zero-based index of starting element in a
-	const __bits* b, 		// the second source array
-	int offb, 				// the zero-based index of starting element in b
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = a[i] | b[i];
-	}
-}
-
-BITSAPI(void, bits_or4)(
-	int length,				// number of elements to process
-	const __bits* a, 		// the first source array
-	int offa, 				// the zero-based index of starting element in a
-	const __bits* b, 		// the second source array
-	int offb, 				// the zero-based index of starting element in b
-	const __bits* c, 		// the third source array
-	int offc, 				// the zero-based index of starting element in c
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	a += offa;
-	b += offb;
-	c += offc;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = a[i] | b[i] | c[i];
-	}
-}
-
-BITSAPI(void, bits_or5)(
-	int length,				// number of elements to process
-	const __bits* a, 		// the first source array
-	int offa, 				// the zero-based index of starting element in a
-	const __bits* b, 		// the second source array
-	int offb, 				// the zero-based index of starting element in b
-	const __bits* c, 		// the third source array
-	int offc, 				// the zero-based index of starting element in c
-	const __bits* d, 		// the fourth source array
-	int offd, 				// the zero-based index of starting element in d
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	a += offa;
-	b += offb;
-	c += offc;
-	d += offd;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = a[i] | b[i] | c[i] | d[i];
-	}
 }
 
 // Logical AND
@@ -851,25 +764,7 @@ BITSAPI(void, bits_and_mask_inc)(
 }
 
 // Logical AND
-BITSAPI(void, bits_and2)(
-	int length,				// number of elements to process
-	const __bits* x, 		// the source array
-	int offx, 				// the zero-based index of starting element in x
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] &= x[i];
-	}
-}
-
-// Logical AND
-BITSAPI(void, bits_and2_u)(
+BITSAPI(void, bits_and)(
 	int count,				// number of bits to process
 	const __bits* x, 		// the source array
 	int posx, 				// the zero-based index of starting bit in x
@@ -880,45 +775,8 @@ BITSAPI(void, bits_and2_u)(
 	__bits_logical<logical_and2, logical_and3>(count, x, posx, y, posy);
 }
 
-BITSAPI(void, bits_and3)(
-	int length,				// number of elements to process
-	const __bits* a, 		// the first source array
-	int offa, 				// the zero-based index of starting element in a
-	const __bits* b, 		// the second source array
-	int offb, 				// the zero-based index of starting element in b
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = a[i] & b[i];
-	}
-}
-
 // Logical XOR
-BITSAPI(void, bits_xor2)(
-	int length,				// number of elements to process
-	const __bits* x, 		// the source array
-	int offx, 				// the zero-based index of starting element in x
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] ^= x[i];
-	}
-}
-
-BITSAPI(void, bits_xor2_u)(
+BITSAPI(void, bits_xor)(
 	int count,				// number of bits to process
 	const __bits* x, 		// the source array
 	int posx, 				// the zero-based index of starting bit in x
@@ -927,24 +785,4 @@ BITSAPI(void, bits_xor2_u)(
 	)
 {
 	__bits_logical<logical_xor2, logical_xor3>(count, x, posx, y, posy);
-}
-
-BITSAPI(void, bits_xor3)(
-	int length,				// number of elements to process
-	const __bits* a, 		// the first source array
-	int offa, 				// the zero-based index of starting element in a
-	const __bits* b, 		// the second source array
-	int offb, 				// the zero-based index of starting element in b
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = a[i] ^ b[i];
-	}
 }

@@ -44,22 +44,14 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public Image AND(Image op)
         {
-            if (op == null)
-            {
-                throw new ArgumentNullException(nameof(op));
-            }
-
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
-            {
-                throw new NotSupportedException();
-            }
-
-            Image dst = this.Clone(false);
-            BitUtils64.WordsAND(this.Bits.Length, this.Bits, 0, op.Bits, 0, dst.Bits, 0);
+            Image dst = this.Clone(true);
+            dst.ANDIP(op);
             return dst;
         }
 
@@ -70,6 +62,10 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public void ANDIP(Image op)
         {
             if (op == null)
@@ -77,14 +73,26 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(op));
             }
 
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
+            if (this.BitsPerPixel != op.BitsPerPixel)
             {
-                throw new NotSupportedException();
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            BitUtils64.WordsAND(this.Bits.Length, op.Bits, 0, this.Bits, 0);
+            int minheight = Maximum.Min(this.Height, op.Height);
+            if (this.Stride == op.Stride && this.Width <= op.Width)
+            {
+                Arrays.AND(this.Stride * minheight, op.Bits, 0, this.Bits, 0);
+            }
+            else
+            {
+                int minwidth = Maximum.Min(this.Width, op.Width);
+                int stridesrc = op.Stride1;
+                int stridedst = this.Stride1;
+                for (int iy = 0, possrc = 0, posdst = 0; iy < minheight; iy++, possrc += stridesrc, posdst += stridedst)
+                {
+                    BitUtils64.BitsAND(minwidth, op.Bits, possrc, this.Bits, posdst);
+                }
+            }
         }
 
         /// <summary>
@@ -97,22 +105,14 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public Image OR(Image op)
         {
-            if (op == null)
-            {
-                throw new ArgumentNullException(nameof(op));
-            }
-
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
-            {
-                throw new NotSupportedException();
-            }
-
-            Image dst = this.Clone(false);
-            BitUtils64.WordsOR(this.Bits.Length, this.Bits, 0, op.Bits, 0, dst.Bits, 0);
+            Image dst = this.Clone(true);
+            dst.ORIP(op);
             return dst;
         }
 
@@ -123,6 +123,10 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public void ORIP(Image op)
         {
             if (op == null)
@@ -130,14 +134,26 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(op));
             }
 
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
+            if (this.BitsPerPixel != op.BitsPerPixel)
             {
-                throw new NotSupportedException();
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            BitUtils64.WordsOR(this.Bits.Length, op.Bits, 0, this.Bits, 0);
+            int minheight = Maximum.Min(this.Height, op.Height);
+            if (this.Stride == op.Stride && this.Width <= op.Width)
+            {
+                Arrays.OR(this.Stride * minheight, op.Bits, 0, this.Bits, 0);
+            }
+            else
+            {
+                int minwidth = Maximum.Min(this.Width, op.Width);
+                int stridesrc = op.Stride1;
+                int stridedst = this.Stride1;
+                for (int iy = 0, possrc = 0, posdst = 0; iy < minheight; iy++, possrc += stridesrc, posdst += stridedst)
+                {
+                    BitUtils64.OR(minwidth, op.Bits, possrc, this.Bits, posdst);
+                }
+            }
         }
 
         /// <summary>
@@ -150,22 +166,14 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public Image XOR(Image op)
         {
-            if (op == null)
-            {
-                throw new ArgumentNullException(nameof(op));
-            }
-
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
-            {
-                throw new NotSupportedException();
-            }
-
-            Image dst = this.Clone(false);
-            BitUtils64.WordsXOR(this.Bits.Length, this.Bits, 0, op.Bits, 0, dst.Bits, 0);
+            Image dst = this.Clone(true);
+            dst.XORIP(op);
             return dst;
         }
 
@@ -176,6 +184,10 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="op"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The images have a different depth.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="op"/> and this <see cref="Image"/> are not the same.
+        /// </exception>
         public void XORIP(Image op)
         {
             if (op == null)
@@ -183,14 +195,26 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(op));
             }
 
-            if (this.Width != op.Width ||
-                this.Height != op.Height ||
-                this.BitsPerPixel != op.BitsPerPixel)
+            if (this.BitsPerPixel != op.BitsPerPixel)
             {
-                throw new NotSupportedException();
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            BitUtils64.WordsXOR(this.Bits.Length, op.Bits, 0, this.Bits, 0);
+            int minheight = Maximum.Min(this.Height, op.Height);
+            if (this.Stride == op.Stride && this.Width <= op.Width)
+            {
+                Arrays.XOR(this.Stride * minheight, op.Bits, 0, this.Bits, 0);
+            }
+            else
+            {
+                int minwidth = Maximum.Min(this.Width, op.Width);
+                int stridesrc = op.Stride1;
+                int stridedst = this.Stride1;
+                for (int iy = 0, possrc = 0, posdst = 0; iy < minheight; iy++, possrc += stridesrc, posdst += stridedst)
+                {
+                    BitUtils64.XOR(minwidth, op.Bits, possrc, this.Bits, posdst);
+                }
+            }
         }
     }
 }

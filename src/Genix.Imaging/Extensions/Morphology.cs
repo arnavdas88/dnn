@@ -53,7 +53,7 @@ namespace Genix.Imaging
                 Image.BuildORMask(this, kernel, null, mask, iteration > 0);
 
                 // process image
-                BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+                Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
             }
         }
 
@@ -91,7 +91,7 @@ namespace Genix.Imaging
                 Image.BuildANDMask(this, kernel, null, mask, true);
 
                 // process image
-                BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+                Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
             }
         }
 
@@ -178,67 +178,67 @@ namespace Genix.Imaging
 
             // remove isolated pixels
             Image.BuildORMask(this, StructuringElement.Square(3), null, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // 0 x 0
             // x x x
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // 0 x 0
             // 0 0 0
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
 
             // x 0 0
             // x x 0
             // x 0 0
             Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 x
             // 0 x x
             // 0 0 x
             Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            BitUtils64.WordsAND(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
 
             // fill isolated gaps
             Image.BuildANDMask(this, StructuringElement.Cross(3, 3), null, mask, true);
-            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // x 0 x
             // 0 0 0
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // x 0 x
             // x x x
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 x x
             // 0 0 x
             // 0 x x
             Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
 
             // x x 0
             // x 0 0
             // x x 0
             Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            BitUtils64.WordsOR(mask.Length, mask, 0, this.Bits, 0);
+            Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
         }
 
         /// <summary>
@@ -594,7 +594,7 @@ namespace Genix.Imaging
             {
                 if (point.X == 0)
                 {
-                    BitUtils64.WordsOR(
+                    Arrays.OR(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
                         Math.Max(point.Y, 0) * stride,
@@ -608,7 +608,7 @@ namespace Genix.Imaging
                     int offy = (Math.Max(-point.Y, 0) * stride1) + Math.Max(-point.X, 0);
                     for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
                     {
-                        BitUtils64.BitsOR(count, bits, offx, mask, offy);
+                        BitUtils64.OR(count, bits, offx, mask, offy);
                     }
                 }
             }
@@ -635,7 +635,7 @@ namespace Genix.Imaging
             {
                 if (point.X == 0)
                 {
-                    BitUtils64.WordsAND(
+                    Arrays.AND(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
                         Math.Max(point.Y, 0) * stride,

@@ -152,7 +152,7 @@ namespace Genix.Imaging
                     if (len != 0)
                     {
                         ulong mask = ~BitUtils64.SetBit(0, ix & 63);
-                        BitUtils64.WordsAND(len, mask, bits, ix >> 6, stride);
+                        BitUtils64.AND(len, mask, bits, ix >> 6, stride);
                     }
                 }
             }
@@ -166,7 +166,7 @@ namespace Genix.Imaging
                     if (len != 0)
                     {
                         ulong mask = ~BitUtils64.SetBit(0, ix & 63);
-                        BitUtils64.WordsAND(len, mask, bits, size - (len * stride) + (ix >> 6), stride);
+                        BitUtils64.AND(len, mask, bits, size - (len * stride) + (ix >> 6), stride);
                     }
                 }
             }

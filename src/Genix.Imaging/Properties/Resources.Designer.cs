@@ -97,6 +97,15 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The images must have the same depth..
+        /// </summary>
+        internal static string E_DepthNotTheSame {
+            get {
+                return ResourceManager.GetString("E_DepthNotTheSame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot draw on the canvas..
         /// </summary>
         internal static string E_InvalidCanvasOperation {
