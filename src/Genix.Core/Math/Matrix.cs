@@ -21,9 +21,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
         /// <param name="b">The second array that contains the data.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which calculation begins.</param>
         /// <returns>
         /// The calculated dot product value.
         /// </returns>
@@ -39,11 +39,11 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <c>a</c> at which calculation begins.</param>
-        /// <param name="inca">the increment for the elements of <c>a</c>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
+        /// <param name="inca">the increment for the elements of <paramref name="a"/>.</param>
         /// <param name="b">The second array that contains the data.</param>
-        /// <param name="offb">The index in the <c>b</c> at which calculation begins.</param>
-        /// <param name="incb">the increment for the elements of <c>b</c>.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which calculation begins.</param>
+        /// <param name="incb">the increment for the elements of <paramref name="b"/>.</param>
         /// <returns>
         /// The calculated dot product value.
         /// </returns>
@@ -65,7 +65,7 @@ namespace Genix.Core
         /// <param name="y">The array that contains the vector y.</param>
         /// <param name="offy">The index in the <c>y</c> at which the vector y begins.</param>
         /// <param name="a">The array that contains the destination matrix A.</param>
-        /// <param name="offa">The index in the <c>a</c> at which the matrix A begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which the matrix A begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void VxV(MatrixLayout matrixLayout, int m, int n, float[] x, int offx, float[] y, int offy, float[] a, int offa)
         {
@@ -80,7 +80,7 @@ namespace Genix.Core
         /// <param name="m">Specifies the number of rows of the matrix A.</param>
         /// <param name="n">Specifies the number of columns of the matrix A.</param>
         /// <param name="a">The array that contains the matrix A.</param>
-        /// <param name="offa">The index in the <c>a</c> at which the matrix A begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which the matrix A begins.</param>
         /// <param name="transa">Specifies whether the matrix A should be transposed before computation.</param>
         /// <param name="x">The array that contains the vector x.</param>
         /// <param name="offx">The index in the <c>x</c> at which the vector x begins.</param>
@@ -110,13 +110,13 @@ namespace Genix.Core
         /// <param name="k">Specifies the number of columns of the matrix op(A) and the number of rows of the matrix op(B).</param>
         /// <param name="n">Specifies the number of columns of the matrix op(B) and of the matrix C.</param>
         /// <param name="a">The array that contains the matrix A.</param>
-        /// <param name="offa">The index in the <c>a</c> at which the matrix A begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which the matrix A begins.</param>
         /// <param name="transa">Specifies whether the matrix A should be transposed before computation.</param>
         /// <param name="b">The array that contains the matrix B.</param>
-        /// <param name="offb">The index in the <c>a</c> at which the matrix B begins.</param>
+        /// <param name="offb">The index in the <paramref name="a"/> at which the matrix B begins.</param>
         /// <param name="transb">Specifies whether the matrix B should be transposed before computation.</param>
         /// <param name="c">The array that contains the destination matrix C.</param>
-        /// <param name="offc">The index in the <c>a</c> at which the matrix C begins.</param>
+        /// <param name="offc">The index in the <paramref name="a"/> at which the matrix C begins.</param>
         /// <param name="clearc">Specifies whether the matrix C should be cleared before operation.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void MxM(MatrixLayout matrixLayout, int m, int k, int n, float[] a, int offa, bool transa, float[] b, int offb, bool transb, float[] c, int offc, bool clearc)

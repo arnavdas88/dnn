@@ -1103,7 +1103,7 @@ namespace Genix.Core
         /// Divides all elements of one array by a scalar and puts results into destination array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The array that contains the data to divide.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
@@ -1143,7 +1143,7 @@ namespace Genix.Core
         /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
@@ -1161,7 +1161,7 @@ namespace Genix.Core
         /// Adds a range of values multiplied by a specified factor from a array starting at the specified source index to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
@@ -1180,7 +1180,7 @@ namespace Genix.Core
         /// Adds a range of values multiplied by a specified factor from a array starting at the specified source index to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
@@ -1202,7 +1202,7 @@ namespace Genix.Core
         /// to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>

@@ -467,8 +467,8 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Performs element by element multiplication of two tensors and puts results of multiplication into this tensor.
         /// </summary>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>this(i) := a(i) * b(i)</c>.
         /// </remarks>
@@ -490,7 +490,7 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
         /// </summary>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The tensor that contains the data to add.</param>
         /// <remarks>
         /// The method performs operation defined as <c>this := alpha * x + this</c>.
@@ -502,7 +502,7 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
         /// </summary>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The tensor that contains the data to add.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
         /// <remarks>
@@ -515,8 +515,8 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Performs element by element multiplication of two tensors and adds results of multiplication to this tensor.
         /// </summary>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>this(i) += a(i) * b(i)</c>.
         /// </remarks>

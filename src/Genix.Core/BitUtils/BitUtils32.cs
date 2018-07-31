@@ -213,7 +213,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to search.</param>
         /// <param name="bits">The array that contains the data to search.</param>
-        /// <param name="position">The starting bit position in <c>bits</c>.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
         /// <returns>
         /// The bit position of the first set bit (1) found.
         /// </returns>
@@ -228,7 +228,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to search.</param>
         /// <param name="bits">The array that contains the data to search.</param>
-        /// <param name="position">The starting bit position in <c>bits</c>.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
         /// <returns>
         /// The bit position of the last set bit (1) found.
         /// </returns>
@@ -243,7 +243,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of bits to search.</param>
         /// <param name="bits">The array that contains the data to search.</param>
-        /// <param name="position">The starting bit position in <c>bits</c>.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
         /// <returns>
         /// The bit position of the first reset bit (0) found.
         /// </returns>
@@ -258,7 +258,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="count">The number of values to search.</param>
         /// <param name="bits">The array that bits the data to search.</param>
-        /// <param name="position">The starting bit position in <c>bits</c>.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
         /// <returns>
         /// The bit position of the last reset bit (0) found.
         /// </returns>

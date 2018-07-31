@@ -342,8 +342,8 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
         /// <param name="a">The array that contains the data to copy.</param>
-        /// <param name="offa">The index in the <c>a</c> at which copying begins.</param>
-        /// <param name="inca">The increment for the elements of <c>a</c>.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which copying begins.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -357,7 +357,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
         /// <param name="a">The array that contains the data to copy.</param>
-        /// <param name="offa">The index in the <c>a</c> at which copying begins.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which copying begins.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
@@ -486,9 +486,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -518,9 +518,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -535,11 +535,11 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -554,13 +554,13 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
         /// <param name="d">The fourth source array.</param>
-        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="offd">The starting element position in <paramref name="d"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -590,9 +590,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -622,9 +622,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -654,9 +654,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -671,11 +671,11 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -690,13 +690,13 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <c>c</c>.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
         /// <param name="d">The fourth source array.</param>
-        /// <param name="offd">The starting element position in <c>d</c>.</param>
+        /// <param name="offd">The starting element position in <paramref name="d"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -726,9 +726,9 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <c>a</c>.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <c>b</c>.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

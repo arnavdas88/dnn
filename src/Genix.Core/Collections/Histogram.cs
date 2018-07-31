@@ -26,7 +26,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bins">The number of bins.</param>
         /// <exception cref="ArgumentException">
-        /// <c>bins</c> is less or equal to zero.
+        /// <paramref name="bins"/> is less or equal to zero.
         /// </exception>
         public Histogram(int bins)
         {
@@ -46,7 +46,7 @@ namespace Genix.Core
         /// <param name="bins">The number of bins.</param>
         /// <param name="counts">The collection of zero-based indexes of the bins to initialize the histogram with.</param>
         /// <exception cref="ArgumentException">
-        /// <c>bins</c> is less or equal to zero.
+        /// <paramref name="bins"/> is less or equal to zero.
         /// </exception>
         public Histogram(int bins, IEnumerable<int> counts)
             : this(bins)
@@ -63,7 +63,7 @@ namespace Genix.Core
         /// <param name="bins">The number of bins.</param>
         /// <param name="counts">The collection of (bin, count) pairs to initialize the histogram with.</param>
         /// <exception cref="ArgumentException">
-        /// <c>bins</c> is less or equal to zero.
+        /// <paramref name="bins"/> is less or equal to zero.
         /// </exception>
         public Histogram(int bins, IEnumerable<(int bin, int count)> counts)
             : this(bins)

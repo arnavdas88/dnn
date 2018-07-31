@@ -23,10 +23,10 @@ namespace Genix.MachineLearning
         /// Adds elements of two tensors element-wise.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains the sum of <c>a</c> and <c>b</c>.
+        /// The <see cref="Tensor"/> that contains the sum of <paramref name="a"/> and <paramref name="b"/>.
         /// </returns>
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) + b(i)</c>.
@@ -129,10 +129,10 @@ namespace Genix.MachineLearning
         /// Subtracts elements of two tensors element-wise.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains the difference of <c>a</c> and <c>b</c>.
+        /// The <see cref="Tensor"/> that contains the difference of <paramref name="a"/> and <paramref name="b"/>.
         /// </returns>
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) - b(i)</c>.
@@ -190,10 +190,10 @@ namespace Genix.MachineLearning
         /// Multiplies elements of two tensors element-wise.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains the product of <c>a</c> and <c>b</c>.
+        /// The <see cref="Tensor"/> that contains the product of <paramref name="a"/> and <paramref name="b"/>.
         /// </returns>
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) * b(i)</c>.
@@ -289,10 +289,10 @@ namespace Genix.MachineLearning
         /// Divides elements of two tensors element-wise.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains the division of <c>a</c> and <c>b</c>.
+        /// The <see cref="Tensor"/> that contains the division of <paramref name="a"/> and <paramref name="b"/>.
         /// </returns>
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) / b(i)</c>.
@@ -352,7 +352,7 @@ namespace Genix.MachineLearning
         /// Squares elements of a tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -390,7 +390,7 @@ namespace Genix.MachineLearning
         /// Raises elements of a tensor to the scalar power.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <param name="power">The constant value for power.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
@@ -429,7 +429,7 @@ namespace Genix.MachineLearning
         /// Computes a square root of elements of a tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -467,7 +467,7 @@ namespace Genix.MachineLearning
         /// Computes absolute value of elements of a tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -504,8 +504,8 @@ namespace Genix.MachineLearning
         /// Calculates a larger of each pair of elements of the two tensors.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -557,8 +557,8 @@ namespace Genix.MachineLearning
         /// Calculates a smaller of each pair of elements of the two tensors.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="a">The input tensor <c>a</c>.</param>
-        /// <param name="b">The input tensor <c>b</c>.</param>
+        /// <param name="a">The input tensor <paramref name="a"/>.</param>
+        /// <param name="b">The input tensor <paramref name="b"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -610,7 +610,7 @@ namespace Genix.MachineLearning
         /// Computes a rectified linear unit nonlinearity element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -647,7 +647,7 @@ namespace Genix.MachineLearning
         /// Computes a sigmoid nonlinearity element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -684,7 +684,7 @@ namespace Genix.MachineLearning
         /// Computes a hyperbolic tangent nonlinearity element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -721,7 +721,7 @@ namespace Genix.MachineLearning
         /// Computes a hyperbolic tangent nonlinearity element wise on a tensor in place.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The tensor <c>x</c>.</param>
+        /// <param name="x">The tensor <paramref name="x"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>x(i) := tanh(x(i))</c>.
         /// </remarks>
@@ -752,7 +752,7 @@ namespace Genix.MachineLearning
         /// Computes a sines element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -789,7 +789,7 @@ namespace Genix.MachineLearning
         /// Computes a cosines element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The input tensor <c>x</c>.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
         /// <returns>
         /// The output <see cref="Tensor"/> <c>y</c>.
         /// </returns>
@@ -831,7 +831,7 @@ namespace Genix.MachineLearning
         /// <param name="transa">Specifies whether the matrix A should be transposed before computation.</param>
         /// <param name="b">The tensor that contains the matrix B.</param>
         /// <param name="transb">Specifies whether the matrix B should be transposed before computation.</param>
-        /// <param name="bias">The tensor that contains the bias vector <c>b</c> to add to each column of matrix A. Can be null.</param>
+        /// <param name="bias">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix A. Can be null.</param>
         /// <returns>
         /// The <see cref="Tensor"/> that contains the destination matrix C.
         /// </returns>
@@ -1026,16 +1026,16 @@ namespace Genix.MachineLearning
         /// Computes a matrix-vector product.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="matrixLayout">Specifies whether the matrix A is row-major or column-major.</param>
-        /// <param name="a">The tensor that contains the matrix A.</param>
+        /// <param name="matrixLayout">Specifies whether the matrix <paramref name="a"/> is row-major or column-major.</param>
+        /// <param name="a">The tensor that contains the matrix <paramref name="a"/>.</param>
         /// <param name="transa">Specifies whether the matrix A should be transposed before computation.</param>
-        /// <param name="x">The tensor that contains the vector x.</param>
-        /// <param name="bias">The tensor that contains the bias vector <c>b</c>. Can be null.</param>
+        /// <param name="x">The tensor that contains the vector <paramref name="x"/>.</param>
+        /// <param name="bias">The tensor that contains the bias vector <paramref name="bias"/>. Can be null.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains the destination vector y.
+        /// The <see cref="Tensor"/> that contains the destination vector <c>y</c>.
         /// </returns>
         /// <remarks>
-        /// The method performs operation defined as y := op(A)*x + b.
+        /// The method performs operation defined as y := op(<paramref name="a"/>)*<paramref name="x"/> + <paramref name="bias"/>.
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1146,8 +1146,8 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="matrixLayout">Specifies whether the matrix A is row-major or column-major.</param>
-        /// <param name="x">The tensor that contains the vector <c>x</c>.</param>
-        /// <param name="y">The tensor that contains the vector <c>y</c>.</param>
+        /// <param name="x">The tensor that contains the vector <paramref name="x"/>.</param>
+        /// <param name="y">The tensor that contains the vector <paramref name="y"/>.</param>
         /// <returns>
         /// The <see cref="Tensor"/> that contains the destination matrix A.
         /// </returns>
