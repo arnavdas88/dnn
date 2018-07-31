@@ -177,54 +177,6 @@
   <data name="E_InvalidInputTensor_InvalidRank" xml:space="preserve">
     <value>The input tensor rank '{0}' does not match the network rank '{1}'.</value>
   </data>
-  <data name="E_LanguageModel_EmptyCharset" xml:space="preserve">
-    <value>The charset must contain at least one character.</value>
-  </data>
-  <data name="E_LanguageModel_EmptyVocabulary" xml:space="preserve">
-    <value>The vocabulary must contain at least one word.</value>
-  </data>
-  <data name="E_LanguageModel_InvalidCharacterCount" xml:space="preserve">
-    <value>Invalid count {0} for character {1}.</value>
-  </data>
-  <data name="E_LanguageModel_InvalidCharacterFrequency" xml:space="preserve">
-    <value>Invalid frequency {0} for character {1}.</value>
-  </data>
-  <data name="E_LanguageModel_InvalidMaximumRepeatCount" xml:space="preserve">
-    <value>The maximum repeat count must be greater or equal than its minimum repeat count.</value>
-  </data>
-  <data name="E_LanguageModel_InvalidMinimumRepeatCount" xml:space="preserve">
-    <value>The minimum repeat count must be non-negative.</value>
-  </data>
-  <data name="E_LanguageModel_InvalidWordCount" xml:space="preserve">
-    <value>Invalid count {0} for word {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_RangeIsEmpty" xml:space="preserve">
-    <value>Character range is empty, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_RangeMissingClosingBracket" xml:space="preserve">
-    <value>Character range missing closing bracket, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_RangeOutOfOrder" xml:space="preserve">
-    <value>Character range is out of order, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_UnsupportedCulture" xml:space="preserve">
-    <value>Character class is not supported for culture '{0}', regular expression '{1}' at position {2}.</value>
-  </data>
-  <data name="E_InvalidRegex_GroupIsEmpty" xml:space="preserve">
-    <value>Group is empty, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_GroupMissingClosingBracket" xml:space="preserve">
-    <value>Group missing closing bracket, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_MayNotEndWithBackslash" xml:space="preserve">
-    <value>Pattern may not end with a trailing backslash, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_TokenNotQuantifiable" xml:space="preserve">
-    <value>The preceding token is not quantifiable, regular expression '{0}' at position {1}.</value>
-  </data>
-  <data name="E_InvalidRegex_RangeWithSequence" xml:space="preserve">
-    <value>You can not create a range with a shorthand escape sequences, regular expression '{0}' at position {1}.</value>
-  </data>
   <data name="E_InvalidNetArchitecture_InvalidClassCountInLossLayer" xml:space="preserve">
     <value>The number of classes in the Loss layers must match the number of classification network classes.</value>
   </data>

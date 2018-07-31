@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.LanguageModel
+namespace Genix.MachineLearning.LanguageModel
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -70,6 +70,20 @@ namespace Genix.DNN.LanguageModel
         /// The value between 0.0f and 1.0f.
         /// </value>
         public float WordEndProbability { get; protected set; }
+
+        /// <summary>
+        /// Create a <see cref="State"/> out of two other states.
+        /// </summary>
+        /// <param name="state1">The first <see cref="State"/>.</param>
+        /// <param name="state2">The second <see cref="State"/>.</param>
+        /// <returns>
+        /// The <see cref="CompositeState"/> object this method creates.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static State Create(State state1, State state2)
+        {
+            return CompositeState.Create(state1, state2);
+        }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -13,9 +13,8 @@ namespace Genix.DNN.Learning
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.DNN;
-    using Genix.DNN.LanguageModel;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.LanguageModel;
 
     /// <summary>
     /// Performs a beam search decoding the logits.
@@ -571,7 +570,7 @@ namespace Genix.DNN.Learning
                 this.ProbNoBlank = Mathematics.LogSumExp(this.ProbNoBlank, probNoBlank);
                 this.Prob = Mathematics.LogSumExp(this.ProbBlank, this.ProbNoBlank);
 
-                this.State = CompositeState.Create(this.State, state);
+                this.State = State.Create(this.State, state);
             }
         }
 

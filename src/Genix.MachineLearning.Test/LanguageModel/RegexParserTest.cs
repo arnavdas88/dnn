@@ -1,4 +1,4 @@
-﻿namespace Genix.DNN.Test
+﻿namespace Genix.MachineLearning.LanguageModel.Test
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -4,13 +4,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.LanguageModel
+namespace Genix.MachineLearning.LanguageModel
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using Newtonsoft.Json;

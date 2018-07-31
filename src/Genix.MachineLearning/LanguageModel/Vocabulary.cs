@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.LanguageModel
+namespace Genix.MachineLearning.LanguageModel
 {
     using System;
     using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Genix.DNN.LanguageModel
         private const int NodeSize = 16;
         private const int SeekToBegin = 0;
         private const int SeekToEnd = -1;
-        private const char Separator = LanguageModel.Context.WhiteSpace;
+        private const char Separator = Context.WhiteSpace;
 
         [JsonProperty("charCount")]
         private readonly int charCount;

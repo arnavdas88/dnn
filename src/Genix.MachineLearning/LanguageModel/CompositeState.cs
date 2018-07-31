@@ -4,14 +4,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.LanguageModel
+namespace Genix.MachineLearning.LanguageModel
 {
-    using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Runtime.CompilerServices;
 
+    /// <summary>
+    /// Represents a <see cref="State"/> that is a combination of other <see cref="State"/> objects.
+    /// </summary>
     internal sealed class CompositeState : State
     {
         /// <summary>
@@ -53,8 +54,16 @@ namespace Genix.DNN.LanguageModel
         {
         }
 
+        /// <summary>
+        /// Create a <see cref="CompositeState"/> out of two other states.
+        /// </summary>
+        /// <param name="state1">The first <see cref="State"/>.</param>
+        /// <param name="state2">The second <see cref="State"/>.</param>
+        /// <returns>
+        /// The <see cref="CompositeState"/> object this method creates.
+        /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static State Create(State state1, State state2)
+        public static new State Create(State state1, State state2)
         {
             if (state1 != null)
             {
@@ -66,6 +75,15 @@ namespace Genix.DNN.LanguageModel
             }
         }
 
+        /// <summary>
+        /// Create a <see cref="CompositeState"/> out of three other states.
+        /// </summary>
+        /// <param name="state1">The first <see cref="State"/>.</param>
+        /// <param name="state2">The second <see cref="State"/>.</param>
+        /// <param name="state3">The third <see cref="State"/>.</param>
+        /// <returns>
+        /// The <see cref="CompositeState"/> object this method creates.
+        /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static State Create(State state1, State state2, State state3)
         {
@@ -86,6 +104,77 @@ namespace Genix.DNN.LanguageModel
             {
                 return CompositeState.Create(state2, state3);
             }
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+
+            CompositeState other = obj as CompositeState;
+            if (other == null)
+            {
+                return false;
+            }
+
+            return Enumerable.SequenceEqual(this.states, other.states);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => this.states[0].GetHashCode();
+
+        /// <summary>
+        /// Adds a <see cref="State"/> to this <see cref="CompositeState"/>.
+        /// </summary>
+        /// <param name="state">The <see cref="State"/> to add.</param>
+        public void Add(State state)
+        {
+            this.AddState(state);
+            this.InitializeState();
+        }
+
+        /// <inheritdoc />
+        public override IDictionary<char, State> NextStates()
+        {
+            if (this.nextstates == null)
+            {
+                IDictionary<char, State> set = null;
+
+                IList<State> s = this.states;
+                for (int i = 0, ii = s.Count; i < ii; i++)
+                {
+                    IDictionary<char, State> nextStates = s[i].NextStates();
+
+                    if (set == null)
+                    {
+                        set = nextStates;
+                    }
+                    else
+                    {
+                        foreach (State s2 in nextStates.Values)
+                        {
+                            State s1;
+                            if (set.TryGetValue(s2.Char, out s1))
+                            {
+                                set[s2.Char] = CompositeState.Create(s1, s2);
+                            }
+                            else
+                            {
+                                set[s2.Char] = s2;
+                            }
+                        }
+                    }
+                }
+
+                this.nextstates = set;
+            }
+
+            return this.nextstates;
         }
 
         /*[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -177,7 +266,7 @@ namespace Genix.DNN.LanguageModel
         }*/
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IDictionary<char, State> Merge(params IDictionary<char, State>[] states)
+        internal static IDictionary<char, State> Merge(params IDictionary<char, State>[] states)
         {
             IDictionary<char, State> set = null;
 
@@ -209,73 +298,6 @@ namespace Genix.DNN.LanguageModel
             }
 
             return set;
-        }
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj)
-        {
-            if (obj == this)
-            {
-                return true;
-            }
-
-            CompositeState other = obj as CompositeState;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return Enumerable.SequenceEqual(this.states, other.states);
-        }
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => this.states[0].GetHashCode();
-
-        public void Add(State state)
-        {
-            this.AddState(state);
-            this.InitializeState();
-        }
-
-        /// <inheritdoc />
-        public override IDictionary<char, State> NextStates()
-        {
-            if (this.nextstates == null)
-            {
-                IDictionary<char, State> set = null;
-
-                IList<State> s = this.states;
-                for (int i = 0, ii = s.Count; i < ii; i++)
-                {
-                    IDictionary<char, State> nextStates = s[i].NextStates();
-
-                    if (set == null)
-                    {
-                        set = nextStates;
-                    }
-                    else
-                    {
-                        foreach (State s2 in nextStates.Values)
-                        {
-                            State s1;
-                            if (set.TryGetValue(s2.Char, out s1))
-                            {
-                                set[s2.Char] = CompositeState.Create(s1, s2);
-                            }
-                            else
-                            {
-                                set[s2.Char] = s2;
-                            }
-                        }
-                    }
-                }
-
-                this.nextstates = set;
-            }
-
-            return this.nextstates;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

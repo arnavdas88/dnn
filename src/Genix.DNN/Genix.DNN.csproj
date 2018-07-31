@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DocumentationFile>..\..\Debug\Genix.DNN.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DocumentationFile>..\..\Release\Genix.DNN.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
@@ -50,14 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassificationNetwork.cs" />
-    <Compile Include="LanguageModel\CompositeState.cs" />
-    <Compile Include="LanguageModel\NullContext.cs" />
-    <Compile Include="LanguageModel\State.cs" />
-    <Compile Include="LanguageModel\Charset.cs" />
-    <Compile Include="LanguageModel\Context.cs" />
-    <Compile Include="LanguageModel\GraphContext.cs" />
-    <Compile Include="LanguageModel\RegexParser.cs" />
-    <Compile Include="LanguageModel\Vocabulary.cs" />
     <Compile Include="Layers\GRUCell.cs" />
     <Compile Include="Layers\GRULayer.cs" />
     <Compile Include="Layers\LSTMCell.cs" />

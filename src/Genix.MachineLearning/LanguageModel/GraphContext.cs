@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.LanguageModel
+namespace Genix.MachineLearning.LanguageModel
 {
     using System;
     using System.Collections.Generic;

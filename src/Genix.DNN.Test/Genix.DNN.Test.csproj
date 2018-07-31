@@ -67,10 +67,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Helpers.cs" />
-    <Compile Include="LanguageModel\CharsetTest.cs" />
-    <Compile Include="LanguageModel\RegexParserTest.cs" />
-    <Compile Include="LanguageModel\ContextTest.cs" />
-    <Compile Include="LanguageModel\VocabularyTest.cs" />
     <Compile Include="Layers\ConcatLayerTest.cs" />
     <Compile Include="Layers\MaxOutLayerTest.cs" />
     <Compile Include="Layers\SigmoidLayerTest.cs" />

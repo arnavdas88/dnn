@@ -16,10 +16,10 @@ namespace Genix.DNN
     using System.Runtime.Serialization;
     using System.Text;
     using Genix.Core;
-    using Genix.DNN.LanguageModel;
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.LanguageModel;
     using Newtonsoft.Json;
 
     /// <summary>

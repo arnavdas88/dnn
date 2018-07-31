@@ -1,11 +1,11 @@
-﻿namespace Genix.DNN.Test
+﻿namespace Genix.MachineLearning.LanguageModel.Test
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using Genix.DNN.LanguageModel;
+    using Genix.MachineLearning.Test;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
