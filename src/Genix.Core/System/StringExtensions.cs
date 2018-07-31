@@ -7,12 +7,63 @@
 namespace System
 {
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text;
 
     /// <summary>
     /// Provides extension methods for the <see cref="string"/> class.
     /// </summary>
     public static class StringExtensions
     {
+        /// <summary>
+        /// Determines whether the string contains at least one decimal digit.
+        /// </summary>
+        /// <param name="s">The string to test.</param>
+        /// <returns><b>true</b> if s contains decimal digits; otherwise, <b>false</b>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasDigits(this string s) => !string.IsNullOrEmpty(s) && s.Any(x => char.IsDigit(x));
+
+        /// <summary>
+        /// Determines whether the string contains at least one letter.
+        /// </summary>
+        /// <param name="s">The string to test.</param>
+        /// <returns><b>true</b> if s contains letters; otherwise, <b>false</b>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasLetters(this string s) => !string.IsNullOrEmpty(s) && s.Any(x => char.IsLetter(x));
+
+        /// <summary>
+        /// Removes characters categorized as a punctuation from the string.
+        /// </summary>
+        /// <param name="s">The string to remove punctuation from.</param>
+        /// <returns>The modified string.</returns>
+        public static string RemovePunctuation(this string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return s;
+            }
+
+            StringBuilder sb = null;
+            for (int i = 0, ii = s.Length; i < ii; i++)
+            {
+                char ch = s[i];
+                if (char.IsPunctuation(ch))
+                {
+                    if (sb == null)
+                    {
+                        sb = new StringBuilder(s, 0, i > 0 ? i - 1 : 0, ii);
+                    }
+                }
+                else if (sb != null)
+                {
+                    sb.Append(ch);
+                }
+            }
+
+            return sb != null ? sb.ToString() : s;
+        }
+
         /// <summary>
         /// Qualifies string on both ends with the specified character qualifier.
         /// </summary>
@@ -22,10 +73,8 @@ namespace System
         /// <remarks>
         /// If <c>s</c> contains <c>qualifier</c>, the method duplicates each occurrence of <c>qualifier</c> in <c>s</c>.
         /// </remarks>
-        public static string Qualify(this string s, char qualifier)
-        {
-            return s.Qualify(qualifier.ToString());
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Qualify(this string s, char qualifier) => s.Qualify(qualifier.ToString());
 
         /// <summary>
         /// Qualifies string on both ends with the specified string qualifier.
@@ -57,10 +106,8 @@ namespace System
         /// <param name="s">The string to check.</param>
         /// <param name="qualifier">The qualifier character to find.</param>
         /// <returns><b>True</b> is string is qualified; otherwise, <b>false</b>.</returns>
-        public static bool IsQualified(this string s, char qualifier)
-        {
-            return s.IsQualified(qualifier.ToString());
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsQualified(this string s, char qualifier) => s.IsQualified(qualifier.ToString());
 
         /// <summary>
         /// Check is string has specified qualifier on both ends.

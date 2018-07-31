@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="E_Classifier_EmptyTrainset" xml:space="preserve">
+    <value>There are not enough data with ground truth to train the classifier.</value>
+  </data>
   <data name="E_SupportsBinaryImagesOnly" xml:space="preserve">
     <value>This operation supports binary (1bpp) images only.</value>
   </data>

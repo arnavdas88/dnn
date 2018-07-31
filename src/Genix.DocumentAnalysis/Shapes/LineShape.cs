@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Line.cs" company="Noname, Inc.">
+// <copyright file="LineShape.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -15,16 +15,16 @@ namespace Genix.DocumentAnalysis
     /// Represents a straight line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Line : Shape
+    public class LineShape : Shape
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Line"/> class.
+        /// Initializes a new instance of the <see cref="LineShape"/> class.
         /// </summary>
         /// <param name="begin">The starting point of the line.</param>
         /// <param name="end">The ending point of the line.</param>
         /// <param name="width">The line width, in pixels.</param>
         /// <param name="types">The line types.</param>
-        public Line(Point begin, Point end, int width, LineTypes types)
+        public LineShape(Point begin, Point end, int width, LineTypes types)
         {
             this.Begin = begin;
             this.End = end;
@@ -73,6 +73,9 @@ namespace Genix.DocumentAnalysis
         /// </value>
         [JsonProperty("types")]
         public LineTypes Types { get; }
+
+        /// <inheritdoc />
+        public override string Text => null;
 
         /// <inheritdoc />
         public override string ToString() => string.Format(

@@ -8,6 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Drawing;
+    using System.Globalization;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -40,5 +41,20 @@ namespace Genix.DocumentAnalysis
         /// </value>
         [JsonProperty("bounds")]
         public Rectangle Bounds { get; protected set; }
+
+        /// <summary>
+        /// Gets the shape text.
+        /// </summary>
+        /// <value>
+        /// The <see cref="string"/> that contains the shape text.
+        /// </value>
+        public abstract string Text { get; }
+
+        /// <inheritdoc />
+        public override string ToString() => string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}: {1}",
+            this.GetType().Name,
+            this.Bounds);
     }
 }

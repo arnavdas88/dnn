@@ -255,7 +255,7 @@ template<typename T, T OP(T, T)> void __forceinline __logical(
 	int offy 				// the zero-based index of starting element in y
 )
 {
-	x += offx;
+	y += offy;
 
 	for (int i = 0; i < length; i++)
 	{

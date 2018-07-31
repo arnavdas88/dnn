@@ -36,7 +36,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static Image FindAndRemoveLines(Image image, LineDetectionOptions options, out IList<Line> lines)
+        public static Image FindAndRemoveLines(Image image, LineDetectionOptions options, out IList<LineShape> lines)
         {
             if (image == null)
             {
@@ -49,7 +49,7 @@ namespace Genix.DocumentAnalysis
             }
 
             Image cleanedImage = null;
-            lines = new List<Line>();
+            lines = new List<LineShape>();
 
             // find horizontal lines
             if (options.Types.HasFlag(LineTypes.Horizontal))
@@ -71,7 +71,7 @@ namespace Genix.DocumentAnalysis
                 foreach (ConnectedComponent component in components)
                 {
                     int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
-                    lines.Add(new Line(
+                    lines.Add(new LineShape(
                         new System.Drawing.Point(component.Bounds.Left, y),
                         new System.Drawing.Point(component.Bounds.Right, y),
                         Math.Max(1, component.Bounds.Height - (2 * DilationSize)),

@@ -16,14 +16,22 @@ namespace Genix.DocumentAnalysis
     [JsonObject(MemberSerialization.OptIn)]
     public class TextShape : Shape
     {
+        [JsonProperty("text")]
+        private readonly string text;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TextShape"/> class.
         /// </summary>
         /// <param name="bounds">The shape position.</param>
-        protected TextShape(Rectangle bounds)
+        /// <param name="text">The shape text.</param>
+        protected TextShape(Rectangle bounds, string text)
             : base(bounds)
         {
+            this.text = text;
         }
+
+        /// <inheritdoc />
+        public override string Text => this.text;
 
         /// <inheritdoc />
         public override string ToString() => string.Format(

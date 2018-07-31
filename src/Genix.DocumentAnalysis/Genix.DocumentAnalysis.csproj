@@ -43,10 +43,22 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classification\Bayes\BayesClassifier.cs" />
+    <Compile Include="Classification\Bayes\BayesFeatureBuilder.cs" />
+    <Compile Include="Classification\Bayes\BayesFeatures.cs" />
+    <Compile Include="Classification\Classifier.cs" />
+    <Compile Include="Classification\IFeatureBuilder.cs" />
+    <Compile Include="Classification\Features.cs" />
+    <Compile Include="Classification\IClassifierProgress.cs" />
+    <Compile Include="Classification\Answer.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancing.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancingOptions.cs" />
+    <Compile Include="ImageSource.cs" />
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
+    <Compile Include="DataSource.cs" />
+    <Compile Include="OCR\OCR.cs" />
+    <Compile Include="PageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -54,12 +66,15 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Shapes\Container.cs" />
-    <Compile Include="Shapes\Line.cs" />
+    <Compile Include="Shapes\IContainer.cs" />
+    <Compile Include="Shapes\LineShape.cs" />
     <Compile Include="Shapes\LineTypes.cs" />
+    <Compile Include="Shapes\PageShape.cs" />
+    <Compile Include="Shapes\PictureShape.cs" />
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\TextShape.cs" />
-    <Compile Include="Shapes\TextBlock.cs" />
-    <Compile Include="Shapes\TextLine.cs" />
+    <Compile Include="Shapes\TextBlockShape.cs" />
+    <Compile Include="Shapes\TextLineShape.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DocumentAnalysis.snk" />

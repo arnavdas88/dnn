@@ -61,6 +61,15 @@ namespace Genix.DocumentAnalysis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are not enough data with ground truth to train the classifier..
+        /// </summary>
+        internal static string E_Classifier_EmptyTrainset {
+            get {
+                return ResourceManager.GetString("E_Classifier_EmptyTrainset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation supports binary (1bpp) images only..
         /// </summary>
         internal static string E_SupportsBinaryImagesOnly {
