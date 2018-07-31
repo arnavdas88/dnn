@@ -65,7 +65,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, int alpha, int[] y, int offy)
         {
-            NativeMethods.i32addc(length, alpha, y, offy);
+            NativeMethods.addc_ip_s32(length, alpha, y, offy);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void AddC(int length, uint alpha, uint[] y, int offy)
         {
-            NativeMethods.u32addc(length, alpha, y, offy);
+            NativeMethods.addc_ip_u32(length, alpha, y, offy);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, long alpha, long[] y, int offy)
         {
-            NativeMethods.i64addc(length, alpha, y, offy);
+            NativeMethods.addc_ip_s64(length, alpha, y, offy);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void AddC(int length, ulong alpha, ulong[] y, int offy)
         {
-            NativeMethods.u64addc(length, alpha, y, offy);
+            NativeMethods.addc_ip_u64(length, alpha, y, offy);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, float alpha, float[] y, int offy)
         {
-            NativeMethods.saddc(length, alpha, y, offy);
+            NativeMethods.addc_ip_f32(length, alpha, y, offy);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, int[] x, int offx, int alpha, int[] y, int offy)
         {
-            NativeMethods.i32addxc(length, x, offx, alpha, y, offy);
+            NativeMethods.addc_s32(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void AddC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
         {
-            NativeMethods.u32addxc(length, x, offx, alpha, y, offy);
+            NativeMethods.addc_u32(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, long[] x, int offx, long alpha, long[] y, int offy)
         {
-            NativeMethods.i64addxc(length, x, offx, alpha, y, offy);
+            NativeMethods.addc_s64(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void AddC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
         {
-            NativeMethods.u64addxc(length, x, offx, alpha, y, offy);
+            NativeMethods.addc_u64(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -223,181 +223,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddC(int length, float[] x, int offx, float alpha, float[] y, int offy)
         {
-            NativeMethods.saddxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 32-bit integers in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, int alpha, int[] y, int offy)
-        {
-            NativeMethods.i32subc(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void SubC(int length, uint alpha, uint[] y, int offy)
-        {
-            NativeMethods.u32subc(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 64-bit integers in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, long alpha, long[] y, int offy)
-        {
-            NativeMethods.i64subc(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void SubC(int length, ulong alpha, ulong[] y, int offy)
-        {
-            NativeMethods.u64subc(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of floats in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, float alpha, float[] y, int offy)
-        {
-            NativeMethods.ssubc(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 32-bit integers not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, int[] x, int offx, int alpha, int[] y, int offy)
-        {
-            NativeMethods.i32subxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void SubC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
-        {
-            NativeMethods.u32subxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 64-bit integers not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, long[] x, int offx, long alpha, long[] y, int offy)
-        {
-            NativeMethods.i64subxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void SubC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
-        {
-            NativeMethods.u64subxc(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of floats not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, float[] x, int offx, float alpha, float[] y, int offy)
-        {
-            NativeMethods.ssubxc(length, x, offx, alpha, y, offy);
+            NativeMethods.addc_f32(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -414,7 +240,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, int[] x, int offx, int[] y, int offy)
         {
-            NativeMethods.i32add(length, x, offx, y, offy);
+            NativeMethods.add_ip_s32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -432,7 +258,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, uint[] x, int offx, uint[] y, int offy)
         {
-            NativeMethods.u32add(length, x, offx, y, offy);
+            NativeMethods.add_ip_u32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -449,7 +275,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, long[] x, int offx, long[] y, int offy)
         {
-            NativeMethods.i64add(length, x, offx, y, offy);
+            NativeMethods.add_ip_s64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -467,7 +293,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.u64add(length, x, offx, y, offy);
+            NativeMethods.add_ip_u64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -484,7 +310,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.sadd(length, x, offx, y, offy);
+            NativeMethods.add_ip_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -519,7 +345,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
         {
-            NativeMethods.i32addx(length, a, offa, b, offb, y, offy);
+            NativeMethods.add_s32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -539,7 +365,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
-            NativeMethods.u32addx(length, a, offa, b, offb, y, offy);
+            NativeMethods.add_u32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -558,7 +384,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
         {
-            NativeMethods.i64addx(length, a, offa, b, offb, y, offy);
+            NativeMethods.add_s64(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -578,7 +404,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Add(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
-            NativeMethods.u64addx(length, a, offa, b, offb, y, offy);
+            NativeMethods.add_u64(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -597,7 +423,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.saddx(length, a, offa, b, offb, y, offy);
+            NativeMethods.add_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -620,6 +446,180 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, int alpha, int[] y, int offy)
+        {
+            NativeMethods.subc_ip_s32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.subc_ip_u32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, long alpha, long[] y, int offy)
+        {
+            NativeMethods.subc_ip_s64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.subc_ip_u64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of floats in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, float alpha, float[] y, int offy)
+        {
+            NativeMethods.subc_ip_f32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.subc_s32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 32-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.subc_u32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.subc_s64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of 64-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void SubC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.subc_u64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Subtracts a constant value from each element of an array of floats not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="alpha">The scalar to subtract.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.subc_f32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
         /// Subtracts the elements of two arrays of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
@@ -633,7 +633,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, int[] x, int offx, int[] y, int offy)
         {
-            NativeMethods.i32sub(length, x, offx, y, offy);
+            NativeMethods.sub_ip_s32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -651,7 +651,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Sub(int length, uint[] x, int offx, uint[] y, int offy)
         {
-            NativeMethods.u32sub(length, x, offx, y, offy);
+            NativeMethods.sub_ip_u32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -668,7 +668,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, long[] x, int offx, long[] y, int offy)
         {
-            NativeMethods.i64sub(length, x, offx, y, offy);
+            NativeMethods.sub_ip_s64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -686,7 +686,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Sub(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.u64sub(length, x, offx, y, offy);
+            NativeMethods.sub_ip_u64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -703,7 +703,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.ssub(length, x, offx, y, offy);
+            NativeMethods.sub_ip_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -738,7 +738,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
         {
-            NativeMethods.i32subx(length, a, offa, b, offb, y, offy);
+            NativeMethods.sub_s32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -758,7 +758,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Sub(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
-            NativeMethods.u32subx(length, a, offa, b, offb, y, offy);
+            NativeMethods.sub_u32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -777,7 +777,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
         {
-            NativeMethods.i64subx(length, a, offa, b, offb, y, offy);
+            NativeMethods.sub_s64(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -797,7 +797,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Sub(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
-            NativeMethods.u64subx(length, a, offa, b, offb, y, offy);
+            NativeMethods.sub_u64(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -816,7 +816,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.ssubx(length, a, offa, b, offb, y, offy);
+            NativeMethods.sub_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -860,6 +860,180 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Multiplies each element of an array of 32-bit integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, int alpha, int[] y, int offy)
+        {
+            NativeMethods.mulc_ip_s32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 32-bit unsigned integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void MulC(int length, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.mulc_ip_u32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 64-bit integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, long alpha, long[] y, int offy)
+        {
+            NativeMethods.mulc_ip_s64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 64-bit unsigned integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void MulC(int length, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.mulc_ip_u64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of single-precision floating-point numbers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, float alpha, float[] y, int offy)
+        {
+            NativeMethods.mulc_ip_f32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 32-bit integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.mulc_s32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 32-bit unsigned integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void MulC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.mulc_u32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 64-bit integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.mulc_s64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of 64-bit unsigned integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void MulC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.mulc_u64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies each element of an array of single-precision floating-point numbers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.mulc_f32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
         /// Multiplies elements of one array starting at the specified index
         /// to elements of another array starting at the specified index
         /// and puts results into destination array.
@@ -878,44 +1052,6 @@ namespace Genix.Core
         public static void Multiply(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
             NativeMethods.smul(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Multiplies all elements of one array by a scalar and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
-        /// <param name="x">The array that contains the data to multiply.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := alpha * x</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Multiply(int length, float alpha, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.smulxc(length, x, offx, 1, alpha, y, offy, 1);
-        }
-
-        /// <summary>
-        /// Multiplies all elements of one array by a scalar and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
-        /// <param name="x">The array that contains the data to multiply.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := alpha * x</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Multiply(int length, float alpha, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods.smulxc(length, x, offx, incx, alpha, y, offy, incy);
         }
 
         /// <summary>
@@ -978,27 +1114,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Divide(int length, float alpha, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.smulxc(length, x, offx, 1, 1.0f / alpha, y, offy, 1);
-        }
-
-        /// <summary>
-        /// Divides all elements of one array by a scalar and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <c>alpha</c>.</param>
-        /// <param name="x">The array that contains the data to divide.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := x / alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Divide(int length, float alpha, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods.smulxc(length, x, offx, incx, 1.0f / alpha, y, offy, incy);
+            NativeMethods.mulc_f32(length, x, offx, 1.0f / alpha, y, offy);
         }
 
         /// <summary>
@@ -1442,123 +1558,83 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32addc(int n, int a, [In, Out] int[] y, int offy);
+            public static extern void addc_ip_s32(int n, int a, [In, Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32addc(int n, uint a, [In, Out] uint[] y, int offy);
+            public static extern void addc_ip_u32(int n, uint a, [In, Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64addc(int n, long a, [In, Out] long[] y, int offy);
+            public static extern void addc_ip_s64(int n, long a, [In, Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64addc(int n, ulong a, [In, Out] ulong[] y, int offy);
+            public static extern void addc_ip_u64(int n, ulong a, [In, Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void saddc(int n, float a, [In, Out] float[] y, int offy);
+            public static extern void addc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32addxc(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+            public static extern void addc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32addxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+            public static extern void addc_u32(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64addxc(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+            public static extern void addc_s64(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64addxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+            public static extern void addc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void saddxc(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+            public static extern void addc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32subc(int n, int a, [In, Out] int[] y, int offy);
+            public static extern void add_ip_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32subc(int n, uint a, [In, Out] uint[] y, int offy);
+            public static extern void add_ip_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64subc(int n, long a, [In, Out] long[] y, int offy);
+            public static extern void add_ip_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64subc(int n, ulong a, [In, Out] ulong[] y, int offy);
+            public static extern void add_ip_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssubc(int n, float a, [In, Out] float[] y, int offy);
+            public static extern void add_ip_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32subxc(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+            public static extern void add_s32(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32subxc(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+            public static extern void add_u32(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64subxc(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+            public static extern void add_s64(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64subxc(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+            public static extern void add_u64(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssubxc(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i32add(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u32add(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i64add(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u64add(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sadd(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i32addx(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u32addx(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i64addx(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u64addx(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void saddx(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void add_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1570,43 +1646,83 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32sub(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+            public static extern void subc_ip_s32(int n, int a, [In, Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32sub(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            public static extern void subc_ip_u32(int n, uint a, [In, Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64sub(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+            public static extern void subc_ip_s64(int n, long a, [In, Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64sub(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            public static extern void subc_ip_u64(int n, ulong a, [In, Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssub(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern void subc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32subx(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+            public static extern void subc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32subx(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+            public static extern void subc_u32(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i64subx(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+            public static extern void subc_s64(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u64subx(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+            public static extern void subc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssubx(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void subc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_ip_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_ip_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_ip_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_ip_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_ip_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_s32(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_u32(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_s64(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_u64(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sub_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -1618,7 +1734,43 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void smulxc(int n, [In] float[] x, int offx, int incx, float a, [Out] float[] y, int offy, int incy);
+            public static extern void mulc_ip_s32(int n, int a, [In, Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_ip_u32(int n, uint a, [In, Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_ip_s64(int n, long a, [In, Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_ip_u64(int n, ulong a, [In, Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_u32(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_s64(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

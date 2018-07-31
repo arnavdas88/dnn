@@ -451,7 +451,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(float alpha) => Mathematics.Multiply(this.Length, alpha, this.Weights, 0, this.Weights, 0);
+        public void Multiply(float alpha) => Mathematics.MulC(this.Length, alpha, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor to elements of another tensor.

@@ -622,7 +622,7 @@ namespace Genix.MachineLearning
                     else
 #endif
                     {
-                        Mathematics.Multiply(x.Length, probability, xw, 0, yw, 0);
+                        Mathematics.MulC(x.Length, xw, 0, probability, yw, 0);
                     }
 
                     return y;

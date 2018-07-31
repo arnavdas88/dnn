@@ -272,7 +272,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Multiply(x.Length, alpha, x.Weights, 0, y.Weights, 0);
+                    Mathematics.MulC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)

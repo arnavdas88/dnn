@@ -226,7 +226,7 @@ namespace Genix.DNN.Learning
 
             if (batchSize > 1)
             {
-                Mathematics.Multiply(layer.w.Length, 1.0f / batchSize, dw, 0, dw, 0);
+                Mathematics.MulC(layer.w.Length, 1.0f / batchSize, dw, 0);
             }
 
             float rateL1 = this.RateL1 * layer.RateL1Multiplier;

@@ -90,7 +90,7 @@ namespace Genix.DNN.Learning
             {
                 // vanilla sgd
                 // dx = -learningRate * g
-                Mathematics.Multiply(gradient.Length, -learningRate, gradient, 0, gradient, 0);
+                Mathematics.MulC(gradient.Length, -learningRate, gradient, 0);
             }
         }
     }
