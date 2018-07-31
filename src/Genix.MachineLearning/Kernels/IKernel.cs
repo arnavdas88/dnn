@@ -7,7 +7,7 @@
 namespace Genix.MachineLearning.Kernels
 {
     /// <summary>
-    /// Defines a contrect for a kernel function.
+    /// Defines a contract for a kernel function.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -15,17 +15,17 @@ namespace Genix.MachineLearning.Kernels
     /// a Kernel is a function that calculates a dot product between the two arguments.
     /// </para>
     /// </remarks>
-    /// <typeparam name="T">The type of function arguments.</typeparam>
-    public interface IKernel<in T>
+    public interface IKernel
     {
         /// <summary>
         /// The kernel function.
         /// </summary>
-        /// <param name="x">The inpunt vector <paramref name="x"/>.</param>
-        /// <param name="y">The inpunt vector <paramref name="y"/>.</param>
+        /// <param name="session">The graph that stores all operations performed on the tensors.</param>
+        /// <param name="x">The input tensor <paramref name="x"/>.</param>
+        /// <param name="y">The input tensor <paramref name="y"/>.</param>
         /// <returns>
-        /// The dot product of <paramref name="x"/> and <paramref name="y"/>.
+        /// The output tensor that contains the product of <paramref name="x"/> and <paramref name="y"/>.
         /// </returns>
-        float Execute(T x, T y);
+        float Execute(int length, float[] x, int offx, float[] y, int offy);
     }
 }

@@ -6,28 +6,30 @@
 
 namespace Genix.MachineLearning.Kernels
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Represents the Chi-Square kernel comes from the Chi-Square distribution.
     /// </summary>
     public class ChiSquare
-        : IKernel<float[]>
+        : IKernel
     {
         /// <inheritdoc />
-        public float Execute(float[] x, float[] y)
+        public float Execute(int length, float[] x, int offx, float[] y, int offy)
         {
             float sum = 0.0f;
 
-            for (int i = 0, ii = x.Length; i < ii; i++)
+            for (int i = 0; i < length; i++)
             {
-                float den = 0.5f * (x[i] + y[i]);
+                float den = x[offx + i] + y[offy + i];
                 if (den != 0.0f)
                 {
-                    float num = x[i] - y[i];
+                    float num = x[offx + i] - y[offy + i];
                     sum += (num * num) / den;
                 }
             }
 
-            return 1.0f - sum;
+            return 1.0f - (0.5f * sum);
         }
     }
 }

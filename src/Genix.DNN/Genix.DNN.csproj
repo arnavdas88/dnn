@@ -66,6 +66,7 @@
     <Compile Include="Learning\ClassificationNetworkTrainer.cs" />
     <Compile Include="Learning\Losses\CTCBeamSearch.cs" />
     <Compile Include="Learning\Losses\CTCLoss.cs" />
+    <Compile Include="Learning\Losses\HingeLoss.cs" />
     <Compile Include="NetworkGraph\NetworkGraphJsonConverter.cs" />
     <Compile Include="Layers\AveragePoolingLayer.cs" />
     <Compile Include="Layers\ConcatLayer.cs" />
