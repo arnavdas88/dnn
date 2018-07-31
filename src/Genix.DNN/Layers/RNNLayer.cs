@@ -11,6 +11,7 @@ namespace Genix.DNN.Layers
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

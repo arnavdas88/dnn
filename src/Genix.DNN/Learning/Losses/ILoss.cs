@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using Genix.MachineLearning;
+
 namespace Genix.DNN.Learning
 {
     /// <summary>

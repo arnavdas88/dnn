@@ -10,6 +10,7 @@ namespace Genix.DNN.Learning
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Negative log-likelihood loss.

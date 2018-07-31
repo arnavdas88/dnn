@@ -18,10 +18,11 @@ namespace Genix.NetClassify
     using System.Text;
     using System.Threading;
     using Genix.DNN;
-    using Genix.DNN.Imaging;
     using Genix.DNN.LanguageModel;
     using Genix.Imaging.Lab;
     using Genix.Lab;
+    using Genix.MachineLearning;
+    using Genix.MachineLearning.Imaging;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

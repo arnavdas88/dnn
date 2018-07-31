@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Genix.DNN.Imaging")]
+[assembly: AssemblyTitle("Genix.MachineLearning")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: NeutralResourcesLanguage("en")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("DCB834A6-D816-4504-BD7E-ABD67518C4EF")]
+[assembly: Guid("6AFC2C80-A968-49A0-8457-04485EC80AF4")]
 
 // Version information for an assembly consists of the following four values:
 //

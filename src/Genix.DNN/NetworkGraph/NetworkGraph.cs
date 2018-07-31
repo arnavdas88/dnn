@@ -14,6 +14,7 @@ namespace Genix.DNN
     using System.Text;
     using Genix.DNN.Layers;
     using Genix.Graph;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

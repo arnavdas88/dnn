@@ -15,6 +15,7 @@ namespace Genix.DNN.Learning
     using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.LanguageModel;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Performs a beam search decoding the logits.

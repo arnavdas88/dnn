@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.Imaging
+namespace Genix.MachineLearning.Imaging
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ namespace Genix.DNN.Imaging
     using Genix.Imaging;
 
     /// <summary>
-    /// Provides DNN extensions for <see cref="Image"/> class.
+    /// Provides machine learning extensions for <see cref="Image"/> class.
     /// </summary>
     public static class ImageExtensions
     {

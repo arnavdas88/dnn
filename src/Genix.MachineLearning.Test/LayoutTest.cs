@@ -1,5 +1,5 @@
 ﻿#if false
-namespace Genix.DNN.Test
+namespace Genix.MachineLearning.Test
 {
     using System;
     using System.Linq;

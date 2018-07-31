@@ -7,7 +7,7 @@
 ////#define NOLEARNING
 ////#define SESSION_DIAG
 
-namespace Genix.DNN
+namespace Genix.MachineLearning
 {
     using System;
     using System.Collections.Generic;

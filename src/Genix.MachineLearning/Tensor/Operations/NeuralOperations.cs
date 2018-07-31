@@ -6,7 +6,7 @@
 
 ////#define NOLEARNING
 
-namespace Genix.DNN
+namespace Genix.MachineLearning
 {
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;

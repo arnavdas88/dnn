@@ -12,6 +12,7 @@ namespace Genix.DNN.Learning
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Square loss, also known as L2-loss or Euclidean loss.

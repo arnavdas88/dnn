@@ -6,7 +6,7 @@
 
 ////#define NOLEARNING
 
-namespace Genix.DNN
+namespace Genix.MachineLearning
 {
     using System;
     using System.Collections.Generic;

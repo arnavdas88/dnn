@@ -21,9 +21,10 @@ namespace Genix.NetLearn
     using System.Threading;
     using System.Threading.Tasks;
     using Genix.DNN;
-    using Genix.DNN.Imaging;
     using Genix.DNN.Learning;
     using Genix.Imaging.Lab;
+    using Genix.MachineLearning;
+    using Genix.MachineLearning.Imaging;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

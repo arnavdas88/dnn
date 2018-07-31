@@ -19,6 +19,7 @@ namespace Genix.DNN
     using Genix.DNN.LanguageModel;
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassificationNetwork.cs" />
-    <Compile Include="Kernel.cs" />
     <Compile Include="LanguageModel\CompositeState.cs" />
     <Compile Include="LanguageModel\NullContext.cs" />
     <Compile Include="LanguageModel\State.cs" />
@@ -118,13 +117,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tensor\Operations\ArrayOperations.cs" />
-    <Compile Include="Tensor\Operations\MathOperations.cs" />
-    <Compile Include="Tensor\Operations\NeuralOperations.cs" />
-    <Compile Include="Tensor\Shape.cs" />
-    <Compile Include="Tensor\Tensor.cs" />
-    <Compile Include="Tensor\Axis.cs" />
-    <Compile Include="Tensor\Session.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DNN.snk" />
@@ -141,6 +133,10 @@
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.MachineLearning\Genix.MachineLearning.csproj">
+      <Project>{1d734863-b6c8-4552-8ace-6a0cedac5e66}</Project>
+      <Name>Genix.MachineLearning</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
