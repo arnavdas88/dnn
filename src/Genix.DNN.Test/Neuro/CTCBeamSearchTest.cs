@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Genix.DNN.LanguageModel;
+    using Genix.MachineLearning;
     using Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

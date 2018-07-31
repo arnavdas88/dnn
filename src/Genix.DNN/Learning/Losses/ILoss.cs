@@ -4,10 +4,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Genix.MachineLearning;
-
 namespace Genix.DNN.Learning
 {
+    using Genix.MachineLearning;
+
     /// <summary>
     /// Common interface for loss functions, such as <see cref="SquareLoss"/> and <see cref="LogLikelihoodLoss"/>.
     /// </summary>

@@ -6,7 +6,6 @@
 
 namespace Genix.DNN.Layers
 {
-    using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using Genix.Core;

@@ -9,6 +9,7 @@ namespace Genix.DNN.Layers
     using System;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

@@ -691,6 +691,21 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
+        /// Validates the tensor.
+        /// </summary>
+        [Conditional("DEBUG")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Validate()
+        {
+            Debug.Assert(!this.Weights.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid weight.");
+
+            if (this.gradient != null)
+            {
+                Debug.Assert(!this.gradient.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid gradient.");
+            }
+        }
+
+        /// <summary>
         /// Changes the <see cref="Tensor"/> dimensions.
         /// </summary>
         /// <param name="shape">The new <see cref="Tensor"/> dimensions.</param>
@@ -741,21 +756,6 @@ namespace Genix.MachineLearning
             float[] dw = this.gradient;
             this.gradient = null;
             return dw;
-        }
-
-        /// <summary>
-        /// Validates the tensor.
-        /// </summary>
-        [Conditional("DEBUG")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Validate()
-        {
-            Debug.Assert(!this.Weights.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid weight.");
-
-            if (this.gradient != null)
-            {
-                Debug.Assert(!this.gradient.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid gradient.");
-            }
         }
     }
 }

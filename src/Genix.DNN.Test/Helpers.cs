@@ -3,6 +3,7 @@
     using System;
     using System.Globalization;
     using System.Reflection;
+    using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     internal static class Helpers

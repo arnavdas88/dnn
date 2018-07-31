@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using Genix.MachineLearning;
     using Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;

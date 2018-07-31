@@ -13,6 +13,7 @@ namespace Genix.DNN.Layers
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Genix.Core;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

@@ -103,33 +103,13 @@ namespace Genix.MachineLearning
         public int[] Strides { get; private set; }
 
         /// <summary>
-        /// Calculates the element position in the tensor.
-        /// </summary>
-        /// <param name="axes">The element coordinates.</param>
-        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Position(params int[] axes)
-        {
-            int pos = 0;
-
-            int[] strides = this.Strides;
-            for (int i = 0, ii = axes.Length; i < ii; i++)
-            {
-                pos += strides[i] * axes[i];
-            }
-
-            return pos;
-        }
-
-        /// <summary>
         /// Calculate the total shape size.
         /// </summary>
         /// <param name="shape">The shape to evaluate.</param>
         /// <returns>The product of shape dimensions.</returns>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int ShapeLength(int[] shape)
+        public static int ShapeLength(int[] shape)
         {
             int length = 1;
             for (int i = 0, ii = shape.Length; i < ii; i++)
@@ -138,63 +118,6 @@ namespace Genix.MachineLearning
             }
 
             return length;
-        }
-
-        /// <summary>
-        /// Determines whether two shapes are identical.
-        /// </summary>
-        /// <param name="shape1">The first shape to evaluate.</param>
-        /// <param name="shape2">The second shape to evaluate.</param>
-        /// <returns><b>true</b> if <c>shape1</c> is the same as <c>shape2</c>; otherwise; <b>false</b>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(int[] shape1, int[] shape2)
-        {
-            return shape1.Length == shape2.Length && Arrays.Equals(shape1.Length, shape1, 0, shape2, 0);
-        }
-
-        /// <summary>
-        /// Determines whether all shapes in the collection are identical.
-        /// </summary>
-        /// <param name="shapes">The shapes to evaluate.</param>
-        /// <returns>
-        /// <b>true</b> if all shapes in <c>shapes</c> are identical; otherwise; <b>false</b>.
-        /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(IList<int[]> shapes)
-        {
-            for (int i = 1, ii = shapes.Count; i < ii; i++)
-            {
-                if (!Shape.AreSame(shapes[0], shapes[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether the shapes of all tensors in the collection are identical.
-        /// </summary>
-        /// <param name="xs">The tensors to evaluate.</param>
-        /// <returns>
-        /// <b>true</b> if shapes of all tensors in <c>xs</c> are identical; otherwise; <b>false</b>.
-        /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(IList<Tensor> xs)
-        {
-            for (int i = 1, ii = xs.Count; i < ii; i++)
-            {
-                if (!Shape.AreSame(xs[0].Axes, xs[i].Axes))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -209,7 +132,7 @@ namespace Genix.MachineLearning
         /// The <c>shapes</c> must have the same rank and dimensions along all axes other than <c>axis</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int[] Concat(IList<int[]> shapes, int axis)
+        public static int[] Concat(IList<int[]> shapes, int axis)
         {
             if (shapes == null)
             {
@@ -268,7 +191,7 @@ namespace Genix.MachineLearning
         /// The expanded shape.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int[] Expand(int[] shape, int axis, int dimension)
+        public static int[] Expand(int[] shape, int axis, int dimension)
         {
             return shape.InsertAt(axis, dimension);
         }
@@ -282,7 +205,7 @@ namespace Genix.MachineLearning
         /// The squeezed shape.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int[] Remove(int[] shape, int axis)
+        public static int[] Remove(int[] shape, int axis)
         {
             return shape.RemoveAt(axis);
         }
@@ -297,7 +220,7 @@ namespace Genix.MachineLearning
         /// The reshaped shape.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int[] Reshape(int[] shape, int axis, int dimension)
+        public static int[] Reshape(int[] shape, int axis, int dimension)
         {
             shape = shape?.ToArray() ?? throw new ArgumentNullException(nameof(shape));
             int rank = shape.Length;
@@ -315,6 +238,83 @@ namespace Genix.MachineLearning
             shape[axis] = dimension;
 
             return shape;
+        }
+
+        /// <summary>
+        /// Calculates the element position in the tensor.
+        /// </summary>
+        /// <param name="axes">The element coordinates.</param>
+        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Position(params int[] axes)
+        {
+            int pos = 0;
+
+            int[] strides = this.Strides;
+            for (int i = 0, ii = axes.Length; i < ii; i++)
+            {
+                pos += strides[i] * axes[i];
+            }
+
+            return pos;
+        }
+
+        /// <summary>
+        /// Determines whether two shapes are identical.
+        /// </summary>
+        /// <param name="shape1">The first shape to evaluate.</param>
+        /// <param name="shape2">The second shape to evaluate.</param>
+        /// <returns><b>true</b> if <c>shape1</c> is the same as <c>shape2</c>; otherwise; <b>false</b>.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool AreSame(int[] shape1, int[] shape2)
+        {
+            return shape1.Length == shape2.Length && Arrays.Equals(shape1.Length, shape1, 0, shape2, 0);
+        }
+
+        /// <summary>
+        /// Determines whether all shapes in the collection are identical.
+        /// </summary>
+        /// <param name="shapes">The shapes to evaluate.</param>
+        /// <returns>
+        /// <b>true</b> if all shapes in <c>shapes</c> are identical; otherwise; <b>false</b>.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool AreSame(IList<int[]> shapes)
+        {
+            for (int i = 1, ii = shapes.Count; i < ii; i++)
+            {
+                if (!Shape.AreSame(shapes[0], shapes[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether the shapes of all tensors in the collection are identical.
+        /// </summary>
+        /// <param name="xs">The tensors to evaluate.</param>
+        /// <returns>
+        /// <b>true</b> if shapes of all tensors in <c>xs</c> are identical; otherwise; <b>false</b>.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool AreSame(IList<Tensor> xs)
+        {
+            for (int i = 1, ii = xs.Count; i < ii; i++)
+            {
+                if (!Shape.AreSame(xs[0].Axes, xs[i].Axes))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

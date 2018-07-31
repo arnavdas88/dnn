@@ -7,7 +7,6 @@
 namespace Genix.MachineLearning
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Defines the axis along one of the tensor dimensions.

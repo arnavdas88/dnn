@@ -7,7 +7,7 @@
 namespace Genix.DNN.Layers
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents the layer that can be trained. This is an abstract class.

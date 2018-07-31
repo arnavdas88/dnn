@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -21,6 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 [assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("C10FF640-B3D6-47EA-97F8-FC746FD22160")]

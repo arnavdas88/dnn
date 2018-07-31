@@ -11,6 +11,7 @@ namespace Genix.DNN.Learning
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents a basic trainer for neural nets.

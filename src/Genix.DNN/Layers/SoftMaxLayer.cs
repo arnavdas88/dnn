@@ -6,13 +6,10 @@
 
 namespace Genix.DNN.Layers
 {
-    using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text.RegularExpressions;
     using Genix.Core;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>

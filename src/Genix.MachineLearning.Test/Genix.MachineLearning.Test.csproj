@@ -68,8 +68,6 @@
   <ItemGroup>
     <Compile Include="Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StopwatchExtensions.cs" />
-    <Compile Include="LayoutTest.cs" />
     <Compile Include="TensorTest.cs" />
     <Compile Include="KernelTest.cs" />
     <Compile Include="Tensor\MathOperationsTest.cs" />

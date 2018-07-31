@@ -88,7 +88,7 @@ namespace Genix.DNN.Layers
         /// Gets the convolution kernel.
         /// </summary>
         /// <value>
-        /// The <see cref="DNN.Kernel"/> object.
+        /// The <see cref="MachineLearning.Kernel"/> object.
         /// </value>
         [JsonProperty("Kernel")]
         public Kernel Kernel { get; private set; }

@@ -8,6 +8,7 @@
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
+    using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 

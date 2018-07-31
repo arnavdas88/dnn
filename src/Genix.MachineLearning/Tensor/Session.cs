@@ -64,6 +64,32 @@ namespace Genix.MachineLearning
         public bool CalculateGradients { get; private set; } = true;
 
         /// <summary>
+        /// Runs an operation on the graph.
+        /// </summary>
+        /// <typeparam name="T">The return type of the operation.</typeparam>
+        /// <param name="actionName">The name of the action.</param>
+        /// <param name="action">The operation to run.</param>
+        /// <returns>
+        /// The result of the operation.
+        /// </returns>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "actionName", Justification = "Reserved for debugging.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T RunOperation<T>(string actionName, Func<T> action)
+        {
+#if SESSION_DIAG
+            this.StartStopwatch();
+#endif
+
+            T result = action();
+
+#if SESSION_DIAG
+            this.StopStopwatch(actionName);
+#endif
+
+            return result;
+        }
+
+        /// <summary>
         /// Adds an operation to the graph.
         /// </summary>
         /// <param name="actionName">The name of the action.</param>
@@ -230,23 +256,6 @@ namespace Genix.MachineLearning
 #else
             return null;
 #endif
-        }
-
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "actionName", Justification = "Reserved for debugging.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal T RunOperation<T>(string actionName, Func<T> action)
-        {
-#if SESSION_DIAG
-            this.StartStopwatch();
-#endif
-
-            T result = action();
-
-#if SESSION_DIAG
-            this.StopStopwatch(actionName);
-#endif
-
-            return result;
         }
 
 #if SESSION_DIAG
