@@ -75,6 +75,14 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Image{T}"/> class.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected Image()
+        {
+        }
+
+        /// <summary>
         /// Gets the width, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>

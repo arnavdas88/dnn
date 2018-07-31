@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImageExtensions.cs" />
+    <Compile Include="IntegralImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>

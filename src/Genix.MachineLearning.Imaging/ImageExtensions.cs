@@ -100,8 +100,6 @@ namespace Genix.MachineLearning.Imaging
                 ulong[] bits = image.Bits;
                 int bstride = image.Stride;
                 int pixelsPerSample = 64 / bitsPerPixel;
-
-                float unitValue = (float)(1.0 / (Math.Pow(2.0, pixelsPerSample) - 1));
                 ulong mask = ~(ulong.MaxValue << bitsPerPixel);
 
                 for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
@@ -113,7 +111,7 @@ namespace Genix.MachineLearning.Imaging
                         {
                             for (int shift = 0; shift < 64 && x < width; x++, shift += bitsPerPixel, offx += xstride)
                             {
-                                w[offx] = unitValue * ((b >> shift) & mask);
+                                w[offx] = (float)((b >> shift) & mask);
                             }
                         }
                         else
@@ -123,6 +121,9 @@ namespace Genix.MachineLearning.Imaging
                         }
                     }
                 }
+
+                // normalize tensor to 1
+                Mathematics.MulC(tensor.Length, (float)(1.0 / ((1 << bitsPerPixel) - 1)), w, 0);
 
                 return tensor;
             }
