@@ -462,7 +462,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor x) => Mathematics.Multiply(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Multiply(Tensor x) => Mathematics.Mul(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Performs element by element multiplication of two tensors and puts results of multiplication into this tensor.
@@ -474,7 +474,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor a, Tensor b) => Mathematics.Multiply(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
+        public void Multiply(Tensor a, Tensor b) => Mathematics.Mul(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Divides elements of this tensor to elements of another tensor.

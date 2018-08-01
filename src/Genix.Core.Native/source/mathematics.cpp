@@ -495,27 +495,69 @@ GENIXAPI(void, mulc_u32)(int n, const unsigned __int32* x, int offx, unsigned __
 GENIXAPI(void, mulc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __mulc(n, x, offx, a, y, offy); }
 GENIXAPI(void, mulc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __mulc(n, x, offx, a, y, offy); }
 
-// multiplies two vectors element-wise
-GENIXAPI(void, smul)(
+// Multiplies two vectors element-wise in-place
+template<typename T> void __forceinline __mul_ip(
 	int n,
-	const float* a, int offa,
-	const float* b, int offb,
-	float* y, int offy)
+	const T* x, int offx,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] *= x[i];
+	}
+}
+
+GENIXAPI(void, mul_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __mul_ip(n, x, offx, y, offy); }
+GENIXAPI(void, mul_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __mul_ip(n, x, offx, y, offy); }
+GENIXAPI(void, mul_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __mul_ip(n, x, offx, y, offy); }
+GENIXAPI(void, mul_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __mul_ip(n, x, offx, y, offy); }
+GENIXAPI(void, mul_ip_f32)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__mul_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vsMul(n, y, x, y);
+	}
+}
+
+// Multiplies two vectors element-wise not-in-place
+template<typename T> void __forceinline __mul(
+	int n,
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
 {
 	a += offa;
 	b += offb;
 	y += offy;
 
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = a[i] * b[i];
+	}
+}
+
+GENIXAPI(void, mul_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, mul_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, mul_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, mul_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, mul_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
+{
 	if (n <= 32)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = a[i] * b[i];
-		}
+		__mul(n, a, offa, b, offb, y, offy);
 	}
 	else
 	{
-		::vsMul(n, a, b, y);
+		::vsMul(n, a + offa, b + offb, y + offy);
 	}
 }
 

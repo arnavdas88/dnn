@@ -1034,24 +1034,187 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Multiplies elements of one array starting at the specified index
-        /// to elements of another array starting at the specified index
-        /// and puts results into destination array.
+        /// Multiplies the elements of two arrays of 32-bit integers in-place.
         /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <paramref name="a"/>.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
-        /// <param name="b">The input array <paramref name="b"/>.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := a(offa + i) * b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Multiply(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        public static void Mul(int length, int[] x, int offx, int[] y, int offy)
         {
-            NativeMethods.smul(length, a, offa, b, offb, y, offy);
+            NativeMethods.mul_ip_s32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 32-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Mul(int length, uint[] x, int offx, uint[] y, int offy)
+        {
+            NativeMethods.mul_ip_u32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 64-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mul(int length, long[] x, int offx, long[] y, int offy)
+        {
+            NativeMethods.mul_ip_s64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 64-bit unsigned integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Mul(int length, ulong[] x, int offx, ulong[] y, int offy)
+        {
+            NativeMethods.mul_ip_u64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of floats in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The array that contains source data.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mul(int length, float[] x, int offx, float[] y, int offy)
+        {
+            NativeMethods.mul_ip_f32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 32-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mul(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
+        {
+            NativeMethods.mul_s32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 32-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Mul(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        {
+            NativeMethods.mul_u32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 64-bit integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mul(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
+        {
+            NativeMethods.mul_s64(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of 64-bit unsigned integers not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Mul(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        {
+            NativeMethods.mul_u64(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Multiplies the elements of two arrays of floats not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
+        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
+        /// <param name="y">The array that contains destination data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mul(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.mul_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -1774,7 +1937,43 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void smul(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void mul_ip_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_ip_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_ip_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_ip_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_ip_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_s32(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_u32(int n, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_s64(int n, [In] long[] a, int offa, [In] long[] b, int offb, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_u64(int n, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mul_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

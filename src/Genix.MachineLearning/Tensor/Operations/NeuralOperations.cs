@@ -702,7 +702,7 @@ namespace Genix.MachineLearning
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
-                                Mathematics.Multiply(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
                                 Mathematics.Divide(x.Length, x.Gradient, 0, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
@@ -710,7 +710,7 @@ namespace Genix.MachineLearning
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
                                 Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
-                                Mathematics.Multiply(x.Length, x.Gradient, 0, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Mul(x.Length, x.Gradient, 0, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
                                 Mathematics.MultiplyAndAdd(x.Length, -2.0f * alpha * beta / kernelSize, work.Weights, 0, x.Gradient, 0);
