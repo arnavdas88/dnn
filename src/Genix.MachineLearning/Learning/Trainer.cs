@@ -63,6 +63,15 @@ namespace Genix.MachineLearning.Learning
         public float ClipValue { get; set; } = float.NaN;
 
         /// <summary>
+        /// Gets or sets the degree of parallelism for the learning queries.
+        /// </summary>
+        /// <value>
+        /// The degree of parallelism for the query.
+        /// The default value is Math.Min(System.Environment.ProcessorCount, 512).
+        /// </value>
+        public int MaxDegreeOfParallelism { get; set; } = Math.Min(System.Environment.ProcessorCount, 512);
+
+        /// <summary>
         /// Performs one epoch of SGD algorithm.
         /// </summary>
         /// <param name="machine">The machine to train.</param>
@@ -88,6 +97,12 @@ namespace Genix.MachineLearning.Learning
                 throw new ArgumentNullException(nameof(machine));
             }
 
+            ParallelOptions parallelOptions = new ParallelOptions()
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = this.MaxDegreeOfParallelism,
+            };
+
             float costLoss = 0.0f;
             float lossL1 = 0.0f;
             float lossL2 = 0.0f;
@@ -98,13 +113,13 @@ namespace Genix.MachineLearning.Learning
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                costLoss += Trainer<TExpected>.LearnBatch(machine, batch, lossFunction, cancellationToken);
+                costLoss += Trainer<TExpected>.LearnBatch(machine, batch, lossFunction, parallelOptions);
 
                 batchCount++;
                 totalSamples += batch.Count;
 
                 // perform an update for all sets of weights
-                (float lossL1, float lossL2) losses = this.UpdateLayers(machine, epoch, batch.Count, totalSamples, algorithm, cancellationToken);
+                (float lossL1, float lossL2) losses = this.UpdateLayers(machine, epoch, batch.Count, totalSamples, algorithm, parallelOptions);
                 lossL1 += losses.lossL1;
                 lossL2 += losses.lossL2;
             }
@@ -123,7 +138,7 @@ namespace Genix.MachineLearning.Learning
         /// <param name="machine">The machine to train.</param>
         /// <param name="samples">The sample to learn on.</param>
         /// <param name="lossFunction">The loss function.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <returns>
         /// The calculated loss.
         /// </returns>
@@ -131,7 +146,7 @@ namespace Genix.MachineLearning.Learning
             ITrainableMachine machine,
             List<(Tensor X, TExpected Expected)> samples,
             ILoss<TExpected> lossFunction,
-            CancellationToken cancellationToken)
+            ParallelOptions parallelOptions)
         {
             float costLoss = 0.0f;
             object syncObject = new object();
@@ -145,7 +160,7 @@ namespace Genix.MachineLearning.Learning
                 }
             };
 
-            CommonParallel.For(0, samples.Count, /* samples.Count,*/ body, cancellationToken);
+            CommonParallel.For(0, samples.Count, body, parallelOptions);
 
             return costLoss;
         }
@@ -156,13 +171,16 @@ namespace Genix.MachineLearning.Learning
             int batchSize,
             int totalSamples,
             ITrainingAlgorithm algorithm,
-            CancellationToken cancellationToken)
+            ParallelOptions parallelOptions)
         {
             object syncObject = new object();
             float lossL1 = 0.0f;
             float lossL2 = 0.0f;
 
-            foreach (var w in machine.EnumWeights().AsParallel().WithCancellation(cancellationToken))
+            foreach (var w in machine.EnumWeights()
+                                     .AsParallel()
+                                     .WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism)
+                                     .WithCancellation(parallelOptions.CancellationToken))
             {
                 (float lossL1, float lossL2) losses = this.UpdateWeights(epoch, w, batchSize, totalSamples, algorithm);
                 lock (syncObject)

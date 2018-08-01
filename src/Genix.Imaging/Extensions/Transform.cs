@@ -27,27 +27,30 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image Affine(System.Windows.Media.Matrix matrix)
         {
+            const float Eps = 1e-8f;
+
             if (matrix.IsIdentity)
             {
                 return this.Copy();
             }
 
             // calculate new image size and position
-            System.Windows.Point tr = TransformPoint(this.Width - 1, 0);
-            System.Windows.Point br = TransformPoint(this.Width - 1, this.Height - 1);
-            System.Windows.Point bl = TransformPoint(0, this.Height - 1);
+            System.Windows.Point tr = TransformPoint(this.Width, 0);
+            System.Windows.Point br = TransformPoint(this.Width, this.Height);
+            System.Windows.Point bl = TransformPoint(0, this.Height);
 
             double x1dst = Maximum.Min(bl.X, tr.X, br.X, 0.0);
             double x2dst = Maximum.Max(bl.X, tr.X, br.X, 0.0);
             double y1dst = Maximum.Min(bl.Y, tr.Y, br.Y, 0.0);
             double y2dst = Maximum.Max(bl.Y, tr.Y, br.Y, 0.0);
 
-            int widthdst = (int)Math.Round(x2dst - x1dst, MidpointRounding.AwayFromZero) + 1;
-            int heightdst = (int)Math.Round(y2dst - y1dst, MidpointRounding.AwayFromZero) + 1;
-
             // translate matrix so the transformed image fits into new frame
             matrix.OffsetX = -Maximum.Min(x1dst, x2dst);
             matrix.OffsetY = -Maximum.Min(y1dst, y2dst);
+
+            // note: add epsilon to avoid rounding problems
+            int widthdst = (int)Math.Floor(x2dst - x1dst + Eps);
+            int heightdst = (int)Math.Floor(y2dst - y1dst + Eps);
 
             // IPP does not support 1bpp images - convert to 8bpp
             Image grayImage;

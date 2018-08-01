@@ -240,7 +240,7 @@ namespace Genix.MachineLearning.Imaging
                             color = Math.Max(color, 0);
                             color = Math.Min(color, 255);
 
-                            p[(iy * data.Stride) + ix] = (byte)color;
+                            p[(iy * data.Stride) + ix] = (byte)(255 - color);
                         }
                     }
                 }

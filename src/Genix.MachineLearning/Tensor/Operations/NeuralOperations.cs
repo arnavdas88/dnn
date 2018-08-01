@@ -14,6 +14,7 @@ namespace Genix.MachineLearning
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Threading;
+    using System.Threading.Tasks;
     using Genix.Core;
 
     /// <summary>
@@ -819,7 +820,7 @@ namespace Genix.MachineLearning
                             xstride3);
                     }
                 },
-                CancellationToken.None);
+                new ParallelOptions());
         }
 
         private static class NativeMethods

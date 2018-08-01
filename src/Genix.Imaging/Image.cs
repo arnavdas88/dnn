@@ -62,7 +62,7 @@ namespace Genix.Imaging
         /// <value>
         /// The mask that clears ending unused bits in the stride.
         /// </value>
-        internal ulong EndMask => ~(ulong.MaxValue << (this.WidthBits & 63));
+        internal ulong EndMask => ulong.MaxValue >> (64 - (this.WidthBits & 63));
 
         /// <summary>
         /// Creates a new <see cref="Image"/> that is a copy of the current instance.

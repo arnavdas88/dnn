@@ -8,6 +8,30 @@
     public class ArraysTest
     {
         [TestMethod]
+        public void ClipTest()
+        {
+            float[] oldValues = new float[] { -10.0f, 10.0f, -10.0f, 0.0f, 10.0f };
+
+            float[] values = oldValues.ToArray();
+            Arrays.Clip(values.Length - 2, -2.0f, 2.0f, values, 2);
+            CollectionAssert.AreEqual(
+                new float[] { -10.0f, 10.0f, -2.0f, 0.0f, 2.0f },
+                values);
+
+            values = oldValues.ToArray();
+            Arrays.Clip(values.Length - 2, float.NaN, 2.0f, values, 2);
+            CollectionAssert.AreEqual(
+                new float[] { -10.0f, 10.0f, -10.0f, 0.0f, 2.0f },
+                values);
+
+            values = oldValues.ToArray();
+            Arrays.Clip(values.Length - 2, -2.0f, float.NaN, values, 2);
+            CollectionAssert.AreEqual(
+                new float[] { -10.0f, 10.0f, -2.0f, 0.0f, 10.0f },
+                values);
+        }
+
+        [TestMethod]
         public void ReplaceTest()
         {
             float[] oldValues = new float[]

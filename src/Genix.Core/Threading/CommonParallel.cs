@@ -13,22 +13,20 @@ namespace Genix.Core
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Used to simplify parallel code, particularly between the .NET 4.0 and Silverlight Code.
+    /// Used to simplify parallel code.
     /// </summary>
     public static class CommonParallel
     {
-        private static int maxDegreeOfParallelism = Environment.ProcessorCount;
-
         /// <summary>
         /// Executes a for loop in which iterations may run in parallel.
         /// </summary>
         /// <param name="fromInclusive">The start index, inclusive.</param>
         /// <param name="toExclusive">The end index, exclusive.</param>
         /// <param name="body">The body to be invoked for each iteration range.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static void For(int fromInclusive, int toExclusive, Action<int, int> body, CancellationToken cancellationToken)
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
+        public static void For(int fromInclusive, int toExclusive, Action<int, int> body, ParallelOptions parallelOptions)
         {
-            For(fromInclusive, toExclusive, Math.Max(1, (toExclusive - fromInclusive) / CommonParallel.maxDegreeOfParallelism), body, cancellationToken);
+            For(fromInclusive, toExclusive, Math.Max(1, (toExclusive - fromInclusive) / parallelOptions.MaxDegreeOfParallelism), body, parallelOptions);
         }
 
         /// <summary>
@@ -38,8 +36,8 @@ namespace Genix.Core
         /// <param name="toExclusive">The end index, exclusive.</param>
         /// <param name="rangeSize">The partition size for splitting work into smaller pieces.</param>
         /// <param name="body">The body to be invoked for each iteration range.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static void For(int fromInclusive, int toExclusive, int rangeSize, Action<int, int> body, CancellationToken cancellationToken)
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
+        public static void For(int fromInclusive, int toExclusive, int rangeSize, Action<int, int> body, ParallelOptions parallelOptions)
         {
             if (body == null)
             {
@@ -64,7 +62,7 @@ namespace Genix.Core
             int length = toExclusive - fromInclusive;
             if (length > 0)
             {
-                if (CommonParallel.maxDegreeOfParallelism < 2 || (rangeSize * 2) > length)
+                if (parallelOptions.MaxDegreeOfParallelism < 2 || (rangeSize * 2) > length)
                 {
                     // Special case: not worth to parallelize, inline
                     body(fromInclusive, toExclusive);
@@ -74,7 +72,7 @@ namespace Genix.Core
                     // Common case
                     Parallel.ForEach(
                         Partitioner.Create(fromInclusive, toExclusive, rangeSize),
-                        CommonParallel.CreateParallelOptions(cancellationToken),
+                        parallelOptions,
                         range => body(range.Item1, range.Item2));
                 }
             }
@@ -83,10 +81,11 @@ namespace Genix.Core
         /// <summary>
         /// Executes each of the provided actions inside a discrete, asynchronous task.
         /// </summary>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <param name="actions">An array of actions to execute.</param>
         /// <exception cref="ArgumentException">The actions array contains a <c>null</c> element.</exception>
         /// <exception cref="AggregateException">At least one invocation of the actions threw an exception.</exception>
-        public static void Invoke(params Action[] actions)
+        public static void Invoke(ParallelOptions parallelOptions, params Action[] actions)
         {
             if (actions == null)
             {
@@ -107,7 +106,7 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (CommonParallel.maxDegreeOfParallelism < 2)
+            if (parallelOptions.MaxDegreeOfParallelism < 2)
             {
                 for (int i = 0; i < actions.Length; i++)
                 {
@@ -118,9 +117,7 @@ namespace Genix.Core
             }
 
             // Common case
-            Parallel.Invoke(
-                CreateParallelOptions(CancellationToken.None),
-                actions);
+            Parallel.Invoke(parallelOptions, actions);
         }
 
         /// <summary>
@@ -131,8 +128,9 @@ namespace Genix.Core
         /// <param name="toExclusive">Ending index of the loop.</param>
         /// <param name="select">The function to select items over a subset.</param>
         /// <param name="reduce">The function to select the item of selection from the subsets.</param>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <returns>The selected value.</returns>
-        public static T Aggregate<T>(int fromInclusive, int toExclusive, Func<int, T> select, Func<T[], T> reduce)
+        public static T Aggregate<T>(int fromInclusive, int toExclusive, Func<int, T> select, Func<T[], T> reduce, ParallelOptions parallelOptions)
         {
             if (select == null)
             {
@@ -157,7 +155,7 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (CommonParallel.maxDegreeOfParallelism < 2)
+            if (parallelOptions.MaxDegreeOfParallelism < 2)
             {
                 var mapped = new T[toExclusive - fromInclusive];
                 for (int k = 0; k < mapped.Length; k++)
@@ -173,7 +171,7 @@ namespace Genix.Core
             var syncLock = new object();
             Parallel.ForEach(
                 Partitioner.Create(fromInclusive, toExclusive),
-                CreateParallelOptions(CancellationToken.None),
+                parallelOptions,
                 () => new List<T>(),
                 (range, loop, localData) =>
                 {
@@ -204,8 +202,9 @@ namespace Genix.Core
         /// <param name="array">The array to iterate over.</param>
         /// <param name="select">The function to select items over a subset.</param>
         /// <param name="reduce">The function to select the item of selection from the subsets.</param>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <returns>The selected value.</returns>
-        public static TOut Aggregate<T, TOut>(T[] array, Func<int, T, TOut> select, Func<TOut[], TOut> reduce)
+        public static TOut Aggregate<T, TOut>(T[] array, Func<int, T, TOut> select, Func<TOut[], TOut> reduce, ParallelOptions parallelOptions)
         {
             if (select == null)
             {
@@ -230,7 +229,7 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (CommonParallel.maxDegreeOfParallelism < 2)
+            if (parallelOptions.MaxDegreeOfParallelism < 2)
             {
                 var mapped = new TOut[array.Length];
                 for (int k = 0; k < mapped.Length; k++)
@@ -246,7 +245,7 @@ namespace Genix.Core
             var syncLock = new object();
             Parallel.ForEach(
                 Partitioner.Create(0, array.Length),
-                CreateParallelOptions(CancellationToken.None),
+                parallelOptions,
                 () => new List<TOut>(),
                 (range, loop, localData) =>
                 {
@@ -279,8 +278,9 @@ namespace Genix.Core
         /// <param name="select">The function to select items over a subset.</param>
         /// <param name="reducePair">The function to select the item of selection from the subsets.</param>
         /// <param name="reduceDefault">Default result of the reduce function on an empty set.</param>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <returns>The selected value.</returns>
-        public static T Aggregate<T>(int fromInclusive, int toExclusive, Func<int, T> select, Func<T, T, T> reducePair, T reduceDefault)
+        public static T Aggregate<T>(int fromInclusive, int toExclusive, Func<int, T> select, Func<T, T, T> reducePair, T reduceDefault, ParallelOptions parallelOptions)
         {
             return Aggregate(
                 fromInclusive,
@@ -305,7 +305,8 @@ namespace Genix.Core
                     }
 
                     return result;
-                });
+                },
+                parallelOptions);
         }
 
         /// <summary>
@@ -317,8 +318,9 @@ namespace Genix.Core
         /// <param name="select">The function to select items over a subset.</param>
         /// <param name="reducePair">The function to select the item of selection from the subsets.</param>
         /// <param name="reduceDefault">Default result of the reduce function on an empty set.</param>
+        /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         /// <returns>The selected value.</returns>
-        public static TOut Aggregate<T, TOut>(T[] array, Func<int, T, TOut> select, Func<TOut, TOut, TOut> reducePair, TOut reduceDefault)
+        public static TOut Aggregate<T, TOut>(T[] array, Func<int, T, TOut> select, Func<TOut, TOut, TOut> reducePair, TOut reduceDefault, ParallelOptions parallelOptions)
         {
             return Aggregate(
                 array,
@@ -342,17 +344,8 @@ namespace Genix.Core
                     }
 
                     return result;
-                });
-        }
-
-        private static ParallelOptions CreateParallelOptions(CancellationToken cancellationToken)
-        {
-            return new ParallelOptions
-            {
-                MaxDegreeOfParallelism = CommonParallel.maxDegreeOfParallelism,
-                CancellationToken = cancellationToken,
-                ////TaskScheduler = Control.TaskScheduler,
-            };
+                },
+                parallelOptions);
         }
     }
 }

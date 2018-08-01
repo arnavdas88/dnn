@@ -384,12 +384,12 @@ namespace Genix.Core
         {
             if (!float.IsNaN(minValue))
             {
-                Maximum.Min(length, x, offx, minValue, x, offx);
+                Maximum.Max(length, x, offx, minValue, x, offx);
             }
 
             if (!float.IsNaN(maxValue))
             {
-                Maximum.Max(length, x, offx, maxValue, x, offx);
+                Maximum.Min(length, x, offx, maxValue, x, offx);
             }
         }
 
