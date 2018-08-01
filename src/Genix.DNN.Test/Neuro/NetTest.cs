@@ -7,6 +7,7 @@
     using Genix.DNN;
     using Genix.DNN.Learning;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 

@@ -9,6 +9,7 @@
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -187,7 +188,7 @@
 
             // train the network
             SquareLoss loss = new SquareLoss();
-            NetworkTrainer<Tensor> trainer = new NetworkTrainer<Tensor>() { /*ClipValue = 2.0f*/ };
+            Trainer<Tensor> trainer = new Trainer<Tensor>() { /*ClipValue = 2.0f*/ };
             SGD sgd = new SGD();
 
             for (int epoch = 0; epoch < epochs; epoch++)

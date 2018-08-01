@@ -18,6 +18,7 @@ namespace Genix.DNN
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.Learning;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace Genix.DNN
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     [DebuggerDisplay("{Architecture}")]
-    public class Network
+    public class Network : ITrainableMachine
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Network"/> class.
@@ -178,6 +179,31 @@ namespace Genix.DNN
         public string SaveToString()
         {
             return JsonConvert.SerializeObject(this);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<(Tensor w, float rateL1Multiplier, float rateL2Multiplier)> EnumWeights()
+        {
+            return this
+                .Graph
+                .Vertices
+                .OfType<TrainableLayer>()
+                .Where(x => x.IsTrainable)
+                .SelectMany(x => x.EnumGradients());
+        }
+
+        /// <inheritdoc />
+        public float Learn<TExpected>(IList<(Tensor x, TExpected expected)> samples, ILoss<TExpected> lossFunction)
+        {
+            Session session = new Session(true);
+
+            float loss = 0.0f;
+            for (int i = 0; i < samples.Count; i++)
+            {
+                loss += this.LearnOne(session, samples[i].x, samples[i].expected, lossFunction).Loss;
+            }
+
+            return loss;
         }
 
         /// <summary>

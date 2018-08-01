@@ -12,11 +12,12 @@ namespace Genix.DNN.Learning
     using System.Linq;
     using System.Threading;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.Learning;
 
     /// <summary>
     /// Represents a basic trainer for neural nets.
     /// </summary>
-    public class ClassificationNetworkTrainer : NetworkTrainer<int[]>
+    public class ClassificationNetworkTrainer : Trainer<int[]>
     {
         /// <summary>
         /// Performs one epoch of SGD algorithm.

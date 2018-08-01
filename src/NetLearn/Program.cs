@@ -25,6 +25,7 @@ namespace Genix.NetLearn
     using Genix.Imaging.Lab;
     using Genix.MachineLearning;
     using Genix.MachineLearning.Imaging;
+    using Genix.MachineLearning.Learning;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

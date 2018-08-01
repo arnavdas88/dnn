@@ -13,6 +13,7 @@
     using Genix.DNN.Layers;
     using Genix.DNN.Learning;
     using Genix.MachineLearning;
+    using Genix.MachineLearning.Learning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
@@ -194,7 +195,7 @@
             }
 
             // train the network
-            NetworkTrainer<int[]> trainer = new NetworkTrainer<int[]>()
+            Trainer<int[]> trainer = new Trainer<int[]>()
             {
                 ClipValue = 2.0f
             };
@@ -277,7 +278,7 @@
 
             // train the network
             SquareLoss loss = new SquareLoss();
-            NetworkTrainer<Tensor> trainer = new NetworkTrainer<Tensor>();
+            Trainer<Tensor> trainer = new Trainer<Tensor>();
             SGD sgd = new SGD();
 
             for (int epoch = 0; epoch < epochs; epoch++)
@@ -358,7 +359,7 @@
             {
                 LearningRate = 0.01f
             };
-            NetworkTrainer<int[]> trainer = new NetworkTrainer<int[]>()
+            Trainer<int[]> trainer = new Trainer<int[]>()
             {
                 BatchSize = 1,
                 ClipValue = 10.0f

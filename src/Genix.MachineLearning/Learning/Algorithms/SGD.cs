@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.Learning
+namespace Genix.MachineLearning.Learning
 {
     using System.Diagnostics.CodeAnalysis;
     using Genix.Core;

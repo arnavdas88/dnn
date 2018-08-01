@@ -71,6 +71,7 @@
     <Compile Include="LanguageModel\ContextTest.cs" />
     <Compile Include="LanguageModel\RegexParserTest.cs" />
     <Compile Include="LanguageModel\VocabularyTest.cs" />
+    <Compile Include="Learning\CTCTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TensorTest.cs" />
     <Compile Include="KernelTest.cs" />

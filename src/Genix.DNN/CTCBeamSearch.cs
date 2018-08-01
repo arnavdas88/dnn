@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.Learning
+namespace Genix.DNN
 {
     using System;
     using System.Collections.Generic;

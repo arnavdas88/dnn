@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassificationNetwork.cs" />
+    <Compile Include="CTCBeamSearch.cs" />
     <Compile Include="Layers\GRUCell.cs" />
     <Compile Include="Layers\GRULayer.cs" />
     <Compile Include="Layers\LSTMCell.cs" />
@@ -60,20 +61,14 @@
     <Compile Include="Layers\SRNCell.cs" />
     <Compile Include="Layers\SRNLayer.cs" />
     <Compile Include="Layers\TrainableLayer.cs" />
-    <Compile Include="Learning\Algorithms\GradientAccumulators.cs" />
-    <Compile Include="Learning\Algorithms\ITrainingAlgorithm.cs" />
     <Compile Include="Layers\LSTMLayer.cs" />
     <Compile Include="Learning\ClassificationNetworkTrainer.cs" />
-    <Compile Include="Learning\Losses\CTCBeamSearch.cs" />
-    <Compile Include="Learning\Losses\CTCLoss.cs" />
-    <Compile Include="Learning\Losses\HingeLoss.cs" />
     <Compile Include="NetworkGraph\NetworkGraphJsonConverter.cs" />
     <Compile Include="Layers\AveragePoolingLayer.cs" />
     <Compile Include="Layers\ConcatLayer.cs" />
     <Compile Include="Layers\LRNLayer.cs" />
     <Compile Include="Layers\ScaleLayer.cs" />
     <Compile Include="Layers\SplitLayer.cs" />
-    <Compile Include="Learning\Losses\CrossEntropyLoss.cs" />
     <Compile Include="NetworkGraph\NetworkGraphBuilder.cs" />
     <Compile Include="NetworkGraph\NetworkEdge.cs" />
     <Compile Include="NetworkGraph\NetworkGraph.cs" />
@@ -92,19 +87,10 @@
     <Compile Include="Layers\StochasticLayer.cs" />
     <Compile Include="Layers\MaxPoolingLayer.cs" />
     <Compile Include="Network.cs" />
-    <Compile Include="Learning\Algorithms\Adadelta.cs" />
-    <Compile Include="Learning\Algorithms\Adagrad.cs" />
-    <Compile Include="Learning\Algorithms\Adam.cs" />
-    <Compile Include="Learning\Algorithms\SGD.cs" />
-    <Compile Include="Learning\Algorithms\RMSProp.cs" />
-    <Compile Include="Learning\Losses\ILoss.cs" />
-    <Compile Include="Learning\Losses\LogLikelihoodLoss.cs" />
-    <Compile Include="Learning\Losses\SquareLoss.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
     <Compile Include="Learning\NetworkTrainer.cs" />
-    <Compile Include="Learning\TrainingResult.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

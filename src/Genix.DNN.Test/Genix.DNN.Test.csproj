@@ -90,10 +90,8 @@
     <Compile Include="Layers\Map2SequenceLayerTest.cs" />
     <Compile Include="Layers\GRUCellTest.cs" />
     <Compile Include="Layers\GRULayerTest.cs" />
-    <Compile Include="Neuro\NetTest.cs" />
-    <Compile Include="Neuro\MathTest.cs" />
-    <Compile Include="Neuro\CTCTest.cs" />
     <Compile Include="Neuro\CTCBeamSearchTest.cs" />
+    <Compile Include="Neuro\NetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GraphTest.cs" />
   </ItemGroup>

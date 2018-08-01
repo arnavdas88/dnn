@@ -1,11 +1,10 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="NetworkTrainer.cs" company="Noname, Inc.">
+// <copyright file="Trainer.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-#if false
-namespace Genix.DNN.Learning
+namespace Genix.MachineLearning.Learning
 {
     using System;
     using System.Collections.Generic;
@@ -14,20 +13,18 @@ namespace Genix.DNN.Learning
     using System.Threading;
     using System.Threading.Tasks;
     using Genix.Core;
-    using Genix.DNN.Layers;
     using Genix.MachineLearning;
-    using Genix.MachineLearning.Learning;
 
     /// <summary>
-    /// Represents a basic trainer for neural nets.
+    /// Represents a basic trainer for trainable machines.
     /// </summary>
     /// <typeparam name="TExpected">The type for the expected values.</typeparam>
-    public class NetworkTrainer<TExpected>
+    public class Trainer<TExpected>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NetworkTrainer{TExpected}"/> class.
+        /// Initializes a new instance of the <see cref="Trainer{TExpected}"/> class.
         /// </summary>
-        public NetworkTrainer()
+        public Trainer()
         {
         }
 
@@ -68,7 +65,7 @@ namespace Genix.DNN.Learning
         /// <summary>
         /// Performs one epoch of SGD algorithm.
         /// </summary>
-        /// <param name="net">The network to train.</param>
+        /// <param name="machine">The machine to train.</param>
         /// <param name="input">The sequence of learning samples.</param>
         /// <param name="epoch">The zero-based index of learning epoch.</param>
         /// <param name="algorithm">The training algorithm.</param>
@@ -79,16 +76,16 @@ namespace Genix.DNN.Learning
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need a sequence of generic arguments here.")]
         public TrainingResult RunEpoch(
-            Network net,
+            ITrainableMachine machine,
             IEnumerable<(Tensor, TExpected)> input,
             int epoch,
             ITrainingAlgorithm algorithm,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
         {
-            if (net == null)
+            if (machine == null)
             {
-                throw new ArgumentNullException(nameof(net));
+                throw new ArgumentNullException(nameof(machine));
             }
 
             float costLoss = 0.0f;
@@ -97,27 +94,20 @@ namespace Genix.DNN.Learning
 
             int totalSamples = 0;
             int batchCount = 0;
-            foreach (IList<(Tensor, TExpected)> batch in Partitioner.Partition(input, this.BatchSize))
+            foreach (List<(Tensor, TExpected)> batch in Partitioner.Partition(input, this.BatchSize))
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                costLoss += NetworkTrainer<TExpected>.LearnBatch(net, batch, lossFunction, cancellationToken);
+                costLoss += Trainer<TExpected>.LearnBatch(machine, batch, lossFunction, cancellationToken);
 
                 batchCount++;
                 totalSamples += batch.Count;
 
                 // perform an update for all sets of weights
-                (float lossL1, float lossL2) losses = this.UpdateLayers(net, epoch, batch.Count, totalSamples, algorithm, cancellationToken);
+                (float lossL1, float lossL2) losses = this.UpdateLayers(machine, epoch, batch.Count, totalSamples, algorithm, cancellationToken);
                 lossL1 += losses.lossL1;
                 lossL2 += losses.lossL2;
             }
-
-            // collect memory
-            /*GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();*/
 
             return new TrainingResult()
             {
@@ -130,7 +120,7 @@ namespace Genix.DNN.Learning
         /// <summary>
         /// Performs one iteration of SGD algorithm.
         /// </summary>
-        /// <param name="network">The network to train.</param>
+        /// <param name="machine">The machine to train.</param>
         /// <param name="samples">The sample to learn on.</param>
         /// <param name="lossFunction">The loss function.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -138,8 +128,8 @@ namespace Genix.DNN.Learning
         /// The calculated loss.
         /// </returns>
         private static float LearnBatch(
-            Network network,
-            IList<(Tensor X, TExpected Expected)> samples,
+            ITrainableMachine machine,
+            List<(Tensor X, TExpected Expected)> samples,
             ILoss<TExpected> lossFunction,
             CancellationToken cancellationToken)
         {
@@ -148,19 +138,7 @@ namespace Genix.DNN.Learning
 
             Action<int, int> body = (a, b) =>
             {
-                Session session = new Session(true);
-
-                ////Tensor[] xs = samples.Select(x => x.X).Skip(a).Take(b - a).ToArray();
-                ////TExpected[] yes = samples.Select(x => x.Expected).Skip(a).Take(b - a).ToArray();
-
-                ////float loss = network.LearnMany(session, xs, yes, lossFunction).Loss;
-
-                float loss = 0.0f;
-                for (int i = a; i < b; i++)
-                {
-                    loss += network.LearnOne(session, samples[i].X, samples[i].Expected, lossFunction).Loss;
-                }
-
+                float loss = machine.Learn(samples.GetRange(a, b - a), lossFunction);
                 lock (syncObject)
                 {
                     costLoss += loss;
@@ -173,7 +151,7 @@ namespace Genix.DNN.Learning
         }
 
         private (float, float) UpdateLayers(
-            Network net,
+            ITrainableMachine machine,
             int epoch,
             int batchSize,
             int totalSamples,
@@ -184,22 +162,15 @@ namespace Genix.DNN.Learning
             float lossL1 = 0.0f;
             float lossL2 = 0.0f;
 
-            ////foreach (StochasticLayer layer in net.Graph.Vertices.OfType<StochasticLayer>().Where(x => x.IsTrainable))
-            Parallel.ForEach(
-                net.Graph.Vertices.OfType<TrainableLayer>().Where(x => x.IsTrainable),
-                new ParallelOptions() { CancellationToken = cancellationToken },
-                layer =>
+            foreach (var w in machine.EnumWeights().AsParallel().WithCancellation(cancellationToken))
+            {
+                (float lossL1, float lossL2) losses = this.UpdateWeights(epoch, w, batchSize, totalSamples, algorithm);
+                lock (syncObject)
                 {
-                    foreach (var wg in layer.EnumGradients())
-                    {
-                        (float lossL1, float lossL2) losses = this.LearnLayerWeights(epoch, wg, batchSize, totalSamples, algorithm);
-                        lock (syncObject)
-                        {
-                            lossL1 += losses.lossL1;
-                            lossL2 += losses.lossL2;
-                        }
-                    }
-                });
+                    lossL1 += losses.lossL1;
+                    lossL2 += losses.lossL2;
+                }
+            }
 
             return (lossL1, lossL2);
         }
@@ -213,7 +184,7 @@ namespace Genix.DNN.Learning
         /// <param name="totalSamples">The total number of samples processed to the moment.</param>
         /// <param name="algorithm">The training algorithm.</param>
         /// <returns>The tuple that contains L1 and L2 losses.</returns>
-        private (float, float) LearnLayerWeights(
+        private (float, float) UpdateWeights(
             int epoch,
             (Tensor w, float RateL1Multiplier, float RateL2Multiplier) layer,
             int batchSize,
@@ -276,13 +247,13 @@ namespace Genix.DNN.Learning
             /// <param name="source">The sequence to partition.</param>
             /// <param name="partitionSize">The number of elements in group.</param>
             /// <returns>The sequence of partitions.</returns>
-            public static IEnumerable<IList<T>> Partition<T>(IEnumerable<T> source, int partitionSize)
+            public static IEnumerable<List<T>> Partition<T>(IEnumerable<T> source, int partitionSize)
             {
                 using (IEnumerator<T> enumerator = source.GetEnumerator())
                 {
                     while (enumerator.MoveNext())
                     {
-                        IList<T> partition = Partitioner.YieldPartition(enumerator, partitionSize);
+                        List<T> partition = Partitioner.YieldPartition(enumerator, partitionSize);
                         if (partition.Count > 0)
                         {
                             yield return partition;
@@ -298,7 +269,7 @@ namespace Genix.DNN.Learning
             /// <param name="source">The sequence to partition.</param>
             /// <param name="partitionSize">The number of elements in group.</param>
             /// <returns>One partition.</returns>
-            private static IList<T> YieldPartition<T>(IEnumerator<T> source, int partitionSize)
+            private static List<T> YieldPartition<T>(IEnumerator<T> source, int partitionSize)
             {
                 List<T> partition = new List<T>();
 
@@ -313,4 +284,3 @@ namespace Genix.DNN.Learning
         }
     }
 }
-#endif

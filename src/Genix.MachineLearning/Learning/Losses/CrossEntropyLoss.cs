@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 #if false
-namespace Genix.DNN.Learning
+namespace Genix.MachineLearning.Learning
 {
     using System;
 

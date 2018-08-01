@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DNN.Learning
+namespace Genix.MachineLearning.Learning
 {
     /// <summary>
     /// Specifies an algorithm for training neural nets.
