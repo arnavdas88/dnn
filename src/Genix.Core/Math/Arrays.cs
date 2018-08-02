@@ -20,6 +20,46 @@ namespace Genix.Core
     public static class Arrays
     {
         /// <summary>
+        /// Creates an array of 32-bit integers with the specified length and starting value.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <param name="value">The initial value for the array values.</param>
+        /// <returns>
+        /// The allocated array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int[] Create(int length, int value)
+        {
+            int[] a = new int[length];
+            if (value != 0)
+            {
+                Arrays.Set(length, value, a, 0);
+            }
+
+            return a;
+        }
+
+        /// <summary>
+        /// Creates an array of single-precision floating-point numbers with the specified length and starting value.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <param name="value">The initial value for the array values.</param>
+        /// <returns>
+        /// The allocated array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float[] Create(int length, float value)
+        {
+            float[] a = new float[length];
+            if (value != 0.0f)
+            {
+                Arrays.Set(length, value, a, 0);
+            }
+
+            return a;
+        }
+
+        /// <summary>
         /// Determines whether the two array contain same data.
         /// </summary>
         /// <param name="length">The number of elements to check.</param>

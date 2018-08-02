@@ -90,7 +90,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
-    <Compile Include="Learning\NetworkTrainer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

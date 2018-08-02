@@ -20,9 +20,11 @@ namespace Genix.MachineLearning.Kernels
         /// <summary>
         /// The kernel function.
         /// </summary>
-        /// <param name="session">The graph that stores all operations performed on the tensors.</param>
-        /// <param name="x">The input tensor <paramref name="x"/>.</param>
-        /// <param name="y">The input tensor <paramref name="y"/>.</param>
+        /// <param name="length">The number of elements in vectors.</param>
+        /// <param name="x">The input vector <paramref name="x"/>.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The input vector <paramref name="y"/>.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <returns>
         /// The output tensor that contains the product of <paramref name="x"/> and <paramref name="y"/>.
         /// </returns>

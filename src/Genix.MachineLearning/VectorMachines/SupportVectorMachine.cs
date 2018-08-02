@@ -12,6 +12,9 @@ namespace Genix.MachineLearning.VectorMachines
     using Genix.MachineLearning.Kernels;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents the Support Vector Machine (SVM).
+    /// </summary>
     public class SupportVectorMachine
     {
         /// <summary>
@@ -23,20 +26,19 @@ namespace Genix.MachineLearning.VectorMachines
         /// Initializes a new instance of the <see cref="SupportVectorMachine"/> class.
         /// </summary>
         /// <param name="numberOfInputs">The length of the input vectors expected by the machine.</param>
+        /// <param name="numberOfSupportVectors">The number of support vectors the machine would use.</param>
         /// <param name="kernel">The kernel function to use.</param>
         /// <param name="random">The random numbers generator.</param>
-        public SupportVectorMachine(int numberOfInputs, IKernel kernel, RandomNumberGenerator random)
+        public SupportVectorMachine(int numberOfInputs, int numberOfSupportVectors, IKernel kernel, RandomNumberGenerator random)
         {
             this.kernel = kernel;
 
-            const int NumberOfVectors = 10;
-
-            this.Weights = new Tensor("weights", new int[] { NumberOfVectors, 1 });
-            this.Weights.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt(1.0 / NumberOfVectors)));
+            this.Weights = new Tensor("weights", new int[] { numberOfSupportVectors, 1 });
+            this.Weights.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt(1.0 / numberOfSupportVectors)));
 
             this.Bias = new Tensor("biases", new int[] { 1 });
 
-            this.Vectors = new Tensor("support vectors", new int[] { numberOfInputs, NumberOfVectors });
+            this.Vectors = new Tensor("support vectors", new int[] { numberOfInputs, numberOfSupportVectors });
             this.Vectors.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt(1.0 / numberOfInputs)));
         }
 
@@ -113,12 +115,11 @@ namespace Genix.MachineLearning.VectorMachines
         {
             const string ActionName = "SVM kernel";
 
-            // run kernel
-            int mb = x.Axes[0];
-            int inputLength = x.Strides[0];
-            int vectorCount = 10;
+            int numberOfInputs = this.Vectors.Axes[0];
+            int numberOfSupportVectors = this.Vectors.Axes[1];
 
-            Tensor y = session.AllocateTensor(ActionName, new[] { mb, vectorCount }, calculateGradient);
+            int mb = x.Axes[0];
+            Tensor y = session.AllocateTensor(ActionName, new[] { mb, numberOfSupportVectors }, calculateGradient);
 
             int y0 = y.Axes[0];
             int y1 = y.Axes[1];
@@ -127,11 +128,13 @@ namespace Genix.MachineLearning.VectorMachines
             float[] yw = y.Weights;
             float[] vw = this.Vectors.Weights;
 
-            for (int ix = 0, xpos = 0, ypos = 0; ix < y0; ix++, xpos += inputLength)
+            // here we are basically doing matrix to matrix multiplication
+            // with a custom dot product
+            for (int ix = 0, xpos = 0, ypos = 0; ix < y0; ix++, xpos += numberOfInputs)
             {
-                for (int iy = 0, vpos = 0; iy < y1; iy++, vpos += inputLength)
+                for (int iy = 0, vpos = 0; iy < y1; iy++, vpos += numberOfInputs)
                 {
-                    yw[ypos++] = this.kernel.Execute(inputLength, xw, xpos, vw, vpos);
+                    yw[ypos++] = this.kernel.Execute(numberOfInputs, xw, xpos, vw, vpos);
                 }
             }
 

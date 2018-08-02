@@ -1003,8 +1003,7 @@ namespace Genix.MachineLearning
 
                                     if (bias?.CalculateGradient ?? false)
                                     {
-                                        float[] ones = new float[n];
-                                        Arrays.Set(n, 1.0f, ones, 0);
+                                        float[] ones = Arrays.Create(n, 1.0f);
 
                                         lock (bias)
                                         {
