@@ -12,11 +12,11 @@ namespace Genix.Core
     /// <summary>
     /// Represents random numbers generator that generates random numbers within a specified range.
     /// </summary>
-    public class RandomRangeGenerator : RandomNumberGenerator
+    public class RandomRangeGenerator : RandomNumberGenerator<float>
     {
         private readonly float minValue;
         private readonly float maxValue;
-        private readonly Random random;
+        private readonly RandomGenerator random;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RandomRangeGenerator"/> class.
@@ -40,7 +40,7 @@ namespace Genix.Core
         {
             this.minValue = minValue;
             this.maxValue = maxValue;
-            this.random = random;
+            this.random = new RandomGenerator(random);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float Generate()
         {
-            return ((float)this.random.NextDouble() * (this.maxValue - this.minValue)) + this.minValue;
+            return this.random.Generate(this.minValue, this.maxValue);
         }
     }
 }

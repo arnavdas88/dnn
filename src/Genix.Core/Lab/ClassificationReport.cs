@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="TestReport.cs" company="Noname, Inc.">
+// <copyright file="ClassificationReport.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -13,43 +13,40 @@ namespace Genix.Lab
     /// <summary>
     /// Represents a classification test report.
     /// </summary>
-    public class TestReport
+    /// <typeparam name="T">The type of the classification answer.</typeparam>
+    public class ClassificationReport<T>
     {
-        private readonly List<ClassificationResult> results = new List<ClassificationResult>();
-        private readonly List<ClassSummary> classes = new List<ClassSummary>();
+        private readonly List<ClassificationResult<T>> results = new List<ClassificationResult<T>>();
+        private readonly List<ClassSummary<T>> classes = new List<ClassSummary<T>>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestReport"/> class.
+        /// Initializes a new instance of the <see cref="ClassificationReport{T}"/> class.
         /// </summary>
         /// <param name="results">The classification results.</param>
-        public TestReport(IEnumerable<ClassificationResult> results)
+        public ClassificationReport(IEnumerable<ClassificationResult<T>> results)
         {
             if (results == null)
             {
                 throw new ArgumentNullException(nameof(results));
             }
 
-            Dictionary<string, ClassSummary> summaries = new Dictionary<string, ClassSummary>();
+            Dictionary<T, ClassSummary<T>> summaries = new Dictionary<T, ClassSummary<T>>();
 
-            foreach (ClassificationResult result in results)
+            foreach (ClassificationResult<T> result in results)
             {
                 this.results.Add(result);
 
-                string truth = result.Expected ?? string.Empty;
-
-                if (!summaries.TryGetValue(truth, out ClassSummary summary))
+                T expected = result.Expected;
+                if (!summaries.TryGetValue(expected, out ClassSummary<T> summary))
                 {
-                    summary = new ClassSummary(truth);
-
-                    summaries.Add(truth, summary);
+                    summaries[expected] = summary = new ClassSummary<T>(expected);
                     this.classes.Add(summary);
                 }
 
                 summary.Add(result);
 
                 this.AllClasses.Add(result);
-
-                this.ConfusionMatrix.Add(result.Predicted, truth);
+                this.ConfusionMatrix.Add(result.Predicted, expected);
             }
 
             this.results.TrimExcess();
@@ -62,11 +59,11 @@ namespace Genix.Lab
         /// <value>
         /// A collection of classification results.
         /// </value>
-        public ReadOnlyCollection<ClassificationResult> Results
+        public ReadOnlyCollection<ClassificationResult<T>> Results
         {
             get
             {
-                return new ReadOnlyCollection<ClassificationResult>(this.results);
+                return new ReadOnlyCollection<ClassificationResult<T>>(this.results);
             }
         }
 
@@ -76,11 +73,11 @@ namespace Genix.Lab
         /// <value>
         /// A collection of reports for each class.
         /// </value>
-        public ReadOnlyCollection<ClassSummary> Classes
+        public ReadOnlyCollection<ClassSummary<T>> Classes
         {
             get
             {
-                return new ReadOnlyCollection<ClassSummary>(this.classes);
+                return new ReadOnlyCollection<ClassSummary<T>>(this.classes);
             }
         }
 
@@ -90,7 +87,7 @@ namespace Genix.Lab
         /// <value>
         /// A combined report for all classes.
         /// </value>
-        public ClassSummary AllClasses { get; } = new ClassSummary("All");
+        public ClassSummary<T> AllClasses { get; } = new ClassSummary<T>(default);
 
         /// <summary>
         /// Gets a confusion matrix.
@@ -98,6 +95,6 @@ namespace Genix.Lab
         /// <value>
         /// A <see cref="ConfusionMatrix"/> object.
         /// </value>
-        public ConfusionMatrix ConfusionMatrix { get; } = new ConfusionMatrix();
+        public ConfusionMatrix<T> ConfusionMatrix { get; } = new ConfusionMatrix<T>();
     }
 }

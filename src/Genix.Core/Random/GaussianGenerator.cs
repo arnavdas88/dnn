@@ -26,7 +26,7 @@ namespace Genix.Core
     /// float randomNumber = generator.Generate();
     /// </code>
     /// </example>
-    public class GaussianGenerator : RandomNumberGenerator
+    public class GaussianGenerator : RandomNumberGenerator<float>
     {
         private readonly double mean;
         private readonly double standardDeviation;

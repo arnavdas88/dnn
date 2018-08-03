@@ -29,7 +29,7 @@ namespace Genix.MachineLearning.Kernels
                 }
             }
 
-            return 1.0f - (0.5f * sum);
+            return 1.0f - (2.0f * sum);
         }
     }
 }

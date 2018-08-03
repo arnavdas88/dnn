@@ -11,14 +11,15 @@ namespace Genix.Core
     /// <summary>
     /// Defines a random numbers generator.
     /// </summary>
-    public abstract class RandomNumberGenerator
+    /// <typeparam name="T">The type of numbers this generator creates.</typeparam>
+    public abstract class RandomNumberGenerator<T>
     {
         /// <summary>
         /// Generates a random observation from the current distribution.
         /// </summary>
         /// <returns>A random observations drawn from this distribution.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract float Generate();
+        public abstract T Generate();
 
         /// <summary>
         /// Generates a random vector of observations from the current distribution.
@@ -26,9 +27,9 @@ namespace Genix.Core
         /// <param name="samples">The number of samples to generate.</param>
         /// <returns>A random vector of observations drawn from this distribution.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Generate(int samples)
+        public T[] Generate(int samples)
         {
-            return this.Generate(samples, new float[samples]);
+            return this.Generate(samples, new T[samples]);
         }
 
         /// <summary>
@@ -38,65 +39,16 @@ namespace Genix.Core
         /// <param name="result">The location where to store the samples.</param>
         /// <returns>A random vector of observations drawn from this distribution.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Generate(int samples, float[] result)
+        public T[] Generate(int samples, T[] result)
         {
             if (result == null)
             {
-                result = new float[samples];
+                result = new T[samples];
             }
 
             for (int i = 0; i < samples; i++)
             {
                 result[i] = this.Generate();
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Generates a random observation that is within a specified range from the current distribution.
-        /// </summary>
-        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
-        /// <param name="maxValue">The exclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
-        /// <returns>A random observations drawn from this distribution.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Generate(float minValue, float maxValue)
-        {
-            return (this.Generate() * (maxValue - minValue)) + minValue;
-        }
-
-        /// <summary>
-        /// Generates a random vector of observations that are within a specified range from the current distribution.
-        /// </summary>
-        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
-        /// <param name="maxValue">The exclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
-        /// <param name="samples">The number of samples to generate.</param>
-        /// <returns>A random vector of observations drawn from this distribution.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Generate(float minValue, float maxValue, int samples)
-        {
-            return this.Generate(minValue, maxValue, samples, new float[samples]);
-        }
-
-        /// <summary>
-        /// Generates a random vector of observations that are within a specified range from the current distribution.
-        /// </summary>
-        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
-        /// <param name="maxValue">The exclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
-        /// <param name="samples">The number of samples to generate.</param>
-        /// <param name="result">The location where to store the samples.</param>
-        /// <returns>A random vector of observations drawn from this distribution.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Generate(float minValue, float maxValue, int samples, float[] result)
-        {
-            if (result == null)
-            {
-                result = new float[samples];
-            }
-
-            for (int i = 0; i < samples; i++)
-            {
-                result[i] = this.Generate(minValue, maxValue);
             }
 
             return result;

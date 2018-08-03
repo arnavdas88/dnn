@@ -16,7 +16,8 @@ namespace Genix.Core
     public static class Matrix
     {
         /// <summary>
-        /// Calculates a dot product between values from one array starting at the specified index
+        /// Calculates a dot product between values from one array of single-precision floating point numbers
+        /// starting at the specified index
         /// and values from another array starting at the specified index.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -30,7 +31,26 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DotProduct(int length, float[] a, int offa, float[] b, int offb)
         {
-            return NativeMethods._sdot(length, a, offa, 1, b, offb, 1);
+            return NativeMethods.dot_f32(length, a, offa, 1, b, offb, 1);
+        }
+
+        /// <summary>
+        /// Calculates a dot product between values from one array of double-precision floating point numbers
+        /// starting at the specified index
+        /// and values from another array starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first array that contains the data.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
+        /// <param name="b">The second array that contains the data.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which calculation begins.</param>
+        /// <returns>
+        /// The calculated dot product value.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double DotProduct(int length, double[] a, int offa, double[] b, int offb)
+        {
+            return NativeMethods.dot_f64(length, a, offa, 1, b, offb, 1);
         }
 
         /// <summary>
@@ -50,7 +70,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DotProduct(int length, float[] a, int offa, int inca, float[] b, int offb, int incb)
         {
-            return NativeMethods._sdot(length, a, offa, inca, b, offb, incb);
+            return NativeMethods.dot_f32(length, a, offa, inca, b, offb, incb);
         }
 
         /// <summary>
@@ -143,7 +163,11 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern float _sdot(int n, [In] float[] x, int offx, int incx, [In] float[] y, int offy, int incy);
+            public static extern float dot_f32(int n, [In] float[] x, int offx, int incx, [In] float[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern double dot_f64(int n, [In] double[] x, int offx, int incx, [In] double[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

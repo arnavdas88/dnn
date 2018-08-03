@@ -33,7 +33,7 @@ namespace Genix.DNN.Layers
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        public FullyConnectedLayer(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
+        public FullyConnectedLayer(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
         }
@@ -44,7 +44,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public FullyConnectedLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public FullyConnectedLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, FullyConnectedLayer.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
@@ -86,7 +86,7 @@ namespace Genix.DNN.Layers
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        private void Initialize(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
+        private void Initialize(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
         {
             if (inputShape == null)
             {

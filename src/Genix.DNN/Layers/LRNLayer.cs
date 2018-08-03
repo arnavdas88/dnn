@@ -87,7 +87,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, LRNLayer.ArchitecturePattern);

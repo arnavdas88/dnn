@@ -60,6 +60,26 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Creates an array of double-precision floating-point numbers with the specified length and starting value.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <param name="value">The initial value for the array values.</param>
+        /// <returns>
+        /// The allocated array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double[] Create(int length, double value)
+        {
+            double[] a = new double[length];
+            if (value != 0.0f)
+            {
+                Arrays.Set(length, value, a, 0);
+            }
+
+            return a;
+        }
+
+        /// <summary>
         /// Determines whether the two array contain same data.
         /// </summary>
         /// <param name="length">The number of elements to check.</param>
@@ -225,16 +245,85 @@ namespace Genix.Core
          }*/
 
         /// <summary>
-        /// Sets values in the array starting at the specified source index to the specified value.
+        /// Sets signed 32-bit values in the array starting at the specified source index to the specified value.
         /// </summary>
         /// <param name="length">The number of elements to set.</param>
         /// <param name="value">The value to set.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, int value, int[] y, int offy)
+        {
+            NativeMethods.set_s32(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets unsigned 32-bit values in the array starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, uint value, uint[] y, int offy)
+        {
+            NativeMethods.set_u32(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets signed 64-bit values in the array starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, long value, long[] y, int offy)
+        {
+            NativeMethods.set_s64(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets unsigned 64-bit values in the array starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The array that receives the data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, ulong value, ulong[] y, int offy)
+        {
+            NativeMethods.set_u64(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets values in the array of single-precision floating point numbers
+        /// starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which setting begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set(int length, float value, float[] y, int offy)
         {
-            NativeMethods.sset(length, value, y, offy);
+            NativeMethods.set_f32(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Sets values in the array of double-precision floating point numbers
+        /// starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which setting begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, double value, double[] y, int offy)
+        {
+            NativeMethods.set_f64(length, value, y, offy);
         }
 
         /// <summary>
@@ -249,60 +338,6 @@ namespace Genix.Core
         public static void Set(int length, float value, float[] y, int offy, int incy)
         {
             NativeMethods.sset_inc(length, value, y, offy, incy);
-        }
-
-        /// <summary>
-        /// Sets signed 32-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, int value, int[] y, int offy)
-        {
-            NativeMethods.i32set(length, value, y, offy);
-        }
-
-        /// <summary>
-        /// Sets unsigned 32-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, uint value, uint[] y, int offy)
-        {
-            NativeMethods.u32set(length, value, y, offy);
-        }
-
-        /// <summary>
-        /// Sets signed 64-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, long value, long[] y, int offy)
-        {
-            NativeMethods.i64set(length, value, y, offy);
-        }
-
-        /// <summary>
-        /// Sets unsigned 64-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, ulong value, ulong[] y, int offy)
-        {
-            NativeMethods.u64set(length, value, y, offy);
         }
 
         /// <summary>
@@ -824,23 +859,27 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32set(int n, int a, [Out] int[] y, int offy);
+            public static extern void set_s32(int n, int a, [Out] int[] y, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i32set")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "set_s32")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32set(int n, uint a, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i64set(int n, long a, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "i64set")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u64set(int n, ulong a, [Out] ulong[] y, int offy);
+            public static extern void set_u32(int n, uint a, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void sset(int n, float a, [Out] float[] y, int offy);
+            public static extern void set_s64(int n, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "set_s64")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void set_u64(int n, ulong a, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void set_f32(int n, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void set_f64(int n, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

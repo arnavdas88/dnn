@@ -7,8 +7,8 @@
 namespace Genix.MachineLearning.VectorMachines
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Genix.Core;
+    using System.IO;
+    using System.Text;
     using Genix.MachineLearning.Kernels;
     using Newtonsoft.Json;
 
@@ -20,125 +20,139 @@ namespace Genix.MachineLearning.VectorMachines
         /// <summary>
         /// The kernel used by this machine.
         /// </summary>
+        [JsonProperty("kernel", TypeNameHandling = TypeNameHandling.Objects)]
         private readonly IKernel kernel;
+
+        /// <summary>
+        /// The support vectors used by this machine.
+        /// </summary>
+        [JsonProperty("vectors")]
+        private readonly float[][] vectors;
+
+        /// <summary>
+        /// The weights used by this machine.
+        /// </summary>
+        [JsonProperty("weights")]
+        private readonly float[] weights;
+
+        /// <summary>
+        /// The bias used by this machine.
+        /// </summary>
+        [JsonProperty("bias")]
+        private readonly float bias;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SupportVectorMachine"/> class.
         /// </summary>
-        /// <param name="numberOfInputs">The length of the input vectors expected by the machine.</param>
-        /// <param name="numberOfSupportVectors">The number of support vectors the machine would use.</param>
         /// <param name="kernel">The kernel function to use.</param>
-        /// <param name="random">The random numbers generator.</param>
-        public SupportVectorMachine(int numberOfInputs, int numberOfSupportVectors, IKernel kernel, RandomNumberGenerator random)
+        /// <param name="vectors">The support vectors to use.</param>
+        /// <param name="weights">The weights to use.</param>
+        /// <param name="bias">The bias to use.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="vectors"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="weights"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The length of weights and support vectors are not the same.</para>
+        /// </exception>
+        public SupportVectorMachine(IKernel kernel, float[][] vectors, float[] weights, float bias)
         {
-            this.kernel = kernel;
+            this.kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
+            this.vectors = vectors ?? throw new ArgumentNullException(nameof(vectors));
+            this.weights = weights ?? throw new ArgumentNullException(nameof(weights));
+            this.bias = bias;
 
-            this.Weights = new Tensor("weights", new int[] { numberOfSupportVectors, 1 });
-            this.Weights.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt(1.0 / numberOfSupportVectors)));
-
-            this.Bias = new Tensor("biases", new int[] { 1 });
-
-            this.Vectors = new Tensor("support vectors", new int[] { numberOfInputs, numberOfSupportVectors });
-            this.Vectors.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt(1.0 / numberOfInputs)));
+            if (vectors.Length != weights.Length)
+            {
+                throw new ArgumentException("The length of weights and support vectors are not the same.");
+            }
         }
 
         /// <summary>
-        /// Gets the weights used by this machine.
+        /// Initializes a new instance of the <see cref="SupportVectorMachine"/> class.
         /// </summary>
-        /// <value>
-        /// The tensor that contains weights used by this machine.
-        /// </value>
-        /// <remarks>
-        /// The <see cref="Weights"/> is a rank-1 tensor.
-        /// </remarks>
-        [JsonProperty("weights")]
-        public Tensor Weights { get; private set; }
+        [JsonConstructor]
+        private SupportVectorMachine()
+        {
+        }
 
         /// <summary>
-        /// Gets the bias used by this machine.
+        /// Creates a <see cref="SupportVectorMachine"/> from the specified file.
         /// </summary>
-        /// <value>
-        /// The <see cref="Tensor"/> object that contains bias used by this machine.
-        /// </value>
-        /// <remarks>
-        /// The <see cref="Bias"/> is a rank-1 tensor with a single position occupied by bias value.
-        /// </remarks>
-        [JsonProperty("bias")]
-        public Tensor Bias { get; private set; }
+        /// <param name="fileName">A string that contains the name of the file from which to create the <see cref="SupportVectorMachine"/>.</param>
+        /// <returns>The <see cref="SupportVectorMachine"/> this method creates.</returns>
+        public static SupportVectorMachine FromFile(string fileName) => SupportVectorMachine.FromString(File.ReadAllText(fileName, Encoding.UTF8));
 
         /// <summary>
-        /// Gets the support vectors used by this machine.
+        /// Creates a <see cref="SupportVectorMachine"/> from the specified byte array.
         /// </summary>
-        /// <value>
-        /// The <see cref="Tensor"/> object that contains support vectors used by this machine.
-        /// </value>
-        /// <remarks>
-        /// The <see cref="Vectors"/> is a rank-1 tensor.
-        /// </remarks>
-        [JsonProperty("vectors")]
-        public Tensor Vectors { get; private set; }
+        /// <param name="buffer">The buffer to read the <see cref="SupportVectorMachine"/> from.</param>
+        /// <returns>The <see cref="SupportVectorMachine"/> this method creates.</returns>
+        public static SupportVectorMachine FromMemory(byte[] buffer) => SupportVectorMachine.FromString(UTF8Encoding.UTF8.GetString(buffer));
 
         /// <summary>
-        /// Computes a score measuring association between the specified <paramref name="x" /> tensor and each class.
+        /// Creates a <see cref="SupportVectorMachine"/> from the specified <see cref="string"/>.
         /// </summary>
-        /// <param name="session">The graph that stores all operations performed on the tensors.</param>
-        /// <param name="x">The input tensor.</param>
+        /// <param name="value">The <see cref="string"/> to read the <see cref="SupportVectorMachine"/> from.</param>
+        /// <returns>The <see cref="SupportVectorMachine"/> this method creates.</returns>
+        public static SupportVectorMachine FromString(string value) => JsonConvert.DeserializeObject<SupportVectorMachine>(value);
+
+        /// <summary>
+        /// Computes a score measuring association between the specified <paramref name="x" /> vector and each class.
+        /// </summary>
+        /// <param name="x">The input vector.</param>
         /// <returns>
-        /// The output tensor that contains the calculated scores.
+        /// The calculated score.
         /// </returns>
-        public Tensor Execute(Session session, Tensor x)
+        public float Execute(float[] x)
         {
-            // run linear classifier
-            return session.MxM(
-                MatrixLayout.ColumnMajor,
-                this.Weights,
-                false,
-                this.ExecuteKernel(session, x, false),
-                false,
-                this.Bias);
-
-            /*for (int i = 0, ii = input.Length; i < ii; i++)
+            float result = this.bias;
+            for (int i = 0, ii = this.weights.Length; i < ii; i++)
             {
-                float sum = this.threshold;
-                for (int j = 0; j < this.supportVectors.Length; j++)
-                {
-                    sum += this.weights[j] * this.kernel.Execute(this.supportVectors[j], input[i]);
-                }
-
-                result[i] = sum;
+                result += this.weights[i] * this.kernel.Execute(x.Length, this.vectors[i], 0, x, 0);
             }
 
-            return result;*/
+            return result;
         }
 
-        private Tensor ExecuteKernel(Session session, Tensor x, bool calculateGradient)
+        /// <summary>
+        /// Computes a score measuring association between the specified <paramref name="x" /> vectors and each class.
+        /// </summary>
+        /// <param name="x">The input vectors.</param>
+        /// <returns>
+        /// The calculated scores.
+        /// </returns>
+        [CLSCompliant(false)]
+        public float[] Execute(float[][] x)
         {
-            const string ActionName = "SVM kernel";
-
-            int numberOfInputs = this.Vectors.Axes[0];
-            int numberOfSupportVectors = this.Vectors.Axes[1];
-
-            int mb = x.Axes[0];
-            Tensor y = session.AllocateTensor(ActionName, new[] { mb, numberOfSupportVectors }, calculateGradient);
-
-            int y0 = y.Axes[0];
-            int y1 = y.Axes[1];
-
-            float[] xw = x.Weights;
-            float[] yw = y.Weights;
-            float[] vw = this.Vectors.Weights;
-
-            // here we are basically doing matrix to matrix multiplication
-            // with a custom dot product
-            for (int ix = 0, xpos = 0, ypos = 0; ix < y0; ix++, xpos += numberOfInputs)
+            float[] result = new float[x.Length];
+            for (int i = 0, ii = x.Length; i < ii; i++)
             {
-                for (int iy = 0, vpos = 0; iy < y1; iy++, vpos += numberOfInputs)
-                {
-                    yw[ypos++] = this.kernel.Execute(numberOfInputs, xw, xpos, vw, vpos);
-                }
+                result[i] = this.Execute(x[i]);
             }
 
-            return y;
+            return result;
         }
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> into the specified file.
+        /// </summary>
+        /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="SupportVectorMachine"/>.</param>
+        public void SaveToFile(string fileName) => File.WriteAllText(fileName, this.SaveToString(), Encoding.UTF8);
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> to the memory buffer.
+        /// </summary>
+        /// <returns>The buffer that contains saved <see cref="SupportVectorMachine"/>.</returns>
+        public byte[] SaveToMemory() => UTF8Encoding.UTF8.GetBytes(this.SaveToString());
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> to the text string.
+        /// </summary>
+        /// <returns>The string that contains saved <see cref="SupportVectorMachine"/>.</returns>
+        public string SaveToString() => JsonConvert.SerializeObject(this);
     }
 }

@@ -14,7 +14,7 @@
     [TestClass]
     public class SRNCellTest
     {
-        private readonly RandomNumberGenerator random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
 
         [TestMethod, TestCategory("SRN")]
         public void ConstructorTest1()

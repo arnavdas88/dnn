@@ -7,6 +7,8 @@
 namespace Genix.MachineLearning.VectorMachines.Learning
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Genix.Core;
     using Genix.MachineLearning.Classifcation;
     using Genix.MachineLearning.Kernels;
@@ -25,37 +27,61 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         /// Initializes a new instance of the <see cref="SequentualMinimalOptimization"/> class.
         /// </summary>
         /// <param name="kernel">The kernel function to use.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="kernel"/> is <b>null</b>.
+        /// </exception>
         public SequentualMinimalOptimization(IKernel kernel)
         {
-            this.kernel = kernel;
+            this.kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
         }
+
+        /// <summary>
+        /// Gets or sets the pair selection optimization algorithm.
+        /// </summary>
+        /// <value>
+        /// The <see cref="SMOAlgorithm"/> enumeration. The default is <see cref="SMOAlgorithm.LibSVM"/>.
+        /// </value>
+        public SMOAlgorithm Algorithm { get; set; } = SMOAlgorithm.LibSVM;
+
+        /// <summary>
+        /// Gets or sets the convergence tolerance.
+        /// </summary>
+        /// <value>
+        /// The criterion for completing the training process. The default is 0.01.
+        /// </value>
+        public float Tolerance { get; set; } = 0.01f;
 
         /// <summary>
         /// Learns a model that can map the given inputs to the given outputs.
         /// </summary>
-        /// <param name="x">The model inputs.</param>
-        /// <param name="labels">The expected outputs associated with each <paramref name="x"/>.</param>
-        /// <param name="weights">The weight of importance for each input-output pair (if supported by the learning algorithm).</param>
+        /// <param name="samples">
+        /// The samples used for learning.
+        /// Each sample consists of input vector <c>x</c>,
+        /// expected output <c>y</c>,
+        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
+        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
+        /// </param>
         /// <returns>
-        /// A model that has learned how to produce <paramref name="labels" /> given <paramref name="x" />.
+        /// The <see cref="SupportVectorMachine"/> learned by this method.
         /// </returns>
-        public SupportVectorMachine Learn(float[][] x, bool[] labels, float[] weights = null)
+        public SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples)
         {
             const float complexity = 1;
             const float positiveWeight = 1;
             const float negativeWeight = 1;
 
             // count positive and negative labels
-            Labels.GetRatio(labels, out int positives, out int negatives);
+            Labels.GetRatio(samples.Select(x => x.y), out int positives, out int negatives);
 
             // if all labels are either positive or negative
             // create machine that will always produce one kind of output
             if (positives == 0 || negatives == 0)
             {
-                /*Model.SupportVectors = new TInput[0];
-                Model.Weights = new double[0];
-                Model.Threshold = (positives == 0) ? -1 : +1;
-                return Model;*/
+                return new SupportVectorMachine(
+                    this.kernel,
+                    new float[0][],
+                    new float[0],
+                    positives == 0 ? -1 : 1);
             }
 
             // calculate complexity
@@ -63,50 +89,80 @@ namespace Genix.MachineLearning.VectorMachines.Learning
             float negativeComplexity = complexity * negativeWeight;
 
             // calculate costs associated with each input
-            float[] costs = new float[labels.Length];
-            for (int i = 0, ii = labels.Length; i < ii; i++)
+            float[] c = new float[samples.Count];
+            for (int i = 0, ii = samples.Count; i < ii; i++)
             {
-                costs[i] = labels[i] ? positiveComplexity : negativeComplexity;
-            }
-
-            if (weights != null)
-            {
-                Mathematics.Mul(costs.Length, costs, 0, weights, 0);
+                c[i] = (samples[i].y ? positiveComplexity : negativeComplexity) * samples[i].weight;
             }
 
             // create expected values (+/-1)
-            int[] expected = new int[labels.Length];
-            for (int i = 0, ii = labels.Length; i < ii; i++)
+            int[] y = new int[samples.Count];
+            for (int i = 0, ii = samples.Count; i < ii; i++)
             {
-                expected[i] = labels[i] ? 1 : -1;
+                y[i] = samples[i].y ? 1 : -1;
             }
 
-            // lagrange multipliers
-            ////this.alpha = new double[samples];
-
-            Func<int, int[], int, float[], float[]> q = (int i, int[] indices, int length, float[] result) =>
+            switch (this.Algorithm)
             {
-                for (int j = 0; j < length; j++)
-                {
-                    ////result[j] = y[i] * y[indices[j]] * this.kernel.Execute(x[i], x[indices[j]]);
-                }
+                case SMOAlgorithm.LibSVM:
+                    Func<int, int[], int, float[], float[]> q = (int i, int[] indices, int length, float[] result) =>
+                    {
+                        for (int j = 0; j < length; j++)
+                        {
+                            result[j] = y[i] *
+                                        y[indices[j]] *
+                                        this.kernel.Execute(samples[i].x.Length, samples[i].x, 0, samples[indices[j]].x, 0);
+                        }
 
-                return result;
-            };
+                        return result;
+                    };
 
-            ////var s = new FanChenLinQuadraticOptimization(alpha.Length, q, minusOnes, y)
-            {
-                /*Tolerance = tolerance,
-                Shrinking = this.shrinking,
-                Solution = alpha,
-                Token = Token,
-                UpperBounds = c*/
-            };
+                    LibSVMOptimization s = new LibSVMOptimization()
+                    {
+                        Tolerance = this.Tolerance,
+                    };
 
-            ////ISupportVectorMachine<double[]> svm = base.Learn(x, labels, weights);
-            ////return (SupportVectorMachine)svm;
+                    s.Optimize(
+                        samples.Count,
+                        c,
+                        Arrays.Create(samples.Count, -1.0f),
+                        y,
+                        q,
+                        out float[] solution,
+                        out float rho);
 
-            return null;
+                    HashSet<int> activeExamples = new HashSet<int>();
+                    for (int i = 0; i < solution.Length; i++)
+                    {
+                        if (solution[i] > 0)
+                        {
+                            activeExamples.Add(i);
+                        }
+                    }
+
+                    float b_lower = rho;
+                    float b_upper = rho;
+
+                    float[][] vectors = new float[activeExamples.Count][];
+                    float[] weights = new float[activeExamples.Count];
+
+                    int index = 0;
+                    foreach (var j in activeExamples)
+                    {
+                        vectors[index] = samples[j].x.ToArray();
+                        weights[index] = solution[j] * y[j];
+                        index++;
+                    }
+
+                    return new SupportVectorMachine(
+                        this.kernel,
+                        vectors,
+                        weights,
+                        -(b_lower + b_upper) / 2);
+
+                default:
+                    throw new ArgumentException("The SMO optimization algorithm is invalid.");
+            }
         }
     }
 }

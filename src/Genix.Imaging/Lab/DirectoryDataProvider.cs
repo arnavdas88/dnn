@@ -13,6 +13,7 @@ namespace Genix.Imaging.Lab
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using Genix.Core;
     using Genix.Imaging;
     using Genix.Lab;
 
@@ -181,8 +182,7 @@ namespace Genix.Imaging.Lab
                     foreach ((Genix.Imaging.Image image, int? frameIndex) in this.LoadImage(sample.path))
                     {
                         yield return new TestImage(
-                            sample.path,
-                            frameIndex,
+                            new DataSourceId(sample.path, Path.GetFileName(sample.path), frameIndex),
                             null,
                             null,
                             image,

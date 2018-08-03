@@ -11,7 +11,7 @@
     public class ArrayOperationsTest
     {
         private const float Eps = 1e-6f;
-        private readonly RandomNumberGenerator random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
 
         [TestMethod]
         public void CopyTest()

@@ -39,7 +39,7 @@ namespace Genix.DNN.Layers
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfNeurons, forgetBias, matrixLayout, random);
         }
@@ -50,7 +50,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public LSTMLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public LSTMLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, LSTMLayer.ArchitecturePattern);
 
@@ -129,7 +129,7 @@ namespace Genix.DNN.Layers
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (inputShape == null)
             {

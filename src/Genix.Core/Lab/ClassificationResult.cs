@@ -8,54 +8,53 @@ namespace Genix.Lab
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
+    using Genix.Core;
 
     /// <summary>
     /// Represents the result of classification.
     /// </summary>
-    public class ClassificationResult
+    /// <typeparam name="T">The type of the classification answer.</typeparam>
+    public class ClassificationResult<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassificationResult" /> class.
+        /// Initializes a new instance of the <see cref="ClassificationResult{T}" /> class.
         /// </summary>
         public ClassificationResult()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassificationResult" /> class, using property values.
+        /// Initializes a new instance of the <see cref="ClassificationResult{T}" /> class,
+        /// using property values.
         /// </summary>
-        /// <param name="fileName">The image file name.</param>
-        /// <param name="frameIndex">The zero-based frame index of the classified image in the multi-page image file.</param>
-        /// <param name="className">The classification result.</param>
-        /// <param name="truth">The ground truth data for the class.</param>
+        /// <param name="sourceId">The information about result source.</param>
+        /// <param name="predicted">The classification result.</param>
+        /// <param name="expected">The ground truth data for the class.</param>
         /// <param name="confidence">The classification confidence level.</param>
         /// <param name="isAccepted">The value indicating whether the classification result was accepted.</param>
-        public ClassificationResult(string fileName, int? frameIndex, string className, string truth, int confidence, bool isAccepted)
+        public ClassificationResult(DataSourceId sourceId, T predicted, T expected, int confidence, bool isAccepted)
         {
-            this.FileName = fileName;
-            this.FrameIndex = frameIndex;
-            this.Predicted = className;
-            this.Expected = truth;
+            this.SourceId = sourceId;
+            this.Predicted = predicted;
+            this.Expected = expected;
             this.Confidence = confidence;
             this.IsAccepted = isAccepted;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassificationResult" /> class that has the same property values as the specified <see cref="ClassificationResult" />.
+        /// Initializes a new instance of the <see cref="ClassificationResult{T}" /> class that has the same property values as the specified <see cref="ClassificationResult{T}" />.
         /// </summary>
-        /// <param name="other">The <see cref="ClassificationResult" /> to copy property values from.</param>
-        public ClassificationResult(ClassificationResult other)
+        /// <param name="other">The <see cref="ClassificationResult{T}" /> to copy property values from.</param>
+        public ClassificationResult(ClassificationResult<T> other)
         {
             if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
             }
 
-            this.FileName = other.FileName;
-            this.FrameIndex = other.FrameIndex;
+            this.SourceId = other.SourceId;
             this.Predicted = other.Predicted;
             this.Expected = other.Expected;
             this.Confidence = other.Confidence;
@@ -63,20 +62,12 @@ namespace Genix.Lab
         }
 
         /// <summary>
-        /// Gets or sets the image file name.
+        /// Gets or sets the data source id.
         /// </summary>
         /// <value>
-        /// A <see cref="string"/> that contains the image file name.
+        /// A <see cref="DataSourceId"/> that contains the information about result source.
         /// </value>
-        public string FileName { get; set; }
-
-        /// <summary>
-        /// Gets or sets zero-based frame index of the classified image in the multi-page image file. <b>null</b> if the classified image belongs to a single-page image file.
-        /// </summary>
-        /// <value>
-        /// The zero-based index for the classified image in a multi-page image file. <b>null</b> if the classified image belongs to a single-page image file.
-        /// </value>
-        public int? FrameIndex { get; set; }
+        public DataSourceId SourceId { get; set; }
 
         /// <summary>
         /// Gets or sets the classification result.
@@ -84,7 +75,7 @@ namespace Genix.Lab
         /// <value>
         /// A <see cref="string"/> that contains the classification result.
         /// </value>
-        public string Predicted { get; set; }
+        public T Predicted { get; set; }
 
         /// <summary>
         /// Gets or sets the ground truth data.
@@ -92,7 +83,7 @@ namespace Genix.Lab
         /// <value>
         /// The <see cref="string"/> that contains the ground truth.
         /// </value>
-        public string Expected { get; set; }
+        public T Expected { get; set; }
 
         /// <summary>
         /// Gets or sets the classification confidence level.
@@ -114,37 +105,37 @@ namespace Genix.Lab
         /// Writes a classification result into the stream.
         /// </summary>
         /// <param name="writer">The stream to write to.</param>
-        /// <param name="answer">The <see cref="ClassificationResult"/> structure to write.</param>
-        public static void Write(TextWriter writer, ClassificationResult answer)
+        /// <param name="result">The <see cref="ClassificationResult{T}"/> structure to write.</param>
+        public static void Write(TextWriter writer, ClassificationResult<T> result)
         {
             if (writer == null)
             {
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            if (answer == null)
+            if (result == null)
             {
-                throw new ArgumentNullException(nameof(answer));
+                throw new ArgumentNullException(nameof(result));
             }
 
-            writer.WriteLine(answer.ToString());
+            writer.WriteLine(result.ToString());
         }
 
         /// <summary>
         /// Writes a sequence of classification results into the stream.
         /// </summary>
         /// <param name="writer">The stream to write to.</param>
-        /// <param name="answers">The sequence of <see cref="ClassificationResult"/> structures to write.</param>
-        public static void Write(TextWriter writer, IEnumerable<ClassificationResult> answers)
+        /// <param name="results">The sequence of <see cref="ClassificationResult{T}"/> structures to write.</param>
+        public static void Write(TextWriter writer, IEnumerable<ClassificationResult<T>> results)
         {
-            if (answers == null)
+            if (results == null)
             {
-                throw new ArgumentNullException(nameof(answers));
+                throw new ArgumentNullException(nameof(results));
             }
 
-            foreach (ClassificationResult answer in answers)
+            foreach (ClassificationResult<T> result in results)
             {
-                ClassificationResult.Write(writer, answer);
+                ClassificationResult<T>.Write(writer, result);
             }
         }
 
@@ -152,12 +143,12 @@ namespace Genix.Lab
         /// Reads a sequence of classification results from the file.
         /// </summary>
         /// <param name="fileName">A path to the file to read from.</param>
-        /// <returns>A collection of <see cref="ClassificationResult"/> structures created from the stream.</returns>
-        public static IList<ClassificationResult> Read(string fileName)
+        /// <returns>A collection of <see cref="ClassificationResult{T}"/> structures created from the stream.</returns>
+        public static IList<ClassificationResult<T>> Read(string fileName)
         {
             using (StreamReader reader = new StreamReader(fileName, System.Text.Encoding.UTF8))
             {
-                return ClassificationResult.Read(reader).ToList();
+                return ClassificationResult<T>.Read(reader).ToList();
             }
         }
 
@@ -165,8 +156,8 @@ namespace Genix.Lab
         /// Reads a sequence of classification results from the stream.
         /// </summary>
         /// <param name="reader">A stream to read from.</param>
-        /// <returns>A sequence of <see cref="ClassificationResult"/> structures created from the stream.</returns>
-        public static IEnumerable<ClassificationResult> Read(TextReader reader)
+        /// <returns>A sequence of <see cref="ClassificationResult{T}"/> structures created from the stream.</returns>
+        public static IEnumerable<ClassificationResult<T>> Read(TextReader reader)
         {
             while (true)
             {
@@ -176,34 +167,24 @@ namespace Genix.Lab
                     break;
                 }
 
-                if (s == string.Empty)
+                if (s != string.Empty)
                 {
-                    continue;
-                }
-
-                string[] split = s.SplitQualified(',');
-                if (split.Length >= 5)
-                {
-                    ClassificationResult answer = new ClassificationResult()
+                    string[] split = s.SplitQualified(',');
+                    if (split.Length >= 5)
                     {
-                        FileName = split[0],
-                    };
+                        string fileName = split[0];
+                        int? frameIndex = !string.IsNullOrEmpty(split[1]) ? (int?)int.Parse(split[1]) : null;
+                        string predicted = split[2].Unqualify('\"');
+                        int confidence = int.Parse(split[3]);
+                        bool isAccepted = split[4] == "1";
 
-                    if (!string.IsNullOrEmpty(split[1]))
-                    {
-                        answer.FrameIndex = int.Parse(split[1]);
+                        yield return new ClassificationResult<T>(
+                            new DataSourceId(fileName, fileName, frameIndex),
+                            !string.IsNullOrEmpty(predicted) ? (T)Convert.ChangeType(predicted, typeof(T)) : default,
+                            default,
+                            confidence,
+                            isAccepted);
                     }
-
-                    string className = split[2].Unqualify('\"');
-                    if (!string.IsNullOrEmpty(className))
-                    {
-                        answer.Predicted = className;
-                    }
-
-                    answer.Confidence = int.Parse(split[3]);
-                    answer.IsAccepted = split[4] == "1";
-
-                    yield return answer;
                 }
             }
 
@@ -218,16 +199,15 @@ namespace Genix.Lab
                 return true;
             }
 
-            ClassificationResult other = obj as ClassificationResult;
+            ClassificationResult<T> other = obj as ClassificationResult<T>;
             if (other == null)
             {
                 return false;
             }
 
-            return string.Compare(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase) == 0 &&
-                this.FrameIndex == other.FrameIndex &&
-                this.Predicted == other.Predicted &&
-                this.Expected == other.Expected &&
+            return object.Equals(this.SourceId, other.SourceId) &&
+                object.Equals(this.Predicted, other.Predicted) &&
+                object.Equals(this.Expected, other.Expected) &&
                 this.Confidence == other.Confidence &&
                 this.IsAccepted == other.IsAccepted;
         }
@@ -239,10 +219,9 @@ namespace Genix.Lab
         public override string ToString() =>
             string.Join(
                 ",",
-                this.FileName,
-                this.FrameIndex.HasValue ? this.FrameIndex.Value.ToString(CultureInfo.InvariantCulture) : string.Empty,
-                this.Predicted?.Qualify() ?? string.Empty,
-                this.Expected?.Qualify() ?? string.Empty,
+                this.SourceId,
+                this.Predicted?.ToString()?.Qualify() ?? string.Empty,
+                this.Expected?.ToString()?.Qualify() ?? string.Empty,
                 this.Confidence,
                 this.IsAccepted ? 1 : 0);
     }

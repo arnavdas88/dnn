@@ -31,7 +31,7 @@ namespace Genix.DNN.Layers
         /// <param name="numberOfNeurons">The number of neurons in the hidden and fully connected layers.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        public GRULayer(int[] inputShape, IList<int> numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator random)
+        public GRULayer(int[] inputShape, IList<int> numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
         }
@@ -42,7 +42,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public GRULayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public GRULayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, GRULayer.ArchitecturePattern);
 
@@ -96,7 +96,7 @@ namespace Genix.DNN.Layers
             int[] inputShape,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (inputShape == null)
             {

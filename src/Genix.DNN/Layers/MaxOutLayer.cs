@@ -55,7 +55,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public MaxOutLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public MaxOutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, MaxOutLayer.ArchitecturePattern);
             int groupSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);

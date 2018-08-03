@@ -17,12 +17,13 @@ namespace Genix.Lab
     /// Visualizes the performance of a prediction algorithm.
     /// Each row of the matrix represents the instances in a predicted class while each column represents the instances in an expected class.
     /// </summary>
-    public class ConfusionMatrix : ICloneable
+    /// <typeparam name="T">The type of the classification answer.</typeparam>
+    public class ConfusionMatrix<T> : ICloneable
     {
         /// <summary>
         /// The labels supported by the matrix.
         /// </summary>
-        private readonly Dictionary<string, int> labels = new Dictionary<string, int>();
+        private readonly Dictionary<T, int> labels = new Dictionary<T, int>();
 
         /// <summary>
         /// The confusion matrix.
@@ -30,7 +31,7 @@ namespace Genix.Lab
         private int[][] matrix = new int[0][];
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfusionMatrix"/> class.
+        /// Initializes a new instance of the <see cref="ConfusionMatrix{T}"/> class.
         /// </summary>
         public ConfusionMatrix()
         {
@@ -42,7 +43,7 @@ namespace Genix.Lab
         /// <value>
         /// The <see cref="IReadOnlyCollection{T}"/> that contains a list of labels.
         /// </value>
-        public IReadOnlyCollection<string> Labels
+        public IReadOnlyCollection<T> Labels
         {
             get { return this.labels.Keys; }
         }
@@ -56,7 +57,7 @@ namespace Genix.Lab
         /// The <see cref="int"/> that represents a number of confusions between <c>predicted</c> and <c>expected</c> labels.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1023:IndexersShouldNotBeMultidimensional", Justification = "We need to use label names and access two-dimensional matrix.")]
-        public int this[string predicted, string expected]
+        public int this[T predicted, T expected]
         {
             get
             {
@@ -79,7 +80,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="predicted">The detected label.</param>
         /// <param name="expected">The correct label.</param>
-        public void Add(string predicted, string expected)
+        public void Add(T predicted, T expected)
         {
             this.InsertLabel(predicted, out int predictedIndex);
             this.InsertLabel(expected, out int expectedIndex);
@@ -100,7 +101,7 @@ namespace Genix.Lab
                 return true;
             }
 
-            ConfusionMatrix other = obj as ConfusionMatrix;
+            ConfusionMatrix<T> other = obj as ConfusionMatrix<T>;
             if (other == null)
             {
                 return false;
@@ -118,8 +119,8 @@ namespace Genix.Lab
             int count = this.labels.Count;
 
             // calculate maximum label length
-            string[] names = this.labels.Keys.OrderBy(x => x).ToArray();
-            int[] lengths = names.Select(x => Math.Max((x?.Length ?? 0) + 1, 8)).ToArray();
+            T[] names = this.labels.Keys.OrderBy(x => x).ToArray();
+            int[] lengths = names.Select(x => Math.Max((x?.ToString()?.Length ?? 0) + 1, 8)).ToArray();
             int maxLength = lengths.Max();
             string maxFormat = string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}}", maxLength);
             string[] formats = lengths.Select(x => string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}}", x)).ToArray();
@@ -165,8 +166,8 @@ namespace Genix.Lab
         /// </returns>
         public object Clone()
         {
-            ConfusionMatrix other = new ConfusionMatrix();
-            foreach (KeyValuePair<string, int> kvp in other.labels)
+            ConfusionMatrix<T> other = new ConfusionMatrix<T>();
+            foreach (KeyValuePair<T, int> kvp in other.labels)
             {
                 other.labels.Add(kvp.Key, kvp.Value);
             }
@@ -185,7 +186,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="label">The label to find.</param>
         /// <param name="index">The zero-based index of inserted label.</param>
-        private void InsertLabel(string label, out int index)
+        private void InsertLabel(T label, out int index)
         {
             if (!this.labels.TryGetValue(label, out index))
             {

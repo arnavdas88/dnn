@@ -28,7 +28,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The random numbers generator.
         /// </summary>
-        private readonly RandomNumberGenerator random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DropoutLayer"/> class.
@@ -47,7 +47,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, DropoutLayer.ArchitecturePattern);

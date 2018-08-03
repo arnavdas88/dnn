@@ -36,7 +36,7 @@ namespace Genix.DNN.Layers
             int[] inputShape,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
         }
@@ -47,7 +47,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public SRNLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public SRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, SRNLayer.ArchitecturePattern);
 
@@ -102,7 +102,7 @@ namespace Genix.DNN.Layers
             int[] inputShape,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (inputShape == null)
             {

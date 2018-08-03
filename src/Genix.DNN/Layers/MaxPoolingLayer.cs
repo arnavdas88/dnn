@@ -43,7 +43,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public MaxPoolingLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public MaxPoolingLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(inputShape, MaxPoolingLayer.KernelFromArchitecture(architecture))
         {
         }

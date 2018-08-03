@@ -108,7 +108,7 @@ namespace Genix.DNN.Layers
             int[] weightsShape,
             int[] hiddenShape,
             int[] biasesShape,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (hiddenShape == null)
             {

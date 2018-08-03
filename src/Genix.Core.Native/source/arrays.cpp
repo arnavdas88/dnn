@@ -72,9 +72,10 @@ template<typename T> void __forceinline __set(
 	}
 }
 
-GENIXAPI(void, i32set)(int n, __int32 a, __int32* y, int offy) { __set(n, a, y, offy); }
-GENIXAPI(void, i64set)(int n, __int64 a, __int64* y, int offy) { __set(n, a, y, offy); }
-GENIXAPI(void, sset)(int n, float a, float* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_s32)(int n, __int32 a, __int32* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_s64)(int n, __int64 a, __int64* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_f32)(int n, float a, float* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_f64)(int n, double a, double* y, int offy) { __set(n, a, y, offy); }
 
 extern "C" __declspec(dllexport) void WINAPI sset_inc(
 	int n,

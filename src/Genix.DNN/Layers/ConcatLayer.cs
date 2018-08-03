@@ -46,7 +46,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShapes">The dimensions of the layer's input tensors.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ConcatLayer(IList<int[]> inputShapes, string architecture, RandomNumberGenerator random)
+        public ConcatLayer(IList<int[]> inputShapes, string architecture, RandomNumberGenerator<float> random)
             : base(1, Shape.Concat(inputShapes, ConcatLayer.Axis))
         {
             Layer.ParseArchitechture(architecture, ConcatLayer.ArchitecturePattern);

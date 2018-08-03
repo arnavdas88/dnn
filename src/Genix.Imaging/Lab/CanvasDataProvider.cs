@@ -12,6 +12,7 @@ namespace Genix.Imaging.Lab
     using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Windows;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -254,8 +255,7 @@ namespace Genix.Imaging.Lab
                     HorizontalAlignment.Center);
 
                 yield return new TestImage(
-                    id,
-                    (int?)null,
+                    new DataSourceId(id, null, null),
                     font,
                     fontStyle,
                     this.canvas.ToImage(this.Width <= 0 ? new Rectangle(0, 0, position.Right + (this.Height / 4), this.Height) : Rectangle.Empty),

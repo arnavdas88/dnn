@@ -578,7 +578,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor Dropout(this Session session, Tensor x, RandomNumberGenerator random, float probability)
+        public static Tensor Dropout(this Session session, Tensor x, RandomNumberGenerator<float> random, float probability)
         {
             const string ActionName = "dropout";
 

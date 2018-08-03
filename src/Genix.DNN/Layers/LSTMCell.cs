@@ -60,7 +60,7 @@ namespace Genix.DNN.Layers
             int numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfNeurons, matrixLayout, forgetBias, random);
         }
@@ -71,7 +71,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, LSTMCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
@@ -274,7 +274,7 @@ namespace Genix.DNN.Layers
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             float forgetBias,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron

@@ -160,7 +160,7 @@ namespace Genix.DNN.Layers
         /// <returns>
         /// The <see cref="Layer"/> this method creates.
         /// </returns>
-        public static Layer CreateFromArchitecture(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public static Layer CreateFromArchitecture(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             foreach (KeyValuePair<Type, Regex> layer in Layer.registeredLayers)
             {
@@ -184,7 +184,7 @@ namespace Genix.DNN.Layers
         /// <returns>
         /// The <see cref="Layer"/> this method creates.
         /// </returns>
-        public static Layer CreateFromArchitecture(IList<int[]> inputShapes, string architecture, RandomNumberGenerator random)
+        public static Layer CreateFromArchitecture(IList<int[]> inputShapes, string architecture, RandomNumberGenerator<float> random)
         {
             foreach (KeyValuePair<Type, Regex> layer in Layer.registeredLayers)
             {

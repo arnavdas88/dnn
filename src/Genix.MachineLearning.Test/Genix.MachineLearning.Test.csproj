@@ -45,6 +45,15 @@
     <AssemblyOriginatorKeyFile>Genix.MachineLearning.Test.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accord.MachineLearning">
+      <HintPath>E:\Accord\framework\Debug\Accord.MachineLearning.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Math">
+      <HintPath>E:\Accord\framework\Debug\Accord.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Statistics">
+      <HintPath>E:\Accord\framework\Debug\Accord.Statistics.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -73,11 +82,12 @@
     <Compile Include="LanguageModel\VocabularyTest.cs" />
     <Compile Include="Learning\CTCTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TensorTest.cs" />
+    <Compile Include="Tensor\TensorTest.cs" />
     <Compile Include="KernelTest.cs" />
     <Compile Include="Tensor\MathOperationsTest.cs" />
     <Compile Include="Tensor\ArrayOperationsTest.cs" />
     <Compile Include="Tensor\NeuralOperationsTest.cs" />
+    <Compile Include="VectorMachines\SupportVectorMachineTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
@@ -93,6 +103,7 @@
     <None Include="Genix.MachineLearning.Test.snk" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

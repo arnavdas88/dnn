@@ -38,7 +38,7 @@ namespace Genix.DNN
             ComponentGraph componentGraph = NetworkGraphBuilder.ParseArchitecture(architecture, false);
 
             // 2. create layers in the preliminary graph
-            RandomNumberGenerator random = null; //// new Random(0);
+            RandomNumberGenerator<float> random = null; //// new Random(0);
             foreach (ComponentVertex sink in componentGraph.Sinks)
             {
                 NetworkGraphBuilder.CreateLayerInGraph(componentGraph, sink, random);
@@ -169,7 +169,7 @@ namespace Genix.DNN
             }
         }
 
-        private static void CreateLayerInGraph(ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator random)
+        private static void CreateLayerInGraph(ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator<float> random)
         {
             if (graph.InDegree(vertex) == 0)
             {

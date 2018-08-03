@@ -49,6 +49,7 @@
     <Compile Include="Collections\LinkedCollection.cs" />
     <Compile Include="Collections\LinkedCollectionItem.cs" />
     <Compile Include="Collections\QuadTree.cs" />
+    <Compile Include="Data\DataSourceId.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
@@ -66,8 +67,8 @@
     <Compile Include="Lab\RejectCurve.cs" />
     <Compile Include="Lab\RejectCurvePoint.cs" />
     <Compile Include="Lab\RejectCurveTarget.cs" />
-    <Compile Include="Lab\TestReport.cs" />
-    <Compile Include="Lab\TestReportWriter.cs" />
+    <Compile Include="Lab\ClassificationReport.cs" />
+    <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Mathematics.cs" />
     <Compile Include="Math\Matrix.cs" />
@@ -84,6 +85,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Random\BinarySampleGenerator.cs" />
     <Compile Include="Random\GaussianGenerator.cs" />
     <Compile Include="Random\RandomGenerator.cs" />
     <Compile Include="Random\RandomNumberGenerator.cs" />

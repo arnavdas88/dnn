@@ -26,18 +26,20 @@ namespace Genix.MachineLearning.Classifcation
         /// <returns>
         /// The percentage of positive samples in <paramref name="labels"/>.
         /// </returns>
-        public static float GetRatio(bool[] labels, out int positives, out int negatives)
+        public static float GetRatio(IEnumerable<bool> labels, out int positives, out int negatives)
         {
+            int count = 0;
             positives = 0;
-            for (int i = 0, ii = labels.Length; i < ii; i++)
+            foreach (bool label in labels)
             {
-                if (labels[i])
+                count++;
+                if (label)
                 {
                     positives++;
                 }
             }
 
-            negatives = labels.Length - positives;
+            negatives = count - positives;
             return positives / (float)(positives + negatives);
         }
     }

@@ -1,38 +1,62 @@
 #include "stdafx.h"
 #include "mkl.h"
 
-GENIXAPI(float, _sdot)(
+// calculates dot product of two vectors
+template<typename T> T __forceinline __dot(
 	int n,
-	const float* x, int offx, int incx,
-	const float* y, int offy, int incy)
+	const T* x, int offx, int incx,
+	const T* y, int offy, int incy)
 {
 	x += offx;
 	y += offy;
 
-	if (n <= 32)
+	T result = 0;
+
+	if (incx == 1 && incy == 1)
 	{
-		float res = 0.0f;
-
-		if (incx == 1 && incy == 1)
+		for (int i = 0; i < n; i++)
 		{
-			for (int i = 0; i < n; i++)
-			{
-				res += x[i] * y[i];
-			}
+			result += x[i] * y[i];
 		}
-		else
-		{
-			for (int i = 0, xi = 0, yi = 0; i < n; i++, xi += incx, yi += incy)
-			{
-				res += x[xi] * y[yi];
-			}
-		}
-
-		return res;
 	}
 	else
 	{
-		return ::cblas_sdot(n, x, incx, y, incy);
+		for (int i = 0, xi = 0, yi = 0; i < n; i++, xi += incx, yi += incy)
+		{
+			result += x[xi] * y[yi];
+		}
+	}
+
+	return result;
+}
+
+GENIXAPI(float, dot_f32)(
+	int n,
+	const float* x, int offx, int incx,
+	const float* y, int offy, int incy)
+{
+	if (n <= 32)
+	{
+		return __dot(n, x, offx, incx, y, offy, incy);
+	}
+	else
+	{
+		return ::cblas_sdot(n, x + offx, incx, y + offy, incy);
+	}
+}
+
+GENIXAPI(double, dot_f64)(
+	int n,
+	const double* x, int offx, int incx,
+	const double* y, int offy, int incy)
+{
+	if (n <= 32)
+	{
+		return __dot(n, x, offx, incx, y, offy, incy);
+	}
+	else
+	{
+		return ::cblas_ddot(n, x + offx, incx, y + offy, incy);
 	}
 }
 

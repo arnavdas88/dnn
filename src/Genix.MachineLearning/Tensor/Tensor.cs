@@ -543,7 +543,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="random">The random numbers generator.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Randomize(RandomNumberGenerator random)
+        public void Randomize(RandomNumberGenerator<float> random)
         {
             if (random == null)
             {
@@ -558,7 +558,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="random">The random numbers generator.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RandomizeGradient(RandomNumberGenerator random)
+        public void RandomizeGradient(RandomNumberGenerator<float> random)
         {
             if (random == null)
             {

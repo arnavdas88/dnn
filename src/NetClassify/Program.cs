@@ -110,7 +110,7 @@ namespace Genix.NetClassify
         {
             ClassificationNetwork network = ClassificationNetwork.FromFile(options.NetworkFileName);
 
-            List<ClassificationResult> results = new List<ClassificationResult>();
+            List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();
 
             using (TestImageProvider<string> dataProvider = options.CreateTestImageProvider(network))
             {
@@ -140,30 +140,30 @@ namespace Genix.NetClassify
                     string answer = answers.FirstOrDefault().Answer;
                     int prob = (int)((answers.FirstOrDefault().Probability * 100) + 0.5f);
 
-                    results.Add(new ClassificationResult(
-                        sample.Id,
-                        sample.FrameIndex,
+                    results.Add(new ClassificationResult<string>(
+                        sample.SourceId,
                         answer,
                         string.Concat(sample.Labels),
                         prob,
                         prob >= 38));
 
                     ////Program.Write(logFile, ".");
-                    Program.Write(string.Format(CultureInfo.InvariantCulture, "({0})\tFile: {1}", Program.totalImages, sample.Id));
-                    if (sample.FrameIndex.HasValue)
-                    {
-                        Program.Write(string.Format(CultureInfo.InvariantCulture, ";{0}", sample.FrameIndex.Value + 1));
-                    }
-
-                    Program.WriteLine(string.Format(CultureInfo.InvariantCulture, " ... {0} {1} OK ({2} ms).", answer, prob, duration));
+                    Program.Write(string.Format(
+                        CultureInfo.InvariantCulture,
+                        "({0})\tFile: {1} ... {2} {3} OK ({4} ms).",
+                        Program.totalImages,
+                        sample.SourceId.ToFileName(),
+                        answer,
+                        prob,
+                        duration));
                 }
             }
 
             // write report
-            TestReport testReport = new TestReport(results);
+            ClassificationReport<string> testReport = new ClassificationReport<string>(results);
             using (StreamWriter outputFile = File.CreateText(options.OutputFileName))
             {
-                TestReportWriter.WriteReport(outputFile, testReport);
+                ClassificationReportWriter<string>.WriteReport(outputFile, testReport);
             }
         }
 

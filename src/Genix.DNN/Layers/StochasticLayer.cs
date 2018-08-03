@@ -154,7 +154,7 @@ namespace Genix.DNN.Layers
             MatrixLayout matrixLayout,
             int[] weightsShape,
             int[] biasesShape,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (weightsShape == null)
             {

@@ -13,24 +13,25 @@ namespace Genix.Lab
     /// <summary>
     /// Represents a classification summary report for a single class.
     /// </summary>
-    public class ClassSummary
+    /// <typeparam name="T">The type of the classification answer.</typeparam>
+    public class ClassSummary<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassSummary"/> class.
+        /// Initializes a new instance of the <see cref="ClassSummary{T}"/> class.
         /// </summary>
-        /// <param name="className">The class name this summary is for.</param>
-        public ClassSummary(string className)
+        /// <param name="label">The label this summary is for.</param>
+        public ClassSummary(T label)
         {
-            this.ClassName = className;
+            this.Label = label;
         }
 
         /// <summary>
-        /// Gets a name of the class this summary is for.
+        /// Gets a name of the label this summary is for.
         /// </summary>
         /// <value>
-        /// A <see cref="string"/> that contains the class name.
+        /// A <see cref="string"/> that contains the label.
         /// </value>
-        public string ClassName { get; }
+        public T Label { get; }
 
         /// <summary>
         /// Gets a classification statistics for the class.
@@ -46,29 +47,29 @@ namespace Genix.Lab
         /// <value>
         /// A <see cref="IList{ClassificationResult}"/> object.
         /// </value>
-        public IList<ClassificationResult> Errors { get; } = new List<ClassificationResult>();
+        public IList<ClassificationResult<T>> Errors { get; } = new List<ClassificationResult<T>>();
 
         /// <summary>
         /// Adds the classification result to the class summary.
         /// </summary>
-        /// <param name="answer">The classification result.</param>
-        public void Add(ClassificationResult answer)
+        /// <param name="resut">The classification result.</param>
+        public void Add(ClassificationResult<T> resut)
         {
-            if (answer == null)
+            if (resut == null)
             {
-                throw new ArgumentNullException(nameof(answer));
+                throw new ArgumentNullException(nameof(resut));
             }
 
             // compare result with truth
-            bool? isValid = string.IsNullOrEmpty(answer.Expected) ? null : (bool?)(answer.Expected == answer.Predicted);
+            bool? isValid = object.Equals(resut.Expected, default(T)) ? null : (bool?)object.Equals(resut.Expected, resut.Predicted);
 
             // add to statistics
-            this.Statistics.Add(answer.Confidence, answer.IsAccepted, isValid);
+            this.Statistics.Add(resut.Confidence, resut.IsAccepted, isValid);
 
             // create an error record
             if (isValid.HasValue && !isValid.Value)
             {
-                this.Errors.Add(new ClassificationResult(answer));
+                this.Errors.Add(new ClassificationResult<T>(resut));
             }
         }
 
@@ -80,19 +81,19 @@ namespace Genix.Lab
                 return true;
             }
 
-            ClassSummary other = obj as ClassSummary;
+            ClassSummary<T> other = obj as ClassSummary<T>;
             if (other == null)
             {
                 return false;
             }
 
-            return object.Equals(this.ClassName, other.ClassName) &&
+            return object.Equals(this.Label, other.Label) &&
                    this.Statistics.Equals(other.Statistics) &&
                    this.Errors.Count == other.Errors.Count &&
                    Enumerable.SequenceEqual(this.Errors, other.Errors);
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => (this.ClassName ?? string.Empty).GetHashCode();
+        public override int GetHashCode() => this.Label?.GetHashCode() ?? 0;
     }
 }

@@ -13,6 +13,8 @@ namespace Genix.Lab
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Declares an object that contains named truth information for a list of files.
@@ -37,7 +39,7 @@ namespace Genix.Lab
         /// <summary>
         /// A collection of files.
         /// </summary>
-        private readonly Dictionary<FileKey, FileData> files = new Dictionary<FileKey, FileData>();
+        private readonly Dictionary<FileKey, FileData> files = new Dictionary<FileKey, FileData>(new FileKeyComparer());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Truth"/> class.
@@ -52,7 +54,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the names of files in the truth.
         /// </value>
-        public ReadOnlyCollection<string> FileNames => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.FileName).ToList());
+        public ReadOnlyCollection<string> FileNames => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.Name).ToList());
 
         /// <summary>
         /// Gets a collection of file paths for the current truth.
@@ -60,7 +62,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the names of file paths in the truth.
         /// </value>
-        public ReadOnlyCollection<string> FilePaths => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.FilePath).ToList());
+        public ReadOnlyCollection<string> FilePaths => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.Id).ToList());
 
         /// <summary>
         /// Gets a collection of files for the current truth.
@@ -335,7 +337,7 @@ namespace Genix.Lab
             int fieldCount = truth.fields.Count;
             foreach (KeyValuePair<FileKey, FileData> kvp in truth.files)
             {
-                FileKey key = new FileKey(kvp.Key.FilePath, kvp.Key.FrameIndex);
+                FileKey key = new FileKey(kvp.Key);
                 if (!this.files.TryGetValue(key, out FileData file))
                 {
                     file = this.files[key] = new FileData();
@@ -478,7 +480,7 @@ namespace Genix.Lab
                     {
                         foreach (KeyValuePair<FileKey, FileData> kvp in this.files)
                         {
-                            writer.Write(kvp.Key.FilePath);
+                            writer.Write(kvp.Key.Id);
                             if (kvp.Key.FrameIndex.HasValue)
                             {
                                 writer.Write(";");
@@ -504,7 +506,7 @@ namespace Genix.Lab
         /// <summary>
         /// Represents the key for the file collection.
         /// </summary>
-        private class FileKey
+        private class FileKey : DataSourceId
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="FileKey"/> class, using the file path.
@@ -512,56 +514,42 @@ namespace Genix.Lab
             /// <param name="filePath">A file path.</param>
             /// <param name="frameIndex">A zero-based index of this image in the TIFF file.</param>
             public FileKey(string filePath, int? frameIndex)
+                : base(
+                    filePath.ToUpperInvariant(),
+                    Path.GetFileName(filePath).ToUpperInvariant(),
+                    frameIndex)
             {
-                this.FilePath = filePath.ToUpperInvariant();
-                this.FileName = Path.GetFileName(this.FilePath);
-                this.FrameIndex = frameIndex;
             }
 
             /// <summary>
-            /// Gets the full file path.
+            /// Initializes a new instance of the <see cref="FileKey"/> class,
+            /// using the existing <see cref="FileKey"/> object.
             /// </summary>
-            /// <value>
-            /// The full file path.
-            /// </value>
-            public string FilePath { get; }
-
-            /// <summary>
-            /// Gets the file name.
-            /// </summary>
-            /// <value>
-            /// The file name.
-            /// </value>
-            public string FileName { get; }
-
-            /// <summary>
-            /// Gets the zero-based index of this image in the multi-page file.
-            /// </summary>
-            /// <value>
-            /// The zero-based index of this image in the multi-page file.
-            /// </value>
-            public int? FrameIndex { get; private set; }
-
-            /// <inheritdoc />
-            public override bool Equals(object obj)
+            /// <param name="other">The <see cref="FileKey"/> to copy the data from.</param>
+            public FileKey(FileKey other)
+                : base(other)
             {
-                if (obj == this)
-                {
-                    return true;
-                }
+            }
+        }
 
-                FileKey other = obj as FileKey;
-                if (other == null)
-                {
-                    return false;
-                }
-
-                return this.FileName == other.FileName &&
-                       this.FrameIndex == other.FrameIndex;
+        /// <summary>
+        /// Defines methods to support the comparison of property items for equality.
+        /// </summary>
+        private class FileKeyComparer : IEqualityComparer<FileKey>
+        {
+            /// <inheritdoc />
+            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Equals(FileKey x, FileKey y)
+            {
+                return x.Name == y.Name &&
+                       x.FrameIndex == y.FrameIndex;
             }
 
             /// <inheritdoc />
-            public override int GetHashCode() => this.FileName.GetHashCode() ^ this.FrameIndex.GetValueOrDefault();
+            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetHashCode(FileKey obj) => obj.Name.GetHashCode() ^ obj.FrameIndex.GetValueOrDefault();
         }
 
         /// <summary>

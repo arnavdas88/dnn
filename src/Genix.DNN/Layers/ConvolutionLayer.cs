@@ -39,7 +39,7 @@ namespace Genix.DNN.Layers
             int numberOfFilters,
             Kernel kernel,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             this.Initialize(inputShape, numberOfFilters, kernel, matrixLayout, random);
         }
@@ -50,7 +50,7 @@ namespace Genix.DNN.Layers
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ConvolutionLayer(int[] inputShape, string architecture, RandomNumberGenerator random)
+        public ConvolutionLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
             List<Group> groups = Layer.ParseArchitechture(architecture, ConvolutionLayer.ArchitecturePattern);
             int numberOfFilters = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
@@ -162,7 +162,7 @@ namespace Genix.DNN.Layers
             int numberOfFilters,
             Kernel kernel,
             MatrixLayout matrixLayout,
-            RandomNumberGenerator random)
+            RandomNumberGenerator<float> random)
         {
             if (inputShape == null)
             {
