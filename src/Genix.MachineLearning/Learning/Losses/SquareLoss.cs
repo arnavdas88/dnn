@@ -66,14 +66,7 @@ namespace Genix.MachineLearning.Learning
 
             float Calculate(int length, int offy, int offe)
             {
-                float sum = 0.0f;
-                for (int i = 0; i < length; i++)
-                {
-                    float u = yw[offy + i] - ew[offe + i];
-                    sum += u * u;
-                }
-
-                return (float)Math.Sqrt((float)sum) / length;
+                return Mathematics.EuclideanDistance(length, yw, offy, ew, offe) / length;
             }
         }
     }

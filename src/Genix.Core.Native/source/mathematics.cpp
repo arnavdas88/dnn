@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <math.h>
+#include <cmath>
 #include "mkl.h"
 
 GENIXAPI(float, slogSumExp2)(const float a, const float b)
@@ -131,6 +131,7 @@ GENIXAPI(void, addc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __addc_ip(
 GENIXAPI(void, addc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __addc_ip(n, a, y, offy); }
 GENIXAPI(void, addc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __addc_ip(n, a, y, offy); }
 GENIXAPI(void, addc_ip_f32)(int n, float a, float* y, int offy) { __addc_ip(n, a, y, offy); }
+GENIXAPI(void, addc_ip_f64)(int n, double a, double* y, int offy) { __addc_ip(n, a, y, offy); }
 
 // Adds a constant value to each element of a vector not in-place.
 template<typename T> void __forceinline __addc(
@@ -153,6 +154,7 @@ GENIXAPI(void, addc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* 
 GENIXAPI(void, addc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __addc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __addc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __addc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __addc(n, x, offx, a, y, offy); }
 
 // Subtracts a constant value from each element of a vector in-place.
 template<typename T> void __forceinline __subc_ip(
@@ -173,6 +175,7 @@ GENIXAPI(void, subc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __subc_ip(
 GENIXAPI(void, subc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __subc_ip(n, a, y, offy); }
 GENIXAPI(void, subc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __subc_ip(n, a, y, offy); }
 GENIXAPI(void, subc_ip_f32)(int n, float a, float* y, int offy) { __subc_ip(n, a, y, offy); }
+GENIXAPI(void, subc_ip_f64)(int n, double a, double* y, int offy) { __subc_ip(n, a, y, offy); }
 
 // Subtracts a constant value from each element of a vector not in-place.
 template<typename T> void __forceinline __subc(
@@ -195,6 +198,7 @@ GENIXAPI(void, subc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* 
 GENIXAPI(void, subc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __subc(n, x, offx, a, y, offy); }
 GENIXAPI(void, subc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __subc(n, x, offx, a, y, offy); }
 GENIXAPI(void, subc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __subc(n, x, offx, a, y, offy); }
+GENIXAPI(void, subc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __subc(n, x, offx, a, y, offy); }
 
 // Adds the elements of two vectors in-place.
 template<typename T> void __forceinline __add_ip(
@@ -228,6 +232,19 @@ GENIXAPI(void, add_ip_f32)(int n, const float* x, int offx, float* y, int offy)
 		::vsAdd(n, y, x, y);
 	}
 }
+GENIXAPI(void, add_ip_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__add_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vdAdd(n, y, x, y);
+	}
+}
 
 // Adds the elements of two vectors not in-place.
 template<typename T> void __forceinline __add(
@@ -259,6 +276,17 @@ GENIXAPI(void, add_f32)(int n, const float* a, int offa, const float* b, int off
 	else
 	{
 		::vsAdd(n, a + offa, b + offb, y + offy);
+	}
+}
+GENIXAPI(void, add_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__add(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vdAdd(n, a + offa, b + offb, y + offy);
 	}
 }
 
@@ -344,6 +372,19 @@ GENIXAPI(void, sub_ip_f32)(int n, const float* x, int offx, float* y, int offy)
 		::vsSub(n, y, x, y);
 	}
 }
+GENIXAPI(void, sub_ip_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sub_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vdSub(n, y, x, y);
+	}
+}
 
 // Subtracts the elements of two vectors not in-place.
 template<typename T> void __forceinline __sub(
@@ -375,6 +416,17 @@ GENIXAPI(void, sub_f32)(int n, const float* a, int offa, const float* b, int off
 	else
 	{
 		::vsSub(n, a + offa, b + offb, y + offy);
+	}
+}
+GENIXAPI(void, sub_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sub(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vdSub(n, a + offa, b + offb, y + offy);
 	}
 }
 
@@ -441,6 +493,17 @@ GENIXAPI(void, mulc_ip_f32)(int n, float a, float* y, int offy)
 		::cblas_sscal(n, a, y + offy, 1);
 	}
 }
+GENIXAPI(void, mulc_ip_f64)(int n, double a, double* y, int offy)
+{
+	if (n <= 256)
+	{
+		__mulc_ip(n, a, y, offy);
+	}
+	else
+	{
+		::cblas_dscal(n, a, y + offy, 1);
+	}
+}
 
 GENIXAPI(void, smulc_inc)(
 	int n,
@@ -494,6 +557,7 @@ GENIXAPI(void, mulc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* 
 GENIXAPI(void, mulc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __mulc(n, x, offx, a, y, offy); }
 GENIXAPI(void, mulc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __mulc(n, x, offx, a, y, offy); }
 GENIXAPI(void, mulc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __mulc(n, x, offx, a, y, offy); }
+GENIXAPI(void, mulc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __mulc(n, x, offx, a, y, offy); }
 
 // Multiplies two vectors element-wise in-place
 template<typename T> void __forceinline __mul_ip(
@@ -527,6 +591,19 @@ GENIXAPI(void, mul_ip_f32)(int n, const float* x, int offx, float* y, int offy)
 		::vsMul(n, y, x, y);
 	}
 }
+GENIXAPI(void, mul_ip_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__mul_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vdMul(n, y, x, y);
+	}
+}
 
 // Multiplies two vectors element-wise not-in-place
 template<typename T> void __forceinline __mul(
@@ -558,6 +635,17 @@ GENIXAPI(void, mul_f32)(int n, const float* a, int offa, const float* b, int off
 	else
 	{
 		::vsMul(n, a + offa, b + offb, y + offy);
+	}
+}
+GENIXAPI(void, mul_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__mul(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vdMul(n, a + offa, b + offb, y + offy);
 	}
 }
 
@@ -952,7 +1040,9 @@ GENIXAPI(float, _snrm2)(
 }
 
 // sum(x)
-template<typename T, typename TArg> T __forceinline __sum(const int n, const TArg* x, const int offx)
+template<typename T, typename TArg> T __forceinline __sum(
+	const int n,
+	const TArg* x, const int offx)
 {
 	x += offx;
 
@@ -989,6 +1079,10 @@ GENIXAPI(float, sum_f32)(const int n, const float* x, const int offx)
 {
 	return __sum<float, float>(n, x, offx);
 }
+GENIXAPI(double, sum_f64)(const int n, const double* x, const int offx)
+{
+	return __sum<double, double>(n, x, offx);
+}
 
 // variance x
 template<typename T> T __forceinline __variance(int n, T* x, int offx)
@@ -1008,3 +1102,58 @@ template<typename T> T __forceinline __variance(int n, T* x, int offx)
 }
 
 GENIXAPI(float, svariance)(int n, float* x, int offx) { return __variance(n, x, offx); }
+
+// Manhattan distance
+template<typename T> T __forceinline __manhattan_distance(
+	const int n,
+	const T* x, const int offx,
+	const T* y, const int offy)
+{
+	x += offx;
+	y += offy;
+
+	T sum = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		sum += ::fabs(x[i] - y[i]);
+	}
+
+	return sum;
+}
+
+GENIXAPI(float, manhattan_distance_f32)(const int n, const float* x, int offx, const float* y, int offy)
+{
+	return __manhattan_distance(n, x, offx, y, offy);
+}
+GENIXAPI(double, manhattan_distance_f64)(const int n, const double* x, int offx, const double* y, int offy)
+{
+	return __manhattan_distance(n, x, offx, y, offy);
+}
+
+// euclidean distance
+template<typename T> T __forceinline __euclidean_distance_squared(
+	const int n,
+	const T* x, const int offx,
+	const T* y, const int offy)
+{
+	x += offx;
+	y += offy;
+
+	T sum = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		T u = x[i] - y[i];
+		sum += u * u;
+	}
+
+	return sum;
+}
+
+GENIXAPI(float, euclidean_distance_f32)(const int n, const float* x, int offx, const float* y, int offy)
+{
+	return ::sqrtf(__euclidean_distance_squared(n, x, offx, y, offy));
+}
+GENIXAPI(double, euclidean_distance_f64)(const int n, const double* x, int offx, const double* y, int offy)
+{
+	return ::sqrt(__euclidean_distance_squared(n, x, offx, y, offy));
+}

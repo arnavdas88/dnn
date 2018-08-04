@@ -44,6 +44,44 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         public SMOAlgorithm Algorithm { get; set; } = SMOAlgorithm.LibSVM;
 
         /// <summary>
+        ///  Gets or sets the complexity parameter C.
+        /// </summary>
+        /// <value>
+        /// The complexity parameter C. The default value is 1.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// A regularization parameter that trades off wide margin with a small number of margin failures.
+        /// Increasing the value of C forces the creation of a more accurate model that may not generalize well.
+        /// </para>
+        /// </remarks>
+        public float Complexity { get; set; } = 1;
+
+        /// <summary>
+        /// Gets or sets the positive class weight.
+        /// </summary>
+        /// <value>
+        /// The positive class weight. The default value is 1.
+        /// </value>
+        /// <remarks>
+        /// A value higher than zero indicating how much of the <see cref="Complexity"/>
+        /// parameter should be applied to instances having positive label.
+        /// </remarks>
+        public float PositiveWeight { get; set; } = 1;
+
+        /// <summary>
+        /// Gets or sets the negative class weight.
+        /// </summary>
+        /// <value>
+        /// The negative class weight. The default value is 1.
+        /// </value>
+        /// <remarks>
+        /// A value higher than zero indicating how much of the <see cref="Complexity"/>
+        /// parameter should be applied to instances having negative label.
+        /// </remarks>
+        public float NegativeWeight { get; set; } = 1;
+
+        /// <summary>
         /// Gets or sets the convergence tolerance.
         /// </summary>
         /// <value>
@@ -66,10 +104,6 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         /// </returns>
         public SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples)
         {
-            const float complexity = 1;
-            const float positiveWeight = 1;
-            const float negativeWeight = 1;
-
             // count positive and negative labels
             Labels.GetRatio(samples.Select(x => x.y), out int positives, out int negatives);
 
@@ -85,8 +119,8 @@ namespace Genix.MachineLearning.VectorMachines.Learning
             }
 
             // calculate complexity
-            float positiveComplexity = complexity * positiveWeight;
-            float negativeComplexity = complexity * negativeWeight;
+            float positiveComplexity = this.Complexity * this.PositiveWeight;
+            float negativeComplexity = this.Complexity * this.NegativeWeight;
 
             // calculate costs associated with each input
             float[] c = new float[samples.Count];
@@ -131,7 +165,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                         out float[] solution,
                         out float rho);
 
-                    HashSet<int> activeExamples = new HashSet<int>();
+                    /*HashSet<int> activeExamples = new HashSet<int>();
                     for (int i = 0; i < solution.Length; i++)
                     {
                         if (solution[i] > 0)
@@ -158,10 +192,41 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                         this.kernel,
                         vectors,
                         weights,
-                        -(b_lower + b_upper) / 2);
+                        -(b_lower + b_upper) / 2);*/
+
+                    return CreateMachine(solution, -rho);
 
                 default:
                     throw new ArgumentException("The SMO optimization algorithm is invalid.");
+            }
+
+            SupportVectorMachine CreateMachine(float[] alphas, float bias)
+            {
+                // count number of non-bound support vectors
+                int count = 0;
+                for (int i = 0; i < alphas.Length; i++)
+                {
+                    if (alphas[i] > 0)
+                    {
+                        count++;
+                    }
+                }
+
+                // create support vectors and weights
+                float[][] vectors = new float[count][];
+                float[] weights = new float[count];
+
+                for (int i = 0, j = 0; i < alphas.Length; i++)
+                {
+                    if (alphas[i] > 0)
+                    {
+                        vectors[j] = samples[i].x.ToArray();
+                        weights[j] = alphas[i] * y[i];
+                        j++;
+                    }
+                }
+
+                return new SupportVectorMachine(this.kernel, vectors, weights, bias);
             }
         }
     }

@@ -1,0 +1,47 @@
+﻿// -----------------------------------------------------------------------
+// <copyright file="ManhattanDistance.cs" company="Noname, Inc.">
+// Copyright (c) 2018, Alexander Volgunin. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace Genix.MachineLearning.Distances
+{
+    using System;
+    using System.Runtime.CompilerServices;
+    using Genix.Core;
+
+    /// <summary>
+    /// Measures the Manhattan distance between two points.
+    /// </summary>
+    public struct ManhattanDistance
+        : IDistance<float, float>, IDistance<double, double>, IDistance<float[], float>, IDistance<double[], double>
+    {
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Distance(float x, float y)
+        {
+            return Math.Abs(x - y);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double Distance(double x, double y)
+        {
+            return Math.Abs(x - y);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Distance(float[] x, float[] y)
+        {
+            return Mathematics.ManhattanDistance(x.Length, x, 0, y, 0);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double Distance(double[] x, double[] y)
+        {
+            return Mathematics.ManhattanDistance(x.Length, x, 0, y, 0);
+        }
+    }
+}

@@ -75,6 +75,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Clustering\KMeansTest.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="LanguageModel\CharsetTest.cs" />
     <Compile Include="LanguageModel\ContextTest.cs" />

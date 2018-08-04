@@ -45,6 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classifcation\Labels.cs" />
+    <Compile Include="Clustering\KMeans\KMeans.cs" />
+    <Compile Include="Clustering\KMeans\KMeansClusterCollection.cs" />
+    <Compile Include="Clustering\KMeans\KMeansCluster.cs" />
+    <Compile Include="Distances\EuclideanDistance.cs" />
+    <Compile Include="Distances\IDistance.cs" />
+    <Compile Include="Distances\ManhattanDistance.cs" />
     <Compile Include="Kernels\ChiSquare.cs" />
     <Compile Include="Kernels\IKernel.cs" />
     <Compile Include="LanguageModel\Charset.cs" />
