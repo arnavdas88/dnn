@@ -57,6 +57,14 @@ namespace Genix.Imaging
         public int Stride8 => this.Stride << 3;
 
         /// <summary>
+        /// Gets the tranformation performed on the image since it was first created.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Imaging.Transform"/> object that contains the image transormations.
+        /// </value>
+        public Transform Transform { get; private set; } = new IdentityTransform();
+
+        /// <summary>
         /// Gets the mask that clears ending unused bits in the stride.
         /// </summary>
         /// <value>
@@ -85,6 +93,7 @@ namespace Genix.Imaging
                 Arrays.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
             }
 
+            dst.Transform = this.Transform;
             return dst;
         }
 

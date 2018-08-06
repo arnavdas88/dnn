@@ -17,28 +17,29 @@ namespace Genix.Imaging
     /// <summary>
     /// Represents a composite transformation an <see cref="Image"/> that consists of several other transformations.
     /// </summary>
-    public class CompositeTransform : TransformBase
+    [JsonObject(MemberSerialization.OptIn)]
+    public class CompositeTransform : Transform
     {
         [JsonProperty("transforms")]
-        private readonly List<TransformBase> transforms = new List<TransformBase>();
+        private readonly List<Transform> transforms = new List<Transform>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeTransform"/> class.
         /// </summary>
         /// <param name="transforms">The collection of transformations.</param>
-        public CompositeTransform(IEnumerable<TransformBase> transforms)
+        public CompositeTransform(IEnumerable<Transform> transforms)
         {
             if (transforms == null)
             {
                 throw new ArgumentNullException(nameof(transforms));
             }
 
-            TransformBase last = null;
+            Transform last = null;
             Append(transforms);
 
-            void Append(IEnumerable<TransformBase> collection)
+            void Append(IEnumerable<Transform> collection)
             {
-                foreach (TransformBase transform in transforms)
+                foreach (Transform transform in transforms)
                 {
                     if (transform is IdentityTransform)
                     {
@@ -75,12 +76,12 @@ namespace Genix.Imaging
         /// <value>
         /// The collection of transformations.
         /// </value>
-        public ReadOnlyCollection<TransformBase> Transforms => new ReadOnlyCollection<TransformBase>(this.transforms);
+        public ReadOnlyCollection<Transform> Transforms => new ReadOnlyCollection<Transform>(this.transforms);
 
         /// <inheritdoc />
         public override Point Convert(Point value)
         {
-            foreach (TransformBase transform in this.transforms)
+            foreach (Transform transform in this.transforms)
             {
                 value = transform.Convert(value);
             }
@@ -91,7 +92,7 @@ namespace Genix.Imaging
         /// <inheritdoc />
         public override Rect Convert(Rect value)
         {
-            foreach (TransformBase transform in this.transforms)
+            foreach (Transform transform in this.transforms)
             {
                 value = transform.Convert(value);
             }
@@ -100,9 +101,14 @@ namespace Genix.Imaging
         }
 
         /// <inheritdoc />
-        public override TransformBase Append(TransformBase transform)
+        public override Transform Append(Transform transform)
         {
             if (transform is IdentityTransform)
+            {
+                return this;
+            }
+
+            if (transform is MatrixTransform matrixTransform && matrixTransform.IsIdentity)
             {
                 return this;
             }

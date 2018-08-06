@@ -7,11 +7,13 @@
 namespace Genix.Imaging
 {
     using System.Windows;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Represents a horizontal and vertical shift of an <see cref="Image"/>.
     /// </summary>
-    public class IdentityTransform : TransformBase
+    [JsonObject(MemberSerialization.OptIn)]
+    public class IdentityTransform : Transform
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityTransform"/> class.
@@ -33,7 +35,7 @@ namespace Genix.Imaging
         }
 
         /// <inheritdoc />
-        public override TransformBase Append(TransformBase transform)
+        public override Transform Append(Transform transform)
         {
             return transform;
         }

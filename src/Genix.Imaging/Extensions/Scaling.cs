@@ -247,6 +247,7 @@ namespace Genix.Imaging
                 dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
             }
 
+            dst.Transform = this.Transform.Append(new MatrixTransform(left, top));
             return dst;
         }
 
@@ -284,6 +285,7 @@ namespace Genix.Imaging
                 Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
             }
 
+            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.5));
             return dst;
         }
 
@@ -327,6 +329,7 @@ namespace Genix.Imaging
                     break;
             }
 
+            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 1.0 / 3));
             return dst;
         }
 
@@ -374,6 +377,7 @@ namespace Genix.Imaging
                     break;
             }
 
+            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.25));
             return dst;
         }
 

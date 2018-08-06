@@ -87,6 +87,8 @@ namespace Genix.Imaging
         {
             Image dst = new Image(width, height, this);
             Image.CopyArea(this, x, y, width, height, dst, 0, 0);
+
+            dst.Transform = this.Transform.Append(new MatrixTransform(-x, -y));
             return dst;
         }
 
@@ -156,6 +158,7 @@ namespace Genix.Imaging
                 }
             }
 
+            dst.Transform = this.Transform.Append(new MatrixTransform(-bounds.X, -bounds.Y));
             return dst;
         }
 

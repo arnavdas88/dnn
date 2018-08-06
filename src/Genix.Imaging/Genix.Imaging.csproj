@@ -113,7 +113,7 @@
     <Compile Include="Transforms\CompositeTransform.cs" />
     <Compile Include="Transforms\IdentityTransform.cs" />
     <Compile Include="Transforms\MatrixTransform.cs" />
-    <Compile Include="Transforms\TransformBase.cs" />
+    <Compile Include="Transforms\Transform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Imaging.snk" />

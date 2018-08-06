@@ -14,7 +14,8 @@ namespace Genix.Imaging
     /// <summary>
     /// Represents a affine transformation in 2-D space of an <see cref="Image"/>.
     /// </summary>
-    public class MatrixTransform : TransformBase
+    [JsonObject(MemberSerialization.OptIn)]
+    public class MatrixTransform : Transform
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MatrixTransform"/> class, using shift transformation.
@@ -73,6 +74,14 @@ namespace Genix.Imaging
         [JsonProperty("matrix")]
         public Matrix Matrix { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="Matrix"/> is an identity matrix.
+        /// </summary>
+        /// <value>
+        /// <b>true</b> if <see cref="Matrix"/> is an identity matrix; otherwise, <b>false</b>.
+        /// </value>
+        public bool IsIdentity => this.Matrix.IsIdentity;
+
         /// <inheritdoc />
         public override Point Convert(Point value)
         {
@@ -86,14 +95,23 @@ namespace Genix.Imaging
         }
 
         /// <inheritdoc />
-        public override TransformBase Append(TransformBase transform)
+        public override Transform Append(Transform transform)
         {
             if (transform is IdentityTransform)
             {
                 return this;
             }
+            else if (this.IsIdentity)
+            {
+                return transform;
+            }
             else if (transform is MatrixTransform matrixTransform)
             {
+                if (matrixTransform.IsIdentity)
+                {
+                    return this;
+                }
+
                 Matrix matrix = this.Matrix;
                 matrix.Append(matrixTransform.Matrix);
                 return new MatrixTransform(matrix);
@@ -105,7 +123,7 @@ namespace Genix.Imaging
             }
             else
             {
-                return new CompositeTransform(new TransformBase[] { this, transform });
+                return new CompositeTransform(new Transform[] { this, transform });
             }
         }
     }

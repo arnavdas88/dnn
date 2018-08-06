@@ -103,6 +103,7 @@ namespace Genix.Imaging
                 }*/
             }
 
+            transformedImage.Transform = this.Transform.Append(new MatrixTransform(matrix));
             return transformedImage;
 
             System.Windows.Point TransformPoint(int ptx, int pty)
@@ -227,6 +228,7 @@ namespace Genix.Imaging
                 }
             }
 
+            // TODO: add transform
             return dst;
         }
 

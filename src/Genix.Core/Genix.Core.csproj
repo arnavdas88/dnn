@@ -96,6 +96,10 @@
     <Compile Include="System\Int32Extensions.cs" />
     <Compile Include="System\StringExtensions.cs" />
     <Compile Include="Threading\CommonParallel.cs" />
+    <Compile Include="Trees\Heap.cs" />
+    <Compile Include="Trees\PriorityQueue.cs" />
+    <Compile Include="Trees\Tree.cs" />
+    <Compile Include="Trees\TreeNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Core.snk" />

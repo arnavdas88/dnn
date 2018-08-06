@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
+    <Compile Include="Trees\HeapTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Core.Test.snk" />
