@@ -51,6 +51,7 @@
     <Compile Include="Classification\Features.cs" />
     <Compile Include="Classification\IClassifierProgress.cs" />
     <Compile Include="Classification\Answer.cs" />
+    <Compile Include="FeatureDetectors\HistogramsOfOrientedGradients.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancing.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancingOptions.cs" />
     <Compile Include="ImageSource.cs" />
@@ -96,5 +97,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

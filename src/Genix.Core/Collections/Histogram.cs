@@ -209,6 +209,29 @@ namespace Genix.Core
             return Maximum.ArgMax(this.bins.Length, this.bins, 0);
         }
 
+        /// <summary>
+        /// Converts this <see cref="Histogram"/> to a cumulative <see cref="Histogram"/>.
+        /// </summary>
+        /// <returns>
+        /// The cumulative <see cref="Histogram"/> this method creates.
+        /// </returns>
+        public Histogram ToCumulative()
+        {
+            int count = this.Count;
+            Histogram dst = new Histogram(count);
+
+            int[] srcbins = this.bins;
+            int[] dstbins = dst.bins;
+
+            for (int i = 0, sum = 0; i < count; i++)
+            {
+                sum += srcbins[i];
+                dstbins[i] = sum;
+            }
+
+            return dst;
+        }
+
         private int BinIndex(int value)
         {
             if (value < this.minValue)

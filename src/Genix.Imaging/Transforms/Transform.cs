@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="TransformBase.cs" company="Noname, Inc.">
+// <copyright file="Transform.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

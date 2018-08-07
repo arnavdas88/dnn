@@ -768,7 +768,7 @@ GENIXAPI(void, _saxpby)(
 }
 
 // y = a * a
-GENIXAPI(void, ssqr)(
+GENIXAPI(void, sqr_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -790,7 +790,7 @@ GENIXAPI(void, ssqr)(
 }
 
 // y = a ^ 1/2
-GENIXAPI(void, ssqrt)(
+GENIXAPI(void, sqrt_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -811,8 +811,18 @@ GENIXAPI(void, ssqrt)(
 	}
 }
 
+// y = sqrt(a^2 + b^2)
+GENIXAPI(void, hypot_f32)(
+	int n,
+	const float* a, int offa,
+	const float* b, int offb,
+	float* y, int offy)
+{
+	::vsHypot(n, a + offa, b + offb, y + offy);
+}
+
 // y = a ^ b
-GENIXAPI(void, spowx)(
+GENIXAPI(void, powx_f32)(
 	int n,
 	const float* a, int offa,
 	float b,
@@ -835,7 +845,7 @@ GENIXAPI(void, spowx)(
 }
 
 // y += (a ^ b)'
-GENIXAPI(void, powx_gradient)(
+GENIXAPI(void, powx_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	float power,
@@ -884,7 +894,7 @@ GENIXAPI(void, powx_gradient)(
 }
 
 // y = ln(a)
-GENIXAPI(void, slog)(
+GENIXAPI(void, log_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -893,7 +903,7 @@ GENIXAPI(void, slog)(
 }
 
 // y = exp(a)
-GENIXAPI(void, sexp)(
+GENIXAPI(void, exp_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -902,7 +912,7 @@ GENIXAPI(void, sexp)(
 }
 
 // y = sin(a)
-GENIXAPI(void, ssin)(
+GENIXAPI(void, sin_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -911,7 +921,7 @@ GENIXAPI(void, ssin)(
 }
 
 // y += sin(a)'
-GENIXAPI(void, ssin_gradient)(
+GENIXAPI(void, sin_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
@@ -937,7 +947,7 @@ GENIXAPI(void, ssin_gradient)(
 }
 
 // y = cos(a)
-GENIXAPI(void, scos)(
+GENIXAPI(void, cos_f32)(
 	int n,
 	const float* a, int offa,
 	float* y, int offy)
@@ -946,7 +956,7 @@ GENIXAPI(void, scos)(
 }
 
 // y += cos(a)'
-GENIXAPI(void, scos_gradient)(
+GENIXAPI(void, cos_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
@@ -969,6 +979,16 @@ GENIXAPI(void, scos_gradient)(
 			dx[i] -= ::sinf(x[i]) * dy[i];
 		}
 	}
+}
+
+// y = atan2(a/b)
+GENIXAPI(void, atan2_f32)(
+	int n,
+	const float* a, int offa,
+	const float* b, int offb,
+	float* y, int offy)
+{
+	::vsAtan2(n, a + offa, b + offb, y + offy);
 }
 
 // L1 normalization

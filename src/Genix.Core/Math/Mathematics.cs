@@ -1396,7 +1396,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Square(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.ssqr(length, x, offx, y, offy);
+            NativeMethods.sqr_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1414,7 +1414,24 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sqrt(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.ssqrt(length, x, offx, y, offy);
+            NativeMethods.sqrt_f32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a square root of sum of two squared elements of two array starting at the specified indexes
+        /// and puts results into another array starting at the specified index.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting index in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting index in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting index in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Hypotenuse(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.hypot_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -1433,7 +1450,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Pow(int length, float[] x, int offx, float power, float[] y, int offy)
         {
-            NativeMethods.spowx(length, x, offx, power, y, offy);
+            NativeMethods.powx_f32(length, x, offx, power, y, offy);
         }
 
         /// <summary>
@@ -1453,7 +1470,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PowGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float power, float[] dy, int offdy)
         {
-            NativeMethods.powx_gradient(length, x, dx, offx, cleardx, power, dy, offdy);
+            NativeMethods.powx_gradient_f32(length, x, dx, offx, cleardx, power, dy, offdy);
         }
 
         /// <summary>
@@ -1479,7 +1496,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Log(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.slog(length, x, offx, y, offy);
+            NativeMethods.log_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1493,7 +1510,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Exp(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.sexp(length, x, offx, y, offy);
+            NativeMethods.exp_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1507,7 +1524,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sin(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.ssin(length, x, offx, y, offy);
+            NativeMethods.sin_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1523,7 +1540,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SinGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] dy, int offdy)
         {
-            NativeMethods.ssin_gradient(length, x, dx, offx, cleardx, dy, offdy);
+            NativeMethods.sin_gradient_f32(length, x, dx, offx, cleardx, dy, offdy);
         }
 
         /// <summary>
@@ -1537,7 +1554,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Cos(int length, float[] x, int offx, float[] y, int offy)
         {
-            NativeMethods.scos(length, x, offx, y, offy);
+            NativeMethods.cos_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1553,7 +1570,23 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CosGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] dy, int offdy)
         {
-            NativeMethods.scos_gradient(length, x, dx, offx, cleardx, dy, offdy);
+            NativeMethods.cos_gradient_f32(length, x, dx, offx, cleardx, dy, offdy);
+        }
+
+        /// <summary>
+        /// Computes the angle whose tangent is the quotient of two specified numbers element-wise.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The array that contains the y coordinate of points.</param>
+        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
+        /// <param name="b">The array that contains the x coordinate of points.</param>
+        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
+        /// <param name="y">The array that receives the computed data.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Atan2(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.atan2_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -2073,19 +2106,23 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssqr(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
+            public static extern void sqr_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssqrt(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
+            public static extern void sqrt_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void spowx(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
+            public static extern void hypot_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void powx_gradient(
+            public static extern void powx_f32(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void powx_gradient_f32(
                 int n,
                 [In] float[] x,
                 [In, Out] float[] dx,
@@ -2101,19 +2138,19 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void slog(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
+            public static extern void log_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void sexp(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
+            public static extern void exp_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssin(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern void sin_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void ssin_gradient(
+            public static extern void sin_gradient_f32(
                 int n,
                 [In] float[] x,
                 [Out] float[] dx,
@@ -2124,11 +2161,11 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void scos(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern void cos_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void scos_gradient(
+            public static extern void cos_gradient_f32(
                 int n,
                 [In] float[] x,
                 [Out] float[] dx,
@@ -2136,6 +2173,10 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool cleardx,
                 [In] float[] dy,
                 int offdy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="KMeansCentroid.cs" company="Noname, Inc.">
+// <copyright file="KMeansCluster.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

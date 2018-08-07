@@ -409,6 +409,86 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Histogram HistogramY(Rectangle area) => this.HistogramY(area.X, area.Y, area.Width, area.Height);
 
+        /// <summary>
+        /// Computes the minimum and maximum of <see cref="Image"/> values.
+        /// </summary>
+        /// <param name="min">The minimum pixel value.</param>
+        /// <param name="max">The maximum pixel value.</param>
+        /// <exception cref="NotSupportedException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <remarks>
+        /// This method supports gray images only and will throw an exception otherwise.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MinMax(out byte min, out byte max) =>
+            this.MinMax(0, 0, this.Width, this.Height, out min, out max);
+
+        /// <summary>
+        /// Computes the minimum and maximum of <see cref="Image"/> values withing a rectangular area
+        /// specified by a pair of coordinates, a width, and a height.
+        /// </summary>
+        /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="width">The width, in pixels, of the area.</param>
+        /// <param name="height">The height, in pixels, of the area.</param>
+        /// <param name="min">The minimum pixel value.</param>
+        /// <param name="max">The maximum pixel value.</param>
+        /// <exception cref="NotSupportedException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports gray images only and will throw an exception otherwise.
+        /// </remarks>
+        public void MinMax(int x, int y, int width, int height, out byte min, out byte max)
+        {
+            this.ValidateArea(x, y, width, height);
+
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                    NativeMethods.minmax_8bpp(
+                        x,
+                        y,
+                        width,
+                        height,
+                        this.Bits,
+                        this.Stride,
+                        out min,
+                        out max);
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        this.BitsPerPixel));
+            }
+        }
+
+        /// <summary>
+        /// Computes the minimum and maximum of <see cref="Image"/> values withing a rectangular area
+        /// specified by a <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="min">The minimum pixel value.</param>
+        /// <param name="max">The maximum pixel value.</param>
+        /// <exception cref="NotSupportedException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// This method supports gray images only and will throw an exception otherwise.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MinMax(Rectangle area, out byte min, out byte max) =>
+            this.MinMax(area.X, area.Y, area.Width, area.Height, out min, out max);
+
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
@@ -463,6 +543,18 @@ namespace Genix.Imaging
                 [In] ulong[] bits,
                 int stride,
                 [Out] int[] hist);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void minmax_8bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride,
+                [Out] out byte min,
+                [Out] out byte max);
         }
     }
 }

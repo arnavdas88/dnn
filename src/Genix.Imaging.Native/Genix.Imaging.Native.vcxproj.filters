@@ -37,5 +37,14 @@
     <ClCompile Include="source\statistic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\hog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\linesuppression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\threshold.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

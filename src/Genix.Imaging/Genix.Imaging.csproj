@@ -58,11 +58,13 @@
   <ItemGroup>
     <Compile Include="Canvas.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
+    <Compile Include="Extensions\FeatureDetectors.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
     <Compile Include="Extensions\Operators.cs" />
     <Compile Include="Extensions\StructuringElement.cs" />
+    <Compile Include="Extensions\Thresholding.cs" />
     <Compile Include="ImageF.cs" />
     <Compile Include="Extensions\ConnectedComponent.cs" />
     <Compile Include="Lab\CanvasDataProvider.cs" />
