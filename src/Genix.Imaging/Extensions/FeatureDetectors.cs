@@ -100,8 +100,8 @@ namespace Genix.Imaging
                 srcf.Stride);
 
             // convert angles to bins
-            Mathematics.DivC(angles.Length, (float)(Math.PI / numberOfBins), angles, 0);
-            Mathematics.Abs(angles.Length, angles, 0);
+            Math32f.DivC(angles.Length, (float)(Math.PI / numberOfBins), angles, 0);
+            Math32f.Abs(angles.Length, angles, 0);
 
             return (null, 0);
 

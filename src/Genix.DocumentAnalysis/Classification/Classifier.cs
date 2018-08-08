@@ -257,7 +257,7 @@ namespace Genix.DocumentAnalysis.Classification
                 });
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Trains the classifier on a sequence of features extracted from the elements,
         /// provides progress information,
         /// and monitors cancellation requests.
@@ -268,7 +268,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <param name="truthselector">The selector that converts elements into ground truth.</param>
         /// <param name="progress">The provider used to report a progress change. Can be <b>null</b>.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the classifier that the operation should be canceled.</param>
-        /*public abstract void Train<T>(
+        public abstract void Train<T>(
             IEnumerable<T> sources,
             Func<T, CancellationToken, TFeatures> selector,
             Func<T, Features> truthselector,

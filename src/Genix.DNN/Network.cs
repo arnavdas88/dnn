@@ -272,7 +272,7 @@ namespace Genix.DNN
 
             float loss = lossFunction.Loss(y, expected, true);
 
-            Mathematics.Sub(y.Length, y.Weights, 0, y.Gradient, 0, y.Gradient, 0);
+            Math32f.Sub(y.Length, y.Weights, 0, y.Gradient, 0, y.Gradient, 0);
             session.Unroll();
 
             session.DetachTensor(y);

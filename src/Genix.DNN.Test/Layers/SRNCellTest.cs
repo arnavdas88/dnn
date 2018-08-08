@@ -222,7 +222,7 @@
                 }
 
                 // should be dy
-                Mathematics.Add(2, dy, oi, expectedBG, 0);
+                Math32f.Add(2, dy, oi, expectedBG, 0);
             }
 
             Helpers.AreArraysEqual(expectedWG, layer.W.Gradient);

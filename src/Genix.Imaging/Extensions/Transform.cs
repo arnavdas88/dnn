@@ -339,7 +339,7 @@ namespace Genix.Imaging
                     // negative shift is down
                     int shiftY = (int)Math.Round(dblTanA * (centerX - (ix * 64) - 32), MidpointRounding.AwayFromZero);
 
-                    Mathematics.Add(
+                    Math32f.Add(
                         height - Math.Abs(shiftY),
                         histogram[ix],
                         shiftY < 0 ? 0 : shiftY,

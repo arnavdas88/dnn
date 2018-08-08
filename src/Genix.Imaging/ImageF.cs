@@ -6,8 +6,8 @@
 
 namespace Genix.Imaging
 {
-    using Genix.Core;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
 
     /// <summary>
     /// Represents an image with each pixel described by <see cref="float"/> value.

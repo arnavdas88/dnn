@@ -22,22 +22,22 @@
                 float[] y0 = this.random.Generate(length, null);
 
                 float[] y = y0.ToArray();
-                Mathematics.Add(length, x, 0, y, 0);
+                Math32f.Add(length, x, 0, y, 0);
                 GenixAssert.AreArraysEqual(x.Zip(y0, (a, b) => a + b).ToArray(), y);
 
                 y = y0.ToArray();
                 int count = length - Math.Max(offx, offy);
-                Mathematics.Add(count, x, offx, y, offy);
+                Math32f.Add(count, x, offx, y, offy);
                 GenixAssert.AreArraysEqual(offy, y0, 0, y, 0);
                 GenixAssert.AreArraysEqual(count, x.Skip(offx).Zip(y0.Skip(offy), (a, b) => a + b).ToArray(), 0, y, offy);
 
                 y = y0.ToArray();
-                Mathematics.Add(length, x, 0, y0, 0, y, 0);
+                Math32f.Add(length, x, 0, y0, 0, y, 0);
                 GenixAssert.AreArraysEqual(x.Zip(y0, (a, b) => a + b).ToArray(), y);
 
                 y = y0.ToArray();
                 count = length - Math.Max(offx, Math.Max(offy, offy0));
-                Mathematics.Add(count, x, offx, y0, offy0, y, offy);
+                Math32f.Add(count, x, offx, y0, offy0, y, offy);
                 GenixAssert.AreArraysEqual(offy, y0, 0, y, 0);
                 GenixAssert.AreArraysEqual(count, x.Skip(offx).Zip(y0.Skip(offy0), (a, b) => a + b).ToArray(), 0, y, offy);
             }
@@ -52,27 +52,27 @@
                 float[] y = new float[length];
 
                 Arrays.Set(length, 0.0f, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == 1.0f));
 
                 Arrays.Set(length, float.NegativeInfinity, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
                 Arrays.Set(length, float.PositiveInfinity, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
                 Arrays.Set(length, float.MinValue, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
                 Arrays.Set(length, float.MaxValue, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
                 Arrays.Set(length, float.NaN, a, 0);
-                Mathematics.AddC(length, a, 0, 1.0f, y, 0);
+                Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
         }
@@ -86,27 +86,27 @@
                 float[] y = new float[length];
 
                 Arrays.Set(length, 0.0f, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == -1.0f));
 
                 Arrays.Set(length, float.NegativeInfinity, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
                 Arrays.Set(length, float.PositiveInfinity, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
                 Arrays.Set(length, float.MinValue, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
                 Arrays.Set(length, float.MaxValue, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
                 Arrays.Set(length, float.NaN, a, 0);
-                Mathematics.SubC(length, a, 0, 1.0f, y, 0);
+                Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
         }

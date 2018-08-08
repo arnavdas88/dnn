@@ -55,7 +55,7 @@ GENIXAPI(float, slogSumExp3)(const float a, const float b, const float c)
 	}
 }
 
-// calculates absolute value of a vector element-wise
+// calculates absolute value of a vector element-wise in-place.
 template<typename T> void __forceinline __abs_ip(
 	int n,
 	T* y, int offy)
@@ -73,29 +73,47 @@ GENIXAPI(void, abs_ip_s64)(int n, __int64* y, int offy) { __abs_ip(n, y, offy); 
 GENIXAPI(void, abs_ip_f32)(int n, float* y, int offy) { __abs_ip(n, y, offy); }
 GENIXAPI(void, abs_ip_f64)(int n, double* y, int offy) { __abs_ip(n, y, offy); }
 
-// calculates absolute value of a vector element-wise
-GENIXAPI(void, sabs)(
+// calculates absolute value of a vector element-wise not-in-place.
+template<typename T> void __forceinline __abs(
 	int n,
-	const float* a, int offa,
-	float* y, int offy)
+	const T* x, int offx,
+	T* y, int offy)
 {
-	a += offa;
+	x += offx;
 	y += offy;
 
-	if (n <= 32)
+	for (int i = 0; i < n; i++)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = ::fabsf(a[i]);
-		}
-	}
-	else
-	{
-		::vsAbs(n, a, y);
+		y[i] = abs(x[i]);
 	}
 }
 
-GENIXAPI(void, sabs_gradient)(
+GENIXAPI(void, abs_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __abs(n, x, offx, y, offy); }
+GENIXAPI(void, abs_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __abs(n, x, offx, y, offy); }
+GENIXAPI(void, abs_f32)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__abs(n, x, offx, y, offy);
+	}
+	else
+	{
+		::vsAbs(n, x + offx, y + offy);
+	}
+}
+GENIXAPI(void, abs_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__abs(n, x, offx, y, offy);
+	}
+	else
+	{
+		::vdAbs(n, x + offx, y + offy);
+	}
+}
+
+GENIXAPI(void, abs_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* y, const float* dy, int offy)

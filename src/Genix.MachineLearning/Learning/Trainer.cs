@@ -217,7 +217,7 @@ namespace Genix.MachineLearning.Learning
 
             if (batchSize > 1)
             {
-                Mathematics.MulC(layer.w.Length, 1.0f / batchSize, dw, 0);
+                Math32f.MulC(layer.w.Length, 1.0f / batchSize, dw, 0);
             }
 
             float rateL1 = this.RateL1 * layer.RateL1Multiplier;
@@ -248,7 +248,7 @@ namespace Genix.MachineLearning.Learning
             layer.w.Validate();
 
             // update weights
-            Mathematics.Add(layer.w.Length, dw, 0, w, 0);
+            Math32f.Add(layer.w.Length, dw, 0, w, 0);
 
             // zero out gradient so that we can begin accumulating anew
             layer.w.ClearGradient();

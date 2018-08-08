@@ -189,7 +189,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
@@ -200,7 +200,7 @@ namespace Genix.MachineLearning
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Math32f.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
@@ -219,7 +219,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
@@ -242,11 +242,11 @@ namespace Genix.MachineLearning
                             }
                             else
                             {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Math32f.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
                                 }
                             }
 
@@ -259,11 +259,11 @@ namespace Genix.MachineLearning
                                 }
                                 else
                                 {
-                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Math32f.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Math32f.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
                                     }
                                 }
                             }
@@ -623,7 +623,7 @@ namespace Genix.MachineLearning
                     else
 #endif
                     {
-                        Mathematics.MulC(x.Length, xw, 0, probability, yw, 0);
+                        Math32f.MulC(x.Length, xw, 0, probability, yw, 0);
                     }
 
                     return y;
@@ -703,7 +703,7 @@ namespace Genix.MachineLearning
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
-                                Mathematics.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
+                                Math32f.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
                                 Mathematics.Divide(x.Length, x.Gradient, 0, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
@@ -711,7 +711,7 @@ namespace Genix.MachineLearning
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
                                 Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
-                                Mathematics.Mul(x.Length, x.Gradient, 0, y.Gradient, 0, x.Gradient, 0);
+                                Math32f.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
                                 Mathematics.MultiplyAndAdd(x.Length, -2.0f * alpha * beta / kernelSize, work.Weights, 0, x.Gradient, 0);

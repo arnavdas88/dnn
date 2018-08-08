@@ -46,7 +46,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Mathematics.Add(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Math32f.Add(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -60,7 +60,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (a)
                                     {
-                                        Mathematics.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
+                                        Math32f.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
                                     }
 
                                     a.Validate();
@@ -71,7 +71,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (b)
                                     {
-                                        Mathematics.Add(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        Math32f.Add(y.Length, y.Gradient, 0, b.Gradient, 0);
                                     }
 
                                     b.Validate();
@@ -111,13 +111,13 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.AddC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
+                    Math32f.AddC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += dy
-                        session.Push(ActionName, () => Mathematics.Add(y.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Math32f.Add(y.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -152,7 +152,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Mathematics.Sub(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Math32f.Sub(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -166,7 +166,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (a)
                                     {
-                                        Mathematics.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
+                                        Math32f.Add(y.Length, y.Gradient, 0, a.Gradient, 0);
                                     }
                                 }
 
@@ -175,7 +175,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (b)
                                     {
-                                        Mathematics.Sub(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        Math32f.Sub(y.Length, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });
@@ -213,7 +213,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Mathematics.Mul(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Math32f.Mul(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -272,7 +272,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.MulC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
+                    Math32f.MulC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -487,12 +487,12 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Abs(x.Length, x.Weights, 0, y.Weights, 0);
+                    Math32f.Abs(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Mathematics.AbsGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
+                        session.Push(ActionName, () => Math32f.AbsGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -947,7 +947,7 @@ namespace Genix.MachineLearning
                                     {
                                         lock (bias)
                                         {
-                                            Mathematics.Add(c.Length, c.Gradient, 0, bias.Gradient, 0);
+                                            Math32f.Add(c.Length, c.Gradient, 0, bias.Gradient, 0);
                                         }
 
                                         bias.Validate();
@@ -1125,7 +1125,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (bias)
                                     {
-                                        Mathematics.Add(ylen, y.Gradient, 0, bias.Gradient, 0);
+                                        Math32f.Add(ylen, y.Gradient, 0, bias.Gradient, 0);
                                     }
 
                                     bias.Validate();

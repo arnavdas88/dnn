@@ -90,7 +90,7 @@ namespace Genix.MachineLearning.Learning
             {
                 // vanilla sgd
                 // dx = -learningRate * g
-                Mathematics.MulC(gradient.Length, -learningRate, gradient, 0);
+                Math32f.MulC(gradient.Length, -learningRate, gradient, 0);
             }
         }
     }
