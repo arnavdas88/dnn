@@ -21,6 +21,9 @@ namespace Genix.DocumentAnalysis.Classification
         [JsonProperty("classes")]
         private readonly Dictionary<string, ClassData> classes = new Dictionary<string, ClassData>();
 
+        /// <inheritdoc />
+        public override bool IsTrained => false;
+
         /// <summary>
         /// Gets a number of unique words from all pages the classifier was trained on.
         /// </summary>
@@ -113,19 +116,6 @@ namespace Genix.DocumentAnalysis.Classification
 
                 return 1.0;
             }
-        }
-
-        /// <inheritdoc />
-        public override void Train<T>(
-            IEnumerable<T> sources,
-            System.Func<T,
-            CancellationToken,
-            BayesFeatures> selector,
-            System.Func<T, Features> truthselector,
-            IClassifierProgress<T> progress,
-            CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
         }
 
         /// <inheritdoc />

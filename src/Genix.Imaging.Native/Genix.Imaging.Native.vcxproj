@@ -127,6 +127,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\affine.cpp" />
+    <ClCompile Include="source\gradients.cpp" />
     <ClCompile Include="source\hog.cpp" />
     <ClCompile Include="source\linesuppression.cpp" />
     <ClCompile Include="source\scale.cpp" />

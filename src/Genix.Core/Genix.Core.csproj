@@ -64,6 +64,7 @@
     <Compile Include="Lab\ClassStatistics.cs" />
     <Compile Include="Lab\ClassSummary.cs" />
     <Compile Include="Lab\ConfusionMatrix.cs" />
+    <Compile Include="Lab\Program.cs" />
     <Compile Include="Lab\RejectCurve.cs" />
     <Compile Include="Lab\RejectCurvePoint.cs" />
     <Compile Include="Lab\RejectCurveTarget.cs" />

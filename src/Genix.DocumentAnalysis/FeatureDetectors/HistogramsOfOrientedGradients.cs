@@ -6,17 +6,22 @@
 
 namespace Genix.DocumentAnalysis.FeatureDetectors
 {
+    using System;
+    using System.Drawing;
+    using System.Threading;
     using Genix.Imaging;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Represents a Histograms of Oriented Gradients (HOG) feature detector.
     /// </summary>
-    public class HistogramsOfOrientedGradients
+    public class HistogramsOfOrientedGradients : IFeatureDetector
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HistogramsOfOrientedGradients"/> class,
         /// using default parameters.
         /// </summary>
+        [JsonConstructor]
         public HistogramsOfOrientedGradients()
         {
         }
@@ -41,6 +46,7 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// <value>
         /// The cell size, in pixels. The default value is 8.
         /// </value>
+        [JsonProperty("cellSize")]
         public int CellSize { get; } = 8;
 
         /// <summary>
@@ -49,6 +55,7 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// <value>
         /// The block size, in number of <see cref="CellSize"/>. The default value is 2.
         /// </value>
+        [JsonProperty("blockSize")]
         public int BlockSize { get; } = 2;
 
         /// <summary>
@@ -57,18 +64,22 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// <value>
         /// The number of bins (orientations) in the histogram. The default value is 9.
         /// </value>
+        [JsonProperty("numberOfBins")]
         public int NumberOfBins { get; } = 9;
 
-        /// <summary>
-        /// Finds points of interest on the specified <see cref="Image"/> and returns feature vectors.
-        /// </summary>
-        /// <param name="image">The <see cref="Image"/> to process.</param>
-        /// <returns>
-        /// The feature vectors that contains interest points.
-        /// </returns>
-        public float[] ExtractFeatureVectors(Image image)
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public Features Detect(Imaging.Image image, CancellationToken cancellationToken)
         {
-            return null;
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            (float[] vectors, int length) = image.HOG(this.CellSize, this.BlockSize, this.NumberOfBins);
+            return new Features(vectors.Length / length, length, vectors);
         }
     }
 }

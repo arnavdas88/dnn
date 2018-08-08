@@ -12,8 +12,7 @@ namespace Genix.DocumentAnalysis.Classification
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents a set of features extracted from a data source.
-    /// This is an abstract class.
+    /// Represents a set of features for <see cref="BayesClassifier"/>.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class BayesFeatures : Features

@@ -15,7 +15,7 @@ namespace Genix.DocumentAnalysis.Classification
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Provides features extraction for Bayes classification.
+    /// Provides features extraction for <see cref="BayesClassifier"/>.
     /// </summary>
     public class BayesFeatureBuilder
         : IFeatureBuilder<PageSource, BayesFeatures>,

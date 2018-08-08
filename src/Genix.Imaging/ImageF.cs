@@ -6,6 +6,7 @@
 
 namespace Genix.Imaging
 {
+    using Genix.Core;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -39,6 +40,106 @@ namespace Genix.Imaging
             image.HorizontalResolution,
             image.VerticalResolution)
         {
+        }
+
+        /// <summary>
+        /// Sets the border outside specified area of interest.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        internal void SetBorder(int x, int y, int width, int height, BorderType borderType, float borderValue)
+        {
+            int stride = this.Stride;
+            float[] bits = this.Bits;
+
+            int right = x + width;
+            int bottom = y + height;
+            int offy = y * stride;
+
+            switch (borderType)
+            {
+                case BorderType.BorderRepl:
+                    SetBorderRepl();
+                    break;
+
+                case BorderType.BorderConst:
+                    SetBorderConst();
+                    break;
+            }
+
+            void SetBorderRepl()
+            {
+                // set top
+                if (y > 0)
+                {
+                    Arrays.Tile(this.Width, y, bits, offy + stride, bits, 0);
+                }
+
+                // set left
+                if (x > 0)
+                {
+                    for (int i = y, off = offy; i < height; i++, off += stride)
+                    {
+                        Arrays.Set(x, bits[off + x], bits, off);
+                    }
+                }
+
+                // set right
+                int len = this.Width - right;
+                if (len > 0)
+                {
+                    for (int i = y, off = offy + right; i < height; i++, off += stride)
+                    {
+                        Arrays.Set(len, bits[off - 1], bits, off);
+                    }
+                }
+
+                // set bottom
+                len = this.Height - bottom;
+                if (len > 0)
+                {
+                    Arrays.Tile(this.Width, len, bits, (bottom - 1) * stride, bits, bottom * stride);
+                }
+            }
+
+            void SetBorderConst()
+            {
+                // set top
+                if (y > 0)
+                {
+                    Arrays.Set(offy, borderValue, bits, 0);
+                }
+
+                // set left
+                if (x > 0)
+                {
+                    for (int i = y, off = offy; i < height; i++, off += stride)
+                    {
+                        Arrays.Set(x, borderValue, bits, off);
+                    }
+                }
+
+                // set right
+                int len = this.Width - right;
+                if (len > 0)
+                {
+                    for (int i = y, off = offy + right; i < height; i++, off += stride)
+                    {
+                        Arrays.Set(len, borderValue, bits, off);
+                    }
+                }
+
+                // set bottom
+                len = this.Height - bottom;
+                if (len > 0)
+                {
+                    Arrays.Set(len * stride, borderValue, bits, bottom * stride);
+                }
+            }
         }
     }
 }

@@ -7,9 +7,11 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Drawing;
     using System.Globalization;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Core;
 
     /// <content>
     /// Provides feature detection methods for the <see cref="Image"/> class.
@@ -70,28 +72,82 @@ namespace Genix.Imaging
         /// <summary>
         /// Calculates the histogram of oriented gradients (HOG) on the <see cref="Image"/>.
         /// </summary>
+        /// <param name="cellSize">The cell size, in pixels.</param>
+        /// <param name="blockSize">The block size, in number of <paramref name="cellSize"/>.</param>
+        /// <param name="numberOfBins">The number of bins (orientations) in the histogram.</param>
+        /// <returns>
+        /// The tuple that contains the feature vectors and the feature vector length.
+        /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1 or 8.
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1, 8, 24, or 32.
         /// </exception>
-        public void HOG()
+        public (float[] vectors, int vectorLength) HOG(int cellSize, int blockSize, int numberOfBins)
         {
-            if (this.BitsPerPixel != 1 && this.BitsPerPixel != 8)
-            {
-                throw new NotSupportedException(
-                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
-            }
+            // convert image to float
+            ImageF srcf = PrepareImage();
 
-            // IPP does not support 1bpp images - convert to 8bpp
-            Image src = this.BitsPerPixel == 1 ? this.Convert1To8(255, 0) : this;
+            // calculate gradient vectors magnitude and direction using Prewitt operator (-1 0 1)
+            float[] magnitude = new float[srcf.Bits.Length];
+            float[] angles = new float[srcf.Bits.Length];
+            NativeMethods.gradientVectorPrewitt_f32(
+                srcf.Width,
+                srcf.Height,
+                srcf.Bits,
+                srcf.Stride,
+                magnitude,
+                srcf.Stride,
+                angles,
+                srcf.Stride);
 
-            if (NativeMethods.hog(
-                src.BitsPerPixel,
-                src.Width,
-                src.Height,
-                src.Stride,
-                src.Bits) != 0)
+            // convert angles to bins
+            Mathematics.DivC(angles.Length, (float)(Math.PI / numberOfBins), angles, 0);
+            Mathematics.Abs(angles.Length, angles, 0);
+
+            return (null, 0);
+
+            ImageF PrepareImage()
             {
-                throw new OutOfMemoryException();
+                // convert image to 8bpp
+                Image src;
+                switch (this.BitsPerPixel)
+                {
+                    case 1:
+                        src = this.Convert1To8(255, 0);
+                        break;
+
+                    case 8:
+                        src = this;
+                        break;
+
+                    case 24:
+                        src = this.Convert24To8();
+                        break;
+
+                    case 32:
+                        src = this.Convert32To8();
+                        break;
+
+                    default:
+                        throw new NotSupportedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                }
+
+                /*if (NativeMethods.hog(
+                    src.BitsPerPixel,
+                    src.Width,
+                    src.Height,
+                    src.Stride,
+                    src.Bits) != 0)
+                {
+                    throw new OutOfMemoryException();
+                }*/
+
+                // convert image to float
+                return src.Convert8To32f(
+                    Mathematics.RoundUp(src.Width, cellSize),
+                    Mathematics.RoundUp(src.Height, cellSize),
+                    BorderType.BorderRepl,
+                    0);
             }
         }
 
@@ -114,6 +170,27 @@ namespace Genix.Imaging
                 int height,
                 int stride,
                 [In] ulong[] src);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int cart2polar(
+                int n,
+                [In] float[] re,
+                [In] float[] im,
+                [Out] float[] magnitude,
+                [Out] float[] phase);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int gradientVectorPrewitt_f32(
+                int width,
+                int height,
+                [In] float[] src,
+                int stride,
+                [Out] float[] magnitude,
+                int magnitudeStride,
+                [Out] float[] angle,
+                int angleStride);
         }
     }
 }

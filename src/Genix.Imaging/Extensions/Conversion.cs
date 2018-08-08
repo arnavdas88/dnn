@@ -319,6 +319,207 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Converts a gray scale <see cref="Image"/> to a color 24-bit <see cref="Image"/> by copying luminance component to color components.
+        /// </summary>
+        /// <returns>
+        /// A new 24-bit <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts a gray scale image to an RGB/BGR image by copying luminance component to color components.
+        /// </para>
+        /// </remarks>
+        public Image Convert8To24()
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                24,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert8to24(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a gray scale <see cref="Image"/> to a color 32-bit <see cref="Image"/> by copying luminance component to color components.
+        /// </summary>
+        /// <param name="alpha">Constant value to create the alpha channel.</param>
+        /// <returns>
+        /// A new 32-bit <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts a gray scale image to an RGB/BGR image by copying luminance component to color components.
+        /// </para>
+        /// <para>
+        /// The alpha channel is filled with the provided value.
+        /// </para>
+        /// </remarks>
+        public Image Convert8To32(byte alpha)
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                32,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert8to32(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                alpha) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a gray scale <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="float"/> <see cref="ImageF"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
+        /// </para>
+        /// </remarks>
+        public ImageF Convert8To32f()
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            ImageF dst = new ImageF(
+                this.Width,
+                this.Height,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert8to32f(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a gray scale <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/> of specified width and height.
+        /// </summary>
+        /// <param name="width">The width of created image.</param>
+        /// <param name="height">The height of created image.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// A new <see cref="float"/> <see cref="ImageF"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
+        /// </para>
+        /// </remarks>
+        public ImageF Convert8To32f(int width, int height, BorderType borderType, float borderValue)
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            ImageF dst = new ImageF(
+                width,
+                height,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            // convert pixels
+            int areaWidth = Maximum.Min(width, this.Width);
+            int areaHeight = Maximum.Min(height, this.Height);
+            if (NativeMethods._convert8to32f(
+                0,
+                0,
+                areaWidth,
+                areaHeight,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            // set border
+            dst.SetBorder(0, 0, areaWidth, areaHeight, borderType, borderValue);
+
+            return dst;
+        }
+
+        /// <summary>
         /// Converts a color 24-bit <see cref="Image"/> to gray scale using fixed transform coefficients.
         /// </summary>
         /// <returns>
@@ -508,6 +709,43 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 byte threshold);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert8to24(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert8to32(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                byte alpha);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert8to32f(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] float[] dst,
+                int stridedst);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Accord.MachineLearning.VectorMachines.Learning;
+    ////using Accord.MachineLearning.VectorMachines.Learning;
     using Genix.Core;
     using Genix.Lab;
     using Genix.MachineLearning.Kernels;
@@ -58,13 +58,13 @@
             // test
             List<ClassificationResult<bool?>> results = samples
                 .Skip(LearnCount)
-                .Select(x => new ClassificationResult<bool?>(null, machine.Execute(x.x) > 0.5f, x.y, 100, true))
+                .Select(x => new ClassificationResult<bool?>(null, machine.Classify(x.x) > 0.5f, x.y, 100, true))
                 .ToList();
 
             ClassificationReport<bool?> report = new ClassificationReport<bool?>(results);
         }
 
-        [TestMethod]
+        /*[TestMethod]
         public void TrainTest2()
         {
             const int LearnCount = 100;
@@ -86,7 +86,7 @@
             optimization.Learn(
                 samples.Take(LearnCount).Select(x => x.x.Select(w => (double)w).ToArray()).ToArray(),
                 samples.Take(LearnCount).Select(x => x.y).ToArray());
-        }
+        }*/
 
         private static IEnumerable<(double[] x, bool y, double weight)> GenerateSamples(int count, int length, double positiveRatio)
         {

@@ -25,6 +25,14 @@ namespace Genix.DocumentAnalysis.Classification
         private readonly TFeatureBuilder featureBuilder = new TFeatureBuilder();
 
         /// <summary>
+        /// Gets a value indicating whether the classifier has been trained.
+        /// </summary>
+        /// <value>
+        /// <b>true</b> if the classifier has been trained and is ready for use; otherwise, <b>false</b>.
+        /// </value>
+        public abstract bool IsTrained { get; }
+
+        /// <summary>
         /// Extracts features from a <typeparamref name="TSource"/>,
         /// and monitors cancellation requests.
         /// </summary>
@@ -260,12 +268,12 @@ namespace Genix.DocumentAnalysis.Classification
         /// <param name="truthselector">The selector that converts elements into ground truth.</param>
         /// <param name="progress">The provider used to report a progress change. Can be <b>null</b>.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the classifier that the operation should be canceled.</param>
-        public abstract void Train<T>(
+        /*public abstract void Train<T>(
             IEnumerable<T> sources,
             Func<T, CancellationToken, TFeatures> selector,
             Func<T, Features> truthselector,
             IClassifierProgress<T> progress,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken);*/
 
         /// <summary>
         /// Trains the classifier on a sequence of elements,

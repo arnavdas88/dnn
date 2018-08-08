@@ -271,19 +271,72 @@ GENIXAPI(int, _convert8to1)(
 	return 0;
 }
 
+GENIXAPI(int, _convert8to24)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst)
+{
+	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
+	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 3);
+
+	return ippiGrayToRGB_8u_C1C3R(
+		src_u8,
+		stridesrc * sizeof(unsigned __int64),
+		dst_u8,
+		stridedst * sizeof(unsigned __int64),
+		{ width, height });
+}
+
+GENIXAPI(int, _convert8to32)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8 alpha)
+{
+	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
+	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 4);
+
+	return ippiGrayToRGB_8u_C1C4R(
+		src_u8,
+		stridesrc * sizeof(unsigned __int64),
+		dst_u8,
+		stridedst * sizeof(unsigned __int64),
+		{ width, height },
+		alpha);
+}
+
+GENIXAPI(int, _convert8to32f)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	float* dst, const int stridedst)
+{
+	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
+	Ipp32f* dst_f32 = (Ipp32f*)(dst + (ptrdiff_t(y) * stridedst)) + x;
+
+	return ippiConvert_8u32f_C1R(
+		src_u8,
+		stridesrc * sizeof(unsigned __int64),
+		dst_f32,
+		stridedst * sizeof(float),
+		{ width, height });
+}
+
 GENIXAPI(int, _convert24to8)(
 	const int x, const int y,
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst)
 {
-	const unsigned __int8* bits_src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
-	unsigned __int8* bits_dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + x;
+	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
+	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + x;
 
 	return ippiRGBToGray_8u_C3C1R(
-		bits_src_u8,
+		src_u8,
 		stridesrc * sizeof(unsigned __int64),
-		bits_dst_u8,
+		dst_u8,
 		stridedst * sizeof(unsigned __int64),
 		{ width, height });
 }
@@ -294,13 +347,13 @@ GENIXAPI(int, _convert24to32)(
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst)
 {
-	const unsigned __int8* bits_src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
-	unsigned __int8* bits_dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 4);
+	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
+	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 4);
 
 	return ippiCopy_8u_C3AC4R(
-		bits_src_u8,
+		src_u8,
 		stridesrc * sizeof(unsigned __int64),
-		bits_dst_u8,
+		dst_u8,
 		stridedst * sizeof(unsigned __int64),
 		{ width, height });
 }
@@ -311,13 +364,13 @@ GENIXAPI(int, _convert32to8)(
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst)
 {
-	const unsigned __int8* bits_src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 4);
-	unsigned __int8* bits_dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + x;
+	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 4);
+	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + x;
 
 	return ippiRGBToGray_8u_AC4C1R(
-		bits_src_u8,
+		src_u8,
 		stridesrc * sizeof(unsigned __int64),
-		bits_dst_u8,
+		dst_u8,
 		stridedst * sizeof(unsigned __int64),
 		{ width, height });
 }
@@ -457,3 +510,12 @@ GENIXAPI(int, otsu)(
 	return (int)status;
 }
 
+GENIXAPI(int, cart2polar)(
+	const int n,
+	const float* re,
+	const float* im,
+	float* magnitude,
+	float* phase)
+{
+	return ippsCartToPolar_32f(re, im, magnitude, phase, n);
+}

@@ -56,6 +56,24 @@ GENIXAPI(float, slogSumExp3)(const float a, const float b, const float c)
 }
 
 // calculates absolute value of a vector element-wise
+template<typename T> void __forceinline __abs_ip(
+	int n,
+	T* y, int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = abs(y[i]);
+	}
+}
+
+GENIXAPI(void, abs_ip_s32)(int n, __int32* y, int offy) { __abs_ip(n, y, offy); }
+GENIXAPI(void, abs_ip_s64)(int n, __int64* y, int offy) { __abs_ip(n, y, offy); }
+GENIXAPI(void, abs_ip_f32)(int n, float* y, int offy) { __abs_ip(n, y, offy); }
+GENIXAPI(void, abs_ip_f64)(int n, double* y, int offy) { __abs_ip(n, y, offy); }
+
+// calculates absolute value of a vector element-wise
 GENIXAPI(void, sabs)(
 	int n,
 	const float* a, int offa,
@@ -665,6 +683,50 @@ GENIXAPI(void, smuladd)(
 		y[i] += a[i] * b[i];
 	}
 }
+
+// divides each element of a vector by a constant value in-place.
+template<typename T> void __forceinline __divc_ip(
+	const int n,
+	const T a,
+	T* y, const int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] /= a;
+	}
+}
+
+GENIXAPI(void, divc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __divc_ip(n, a, y, offy); }
+GENIXAPI(void, divc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __divc_ip(n, a, y, offy); }
+GENIXAPI(void, divc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __divc_ip(n, a, y, offy); }
+GENIXAPI(void, divc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __divc_ip(n, a, y, offy); }
+GENIXAPI(void, divc_ip_f32)(int n, float a, float* y, int offy) { __divc_ip(n, a, y, offy); }
+GENIXAPI(void, divc_ip_f64)(int n, double a, double* y, int offy) { __divc_ip(n, a, y, offy); }
+
+// divides each element of a vector by a constant value not-in-place.
+template<typename T> void __forceinline __divc(
+	const int n,
+	const T* x, const int offx,
+	const T a,
+	T* y, const int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = x[i] / a;
+	}
+}
+
+GENIXAPI(void, divc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __divc(n, x, offx, a, y, offy); }
+GENIXAPI(void, divc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __divc(n, x, offx, a, y, offy); }
+GENIXAPI(void, divc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __divc(n, x, offx, a, y, offy); }
+GENIXAPI(void, divc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __divc(n, x, offx, a, y, offy); }
+GENIXAPI(void, divc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __divc(n, x, offx, a, y, offy); }
+GENIXAPI(void, divc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __divc(n, x, offx, a, y, offy); }
 
 // divides two vectors element-wise
 GENIXAPI(void, sdiv)(

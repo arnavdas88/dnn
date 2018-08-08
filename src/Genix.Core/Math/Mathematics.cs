@@ -18,6 +18,78 @@ namespace Genix.Core
     public static class Mathematics
     {
         /// <summary>
+        /// Rounds the value up to a next specified multiple.
+        /// </summary>
+        /// <param name="value">The value to round.</param>
+        /// <param name="multiple">The multiple.</param>
+        /// <returns>The rounded value.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RoundUp(int value, int multiple)
+        {
+            return (value + multiple - 1) / multiple * multiple;
+        }
+
+        /// <summary>
+        /// Computes the absolute value of elements of an array of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = Math.Abs(y(offy + i))</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Abs(int length, int[] y, int offy)
+        {
+            NativeMethods.abs_ip_s32(length, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the absolute value of elements of an array of 64-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = Math.Abs(y(offy + i))</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Abs(int length, long[] y, int offy)
+        {
+            NativeMethods.abs_ip_s64(length, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the absolute value of elements of an array of single-precision floating point numbers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = Math.Abs(y(offy + i))</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Abs(int length, float[] y, int offy)
+        {
+            NativeMethods.abs_ip_f32(length, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the absolute value of elements of an array of double-precision floating point numbers in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) = Math.Abs(y(offy + i))</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Abs(int length, double[] y, int offy)
+        {
+            NativeMethods.abs_ip_f64(length, y, offy);
+        }
+
+        /// <summary>
         /// Computes absolute value of a range of values from one array starting at the specified source index
         /// and stores results in another array starting at the specified destination index.
         /// </summary>
@@ -25,7 +97,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains the data to compute.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Abs(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -58,7 +130,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -74,7 +146,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -91,7 +163,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -107,7 +179,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -124,7 +196,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="alpha">The scalar to add.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += alpha</c>.
         /// </remarks>
@@ -138,11 +210,11 @@ namespace Genix.Core
         /// Adds a constant value to each element of an array of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -156,11 +228,11 @@ namespace Genix.Core
         /// Adds a constant value to each element of an array of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -175,11 +247,11 @@ namespace Genix.Core
         /// Adds a constant value to each element of an array of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -193,11 +265,11 @@ namespace Genix.Core
         /// Adds a constant value to each element of an array of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -212,11 +284,11 @@ namespace Genix.Core
         /// Adds a constant value to each element of an array of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to add.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) + alpha</c>.
         /// </remarks>
@@ -230,10 +302,10 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -247,10 +319,10 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 32-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -265,10 +337,10 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 64-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -282,10 +354,10 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 64-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -300,10 +372,10 @@ namespace Genix.Core
         /// Adds the elements of two arrays of floats in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
         /// </remarks>
@@ -317,11 +389,11 @@ namespace Genix.Core
         /// Adds the elements of two arrays of floats with increment in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
@@ -333,12 +405,12 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -352,12 +424,12 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -372,12 +444,12 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -391,12 +463,12 @@ namespace Genix.Core
         /// Adds the elements of two arrays of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -411,12 +483,12 @@ namespace Genix.Core
         /// Adds the elements of two arrays of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
         /// </remarks>
@@ -430,14 +502,14 @@ namespace Genix.Core
         /// Adds the elements of two arrays of floats with increment not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which adding begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
         /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which adding begins.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
         /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Add(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
@@ -451,7 +523,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to subtract.</param>
         /// <param name="alpha">The scalar to subtract.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
         /// </remarks>
@@ -467,7 +539,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to subtract.</param>
         /// <param name="alpha">The scalar to subtract.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
         /// </remarks>
@@ -484,7 +556,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to subtract.</param>
         /// <param name="alpha">The scalar to subtract.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
         /// </remarks>
@@ -500,7 +572,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to subtract.</param>
         /// <param name="alpha">The scalar to subtract.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
         /// </remarks>
@@ -517,7 +589,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to subtract.</param>
         /// <param name="alpha">The scalar to subtract.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) -= alpha</c>.
         /// </remarks>
@@ -531,11 +603,11 @@ namespace Genix.Core
         /// Subtracts a constant value from each element of an array of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
         /// </remarks>
@@ -549,11 +621,11 @@ namespace Genix.Core
         /// Subtracts a constant value from each element of an array of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
         /// </remarks>
@@ -568,11 +640,11 @@ namespace Genix.Core
         /// Subtracts a constant value from each element of an array of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
         /// </remarks>
@@ -586,11 +658,11 @@ namespace Genix.Core
         /// Subtracts a constant value from each element of an array of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
         /// </remarks>
@@ -605,11 +677,11 @@ namespace Genix.Core
         /// Subtracts a constant value from each element of an array of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) - alpha</c>.
         /// </remarks>
@@ -623,12 +695,12 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) -= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, int[] x, int offx, int[] y, int offy)
@@ -640,12 +712,12 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 32-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) -= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
@@ -658,12 +730,12 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 64-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) -= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, long[] x, int offx, long[] y, int offy)
@@ -675,12 +747,12 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 64-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) -= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
@@ -693,12 +765,12 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of floats in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += x(offx + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) -= x(offx + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] x, int offx, float[] y, int offy)
@@ -710,11 +782,11 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of floats with increment in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which subtraction begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
@@ -726,14 +798,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) - b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, int[] a, int offa, int[] b, int offb, int[] y, int offy)
@@ -745,14 +817,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) - b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
@@ -765,14 +837,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) - b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, long[] a, int offa, long[] b, int offb, long[] y, int offy)
@@ -784,14 +856,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) - b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
@@ -804,14 +876,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) + b(offb + i)</c>.
+        /// The method performs operation defined as <c>y(offy + i) = a(offa + i) - b(offb + i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
@@ -823,14 +895,14 @@ namespace Genix.Core
         /// Subtracts the elements of two arrays of floats with increment not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first array that contains source data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which subtraction begins.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
         /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The second array that contains source data.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which subtraction begins.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
         /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which subtraction begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sub(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
@@ -846,10 +918,10 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="maskx">The first array that contains the data to compare.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="masky">The second array that contains the data to compare.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which adding begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := y(i) + (xmask(offx + i) == ymask(offy + i) ? x(offx + i) : 0)</c>.
         /// </remarks>
@@ -865,7 +937,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to multiply.</param>
         /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
         /// </remarks>
@@ -881,7 +953,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to multiply.</param>
         /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
         /// </remarks>
@@ -898,7 +970,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to multiply.</param>
         /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
         /// </remarks>
@@ -914,7 +986,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to multiply.</param>
         /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
         /// </remarks>
@@ -926,12 +998,12 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Multiplies each element of an array of single-precision floating-point numbers by a constant value in-place.
+        /// Multiplies each element of an array of single-precision floating point numbers by a constant value in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
         /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
         /// </remarks>
@@ -942,14 +1014,30 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Multiplies each element of an array of double-precision floating point numbers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, double alpha, double[] y, int offy)
+        {
+            NativeMethods.mulc_ip_f64(length, alpha, y, offy);
+        }
+
+        /// <summary>
         /// Multiplies each element of an array of 32-bit integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
         /// </remarks>
@@ -963,11 +1051,11 @@ namespace Genix.Core
         /// Multiplies each element of an array of 32-bit unsigned integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
         /// </remarks>
@@ -982,11 +1070,11 @@ namespace Genix.Core
         /// Multiplies each element of an array of 64-bit integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
         /// </remarks>
@@ -1000,11 +1088,11 @@ namespace Genix.Core
         /// Multiplies each element of an array of 64-bit unsigned integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
         /// </remarks>
@@ -1016,14 +1104,14 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Multiplies each element of an array of single-precision floating-point numbers by a constant value not-in-place.
+        /// Multiplies each element of an array of single-precision floating point numbers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
         /// </remarks>
@@ -1034,13 +1122,31 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Multiplies each element of an array of double-precision floating point numbers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MulC(int length, double[] x, int offx, double alpha, double[] y, int offy)
+        {
+            NativeMethods.mulc_f64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
         /// Multiplies the elements of two arrays of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
@@ -1054,10 +1160,10 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 32-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
@@ -1072,10 +1178,10 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 64-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
@@ -1089,10 +1195,10 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 64-bit unsigned integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
@@ -1107,10 +1213,10 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of floats in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The array that contains source data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which multiplication begins.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The array that contains source and destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) *= x(offx + i)</c>.
         /// </remarks>
@@ -1124,12 +1230,12 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="a">The first source array.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="b">The second source array.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1143,12 +1249,12 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 32-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="a">The first source array.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="b">The second source array.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1163,12 +1269,12 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="a">The first source array.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="b">The second source array.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1182,12 +1288,12 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of 64-bit unsigned integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="a">The first source array.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="b">The second source array.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1202,12 +1308,12 @@ namespace Genix.Core
         /// Multiplies the elements of two arrays of floats not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first array that contains source data.</param>
+        /// <param name="a">The first source array.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which multiplication begins.</param>
-        /// <param name="b">The second array that contains source data.</param>
+        /// <param name="b">The second source array.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which multiplication begins.</param>
-        /// <param name="y">The array that contains destination data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which multiplication begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) = a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1215,6 +1321,214 @@ namespace Genix.Core
         public static void Mul(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
             NativeMethods.mul_f32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 32-bit integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, int alpha, int[] y, int offy)
+        {
+            NativeMethods.divc_ip_s32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 32-bit unsigned integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void DivC(int length, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.divc_ip_u32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 64-bit integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, long alpha, long[] y, int offy)
+        {
+            NativeMethods.divc_ip_s64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 64-bit unsigned integers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void DivC(int length, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.divc_ip_u64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of single-precision floating point numbers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, float alpha, float[] y, int offy)
+        {
+            NativeMethods.divc_ip_f32(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of double-precision floating point numbers by a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The array that contains source and destination data.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, double alpha, double[] y, int offy)
+        {
+            NativeMethods.divc_ip_f64(length, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 32-bit integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, int[] x, int offx, int alpha, int[] y, int offy)
+        {
+            NativeMethods.divc_s32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 32-bit unsigned integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void DivC(int length, uint[] x, int offx, uint alpha, uint[] y, int offy)
+        {
+            NativeMethods.divc_u32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 64-bit integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, long[] x, int offx, long alpha, long[] y, int offy)
+        {
+            NativeMethods.divc_s64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of 64-bit unsigned integers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void DivC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
+        {
+            NativeMethods.divc_u64(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of single-precision floating point numbers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.divc_f32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Divides each element of an array of double-precision floating point numbers by a constant value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to divide.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DivC(int length, double[] x, int offx, double alpha, double[] y, int offy)
+        {
+            NativeMethods.divc_f64(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -1228,7 +1542,7 @@ namespace Genix.Core
         /// <param name="b">The input array <paramref name="b"/>.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := a(offa + i) / b(offb + i)</c>.
         /// </remarks>
@@ -1251,7 +1565,7 @@ namespace Genix.Core
         /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
         /// <param name="incb">the increment for the elements of <paramref name="b"/>.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i * incy) := a(offa + i * inca) / b(offb + i * incb)</c>.
@@ -1270,7 +1584,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains the data to divide.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := x / alpha</c>.
         /// </remarks>
@@ -1291,7 +1605,7 @@ namespace Genix.Core
         /// <param name="b">The input array <paramref name="b"/>.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) += a(offa + i) * b(offb + i)</c>.
         /// </remarks>
@@ -1310,7 +1624,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains the data to add.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + y</c>.
         /// </remarks>
@@ -1329,7 +1643,7 @@ namespace Genix.Core
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + beta * y</c>.
         /// </remarks>
@@ -1349,7 +1663,7 @@ namespace Genix.Core
         /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <param name="beta">The scalar <c>beta</c>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + beta * y</c>.
@@ -1370,7 +1684,7 @@ namespace Genix.Core
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y := alpha * x + y</c>.
@@ -1389,7 +1703,7 @@ namespace Genix.Core
         /// <param name="x">The input array <paramref name="x"/>.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
         /// </remarks>
@@ -1407,7 +1721,7 @@ namespace Genix.Core
         /// <param name="x">The input array <paramref name="x"/>.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := sqrt(x(offx + i))</c>.
         /// </remarks>
@@ -1443,7 +1757,7 @@ namespace Genix.Core
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="power">The constant value for power.</param>
         /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
         /// </remarks>
@@ -1492,7 +1806,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains data used for computation.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Log(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -1506,7 +1820,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains data used for computation.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Exp(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -1520,7 +1834,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains data used for computation.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sin(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -1550,7 +1864,7 @@ namespace Genix.Core
         /// <param name="x">The array that contains data used for computation.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Cos(int length, float[] x, int offx, float[] y, int offy)
         {
@@ -1582,7 +1896,7 @@ namespace Genix.Core
         /// <param name="b">The array that contains the x coordinate of points.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
         /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Atan2(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
@@ -1626,7 +1940,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1641,7 +1955,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1656,7 +1970,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1672,7 +1986,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1687,7 +2001,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1703,7 +2017,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which adding begins.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The sum of elements in the array.
         /// </returns>
@@ -1811,6 +2125,22 @@ namespace Genix.Core
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void abs_ip_s32(int n, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void abs_ip_s64(int n, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void abs_ip_f32(int n, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void abs_ip_f64(int n, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -2030,6 +2360,10 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_ip_f64(int n, double a, [In, Out] double[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern void mulc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -2047,6 +2381,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void mulc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void mulc_f64(int n, [In] double[] x, int offx, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
@@ -2091,6 +2429,54 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void smuladd(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_s32(int n, int a, [In, Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_u32(int n, uint a, [In, Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_s64(int n, long a, [In, Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_u64(int n, ulong a, [In, Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_ip_f64(int n, double a, [In, Out] double[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_u32(int n, [In] uint[] x, int offx, uint a, [Out] uint[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_s64(int n, [In] long[] x, int offx, long a, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void divc_f64(int n, [In] double[] x, int offx, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

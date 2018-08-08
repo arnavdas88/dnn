@@ -88,6 +88,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">
+      <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
+      <Name>Genix.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Genix.DNN\Genix.DNN.csproj">
       <Project>{75e41c3e-e491-4d38-9b62-a01e90dece12}</Project>
       <Name>Genix.DNN</Name>

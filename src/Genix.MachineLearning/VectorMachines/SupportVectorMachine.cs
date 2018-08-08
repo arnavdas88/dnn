@@ -107,7 +107,7 @@ namespace Genix.MachineLearning.VectorMachines
         /// <returns>
         /// The calculated score.
         /// </returns>
-        public float Execute(float[] x)
+        public float Classify(float[] x)
         {
             float result = this.bias;
             for (int i = 0, ii = this.weights.Length; i < ii; i++)
@@ -126,12 +126,12 @@ namespace Genix.MachineLearning.VectorMachines
         /// The calculated scores.
         /// </returns>
         [CLSCompliant(false)]
-        public float[] Execute(float[][] x)
+        public float[] Classify(float[][] x)
         {
             float[] result = new float[x.Length];
             for (int i = 0, ii = x.Length; i < ii; i++)
             {
-                result[i] = this.Execute(x[i]);
+                result[i] = this.Classify(x[i]);
             }
 
             return result;

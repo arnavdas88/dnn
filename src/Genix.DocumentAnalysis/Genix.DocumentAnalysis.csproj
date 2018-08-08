@@ -51,7 +51,12 @@
     <Compile Include="Classification\Features.cs" />
     <Compile Include="Classification\IClassifierProgress.cs" />
     <Compile Include="Classification\Answer.cs" />
+    <Compile Include="Classification\PointsOfInterest\PointsOfInterestClassifier.cs" />
+    <Compile Include="Classification\PointsOfInterest\PointsOfInterestFeatureBuilder.cs" />
+    <Compile Include="Classification\PointsOfInterest\PointsOfInterestFeatures.cs" />
+    <Compile Include="FeatureDetectors\Features.cs" />
     <Compile Include="FeatureDetectors\HistogramsOfOrientedGradients.cs" />
+    <Compile Include="FeatureDetectors\IFeatureDetector.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancing.cs" />
     <Compile Include="ImageEnhancing\ImageEnhancingOptions.cs" />
     <Compile Include="ImageSource.cs" />
@@ -89,6 +94,10 @@
     <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
       <Name>Genix.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.MachineLearning\Genix.MachineLearning.csproj">
+      <Project>{1d734863-b6c8-4552-8ace-6a0cedac5e66}</Project>
+      <Name>Genix.MachineLearning</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

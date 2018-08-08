@@ -50,15 +50,16 @@ namespace Genix.MachineLearning.Clustering
         /// <value>
         /// The number of clusters.
         /// </value>
+        [JsonProperty("K")]
         public int K { get; private set; }
 
         /// <summary>
-        /// Gets the collection of centroids.
+        /// Gets the collection of clusters.
         /// </summary>
         /// <value>
         /// The <see cref="KMeansClusterCollection"/> object.
         /// </value>
-        public KMeansClusterCollection Centroids => this.clusters;
+        public KMeansClusterCollection Clusters => this.clusters;
 
         /// <summary>
         /// Assigns the vector to one of the clusters.
@@ -113,6 +114,26 @@ namespace Genix.MachineLearning.Clustering
             {
                 this.Assign(xs[i], out float distance);
                 result[i] = distance;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a feature vector by assigning each data point in <paramref name="xs"/> to one of the clusters.
+        /// </summary>
+        /// <param name="xs">The range of data points to assign.</param>
+        /// <returns>
+        /// The feature vector of length <see cref="K"/>.
+        /// Each element of the feature vector contains the number of data points assigned to corresponding cluster.
+        /// </returns>
+        public float[] Transform(IList<float[]> xs)
+        {
+            float[] result = new float[this.K];
+            for (int i = 0, ii = result.Length; i < ii; i++)
+            {
+                int cluster = this.Assign(xs[i]);
+                result[cluster] += 1.0f;
             }
 
             return result;
