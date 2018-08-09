@@ -9,8 +9,8 @@ namespace Genix.Imaging
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
@@ -163,6 +163,16 @@ namespace Genix.Imaging
                 Array32f.ThresholdLT(blocks.Length, threshold, 0.0f, blocks, 0);
             }
 
+            /*SparseVectorF[] sparse = new SparseVectorF[blockCount];
+            for (int i = 0; i < blockCount; i++)
+            {
+                sparse[i] = SparseVectorF.FromDense(blockSizeInBins, blocks, i * blockSizeInBins);
+            }*/
+
+            /*IList<SparseVectorF> sparse = Enumerable.Range(0, blockCount)
+                                                    .Select(i => SparseVectorF.FromDense(blockSizeInBins, blocks, i * blockSizeInBins))
+                                                    .ToList();*/
+
             return (blocks, blockSizeInBins);
 
             ImageF PrepareImage()
@@ -251,8 +261,20 @@ namespace Genix.Imaging
                     {
                         for (int ixc = 0, offxc = offyc; ixc < cellSize; ixc++, offxc++)
                         {
-                            int bin = (int)ang[offxc] % numberOfBins;
-                            h[offh + bin] += mag[offxc];
+                            float value = mag[offxc];
+                            if (value != 0.0f)
+                            {
+                                ////int bin = (int)ang[offxc] % numberOfBins;
+                                ////h[offh + bin] += mag[offxc];
+
+                                float angle = ang[offxc];
+
+                                int bin = (int)angle;
+                                float value1 = value * (angle - bin);
+
+                                h[offh + (bin % numberOfBins)] += value1;
+                                h[offh + ((bin + 1) % numberOfBins)] += value - value1;
+                            }
                         }
                     }
                 }

@@ -1214,6 +1214,31 @@ GENIXAPI(double, manhattan_distance_f64)(const int n, const double* x, int offx,
 	return __manhattan_distance(n, x, offx, y, offy);
 }
 
+template<typename T> T __forceinline __sparse_manhattan_distance(
+	const int n,
+	const int* xidx, const T* x,
+	const T* y, const int offy)
+{
+	y += offy;
+
+	T sum = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		sum += ::fabs(x[i] - y[xidx[i]]);
+	}
+
+	return sum;
+}
+
+GENIXAPI(float, sparse_manhattan_distance_f32)(const int n, const int* xidx, const float* x, const float* y, int offy)
+{
+	return __sparse_manhattan_distance(n, xidx, x, y, offy);
+}
+GENIXAPI(double, sparse_manhattan_distance_f64)(const int n, const int* xidx, const double* x, const double* y, int offy)
+{
+	return __sparse_manhattan_distance(n, xidx, x, y, offy);
+}
+
 // euclidean distance
 template<typename T> T __forceinline __euclidean_distance_squared(
 	const int n,
@@ -1241,3 +1266,31 @@ GENIXAPI(double, euclidean_distance_f64)(const int n, const double* x, int offx,
 {
 	return ::sqrt(__euclidean_distance_squared(n, x, offx, y, offy));
 }
+
+template<typename T> T __forceinline __sparse_euclidean_distance_squared(
+	const int n,
+	const int* xidx, const T* x,
+	const T* y, const int offy)
+{
+	y += offy;
+
+	T sum = T(0);
+	for (int i = 0; i < n; i++)
+	{
+		T u = x[i] - y[xidx[i]];
+		sum += u * u;
+	}
+
+	return sum;
+}
+
+GENIXAPI(float, sparse_euclidean_distance_f32)(const int n, const int* xidx, const float* x, const float* y, int offy)
+{
+	return ::sqrtf(__sparse_euclidean_distance_squared(n, xidx, x, y, offy));
+}
+GENIXAPI(double, sparse_euclidean_distance_f64)(const int n, const int* xidx, const double* x, const double* y, int offy)
+{
+	return ::sqrt(__sparse_euclidean_distance_squared(n, xidx, x, y, offy));
+}
+
+

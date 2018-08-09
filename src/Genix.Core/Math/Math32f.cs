@@ -394,6 +394,46 @@ namespace Genix.Core
             return NativeMethods.nrm2_f32(length, x, offx);
         }
 
+        /// <summary>
+        /// Computes the Manhattan distance between elements of two arrays.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The first array <paramref name="x"/>.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The first array <paramref name="y"/>.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// The Manhattan distance between elements of two arrays.
+        /// </returns>
+        /// <remarks>
+        /// The method performs operation defined as sum(abs(x[i] - y[i])).
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float ManhattanDistance(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return NativeMethods.manhattan_distance_f32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the Euclidean distance between elements of two arrays.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The first array <paramref name="x"/>.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The first array <paramref name="y"/>.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// The Euclidean distance between elements of two arrays.
+        /// </returns>
+        /// <remarks>
+        /// The method performs operation defined as sqrt(sum((x[i] - y[i])^2)).
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float EuclideanDistance(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return NativeMethods.euclidean_distance_f32(length, x, offx, y, offy);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -497,6 +537,14 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern float nrm2_f32(int n, [In] float[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float manhattan_distance_f32(int n, [In] float[] x, int offx, [In] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float euclidean_distance_f32(int n, [In] float[] x, int offx, [In] float[] y, int offy);
         }
     }
 }

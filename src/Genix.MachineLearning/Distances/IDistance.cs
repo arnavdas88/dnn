@@ -9,9 +9,10 @@ namespace Genix.MachineLearning.Distances
     /// <summary>
     /// Defines a contract for measuring distance between two points.
     /// </summary>
-    /// <typeparam name="TPoint">The type of the point.</typeparam>
+    /// <typeparam name="TPoint1">The type of the first point.</typeparam>
+    /// <typeparam name="TPoint2">The type of the second point.</typeparam>
     /// <typeparam name="TDistance">The type of the measured distance.</typeparam>
-    public interface IDistance<in TPoint, out TDistance>
+    public interface IDistance<in TPoint1, in TPoint2, out TDistance>
     {
         /// <summary>
         /// Computes the distance between points <paramref name="x"/> and <paramref name="y"/>.
@@ -21,6 +22,6 @@ namespace Genix.MachineLearning.Distances
         /// <returns>
         /// A value that represents the distance between <paramref name="x"/> and <paramref name="y"/>.
         /// </returns>
-        TDistance Distance(TPoint x, TPoint y);
+        TDistance Distance(TPoint1 x, TPoint2 y);
     }
 }

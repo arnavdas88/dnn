@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+#if 0
 #include "daal.h"
 
 using namespace std;
@@ -16,10 +18,12 @@ float inputArray[samples * dimension] =
 	4.0, 23.0, 77.0,
 	4.0, 23.0, 79.0,
 };
+#endif
 
 
 GENIXAPI(void, kmeans)(int k, int iter/*, float** x*/)
 {
+#if 0
 	k = 2;
 
 	// Create data source
@@ -58,4 +62,5 @@ GENIXAPI(void, kmeans)(int k, int iter/*, float** x*/)
 	/*printNumericTable(algorithm.getResult()->get(kmeans::assignments), "First 10 cluster assignments:", 10);
 	printNumericTable(algorithm.getResult()->get(kmeans::centroids), "First 10 dimensions of centroids:", 20, 10);
 	printNumericTable(algorithm.getResult()->get(kmeans::objectiveFunction), "Objective function value:");*/
+#endif
 }

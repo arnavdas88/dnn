@@ -28,7 +28,7 @@ namespace Genix.MachineLearning.Clustering
         /// The distance function.
         /// </summary>
         [JsonProperty("distance", TypeNameHandling = TypeNameHandling.Objects)]
-        private readonly IDistance<float[], float> distance;
+        private readonly IDistance<float[], float[], float> distance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KMeans"/> class.
@@ -37,7 +37,7 @@ namespace Genix.MachineLearning.Clustering
         /// <exception cref="ArgumentNullException">
         /// <paramref name="distance"/> is <b>null</b>.
         /// </exception>
-        public KMeans(IDistance<float[], float> distance)
+        public KMeans(IDistance<float[], float[], float> distance)
         {
             this.distance = distance ?? throw new ArgumentNullException(nameof(distance));
 

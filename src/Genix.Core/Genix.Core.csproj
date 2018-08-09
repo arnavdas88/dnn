@@ -79,6 +79,7 @@
     <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\Nonlinearity.cs" />
     <Compile Include="Math\Arrays.cs" />
+    <Compile Include="Math\SparseVectorF.cs" />
     <Compile Include="Math\Swapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>

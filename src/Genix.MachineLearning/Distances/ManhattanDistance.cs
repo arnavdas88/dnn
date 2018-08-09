@@ -14,7 +14,11 @@ namespace Genix.MachineLearning.Distances
     /// Measures the Manhattan distance between two points.
     /// </summary>
     public struct ManhattanDistance
-        : IDistance<float, float>, IDistance<double, double>, IDistance<float[], float>, IDistance<double[], double>
+        : IDistance<float, float, float>,
+          IDistance<double, double, double>,
+          IDistance<float[], float[], float>,
+          IDistance<SparseVectorF, float[], float>,
+          IDistance<double[], double[], double>
     {
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -34,7 +38,14 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Distance(float[] x, float[] y)
         {
-            return Mathematics.ManhattanDistance(x.Length, x, 0, y, 0);
+            return Math32f.ManhattanDistance(x.Length, x, 0, y, 0);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Distance(SparseVectorF x, float[] y)
+        {
+            return x.ManhattanDistance(y, 0);
         }
 
         /// <inheritdoc />
