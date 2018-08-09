@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ImageEnhancingOptions.cs" company="Noname, Inc.">
+// <copyright file="ImagePreprocessingOptions.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -9,10 +9,10 @@ namespace Genix.DocumentAnalysis
     using System;
 
     /// <summary>
-    /// Defines the image enhancing options.
+    /// Defines the image preprocessing options.
     /// </summary>
     [Flags]
-    public enum ImageEnhancingOptions
+    public enum ImagePreprocessingOptions
     {
         /// <summary>
         /// None of the options.
@@ -27,7 +27,7 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Removes black over scan border.
         /// </summary>
-        CleanBorderNoise = 2,
+        CleanOverscan = 2,
 
         /// <summary>
         /// Aligns the image horizontally.

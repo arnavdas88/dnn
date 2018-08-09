@@ -70,11 +70,20 @@ namespace Genix.DocumentAnalysis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The image depth {0} is not supported for this operation..
+        /// </summary>
+        internal static string E_UnsupportedDepth {
+            get {
+                return ResourceManager.GetString("E_UnsupportedDepth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation supports binary (1bpp) images only..
         /// </summary>
-        internal static string E_SupportsBinaryImagesOnly {
+        internal static string E_UnsupportedDepth_1bpp {
             get {
-                return ResourceManager.GetString("E_SupportsBinaryImagesOnly", resourceCulture);
+                return ResourceManager.GetString("E_UnsupportedDepth_1bpp", resourceCulture);
             }
         }
     }

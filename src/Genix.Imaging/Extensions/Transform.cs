@@ -57,7 +57,7 @@ namespace Genix.Imaging
             bool convert1bpp = false;
             if (this.BitsPerPixel == 1)
             {
-                grayImage = this.Convert1To8(255, 0);
+                grayImage = this.Convert1To8();
                 convert1bpp = true;
             }
             else

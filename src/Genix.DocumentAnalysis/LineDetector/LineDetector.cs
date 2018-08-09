@@ -45,7 +45,7 @@ namespace Genix.DocumentAnalysis
 
             if (image.BitsPerPixel != 1)
             {
-                throw new NotImplementedException(Properties.Resources.E_SupportsBinaryImagesOnly);
+                throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image cleanedImage = null;

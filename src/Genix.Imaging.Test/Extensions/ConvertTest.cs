@@ -16,7 +16,7 @@
             image.SetPixel(5, 0, 1);
             image.SetPixel(9, 0, 1);
 
-            Image result = image.Convert1To8(255, 0);
+            Image result = image.Convert1To8();
             result.ToBitmap();
             Assert.AreEqual(0u, result.GetPixel(0, 0));
             Assert.AreEqual(255u, result.GetPixel(1, 0));
@@ -36,7 +36,7 @@
             Image image1 = new Image(2000, 3000, 1, 200, 200);
             image1.Randomize();
 
-            Image image2 = image1.Convert1To8(255, 0);
+            Image image2 = image1.Convert1To8();
             for (int iy = 0; iy < image1.Height; iy++)
             {
                 for (int ix = 0; ix < image1.Width; ix++)

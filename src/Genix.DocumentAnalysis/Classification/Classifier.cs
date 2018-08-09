@@ -33,6 +33,14 @@ namespace Genix.DocumentAnalysis.Classification
         public abstract bool IsTrained { get; }
 
         /// <summary>
+        /// Gets the feature builder used by this classifier.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IFeatureBuilder{TSource, TFeatures}"/> object.
+        /// </value>
+        public TFeatureBuilder FeatureBuilder => this.featureBuilder;
+
+        /// <summary>
         /// Extracts features from a <typeparamref name="TSource"/>,
         /// and monitors cancellation requests.
         /// </summary>

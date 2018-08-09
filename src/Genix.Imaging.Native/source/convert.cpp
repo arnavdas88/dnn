@@ -375,6 +375,23 @@ GENIXAPI(int, _convert32to8)(
 		{ width, height });
 }
 
+GENIXAPI(int, _convert32to24)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst)
+{
+	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 4);
+	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 3);
+
+	return ippiCopy_8u_AC4C3R(
+		src_u8,
+		stridesrc * sizeof(unsigned __int64),
+		dst_u8,
+		stridedst * sizeof(unsigned __int64),
+		{ width, height });
+}
+
 GENIXAPI(int, otsu)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,

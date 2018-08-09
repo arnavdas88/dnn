@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis.Classification
 {
     using System;
+    using System.Drawing;
     using System.Threading;
     using Genix.DocumentAnalysis.FeatureDetectors;
     using Newtonsoft.Json;
@@ -44,6 +45,16 @@ namespace Genix.DocumentAnalysis.Classification
         }
 
         /// <summary>
+        /// Gets or sets image enhancing modes that the <see cref="PointsOfInterestFeatureBuilder"/>
+        /// should apply to the image before extracting points of interest from it.
+        /// </summary>
+        /// <value>
+        /// The <see cref="ImageEnhancingOptions"/> enumeration.
+        /// </value>
+        [JsonProperty("imageEnhancingOptions")]
+        public ImagePreprocessingOptions ImageEnhancingOptions { get; set; } = ImagePreprocessingOptions.None;
+
+        /// <summary>
         /// Gets the feature detector.
         /// </summary>
         /// <value>
@@ -62,7 +73,8 @@ namespace Genix.DocumentAnalysis.Classification
                 throw new ArgumentNullException(nameof(source));
             }
 
-            FeatureDetectors.Features features = this.detector.Detect(source.Image, cancellationToken);
+            Imaging.Image image = ImagePreprocessing.Process(source.Image, this.ImageEnhancingOptions, 8);
+            FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
             return new PointsOfInterestFeatures(features);
         }
     }

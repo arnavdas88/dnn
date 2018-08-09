@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
@@ -46,7 +47,7 @@ namespace Genix.Imaging
             Image mask = this.Convert8To1(threshold)
                               .Dilate(StructuringElement.Rectangle(7, 1), 1)
                               .Dilate(StructuringElement.Rectangle(1, 7), 1)
-                              .Convert1To8(255, 0);
+                              .Convert1To8();
 
             // use mask to remove foreground pixels from original image
             Image values = this & mask;
@@ -123,6 +124,24 @@ namespace Genix.Imaging
                 throw new InvalidOperationException("Cannot binarize the this.", e);
             }*/
         }
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to gray scale.
+        /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking that uses 255 for zero pixels and 0 for one pixels.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Convert1To8() => this.Convert1To8(255, 0);
 
         /// <summary>
         /// Converts a binary <see cref="Image"/> to gray scale.
@@ -569,7 +588,7 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts a color 24-bit <see cref="Image"/> to a color 32-bit <see cref="Image"/> using fixed transform coefficients.
+        /// Converts a color 24-bit <see cref="Image"/> to a color 32-bit <see cref="Image"/> by adding alpha channel.
         /// </summary>
         /// <returns>
         /// A new 32-bit <see cref="Image"/>.
@@ -644,6 +663,48 @@ namespace Genix.Imaging
                 this.VerticalResolution);
 
             if (NativeMethods._convert32to8(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a color 32-bit <see cref="Image"/> to a color 24-bit <see cref="Image"/> by discarding alpha channel.
+        /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image Convert32To24()
+        {
+            if (this.BitsPerPixel != 32)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+            }
+
+            Image dst = new Image(
+                this.Width,
+                this.Height,
+                24,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            if (NativeMethods._convert32to24(
                 0,
                 0,
                 this.Width,
@@ -774,6 +835,18 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern int _convert32to8(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int _convert32to24(
                 int x,
                 int y,
                 int width,

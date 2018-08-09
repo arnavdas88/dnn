@@ -23,7 +23,7 @@ namespace Genix.Imaging
         /// <returns>
         /// A new cleaned <see cref="Image"/>.
         /// </returns>
-        public Image CleanBorderNoise(float maxNoiseWidth, float maxNoiseHeight)
+        public Image CleanOverscan(float maxNoiseWidth, float maxNoiseHeight)
         {
             int width = this.Width;
             int height = this.Height;

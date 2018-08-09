@@ -42,7 +42,7 @@ namespace Genix.Imaging
             bool convert1bpp = false;
             if (this.BitsPerPixel == 1)
             {
-                src = this.Convert1To8(255, 0);
+                src = this.Convert1To8();
                 convert1bpp = true;
             }
             else
@@ -172,7 +172,7 @@ namespace Genix.Imaging
                 switch (this.BitsPerPixel)
                 {
                     case 1:
-                        src = this.Convert1To8(255, 0);
+                        src = this.Convert1To8();
                         break;
 
                     case 8:

@@ -57,8 +57,8 @@
     <Compile Include="FeatureDetectors\Features.cs" />
     <Compile Include="FeatureDetectors\HistogramsOfOrientedGradients.cs" />
     <Compile Include="FeatureDetectors\IFeatureDetector.cs" />
-    <Compile Include="ImageEnhancing\ImageEnhancing.cs" />
-    <Compile Include="ImageEnhancing\ImageEnhancingOptions.cs" />
+    <Compile Include="ImagePreprocessing\ImagePreprocessing.cs" />
+    <Compile Include="ImagePreprocessing\ImagePreprocessingOptions.cs" />
     <Compile Include="ImageSource.cs" />
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
