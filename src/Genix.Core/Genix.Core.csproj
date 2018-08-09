@@ -71,6 +71,7 @@
     <Compile Include="Lab\ClassificationReport.cs" />
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
+    <Compile Include="Math\Array32f.cs" />
     <Compile Include="Math\Math32f.cs" />
     <Compile Include="Math\Mathematics.cs" />
     <Compile Include="Math\Matrix.cs" />

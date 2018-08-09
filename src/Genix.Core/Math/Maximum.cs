@@ -288,21 +288,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Calculates a smaller of each element of an array and a scalar value.
-        /// </summary>
-        /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
-        /// <param name="b">The scalar value.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Min(int length, float[] a, int offa, float b, float[] y, int offy)
-        {
-            NativeMethods.sminc(length, a, offa, b, y, offy);
-        }
-
-        /// <summary>
         /// Calculates a smaller of each pair of elements of the two array arguments.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -316,21 +301,6 @@ namespace Genix.Core
         public static void Min(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
             NativeMethods.smin(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Calculates a larger of each element of an array and a scalar value.
-        /// </summary>
-        /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="a">The first array that contains the data.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which calculation begins.</param>
-        /// <param name="b">The scalar value.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which calculation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Max(int length, float[] a, int offa, float b, float[] y, int offy)
-        {
-            NativeMethods.smaxc(length, a, offa, b, y, offy);
         }
 
         /// <summary>
@@ -515,15 +485,7 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void sminc(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void smin(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void smaxc(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

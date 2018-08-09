@@ -133,6 +133,7 @@
     <ClCompile Include="source\nonlinearity.cpp" />
     <ClCompile Include="source\arrays.cpp" />
     <ClCompile Include="source\sorting.cpp" />
+    <ClCompile Include="source\thresholding.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

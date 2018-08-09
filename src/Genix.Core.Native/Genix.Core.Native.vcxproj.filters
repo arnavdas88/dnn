@@ -49,6 +49,9 @@
     <ClCompile Include="source\sorting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\thresholding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source\bitutils.inl">

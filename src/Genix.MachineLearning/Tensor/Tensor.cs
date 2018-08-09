@@ -617,7 +617,7 @@ namespace Genix.MachineLearning
         /// The L1-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L1Norm() => Mathematics.L1Norm(this.Length, this.Weights, 0, 1);
+        public float L1Norm() => Math32f.L1Norm(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Computes the L2-Norm (Euclidian norm) of the tensor elements.
@@ -626,7 +626,7 @@ namespace Genix.MachineLearning
         /// The L2-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L2Norm() => Mathematics.L2Norm(this.Length, this.Weights, 0, 1);
+        public float L2Norm() => Math32f.L2Norm(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Clips tensor values to a specified minimum and maximum values.

@@ -1610,38 +1610,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the L1-Norm (sum of magnitudes) of the array elements.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
-        /// <returns>
-        /// The L1-Norm of array elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float L1Norm(int length, float[] x, int offx, int incx)
-        {
-            return NativeMethods._snrm1(length, x, offx, incx);
-        }
-
-        /// <summary>
-        /// Computes the L2-Norm (Euclidian norm) of the array elements.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
-        /// <returns>
-        /// The L2-Norm of array elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float L2Norm(int length, float[] x, int offx, int incx)
-        {
-            return NativeMethods._snrm2(length, x, offx, incx);
-        }
-
-        /// <summary>
         /// Computes the sum of all elements in the array of 8-bit unsigned integers.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -2233,14 +2201,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern float _snrm1(int n, [In] float[] x, int offx, int incx);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern float _snrm2(int n, [In] float[] x, int offx, int incx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

@@ -308,6 +308,92 @@ namespace Genix.Core
             NativeMethods.divc_f32(length, x, offx, alpha, y, offy);
         }
 
+        /// <summary>
+        /// Computes a smaller of each element of an array and a scalar value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinC(int length, float a, float[] y, int offy)
+        {
+            NativeMethods.minc_ip_f32(length, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each element of an array and a scalar value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinC(int length, float[] x, int offx, float a, float[] y, int offy)
+        {
+            NativeMethods.minc_f32(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each element of an array and a scalar value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MaxC(int length, float a, float[] y, int offy)
+        {
+            NativeMethods.maxc_ip_f32(length, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each element of an array and a scalar value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MaxC(int length, float[] x, int offx, float a, float[] y, int offy)
+        {
+            NativeMethods.maxc_f32(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the L1-Norm (sum of magnitudes) of the array elements.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The L1-Norm of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float L1Norm(int length, float[] x, int offx)
+        {
+            return NativeMethods.nrm1_f32(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the L2-Norm (Euclidian norm) of the array elements.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The L2-Norm of elements in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float L2Norm(int length, float[] x, int offx)
+        {
+            return NativeMethods.nrm2_f32(length, x, offx);
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
@@ -387,6 +473,30 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void divc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void minc_ip_f32(int n, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void minc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void maxc_ip_f32(int n, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void maxc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float nrm1_f32(int n, [In] float[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float nrm2_f32(int n, [In] float[] x, int offx);
         }
     }
 }

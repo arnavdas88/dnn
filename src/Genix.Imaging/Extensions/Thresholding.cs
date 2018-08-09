@@ -251,7 +251,7 @@ namespace Genix.Imaging
 
         /// <summary>
         /// Performs double thresholding of pixel values on the <see cref="Image"/>.
-        /// Pixels that are smaller or greater than the thresholds, are set to a specified value.
+        /// Pixels that are smaller or greater than the thresholds, are set to a specified values.
         /// </summary>
         /// <param name="thresholdLT">The lower threshold value to use for each pixel.</param>
         /// <param name="valueLT">The value to set for each pixel that is smaller than the <paramref name="thresholdLT"/>.</param>
@@ -287,7 +287,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Performs double thresholding of pixel values on the <see cref="Image"/> withing a rectangular area
         /// specified by a pair of coordinates, a width, and a height.
-        /// Pixels that are smaller or greater than the thresholds, are set to a specified value.
+        /// Pixels that are smaller or greater than the thresholds, are set to a specified values.
         /// </summary>
         /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
@@ -357,7 +357,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Performs double thresholding of pixel values on the <see cref="Image"/> withing a rectangular area
         /// specified by a <see cref="Rectangle"/> struct.
-        /// Pixels that are smaller or greater than the thresholds, are set to a specified value.
+        /// Pixels that are smaller or greater than the thresholds, are set to a specified values.
         /// </summary>
         /// <param name="area">The width, height, and location of the area.</param>
         /// <param name="thresholdLT">The lower threshold value to use for each pixel.</param>

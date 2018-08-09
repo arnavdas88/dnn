@@ -7,18 +7,16 @@
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
-#define WIND_WIDTH  64  /* detection window width  */
-#define WIND_HEIGHT 128 /* detection window image height */
+////#define WIND_WIDTH  64  /* detection window width  */
+////#define WIND_HEIGHT 128 /* detection window image height */
 
 GENIXAPI(int, hog)(
 	const int bitsPerPixel,
-	const int width, const int height, const int stride, const unsigned __int64* src)
+	const int width, const int height, const int stride, const float* src)
 {
 	IppStatus status = ippStsNoErr;
 
-
 	int hogCtxSize = 0, hogBuffSize = 0, winBuffSize = 0;
-	int srcStep = 0;		// Steps, in bytes, through the source/destination/feature images
 	IppiHOGSpec* pHOGctx = NULL;
 	Ipp8u* pBuffer = NULL;
 	Ipp32f* pDescriptor = NULL;
@@ -34,23 +32,11 @@ GENIXAPI(int, hog)(
 		9,			/* Number of bins (orientations) in the histogram */
 		1.0f,		/* Sigma value (in the applied Gaussian) */
 		0.2f,		/* Threshold value (applied for normalization) */
-		{ WIND_WIDTH, WIND_HEIGHT },	/* Size (width and height in pixels) of detection window */
+		{ width, height },	/* Size (width and height in pixels) of detection window */
 	};
 
-	int numLocsx = (width + WIND_WIDTH - 1) / WIND_WIDTH;
-	int numLocsy = (height + WIND_HEIGHT - 1) / WIND_HEIGHT;
-	int numLocs = numLocsx * numLocsy;
-	IppiPoint* loc = (IppiPoint*)ippsMalloc_8u(numLocs * sizeof(IppiPoint));
-	if (loc == NULL) { status = ippStsNoMemErr; }
-	check_sts(status)
-
-		for (int y = 0, ypos = 0, i = 0; y < numLocsy; y++, ypos += WIND_HEIGHT)
-		{
-			for (int x = 0, xpos = 0; x < numLocsx; x++, xpos += WIND_WIDTH)
-			{
-				loc[i++] = { xpos, ypos };
-			}
-		}
+	int numLocs = 1;
+	IppiPoint loc = { 0, 0 };
 
 	/* Get size of HOG context */
 	check_sts(status = ippiHOGGetSize(&config, &hogCtxSize));
@@ -68,20 +54,19 @@ GENIXAPI(int, hog)(
 	pDescriptor = (Ipp32f*)ippsMalloc_8u(numLocs*winBuffSize);
 
 	/* Compute HOG descriptor */
-	check_sts(status = ippiHOG_8u32f_C1R(
-		(const Ipp8u *)src,
-		stride * sizeof(unsigned __int64),
+	check_sts(status = ippiHOG_32f_C1R(
+		src,
+		stride * sizeof(float),
 		roiSize,
-		loc,
+		&loc,
 		numLocs,
 		pDescriptor,
 		pHOGctx,
 		ippBorderConst,
-		borderValue,
+		255,
 		pBuffer));
 
 	EXIT_MAIN
-		ippsFree(loc);
 	ippsFree(pHOGctx);
 	ippsFree(pBuffer);
 	ippsFree(pDescriptor);

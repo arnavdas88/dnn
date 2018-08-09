@@ -43,10 +43,10 @@
     <ClCompile Include="source\linesuppression.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\threshold.cpp">
+    <ClCompile Include="source\gradients.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\gradients.cpp">
+    <ClCompile Include="source\thresholding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

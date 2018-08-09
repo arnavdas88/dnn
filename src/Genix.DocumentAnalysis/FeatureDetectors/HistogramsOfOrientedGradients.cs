@@ -32,12 +32,24 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// </summary>
         /// <param name="cellSize">The cell size, in pixels.</param>
         /// <param name="blockSize">The block size, in number of <paramref name="cellSize"/>.</param>
+        /// <param name="blockStride">The block stride size, in number of <paramref name="cellSize"/>.</param>
         /// <param name="numberOfBins">The number of bins (orientations) in the histogram.</param>
-        public HistogramsOfOrientedGradients(int cellSize, int blockSize, int numberOfBins)
+        /// <param name="threshold">
+        /// The threshold value to apply after normalization.
+        /// Bins that are less than the threshold, are set to zero.
+        /// </param>
+        public HistogramsOfOrientedGradients(
+            int cellSize,
+            int blockSize,
+            int blockStride,
+            int numberOfBins,
+            float threshold)
         {
             this.CellSize = cellSize;
             this.BlockSize = blockSize;
+            this.BlockStride = blockStride;
             this.NumberOfBins = numberOfBins;
+            this.Threshold = threshold;
         }
 
         /// <summary>
@@ -59,6 +71,15 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         public int BlockSize { get; } = 2;
 
         /// <summary>
+        /// Gets the block stride size, in number of <see cref="CellSize"/>.
+        /// </summary>
+        /// <value>
+        /// The block stride size, in number of <see cref="CellSize"/>. The default value is 1.
+        /// </value>
+        [JsonProperty("blockSize")]
+        public int BlockStride { get; } = 1;
+
+        /// <summary>
         /// Gets the number of bins (orientations) in the histogram.
         /// </summary>
         /// <value>
@@ -66,6 +87,18 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// </value>
         [JsonProperty("numberOfBins")]
         public int NumberOfBins { get; } = 9;
+
+        /// <summary>
+        /// Gets the threshold to apply to bin values after normalization.
+        /// </summary>
+        /// <value>
+        /// The threshold to apply. The default value is 0.2f.
+        /// </value>
+        /// <remarks>
+        /// Bins that are less than the threshold, are set to zero.
+        /// </remarks>
+        [JsonProperty("threshold")]
+        public float Threshold { get; } = 0.2f;
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">
@@ -78,7 +111,12 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
                 throw new ArgumentNullException(nameof(image));
             }
 
-            (float[] vectors, int length) = image.HOG(this.CellSize, this.BlockSize, this.NumberOfBins);
+            (float[] vectors, int length) = image.HOG(
+                this.CellSize,
+                this.BlockSize,
+                this.BlockStride,
+                this.NumberOfBins,
+                this.Threshold);
             return new Features(vectors.Length / length, length, vectors);
         }
     }

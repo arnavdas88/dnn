@@ -4,21 +4,93 @@
 #undef min
 #undef max
 
-// Returns the smaller of each element of an array and a scalar value.
-extern "C" __declspec(dllexport) void WINAPI sminc(
+// Computes the smaller of each element of an array and a scalar value in-place
+template<typename T> void __forceinline __minc_ip(
 	int n,
-	const float* a, int offa,
-	const float b,
-	float* y, int offy)
+	const T a,
+	T* y, int offy)
 {
-	a += offa;
 	y += offy;
 
 	for (int i = 0; i < n; i++)
 	{
-		y[i] = __min(a[i], b);
+		y[i] = __min(y[i], a);
 	}
 }
+
+GENIXAPI(void, minc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __minc_ip(n, a, y, offy); }
+GENIXAPI(void, minc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __minc_ip(n, a, y, offy); }
+GENIXAPI(void, minc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __minc_ip(n, a, y, offy); }
+GENIXAPI(void, minc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __minc_ip(n, a, y, offy); }
+GENIXAPI(void, minc_ip_f32)(int n, float a, float* y, int offy) { __minc_ip(n, a, y, offy); }
+GENIXAPI(void, minc_ip_f64)(int n, double a, double* y, int offy) { __minc_ip(n, a, y, offy); }
+
+// Computes the smaller of each element of an array and a scalar value not-in-place
+template<typename T> void __forceinline __minc(
+	int n,
+	const T* x, int offx,
+	const T a,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = __min(x[i], a);
+	}
+}
+
+GENIXAPI(void, minc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __minc(n, x, offx, a, y, offy); }
+GENIXAPI(void, minc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __minc(n, x, offx, a, y, offy); }
+GENIXAPI(void, minc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __minc(n, x, offx, a, y, offy); }
+GENIXAPI(void, minc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __minc(n, x, offx, a, y, offy); }
+GENIXAPI(void, minc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __minc(n, x, offx, a, y, offy); }
+GENIXAPI(void, minc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __minc(n, x, offx, a, y, offy); }
+
+// Computes the larger of each element of an array and a scalar value in-place
+template<typename T> void __forceinline __maxc_ip(
+	int n,
+	const T a,
+	T* y, int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = __max(y[i], a);
+	}
+}
+
+GENIXAPI(void, maxc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __maxc_ip(n, a, y, offy); }
+GENIXAPI(void, maxc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __maxc_ip(n, a, y, offy); }
+GENIXAPI(void, maxc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __maxc_ip(n, a, y, offy); }
+GENIXAPI(void, maxc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __maxc_ip(n, a, y, offy); }
+GENIXAPI(void, maxc_ip_f32)(int n, float a, float* y, int offy) { __maxc_ip(n, a, y, offy); }
+GENIXAPI(void, maxc_ip_f64)(int n, double a, double* y, int offy) { __maxc_ip(n, a, y, offy); }
+
+// Computes the larger of each element of an array and a scalar value not-in-place
+template<typename T> void __forceinline __maxc(
+	int n,
+	const T* x, int offx,
+	const T a,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = __max(x[i], a);
+	}
+}
+
+GENIXAPI(void, maxc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __maxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, maxc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __maxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, maxc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __maxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, maxc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __maxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, maxc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __maxc(n, x, offx, a, y, offy); }
+GENIXAPI(void, maxc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __maxc(n, x, offx, a, y, offy); }
 
 // Returns the smaller of each pair of elements of the two vector arguments.
 extern "C" __declspec(dllexport) void WINAPI smin(
@@ -28,22 +100,6 @@ extern "C" __declspec(dllexport) void WINAPI smin(
 	float* y, int offy)
 {
 	::vsFmin(n, a + offa, b + offb, y + offy);
-}
-
-// Returns the larger of each element of an array and a scalar value.
-extern "C" __declspec(dllexport) void WINAPI smaxc(
-	int n,
-	const float* a, int offa,
-	const float b,
-	float* y, int offy)
-{
-	a += offa;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = __max(a[i], b);
-	}
 }
 
 // Returns the larger of each pair of elements of the two vector arguments.

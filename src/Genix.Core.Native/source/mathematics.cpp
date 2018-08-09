@@ -1072,71 +1072,55 @@ GENIXAPI(void, atan2_f32)(
 }
 
 // L1 normalization
-GENIXAPI(float, _snrm1)(
+template<typename T> T __forceinline __nrm1(
 	int n,
-	const float* x, int offx, int incx)
+	const T* x, int offx)
 {
 	x += offx;
 
-	if (n <= 32)
-	{
-		float sum = 0.0f;
+	T sum = T(0);
 
-		if (incx == 1)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				sum += ::fabsf(x[i]);
-			}
-		}
-		else
-		{
-			for (int i = 0; i < n; i++, x += incx)
-			{
-				sum += ::fabsf(*x);
-			}
-		}
-
-		return sum;
-	}
-	else
+	for (int i = 0; i < n; i++)
 	{
-		return ::cblas_sasum(n, x, incx);
+		sum += abs(x[i]);
 	}
+
+	return sum;
+}
+
+GENIXAPI(float, nrm1_f32)(int n, const float* x, int offx)
+{
+	return n <= 32 ? __nrm1(n, x, offx) : ::cblas_sasum(n, x + offx, 1);
+}
+GENIXAPI(double, nrm1_f64)(int n, const double* x, int offx)
+{
+	return n <= 32 ? __nrm1(n, x, offx) : ::cblas_dasum(n, x + offx, 1);
 }
 
 // L2 normalization
-GENIXAPI(float, _snrm2)(
+template<typename T> T __forceinline __nrm2_squared(
 	int n,
-	const float* x, int offx, int incx)
+	const T* x, int offx)
 {
 	x += offx;
 
-	if (n <= 32)
-	{
-		float sum = 0.0f;
+	T sum = T(0);
 
-		if (incx == 1)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				sum += x[i] * x[i];
-			}
-		}
-		else
-		{
-			for (int i = 0; i < n; i++, x += incx)
-			{
-				sum += *x * *x;
-			}
-		}
-
-		return sum;
-	}
-	else
+	for (int i = 0; i < n; i++)
 	{
-		return ::cblas_snrm2(n, x, incx);
+		sum += x[i] * x[i];
 	}
+
+	return sum;
+}
+
+GENIXAPI(float, nrm2_f32)(int n, const float* x, int offx)
+{
+	return n <= 32 ? ::sqrtf(__nrm2_squared(n, x, offx)) : ::cblas_snrm2(n, x + offx, 1);
+}
+GENIXAPI(double, nrm2_f64)(int n, const double* x, int offx)
+{
+	return n <= 32 ? ::sqrt(__nrm2_squared(n, x, offx)) : ::cblas_dnrm2(n, x + offx, 1);
 }
 
 // sum(x)

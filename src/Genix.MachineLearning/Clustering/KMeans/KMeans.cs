@@ -62,6 +62,27 @@ namespace Genix.MachineLearning.Clustering
         public KMeansClusterCollection Clusters => this.clusters;
 
         /// <summary>
+        /// Learns a <see cref="KMeans"/> model that can map the given inputs to the desired outputs.
+        /// </summary>
+        /// <param name="k">The number of clusters.</param>
+        /// <param name="samples">
+        /// The samples to clusterize.
+        /// Each sample consist of vector <c>x</c> and its <c>weight</c>.
+        /// </param>
+        /// <returns>
+        /// The learned <see cref="KMeans"/> model.
+        /// </returns>
+        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
+        {
+            if (samples == null)
+            {
+                throw new ArgumentNullException(nameof(samples));
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Assigns the vector to one of the clusters.
         /// </summary>
         /// <param name="x">The data point to assign.</param>
@@ -137,27 +158,6 @@ namespace Genix.MachineLearning.Clustering
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Learns a <see cref="KMeans"/> model that can map the given inputs to the desired outputs.
-        /// </summary>
-        /// <param name="k">The number of clusters.</param>
-        /// <param name="samples">
-        /// The samples to clusterize.
-        /// Each sample consist of vector <c>x</c> and its <c>weight</c>.
-        /// </param>
-        /// <returns>
-        /// The learned <see cref="KMeans"/> model.
-        /// </returns>
-        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
-        {
-            if (samples == null)
-            {
-                throw new ArgumentNullException(nameof(samples));
-            }
-
-            return null;
         }
 
         private static class NativeMethods
