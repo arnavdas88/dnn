@@ -16,6 +16,19 @@ namespace Genix.Core
     public static class Array32f
     {
         /// <summary>
+        /// Sets all elements in the array to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, float value, float[] y, int offy)
+        {
+            NativeMethods.set_f32(length, value, y, offy);
+        }
+
+        /// <summary>
         /// Performs thresholding of elements of an array.
         /// Elements that are less than the threshold, are set to a specified value.
         /// </summary>
@@ -65,6 +78,10 @@ namespace Genix.Core
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void set_f32(int n, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

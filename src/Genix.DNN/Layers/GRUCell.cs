@@ -264,7 +264,7 @@ namespace Genix.DNN.Layers
             this.UC.Randomize(random);
 
             // initialize biases for update and reset gates only
-            Arrays.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
+            Array32f.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
         }
 
 #if !TENSORFLOW

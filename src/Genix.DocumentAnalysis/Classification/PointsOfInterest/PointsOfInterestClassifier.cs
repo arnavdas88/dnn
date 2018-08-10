@@ -70,9 +70,11 @@ namespace Genix.DocumentAnalysis.Classification
         private protected override void FinishTraining(CancellationToken cancellationToken)
         {
             // learn k-means
+            int dimension = this.features[0].features.Length;
             this.kmeans = KMeans.Learn(
                 512,
-                this.features[0].features.Length,
+                dimension,
+                /*this.features.SelectMany(x => x.features.Vectors.Partition(dimension)).ToList());*/
                 this.features.SelectMany(x => x.features.Vectors).ToArray());
         }
 

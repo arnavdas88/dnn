@@ -8,8 +8,12 @@ namespace Genix.MachineLearning.Clustering
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using System.Threading.Tasks;
+    using Genix.Core;
     using Genix.MachineLearning.Distances;
     using Newtonsoft.Json;
 
@@ -22,13 +26,13 @@ namespace Genix.MachineLearning.Clustering
         /// The collection of clusters.
         /// </summary>
         [JsonProperty("clusters")]
-        private readonly KMeansClusterCollection clusters = new KMeansClusterCollection();
+        private readonly KMeansClusterCollection clusters = null;
 
         /// <summary>
         /// The distance function.
         /// </summary>
         [JsonProperty("distance", TypeNameHandling = TypeNameHandling.Objects)]
-        private readonly IDistance<float[], float[], float> distance;
+        private readonly IVectorDistance<float, float> distance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KMeans"/> class.
@@ -37,7 +41,7 @@ namespace Genix.MachineLearning.Clustering
         /// <exception cref="ArgumentNullException">
         /// <paramref name="distance"/> is <b>null</b>.
         /// </exception>
-        public KMeans(IDistance<float[], float[], float> distance)
+        public KMeans(IVectorDistance<float, float> distance)
         {
             this.distance = distance ?? throw new ArgumentNullException(nameof(distance));
 
@@ -72,27 +76,107 @@ namespace Genix.MachineLearning.Clustering
         /// <returns>
         /// The learned <see cref="KMeans"/> model.
         /// </returns>
-        public static KMeans Learn(int k, int dimension, float[] x)
+        public static KMeans Learn(int k, int dimension, /*IList<float[]>*/ float[] x)
         {
             if (x == null)
             {
                 throw new ArgumentNullException(nameof(x));
             }
 
-            NativeMethods.kmeans(k, 5, dimension, x.Length / dimension, x);
+            int sampleCount = /*x.Count; ////*/ x.Length / dimension;
 
-            return null;
-        }
+#if false
+            NativeMethods.kmeans(k, 1, dimension, sampleCount, x);
+#else
+            int maxiter = 20;
+            IVectorDistance<float, float> distance = default(EuclideanDistance);
 
-/*        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
-        {
-            if (samples == null)
+            KMeansClusterCollection clusters = Seed();
+            float[][] means = JaggedArray.Create<float>(k, dimension);
+            int[] counts = new int[k];
+            object[] sync = new object[k];
+            for (int i = 0; i < k; i++)
             {
-                throw new ArgumentNullException(nameof(samples));
+                sync[i] = new object();
             }
 
+            for (int iter = 0; iter < maxiter; iter++)
+            {
+                // reset means and counts
+                if (iter > 0)
+                {
+                    for (int i = 0; i < k; i++)
+                    {
+                        Array32f.Set(dimension, 0.0f, means[i], 0);
+                    }
+
+                    Arrays.Set(counts.Length, 0, counts, 0);
+                }
+
+                // assign vectors to new clusters
+                CommonParallel.For(
+                    0,
+                    sampleCount,
+                    (a, b) =>
+                    {
+                        for (int i = a, off = a * dimension; i < b; i++, off += dimension)
+                        {
+                            int index = clusters.Assign(distance, x, off);
+
+                            lock (sync[index])
+                            {
+                                Math32f.AddProductC(dimension, x, off, 1.0f, means[index], 0);
+                                counts[index]++;
+                            }
+                        }
+                    },
+                    new ParallelOptions());
+
+                // calculate new centroids
+                for (int i = 0; i < k; i++)
+                {
+                    if (counts[i] != 0)
+                    {
+                        Math32f.DivC(dimension, means[i], 0, counts[i], clusters[i].Centroid, 0);
+                    }
+                }
+            }
+#endif
             return null;
-        }*/
+
+            KMeansClusterCollection Seed()
+            {
+                Random random = new Random(0);
+
+                KMeansClusterCollection result = new KMeansClusterCollection(k, dimension);
+                for (int i = 0; i < k; i++)
+                {
+                    int index = random.Next(0, sampleCount);
+                    int off = index * dimension;
+                    if (i > 0 && result.Take(i).Any(c => Arrays.Equals(dimension, c.Centroid, 0, x, off)))
+                    {
+                        i--;
+                        continue;
+                    }
+
+                    Arrays.Copy(dimension, x, off, result[i].Centroid, 0);
+                }
+
+                Console.WriteLine("seeded.");
+
+                return result;
+            }
+        }
+
+        /*        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
+                {
+                    if (samples == null)
+                    {
+                        throw new ArgumentNullException(nameof(samples));
+                    }
+
+                    return null;
+                }*/
 
         /// <summary>
         /// Assigns the vector to one of the clusters.
@@ -101,37 +185,19 @@ namespace Genix.MachineLearning.Clustering
         /// <returns>
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
-        public int Assign(float[] x)
-        {
-            return this.Assign(x, out float distance);
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Assign(float[] x) => this.clusters.Assign(this.distance, x, 0);
 
         /// <summary>
         /// Assigns the vector to one of the clusters and returns the distance to that cluster.
         /// </summary>
         /// <param name="x">The data point to assign.</param>
-        /// <param name="distance">The distance to the cluster.</param>
+        /// <param name="score">The distance to the cluster.</param>
         /// <returns>
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
-        public int Assign(float[] x, out float distance)
-        {
-            // TODO: use KDTree
-            int win = 0;
-            distance = this.distance.Distance(x, this.clusters[0].Centroid);
-
-            for (int i = 1, ii = this.clusters.Count; i < ii; i++)
-            {
-                float dist = this.distance.Distance(x, this.clusters[i].Centroid);
-                if (dist < distance)
-                {
-                    win = i;
-                    distance = dist;
-                }
-            }
-
-            return win;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Assign(float[] x, out float score) => this.clusters.Assign(this.distance, x, 0, out score);
 
         /// <summary>
         /// Assigns the range of data points to feature vector containing the distance between each point and its assigned cluster.

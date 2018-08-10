@@ -565,7 +565,7 @@ namespace Genix.MachineLearning
                                     if (start < 0)
                                     {
                                         int count = -start * xstride2;
-                                        Arrays.Set(count, 0.0f, yw, yposk2);
+                                        Array32f.Set(count, 0.0f, yw, yposk2);
                                         xposk2 += count;
                                         yposk2 += count;
 
@@ -574,7 +574,7 @@ namespace Genix.MachineLearning
 
                                     if (end > x2)
                                     {
-                                        Arrays.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
+                                        Array32f.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
 
                                         end = x2;
                                     }
@@ -583,7 +583,7 @@ namespace Genix.MachineLearning
                                 }
                                 else
                                 {
-                                    Arrays.Set(ksize2 * xstride2, 0.0f, yw, yposk);
+                                    Array32f.Set(ksize2 * xstride2, 0.0f, yw, yposk);
                                 }
                             }
 

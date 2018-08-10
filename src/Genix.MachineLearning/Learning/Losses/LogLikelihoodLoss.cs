@@ -74,7 +74,7 @@ namespace Genix.MachineLearning.Learning
             if (calculateGradient)
             {
                 float[] dyw = y.Gradient;
-                Arrays.Set(y.Length, this.LSR / mbsize, dyw, 0);
+                Array32f.Set(y.Length, this.LSR / mbsize, dyw, 0);
 
                 for (int i = 0, yi = 0; i < mb; i++, yi += mbsize)
                 {

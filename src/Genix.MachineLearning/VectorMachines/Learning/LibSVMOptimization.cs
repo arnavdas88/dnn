@@ -158,7 +158,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
             // initialize gradient
             Arrays.Copy(numberOfVariables, p, 0, g, 0);
-            Arrays.Set(numberOfVariables, 0.0f, gbar, 0);
+            Array32f.Set(numberOfVariables, 0.0f, gbar, 0);
             /*for (int i = 0; i < numberOfVariables; i++)
             {
                 g[i] = p[i];

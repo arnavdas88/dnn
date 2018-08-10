@@ -18,7 +18,9 @@ namespace Genix.MachineLearning.Distances
           IDistance<double, double, double>,
           IDistance<float[], float[], float>,
           IDistance<SparseVectorF, float[], float>,
-          IDistance<double[], double[], double>
+          IDistance<double[], double[], double>,
+          IVectorDistance<float, float>,
+          IVectorDistance<double, double>
     {
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -53,6 +55,20 @@ namespace Genix.MachineLearning.Distances
         public double Distance(double[] x, double[] y)
         {
             return Mathematics.EuclideanDistance(x.Length, x, 0, y, 0);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Distance(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return Math32f.EuclideanDistance(length, x, offx, y, offy);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double Distance(int length, double[] x, int offx, double[] y, int offy)
+        {
+            return Mathematics.EuclideanDistance(length, x, offx, y, offy);
         }
     }
 }

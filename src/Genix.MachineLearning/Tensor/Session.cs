@@ -182,7 +182,7 @@ namespace Genix.MachineLearning
                 if (calculateGradient && stack.Count > 0)
                 {
                     float[] dw = stack.Pop();
-                    Arrays.Set(length, 0.0f, dw, 0);
+                    Array32f.Set(length, 0.0f, dw, 0);
 
                     x = new Tensor(name, shape, w, dw);
                 }

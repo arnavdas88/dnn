@@ -225,7 +225,7 @@ namespace Genix.Imaging
                 float[] temp = h[0];
                 h.RemoveAt(0);
                 h.Add(temp);
-                Arrays.Set(temp.Length, 0, temp, 0);
+                Array32f.Set(temp.Length, 0, temp, 0);
             }
 
             void ComputeHistLine(int offy, float[] h)

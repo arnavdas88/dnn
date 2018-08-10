@@ -53,7 +53,7 @@ namespace Genix.Core
             float[] a = new float[length];
             if (value != 0.0f)
             {
-                Arrays.Set(length, value, a, 0);
+                Array32f.Set(length, value, a, 0);
             }
 
             return a;
@@ -296,20 +296,6 @@ namespace Genix.Core
         public static void Set(int length, ulong value, ulong[] y, int offy)
         {
             NativeMethods.set_u64(length, value, y, offy);
-        }
-
-        /// <summary>
-        /// Sets values in the array of single-precision floating point numbers
-        /// starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which setting begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, float value, float[] y, int offy)
-        {
-            NativeMethods.set_f32(length, value, y, offy);
         }
 
         /// <summary>
@@ -872,10 +858,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName, EntryPoint = "set_s64")]
             [SuppressUnmanagedCodeSecurity]
             public static extern void set_u64(int n, ulong a, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void set_f32(int n, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

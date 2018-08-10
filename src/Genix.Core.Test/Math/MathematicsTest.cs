@@ -51,27 +51,27 @@
                 float[] a = new float[length];
                 float[] y = new float[length];
 
-                Arrays.Set(length, 0.0f, a, 0);
+                Array32f.Set(length, 0.0f, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == 1.0f));
 
-                Arrays.Set(length, float.NegativeInfinity, a, 0);
+                Array32f.Set(length, float.NegativeInfinity, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
-                Arrays.Set(length, float.PositiveInfinity, a, 0);
+                Array32f.Set(length, float.PositiveInfinity, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
-                Arrays.Set(length, float.MinValue, a, 0);
+                Array32f.Set(length, float.MinValue, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
-                Arrays.Set(length, float.MaxValue, a, 0);
+                Array32f.Set(length, float.MaxValue, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
-                Arrays.Set(length, float.NaN, a, 0);
+                Array32f.Set(length, float.NaN, a, 0);
                 Math32f.AddC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }
@@ -85,27 +85,27 @@
                 float[] a = new float[length];
                 float[] y = new float[length];
 
-                Arrays.Set(length, 0.0f, a, 0);
+                Array32f.Set(length, 0.0f, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == -1.0f));
 
-                Arrays.Set(length, float.NegativeInfinity, a, 0);
+                Array32f.Set(length, float.NegativeInfinity, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNegativeInfinity(x)));
 
-                Arrays.Set(length, float.PositiveInfinity, a, 0);
+                Array32f.Set(length, float.PositiveInfinity, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsPositiveInfinity(x)));
 
-                Arrays.Set(length, float.MinValue, a, 0);
+                Array32f.Set(length, float.MinValue, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MinValue));
 
-                Arrays.Set(length, float.MaxValue, a, 0);
+                Array32f.Set(length, float.MaxValue, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => x == float.MaxValue));
 
-                Arrays.Set(length, float.NaN, a, 0);
+                Array32f.Set(length, float.NaN, a, 0);
                 Math32f.SubC(length, a, 0, 1.0f, y, 0);
                 Assert.IsTrue(y.All(x => float.IsNaN(x)));
             }

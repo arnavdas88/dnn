@@ -26,7 +26,8 @@ namespace Genix.Core
         /// <param name="parallelOptions">The object that configures the behavior of this operation..</param>
         public static void For(int fromInclusive, int toExclusive, Action<int, int> body, ParallelOptions parallelOptions)
         {
-            For(fromInclusive, toExclusive, Math.Max(1, (toExclusive - fromInclusive) / parallelOptions.MaxDegreeOfParallelism), body, parallelOptions);
+            int maxDegreeOfParallelism = CommonParallel.GetMaxDegreeOfParallelism(parallelOptions);
+            For(fromInclusive, toExclusive, Math.Max(1, (toExclusive - fromInclusive) / maxDegreeOfParallelism), body, parallelOptions);
         }
 
         /// <summary>
@@ -62,7 +63,8 @@ namespace Genix.Core
             int length = toExclusive - fromInclusive;
             if (length > 0)
             {
-                if (parallelOptions.MaxDegreeOfParallelism < 2 || (rangeSize * 2) > length)
+                int maxDegreeOfParallelism = CommonParallel.GetMaxDegreeOfParallelism(parallelOptions);
+                if (maxDegreeOfParallelism < 2 || (rangeSize * 2) > length)
                 {
                     // Special case: not worth to parallelize, inline
                     body(fromInclusive, toExclusive);
@@ -106,7 +108,8 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (parallelOptions.MaxDegreeOfParallelism < 2)
+            int maxDegreeOfParallelism = CommonParallel.GetMaxDegreeOfParallelism(parallelOptions);
+            if (maxDegreeOfParallelism < 2)
             {
                 for (int i = 0; i < actions.Length; i++)
                 {
@@ -155,7 +158,8 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (parallelOptions.MaxDegreeOfParallelism < 2)
+            int maxDegreeOfParallelism = CommonParallel.GetMaxDegreeOfParallelism(parallelOptions);
+            if (maxDegreeOfParallelism < 2)
             {
                 var mapped = new T[toExclusive - fromInclusive];
                 for (int k = 0; k < mapped.Length; k++)
@@ -191,6 +195,7 @@ namespace Genix.Core
                         intermediateResults.Add(reduce(localResult.ToArray()));
                     }
                 });
+
             return reduce(intermediateResults.ToArray());
         }
 
@@ -229,7 +234,8 @@ namespace Genix.Core
             }
 
             // Special case: straight execution without parallelism
-            if (parallelOptions.MaxDegreeOfParallelism < 2)
+            int maxDegreeOfParallelism = CommonParallel.GetMaxDegreeOfParallelism(parallelOptions);
+            if (maxDegreeOfParallelism < 2)
             {
                 var mapped = new TOut[array.Length];
                 for (int k = 0; k < mapped.Length; k++)
@@ -346,6 +352,17 @@ namespace Genix.Core
                     return result;
                 },
                 parallelOptions);
+        }
+
+        private static int GetMaxDegreeOfParallelism(ParallelOptions parallelOptions)
+        {
+            int maxDegreeOfParallelism = parallelOptions.MaxDegreeOfParallelism;
+            if (maxDegreeOfParallelism == -1)
+            {
+                maxDegreeOfParallelism = Math.Min(System.Environment.ProcessorCount, 512);
+            }
+
+            return maxDegreeOfParallelism;
         }
     }
 }

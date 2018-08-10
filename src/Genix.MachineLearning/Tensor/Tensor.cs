@@ -335,7 +335,7 @@ namespace Genix.MachineLearning
         /// Sets all the weights in the tensor to zero.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => Arrays.Set(this.Length, 0, this.Weights, 0);
+        public void Clear() => Array32f.Set(this.Length, 0.0f, this.Weights, 0);
 
         /// <summary>
         /// Sets all the weights in the tensor's gradient to zero.
@@ -345,7 +345,7 @@ namespace Genix.MachineLearning
         {
             if (this.gradient != null)
             {
-                Arrays.Set(this.Length, 0, this.gradient, 0);
+                Array32f.Set(this.Length, 0, this.gradient, 0);
             }
         }
 
@@ -354,7 +354,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(float value) => Arrays.Set(this.Length, value, this.Weights, 0);
+        public void Set(float value) => Array32f.Set(this.Length, value, this.Weights, 0);
 
         /// <summary>
         /// Sets all values in the tensor to the specified values.
@@ -381,7 +381,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value) => Arrays.Set(this.Length, value, this.Gradient, 0);
+        public void SetGradient(float value) => Array32f.Set(this.Length, value, this.Gradient, 0);
 
         /// <summary>
         /// Sets all values in the tensor gradient to the specified values.
