@@ -780,36 +780,47 @@ GENIXAPI(void, sdiv)(
 	}
 }
 
+// Adds product of a vector and a constant to the accumulator vector.
 // y += a * x
-GENIXAPI(void, _saxpy)(
-	int n,
-	float a,
-	const float* x, int offx, int incx,
-	float* y, int offy, int incy)
+template<typename T> void __forceinline __addproductc(
+	const int n,
+	const T* x, const int offx,
+	const T a,
+	T* y, const int offy)
 {
 	x += offx;
 	y += offy;
 
+	for (int i = 0; i < n; i++)
+	{
+		y[i] += x[i] * a;
+	}
+}
+
+GENIXAPI(void, addproductc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_f32)(int n, const float* x, int offx, float a, float* y, int offy)
+{
 	if (n <= 24)
 	{
-		if (incx == 1 && incy == 1)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				y[i] += x[i] * a;
-			}
-		}
-		else
-		{
-			for (int i = 0, xi = 0, yi = 0; i < n; i++, xi += incx, yi += incy)
-			{
-				y[yi] += x[xi] * a;
-			}
-		}
+		__addproductc(n, x, offx, a, y, offy);
 	}
 	else
 	{
-		::cblas_saxpy(n, a, x, incx, y, incy);
+		::cblas_saxpy(n, a, x + offx, 1, y + offy, 1);
+	}
+}
+GENIXAPI(void, addproductc_f64)(int n, const double* x, int offx, double a, double* y, int offy)
+{
+	if (n <= 24)
+	{
+		__addproductc(n, x, offx, a, y, offy);
+	}
+	else
+	{
+		::cblas_daxpy(n, a, x + offx, 1, y + offy, 1);
 	}
 }
 

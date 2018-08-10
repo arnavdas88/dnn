@@ -277,7 +277,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Mathematics.MultiplyAndAdd(y.Length, alpha, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Math32f.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0));
                     }
 #endif
 

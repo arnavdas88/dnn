@@ -92,7 +92,7 @@ namespace Genix.MachineLearning
                                 float alpha = 1.0f / count;
                                 for (int i = 0; i < count; i++)
                                 {
-                                    Mathematics.MultiplyAndAdd(x.Length, alpha, ys[i].Gradient, 0, x.Gradient, 0);
+                                    Math32f.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
                                 }
                             });
 

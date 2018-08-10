@@ -316,7 +316,7 @@ namespace Genix.MachineLearning
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
                                 {
-                                    Mathematics.MultiplyAndAdd(ystride2, alpha, dyw, ypos2, dxw, xpos2K);
+                                    Math32f.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
                                 }
                             }
                         }
@@ -685,7 +685,7 @@ namespace Genix.MachineLearning
                     Mathematics.Square(x.Length, x.Weights, 0, scale.Weights, 0);
                     NeuralOperations.LRNKernel(scale, scale.Weights, y.Weights, kernelSize);
                     scale.Set(k);
-                    scale.MultiplyAndAdd(alpha / kernelSize, y);
+                    scale.AddProductC(y, alpha / kernelSize);
 
                     // 2. calculate forward tensor
                     // y(i) = x(i) * scale(i) ^ -beta
@@ -714,7 +714,7 @@ namespace Genix.MachineLearning
                                 Math32f.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
-                                Mathematics.MultiplyAndAdd(x.Length, -2.0f * alpha * beta / kernelSize, work.Weights, 0, x.Gradient, 0);
+                                Math32f.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);
                             });
                     }
 #endif

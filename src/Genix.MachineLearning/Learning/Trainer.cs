@@ -236,7 +236,7 @@ namespace Genix.MachineLearning.Learning
             {
                 l2 = layer.w.L2Norm() * rateL2;
 
-                Mathematics.MultiplyAndAdd(layer.w.Length, rateL2, w, 0, dw, 0);
+                Math32f.AddProductC(layer.w.Length, w, 0, rateL2, dw, 0);
             }
 
             if (!float.IsNaN(this.ClipValue))

@@ -309,6 +309,24 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Adds product of element of an array and a constant to the elements of destination array.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] += x[i] * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddProductC(int length, float[] x, int offx, float alpha, float[] y, int offy)
+        {
+            NativeMethods.addproductc_f32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
         /// Computes a smaller of each element of an array and a scalar value in-place.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -513,6 +531,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void divc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void addproductc_f32(int n, [In] float[] x, int offx, float a, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

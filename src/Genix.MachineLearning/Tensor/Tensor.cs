@@ -478,14 +478,14 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
         /// </summary>
-        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <param name="x">The tensor that contains the data to add.</param>
+        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c>this := alpha * x + this</c>.
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MultiplyAndAdd(float alpha, Tensor x) => Mathematics.MultiplyAndAdd(this.Length, alpha, x.Weights, 0, this.Weights, 0);
+        public void AddProductC(Tensor x, float alpha) => Math32f.AddProductC(this.Length, x.Weights, 0, alpha, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.

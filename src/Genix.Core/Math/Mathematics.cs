@@ -1322,25 +1322,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds a range of values multiplied by a specified factor from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := alpha * x + y</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MultiplyAndAdd(int length, float alpha, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods._saxpy(length, alpha, x, offx, 1, y, offy, 1);
-        }
-
-        /// <summary>
         /// Adds a range of values multiplied by a specified factor from a array starting at the specified source index to another array starting at the specified destination index.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -1378,27 +1359,6 @@ namespace Genix.Core
         public static void MultiplyAndAdd(int length, float alpha, float[] x, int offx, int incx, float beta, float[] y, int offy, int incy)
         {
             NativeMethods._saxpby(length, alpha, x, offx, incx, beta, y, offy, incy);
-        }
-
-        /// <summary>
-        /// Adds a range of values multiplied by a specified factor from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
-        /// <param name="x">The array that contains the data to add.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="incx">the increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := alpha * x + y</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MultiplyAndAdd(int length, float alpha, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods._saxpy(length, alpha, x, offx, incx, y, offy, incy);
         }
 
         /// <summary>
@@ -2079,10 +2039,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void sdiv(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void _saxpy(int n, float a, [In] float[] x, int offx, int incx, [In, Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
