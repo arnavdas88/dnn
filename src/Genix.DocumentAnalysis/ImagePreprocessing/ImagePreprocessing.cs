@@ -7,7 +7,6 @@
 namespace Genix.DocumentAnalysis
 {
     using System;
-    using System.Globalization;
     using Genix.Imaging;
 
     /// <summary>
@@ -35,94 +34,23 @@ namespace Genix.DocumentAnalysis
             // remove noise
             if (options.HasFlag(ImagePreprocessingOptions.Despeckle))
             {
-                image = ConvertTo1bpp().Despeckle();
+                image = image.ConvertTo(1).Despeckle();
             }
 
             // removes border noise
             if (options.HasFlag(ImagePreprocessingOptions.CleanOverscan))
             {
                 // clean 1/2 inches on all sides
-                image = ConvertTo1bpp().CleanOverscan(0.5f, 0.5f);
+                image = image.ConvertTo(1).CleanOverscan(0.5f, 0.5f);
             }
 
             // align
             if (options.HasFlag(ImagePreprocessingOptions.Despeckle))
             {
-                image = ConvertTo1bpp().Deskew();
+                image = image.ConvertTo(1).Deskew();
             }
 
-            // convert to requested depth
-            switch (bitsPerPixel)
-            {
-                case 1: return ConvertTo1bpp();
-                case 8: return ConvertTo8bpp();
-                case 24: return ConvertTo24bpp();
-                case 32: return ConvertTo32bpp();
-
-                default:
-                    throw new NotImplementedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, bitsPerPixel));
-            }
-
-            Image ConvertTo1bpp()
-            {
-                switch (image.BitsPerPixel)
-                {
-                    case 1: return image;
-                    case 8: return image.Binarize();
-                    case 24: return image.Convert24To8().Binarize();
-                    case 32: return image.Convert32To8().Binarize();
-
-                    default:
-                        throw new NotImplementedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
-                }
-            }
-
-            Image ConvertTo8bpp()
-            {
-                switch (image.BitsPerPixel)
-                {
-                    case 1: return image.Convert1To8();
-                    case 8: return image;
-                    case 24: return image.Convert24To8();
-                    case 32: return image.Convert32To8();
-
-                    default:
-                        throw new NotImplementedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
-                }
-            }
-
-            Image ConvertTo24bpp()
-            {
-                switch (image.BitsPerPixel)
-                {
-                    case 1: return image.Convert1To8().Convert8To24();
-                    case 8: return image.Convert8To24();
-                    case 24: return image;
-                    case 32: return image.Convert32To24();
-
-                    default:
-                        throw new NotImplementedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
-                }
-            }
-
-            Image ConvertTo32bpp()
-            {
-                switch (image.BitsPerPixel)
-                {
-                    case 1: return image.Convert1To8().Convert8To32(255);
-                    case 8: return image.Convert8To32(255);
-                    case 24: return image.Convert24To32();
-                    case 32: return image;
-
-                    default:
-                        throw new NotImplementedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
-                }
-            }
+            return image.ConvertTo(bitsPerPixel);
         }
     }
 }

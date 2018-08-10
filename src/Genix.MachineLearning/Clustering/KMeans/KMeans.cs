@@ -41,7 +41,7 @@ namespace Genix.MachineLearning.Clustering
         {
             this.distance = distance ?? throw new ArgumentNullException(nameof(distance));
 
-            NativeMethods.kmeans(3, 5);
+            ////NativeMethods.kmeans(3, 5);
         }
 
         /// <summary>
@@ -72,7 +72,19 @@ namespace Genix.MachineLearning.Clustering
         /// <returns>
         /// The learned <see cref="KMeans"/> model.
         /// </returns>
-        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
+        public static KMeans Learn(int k, int dimension, float[] x)
+        {
+            if (x == null)
+            {
+                throw new ArgumentNullException(nameof(x));
+            }
+
+            NativeMethods.kmeans(k, 5, dimension, x.Length / dimension, x);
+
+            return null;
+        }
+
+/*        public static KMeans Learn(int k, IEnumerable<(float[] x, float weight)> samples)
         {
             if (samples == null)
             {
@@ -80,7 +92,7 @@ namespace Genix.MachineLearning.Clustering
             }
 
             return null;
-        }
+        }*/
 
         /// <summary>
         /// Assigns the vector to one of the clusters.
@@ -166,7 +178,7 @@ namespace Genix.MachineLearning.Clustering
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void kmeans(int k, int iter);
+            public static extern void kmeans(int k, int iter, int dimension, int samples, float[] x);
         }
     }
 }

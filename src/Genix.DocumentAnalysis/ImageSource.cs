@@ -6,6 +6,8 @@
 
 namespace Genix.DocumentAnalysis
 {
+    using System;
+    using Genix.Core;
     using Genix.Imaging;
     using Newtonsoft.Json;
 
@@ -24,9 +26,23 @@ namespace Genix.DocumentAnalysis
         /// The zero-based index for this page if it belongs to a multi-page file.
         /// <b>null</b> if this page belongs to a single-page file.
         /// </param>
-        /// <param name="image">The <see cref="PageShape"/> object that contains the page data.</param>
-        protected ImageSource(string id, string name, int? frameIndex, Image image)
+        /// <param name="image">The <see cref="Image"/> object.</param>
+        public ImageSource(string id, string name, int? frameIndex, Image image)
             : base(id, name, frameIndex)
+        {
+            this.Image = image;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSource"/> class.
+        /// </summary>
+        /// <param name="id">The source of data.</param>
+        /// <param name="image">The <see cref="Image"/> object.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="id"/> is <b>null</b>.
+        /// </exception>
+        public ImageSource(DataSourceId id, Image image)
+            : base(id)
         {
             this.Image = image;
         }
@@ -36,7 +52,7 @@ namespace Genix.DocumentAnalysis
         /// using the existing <see cref="ImageSource"/> object.
         /// </summary>
         /// <param name="other">The <see cref="ImageSource"/> to copy the data from.</param>
-        protected ImageSource(ImageSource other)
+        public ImageSource(ImageSource other)
             : base(other)
         {
             this.Image = other.Image;

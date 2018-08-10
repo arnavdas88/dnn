@@ -9,6 +9,7 @@ namespace Genix.DocumentAnalysis.Classification
     using System;
     using System.IO;
     using System.Text;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>

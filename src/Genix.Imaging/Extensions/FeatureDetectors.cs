@@ -102,6 +102,16 @@ namespace Genix.Imaging
             int stride = srcf.Stride;
             float[] bits = srcf.Bits;
 
+            /*if (NativeMethods.hog(
+                srcf.BitsPerPixel,
+                srcf.Width,
+                srcf.Height,
+                srcf.Stride,
+                srcf.Bits) != 0)
+            {
+                throw new OutOfMemoryException();
+            }*/
+
             // calculate gradient vectors magnitude and direction using Prewitt operator (-1 0 1)
             float[] mag = new float[bits.Length];
             float[] ang = new float[bits.Length];
@@ -177,49 +187,14 @@ namespace Genix.Imaging
 
             ImageF PrepareImage()
             {
-                // convert image to 8bpp
-                Image src;
-                switch (this.BitsPerPixel)
-                {
-                    case 1:
-                        src = this.Convert1To8();
-                        break;
-
-                    case 8:
-                        src = this;
-                        break;
-
-                    case 24:
-                        src = this.Convert24To8();
-                        break;
-
-                    case 32:
-                        src = this.Convert32To8();
-                        break;
-
-                    default:
-                        throw new NotSupportedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
-                }
-
-                // convert image to float
-                ImageF dst = src.Convert8To32f(
-                    ComputeImageSize(src.Width),
-                    ComputeImageSize(src.Height),
-                    BorderType.BorderConst,
-                    255);
-
-                /*if (NativeMethods.hog(
-                    dst.BitsPerPixel,
-                    dst.Width,
-                    dst.Height,
-                    dst.Stride,
-                    dst.Bits) != 0)
-                {
-                    throw new OutOfMemoryException();
-                }*/
-
-                return dst;
+                // convert image to 8bpp, then float
+                return this
+                    .ConvertTo(8)
+                    .Convert8To32f(
+                        ComputeImageSize(this.Width),
+                        ComputeImageSize(this.Height),
+                        BorderType.BorderRepl,
+                        0);
 
                 int ComputeImageSize(int size)
                 {

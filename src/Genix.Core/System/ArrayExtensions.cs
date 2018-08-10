@@ -6,6 +6,7 @@
 
 namespace System
 {
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using Genix.Core;
 
@@ -94,6 +95,25 @@ namespace System
             T temp = array[position1];
             array[position1] = array[position2];
             array[position2] = temp;
+        }
+
+        /// <summary>
+        /// Splits the array into partitions of fixed size.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
+        /// <param name="array">The array to split.</param>
+        /// <param name="partitionSize">The number of elements in each partition.</param>
+        /// <returns>
+        /// The sequence of partitions.
+        /// </returns>
+        public static IEnumerable<T[]> Partition<T>(this T[] array, int partitionSize)
+        {
+            for (int i = 0, ii = array.Length - partitionSize; i <= ii; i += partitionSize)
+            {
+                T[] buffer = new T[partitionSize];
+                Array.Copy(array, i, buffer, 0, partitionSize);
+                yield return buffer;
+            }
         }
 
         /// <summary>

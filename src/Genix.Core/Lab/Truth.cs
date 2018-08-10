@@ -120,12 +120,12 @@ namespace Genix.Lab
         {
             get
             {
-                if (this.files.TryGetValue(new FileKey(fileName, frameIndex), out FileData file))
+                if (!this.files.TryGetValue(new FileKey(fileName, frameIndex), out FileData file))
                 {
-                    file.GetField(fieldIndex);
+                    return null;
                 }
 
-                return null;
+                return file.GetField(fieldIndex);
             }
 
             set
@@ -517,7 +517,7 @@ namespace Genix.Lab
                 : base(
                     filePath.ToUpperInvariant(),
                     Path.GetFileName(filePath).ToUpperInvariant(),
-                    frameIndex)
+                    frameIndex.GetValueOrDefault())
             {
             }
 

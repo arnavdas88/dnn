@@ -38,8 +38,8 @@ GENIXAPI(int, gradientVectorPrewitt_f32)(
 		roiSize,
 		maskSize,
 		ippNormL2,
-		ippBorderConst,
-		255,
+		ippBorderRepl,
+		0,
 		pBuffer));
 
 	EXIT_MAIN

@@ -13,6 +13,7 @@ namespace Genix.Imaging.Lab
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using Genix.Core;
     using Genix.Imaging;
     using Genix.Lab;
@@ -23,12 +24,18 @@ namespace Genix.Imaging.Lab
     public class DirectoryDataProvider : TestImageProvider<string>
     {
         private readonly Random random = new Random(0);
-        private readonly string[] truthFileNames = new string[] { "truth.new", "truth.txt" };
-        private readonly string[] truthFieldNames = new string[] { "Class##Name", "Word" };
+        private readonly string[] truthFileNames = new string[] { "truth.txt", "truth.new" };
+        private readonly string[] truthFieldNames = new string[] { "#Class", "Word" };
 
-        ////private readonly List<Tuple<string, bool, Truth, string>> data = new List<Tuple<string, bool, Truth, string>>();
+        private readonly List<(string Path, bool Recursive, Truth Truth, string FieldName, string[] Labels)> data =
+            new List<(string, bool, Truth, string, string[])>();
 
-        private readonly List<(string Path, Truth Truth, string[] Labels)> samples = new List<(string, Truth, string[])>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
+        /// </summary>
+        public DirectoryDataProvider()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
@@ -49,12 +56,7 @@ namespace Genix.Imaging.Lab
         /// <param name="label">The label for all samples in the directory.</param>
         public void AddDirectory(string path, bool recursive, string label)
         {
-            ////this.data.Add(Tuple.Create(path, recursive, (Truth)null, label));
-
-            foreach (string s in DirectoryDataProvider.ListDirectory(path, recursive))
-            {
-                this.samples.Add((s, null, new string[] { label }));
-            }
+            this.data.Add((path, recursive, null, null, new string[] { label }));
         }
 
         /// <summary>
@@ -90,16 +92,10 @@ namespace Genix.Imaging.Lab
 
             Truth truth = Truth.FromFile(truthFileName);
 
+            // find default column if was not provided
             if (string.IsNullOrEmpty(truthFieldName))
             {
-                foreach (string fieldName in this.truthFieldNames)
-                {
-                    if (truth.FieldIndex(fieldName) >= 0)
-                    {
-                        truthFieldName = fieldName;
-                        break;
-                    }
-                }
+                truthFieldName = this.truthFieldNames.FirstOrDefault(x => truth.FieldIndex(x) >= 0);
             }
 
             if (string.IsNullOrEmpty(truthFieldName) || truth.FieldIndex(truthFieldName) < 0)
@@ -111,125 +107,187 @@ namespace Genix.Imaging.Lab
                     truthFileName));
             }
 
-            ////this.data.Add(Tuple.Create(path, recursive, truth, truth != null ? truthFieldName : null));
-
-            this.samples.Add((path, truth, null));
-
-            /*if (File.Exists(path))
-            {
-                string extension = Path.GetExtension(path);
-                if (Imaging.Image.SupportedFileExtensions.Any(x => x.Equals(extension, StringComparison.OrdinalIgnoreCase)))
-                {
-                    string fileName = Path.GetFileName(path);
-                    foreach (string fn in truth.Files)
-                    {
-                        string fileNameWithoutFrameIndex = Truth.SplitFileName(fn, out int frameIndex);
-                        if (fileNameWithoutFrameIndex.Equals(fileName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            this.samples.Add((s, new string[] { label }));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (string s in DirectoryDataProvider.ListDirectory(path, recursive))
-                {
-                    string label = truth.GetTruth(s, null, truthFieldName);
-                    if (!string.IsNullOrEmpty(label))
-                    {
-                        this.samples.Add((s, new string[] { label }));
-                    }
-                }
-            }*/
+            this.data.Add((path, recursive, truth, truthFieldName, null));
         }
 
         /// <summary>
         /// Generates samples for network learning for specified labels.
         /// </summary>
-        /// <param name="labels">The labels to generate samples for.</param>
+        /// <param name="requestedLabels">The labels to generate samples for.</param>
         /// <returns>The sequence of samples. Each sample consist of image and a ground truth.</returns>
-        public override IEnumerable<TestImage> Generate(ISet<string> labels)
+        public override IEnumerable<TestImage> Generate(ISet<string> requestedLabels)
         {
-            /*Truth truth = Truth.FromFile(@"Z:\Test\Recognition\English\Numeric\MachinePrint\truth.txt");
+            ILookup<string, string> lookup = requestedLabels?.ToLookup(x => x);
 
-            const string Path = @"Z:\Test\Recognition\English\Numeric\MachinePrint\000017.tif";
-            ////foreach ((Bitmap image, int? frameIndex) in DirectoryDataProvider.LoadBitmap(Path, width, height))
-            foreach ((Imaging.Image image, int? frameIndex) in DirectoryDataProvider.LoadImage(Path, width, height))
+            return EnumSamples()
+                .Where(x => lookup == null || lookup.Contains(string.Concat(x.Labels)))
+                /*.Shuffle(10)*/;
+
+            IEnumerable<TestImage> EnumSamples()
             {
-                yield return new SampleImage(
-                    Path,
-                    frameIndex,
-                    null,
-                    null,
-                    image,
-                    truth.GetTruth(Path, frameIndex, "WORD")?.Select(x => new string(x, 1))?.ToArray());
-            }*/
-
-            ILookup<string, string> lookup = labels?.ToLookup(x => x);
-
-            List<(string, Truth, string[])> completeSamples = new List<(string, Truth, string[])>(this.samples.Count);
-
-            while (this.samples.Count > 0)
-            {
-                int index = this.random.Next(this.samples.Count);
-                (string path, Truth truth, string[] label) sample = this.samples[index];
-
-                ////(string path, Truth truth, string[] label) sample = (@"L:\CHARACTER\MP\mp1\BLIND\6\6_310024.tif", null, new string[] { "0" });
-
-                if (lookup == null || lookup.Contains(string.Concat(sample.label)))
+                foreach ((string path, bool recursive, Truth truth, string fieldName, string[] labels) in this.data)
                 {
-                    foreach ((Genix.Imaging.Image image, int? frameIndex) in this.LoadImage(sample.path))
+                    // filter by provided label
+                    if (lookup != null && labels != null && !lookup.Contains(string.Concat(labels)))
                     {
-                        yield return new TestImage(
-                            new DataSourceId(sample.path, Path.GetFileName(sample.path), frameIndex),
-                            null,
-                            null,
-                            image,
-                            sample.label);
+                        continue;
                     }
-                }
 
-                this.samples.RemoveAt(index);
-                completeSamples.Add(sample);
-            }
-
-            this.samples.Clear();
-            this.samples.AddRange(completeSamples);
-        }
-
-        private static IEnumerable<string> ListDirectory(string path, bool recursive)
-        {
-            // process all files in the directory
-            DirectoryInfo di = new DirectoryInfo(path);
-            foreach (FileInfo fileInfo in di.EnumerateFilesByExtensions(Genix.Imaging.Image.SupportedFileExtensions.ToArray()))
-            {
-                yield return fileInfo.FullName;
-            }
-
-            // process sub-directories
-            if (recursive)
-            {
-                foreach (DirectoryInfo sdi in di.GetDirectories())
-                {
-                    foreach (string s in DirectoryDataProvider.ListDirectory(sdi.FullName, true))
+                    foreach ((string fileName, int startingFrame, int frameCount) in DirectoryDataProvider.ListPath(path, recursive))
                     {
-                        yield return s;
+                        foreach ((Imaging.Image image, int? frameIndex) in this.LoadImage(fileName, startingFrame, frameCount))
+                        {
+                            yield return new TestImage(
+                                new DataSourceId(fileName, Path.GetFileName(fileName), frameIndex),
+                                null,
+                                null,
+                                image,
+                                ComputeLabels(fileName, frameIndex));
+                        }
+                    }
+
+                    string[] ComputeLabels(string fileName, int? frameIndex)
+                    {
+                        return labels ?? new string[] { truth[fileName, frameIndex, fieldName] };
                     }
                 }
             }
         }
 
-        private IEnumerable<(Genix.Imaging.Image, int?)> LoadImage(string fileName)
+        private static IEnumerable<(string, int, int)> ListPath(string path, bool recursive)
         {
-            foreach ((Genix.Imaging.Image image, int? frameIndex, _) in Genix.Imaging.Image.FromFile(fileName))
+            if (Directory.Exists(path))
             {
-                IList<Genix.Imaging.ConnectedComponent> components = image.FindConnectedComponents().ToList();
+                foreach (string fileName in ListDirectory(path))
+                {
+                    yield return (fileName, 0, -1);
+                }
+            }
+            else if (File.Exists(path))
+            {
+                foreach (var file in ListFile(path))
+                {
+                    yield return file;
+                }
+            }
+
+            IEnumerable<string> ListDirectory(string directoryName)
+            {
+                // process all files in the directory
+                DirectoryInfo di = new DirectoryInfo(directoryName);
+                foreach (FileInfo fileInfo in di.EnumerateFilesByExtensions(Imaging.Image.SupportedFileExtensions.ToArray()))
+                {
+                    yield return fileInfo.FullName;
+                }
+
+                // process sub-directories
+                if (recursive)
+                {
+                    foreach (DirectoryInfo sdi in di.GetDirectories())
+                    {
+                        foreach (string s in ListDirectory(sdi.FullName))
+                        {
+                            yield return s;
+                        }
+                    }
+                }
+            }
+
+            IEnumerable<(string, int, int)> ListFile(string listName)
+            {
+                using (StreamReader reader = new StreamReader(listName, Encoding.UTF8))
+                {
+                    string lastFileName = null;
+                    int lastStartingFrame = 0;
+                    int lastFrameCount = -1;
+
+                    while (true)
+                    {
+                        string s = reader.ReadLine();
+                        if (s == null)
+                        {
+                            break;
+                        }
+
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            string fileName = s.Unqualify('\"').ToUpperInvariant();
+                            int? frameIndex = null;
+
+                            // try to split multi-frame file name
+                            int index = fileName.LastIndexOf(';');
+                            if (index != -1)
+                            {
+                                if (int.TryParse(fileName.Substring(index + 1), NumberStyles.Number, CultureInfo.InvariantCulture, out int frame))
+                                {
+                                    if (frame > 0)
+                                    {
+                                        frameIndex = frame - 1;
+                                    }
+
+                                    fileName = fileName.Substring(0, index);
+                                }
+                            }
+
+                            // merge with last file
+                            if (fileName == lastFileName && frameIndex == lastStartingFrame + lastFrameCount)
+                            {
+                                lastFrameCount++;
+                                continue;
+                            }
+
+                            // release last file
+                            if (!string.IsNullOrEmpty(lastFileName))
+                            {
+                                yield return (lastFileName, lastStartingFrame, lastFrameCount);
+                            }
+
+                            // cache current file
+                            lastFileName = fileName;
+                            if (frameIndex.HasValue)
+                            {
+                                lastStartingFrame = frameIndex.Value;
+                                lastFrameCount = 1;
+                            }
+                            else
+                            {
+                                lastStartingFrame = 0;
+                                lastFrameCount = -1;
+                            }
+                        }
+                    }
+
+                    // release last file
+                    if (!string.IsNullOrEmpty(lastFileName))
+                    {
+                        yield return (lastFileName, lastStartingFrame, lastFrameCount);
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<(Imaging.Image, int?)> LoadImage(string fileName, int startingFrame, int frameCount)
+        {
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileName, startingFrame, frameCount))
+            {
+                if (this.Width > 0 || this.Height > 0)
+                {
+                    yield return (PrepareImage(image), frameIndex);
+                }
+                else
+                {
+                    yield return (image, frameIndex);
+                }
+            }
+
+            Imaging.Image PrepareImage(Imaging.Image image)
+            {
+                IList<ConnectedComponent> components = image.FindConnectedComponents().ToList();
                 if (components.Count > 1)
                 {
                     for (int i = 0; i < components.Count; i++)
                     {
-                        Genix.Imaging.ConnectedComponent component = components[i];
+                        ConnectedComponent component = components[i];
                         if (component.Power <= 24)
                         {
                             Rectangle position = component.Bounds;
@@ -243,10 +301,17 @@ namespace Genix.Imaging.Lab
                     }
                 }
 
-                Genix.Imaging.Image result = image.CropBlackArea(1, 1);
-                result = result.FitToSize(this.Width > 0 ? this.Width : result.Width, this.Height, ScalingOptions.None);
+                image = image.CropBlackArea(1, 1);
 
-                yield return (result, frameIndex);
+                if (this.Width > 0 || this.Height > 0)
+                {
+                    image = image.FitToSize(
+                        this.Width > 0 ? this.Width : image.Width,
+                        this.Height > 0 ? this.Height : image.Height,
+                        ScalingOptions.None);
+                }
+
+                return image;
             }
         }
     }

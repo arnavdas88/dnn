@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis
 {
     using System;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -32,13 +33,15 @@ namespace Genix.DocumentAnalysis
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PageSource"/> class,
-        /// using the existing <see cref="DataSource"/> object and the page data.
+        /// Initializes a new instance of the <see cref="PageSource"/> class.
         /// </summary>
-        /// <param name="other">The <see cref="DataSource"/> to copy the data from.</param>
+        /// <param name="id">The source of data.</param>
         /// <param name="page">The <see cref="PageShape"/> object that contains the page data.</param>
-        public PageSource(DataSource other, PageShape page)
-            : base(other)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="id"/> is <b>null</b>.
+        /// </exception>
+        public PageSource(DataSourceId id, PageShape page)
+            : base(id)
         {
             this.Page = page;
         }

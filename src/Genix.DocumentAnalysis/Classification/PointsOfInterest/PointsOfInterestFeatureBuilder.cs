@@ -22,7 +22,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// The feature detector.
         /// </summary>
         [JsonProperty("detector")]
-        private readonly IFeatureDetector detector = null;
+        private readonly IFeatureDetector detector = new HistogramsOfOrientedGradients();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PointsOfInterestFeatureBuilder"/> class.

@@ -12,61 +12,35 @@ namespace Genix.Core
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents a sparse vector of single-presicion floating point numbers.
+    /// Represents a sparse vector of single-precision floating point numbers.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The sparse vector can be represented in compressed form by two arrays, <see cref="X"/> (values) and <see cref="Idx"/> (indices).
+    /// The sparse vector can be represented in compressed form by two arrays, <see cref="X"/> (values) and <see cref="Idx"/> (Indexes).
     /// Each array has <see cref="Length"/> elements.
     /// </para>
     /// </remarks>
     public struct SparseVectorF
     {
-        /*   /// <summary>
-           /// The length of the dense vector this sparse vector was created from.
-           /// </summary>
-           [JsonProperty("lend")]
-           private readonly int lengthDense;
-
-           /// <summary>
-           /// The number of elements in the vector.
-           /// </summary>
-           [JsonProperty("len")]
-           private readonly int length;*/
-
         /// <summary>
         /// The indexes of the elements.
         /// </summary>
-        ////[JsonProperty("idx")]
+        [JsonProperty("idx")]
         public int[] Idx;
 
         /// <summary>
         /// The values of the elements.
         /// </summary>
-        ////[JsonProperty("x")]
+        [JsonProperty("x")]
         public float[] X;
 
-        /*/// <summary>
-        /// Initializes a new instance of the <see cref="SparseVectorF"/> class.
-        /// </summary>
-        [JsonConstructor]
-        private SparseVectorF()
-        {
-            this.Idx = null;
-            this.X = null;
-        }*/
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="SparseVectorF"/> class.
+        /// Initializes a new instance of the <see cref="SparseVectorF"/> struct.
         /// </summary>
-        /// <param name="lengthDense">The length of the dense vector this sparse vector was created from.</param>
-        /// <param name="length">The number of elements in the vector.</param>
         /// <param name="idx">The indexes of the elements.</param>
         /// <param name="x">The values of the elements.</param>
-        private SparseVectorF(/*int lengthDense, int length,*/ int[] idx, float[] x)
+        private SparseVectorF(int[] idx, float[] x)
         {
-            ////this.lengthDense = lengthDense;
-            ////this.length = length;
             this.Idx = idx;
             this.X = x;
         }
@@ -78,22 +52,6 @@ namespace Genix.Core
         /// The number of elements in the vector.
         /// </value>
         public int Length => this.Idx.Length;
-
-        /*        /// <summary>
-                /// Gets the indexes of the elements.
-                /// </summary>
-                /// <value>
-                /// The indexes of the elements.
-                /// </value>
-                public int[] Idx => this.idx;
-
-                /// <summary>
-                /// Gets the values of the elements.
-                /// </summary>
-                /// <value>
-                /// The values of the elements.
-                /// </value>
-                public float[] X => this.x;*/
 
         /// <summary>
         /// Create a <see cref="SparseVectorF"/> vector from a dense vector's non-zero elements.
@@ -138,6 +96,7 @@ namespace Genix.Core
         /// <summary>
         /// Converts this <see cref="SparseVectorF"/> vector into a dense vector.
         /// </summary>
+        /// <param name="length">The length of a dense vector.</param>
         /// <returns>
         /// The dense vector this method creates.
         /// </returns>
@@ -197,7 +156,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the Manhattan distance between elements of this <see cref="SparseVectorF"/> and the dence vector.
+        /// Computes the Manhattan distance between elements of this <see cref="SparseVectorF"/> and the dense vector.
         /// </summary>
         /// <param name="x">The dense vector <paramref name="x"/>.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
@@ -211,7 +170,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the Euclidean distance between elements of this <see cref="SparseVectorF"/> and the dence vector.
+        /// Computes the Euclidean distance between elements of this <see cref="SparseVectorF"/> and the dense vector.
         /// </summary>
         /// <param name="x">The dense vector <paramref name="x"/>.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>

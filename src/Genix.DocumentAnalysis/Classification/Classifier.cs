@@ -10,6 +10,7 @@ namespace Genix.DocumentAnalysis.Classification
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Genix.Core;
 
     /// <summary>
     /// Defines the contract that provides data classification.
@@ -23,6 +24,13 @@ namespace Genix.DocumentAnalysis.Classification
         where TFeatureBuilder : IFeatureBuilder<TSource, TFeatures>, new()
     {
         private readonly TFeatureBuilder featureBuilder = new TFeatureBuilder();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/> class.
+        /// </summary>
+        protected Classifier()
+        {
+        }
 
         /// <summary>
         /// Gets a value indicating whether the classifier has been trained.
@@ -334,6 +342,7 @@ namespace Genix.DocumentAnalysis.Classification
                     .AsOrdered()
                     .WithCancellation(cancellationToken)
                     .WithMergeOptions(ParallelMergeOptions.NotBuffered)
+                    .WithDegreeOfParallelism(1)
                     .ForAll(element =>
                     {
                         progress?.OnClassifying(element, index);

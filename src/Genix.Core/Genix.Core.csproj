@@ -49,6 +49,7 @@
     <Compile Include="Collections\LinkedCollection.cs" />
     <Compile Include="Collections\LinkedCollectionItem.cs" />
     <Compile Include="Collections\QuadTree.cs" />
+    <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Random\RandomGenerator.cs" />
     <Compile Include="Random\RandomNumberGenerator.cs" />
     <Compile Include="Random\RandomRangeGenerator.cs" />
+    <Compile Include="System.Linq\EnumerableExtensions.cs" />
     <Compile Include="System.Drawing\RectangleExtensions.cs" />
     <Compile Include="System.IO\DirectoryInfoExtensions.cs" />
     <Compile Include="System\ArrayExtensions.cs" />

@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis.Classification
 {
     using System.Threading;
+    using Genix.Core;
 
     /// <summary>
     /// Defines the contract that provides features extraction for further classification.

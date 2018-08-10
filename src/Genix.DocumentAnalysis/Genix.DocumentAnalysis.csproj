@@ -47,6 +47,7 @@
     <Compile Include="Classification\Bayes\BayesFeatureBuilder.cs" />
     <Compile Include="Classification\Bayes\BayesFeatures.cs" />
     <Compile Include="Classification\Classifier.cs" />
+    <Compile Include="Classification\ClassifierProgress.cs" />
     <Compile Include="Classification\IFeatureBuilder.cs" />
     <Compile Include="Classification\Features.cs" />
     <Compile Include="Classification\IClassifierProgress.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="ImageSource.cs" />
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
-    <Compile Include="DataSource.cs" />
     <Compile Include="OCR\OCR.cs" />
     <Compile Include="PageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

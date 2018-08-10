@@ -50,7 +50,7 @@ namespace Genix.Imaging.Lab
         /// <value>
         /// The width of the samples this provider generates.
         /// </value>
-        public int Width { get; protected set; }
+        public int Width { get; protected set; } = 0;
 
         /// <summary>
         /// Gets or sets the height of the samples this provider generates.
@@ -58,7 +58,7 @@ namespace Genix.Imaging.Lab
         /// <value>
         /// The height of the samples this provider generates.
         /// </value>
-        public int Height { get; protected set; }
+        public int Height { get; protected set; } = 0;
 
         /// <summary>
         /// Creates a new <see cref="TestImageProvider{TLabel}"/> from a Json object.

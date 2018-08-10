@@ -77,7 +77,7 @@ namespace Genix.DocumentAnalysis.Classification
         public BayesFeatures BuildFeatures(ImageSource source, CancellationToken cancellationToken)
         {
             PageShape page = this.ocr.Recognize(source.Image);
-            return this.BuildFeatures(new PageSource(source, page), cancellationToken);
+            return this.BuildFeatures(new PageSource(source.Id, page), cancellationToken);
         }
     }
 }

@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Globalization;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -18,6 +19,105 @@ namespace Genix.Imaging
     /// </content>
     public partial class Image
     {
+        /// <summary>
+        /// Converts this <see cref="Image"/> to a specified depth.
+        /// </summary>
+        /// <param name="bitsPerPixel">The requested image depth.</param>
+        /// <returns>
+        /// A new <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// The method converts image to the specified depth using default conversion method.
+        /// If the conversion is not required, the method returns this <see cref="Image"/>.
+        /// </remarks>
+        /// <exception cref="NotImplementedException">
+        /// The conversion is not supported.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image ConvertTo(int bitsPerPixel)
+        {
+            switch (bitsPerPixel)
+            {
+                case 1: return ConvertTo1bpp();
+                case 8: return ConvertTo8bpp();
+                case 24: return ConvertTo24bpp();
+                case 32: return ConvertTo32bpp();
+
+                default:
+                    throw new NotImplementedException(
+                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, bitsPerPixel));
+            }
+
+            Image ConvertTo1bpp()
+            {
+                switch (this.BitsPerPixel)
+                {
+                    case 1: return this;
+                    case 8: return this.Binarize();
+                    case 24: return this.Convert24To8().Binarize();
+                    case 32: return this.Convert32To8().Binarize();
+
+                    default:
+                        throw new NotImplementedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                }
+            }
+
+            Image ConvertTo8bpp()
+            {
+                switch (this.BitsPerPixel)
+                {
+                    case 1: return this.Convert1To8();
+                    case 2: return this.Convert2To8();
+                    case 4: return this.Convert4To8();
+                    case 8: return this;
+                    case 24: return this.Convert24To8();
+                    case 32: return this.Convert32To8();
+
+                    default:
+                        throw new NotImplementedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                }
+            }
+
+            Image ConvertTo24bpp()
+            {
+                switch (this.BitsPerPixel)
+                {
+                    case 1: return this.Convert1To8().Convert8To24();
+                    case 2: return this.Convert2To8().Convert8To24();
+                    case 4: return this.Convert4To8().Convert8To24();
+                    case 8: return this.Convert8To24();
+                    case 24: return this;
+                    case 32: return this.Convert32To24();
+
+                    default:
+                        throw new NotImplementedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                }
+            }
+
+            Image ConvertTo32bpp()
+            {
+                switch (this.BitsPerPixel)
+                {
+                    case 1: return this.Convert1To8().Convert8To32(255);
+                    case 2: return this.Convert2To8().Convert8To32(255);
+                    case 4: return this.Convert4To8().Convert8To32(255);
+                    case 8: return this.Convert8To32(255);
+                    case 24: return this.Convert24To32();
+                    case 32: return this;
+
+                    default:
+                        throw new NotImplementedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                }
+            }
+        }
+
         //// <param name="threshold">The threshold to determine foreground.</param>
         //// <param name="sx">The tile width.</param>
         //// <param name="sy">The tile height.</param>
@@ -193,6 +293,24 @@ namespace Genix.Imaging
         /// <summary>
         /// Converts a 2-bit gray scale <see cref="Image"/> to 8-bit gray scale <see cref="Image"/>.
         /// </summary>
+        /// <returns>
+        /// A new gray scale <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking that uses values 0x00, 0x55, 0xaa, and 0xff.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 2.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Convert2To8() => this.Convert2To8(0x00, 0x55, 0xaa, 0xff);
+
+        /// <summary>
+        /// Converts a 2-bit gray scale <see cref="Image"/> to 8-bit gray scale <see cref="Image"/>.
+        /// </summary>
         /// <param name="value0">8-bit value to be used for 0s pixels.</param>
         /// <param name="value1">8-bit value to be used for 1s pixels.</param>
         /// <param name="value2">8-bit value to be used for 2s pixels.</param>
@@ -201,8 +319,8 @@ namespace Genix.Imaging
         /// A new gray scale <see cref="Image"/>.
         /// </returns>
         /// <remarks>
-        /// A simple unpacking might use <paramref name="value0"/> = 255, <paramref name="value1"/> = 85 (0x55),
-        /// <paramref name="value2"/> = 170 (0xaa), and <paramref name="value3"/> = 255.
+        /// A simple unpacking might use <paramref name="value0"/> = 0 (0x00), <paramref name="value1"/> = 85 (0x55),
+        /// <paramref name="value2"/> = 170 (0xaa), and <paramref name="value3"/> = 255 (0xff).
         /// </remarks>
         /// <exception cref="ArgumentException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 2.

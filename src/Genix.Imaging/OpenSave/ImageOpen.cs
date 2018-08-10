@@ -26,7 +26,10 @@ namespace Genix.Imaging
         /// Creates an <see cref="Image"/> from the specified file.
         /// </summary>
         /// <param name="fileName">A string that contains the name of the file from which to create the <see cref="Image"/>.</param>
-        /// <returns>The <see cref="Image"/> this method creates.</returns>
+        /// <returns>
+        /// The sequence of tuples, one for each loaded frame.
+        /// Each tuple contains frame <see cref="Image"/>, a zero-based index of the frame, and the frame meta data.
+        /// </returns>
         /// <remarks>
         /// <para>The <see cref="Image"/> class supports the following file types:</para>
         /// <list type="bullet">
@@ -35,18 +38,6 @@ namespace Genix.Imaging
         /// <item><description>JPEG</description></item>
         /// <item><description>PNG</description></item>
         /// <item><description>GIF</description></item>
-        /// <item><description>PDF</description></item>
-        /// </list>
-        /// <list type="table">
-        /// <listheader>
-        /// <item><description>Note</description></item>
-        /// </listheader>
-        /// <item>
-        /// <description>
-        /// <para>The <see cref="Image"/> class converts PDF documents to 32 bits per pixel images and sets their resolution to 300 dpi.</para>
-        /// <para>Note that you run out of memory if you try to open PDF document that has a large number of pages.</para>
-        /// </description>
-        /// </item>
         /// </list>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -81,14 +72,72 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromFile(string fileName)
         {
-            return new LoadedImages(fileName);
+            return new LoadedImages(fileName, 0, -1);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="Image"/> from the specified file.
+        /// </summary>
+        /// <param name="fileName">A string that contains the name of the file from which to create the <see cref="Image"/>.</param>
+        /// <param name="startingFrame">A zero-based index of the frame to start loading.</param>
+        /// <param name="frameCount">The number of frames to load.</param>
+        /// <returns>
+        /// The sequence of tuples, one for each loaded frame.
+        /// Each tuple contains frame <see cref="Image"/>, a zero-based index of the frame, and the frame meta data.
+        /// </returns>
+        /// <remarks>
+        /// <para>The <see cref="Image"/> class supports the following file types:</para>
+        /// <list type="bullet">
+        /// <item><description>TIFF</description></item>
+        /// <item><description>BMP</description></item>
+        /// <item><description>JPEG</description></item>
+        /// <item><description>PNG</description></item>
+        /// <item><description>GIF</description></item>
+        /// </list>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="fileName"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="fileName"/> is an empty string (""), contains only white space, or contains one or more invalid characters.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="fileName"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.</para>
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// <para>The file specified by <paramref name="fileName"/> does not exist.</para>
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        /// <para>The specified path is invalid, such as being on an unmapped drive.</para>
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        /// <para>The specified path, file name, or both exceed the system-defined maximum length.
+        /// For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</para>
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// <para>The caller does not have the required permission.</para>
+        /// </exception>
+        /// <exception cref="FileLoadException">
+        /// <para><paramref name="fileName"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in a non-NTFS environment.</para>
+        /// <para>-or-</para>
+        /// <para>The file does not have a valid image format.</para>
+        /// <para>-or-</para>
+        /// <para>The file has zero frames.</para>
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromFile(string fileName, int startingFrame, int frameCount)
+        {
+            return new LoadedImages(fileName, startingFrame, frameCount);
         }
 
         /// <summary>
         /// Creates an <see cref="Image"/> from the specified byte array.
         /// </summary>
         /// <param name="buffer">The buffer to read the <see cref="Image"/> from.</param>
-        /// <returns>The <see cref="Image"/> this method creates.</returns>
+        /// <returns>
+        /// The sequence of tuples, one for each loaded frame.
+        /// Each tuple contains frame <see cref="Image"/>, a zero-based index of the frame, and the frame meta data.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="buffer"/> is <b>null</b>.
         /// </exception>
@@ -107,7 +156,7 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            return new LoadedImages(buffer, 0, buffer.Length);
+            return new LoadedImages(buffer, 0, buffer.Length, 0, -1);
         }
 
         /// <summary>
@@ -116,7 +165,10 @@ namespace Genix.Imaging
         /// <param name="buffer">The buffer to read the <see cref="Image"/> from.</param>
         /// <param name="index">The starting point in the buffer at which to begin reading into the <see cref="Image"/>.</param>
         /// <param name="count">The number of bytes to read.</param>
-        /// <returns>The <see cref="Image"/> this method creates.</returns>
+        /// <returns>
+        /// The sequence of tuples, one for each loaded frame.
+        /// Each tuple contains frame <see cref="Image"/>, a zero-based index of the frame, and the frame meta data.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="buffer"/> is <b>null</b>.
         /// </exception>
@@ -135,7 +187,7 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            return new LoadedImages(buffer, index, count);
+            return new LoadedImages(buffer, index, count, 0, -1);
         }
 
         /// <summary>
@@ -161,7 +213,7 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            return new LoadedImages(stream);
+            return new LoadedImages(stream, 0, -1);
         }
 
         internal static Image OnLoaded(Image image, ImageMetadata metadata, IList<System.Drawing.Color> palette)
@@ -323,106 +375,114 @@ namespace Genix.Imaging
 
             private readonly Stream stream;
 
-            public LoadedImages(string fileName)
+            private readonly int startingFrame;
+            private readonly int frameCount;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public LoadedImages(string fileName, int startingFrame, int frameCount)
             {
                 this.fileName = fileName;
+
+                this.startingFrame = startingFrame;
+                this.frameCount = frameCount;
             }
 
-            public LoadedImages(byte[] buffer, int index, int count)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public LoadedImages(byte[] buffer, int index, int count, int startingFrame, int frameCount)
             {
                 this.buffer = buffer;
                 this.index = index;
                 this.count = count;
+
+                this.startingFrame = startingFrame;
+                this.frameCount = frameCount;
             }
 
-            public LoadedImages(Stream stream)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public LoadedImages(Stream stream, int startingFrame, int frameCount)
             {
                 this.stream = stream;
+
+                this.startingFrame = startingFrame;
+                this.frameCount = frameCount;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             IEnumerator<(Image, int?, ImageMetadata)> IEnumerable<(Image, int?, ImageMetadata)>.GetEnumerator()
             {
-                if (!string.IsNullOrEmpty(this.fileName))
-                {
-                    return new Enumerator(this.fileName);
-                }
-                else if (this.buffer != null)
-                {
-                    return new Enumerator(this.buffer, this.index, this.count);
-                }
-                else
-                {
-                    return new Enumerator(this.stream);
-                }
+                return new Enumerator(this);
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return new Enumerator(this.stream);
+                return new Enumerator(this);
             }
 
             private class Enumerator : IEnumerator<(Image, int?, ImageMetadata)>, IEnumerator
             {
+                private readonly LoadedImages parent;
+
                 private readonly bool ownStream;
                 private readonly Stream stream;
                 private readonly long streamPosition;
                 private readonly BitmapDecoder decoder;
+                private readonly int frameCount;
 
                 // Enumerators are positioned before the first element until the first MoveNext() call.
-                private int position = -1;
+                private int currentFrame = -1;
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                public Enumerator(string fileName)
+                public Enumerator(LoadedImages parent)
                 {
+                    this.parent = parent;
+
                     try
                     {
-                        this.ownStream = true;
-                        this.stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        if (!string.IsNullOrEmpty(parent.fileName))
+                        {
+                            this.ownStream = true;
+                            this.stream = new FileStream(parent.fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        }
+                        else if (parent.buffer != null)
+                        {
+                            this.ownStream = true;
+                            this.stream = new MemoryStream(parent.buffer, parent.index, parent.count, false);
+                        }
+                        else
+                        {
+                            this.stream = parent.stream;
+                        }
+
                         this.streamPosition = this.stream.Position;
                         this.decoder = Enumerator.CreateDecoder(this.stream);
+                        this.frameCount = this.decoder.Frames.Count;
+
+                        this.currentFrame = this.parent.startingFrame - 1;
                     }
                     catch (Exception e)
                     {
-                        this.stream?.Dispose();
+                        this.Dispose();
 
-                        throw new FileLoadException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_CannotLoadImage, fileName),
-                            e);
+                        if (!string.IsNullOrEmpty(parent.fileName))
+                        {
+                            throw new FileLoadException(
+                                string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_CannotLoadImage, parent.fileName),
+                                e);
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                }
-
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                public Enumerator(byte[] buffer, int index, int count)
-                {
-                    try
-                    {
-                        this.ownStream = true;
-                        this.stream = new MemoryStream(buffer, index, count, false);
-                        this.streamPosition = this.stream.Position;
-                        this.decoder = Enumerator.CreateDecoder(this.stream);
-                    }
-                    catch
-                    {
-                        this.stream?.Dispose();
-                        throw;
-                    }
-                }
-
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                public Enumerator(Stream stream)
-                {
-                    this.stream = stream;
-                    this.streamPosition = this.stream.Position;
-                    this.decoder = Enumerator.CreateDecoder(this.stream);
                 }
 
                 public (Image, int?, ImageMetadata) Current
                 {
                     get
                     {
-                        BitmapFrame bitmapFrame = this.decoder.Frames[this.position];
+                        BitmapFrame bitmapFrame = this.decoder.Frames[this.currentFrame];
                         (Image image, ImageMetadata metadata) = bitmapFrame.FromBitmapFrame();
-                        return (image, this.decoder.Frames.Count == 1 ? null : (int?)this.position, metadata);
+                        return (image, this.frameCount == 1 ? null : (int?)this.currentFrame, metadata);
                     }
                 }
 
@@ -431,21 +491,29 @@ namespace Genix.Imaging
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 bool IEnumerator.MoveNext()
                 {
-                    this.position++;
-                    return this.position < this.decoder.Frames.Count;
+                    this.currentFrame++;
+
+                    if (this.parent.frameCount > 0)
+                    {
+                        return this.currentFrame < Math.Min(this.frameCount, this.parent.startingFrame + this.parent.frameCount);
+                    }
+                    else
+                    {
+                        return this.currentFrame < this.frameCount;
+                    }
                 }
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 void IEnumerator.Reset()
                 {
-                    if (this.position != -1)
+                    if (this.currentFrame != this.parent.startingFrame - 1)
                     {
                         if (!this.stream.CanSeek)
                         {
                             throw new InvalidOperationException();
                         }
 
-                        this.position = -1;
+                        this.currentFrame = this.parent.startingFrame - 1;
                         this.stream.Position = this.streamPosition;
                     }
                 }

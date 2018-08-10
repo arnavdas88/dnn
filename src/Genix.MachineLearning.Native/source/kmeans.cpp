@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#if 0
+#if 1
 #include "daal.h"
 
 using namespace std;
@@ -9,7 +9,7 @@ using namespace daal::algorithms;
 using namespace daal::data_management;
 using namespace daal::services;
 
-const size_t samples = 4;
+/*const size_t samples = 4;
 const size_t dimension = 3;
 float inputArray[samples * dimension] =
 {
@@ -17,18 +17,19 @@ float inputArray[samples * dimension] =
 	2.0, 13.0, 50.0,
 	4.0, 23.0, 77.0,
 	4.0, 23.0, 79.0,
-};
+};*/
 #endif
 
 
-GENIXAPI(void, kmeans)(int k, int iter/*, float** x*/)
+GENIXAPI(void, kmeans)(int k, int iter, int dimension, int samples, float* x)
 {
-#if 0
-	k = 2;
+#if 1
+	////k = 2;
 
 	// Create data source
 ///	NumericTablePtr inputData = NumericTablePtr(new Matrix<float>(dimension, dimension, inputArray));
-	NumericTablePtr inputData = NumericTablePtr(new HomogenNumericTable<float>(inputArray, dimension, samples));
+////	NumericTablePtr inputData = NumericTablePtr(new HomogenNumericTable<float>(inputArray, dimension, samples));
+	NumericTablePtr inputData = NumericTablePtr(new HomogenNumericTable<float>(x, dimension, samples));
 
 	// Get initial clusters for the K - Means algorithm
 	kmeans::init::Batch<float, kmeans::init::plusPlusDense> init(k);

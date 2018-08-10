@@ -7,6 +7,7 @@
 namespace Genix.Lab
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -27,6 +28,7 @@ namespace Genix.Lab
 
         private PerformanceCounter performanceCounterNetTotalHeap = null;
         private PerformanceCounter performanceCounterNetGCHandles = null;
+        private ConcurrentDictionary<int, Stopwatch> threadStopwatches = new ConcurrentDictionary<int, Stopwatch>();
 
         /// <summary>
         /// The main program function. Should be called from parent class <c>Main</c> function.
@@ -226,6 +228,37 @@ namespace Genix.Lab
                 virtualSize);
 
             this.Write(logFile, s);
+        }
+
+        /// <summary>
+        /// Restarts the current thread stopwatch.
+        /// </summary>
+        protected void StopwatchRestart()
+        {
+            Stopwatch stopwatch = this.threadStopwatches.GetOrAdd(
+                Thread.CurrentThread.ManagedThreadId,
+                new Stopwatch());
+
+            stopwatch.Restart();
+        }
+
+        /// <summary>
+        /// Stops the current thread stopwatch and reports the elapsed time.
+        /// </summary>
+        /// <returns>
+        /// The total elapsed time measured since last restart, in milliseconds.
+        /// </returns>
+        protected long StopwatchStop()
+        {
+            long duration = 0;
+
+            if (this.threadStopwatches.TryGetValue(Thread.CurrentThread.ManagedThreadId, out Stopwatch stopwatch))
+            {
+                stopwatch.Stop();
+                duration = stopwatch.ElapsedMilliseconds;
+            }
+
+            return duration;
         }
 
         /// <summary>

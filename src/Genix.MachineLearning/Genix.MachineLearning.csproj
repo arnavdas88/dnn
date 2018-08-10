@@ -53,6 +53,7 @@
     <Compile Include="Distances\ManhattanDistance.cs" />
     <Compile Include="Kernels\ChiSquare.cs" />
     <Compile Include="Kernels\IKernel.cs" />
+    <Compile Include="Kernels\ISparseKernel.cs" />
     <Compile Include="LanguageModel\Charset.cs" />
     <Compile Include="LanguageModel\CompositeState.cs" />
     <Compile Include="LanguageModel\Context.cs" />

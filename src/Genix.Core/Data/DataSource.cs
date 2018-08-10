@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.DocumentAnalysis
+namespace Genix.Core
 {
     using System;
     using Newtonsoft.Json;
@@ -27,9 +27,19 @@ namespace Genix.DocumentAnalysis
         /// </param>
         protected DataSource(string id, string name, int? frameIndex)
         {
-            this.Id = id;
-            this.Name = name;
-            this.FrameIndex = frameIndex;
+            this.Id = new DataSourceId(id, name, frameIndex);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataSource"/> class.
+        /// </summary>
+        /// <param name="id">The source of data.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="id"/> is <b>null</b>.
+        /// </exception>
+        protected DataSource(DataSourceId id)
+        {
+            this.Id = id ?? throw new ArgumentNullException("id");
         }
 
         /// <summary>
@@ -45,8 +55,6 @@ namespace Genix.DocumentAnalysis
             }
 
             this.Id = other.Id;
-            this.Name = other.Name;
-            this.FrameIndex = other.FrameIndex;
         }
 
         /// <summary>
@@ -57,32 +65,12 @@ namespace Genix.DocumentAnalysis
         }
 
         /// <summary>
-        /// Gets the unique identifier of the data.
+        /// Gets the source of data.
         /// </summary>
         /// <value>
-        /// A <see cref="string"/> that contains the unique identifier of the data.
+        /// A <see cref="DataSourceId"/> that contains the information about result source.
         /// </value>
         [JsonProperty("id")]
-        public string Id { get; private set; }
-
-        /// <summary>
-        /// Gets the name of the data.
-        /// </summary>
-        /// <value>
-        /// A <see cref="string"/> that contains the name of the data.
-        /// </value>
-        [JsonProperty("name")]
-        public string Name { get; private set; }
-
-        /// <summary>
-        /// Gets the zero-based index of a data if it belongs to a multi-page file.
-        /// <b>null</b> if this data belongs to a single-page file.
-        /// </summary>
-        /// <value>
-        /// The zero-based index for this data if it belongs to a multi-page file.
-        /// <b>null</b> if this data belongs to a single-page file.
-        /// </value>
-        [JsonProperty("frameIndex")]
-        public int? FrameIndex { get; private set; }
+        public DataSourceId Id { get; private set; }
     }
 }

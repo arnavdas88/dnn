@@ -8,6 +8,7 @@ namespace Genix.DocumentAnalysis.Classification
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using Genix.MachineLearning.Clustering;
     using Genix.MachineLearning.VectorMachines;
@@ -19,13 +20,20 @@ namespace Genix.DocumentAnalysis.Classification
     public class PointsOfInterestClassifier
         : Classifier<ImageSource, PointsOfInterestFeatures, PointsOfInterestFeatureBuilder>
     {
+        private List<(FeatureDetectors.Features features, string truth)> features = null;
+
         [JsonProperty("kmeans")]
-        private readonly KMeans kmeans = null;
+        private KMeans kmeans = null;
 
         [JsonProperty("svm")]
-        private readonly SupportVectorMachine svm = null;
+        private SupportVectorMachine svm = null;
 
-        private List<(FeatureDetectors.Features features, string truth)> features = null;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PointsOfInterestClassifier"/> class.
+        /// </summary>
+        public PointsOfInterestClassifier()
+        {
+        }
 
         /// <inheritdoc />
         public override bool IsTrained => false;
@@ -54,12 +62,18 @@ namespace Genix.DocumentAnalysis.Classification
         private protected override void BeginTraining(CancellationToken cancellationToken)
         {
             this.features = new List<(FeatureDetectors.Features features, string truth)>();
+            this.kmeans = null;
+            this.svm = null;
         }
 
         /// <inheritdoc />
         private protected override void FinishTraining(CancellationToken cancellationToken)
         {
             // learn k-means
+            this.kmeans = KMeans.Learn(
+                512,
+                this.features[0].features.Length,
+                this.features.SelectMany(x => x.features.Vectors).ToArray());
         }
 
         /// <inheritdoc />
