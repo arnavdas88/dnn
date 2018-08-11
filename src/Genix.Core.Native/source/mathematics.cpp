@@ -858,25 +858,84 @@ GENIXAPI(void, _saxpby)(
 	}
 }
 
-// y = a * a
-GENIXAPI(void, sqr_f32)(
-	int n,
-	const float* a, int offa,
-	float* y, int offy)
+// y = x * x
+template<typename T> void __forceinline __sqr_ip(
+	const int n,
+	T* y, const int offy)
 {
-	a += offa;
 	y += offy;
 
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = y[i] * y[i];
+	}
+}
+
+GENIXAPI(void, sqr_ip_s32)(int n, __int32* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_s64)(int n, __int64* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_u32)(int n, unsigned __int32* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_u64)(int n, unsigned __int64* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_f32)(int n, float* y, int offy)
+{
 	if (n <= 32)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = a[i] * a[i];
-		}
+		__sqr_ip(n, y, offy);
 	}
 	else
 	{
-		::vsSqr(n, a, y);
+		::vsSqr(n, y + offy, y + offy);
+	}
+}
+GENIXAPI(void, sqr_ip_f64)(int n, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sqr_ip(n, y, offy);
+	}
+	else
+	{
+		::vdSqr(n, y + offy, y + offy);
+	}
+}
+
+template<typename T> void __forceinline __sqr(
+	const int n,
+	const T* x, const int offx,
+	T* y, const int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = x[i] * x[i];
+	}
+}
+
+GENIXAPI(void, sqr_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_f32)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sqr(n, x, offx, y, offy);
+	}
+	else
+	{
+		::vsSqr(n, x + offx, y + offy);
+	}
+}
+GENIXAPI(void, sqr_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__sqr(n, x, offx, y, offy);
+	}
+	else
+	{
+		::vdSqr(n, x + offx, y + offy);
 	}
 }
 

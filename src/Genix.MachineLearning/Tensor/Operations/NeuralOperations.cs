@@ -682,7 +682,7 @@ namespace Genix.MachineLearning
                     // scale(i) = k + alpha / n * sum(x(j) ^ 2)
                     // scale will be later reused in back-propagation
                     // use output as a temporary buffer
-                    Mathematics.Square(x.Length, x.Weights, 0, scale.Weights, 0);
+                    Math32f.Square(x.Length, x.Weights, 0, scale.Weights, 0);
                     NeuralOperations.LRNKernel(scale, scale.Weights, y.Weights, kernelSize);
                     scale.Set(k);
                     scale.AddProductC(y, alpha / kernelSize);

@@ -1362,24 +1362,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Squares elements from one array starting at the specified index
-        /// and puts results into another array starting at the specified index.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <paramref name="x"/>.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Square(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.sqr_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
         /// Computes a square root of elements of one array starting at the specified index
         /// and puts results into another array starting at the specified index.
         /// </summary>
@@ -2043,10 +2025,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void _saxpby(int n, float a, [In] float[] x, int offx, int incx, float b, [In, Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sqr_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
