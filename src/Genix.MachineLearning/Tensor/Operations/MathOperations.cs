@@ -772,12 +772,12 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Sin(x.Length, x.Weights, 0, y.Weights, 0);
+                    Math32f.Sin(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Mathematics.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
+                        session.Push(ActionName, () => Math32f.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
                     }
 #endif
 
@@ -809,12 +809,12 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Cos(x.Length, x.Weights, 0, y.Weights, 0);
+                    Math32f.Cos(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Mathematics.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
+                        session.Push(ActionName, () => Math32f.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
                     }
 #endif
 

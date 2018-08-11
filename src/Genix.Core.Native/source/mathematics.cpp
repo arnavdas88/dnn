@@ -1061,16 +1061,16 @@ GENIXAPI(void, exp_f32)(
 	::vsExp(n, a + offa, y + offy);
 }
 
-// y = sin(a)
+// y = sin(x)
 GENIXAPI(void, sin_f32)(
 	int n,
-	const float* a, int offa,
+	const float* x, int offx,
 	float* y, int offy)
 {
-	::vsSin(n, a + offa, y + offy);
+	::vsSin(n, x + offx, y + offy);
 }
 
-// y += sin(a)'
+// y += sin(x)'
 GENIXAPI(void, sin_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
@@ -1096,16 +1096,16 @@ GENIXAPI(void, sin_gradient_f32)(
 	}
 }
 
-// y = cos(a)
+// y = cos(x)
 GENIXAPI(void, cos_f32)(
 	int n,
-	const float* a, int offa,
+	const float* x, int offx,
 	float* y, int offy)
 {
-	::vsCos(n, a + offa, y + offy);
+	::vsCos(n, x + offx, y + offy);
 }
 
-// y += cos(a)'
+// y += cos(x)'
 GENIXAPI(void, cos_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,

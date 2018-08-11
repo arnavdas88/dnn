@@ -1476,66 +1476,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes a sines element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sin(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.sin_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a gradient of a sines element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains <see cref="Mathematics.Sin"/> method input.</param>
-        /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SinGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] dy, int offdy)
-        {
-            NativeMethods.sin_gradient_f32(length, x, dx, offx, cleardx, dy, offdy);
-        }
-
-        /// <summary>
-        /// Computes a cosines element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Cos(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.cos_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a gradient of a cosines element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains <see cref="Mathematics.Cos"/> method input.</param>
-        /// <param name="dx">The array that receives the computed gradient.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="dy">The array that contains chain gradient from next level.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CosGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] dy, int offdy)
-        {
-            NativeMethods.cos_gradient_f32(length, x, dx, offx, cleardx, dy, offdy);
-        }
-
-        /// <summary>
         /// Computes the angle whose tangent is the quotient of two specified numbers element-wise.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -2061,36 +2001,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void exp_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sin_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sin_gradient_f32(
-                int n,
-                [In] float[] x,
-                [Out] float[] dx,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] float[] dy,
-                int offdy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void cos_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void cos_gradient_f32(
-                int n,
-                [In] float[] x,
-                [Out] float[] dx,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] float[] dy,
-                int offdy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
