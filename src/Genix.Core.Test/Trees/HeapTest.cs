@@ -10,12 +10,12 @@
     public class HeapTest
     {
         [TestMethod]
-        public void HeapTest1()
+        public void BinaryHeapTest1()
         {
             const int Count = 1000000;
             Random random = new Random(0);
 
-            Heap<int> heap = new Heap<int>(100);
+            BinaryHeap<int> heap = new BinaryHeap<int>(100);
 
             int count = 0;
             while (count < Count)
@@ -42,7 +42,47 @@
                     for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
                     {
                         int value = heap.Pop();
-                        Assert.IsTrue(previous >= value);
+                        Assert.IsTrue(previous <= value);
+                        previous = value;
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void FibonacciHeapTest1()
+        {
+            const int Count = 1000000;
+            Random random = new Random(0);
+
+            FibonacciHeap<int> heap = new FibonacciHeap<int>(100);
+
+            int count = 0;
+            while (count < Count)
+            {
+                // add more elements to the heap
+                for (int i = 0, ii = random.Next(10, 100); i < ii; i++, count++)
+                {
+                    heap.Push(random.Next(0, 100));
+                }
+
+                // pop some elements
+                Pop(random.Next(heap.Count / 2, 3 * heap.Count / 4));
+            }
+
+            // pop remaining element
+            Pop(heap.Count);
+
+            void Pop(int popcount)
+            {
+                if (popcount > 0)
+                {
+                    int previous = heap.Pop();
+
+                    for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
+                    {
+                        int value = heap.Pop();
+                        Assert.IsTrue(previous <= value);
                         previous = value;
                     }
                 }
@@ -58,22 +98,41 @@
             Stopwatch stopwatch = new Stopwatch();
             int[] values = Enumerable.Range(0, Size).Select(x => random.Next(0, 1000000)).ToArray();
 
-            Heap<int> heap = new Heap<int>(Size);
+            BinaryHeap<int> binaryHeap = new BinaryHeap<int>(Size);
 
             stopwatch.Restart();
 
             for (int i = 0; i < Count; i++)
             {
-                for (int j = 0, jj = values.Length; j < jj; j++)
+                for (int j = 0, jj = random.Next(10, 100); j < jj; j++)
                 {
-                    heap.Push(values[j]);
+                    binaryHeap.Push(random.Next(0, 100));
                 }
 
-                while (heap.Count > 0)
-                {
-                    heap.Pop();
-                }
+                Pop(binaryHeap, random.Next(binaryHeap.Count / 2, 3 * binaryHeap.Count / 4));
             }
+
+            Pop(binaryHeap, binaryHeap.Count);
+
+            stopwatch.Stop();
+
+            Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
+
+            FibonacciHeap<int> fibonacciHeap = new FibonacciHeap<int>(Size);
+
+            stopwatch.Restart();
+
+            for (int i = 0; i < Count; i++)
+            {
+                for (int j = 0, jj = random.Next(10, 100); j < jj; j++)
+                {
+                    fibonacciHeap.Push(random.Next(0, 100));
+                }
+
+                Pop(fibonacciHeap, random.Next(fibonacciHeap.Count / 2, 3 * fibonacciHeap.Count / 4));
+            }
+
+            Pop(fibonacciHeap, binaryHeap.Count);
 
             stopwatch.Stop();
 
@@ -99,6 +158,21 @@
             stopwatch.Stop();
 
             Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
+
+            void Pop(IHeap<int> heap, int popcount)
+            {
+                if (popcount > 0)
+                {
+                    int previous = heap.Pop();
+
+                    for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
+                    {
+                        int value = heap.Pop();
+                        Assert.IsTrue(previous <= value);
+                        previous = value;
+                    }
+                }
+            }
         }
     }
 }

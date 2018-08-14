@@ -18,7 +18,7 @@ namespace Genix.Core
     public class PriorityQueue<T>
         where T : IComparable<T>
     {
-        private readonly Heap<T> heap;
+        private readonly IHeap<T> heap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PriorityQueue{T}"/> class.
@@ -26,7 +26,7 @@ namespace Genix.Core
         /// <param name="capacity">The initial heap capacity.</param>
         public PriorityQueue(int capacity)
         {
-            this.heap = new Heap<T>(capacity);
+            this.heap = new BinaryHeap<T>(capacity);
         }
 
         /// <summary>

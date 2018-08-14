@@ -93,9 +93,11 @@
     <Compile Include="Tensor\Session.cs" />
     <Compile Include="Tensor\Shape.cs" />
     <Compile Include="Tensor\Tensor.cs" />
+    <Compile Include="VectorMachines\Learning\ISupportVectorMachineLearning.cs" />
     <Compile Include="VectorMachines\Learning\LibSVMOptimization.cs" />
     <Compile Include="VectorMachines\Learning\SequentualMinimalOptimization.cs" />
     <Compile Include="VectorMachines\Learning\SMOAlgorithm.cs" />
+    <Compile Include="VectorMachines\OneVsAllSupportVectorMachine.cs" />
     <Compile Include="VectorMachines\SupportVectorMachine.cs" />
   </ItemGroup>
   <ItemGroup>

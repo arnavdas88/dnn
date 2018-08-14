@@ -7,14 +7,18 @@
 namespace Genix.MachineLearning.VectorMachines
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using System.Threading;
     using Genix.MachineLearning.Kernels;
+    using Genix.MachineLearning.VectorMachines.Learning;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents the Support Vector Machine (SVM).
+    /// Represents the Kernel Support Vector Machine (SVM).
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class SupportVectorMachine
     {
         /// <summary>
@@ -58,7 +62,7 @@ namespace Genix.MachineLearning.VectorMachines
         /// <exception cref="ArgumentException">
         /// <para>The length of weights and support vectors are not the same.</para>
         /// </exception>
-        public SupportVectorMachine(IKernel kernel, float[][] vectors, float[] weights, float bias)
+        internal SupportVectorMachine(IKernel kernel, float[][] vectors, float[] weights, float bias)
         {
             this.kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
             this.vectors = vectors ?? throw new ArgumentNullException(nameof(vectors));
@@ -101,6 +105,52 @@ namespace Genix.MachineLearning.VectorMachines
         public static SupportVectorMachine FromString(string value) => JsonConvert.DeserializeObject<SupportVectorMachine>(value);
 
         /// <summary>
+        /// Learns a Support Vector Machines (SVM).
+        /// </summary>
+        /// <param name="trainer">The learning algorithm.</param>
+        /// <param name="samples">
+        /// The samples used for learning.
+        /// Each sample consists of input vector <c>x</c>,
+        /// expected binary output <c>y</c>,
+        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
+        /// </param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the machine that the operation should be canceled.</param>
+        /// <returns>
+        /// The <see cref="SupportVectorMachine"/> learned by this method.
+        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
+        /// </returns>
+        public static SupportVectorMachine Learn(
+            ISupportVectorMachineLearning trainer,
+            IList<(float[] x, bool y, float weight)> samples,
+            CancellationToken cancellationToken)
+        {
+            if (trainer == null)
+            {
+                throw new ArgumentNullException(nameof(trainer));
+            }
+
+            return trainer.Learn(samples, cancellationToken);
+        }
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> into the specified file.
+        /// </summary>
+        /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="SupportVectorMachine"/>.</param>
+        public void SaveToFile(string fileName) => File.WriteAllText(fileName, this.SaveToString(), Encoding.UTF8);
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> to the memory buffer.
+        /// </summary>
+        /// <returns>The buffer that contains saved <see cref="SupportVectorMachine"/>.</returns>
+        public byte[] SaveToMemory() => UTF8Encoding.UTF8.GetBytes(this.SaveToString());
+
+        /// <summary>
+        /// Saves the current <see cref="SupportVectorMachine"/> to the text string.
+        /// </summary>
+        /// <returns>The string that contains saved <see cref="SupportVectorMachine"/>.</returns>
+        public string SaveToString() => JsonConvert.SerializeObject(this);
+
+        /// <summary>
         /// Computes a score measuring association between the specified <paramref name="x" /> vector and each class.
         /// </summary>
         /// <param name="x">The input vector.</param>
@@ -136,23 +186,5 @@ namespace Genix.MachineLearning.VectorMachines
 
             return result;
         }
-
-        /// <summary>
-        /// Saves the current <see cref="SupportVectorMachine"/> into the specified file.
-        /// </summary>
-        /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="SupportVectorMachine"/>.</param>
-        public void SaveToFile(string fileName) => File.WriteAllText(fileName, this.SaveToString(), Encoding.UTF8);
-
-        /// <summary>
-        /// Saves the current <see cref="SupportVectorMachine"/> to the memory buffer.
-        /// </summary>
-        /// <returns>The buffer that contains saved <see cref="SupportVectorMachine"/>.</returns>
-        public byte[] SaveToMemory() => UTF8Encoding.UTF8.GetBytes(this.SaveToString());
-
-        /// <summary>
-        /// Saves the current <see cref="SupportVectorMachine"/> to the text string.
-        /// </summary>
-        /// <returns>The string that contains saved <see cref="SupportVectorMachine"/>.</returns>
-        public string SaveToString() => JsonConvert.SerializeObject(this);
     }
 }
