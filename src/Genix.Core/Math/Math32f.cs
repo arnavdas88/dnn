@@ -327,6 +327,21 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Squares elements of an array in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to square.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] = y[i] * y[i]</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Square(int length, float[] y, int offy)
+        {
+            NativeMethods.sqr_ip_f32(length, y, offy);
+        }
+
+        /// <summary>
         /// Squares elements of an array not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to square.</param>
@@ -457,6 +472,53 @@ namespace Genix.Core
         public static void MaxC(int length, float[] x, int offx, float a, float[] y, int offy)
         {
             NativeMethods.maxc_f32(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes the sum of elements of an array.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The sum of elements in <paramref name="x"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Sum(int length, float[] x, int offx)
+        {
+            return NativeMethods.sum_f32(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the cumulative sum of elements of an array in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source and destination array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The sum of elements in <paramref name="x"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float CumulativeSum(int length, float[] x, int offx)
+        {
+            return NativeMethods.cumulative_sum_ip_f32(length, x, offx);
+        }
+
+        /// <summary>
+        /// Computes the cumulative sum of elements of an array not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// The sum of elements in <paramref name="x"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float CumulativeSum(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return NativeMethods.cumulative_sum_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -615,6 +677,10 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern void sqr_ip_f32(int n, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern void sqr_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -662,6 +728,18 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void maxc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float sum_f32(int n, [In] float[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float cumulative_sum_ip_f32(int n, [In, Out] float[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern float cumulative_sum_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

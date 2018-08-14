@@ -51,6 +51,7 @@
     <Compile Include="Collections\QuadTree.cs" />
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
+    <Compile Include="Data\NumericTable.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />

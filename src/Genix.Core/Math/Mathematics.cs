@@ -1569,21 +1569,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the sum of all elements in the array of floats.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sum(int length, float[] x, int offx)
-        {
-            return NativeMethods.sum_f32(length, x, offx);
-        }
-
-        /// <summary>
         /// Computes the variance of all elements in the array of floats.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -2025,10 +2010,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern ulong sum_u64(int n, [In] ulong[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern float sum_f32(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

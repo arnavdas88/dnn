@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#if 1
+#if 0
 #include "daal.h"
 
 using namespace std;
@@ -23,7 +23,7 @@ float inputArray[samples * dimension] =
 
 GENIXAPI(void, kmeans)(int k, int iter, int dimension, int samples, float* x)
 {
-#if 1
+#if 0
 	////k = 2;
 
 	// Create data source

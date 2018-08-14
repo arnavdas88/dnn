@@ -220,6 +220,8 @@ namespace Genix.Core
             int count = this.Count;
             Histogram dst = new Histogram(count);
 
+            ////Math32s.CumulativeSum(count, this.bins, 0, dst.bins, 0);
+
             int[] srcbins = this.bins;
             int[] dstbins = dst.bins;
 

@@ -10,7 +10,9 @@ namespace Genix.DocumentAnalysis.Classification
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Genix.Core;
     using Genix.MachineLearning.Clustering;
+    using Genix.MachineLearning.Distances;
     using Genix.MachineLearning.VectorMachines;
     using Newtonsoft.Json;
 
@@ -71,11 +73,12 @@ namespace Genix.DocumentAnalysis.Classification
         {
             // learn k-means
             int dimension = this.features[0].features.Length;
-            this.kmeans = KMeans.Learn(
-                512,
-                dimension,
-                /*this.features.SelectMany(x => x.features.Vectors.Partition(dimension)).ToList());*/
-                this.features.SelectMany(x => x.features.Vectors).ToArray());
+            this.kmeans = new KMeans(512, this.features[0].features.Length, default(EuclideanDistance));
+
+            NumericTable<float> data = new NumericTable<float>();
+            data.AddRange(this.features.SelectMany(x => x.features.Vectors.Partition(dimension)));
+            this.kmeans.Learn(data);
+            /*this.features.SelectMany(x => x.features.Vectors).ToArray());*/
         }
 
         /// <inheritdoc />

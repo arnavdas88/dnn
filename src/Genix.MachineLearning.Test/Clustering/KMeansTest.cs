@@ -9,7 +9,7 @@
         [TestMethod]
         public void XXXTest()
         {
-            KMeans kmeans = new KMeans(new EuclideanDistance());
+            ////KMeans kmeans = new KMeans(new EuclideanDistance());
         }
     }
 }

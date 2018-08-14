@@ -48,6 +48,7 @@
     <Compile Include="Clustering\KMeans\KMeans.cs" />
     <Compile Include="Clustering\KMeans\KMeansClusterCollection.cs" />
     <Compile Include="Clustering\KMeans\KMeansCluster.cs" />
+    <Compile Include="Clustering\KMeans\KMeansSeeding.cs" />
     <Compile Include="Distances\EuclideanDistance.cs" />
     <Compile Include="Distances\IDistance.cs" />
     <Compile Include="Distances\IVectorDistance.cs" />
