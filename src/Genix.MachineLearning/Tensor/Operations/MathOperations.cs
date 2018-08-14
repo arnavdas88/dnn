@@ -227,7 +227,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (a)
                                     {
-                                        Mathematics.MultiplyAndAdd(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
+                                        Math32f.AddProduct(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
                                     }
                                 }
 
@@ -236,7 +236,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (b)
                                     {
-                                        Mathematics.MultiplyAndAdd(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
+                                        Math32f.AddProduct(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });
@@ -312,7 +312,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Mathematics.Divide(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Math32f.Div(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)

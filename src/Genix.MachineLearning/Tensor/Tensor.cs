@@ -473,7 +473,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Divide(Tensor x) => Mathematics.Divide(this.Length, this.Weights, 0, x.Weights, 0, this.Weights, 0);
+        public void Divide(Tensor x) => Math32f.Div(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
@@ -510,7 +510,7 @@ namespace Genix.MachineLearning
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MultiplyAndAdd(Tensor a, Tensor b) => Mathematics.MultiplyAndAdd(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
+        public void AddProduct(Tensor a, Tensor b) => Math32f.AddProduct(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Randomizes all values in the tensor.

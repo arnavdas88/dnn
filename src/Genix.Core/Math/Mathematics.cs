@@ -1245,27 +1245,6 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The input array <paramref name="a"/>.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
-        /// <param name="b">The input array <paramref name="b"/>.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := a(offa + i) / b(offb + i)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Divide(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
-        {
-            NativeMethods.sdiv(length, a, offa, 1, b, offb, 1, y, offy, 1);
-        }
-
-        /// <summary>
-        /// Divides elements of one array starting at the specified index
-        /// to elements of another array starting at the specified index
-        /// and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <paramref name="a"/>.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
         /// <param name="inca">the increment for the elements of <paramref name="a"/>.</param>
         /// <param name="b">The input array <paramref name="b"/>.</param>
         /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
@@ -1280,45 +1259,6 @@ namespace Genix.Core
         public static void Divide(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
         {
             NativeMethods.sdiv(length, a, offa, inca, b, offb, incb, y, offy, incy);
-        }
-
-        /// <summary>
-        /// Divides all elements of one array by a scalar and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar <paramref name="alpha"/>.</param>
-        /// <param name="x">The array that contains the data to divide.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y := x / alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Divide(int length, float alpha, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.mulc_f32(length, x, offx, 1.0f / alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Multiplies elements of one array starting at the specified index
-        /// to elements of another array starting at the specified index
-        /// and adds results to the destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <paramref name="a"/>.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
-        /// <param name="b">The input array <paramref name="b"/>.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) += a(offa + i) * b(offb + i)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MultiplyAndAdd(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
-        {
-            NativeMethods.smuladd(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -1890,10 +1830,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void mul_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void smuladd(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

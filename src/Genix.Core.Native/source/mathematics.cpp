@@ -685,23 +685,6 @@ GENIXAPI(void, mul_f64)(int n, const double* a, int offa, const double* b, int o
 	}
 }
 
-// multiplies two vectors element-wise and adds results to another vector
-GENIXAPI(void, smuladd)(
-	int n,
-	const float* a, int offa,
-	const float* b, int offb,
-	float* y, int offy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] += a[i] * b[i];
-	}
-}
-
 // divides each element of a vector by a constant value in-place.
 template<typename T> void __forceinline __divc_ip(
 	const int n,
@@ -746,7 +729,96 @@ GENIXAPI(void, divc_u64)(int n, const unsigned __int64* x, int offx, unsigned __
 GENIXAPI(void, divc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __divc(n, x, offx, a, y, offy); }
 GENIXAPI(void, divc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __divc(n, x, offx, a, y, offy); }
 
-// divides two vectors element-wise
+// divides two vectors element-wise in-place.
+template<typename T> void __forceinline __div_ip(
+	int n,
+	const T* x, int offx,
+	T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] /= x[i];
+	}
+}
+
+GENIXAPI(void, div_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __div_ip(n, x, offx, y, offy); }
+GENIXAPI(void, div_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __div_ip(n, x, offx, y, offy); }
+GENIXAPI(void, div_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __div_ip(n, x, offx, y, offy); }
+GENIXAPI(void, div_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __div_ip(n, x, offx, y, offy); }
+GENIXAPI(void, div_ip_f32)(int n, const float* x, int offx, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__div_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vsDiv(n, y, x, y);
+	}
+}
+GENIXAPI(void, div_ip_f64)(int n, const double* x, int offx, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__div_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+		::vdDiv(n, y, x, y);
+	}
+}
+
+// divides two vectors element-wise not-in-place.
+template<typename T> void __forceinline __div(
+	int n,
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
+{
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = a[i] / b[i];
+	}
+}
+
+GENIXAPI(void, div_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, div_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, div_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, div_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, div_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
+{
+	if (n <= 32)
+	{
+		__div(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vsDiv(n, a + offa, b + offb, y + offy);
+	}
+}
+GENIXAPI(void, div_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
+{
+	if (n <= 32)
+	{
+		__div(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		::vdDiv(n, a + offa, b + offb, y + offy);
+	}
+}
+
 GENIXAPI(void, sdiv)(
 	int n,
 	const float* a, int offa, int inca,
@@ -823,6 +895,31 @@ GENIXAPI(void, addproductc_f64)(int n, const double* x, int offx, double a, doub
 		::cblas_daxpy(n, a, x + offx, 1, y + offy, 1);
 	}
 }
+
+// Adds product of two vectors to the accumulator vector.
+// y += a * b
+template<typename T> void __forceinline __addproduct(
+	const int n,
+	const T* a, const int offa,
+	const T* b, const int offb,
+	T* y, const int offy)
+{
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] += a[i] * b[i];
+	}
+}
+
+GENIXAPI(void, addproduct_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 
 // y = a * x + b * y
 GENIXAPI(void, _saxpby)(

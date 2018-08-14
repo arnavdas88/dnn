@@ -475,7 +475,7 @@ namespace Genix.Core
             // normalize and output to sum to one
             if (esum != 0.0f)
             {
-                Mathematics.Divide(length, esum, y, offy, y, offy);
+                Math32f.DivC(length, esum, y, offy);
             }
         }
 

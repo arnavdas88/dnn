@@ -309,6 +309,42 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Divides the elements of two arrays in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y /= x</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Div(int length, float[] x, int offx, float[] y, int offy)
+        {
+            NativeMethods.div_ip_f32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Divides the elements of two arrays not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to divide.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y = a / b</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Div(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.div_f32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
         /// Adds product of element of an array and a constant to the elements of destination array.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -324,6 +360,25 @@ namespace Genix.Core
         public static void AddProductC(int length, float[] x, int offx, float alpha, float[] y, int offy)
         {
             NativeMethods.addproductc_f32(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds product of elements of two arrays to the elements of destination array.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y += a * b</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddProduct(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.addproduct_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -673,7 +728,19 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern void div_ip_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void div_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern void addproductc_f32(int n, [In] float[] x, int offx, float a, [In, Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void addproduct_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
