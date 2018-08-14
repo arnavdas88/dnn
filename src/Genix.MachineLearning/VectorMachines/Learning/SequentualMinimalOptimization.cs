@@ -9,6 +9,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using Genix.Core;
     using Genix.MachineLearning.Classifcation;
     using Genix.MachineLearning.Kernels;
@@ -16,7 +17,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
     /// <summary>
     /// The Sequential Minimal Optimization (SMO) Algorithm for Support Vector Machines (SVM) learning.
     /// </summary>
-    public class SequentualMinimalOptimization
+    public class SequentualMinimalOptimization : ISupportVectorMachineLearning
     {
         /// <summary>
         /// The kernel used by this machine.
@@ -89,20 +90,8 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         /// </value>
         public float Tolerance { get; set; } = 0.01f;
 
-        /// <summary>
-        /// Learns a model that can map the given inputs to the given outputs.
-        /// </summary>
-        /// <param name="samples">
-        /// The samples used for learning.
-        /// Each sample consists of input vector <c>x</c>,
-        /// expected output <c>y</c>,
-        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
-        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
-        /// </param>
-        /// <returns>
-        /// The <see cref="SupportVectorMachine"/> learned by this method.
-        /// </returns>
-        public SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples)
+        /// <inheritdoc />
+        public SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples, CancellationToken cancellationToken)
         {
             // count positive and negative labels
             Labels.GetRatio(samples.Select(x => x.y), out int positives, out int negatives);

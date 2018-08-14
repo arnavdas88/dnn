@@ -68,7 +68,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
     /// solution will be put in \\alpha, objective value will be put in obj
     ///</remarks>
 #endif
-    public class LibSVMOptimization
+    internal class LibSVMOptimization
     {
         private const float TAU = 1e-12f;
 
@@ -241,7 +241,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
                 if (y[i] != y[j])
                 {
-                    float quad_coef = qd[i] + qd[j] + (2 * qi[j]);
+                    float quad_coef = qd[i] + qd[j] + (2.0f * qi[j]);
                     if (quad_coef <= 0)
                     {
                         quad_coef = TAU;
@@ -288,7 +288,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                 }
                 else
                 {
-                    float quad_coef = qd[i] + qd[j] - (2 * qi[j]);
+                    float quad_coef = qd[i] + qd[j] - (2.0f * qi[j]);
                     if (quad_coef <= 0)
                     {
                         quad_coef = TAU;

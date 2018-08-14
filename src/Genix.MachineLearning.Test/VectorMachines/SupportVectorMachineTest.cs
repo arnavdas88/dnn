@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     ////using Accord.MachineLearning.VectorMachines.Learning;
     using Genix.Core;
     using Genix.Lab;
@@ -53,7 +54,7 @@
                 Tolerance = 0.01f,
             };
 
-            SupportVectorMachine machine = smo.Learn(samples.Take(LearnCount).ToList());
+            SupportVectorMachine machine = SupportVectorMachine.Learn(smo, samples.Take(LearnCount).ToList(), CancellationToken.None);
 
             // test
             List<ClassificationResult<bool?>> results = samples
