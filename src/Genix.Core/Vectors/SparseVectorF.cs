@@ -21,6 +21,7 @@ namespace Genix.Core
     /// Each array has <see cref="Length"/> elements.
     /// </para>
     /// </remarks>
+    [JsonObject(MemberSerialization.OptIn)]
     public struct SparseVectorF : IVector<float>
     {
         /// <summary>
@@ -46,12 +47,7 @@ namespace Genix.Core
             this.X = x;
         }
 
-        /// <summary>
-        /// Gets the number of elements in the vector.
-        /// </summary>
-        /// <value>
-        /// The number of elements in the vector.
-        /// </value>
+        /// <inheritdoc />
         public int Length => this.Idx.Length;
 
         /// <summary>
@@ -132,6 +128,10 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddProductC(float alpha, float[] y, int offy) => NativeMethods.sparse_addproductc_f32(this.X.Length, this.Idx, this.X, alpha, y, offy);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ManhattanDistance(float[] y, int offy) => NativeMethods.sparse_manhattan_distance_f32(this.X.Length, this.Idx, this.X, y, offy);
 
         /// <inheritdoc />
@@ -155,6 +155,10 @@ namespace Genix.Core
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void sparse_addproductc_f32(int n, [In] int[] xidx, [In] float[] x, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

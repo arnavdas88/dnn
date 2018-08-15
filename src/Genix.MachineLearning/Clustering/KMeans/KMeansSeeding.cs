@@ -19,7 +19,7 @@ namespace Genix.MachineLearning.Clustering
         /// <summary>
         /// The kmeans++ algorithm.
         /// </summary>
-        /// <see cref="https://en.wikipedia.org/wiki/K-means++"/>
+        /// <see href="https://en.wikipedia.org/wiki/K-means++"/>
         KMeansPlusPlus,
     }
 }

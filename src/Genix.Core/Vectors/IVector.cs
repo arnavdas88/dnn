@@ -13,6 +13,14 @@ namespace Genix.Core
     public interface IVector<T>
     {
         /// <summary>
+        /// Gets the vector length.
+        /// </summary>
+        /// <value>
+        /// The number of elements in vector.
+        /// </value>
+        int Length { get; }
+
+        /// <summary>
         /// Copies vector values to an array starting at the specified destination index.
         /// </summary>
         /// <param name="y">The destination dense vector.</param>
@@ -42,16 +50,27 @@ namespace Genix.Core
         void SubC(T alpha);
 
         /// <summary>
-        /// Multiplies each element of the vector by a constant value in-place.
+        /// Multiplies each element of the vector by a constant value.
         /// </summary>
         /// <param name="alpha">The scalar to multiply.</param>
         void MulC(T alpha);
 
         /// <summary>
-        /// Divides each element of the vector by a constant value in-place.
+        /// Divides each element of the vector by a constant value.
         /// </summary>
         /// <param name="alpha">The scalar to divide.</param>
         void DivC(T alpha);
+
+        /// <summary>
+        /// Adds a product of each element of the vector and a constant to the elements of dense vector.
+        /// </summary>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The destination dense vector.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] += this[i] * alpha</c>.
+        /// </remarks>
+        void AddProductC(float alpha, float[] y, int offy);
 
         /// <summary>
         /// Computes the Manhattan distance between elements of this vector and a dense vector.

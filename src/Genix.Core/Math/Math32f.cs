@@ -350,7 +350,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to add.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>

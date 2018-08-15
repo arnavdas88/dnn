@@ -10,7 +10,7 @@ namespace Genix.Core
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents a node of the <see cref="Tree{T}"/>.
+    /// Represents a node of the <see cref="Tree{T, TNode}"/>.
     /// </summary>
     /// <typeparam name="T">The type of the value the node stores.</typeparam>
     public class TreeNode<T>

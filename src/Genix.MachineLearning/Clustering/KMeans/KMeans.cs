@@ -19,28 +19,24 @@ namespace Genix.MachineLearning.Clustering
     /// <summary>
     /// The K-Means clustering algorithm.
     /// </summary>
-    /// <typeparam name="T">The type of vector this algorithm supports.</typeparam>
-    public class KMeans<T>
-        where T : IVector<float>
+    public class KMeans
     {
         /// <summary>
         /// The collection of clusters.
         /// </summary>
         [JsonProperty("clusters")]
-        private readonly KMeansClusterCollection<T> clusters = null;
+        private readonly KMeansClusterCollection clusters = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KMeans"/> class.
         /// </summary>
-        /// <param name="k">The number of clusters.</param>
-        /// <param name="dimension">The vector length.</param>
-        /// <param name="distance">The distance function.</param>
+        /// <param name="clusters">The collection of clusters.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="distance"/> is <b>null</b>.
+        /// <paramref name="clusters"/> is <b>null</b>.
         /// </exception>
-        public KMeans(int k, int dimension, IVectorDistance<float, T, float> distance)
+        private KMeans(KMeansClusterCollection clusters)
         {
-            this.clusters = new KMeansClusterCollection<T>(k, dimension, distance);
+            this.clusters = clusters ?? throw new ArgumentNullException(nameof(clusters));
         }
 
         /// <summary>
@@ -60,13 +56,13 @@ namespace Genix.MachineLearning.Clustering
         public int K => this.clusters.Count;
 
         /// <summary>
-        /// Gets or sets the cluster initialization algorithm.
+        /// Gets the cluster initialization algorithm.
         /// </summary>
         /// <value>
         /// The <see cref="KMeansSeeding"/> enumeration. The default value is <see cref="KMeansSeeding.KMeansPlusPlus"/>.
         /// </value>
         [JsonProperty("seeding")]
-        public KMeansSeeding Seeding { get; set; } = KMeansSeeding.KMeansPlusPlus;
+        public KMeansSeeding Seeding { get; private set; } = KMeansSeeding.KMeansPlusPlus;
 
         /// <summary>
         /// Gets the collection of clusters.
@@ -74,20 +70,33 @@ namespace Genix.MachineLearning.Clustering
         /// <value>
         /// The <see cref="KMeansClusterCollection"/> object.
         /// </value>
-        public KMeansClusterCollection<T> Clusters => this.clusters;
+        public KMeansClusterCollection Clusters => this.clusters;
 
         /// <summary>
         /// Learns a <see cref="KMeans"/> model that can map the given inputs to the desired outputs.
         /// </summary>
+        /// <param name="k">The number of clusters.</param>
+        /// <param name="seeding">The cluster initialization algorithm.</param>
+        /// <param name="distance">The distance function.</param>
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
+        /// <returns>
+        /// The <see cref="KMeans"/> clusterizer learned by this metthod.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="x"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="distance"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
         /// </exception>
-        public void Learn(IList<T> x, IList<float> weights)
+        public static KMeans Learn(
+            int k,
+            KMeansSeeding seeding,
+            IVectorDistance<float, IVector<float>, float> distance,
+            IList<IVector<float>> x,
+            IList<float> weights)
         {
             if (x == null)
             {
@@ -99,17 +108,16 @@ namespace Genix.MachineLearning.Clustering
                 throw new ArgumentException("The number of weights must match the number of input vectors.", nameof(weights));
             }
 
-            int k = this.K;
-            int dimension = this.clusters.Dimension;
             int sampleCount = x.Count;
+            int dimension = x[0].Length;
 
 #if false
             NativeMethods.kmeans(k, 1, dimension, sampleCount, x);
 #else
             int maxiter = 20;
 
-            KMeansClusterCollection<T> clusters = this.clusters;
-            switch (this.Seeding)
+            KMeansClusterCollection clusters = new KMeansClusterCollection(k, dimension, distance);
+            switch (seeding)
             {
                 case KMeansSeeding.KMeansPlusPlus:
                     clusters.KMeansPlusPlusSeeding(x, weights);
@@ -141,12 +149,12 @@ namespace Genix.MachineLearning.Clustering
 
                         for (int i = a; i < b; i++)
                         {
-                            int index = this.clusters.Assign(x[i]);
+                            int index = clusters.Assign(x[i]);
                             float weight = weights?[i] ?? 1.0f;
 
                             int off = index * (dimension + 1);
                             local[off] += weight;
-                            Math32f.AddProductC(dimension, x[i], 0, weight, local, off + 1);
+                            x[i].AddProductC(weight, local, off + 1);
                         }
 
                         lock (sync)
@@ -165,6 +173,11 @@ namespace Genix.MachineLearning.Clustering
                     }
                 }
             }
+
+            return new KMeans(clusters)
+            {
+                Seeding = seeding,
+            };
 #endif
         }
 
@@ -176,7 +189,7 @@ namespace Genix.MachineLearning.Clustering
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Assign(T x) => this.clusters.Assign(x);
+        public int Assign(IVector<float> x) => this.clusters.Assign(x);
 
         /// <summary>
         /// Assigns the vector to one of the clusters and returns the distance to that cluster.
@@ -187,7 +200,7 @@ namespace Genix.MachineLearning.Clustering
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Assign(T x, out float score) => this.clusters.Assign(x, out score);
+        public int Assign(IVector<float> x, out float score) => this.clusters.Assign(x, out score);
 
         /// <summary>
         /// Assigns the range of data points to feature vector containing the distance between each point and its assigned cluster.
@@ -197,7 +210,7 @@ namespace Genix.MachineLearning.Clustering
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(IList<T> x) => this.clusters.Assign(x, null);
+        public float[] Assign(IList<IVector<float>> x) => this.clusters.Assign(x, null);
 
         /// <summary>
         /// Creates a feature vector by assigning each data point in <paramref name="x"/> to one of the clusters.
@@ -208,7 +221,7 @@ namespace Genix.MachineLearning.Clustering
         /// Each element of the feature vector contains the number of data points assigned to corresponding cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Transform(IList<T> x)
+        public float[] Transform(IList<IVector<float>> x)
         {
             float[] result = new float[this.K];
             for (int i = 0, ii = result.Length; i < ii; i++)

@@ -51,7 +51,6 @@
     <Compile Include="Collections\QuadTree.cs" />
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
-    <Compile Include="Data\NumericTable.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
@@ -75,6 +74,8 @@
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Array32f.cs" />
     <Compile Include="Vectors\DenseVectorF.cs" />
+    <Compile Include="Vectors\DenseVectorProxyF.cs" />
+    <Compile Include="Vectors\DenseVectorPackF.cs" />
     <Compile Include="Vectors\IVector.cs" />
     <Compile Include="Math\JaggedArray.cs" />
     <Compile Include="Math\Math32f.cs" />

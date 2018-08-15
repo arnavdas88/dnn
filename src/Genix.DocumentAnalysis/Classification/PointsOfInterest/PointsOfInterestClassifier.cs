@@ -25,7 +25,7 @@ namespace Genix.DocumentAnalysis.Classification
         private List<(FeatureDetectors.Features features, string truth)> features = null;
 
         [JsonProperty("kmeans")]
-        private KMeans<IVector<float>> kmeans = null;
+        private KMeans kmeans = null;
 
         [JsonProperty("svm")]
         private SupportVectorMachine svm = null;
@@ -71,13 +71,27 @@ namespace Genix.DocumentAnalysis.Classification
         /// <inheritdoc />
         private protected override void FinishTraining(CancellationToken cancellationToken)
         {
-            // learn k-means
-            int dimension = this.features[0].features.Length;
-            this.kmeans = new KMeans<IVector<float>>(512, this.features[0].features.Length, default(EuclideanDistance));
+            // count vectors
+            int numberOfVectors = this.features.Sum(x => x.features.Count);
 
-            IList<float[]> x = this.features.SelectMany(f => f.features.Vectors.Partition(dimension)).ToList();
-            ////this.kmeans.Learn(x, null);
-            /*this.features.SelectMany(x => x.features.Vectors).ToArray());*/
+            // copy vectors
+            List<IVector<float>> vectors = new List<IVector<float>>(numberOfVectors);
+            for (int i = 0, ii = this.features.Count; i < ii; i++)
+            {
+                FeatureDetectors.Features f = this.features[i].features;
+                for (int j = 0, jj = f.Count, len = f.Length, off = 0; j < jj; j++, off += len)
+                {
+                    vectors.Add(new DenseVectorProxyF(len, f.X, off));
+                }
+            }
+
+            // learn k-means
+            this.kmeans = KMeans.Learn(
+                512,
+                KMeansSeeding.KMeansPlusPlus,
+                default(EuclideanDistance),
+                vectors,
+                null);
         }
 
         /// <inheritdoc />

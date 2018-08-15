@@ -83,12 +83,12 @@ namespace Genix.Imaging
         /// Bins that are less than the threshold, are set to zero.
         /// </param>
         /// <returns>
-        /// The tuple that contains the feature vectors and the feature vector length.
+        /// The <see cref="DenseVectorPackF"/> that contains packed points of interest.
         /// </returns>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 1, 8, 24, or 32.
         /// </exception>
-        public (float[] vectors, int vectorLength) HOG(
+        public DenseVectorPackF HOG(
             int cellSize,
             int blockSize,
             int blockStride,
@@ -173,17 +173,19 @@ namespace Genix.Imaging
                 Array32f.ThresholdLT(blocks.Length, threshold, 0.0f, blocks, 0);
             }
 
+            /*DenseVectorProxyF[] dense = new DenseVectorProxyF[blockCount];
+            for (int i = 0, off = 0; i < blockCount; i++, off += blockSizeInBins)
+            {
+                dense[i] = new DenseVectorProxyF(blockSizeInBins, blocks, off);
+            }*/
+
             /*SparseVectorF[] sparse = new SparseVectorF[blockCount];
             for (int i = 0; i < blockCount; i++)
             {
-                sparse[i] = SparseVectorF.FromDense(blockSizeInBins, blocks, i * blockSizeInBins);
+                sparse[i] = SparseVectorF.FromDense(blockSizeInBins, vectors[i].X, 0);
             }*/
 
-            /*IList<SparseVectorF> sparse = Enumerable.Range(0, blockCount)
-                                                    .Select(i => SparseVectorF.FromDense(blockSizeInBins, blocks, i * blockSizeInBins))
-                                                    .ToList();*/
-
-            return (blocks, blockSizeInBins);
+            return new DenseVectorPackF(blockCount, blockSizeInBins, blocks);
 
             ImageF PrepareImage()
             {

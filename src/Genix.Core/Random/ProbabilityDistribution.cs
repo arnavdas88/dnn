@@ -11,6 +11,9 @@ namespace Genix.Core
     using System.Diagnostics;
     using System.Linq;
 
+    /// <summary>
+    /// Represents a discrete probability distribution.
+    /// </summary>
     public class ProbabilityDistribution
     {
         /// <summary>
@@ -23,6 +26,11 @@ namespace Genix.Core
         /// </summary>
         private readonly float[] pdf;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProbabilityDistribution"/> class.
+        /// </summary>
+        /// <param name="weights">The probabilities of possible outcomes.</param>
+        /// <param name="random">The random number generator.</param>
         public ProbabilityDistribution(IList<float> weights, Random random)
         {
             if (weights == null)
@@ -40,6 +48,12 @@ namespace Genix.Core
             }
         }
 
+        /// <summary>
+        /// Returns next random outcome.
+        /// </summary>
+        /// <returns>
+        /// A 32-bit signed integer that is greater than or equal to 0, and less than the number of possible outcomes.
+        /// </returns>
         public int Next()
         {
             return BinarySearch(this.random.Generate());

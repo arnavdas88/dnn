@@ -7,8 +7,10 @@
 namespace Genix.DocumentAnalysis.FeatureDetectors
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Threading;
+    using Genix.Core;
     using Genix.Imaging;
     using Newtonsoft.Json;
 
@@ -111,13 +113,14 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
                 throw new ArgumentNullException(nameof(image));
             }
 
-            (float[] vectors, int length) = image.HOG(
+            DenseVectorPackF vectors = image.HOG(
                 this.CellSize,
                 this.BlockSize,
                 this.BlockStride,
                 this.NumberOfBins,
                 this.Threshold);
-            return new Features(vectors.Length / length, length, vectors);
+
+            return new Features(vectors);
         }
     }
 }

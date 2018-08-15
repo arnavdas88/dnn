@@ -12,13 +12,41 @@ namespace Genix.Core
     /// <summary>
     /// Represents a dense vector of single-precision floating point numbers.
     /// </summary>
-    public struct DenseVectorF : IVector<float>
+    [JsonObject(MemberSerialization.OptIn)]
+    public struct DenseVectorF
+        : IVector<float>
     {
         /// <summary>
         /// The values of the elements.
         /// </summary>
         [JsonProperty("x")]
         public float[] X;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DenseVectorF"/> struct.
+        /// </summary>
+        /// <param name="length">The number of elements in the vector.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DenseVectorF(int length)
+        {
+            this.X = new float[length];
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DenseVectorF"/> struct.
+        /// </summary>
+        /// <param name="length">The number of elements in the vector.</param>
+        /// <param name="x">The vector elements.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DenseVectorF(int length, float[] x, int offx)
+            : this(length)
+        {
+            Array32f.Copy(length, x, offx, this.X, 0);
+        }
+
+        /// <inheritdoc />
+        public int Length => this.X.Length;
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,6 +71,10 @@ namespace Genix.Core
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DivC(float alpha) => Math32f.DivC(this.X.Length, alpha, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddProductC(float alpha, float[] y, int offy) => Math32f.AddProductC(this.X.Length, this.X, 0, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

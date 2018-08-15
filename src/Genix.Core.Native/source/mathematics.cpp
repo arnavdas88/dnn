@@ -896,6 +896,27 @@ GENIXAPI(void, addproductc_f64)(int n, const double* x, int offx, double a, doub
 	}
 }
 
+template<typename T> void __forceinline __sparse_addproductc(
+	const int n,
+	const int* xidx, const T* x,
+	const T a,
+	T* y, const int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[xidx[i]] += x[i] * a;
+	}
+}
+
+GENIXAPI(void, sparse_addproductc_s32)(int n, const int* xidx, const __int32* x, __int32 a, __int32* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+GENIXAPI(void, sparse_addproductc_s64)(int n, const int* xidx, const __int64* x, __int64 a, __int64* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+GENIXAPI(void, sparse_addproductc_u32)(int n, const int* xidx, const unsigned __int32* x, unsigned __int32 a, unsigned __int32* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+GENIXAPI(void, sparse_addproductc_u64)(int n, const int* xidx, const unsigned __int64* x, unsigned __int64 a, unsigned __int64* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+GENIXAPI(void, sparse_addproductc_f32)(int n, const int* xidx, const float* x, float a, float* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+GENIXAPI(void, sparse_addproductc_f64)(int n, const int* xidx, const double* x, double a, double* y, int offy) { __sparse_addproductc(n, xidx, x, a, y, offy); }
+
 // Adds product of two vectors to the accumulator vector.
 // y += a * b
 template<typename T> void __forceinline __addproduct(
