@@ -21,61 +21,27 @@ namespace Genix.DocumentAnalysis.Classification
         /// <summary>
         /// The list of answer candidates.
         /// </summary>
-        private readonly List<(string className, double score)> candidates = new List<(string className, double score)>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Answer"/> class.
-        /// </summary>
-        /// <param name="id">The unique identifier of the data used to create this <see cref="Answer"/>.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <param name="frameIndex">
-        /// The zero-based index for this page if it belongs to a multi-page file.
-        /// <b>null</b> if this page belongs to a single-page file.
-        /// </param>
-        /// <param name="className">The name of the class.</param>
-        /// <param name="confidence">A value from 0 to 100 that represents the confidence that the answer is valid.</param>
-        /// <param name="candidates">The collection of candidate answers.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="candidates"/> is <b>null</b>.
-        /// </exception>
-        public Answer(
-            string id,
-            string name,
-            int? frameIndex,
-            string className,
-            double confidence,
-            IEnumerable<(string, double)> candidates)
-            : base(id, name, frameIndex)
-        {
-            if (candidates == null)
-            {
-                throw new ArgumentNullException(nameof(candidates));
-            }
-
-            this.ClassName = className;
-            this.Confidence = confidence;
-            this.candidates.AddRange(candidates);
-        }
+        private readonly List<(string className, float score)> candidates = new List<(string className, float score)>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Answer"/> class,
         /// using the features used to create this <see cref="Answer"/>.
         /// </summary>
-        /// <param name="features">The <see cref="Features"/> used to create this <see cref="Answer"/>.</param>
+        /// <param name="id">The source of data.</param>
         /// <param name="className">The name of the class.</param>
         /// <param name="confidence">A value from 0 to 100 that represents the confidence that the answer is valid.</param>
         /// <param name="candidates">The collection of candidate answers.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="features"/> is <b>null</b>.</para>
+        /// <para><paramref name="id"/> is <b>null</b>.</para>
         /// <para>-or-</para>
         /// <para><paramref name="candidates"/> is <b>null</b>.</para>
         /// </exception>
         public Answer(
-            Features features,
+            DataSourceId id,
             string className,
-            double confidence,
-            IEnumerable<(string, double)> candidates)
-            : base(features)
+            float confidence,
+            IEnumerable<(string, float)> candidates)
+            : base(id)
         {
             if (candidates == null)
             {
@@ -91,15 +57,15 @@ namespace Genix.DocumentAnalysis.Classification
         /// Initializes a new instance of the <see cref="Answer"/> class,
         /// using the features used to create this <see cref="Answer"/>.
         /// </summary>
-        /// <param name="features">The <see cref="Features"/> used to create this <see cref="Answer"/>.</param>
+        /// <param name="id">The source of data.</param>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="features"/> is <b>null</b>.</para>
+        /// <para><paramref name="id"/> is <b>null</b>.</para>
         /// </exception>
         /// <remarks>
         /// This constructor create a blank <see cref="Answer"/> that does not contain any result.
         /// </remarks>
-        public Answer(Features features)
-            : base(features)
+        public Answer(DataSourceId id)
+            : base(id)
         {
         }
 
@@ -136,10 +102,10 @@ namespace Genix.DocumentAnalysis.Classification
         /// Gets a confidence for the answer.
         /// </summary>
         /// <value>
-        /// A <see cref="double"/> value from 0 to 100 that represents the confidence that the answer is valid.
+        /// A <see cref="float"/> value from 0 to 100 that represents the confidence that the answer is valid.
         /// </value>
         [JsonProperty("confidence")]
-        public double Confidence { get; private set; }
+        public float Confidence { get; private set; }
 
         /// <summary>
         /// Gets a collection of candidate answers.
@@ -147,7 +113,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <value>
         /// A <see cref="IReadOnlyCollection{T}"/> object that contains the list of candidate answers.
         /// </value>
-        public IReadOnlyCollection<(string className, double score)> Candidates =>
-            new ReadOnlyCollection<(string, double)>(this.candidates);
+        public IReadOnlyCollection<(string className, float score)> Candidates =>
+            new ReadOnlyCollection<(string, float)>(this.candidates);
     }
 }

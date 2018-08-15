@@ -6,12 +6,16 @@
 
 namespace Genix.NetClassify
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Runtime.ExceptionServices;
     using System.Threading;
     using Genix.DocumentAnalysis;
     using Genix.DocumentAnalysis.Classification;
     using Genix.Imaging.Lab;
+    using Genix.Lab;
 
     internal sealed class Program
     {
@@ -24,8 +28,8 @@ namespace Genix.NetClassify
 
         private class InnerProgram : Lab.Program
         {
-            private Stopwatch totalTimeCounter = new Stopwatch();
-            private Stopwatch localTimeCounter = new Stopwatch();
+            private readonly Stopwatch totalTimeCounter = new Stopwatch();
+            private readonly Stopwatch localTimeCounter = new Stopwatch();
             private long totalImages = 0;
 
             protected override bool OnConfigure(string[] args)
@@ -36,7 +40,8 @@ namespace Genix.NetClassify
             protected override int OnRun()
             {
                 this.totalTimeCounter.Start();
-                this.Learn();
+                PointsOfInterestClassifier classifier = this.Learn();
+                this.Test(classifier);
                 this.totalTimeCounter.Stop();
                 return 0;
             }
@@ -53,35 +58,8 @@ namespace Genix.NetClassify
                 }
             }
 
-            private void Learn()
+            private PointsOfInterestClassifier Learn()
             {
-                ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
-                    (source, index) =>
-                    {
-                        this.StopwatchRestart();
-                    },
-                    (source, index, exception) =>
-                    {
-                        long duration = this.StopwatchStop();
-                        Interlocked.Increment(ref this.totalImages);
-
-                        this.Write(
-                            null,
-                            "({0})\tFile: {1} ... ",
-                            index,
-                            source.SourceId.ToFileName());
-
-                        if (exception != null)
-                        {
-                            this.WriteLine(null, "ERROR.");
-                            this.WriteException(null, exception);
-                        }
-                        else
-                        {
-                            this.WriteLine(null, "OK ({0} ms)", duration);
-                        }
-                    });
-
                 PointsOfInterestClassifier classifier = new PointsOfInterestClassifier();
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
@@ -92,12 +70,109 @@ namespace Genix.NetClassify
                         @"Z:\Test\Classification2\Data\Gerber_truth.txt",
                         "#Class");
 
+                    ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
+                        (source, index) =>
+                        {
+                            this.StopwatchRestart();
+                        },
+                        (source, index, answer, exception) =>
+                        {
+                            long duration = this.StopwatchStop();
+                            Interlocked.Increment(ref this.totalImages);
+
+                            this.Write(
+                                null,
+                                "({0})\tFile: {1} ... ",
+                                index,
+                                source.SourceId.ToFileName());
+
+                            if (exception != null)
+                            {
+                                this.WriteLine(null, "ERROR.");
+                                this.WriteException(null, exception);
+                            }
+                            else
+                            {
+                                this.WriteLine(null, "OK ({0} ms)", duration);
+                            }
+                        });
+
                     classifier.Train<TestImage>(
                         dataProvider.Generate(null),
                         (x, cancellationToken) => new ImageSource(x.SourceId, x.Image),
                         x => string.Concat(x.Labels),
                         progress,
                         CancellationToken.None);
+                }
+
+                return classifier;
+            }
+
+            private void Test(PointsOfInterestClassifier classifier)
+            {
+                List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();
+
+                using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
+                {
+                    dataProvider.AddDirectory(
+                        @"Z:\Test\Classification2\Data\Gerber_test.txt",
+                        false,
+                        @"Z:\Test\Classification2\Data\Gerber_truth.txt",
+                        "#Class");
+
+                    ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
+                        (source, index) =>
+                        {
+                            this.StopwatchRestart();
+                        },
+                        (source, index, answer, exception) =>
+                        {
+                            long duration = this.StopwatchStop();
+                            Interlocked.Increment(ref this.totalImages);
+
+                            this.Write(
+                                null,
+                                "({0})\tFile: {1} ... ",
+                                index,
+                                source.SourceId.ToFileName());
+
+                            if (exception != null)
+                            {
+                                this.WriteLine(null, "ERROR.");
+                                this.WriteException(null, exception);
+                            }
+                            else
+                            {
+                                this.WriteLine(
+                                    null,
+                                    "OK ({0} ms) {1} {2}",
+                                    duration,
+                                    answer?.ClassName ?? string.Empty,
+                                    answer?.Confidence ?? 0.0);
+                            }
+                        });
+
+                    foreach ((TestImage image, Answer answer) in classifier.Classify<TestImage>(
+                        dataProvider.Generate(null),
+                        (x, cancellationToken) => new ImageSource(x.SourceId, x.Image),
+                        progress,
+                        CancellationToken.None))
+                    {
+                        results.Add(new ClassificationResult<string>(
+                            answer.Id,
+                            answer.ClassName,
+                            string.Concat(image.Labels),
+                            (int)((100.0f * answer.Confidence) + 0.5f),
+                            answer.Confidence >= 1));
+                    }
+                }
+
+                // write report
+                ClassificationReport<string> testReport = new ClassificationReport<string>(results);
+                using (StreamWriter outputFile = new StreamWriter(Console.OpenStandardOutput()))
+                ////using (StreamWriter outputFile = File.CreateText(this.options.OutputFileName))
+                {
+                    ClassificationReportWriter<string>.WriteReport(outputFile, testReport);
                 }
             }
         }

@@ -109,11 +109,11 @@ namespace Genix.DocumentAnalysis.Classification
                     try
                     {
                         features = this.BuildFeatures(selector(source, cancellationToken), cancellationToken);
-                        progress?.OnClassified(source, index, null);
+                        progress?.OnClassified(source, index, null, null);
                     }
                     catch (Exception e)
                     {
-                        progress?.OnClassified(source, index, e);
+                        progress?.OnClassified(source, index, null, e);
                     }
 
                     return features;
@@ -200,11 +200,11 @@ namespace Genix.DocumentAnalysis.Classification
                         try
                         {
                             answer = this.Classify(features, cancellationToken);
-                            progress?.OnClassified(source, index, null);
+                            progress?.OnClassified(source, index, answer, null);
                         }
                         catch (Exception e)
                         {
-                            progress?.OnClassified(source, index, e);
+                            progress?.OnClassified(source, index, null, e);
                         }
                     }
 
@@ -228,7 +228,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <para>-or-</para>
         /// <para><paramref name="selector"/> is <b>null</b>.</para>
         /// </exception>
-        public IEnumerable<Answer> Classify<T>(
+        public IEnumerable<(T source, Answer answer)> Classify<T>(
             IEnumerable<T> sources,
             Func<T, CancellationToken, TSource> selector,
             IClassifierProgress<T> progress,
@@ -261,15 +261,15 @@ namespace Genix.DocumentAnalysis.Classification
                         try
                         {
                             answer = this.Classify(source, cancellationToken);
-                            progress?.OnClassified(element, index, null);
+                            progress?.OnClassified(element, index, answer, null);
                         }
                         catch (Exception e)
                         {
-                            progress?.OnClassified(element, index, e);
+                            progress?.OnClassified(element, index, null, e);
                         }
                     }
 
-                    return answer;
+                    return (element, answer);
                 });
         }
 
@@ -360,11 +360,11 @@ namespace Genix.DocumentAnalysis.Classification
                                         trainedCount++;
                                     }
 
-                                    progress?.OnClassified(element, index, null);
+                                    progress?.OnClassified(element, index, null, null);
                                 }
                                 catch (Exception e)
                                 {
-                                    progress?.OnClassified(element, index, e);
+                                    progress?.OnClassified(element, index, null, e);
                                 }
                             }
                         }

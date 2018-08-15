@@ -26,7 +26,8 @@ namespace Genix.DocumentAnalysis.Classification
         /// </summary>
         /// <param name="source">The data to classify.</param>
         /// <param name="index">The zero-based index of the data in the sequence.</param>
+        /// <param name="answer">The classification answer. <b>null</b> in learning mode.</param>
         /// <param name="exception">The exception that might have occurred during classification.</param>
-        void OnClassified(T source, int index, Exception exception);
+        void OnClassified(T source, int index, Answer answer, Exception exception);
     }
 }

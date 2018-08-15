@@ -71,7 +71,7 @@ namespace Genix.DocumentAnalysis.Classification
 
                     // calculate confidence
                     double normalizer = this.classes[answer].Normalizer;
-                    double confidence = Math.Exp(bestCandidate.score - normalizer);
+                    float confidence = (float)Math.Exp(bestCandidate.score - normalizer);
 
                     // scale answer confidence
                     confidence = ScaleConfidence(confidence);
@@ -79,31 +79,31 @@ namespace Genix.DocumentAnalysis.Classification
 
                     // scale confidences for the candidates
                     return new Answer(
-                        features,
+                        features.Id,
                         answer,
                         confidence,
-                        candidates.Select(x => (x.className, ScaleConfidence(Math.Exp(x.score - normalizer)))));
+                        candidates.Select(x => (x.className, ScaleConfidence((float)Math.Exp(x.score - normalizer)))));
                 }
             }
 
             // return blank answer if could not classify
-            return new Answer(features);
+            return new Answer(features.Id);
 
-            double ScaleConfidence(double inputConf)
+            float ScaleConfidence(float inputConf)
             {
-                double[][] grid = new double[][]
+                float[][] grid = new float[][]
                 {
-                    new double[] { 0, 0 },
-                    new double[] { 0.1, 0.01 },
-                    new double[] { 0.2, 0.025 },
-                    new double[] { 0.3, 0.07 },
-                    new double[] { 0.4, 0.3 },
-                    new double[] { 0.5, 0.55 },
-                    new double[] { 0.6, 0.8 },
-                    new double[] { 0.7, 0.88 },
-                    new double[] { 0.8, 0.93 },
-                    new double[] { 0.9, 0.965 },
-                    new double[] { 1, 1 },
+                    new float[] { 0, 0 },
+                    new float[] { 0.1f, 0.01f },
+                    new float[] { 0.2f, 0.025f },
+                    new float[] { 0.3f, 0.07f },
+                    new float[] { 0.4f, 0.3f },
+                    new float[] { 0.5f, 0.55f },
+                    new float[] { 0.6f, 0.8f },
+                    new float[] { 0.7f, 0.88f },
+                    new float[] { 0.8f, 0.93f },
+                    new float[] { 0.9f, 0.965f },
+                    new float[] { 1, 1 },
                 };
 
                 for (int i = 0, ii = grid.GetLength(0) - 1; i < ii; i++)
@@ -114,7 +114,7 @@ namespace Genix.DocumentAnalysis.Classification
                     }
                 }
 
-                return 1.0;
+                return 1.0f;
             }
         }
 

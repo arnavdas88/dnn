@@ -10,6 +10,8 @@ namespace Genix.MachineLearning.Clustering
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Genix.Core;
     using Genix.MachineLearning.Distances;
     using Newtonsoft.Json;
@@ -125,11 +127,13 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="x">The range of data points to assign.</param>
         /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(IList<IVector<float>> x, float[] result) => this.Assign(0, this.Count, x, result);
+        public float[] Assign(IList<IVector<float>> x, float[] result, CancellationToken cancellationToken) =>
+            this.Assign(0, this.Count, x, result, cancellationToken);
 
         /// <summary>
         /// Assigns the range of data points to feature vector containing the distance between each point and its assigned cluster.
@@ -138,21 +142,32 @@ namespace Genix.MachineLearning.Clustering
         /// <param name="count">The number of clusters to assign.</param>
         /// <param name="x">The range of data points to assign.</param>
         /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(int startingIndex, int count, IList<IVector<float>> x, float[] result)
+        public float[] Assign(int startingIndex, int count, IList<IVector<float>> x, float[] result, CancellationToken cancellationToken)
         {
             if (result == null)
             {
                 result = new float[x.Count];
             }
 
-            for (int i = 0, ii = x.Count; i < ii; i++)
-            {
-                this.Assign(startingIndex, count, x[i], out result[i]);
-            }
+            CommonParallel.For(
+                0,
+                x.Count,
+                (a, b) =>
+                {
+                    for (int i = a; i < b; i++)
+                    {
+                        this.Assign(startingIndex, count, x[i], out result[i]);
+                    }
+                },
+                new ParallelOptions()
+                {
+                    CancellationToken = cancellationToken,
+                });
 
             return result;
         }
@@ -162,7 +177,8 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
-        internal void RandomSeeding(IList<IVector<float>> x, IList<float> weights)
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
+        internal void RandomSeeding(IList<IVector<float>> x, IList<float> weights, CancellationToken cancellationToken)
         {
             Random random = new Random(0);
 
@@ -179,8 +195,10 @@ namespace Genix.MachineLearning.Clustering
             // make sure data points are different
             for (int centroid = 1; centroid < k; centroid++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 idx = Next();
-                while (!this.Take(centroid).Any(c => x[idx].Equals(c.Centroid, 0)))
+                while (this.Take(centroid).Any(c => x[idx].Equals(c.Centroid, 0)))
                 {
                     idx = Next();
                 }
@@ -199,8 +217,9 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <see href="https://en.wikipedia.org/wiki/K-means++"/>
-        internal void KMeansPlusPlusSeeding(IList<IVector<float>> x, IList<float> weights)
+        internal void KMeansPlusPlusSeeding(IList<IVector<float>> x, IList<float> weights, CancellationToken cancellationToken)
         {
             Random random = new Random(0);
 
@@ -215,8 +234,10 @@ namespace Genix.MachineLearning.Clustering
             float[] distances = new float[samples];
             for (int centroid = 1; centroid < k; centroid++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // 2. For each data point x, compute D(x), the distance between x and the nearest center that has already been chosen.
-                this.Assign(0, centroid, x, distances);
+                this.Assign(0, centroid, x, distances, cancellationToken);
 
                 // 3. Choose one new data point at random as a new center,
                 // using a weighted probability distribution where a point x is chosen with probability proportional to D(x)^2.

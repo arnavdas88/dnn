@@ -449,14 +449,41 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Calculates softmax probabilities for values in one array and stores calculated values in another array.
+        /// Calculates softmax probabilities for values of array in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives calculated probabilities. Can be <b>null</b>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
+        /// <param name="x">The source and destination array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SoftMax(int length, float[] x, int offx)
+        {
+            // compute max activation
+            float amax = Maximum.Max(length, x, offx);
+
+            // compute exponentials (carefully to not blow up)
+            float esum = 0.0f;
+            for (int i = 0; i < length; i++)
+            {
+                float e = (float)Math.Exp(x[offx + i] - amax);
+                esum += e;
+                x[offx + i] = e;
+            }
+
+            // normalize and output to sum to one
+            if (esum != 0.0f)
+            {
+                Math32f.DivC(length, esum, x, offx);
+            }
+        }
+
+        /// <summary>
+        /// Calculates softmax probabilities for values of array not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SoftMax(int length, float[] x, int offx, float[] y, int offy)
         {

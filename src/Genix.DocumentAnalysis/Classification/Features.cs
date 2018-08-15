@@ -22,27 +22,12 @@ namespace Genix.DocumentAnalysis.Classification
         /// <summary>
         /// Initializes a new instance of the <see cref="Features"/> class.
         /// </summary>
-        /// <param name="id">The unique identifier of the data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <param name="frameIndex">
-        /// The zero-based index for this data if it belongs to a multi-page file.
-        /// <b>null</b> if this data belongs to a single-page file.
-        /// </param>
-        protected Features(string id, string name, int? frameIndex)
-            : base(id, name, frameIndex)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Features"/> class,
-        /// using the <see cref="DataSource"/>.
-        /// </summary>
-        /// <param name="source">The data source used to build these features.</param>
+        /// <param name="id">The source of data.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="source"/> is <b>null</b>.
+        /// <paramref name="id"/> is <b>null</b>.
         /// </exception>
-        protected Features(DataSource source)
-            : base(source)
+        protected Features(DataSourceId id)
+            : base(id)
         {
         }
 

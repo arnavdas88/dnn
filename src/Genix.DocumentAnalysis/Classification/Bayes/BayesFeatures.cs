@@ -24,29 +24,15 @@ namespace Genix.DocumentAnalysis.Classification
         /// <summary>
         /// Initializes a new instance of the <see cref="BayesFeatures"/> class.
         /// </summary>
-        /// <param name="id">The unique identifier of the data.</param>
-        /// <param name="name">The name of the data.</param>
-        /// <param name="frameIndex">
-        /// The zero-based index for this data if it belongs to a multi-page file.
-        /// <b>null</b> if this data belongs to a single-page file.
-        /// </param>
-        /// <param name="words">The collection of words extracted from the data.</param>
-        public BayesFeatures(string id, string name, int? frameIndex, IEnumerable<string> words)
-            : base(id, name, frameIndex)
-        {
-            this.words.AddRange(words);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BayesFeatures"/> class.
-        /// </summary>
-        /// <param name="source">The data source used to build these features.</param>
+        /// <param name="id">The source of data.</param>
         /// <param name="words">The collection of words extracted from the data.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="source"/> is <b>null</b>.
+        /// <para><paramref name="id"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="words"/> is <b>null</b>.</para>
         /// </exception>
-        public BayesFeatures(DataSource source, IEnumerable<string> words)
-            : base(source)
+        public BayesFeatures(DataSourceId id, IEnumerable<string> words)
+            : base(id)
         {
             this.words.AddRange(words);
         }

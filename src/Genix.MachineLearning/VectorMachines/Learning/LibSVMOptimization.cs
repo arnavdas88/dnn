@@ -143,18 +143,10 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
             // initialize active set (for shrinking)
             int activeSize = numberOfVariables;
-            int[] activeSet = new int[numberOfVariables];
-            for (int i = 0; i < numberOfVariables; i++)
-            {
-                activeSet[i] = i;
-            }
+            int[] activeSet = Arrays.Indexes(numberOfVariables);
 
             // initialize index lookup vector
-            int[] indices = new int[numberOfVariables];
-            for (int i = 0; i < indices.Length; i++)
-            {
-                indices[i] = i;
-            }
+            int[] indices = Arrays.Indexes(numberOfVariables);
 
             // initialize gradient
             Array32f.Copy(numberOfVariables, p, 0, g, 0);

@@ -80,6 +80,25 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Creates an array of zero-based indexes of 32-bit integers.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <returns>
+        /// The allocated array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int[] Indexes(int length)
+        {
+            int[] a = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                a[i] = i;
+            }
+
+            return a;
+        }
+
+        /// <summary>
         /// Determines whether the two array contain same data.
         /// </summary>
         /// <param name="length">The number of elements to check.</param>

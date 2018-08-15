@@ -12,7 +12,7 @@ namespace Genix.Core
     /// Represents packed dense vectors of single-precision floating point numbers.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class DenseVectorPackF
+    public class DenseVectorPackF : IVectorPack<float>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DenseVectorPackF"/> class.
@@ -54,33 +54,15 @@ namespace Genix.Core
         {
         }
 
-        /// <summary>
-        /// Gets the number of vectors in <see cref="X"/>.
-        /// </summary>
-        /// <value>
-        /// The number of vectors.
-        /// </value>
+        /// <inheritdoc />
         [JsonProperty("count")]
         public int Count { get; private set; }
 
-        /// <summary>
-        /// Gets the length of each vector in <see cref="X"/>.
-        /// </summary>
-        /// <value>
-        /// The length of each vector.
-        /// </value>
+        /// <inheritdoc />
         [JsonProperty("length")]
         public int Length { get; private set; }
 
-        /// <summary>
-        /// Gets the packed vectors.
-        /// </summary>
-        /// <value>
-        /// The packed vectors.
-        /// </value>
-        /// <remarks>
-        /// The total number of vectors contained in this property is <see cref="Count"/> * <see cref="Length"/>.
-        /// </remarks>
+        /// <inheritdoc />
         [JsonProperty("x")]
         public float[] X { get; private set; }
     }

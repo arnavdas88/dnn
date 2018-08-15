@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis.Classification
 {
     using System;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -25,14 +26,16 @@ namespace Genix.DocumentAnalysis.Classification
         /// Initializes a new instance of the <see cref="PointsOfInterestFeatures"/> class.
         /// </summary>
         /// <param name="features">The features (points of interest) extracted from an <see cref="Imaging.Image"/>.</param>
-        public PointsOfInterestFeatures(FeatureDetectors.Features features)
+        /// <param name="id">The source of data.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="id"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="features"/> is <b>null</b>.</para>
+        /// </exception>
+        public PointsOfInterestFeatures(DataSourceId id, FeatureDetectors.Features features)
+            : base(id)
         {
-            if (features == null)
-            {
-                throw new ArgumentNullException(nameof(features));
-            }
-
-            this.features = features;
+            this.features = features ?? throw new ArgumentNullException(nameof(features));
         }
 
         /// <summary>

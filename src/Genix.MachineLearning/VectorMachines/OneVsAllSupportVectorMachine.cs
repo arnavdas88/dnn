@@ -189,10 +189,11 @@ namespace Genix.MachineLearning.VectorMachines
         /// </summary>
         /// <param name="x">The input vector.</param>
         /// <param name="result">The array that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the machine that the operation should be canceled.</param>
         /// <returns>
         /// The array of length <see cref="NumberOfClasses"/> that contains calculated association between <paramref name="x"/> and each class.
         /// </returns>
-        public float[] Classify(float[] x, float[] result)
+        public float[] Classify(float[] x, float[] result, CancellationToken cancellationToken)
         {
             if (result == null)
             {
@@ -210,7 +211,10 @@ namespace Genix.MachineLearning.VectorMachines
                         result[i] = this.machines[i].Classify(x);
                     }
                 },
-                new ParallelOptions());
+                new ParallelOptions()
+                {
+                    CancellationToken = cancellationToken,
+                });
 
             return result;
         }

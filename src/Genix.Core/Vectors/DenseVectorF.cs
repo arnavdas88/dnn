@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Runtime.CompilerServices;
     using Newtonsoft.Json;
 
@@ -14,7 +15,7 @@ namespace Genix.Core
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public struct DenseVectorF
-        : IVector<float>
+        : IEquatable<DenseVectorF>, IVector<float>
     {
         /// <summary>
         /// The values of the elements.
@@ -47,6 +48,30 @@ namespace Genix.Core
 
         /// <inheritdoc />
         public int Length => this.X.Length;
+
+        /// <inheritdoc />
+        public bool Equals(DenseVectorF other)
+        {
+            return this.Length == other.Length &&
+                (this.Length == 0 || Arrays.Equals(this.X.Length, this.X, 0, other.X, 0));
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (!(obj is DenseVectorF))
+            {
+                return false;
+            }
+
+            return this.Equals((DenseVectorF)obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return (int)CRC.Calculate(this.X);
+        }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -116,7 +116,7 @@ namespace Genix.NetClassify
                         ////this.Write(".");
                         this.Write(
                             null,
-                            "({0})\tFile: {1} ... {2} {3} OK ({4} ms).",
+                            "({0})\tFile: {1} ... OK ({4} ms) {2} {3}",
                             this.totalImages,
                             sample.SourceId.ToFileName(),
                             answer,

@@ -60,6 +60,61 @@ namespace System.Linq
             return source.ShuffleIterator(random, 10);
         }
 
+        /// <summary>
+        /// Creates a <see cref="Dictionary{TKey, TValue}"/> from an <see cref="IEnumerable{T}"/> 
+        /// according to specified key selector and element selector functions.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <typeparam name="TKey">The type of the key returned by <paramref name="keySelector"/>.</typeparam>
+        /// <typeparam name="TElement">The type of the value returned by <paramref name="elementSelector"/>.</typeparam>
+        /// <param name="source">An <see cref="IEnumerable{T}"/> to create a <see cref="Dictionary{TKey, TValue}"/> from.</param>
+        /// <param name="keySelector">A function to extract a key from each element.</param>
+        /// <param name="elementSelector">A transform function to produce a result element value from each element.</param>
+        /// <returns>
+        /// A <see cref="Dictionary{TKey, TValue}"/> that contains values of type <typeparamref name="TElement"/> selected from the input sequence.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="source"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="keySelector"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="elementSelector"/> is <b>null</b>.</para>
+        /// </exception>
+        public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(
+            this IEnumerable<TSource> source,
+            Func<TSource, int, TKey> keySelector,
+            Func<TSource, int, TElement> elementSelector)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (keySelector == null)
+            {
+                throw new ArgumentNullException(nameof(keySelector));
+            }
+
+            if (elementSelector == null)
+            {
+                throw new ArgumentNullException(nameof(elementSelector));
+            }
+
+            Dictionary<TKey, TElement> result =
+                source is ICollection<TSource> collection ?
+                new Dictionary<TKey, TElement>(collection.Count) :
+                new Dictionary<TKey, TElement>();
+
+            int index = -1;
+            foreach (TSource element in source)
+            {
+                index++;
+                result.Add(keySelector(element, index), elementSelector(element, index));
+            }
+
+            return result;
+        }
+
         private static IEnumerable<T> ShuffleIterator<T>(this IEnumerable<T> source, Random random, int bufferSize)
         {
             List<T> buffer = new List<T>(bufferSize);

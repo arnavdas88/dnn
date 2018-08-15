@@ -115,6 +115,19 @@ namespace Genix.Imaging
             }
         }
 
+        /// <summary>
+        /// Returns a critical sum for this <see cref="Image"/>.
+        /// </summary>
+        /// <returns>
+        /// A value that specifies a critical sum for this <see cref="Image"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public uint GetCRC()
+        {
+            return CRC.Calculate(this.Bits);
+        }
+
         private static partial class NativeMethods
         {
             private const string DllName = "Genix.Imaging.Native.dll";

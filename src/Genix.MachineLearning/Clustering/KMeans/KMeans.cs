@@ -11,6 +11,7 @@ namespace Genix.MachineLearning.Clustering
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
+    using System.Threading;
     using System.Threading.Tasks;
     using Genix.Core;
     using Genix.MachineLearning.Distances;
@@ -80,8 +81,9 @@ namespace Genix.MachineLearning.Clustering
         /// <param name="distance">The distance function.</param>
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the classifier that the operation should be canceled.</param>
         /// <returns>
-        /// The <see cref="KMeans"/> clusterizer learned by this metthod.
+        /// The <see cref="KMeans"/> clusterizer learned by this method.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="x"/> is <b>null</b>.</para>
@@ -96,7 +98,8 @@ namespace Genix.MachineLearning.Clustering
             KMeansSeeding seeding,
             IVectorDistance<float, IVector<float>, float> distance,
             IList<IVector<float>> x,
-            IList<float> weights)
+            IList<float> weights,
+            CancellationToken cancellationToken)
         {
             if (x == null)
             {
@@ -114,29 +117,33 @@ namespace Genix.MachineLearning.Clustering
 #if false
             NativeMethods.kmeans(k, 1, dimension, sampleCount, x);
 #else
-            int maxiter = 20;
+            int maxiter = 2;
 
             KMeansClusterCollection clusters = new KMeansClusterCollection(k, dimension, distance);
             switch (seeding)
             {
                 case KMeansSeeding.KMeansPlusPlus:
-                    clusters.KMeansPlusPlusSeeding(x, weights);
+                    clusters.KMeansPlusPlusSeeding(x, weights, cancellationToken);
                     break;
 
                 default:
-                    clusters.RandomSeeding(x, weights);
+                    clusters.RandomSeeding(x, weights, cancellationToken);
                     break;
             }
 
-            float[] countsmeans = new float[k * (dimension + 1)];
+            float[] counts = new float[k];
+            float[] means = new float[k * dimension];
             object sync = new object();
 
             for (int iter = 0; iter < maxiter; iter++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // reset means and counts
                 if (iter > 0)
                 {
-                    Array32f.Set(countsmeans.Length, 0.0f, countsmeans, 0);
+                    Array32f.Set(counts.Length, 0.0f, counts, 0);
+                    Array32f.Set(means.Length, 0.0f, means, 0);
                 }
 
                 // assign vectors to new clusters
@@ -145,31 +152,32 @@ namespace Genix.MachineLearning.Clustering
                     sampleCount,
                     (a, b) =>
                     {
-                        float[] local = new float[countsmeans.Length];
+                        float[] lcounts = new float[counts.Length];
+                        float[] lmeans = new float[means.Length];
 
                         for (int i = a; i < b; i++)
                         {
                             int index = clusters.Assign(x[i]);
                             float weight = weights?[i] ?? 1.0f;
 
-                            int off = index * (dimension + 1);
-                            local[off] += weight;
-                            x[i].AddProductC(weight, local, off + 1);
+                            lcounts[index] += weight;
+                            x[i].AddProductC(weight, lmeans, index * dimension);
                         }
 
                         lock (sync)
                         {
-                            Math32f.Add(countsmeans.Length, local, 0, countsmeans, 0);
+                            Math32f.Add(lcounts.Length, lcounts, 0, counts, 0);
+                            Math32f.Add(lmeans.Length, lmeans, 0, means, 0);
                         }
                     },
                     new ParallelOptions());
 
                 // calculate new centroids
-                for (int i = 0, off = 0; i < k; i++, off += dimension + 1)
+                for (int i = 0, off = 0; i < k; i++, off += dimension)
                 {
-                    if (countsmeans[off] != 0)
+                    if (counts[i] != 0)
                     {
-                        Math32f.DivC(dimension, countsmeans, off + 1, countsmeans[off], clusters[i].Centroid, 0);
+                        Math32f.DivC(dimension, means, off, counts[i], clusters[i].Centroid, 0);
                     }
                 }
             }
@@ -206,28 +214,104 @@ namespace Genix.MachineLearning.Clustering
         /// Assigns the range of data points to feature vector containing the distance between each point and its assigned cluster.
         /// </summary>
         /// <param name="x">The range of data points to assign.</param>
+        /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(IList<IVector<float>> x) => this.clusters.Assign(x, null);
+        public float[] Assign(IList<IVector<float>> x, float[] result, CancellationToken cancellationToken) =>
+            this.clusters.Assign(x, result, cancellationToken);
 
         /// <summary>
         /// Creates a feature vector by assigning each data point in <paramref name="x"/> to one of the clusters.
         /// </summary>
         /// <param name="x">The data points to assign.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each data point. Can be <b>null</b>.</param>
+        /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
         /// The feature vector of length <see cref="K"/>.
         /// Each element of the feature vector contains the number of data points assigned to corresponding cluster.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Transform(IList<IVector<float>> x)
+        public float[] Transform(IList<IVector<float>> x, IList<float> weights, float[] result, CancellationToken cancellationToken)
         {
-            float[] result = new float[this.K];
-            for (int i = 0, ii = result.Length; i < ii; i++)
+            if (result == null)
             {
-                int cluster = this.Assign(x[i]);
-                result[cluster] += 1.0f;
+                result = new float[this.K];
+            }
+
+            if (weights == null)
+            {
+                for (int i = 0, ii = x.Count; i < ii; i++)
+                {
+                    int cluster = this.Assign(x[i]);
+                    result[cluster] += 1.0f;
+                }
+            }
+            else
+            {
+                if (weights.Count != x.Count)
+                {
+                    throw new ArgumentException("The number of weights must match the number of input vectors.", nameof(weights));
+                }
+
+                for (int i = 0, ii = x.Count; i < ii; i++)
+                {
+                    int cluster = this.Assign(x[i]);
+                    result[cluster] += weights[i];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a feature vector by assigning each data point in <paramref name="x"/> to one of the clusters.
+        /// </summary>
+        /// <param name="x">The data points to assign.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each data point. Can be <b>null</b>.</param>
+        /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
+        /// <returns>
+        /// The feature vector of length <see cref="K"/>.
+        /// Each element of the feature vector contains the number of data points assigned to corresponding cluster.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float[] Transform(IVectorPack<float> x, IList<float> weights, float[] result, CancellationToken cancellationToken)
+        {
+            if (result == null)
+            {
+                result = new float[this.K];
+            }
+
+            if (weights == null)
+            {
+                for (int i = 0, ii = x.Count, len = x.Length, off = 0; i < ii; i++, off += len)
+                {
+                    int cluster = this.Assign(new DenseVectorProxyF(len, x.X, off));
+                    result[cluster] += 1.0f;
+                }
+            }
+            else
+            {
+                if (weights.Count != x.Count)
+                {
+                    throw new ArgumentException("The number of weights must match the number of input vectors.", nameof(weights));
+                }
+
+                for (int i = 0, ii = x.Count, len = x.Length, off = 0; i < ii; i++, off += len)
+                {
+                    int cluster = this.Assign(new DenseVectorProxyF(len, x.X, off));
+                    result[cluster] += weights[i];
+                }
             }
 
             return result;

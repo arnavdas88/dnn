@@ -16,7 +16,7 @@ namespace Genix.DocumentAnalysis.Classification
         : IClassifierProgress<T>
     {
         private readonly Action<T, int> classifyingHandler = null;
-        private readonly Action<T, int, Exception> classifiedHandler = null;
+        private readonly Action<T, int, Answer, Exception> classifiedHandler = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassifierProgress{T}"/> class.
@@ -33,7 +33,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <param name="classifiedHandler">The handler to invoke when the data is classified.</param>
         public ClassifierProgress(
             Action<T, int> classifyingHandler,
-            Action<T, int, Exception> classifiedHandler)
+            Action<T, int, Answer, Exception> classifiedHandler)
         {
             this.classifyingHandler = classifyingHandler;
             this.classifiedHandler = classifiedHandler;
@@ -54,10 +54,11 @@ namespace Genix.DocumentAnalysis.Classification
         /// </summary>
         /// <param name="source">The data to classify.</param>
         /// <param name="index">The zero-based index of the data in the sequence.</param>
+        /// <param name="answer">The classification answer. <b>null</b> in learning mode.</param>
         /// <param name="exception">The exception that might have occurred during classification.</param>
-        public virtual void OnClassified(T source, int index, Exception exception)
+        public virtual void OnClassified(T source, int index, Answer answer, Exception exception)
         {
-            this.classifiedHandler?.Invoke(source, index, exception);
+            this.classifiedHandler?.Invoke(source, index, answer, exception);
         }
     }
 }

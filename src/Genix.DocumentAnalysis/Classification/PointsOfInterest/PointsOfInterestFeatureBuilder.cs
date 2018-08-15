@@ -7,9 +7,9 @@
 namespace Genix.DocumentAnalysis.Classification
 {
     using System;
-    using System.Drawing;
     using System.Threading;
     using Genix.DocumentAnalysis.FeatureDetectors;
+    using Genix.Imaging;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -73,9 +73,16 @@ namespace Genix.DocumentAnalysis.Classification
                 throw new ArgumentNullException(nameof(source));
             }
 
-            Imaging.Image image = ImagePreprocessing.Process(source.Image, this.ImageEnhancingOptions, 8);
+            Image image = ImagePreprocessing.Process(source.Image, this.ImageEnhancingOptions, 8);
+
+            image = image.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, Imaging.ScalingOptions.None);
+            image = image.Convert8To1(128);
+            image = image.Dilate(StructuringElement.Rectangle(5, 1), 1);
+            image = image.Dilate(StructuringElement.Rectangle(1, 5), 1);
+            image = image.Convert1To8();
+
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
-            return new PointsOfInterestFeatures(features);
+            return new PointsOfInterestFeatures(source.Id, features);
         }
     }
 }

@@ -20,6 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\Debug\Genix.Core.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -27,6 +28,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\Release\Genix.Core.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -49,6 +51,7 @@
     <Compile Include="Collections\LinkedCollection.cs" />
     <Compile Include="Collections\LinkedCollectionItem.cs" />
     <Compile Include="Collections\QuadTree.cs" />
+    <Compile Include="Cryptography\CRC.cs" />
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\Nonlinearity.cs" />
     <Compile Include="Math\Arrays.cs" />
+    <Compile Include="Vectors\IVectorPack.cs" />
     <Compile Include="Vectors\SparseVectorF.cs" />
     <Compile Include="Math\Swapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

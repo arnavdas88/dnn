@@ -37,18 +37,26 @@ namespace Genix.Core
         public float[] X;
 
         /// <summary>
+        /// The vector length.
+        /// </summary>
+        [JsonProperty("length")]
+        private int length;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SparseVectorF"/> struct.
         /// </summary>
+        /// <param name="length">The vector length.</param>
         /// <param name="idx">The indexes of the elements.</param>
         /// <param name="x">The values of the elements.</param>
-        private SparseVectorF(int[] idx, float[] x)
+        private SparseVectorF(int length, int[] idx, float[] x)
         {
+            this.length = length;
             this.Idx = idx;
             this.X = x;
         }
 
         /// <inheritdoc />
-        public int Length => this.Idx.Length;
+        public int Length => this.length;
 
         /// <summary>
         /// Create a <see cref="SparseVectorF"/> vector from a dense vector's non-zero elements.
@@ -87,7 +95,7 @@ namespace Genix.Core
                 }
             }
 
-            return new SparseVectorF(/*length, count,*/ idx, vals);
+            return new SparseVectorF(length, idx, vals);
         }
 
         /// <inheritdoc />
@@ -112,42 +120,41 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha) => Math32f.AddC(this.X.Length, alpha, this.X, 0);
+        public void AddC(float alpha) => Math32f.AddC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha) => Math32f.SubC(this.X.Length, alpha, this.X, 0);
+        public void SubC(float alpha) => Math32f.SubC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha) => Math32f.MulC(this.X.Length, alpha, this.X, 0);
+        public void MulC(float alpha) => Math32f.MulC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Math32f.DivC(this.X.Length, alpha, this.X, 0);
+        public void DivC(float alpha) => Math32f.DivC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(float alpha, float[] y, int offy) => NativeMethods.sparse_addproductc_f32(this.X.Length, this.Idx, this.X, alpha, y, offy);
+        public void AddProductC(float alpha, float[] y, int offy) => NativeMethods.sparse_addproductc_f32(this.Idx.Length, this.Idx, this.X, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float ManhattanDistance(float[] y, int offy) => NativeMethods.sparse_manhattan_distance_f32(this.X.Length, this.Idx, this.X, y, offy);
+        public float ManhattanDistance(float[] y, int offy) => NativeMethods.sparse_manhattan_distance_f32(this.Idx.Length, this.Idx, this.X, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float EuclideanDistance(float[] y, int offy) => NativeMethods.sparse_euclidean_distance_f32(this.X.Length, this.Idx, this.X, y, offy);
+        public float EuclideanDistance(float[] y, int offy) => NativeMethods.sparse_euclidean_distance_f32(this.Idx.Length, this.Idx, this.X, y, offy);
 
         /// <summary>
         /// Converts this <see cref="SparseVectorF"/> vector into a dense vector.
         /// </summary>
-        /// <param name="length">The length of a dense vector.</param>
         /// <returns>
         /// The dense vector this method creates.
         /// </returns>
-        public float[] ToDense(int length)
+        public float[] ToDense()
         {
-            float[] dense = new float[length];
+            float[] dense = new float[this.length];
             this.Copy(dense, 0);
             return dense;
         }

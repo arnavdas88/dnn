@@ -49,7 +49,7 @@ namespace Genix.DocumentAnalysis.Classification
             }
 
             IList<string> words = GetWordsPage();
-            return new BayesFeatures(source, words);
+            return new BayesFeatures(source.Id, words);
 
             IList<string> GetWordsPage()
             {

@@ -9,6 +9,7 @@ namespace Genix.Imaging
     using System;
     using System.Diagnostics;
     using System.Drawing;
+    using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
@@ -26,10 +27,22 @@ namespace Genix.Imaging
         /// <returns>
         /// A new scaled <see cref="Image"/>.
         /// </returns>
-        public Image Scale(double scaleFactor, ScalingOptions options)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Scale(double scaleFactor, ScalingOptions options) => this.Scale(scaleFactor, scaleFactor, options);
+
+        /// <summary>
+        /// Scales this <see cref="Image"/> in both dimensions without changing its resolution.
+        /// </summary>
+        /// <param name="scaleFactorX">The horizontal scaling factor.</param>
+        /// <param name="scaleFactorY">The vertical scaling factor.</param>
+        /// <param name="options">The scaling options.</param>
+        /// <returns>
+        /// A new scaled <see cref="Image"/>.
+        /// </returns>
+        public Image Scale(double scaleFactorX, double scaleFactorY, ScalingOptions options)
         {
-            int newWidth = (int)((this.Width * scaleFactor) + 0.5);
-            int newHeight = (int)((this.Height * scaleFactor) + 0.5);
+            int newWidth = (int)((this.Width * scaleFactorX) + 0.5);
+            int newHeight = (int)((this.Height * scaleFactorY) + 0.5);
 
             return this.ScaleToSize(newWidth, newHeight, options);
         }
