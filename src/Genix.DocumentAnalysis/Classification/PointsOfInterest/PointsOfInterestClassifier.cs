@@ -25,7 +25,7 @@ namespace Genix.DocumentAnalysis.Classification
         private List<(FeatureDetectors.Features features, string truth)> features = null;
 
         [JsonProperty("kmeans")]
-        private KMeans kmeans = null;
+        private KMeans<IVector<float>> kmeans = null;
 
         [JsonProperty("svm")]
         private SupportVectorMachine svm = null;
@@ -73,11 +73,10 @@ namespace Genix.DocumentAnalysis.Classification
         {
             // learn k-means
             int dimension = this.features[0].features.Length;
-            this.kmeans = new KMeans(512, this.features[0].features.Length, default(EuclideanDistance));
+            this.kmeans = new KMeans<IVector<float>>(512, this.features[0].features.Length, default(EuclideanDistance));
 
-            NumericTable<float> data = new NumericTable<float>();
-            data.AddRange(this.features.SelectMany(x => x.features.Vectors.Partition(dimension)));
-            this.kmeans.Learn(data);
+            IList<float[]> x = this.features.SelectMany(f => f.features.Vectors.Partition(dimension)).ToList();
+            ////this.kmeans.Learn(x, null);
             /*this.features.SelectMany(x => x.features.Vectors).ToArray());*/
         }
 

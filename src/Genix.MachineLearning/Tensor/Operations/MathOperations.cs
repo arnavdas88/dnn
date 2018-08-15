@@ -1079,7 +1079,7 @@ namespace Genix.MachineLearning
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        Arrays.Copy(ylen, bias.Weights, 0, y.Weights, 0);
+                        Array32f.Copy(ylen, bias.Weights, 0, y.Weights, 0);
                         cleary = false;
                     }
 

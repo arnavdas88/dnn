@@ -17,17 +17,18 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         /// <summary>
         /// Learns a Support Vector Machines (SVM) that can map the given inputs to the given outputs.
         /// </summary>
-        /// <param name="samples">
-        /// The samples used for learning.
-        /// Each sample consists of input vector <c>x</c>,
-        /// expected binary output <c>y</c>,
-        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
-        /// </param>
+        /// <param name="x">The input vectors <paramref name="x"/>.</param>
+        /// <param name="y">The expected binary output <paramref name="y"/>.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each input vector (if supported by the learning algorithm).</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the machine that the operation should be canceled.</param>
         /// <returns>
         /// The <see cref="SupportVectorMachine"/> learned by this method.
-        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
+        /// A model that has learned how to produce <paramref name="y"/> given <paramref name="x"/>.
         /// </returns>
-        SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples, CancellationToken cancellationToken);
+        SupportVectorMachine Learn(
+            IList<float[]> x,
+            IList<bool> y,
+            IList<float> weights,
+            CancellationToken cancellationToken);
     }
 }

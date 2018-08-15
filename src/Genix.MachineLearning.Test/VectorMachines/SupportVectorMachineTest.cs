@@ -54,7 +54,12 @@
                 Tolerance = 0.01f,
             };
 
-            SupportVectorMachine machine = SupportVectorMachine.Learn(smo, samples.Take(LearnCount).ToList(), CancellationToken.None);
+            SupportVectorMachine machine = SupportVectorMachine.Learn(
+                smo,
+                samples.Take(LearnCount).Select(x => x.x).ToList(),
+                samples.Take(LearnCount).Select(x => x.y).ToList(),
+                samples.Take(LearnCount).Select(x => x.weight).ToList(),
+                CancellationToken.None);
 
             // test
             List<ClassificationResult<bool?>> results = samples

@@ -263,7 +263,7 @@ namespace Genix.Imaging
                 {
                     for (int iyc = 0; iyc < blockSize; iyc++)
                     {
-                        Arrays.Copy(blockLengthInBins, hist[iyc], offh, blocks, offblock);
+                        Array32f.Copy(blockLengthInBins, hist[iyc], offh, blocks, offblock);
                         offblock += blockLengthInBins;
                     }
                 }

@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -20,7 +21,7 @@ namespace Genix.Core
     /// Each array has <see cref="Length"/> elements.
     /// </para>
     /// </remarks>
-    public struct SparseVectorF
+    public struct SparseVectorF : IVector<float>
     {
         /// <summary>
         /// The indexes of the elements.
@@ -93,6 +94,50 @@ namespace Genix.Core
             return new SparseVectorF(/*length, count,*/ idx, vals);
         }
 
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Copy(float[] y, int offy)
+        {
+            int[] idx = this.Idx;
+            float[] x = this.X;
+
+            for (int i = 0, ii = idx.Length; i < ii; i++)
+            {
+                y[offy + idx[i]] = x[i];
+            }
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(float[] y, int offy)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddC(float alpha) => Math32f.AddC(this.X.Length, alpha, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SubC(float alpha) => Math32f.SubC(this.X.Length, alpha, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MulC(float alpha) => Math32f.MulC(this.X.Length, alpha, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DivC(float alpha) => Math32f.DivC(this.X.Length, alpha, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float ManhattanDistance(float[] y, int offy) => NativeMethods.sparse_manhattan_distance_f32(this.X.Length, this.Idx, this.X, y, offy);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float EuclideanDistance(float[] y, int offy) => NativeMethods.sparse_euclidean_distance_f32(this.X.Length, this.Idx, this.X, y, offy);
+
         /// <summary>
         /// Converts this <see cref="SparseVectorF"/> vector into a dense vector.
         /// </summary>
@@ -103,84 +148,8 @@ namespace Genix.Core
         public float[] ToDense(int length)
         {
             float[] dense = new float[length];
-
-            int[] idx = this.Idx;
-            float[] x = this.X;
-
-            for (int i = 0, ii = idx.Length; i < ii; i++)
-            {
-                dense[idx[i]] = x[i];
-            }
-
+            this.Copy(dense, 0);
             return dense;
-        }
-
-        /// <summary>
-        /// Adds a constant value to each element of the <see cref="SparseVectorF"/>.
-        /// </summary>
-        /// <param name="alpha">The scalar to add.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha)
-        {
-            Math32f.AddC(this.X.Length, alpha, this.X, 0);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of the <see cref="SparseVectorF"/>.
-        /// </summary>
-        /// <param name="alpha">The scalar to subtract.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha)
-        {
-            Math32f.SubC(this.X.Length, alpha, this.X, 0);
-        }
-
-        /// <summary>
-        /// Multiplies each element of the <see cref="SparseVectorF"/> by a constant value in-place.
-        /// </summary>
-        /// <param name="alpha">The scalar to multiply.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha)
-        {
-            Math32f.MulC(this.X.Length, alpha, this.X, 0);
-        }
-
-        /// <summary>
-        /// Divides each element of the <see cref="SparseVectorF"/> by a constant value in-place.
-        /// </summary>
-        /// <param name="alpha">The scalar to divide.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha)
-        {
-            Math32f.DivC(this.X.Length, alpha, this.X, 0);
-        }
-
-        /// <summary>
-        /// Computes the Manhattan distance between elements of this <see cref="SparseVectorF"/> and the dense vector.
-        /// </summary>
-        /// <param name="x">The dense vector <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The Manhattan distance between elements of two vectors.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float ManhattanDistance(float[] x, int offx)
-        {
-            return NativeMethods.sparse_manhattan_distance_f32(this.X.Length, this.Idx, this.X, x, offx);
-        }
-
-        /// <summary>
-        /// Computes the Euclidean distance between elements of this <see cref="SparseVectorF"/> and the dense vector.
-        /// </summary>
-        /// <param name="x">The dense vector <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The Euclidean distance between elements of two vectors.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float EuclideanDistance(float[] x, int offx)
-        {
-            return NativeMethods.sparse_euclidean_distance_f32(this.X.Length, this.Idx, this.X, x, offx);
         }
 
         private static class NativeMethods

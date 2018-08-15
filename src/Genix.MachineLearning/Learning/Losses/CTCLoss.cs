@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Learning
             {
                 if (calculateGradient)
                 {
-                    Arrays.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    Array32f.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 // not enough elements to compute
@@ -79,7 +79,7 @@ namespace Genix.MachineLearning.Learning
             {
                 if (calculateGradient)
                 {
-                    Arrays.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
+                    Array32f.Copy(y.Length, y.Weights, 0, y.Gradient, 0);
                 }
 
                 return float.PositiveInfinity;

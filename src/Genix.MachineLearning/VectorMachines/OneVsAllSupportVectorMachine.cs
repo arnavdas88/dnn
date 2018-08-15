@@ -82,30 +82,34 @@ namespace Genix.MachineLearning.VectorMachines
         /// </summary>
         /// <param name="trainer">The learning algorithm.</param>
         /// <param name="numberOfClasses">The number of classes.</param>
-        /// <param name="samples">
-        /// The samples used for learning.
-        /// Each sample consists of input vector <c>x</c>,
-        /// expected output <c>y</c> (the zero-based index of the class),
-        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
-        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
-        /// </param>
+        /// <param name="x">The input vectors <paramref name="x"/>.</param>
+        /// <param name="y">The expected binary output <paramref name="y"/>.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each input vector (if supported by the learning algorithm).</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the machine that the operation should be canceled.</param>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="trainer"/> is <b>null</b>.</para>
         /// <para>-or-</para>
-        /// <para><paramref name="samples"/> is <b>null</b>.</para>
+        /// <para><paramref name="x"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="y"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para><paramref name="numberOfClasses"/> is less than 2.</para>
+        /// <para>-or-</para>
+        /// <para>The number of elements in <paramref name="y"/> does not match the number of elements in <paramref name="x"/>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
         /// </exception>
         /// <returns>
         /// The <see cref="OneVsAllSupportVectorMachine"/> learned by this method.
-        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
+        /// A model that has learned how to produce <paramref name="y"/> given <paramref name="x"/>.
         /// </returns>
         public static OneVsAllSupportVectorMachine Learn(
             ISupportVectorMachineLearning trainer,
             int numberOfClasses,
-            IList<(float[] x, int y, float weight)> samples,
+            IList<float[]> x,
+            IList<int> y,
+            IList<float> weights,
             CancellationToken cancellationToken)
         {
             if (trainer == null)
@@ -113,9 +117,14 @@ namespace Genix.MachineLearning.VectorMachines
                 throw new ArgumentNullException(nameof(trainer));
             }
 
-            if (samples == null)
+            if (x == null)
             {
-                throw new ArgumentNullException(nameof(samples));
+                throw new ArgumentNullException(nameof(x));
+            }
+
+            if (y == null)
+            {
+                throw new ArgumentNullException(nameof(y));
             }
 
             if (numberOfClasses < 2)
@@ -123,10 +132,16 @@ namespace Genix.MachineLearning.VectorMachines
                 throw new ArgumentException("The machine must have at least two classes.", nameof(numberOfClasses));
             }
 
+            if (y.Count != x.Count)
+            {
+                throw new ArgumentException("The number of output labels must match the number of input vectors.", nameof(y));
+            }
+
             // create the machines
             SupportVectorMachine[] machines = new SupportVectorMachine[numberOfClasses];
 
             // train each machine
+            int sampleCount = x.Count;
             CommonParallel.For(
                 0,
                 machines.Length,
@@ -134,13 +149,13 @@ namespace Genix.MachineLearning.VectorMachines
                 {
                     for (int i = a; i < b; i++)
                     {
-                        (float[] x, bool y, float weight)[] binaryProblem = new (float[], bool, float)[samples.Count];
-                        for (int j = 0, jj = samples.Count; j < jj; j++)
+                        bool[] expected = new bool[sampleCount];
+                        for (int j = 0; j < sampleCount; j++)
                         {
-                            binaryProblem[j] = (samples[j].x, samples[j].y == i, samples[j].weight);
+                            expected[j] = y[j] == i;
                         }
 
-                        machines[i] = SupportVectorMachine.Learn(trainer, binaryProblem, cancellationToken);
+                        machines[i] = SupportVectorMachine.Learn(trainer, x, expected, weights, cancellationToken);
                     }
                 },
                 new ParallelOptions()

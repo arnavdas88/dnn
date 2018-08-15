@@ -76,14 +76,14 @@ namespace Genix.MachineLearning.Learning
                     // apply Nesterov momentum
                     // dx = velocity = momentum^2 * velocity - (1 + momentum) * learningRate * g
                     Mathematics.MultiplyAndAdd(gradient.Length, momentum * momentum, velocity, 0, -(1.0f + momentum) * learningRate, gradient, 0);
-                    Arrays.Copy(gradient.Length, gradient, 0, velocity, 0);
+                    Array32f.Copy(gradient.Length, gradient, 0, velocity, 0);
                 }
                 else
                 {
                     // momentum update
                     // dx = velocity = momentum * velocity - learningRate * g
                     Mathematics.MultiplyAndAdd(gradient.Length, momentum, velocity, 0, -learningRate, gradient, 0);
-                    Arrays.Copy(gradient.Length, gradient, 0, velocity, 0);
+                    Array32f.Copy(gradient.Length, gradient, 0, velocity, 0);
                 }
             }
             else

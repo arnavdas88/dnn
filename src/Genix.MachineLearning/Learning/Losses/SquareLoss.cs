@@ -43,7 +43,7 @@ namespace Genix.MachineLearning.Learning
 
             if (calculateGradient)
             {
-                Arrays.Copy(expected.Length, ew, 0, y.Gradient, 0);
+                Array32f.Copy(expected.Length, ew, 0, y.Gradient, 0);
             }
 
             if (y.Rank == 1)

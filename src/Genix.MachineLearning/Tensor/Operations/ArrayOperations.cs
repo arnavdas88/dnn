@@ -42,7 +42,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -79,7 +79,7 @@ namespace Genix.MachineLearning
                     Tensor[] ys = session.AllocateTensors(ActionName, count, x.Axes, calculateGradient);
                     for (int i = 0; i < count; i++)
                     {
-                        Arrays.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
+                        Array32f.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
                     }
 
 #if !NOLEARNING
@@ -579,7 +579,7 @@ namespace Genix.MachineLearning
                                         end = x2;
                                     }
 
-                                    Arrays.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
+                                    Array32f.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
                                 }
                                 else
                                 {
@@ -732,7 +732,7 @@ namespace Genix.MachineLearning
                     {
                         for (int offx = 0, offy = 0, ylen = y.Length; offy < ylen; offy += xstride)
                         {
-                            Arrays.Copy(xstride, xw, offx, yw, offy);
+                            Array32f.Copy(xstride, xw, offx, yw, offy);
                             offx += xstride;
 
                             for (int i = 1; i < count; i++, offx += xstride)
@@ -824,7 +824,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -869,7 +869,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -914,7 +914,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, shape, calculateGradient);
 
                     // simply copy tensor content
-                    Arrays.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -994,7 +994,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(xstride, x.Weights, 0, yw, offy);
+                        Array32f.Copy(xstride, x.Weights, 0, yw, offy);
                     }
 
                     offy += xstride;
@@ -1040,7 +1040,7 @@ namespace Genix.MachineLearning
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Arrays.Copy(xstride, x.Weights, offx, yw, offyy);
+                            Array32f.Copy(xstride, x.Weights, offx, yw, offyy);
                         }
                     }
 
@@ -1077,7 +1077,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(ystride, xw, offxx, yw, offy);
+                        Array32f.Copy(ystride, xw, offxx, yw, offy);
                     }
                 }
 
@@ -1110,7 +1110,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(ystride, xs[i].Weights, offx, yw, offy);
+                        Array32f.Copy(ystride, xs[i].Weights, offx, yw, offy);
                     }
                 }
             }
@@ -1144,7 +1144,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(xstride0, xw, offxx, yw, offy);
+                        Array32f.Copy(xstride0, xw, offxx, yw, offy);
                     }
                 }
             }
@@ -1177,7 +1177,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(xstride, xw, offx, yw, offy);
+                        Array32f.Copy(xstride, xw, offx, yw, offy);
                     }
                 }
             }
@@ -1210,7 +1210,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Arrays.Copy(ystride, xw, offx, yw, offy);
+                        Array32f.Copy(ystride, xw, offx, yw, offy);
                     }
                 }
             }

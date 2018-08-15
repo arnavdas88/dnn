@@ -327,7 +327,7 @@ namespace Genix.MachineLearning
         public Tensor Copy()
         {
             Tensor y = new Tensor("copy", this.Axes);
-            Arrays.Copy(this.Length, this.Weights, 0, y.Weights, 0);
+            Array32f.Copy(this.Length, this.Weights, 0, y.Weights, 0);
             return y;
         }
 
@@ -373,7 +373,7 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            Arrays.Copy(this.Length, weights, 0, this.Weights, 0);
+            Array32f.Copy(this.Length, weights, 0, this.Weights, 0);
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            Arrays.Copy(this.Length, weights, 0, this.Gradient, 0);
+            Array32f.Copy(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>

@@ -74,6 +74,8 @@
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Array32f.cs" />
+    <Compile Include="Vectors\DenseVectorF.cs" />
+    <Compile Include="Vectors\IVector.cs" />
     <Compile Include="Math\JaggedArray.cs" />
     <Compile Include="Math\Math32f.cs" />
     <Compile Include="Math\Mathematics.cs" />
@@ -82,7 +84,7 @@
     <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\Nonlinearity.cs" />
     <Compile Include="Math\Arrays.cs" />
-    <Compile Include="Math\SparseVectorF.cs" />
+    <Compile Include="Vectors\SparseVectorF.cs" />
     <Compile Include="Math\Swapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
@@ -94,6 +96,7 @@
     </Compile>
     <Compile Include="Random\BinarySampleGenerator.cs" />
     <Compile Include="Random\GaussianGenerator.cs" />
+    <Compile Include="Random\ProbabilityDistribution.cs" />
     <Compile Include="Random\RandomGenerator.cs" />
     <Compile Include="Random\RandomNumberGenerator.cs" />
     <Compile Include="Random\RandomRangeGenerator.cs" />

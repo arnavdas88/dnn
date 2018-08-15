@@ -136,23 +136,6 @@ namespace Genix.Core
         /// <param name="length">The number of elements to copy.</param>
         /// <param name="x">The array that contains the data to copy.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, float[] x, int offx, float[] y, int offy)
-        {
-            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
-            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
-            NativeMethods._scopy(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Copies a range of values from a array starting at the specified source index to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The array that receives the data.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
@@ -179,7 +162,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Copy(int length, int[] x, int offx, int[] y, int offy)
         {
-            NativeMethods.i32copy(length, x, offx, y, offy);
+            NativeMethods.copy_s32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -195,7 +178,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Copy(int length, uint[] x, int offx, uint[] y, int offy)
         {
-            NativeMethods.u32copy(length, x, offx, y, offy);
+            NativeMethods.copy_u32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -210,7 +193,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Copy(int length, long[] x, int offx, long[] y, int offy)
         {
-            NativeMethods.i64copy(length, x, offx, y, offy);
+            NativeMethods.copy_s64(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -226,7 +209,7 @@ namespace Genix.Core
         [CLSCompliant(false)]
         public static void Copy(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            NativeMethods.u64copy(length, x, offx, y, offy);
+            NativeMethods.copy_u64(length, x, offx, y, offy);
         }
 
         /*/// <summary>
@@ -241,7 +224,7 @@ namespace Genix.Core
          [MethodImpl(MethodImplOptions.AggressiveInlining)]
          public static void Copy(int length, char[] x, int offx, char[] y, int offy)
          {
-             NativeMethods.mkl_i16copy(length, x, offx, y, offy);
+             NativeMethods.mkl_copy_s16(length, x, offx, y, offy);
          }*/
 
         /// <summary>
@@ -470,7 +453,7 @@ namespace Genix.Core
         {
             for (int i = 0; i < count; i++, offy += length)
             {
-                Arrays.Copy(length, x, offx, y, offy);
+                Array32f.Copy(length, x, offx, y, offy);
             }
         }
 
@@ -817,27 +800,23 @@ namespace Genix.Core
 
             /*[DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i16copy(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/
+            public static extern void copy_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void i32copy(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+            public static extern void copy_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i32copy")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s32")]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void u32copy(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void i64copy(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "i64copy")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void u64copy(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            public static extern void copy_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void _scopy(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern void copy_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s64")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void copy_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

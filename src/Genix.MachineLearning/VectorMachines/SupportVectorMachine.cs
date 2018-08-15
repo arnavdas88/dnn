@@ -108,20 +108,19 @@ namespace Genix.MachineLearning.VectorMachines
         /// Learns a Support Vector Machines (SVM).
         /// </summary>
         /// <param name="trainer">The learning algorithm.</param>
-        /// <param name="samples">
-        /// The samples used for learning.
-        /// Each sample consists of input vector <c>x</c>,
-        /// expected binary output <c>y</c>,
-        /// and the <c>weight</c> of importance (if supported by the learning algorithm).
-        /// </param>
+        /// <param name="x">The input vectors <paramref name="x"/>.</param>
+        /// <param name="y">The expected binary output <paramref name="y"/>.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each input vector (if supported by the learning algorithm).</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the machine that the operation should be canceled.</param>
         /// <returns>
         /// The <see cref="SupportVectorMachine"/> learned by this method.
-        /// A model that has learned how to produce <paramref name="samples" />.y given <paramref name="samples" />.x.
+        /// A model that has learned how to produce <paramref name="y"/> given <paramref name="x"/>.
         /// </returns>
         public static SupportVectorMachine Learn(
             ISupportVectorMachineLearning trainer,
-            IList<(float[] x, bool y, float weight)> samples,
+            IList<float[]> x,
+            IList<bool> y,
+            IList<float> weights,
             CancellationToken cancellationToken)
         {
             if (trainer == null)
@@ -129,7 +128,7 @@ namespace Genix.MachineLearning.VectorMachines
                 throw new ArgumentNullException(nameof(trainer));
             }
 
-            return trainer.Learn(samples, cancellationToken);
+            return trainer.Learn(x, y, weights, cancellationToken);
         }
 
         /// <summary>

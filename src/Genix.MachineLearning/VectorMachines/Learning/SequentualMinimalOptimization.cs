@@ -91,10 +91,46 @@ namespace Genix.MachineLearning.VectorMachines.Learning
         public float Tolerance { get; set; } = 0.01f;
 
         /// <inheritdoc />
-        public SupportVectorMachine Learn(IList<(float[] x, bool y, float weight)> samples, CancellationToken cancellationToken)
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="x"/> is <b>null</b>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="y"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of elements in <paramref name="y"/> does not match the number of elements in <paramref name="x"/>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
+        /// </exception>
+        public SupportVectorMachine Learn(
+            IList<float[]> x,
+            IList<bool> y,
+            IList<float> weights,
+            CancellationToken cancellationToken)
         {
+            if (x == null)
+            {
+                throw new ArgumentNullException(nameof(x));
+            }
+
+            if (y == null)
+            {
+                throw new ArgumentNullException(nameof(y));
+            }
+
+            if (y.Count != x.Count)
+            {
+                throw new ArgumentException("The number of output labels must match the number of input vectors.", nameof(y));
+            }
+
+            if (weights != null && weights.Count != x.Count)
+            {
+                throw new ArgumentException("The number of weights must match the number of input vectors.", nameof(weights));
+            }
+
+            int sampleCount = x.Count;
+
             // count positive and negative labels
-            Labels.GetRatio(samples.Select(x => x.y), out int positives, out int negatives);
+            Labels.GetRatio(y, out int positives, out int negatives);
 
             // if all labels are either positive or negative
             // create machine that will always produce one kind of output
@@ -107,22 +143,30 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     positives == 0 ? -1 : 1);
             }
 
+            // create expected values (+/-1)
+            int[] expected = new int[sampleCount];
+            for (int i = 0; i < sampleCount; i++)
+            {
+                expected[i] = y[i] ? 1 : -1;
+            }
+
             // calculate complexity
             float positiveComplexity = this.Complexity * this.PositiveWeight;
             float negativeComplexity = this.Complexity * this.NegativeWeight;
 
             // calculate costs associated with each input
-            float[] c = new float[samples.Count];
-            for (int i = 0, ii = samples.Count; i < ii; i++)
+            float[] c = new float[sampleCount];
+            for (int i = 0; i < sampleCount; i++)
             {
-                c[i] = (samples[i].y ? positiveComplexity : negativeComplexity) * samples[i].weight;
+                c[i] = y[i] ? positiveComplexity : negativeComplexity;
             }
 
-            // create expected values (+/-1)
-            int[] y = new int[samples.Count];
-            for (int i = 0, ii = samples.Count; i < ii; i++)
+            if (weights != null)
             {
-                y[i] = samples[i].y ? 1 : -1;
+                for (int i = 0; i < sampleCount; i++)
+                {
+                    c[i] *= weights[i];
+                }
             }
 
             switch (this.Algorithm)
@@ -132,9 +176,9 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     {
                         for (int j = 0; j < length; j++)
                         {
-                            result[j] = y[i] *
-                                        y[indices[j]] *
-                                        this.kernel.Execute(samples[i].x.Length, samples[i].x, 0, samples[indices[j]].x, 0);
+                            result[j] = expected[i] *
+                                        expected[indices[j]] *
+                                        this.kernel.Execute(x[i].Length, x[i], 0, x[indices[j]], 0);
                         }
 
                         return result;
@@ -146,10 +190,10 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     };
 
                     s.Optimize(
-                        samples.Count,
+                        sampleCount,
                         c,
-                        Arrays.Create(samples.Count, -1.0f),
-                        y,
+                        Arrays.Create(sampleCount, -1.0f),
+                        expected,
                         q,
                         out float[] solution,
                         out float rho);
@@ -202,20 +246,20 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                 }
 
                 // create support vectors and weights
-                float[][] vectors = new float[count][];
-                float[] weights = new float[count];
+                float[][] v = new float[count][];
+                float[] w = new float[count];
 
                 for (int i = 0, j = 0; i < alphas.Length; i++)
                 {
                     if (alphas[i] > 0)
                     {
-                        vectors[j] = samples[i].x.ToArray();
-                        weights[j] = alphas[i] * y[i];
+                        v[j] = x[i].ToArray();
+                        w[j] = alphas[i] * expected[i];
                         j++;
                     }
                 }
 
-                return new SupportVectorMachine(this.kernel, vectors, weights, bias);
+                return new SupportVectorMachine(this.kernel, v, w, bias);
             }
         }
     }

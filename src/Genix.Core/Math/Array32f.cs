@@ -6,6 +6,7 @@
 
 namespace Genix.Core
 {
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -26,6 +27,23 @@ namespace Genix.Core
         public static void Set(int length, float value, float[] y, int offy)
         {
             NativeMethods.set_f32(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Copies a range of values from a array starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Copy(int length, float[] x, int offx, float[] y, int offy)
+        {
+            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
+            NativeMethods.copy_f32(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -82,6 +100,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void set_f32(int n, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void copy_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

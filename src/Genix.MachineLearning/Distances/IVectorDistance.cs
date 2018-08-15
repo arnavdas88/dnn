@@ -10,20 +10,19 @@ namespace Genix.MachineLearning.Distances
     /// Defines a contract for measuring distance between two vectors.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the vectors.</typeparam>
+    /// <typeparam name="TVector">The type of the vector.</typeparam>
     /// <typeparam name="TDistance">The type of the measured distance.</typeparam>
-    public interface IVectorDistance<in T, out TDistance>
+    public interface IVectorDistance<in T, in TVector, out TDistance>
     {
         /// <summary>
-        /// Computes the distance between vectors <paramref name="x"/> and <paramref name="y"/>.
+        /// Computes the distance between vector <paramref name="x"/> and a dense vector <paramref name="y"/>.
         /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The first vector.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The second vector.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <returns>
         /// A value that represents the distance between <paramref name="x"/> and <paramref name="y"/>.
         /// </returns>
-        TDistance Distance(int length, T[] x, int offx, T[] y, int offy);
+        TDistance Distance(TVector x, T[] y, int offy);
     }
 }

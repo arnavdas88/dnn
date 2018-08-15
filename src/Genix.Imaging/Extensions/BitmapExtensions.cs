@@ -703,19 +703,19 @@ namespace Genix.Imaging
         {
             private const string DllName = "Genix.Core.Native.dll";
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s8")]
             [SuppressUnmanagedCodeSecurity]
             public static extern unsafe void copy_u2m(int n, [In] uint* x, int offx, [Out] ulong[] dst, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s8")]
             [SuppressUnmanagedCodeSecurity]
             public static extern unsafe void copy_m2m(int n, [In] uint[] x, int offx, [Out] ulong[] dst, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s8")]
             [SuppressUnmanagedCodeSecurity]
             public static extern unsafe void copy_m2u(int n, [In] ulong[] x, int offx, [Out] uint* dst, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i8copy")]
+            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s8")]
             [SuppressUnmanagedCodeSecurity]
             public static extern unsafe void copy_m2m(int n, [In] ulong[] x, int offx, [Out] uint[] dst, int offy);
 

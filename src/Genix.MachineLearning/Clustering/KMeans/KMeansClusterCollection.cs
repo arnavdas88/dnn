@@ -17,16 +17,18 @@ namespace Genix.MachineLearning.Clustering
     /// <summary>
     /// Represents a collection of clusters used by the K-Means clustering algorithm.
     /// </summary>
-    public class KMeansClusterCollection : List<KMeansCluster>
+    /// <typeparam name="T">The type of vector this algorithm supports.</typeparam>
+    public class KMeansClusterCollection<T> : List<KMeansCluster>
+        where T : IVector<float>
     {
         /// <summary>
         /// The distance function.
         /// </summary>
         [JsonProperty("distance", TypeNameHandling = TypeNameHandling.Objects)]
-        private readonly IVectorDistance<float, float> distance;
+        private readonly IVectorDistance<float, T, float> distance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KMeansClusterCollection"/> class.
+        /// Initializes a new instance of the <see cref="KMeansClusterCollection{T}"/> class.
         /// </summary>
         /// <param name="k">The number of clusters.</param>
         /// <param name="dimension">The vector length.</param>
@@ -34,7 +36,7 @@ namespace Genix.MachineLearning.Clustering
         /// <exception cref="ArgumentNullException">
         /// <paramref name="distance"/> is <b>null</b>.
         /// </exception>
-        public KMeansClusterCollection(int k, int dimension, IVectorDistance<float, float> distance)
+        public KMeansClusterCollection(int k, int dimension, IVectorDistance<float, T, float> distance)
             : base(k)
         {
             this.distance = distance ?? throw new ArgumentNullException(nameof(distance));
@@ -46,7 +48,7 @@ namespace Genix.MachineLearning.Clustering
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KMeansClusterCollection"/> class.
+        /// Initializes a new instance of the <see cref="KMeansClusterCollection{T}"/> class.
         /// </summary>
         [JsonConstructor]
         private KMeansClusterCollection()
@@ -73,12 +75,11 @@ namespace Genix.MachineLearning.Clustering
         /// Assigns a data point to one of the clusters.
         /// </summary>
         /// <param name="x">The data point to assign.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <returns>
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Assign(float[] x, int offx) => this.Assign(0, this.Count, x, offx, out float score);
+        public int Assign(T x) => this.Assign(0, this.Count, x, out float score);
 
         /// <summary>
         /// Assigns a data point to one of the clusters and returns the distance to that cluster.
@@ -90,7 +91,7 @@ namespace Genix.MachineLearning.Clustering
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Assign(float[] x, int offx, out float score) => this.Assign(0, this.Count, x, offx, out score);
+        public int Assign(T x, out float score) => this.Assign(0, this.Count, x, out score);
 
         /// <summary>
         /// Assigns a data point to one of the clusters withing specified range and returns the distance to that cluster.
@@ -104,16 +105,15 @@ namespace Genix.MachineLearning.Clustering
         /// The zero-based index of the cluster closest to the <paramref name="x"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Assign(int startingIndex, int count, float[] x, int offx, out float score)
+        public int Assign(int startingIndex, int count, T x, out float score)
         {
             // TODO: use KDTree
-            int dimension = this[startingIndex].Centroid.Length;
             int win = startingIndex;
-            score = this.distance.Distance(dimension, x, offx, this[startingIndex].Centroid, 0);
+            score = this.distance.Distance(x, this[startingIndex].Centroid, 0);
 
             for (int i = startingIndex + 1, ii = startingIndex + count; i < ii; i++)
             {
-                float dist = this.distance.Distance(dimension, x, offx, this[i].Centroid, 0);
+                float dist = this.distance.Distance(x, this[i].Centroid, 0);
                 if (dist < score)
                 {
                     win = i;
@@ -133,7 +133,7 @@ namespace Genix.MachineLearning.Clustering
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(IList<float[]> x, float[] result) => this.Assign(0, this.Count, x, result);
+        public float[] Assign(IList<T> x, float[] result) => this.Assign(0, this.Count, x, result);
 
         /// <summary>
         /// Assigns the range of data points to feature vector containing the distance between each point and its assigned cluster.
@@ -146,7 +146,7 @@ namespace Genix.MachineLearning.Clustering
         /// A vector containing the distance between each point and its assigned cluster.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Assign(int startingIndex, int count, IList<float[]> x, float[] result)
+        public float[] Assign(int startingIndex, int count, IList<T> x, float[] result)
         {
             if (result == null)
             {
@@ -155,38 +155,56 @@ namespace Genix.MachineLearning.Clustering
 
             for (int i = 0, ii = x.Count; i < ii; i++)
             {
-                this.Assign(startingIndex, count, x[i], 0, out result[i]);
+                this.Assign(startingIndex, count, x[i], out result[i]);
             }
 
             return result;
         }
 
-        internal void RandomSeeding(NumericTable<float> x)
+        /// <summary>
+        /// Performs initial cluster seeding by choosing clusters randomly from data points.
+        /// </summary>
+        /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
+        internal void RandomSeeding(IList<T> x, IList<float> weights)
         {
             Random random = new Random(0);
 
             int k = this.Count;
             int dimension = this.Dimension;
             int samples = x.Count;
+            ProbabilityDistribution distribution = weights != null ? new ProbabilityDistribution(weights, random) : null;
 
-            for (int centroid = 0; centroid < k; centroid++)
+            // 1. Choose one center uniformly at random from among the data points.
+            int idx = Next();
+            x[idx].Copy(this[0].Centroid, 0);
+
+            // 2. Choose other centers uniformly at random from among the data points
+            // make sure data points are different
+            for (int centroid = 1; centroid < k; centroid++)
             {
-                int idx = random.Next(0, samples);
-                while (centroid == 0 || !this.Take(centroid).Any(c => Arrays.Equals(dimension, c.Centroid, 0, x[idx], 0)))
+                idx = Next();
+                while (!this.Take(centroid).Any(c => x[idx].Equals(c.Centroid, 0)))
                 {
-                    idx = random.Next(0, samples);
+                    idx = Next();
                 }
 
-                Arrays.Copy(dimension, x[idx], 0, this[centroid].Centroid, 0);
+                x[idx].Copy(this[centroid].Centroid, 0);
+            }
+
+            int Next()
+            {
+                return distribution != null ? distribution.Next() : random.Next(0, samples);
             }
         }
 
         /// <summary>
         /// Performs initial cluster seeding according to K-Means++ algorithm.
         /// </summary>
-        /// <param name="x">The data points.</param>
+        /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
+        /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
         /// <see cref="https://en.wikipedia.org/wiki/K-means++"/>
-        internal void KMeansPlusPlusSeeding(NumericTable<float> x)
+        internal void KMeansPlusPlusSeeding(IList<T> x, IList<float> weights)
         {
             Random random = new Random(0);
 
@@ -196,7 +214,7 @@ namespace Genix.MachineLearning.Clustering
 
             // 1. Choose one center uniformly at random from among the data points.
             int idx = random.Next(0, samples);
-            Arrays.Copy(dimension, x[idx], 0, this[0].Centroid, 0);
+            x[idx].Copy(this[0].Centroid, 0);
 
             float[] distances = new float[samples];
             for (int centroid = 1; centroid < k; centroid++)
@@ -213,12 +231,12 @@ namespace Genix.MachineLearning.Clustering
                     // all points are the same
                     for (; centroid < k; centroid++)
                     {
-                        Arrays.Copy(dimension, this[0].Centroid, 0, this[centroid].Centroid, 0);
+                        Array32f.Copy(dimension, this[0].Centroid, 0, this[centroid].Centroid, 0);
                     }
                 }
                 else
                 {
-                    // Chhose a point from a weighted probability distribution
+                    // Choose a point from a weighted probability distribution
                     float randomValue = (float)random.NextDouble() * sum;
                     idx = -1;
                     sum = 0.0f;
@@ -237,7 +255,7 @@ namespace Genix.MachineLearning.Clustering
                         idx = random.Next(0, samples);
                     }
 
-                    Arrays.Copy(dimension, x[idx], 0, this[centroid].Centroid, 0);
+                    x[idx].Copy(this[centroid].Centroid, 0);
                 }
 
                 // 4. Repeat Steps 2 and 3 until k centers have been chosen.

@@ -29,10 +29,13 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="RandomGenerator"/> class.
         /// </summary>
         /// <param name="random">The random number generator to use as a source of randomness.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="random"/> is <b>null</b>.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RandomGenerator(Random random)
         {
-            this.random = random;
+            this.random = random ?? throw new ArgumentNullException(nameof(random));
         }
 
         /// <summary>

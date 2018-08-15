@@ -24,11 +24,12 @@ template<typename T> void __forceinline __copy(
 	::memcpy(y + offy, x + offx, n * sizeof(T));
 }
 
-GENIXAPI(void, i8copy)(int n, const __int8* x, int offx, __int8* y, int offy) { __copy(n, x, offx, y, offy); }
-GENIXAPI(void, i16copy)(int n, const __int16* x, int offx, __int16* y, int offy) { __copy(n, x, offx, y, offy); }
-GENIXAPI(void, i32copy)(int n, const __int32* x, int offx, __int32* y, int offy) { __copy(n, x, offx, y, offy); }
-GENIXAPI(void, i64copy)(int n, const __int64* x, int offx, __int64* y, int offy) { __copy(n, x, offx, y, offy); }
-GENIXAPI(void, _scopy)(int n, const float* x, int offx, float* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_f32)(int n, const float* x, int offx, float* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_f64)(int n, const double* x, int offx, double* y, int offy) { __copy(n, x, offx, y, offy); }
 
 extern "C" __declspec(dllexport) void WINAPI scopy_inc(
 	int n,
