@@ -76,7 +76,8 @@ namespace Genix.DocumentAnalysis.Classification
             Image image = ImagePreprocessing.Process(source.Image, this.ImageEnhancingOptions, 8);
 
             image = image.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, Imaging.ScalingOptions.None);
-            image = image.Convert8To1(128);
+            image = image.Binarize();
+            ////image = image.Convert8To1(128);
             image = image.Dilate(StructuringElement.Rectangle(5, 1), 1);
             image = image.Dilate(StructuringElement.Rectangle(1, 5), 1);
             image = image.Convert1To8();

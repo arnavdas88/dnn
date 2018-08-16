@@ -140,6 +140,10 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float Sum() => Math32f.Sum(this.Idx.Length, this.X, 0);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ManhattanDistance(float[] y, int offy) => NativeMethods.sparse_manhattan_distance_f32(this.Idx.Length, this.Idx, this.X, y, offy);
 
         /// <inheritdoc />

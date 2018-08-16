@@ -61,7 +61,7 @@ namespace System.Linq
         }
 
         /// <summary>
-        /// Creates a <see cref="Dictionary{TKey, TValue}"/> from an <see cref="IEnumerable{T}"/> 
+        /// Creates a <see cref="Dictionary{TKey, TValue}"/> from an <see cref="IEnumerable{T}"/>
         /// according to specified key selector and element selector functions.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of source.</typeparam>

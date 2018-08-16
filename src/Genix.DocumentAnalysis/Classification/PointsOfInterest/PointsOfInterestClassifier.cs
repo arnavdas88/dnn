@@ -63,15 +63,15 @@ namespace Genix.DocumentAnalysis.Classification
             float[] w = this.svm.Classify(featureVector, null, cancellationToken);
             Maximum.SoftMax(w.Length, w, 0);
 
-            int bestClass = Maximum.ArgMax(w.Length, w, 0);
-
             int[] indices = Arrays.Indexes(w.Length);
             Arrays.Sort(w.Length, w, 0, indices, 0, false);
 
+            float confidence = (float)(-Math.Log(w[indices[1]] / w[indices[0]]));
+
             return new Answer(
                 features.Id,
-                this.classes[bestClass],
-                w[bestClass],
+                this.classes[indices[0]],
+                confidence.Clip(0, 1),
                 w.Take(5).Select((x, i) => (this.classes[indices[i]], w[i])));
         }
 

@@ -7,11 +7,9 @@
 namespace Genix.DocumentAnalysis.FeatureDetectors
 {
     using System;
-    using System.Collections.Generic;
-    using System.Drawing;
+    using System.Linq;
     using System.Threading;
     using Genix.Core;
-    using Genix.Imaging;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -119,6 +117,8 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
                 this.BlockStride,
                 this.NumberOfBins,
                 this.Threshold);
+
+            vectors = DenseVectorPackF.Pack(vectors.Unpack().Where(x => x.Sum() != 0.0f).ToList());
 
             return new Features(vectors);
         }

@@ -73,6 +73,14 @@ namespace Genix.Core
         void AddProductC(float alpha, float[] y, int offy);
 
         /// <summary>
+        /// Computes the sum of elements of the vector.
+        /// </summary>
+        /// <returns>
+        /// The sum of elements of the vector.
+        /// </returns>
+        float Sum();
+
+        /// <summary>
         /// Computes the Manhattan distance between elements of this vector and a dense vector.
         /// </summary>
         /// <param name="y">The dense vector <paramref name="y"/>.</param>

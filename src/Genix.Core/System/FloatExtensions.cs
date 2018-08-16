@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Int32Extensions.cs" company="Noname, Inc.">
+// <copyright file="FloatExtensions.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -9,12 +9,12 @@ namespace System
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Provides extension methods for the <see cref="int"/> class.
+    /// Provides extension methods for the <see cref="float"/> class.
     /// </summary>
-    public static class Int32Extensions
+    public static class FloatExtensions
     {
         /// <summary>
-        /// Determines whether this instance falls within the range of specified 32-bit signed integers.
+        /// Determines whether this instance falls within the range of specified single-presicion floating point numbers.
         /// </summary>
         /// <param name="value">This instance value.</param>
         /// <param name="lowerBound">The lower inclusive bound of the range.</param>
@@ -23,7 +23,7 @@ namespace System
         /// <b>true</b> if this instance is greater than or equal to <paramref name="lowerBound"/> and less than or equal to <paramref name="upperBound"/>; otherwise, <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Between(this int value, int lowerBound, int upperBound)
+        public static bool Between(this float value, float lowerBound, float upperBound)
         {
             return value >= lowerBound && value <= upperBound;
         }
@@ -38,7 +38,7 @@ namespace System
         /// A value that is greater than or equal to <paramref name="lowerBound"/> and less than or equal to <paramref name="upperBound"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Clip(this int value, int lowerBound, int upperBound)
+        public static float Clip(this float value, float lowerBound, float upperBound)
         {
             if (value < lowerBound)
             {

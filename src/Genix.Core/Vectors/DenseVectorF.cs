@@ -15,13 +15,13 @@ namespace Genix.Core
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public struct DenseVectorF
-        : IEquatable<DenseVectorF>, IVector<float>
+        : IEquatable<DenseVectorF>, IDenseVector<float>
     {
         /// <summary>
         /// The values of the elements.
         /// </summary>
         [JsonProperty("x")]
-        public float[] X;
+        private readonly float[] x;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DenseVectorF"/> struct.
@@ -30,7 +30,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DenseVectorF(int length)
         {
-            this.X = new float[length];
+            this.x = new float[length];
         }
 
         /// <summary>
@@ -43,17 +43,23 @@ namespace Genix.Core
         public DenseVectorF(int length, float[] x, int offx)
             : this(length)
         {
-            Array32f.Copy(length, x, offx, this.X, 0);
+            Array32f.Copy(length, x, offx, this.x, 0);
         }
 
         /// <inheritdoc />
-        public int Length => this.X.Length;
+        public int Length => this.x.Length;
+
+        /// <inheritdoc />
+        public float[] X => this.x;
+
+        /// <inheritdoc />
+        public int Offset => 0;
 
         /// <inheritdoc />
         public bool Equals(DenseVectorF other)
         {
             return this.Length == other.Length &&
-                (this.Length == 0 || Arrays.Equals(this.X.Length, this.X, 0, other.X, 0));
+                (this.Length == 0 || Arrays.Equals(this.x.Length, this.x, 0, other.X, 0));
         }
 
         /// <inheritdoc />
@@ -70,43 +76,47 @@ namespace Genix.Core
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return (int)CRC.Calculate(this.X);
+            return (int)CRC.Calculate(this.x);
         }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Copy(float[] y, int offy) => Array32f.Copy(this.X.Length, this.X, 0, y, offy);
+        public void Copy(float[] y, int offy) => Array32f.Copy(this.x.Length, this.x, 0, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(float[] y, int offy) => Arrays.Equals(this.X.Length, this.X, 0, y, offy);
+        public bool Equals(float[] y, int offy) => Arrays.Equals(this.x.Length, this.x, 0, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha) => Math32f.AddC(this.X.Length, alpha, this.X, 0);
+        public void AddC(float alpha) => Math32f.AddC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha) => Math32f.SubC(this.X.Length, alpha, this.X, 0);
+        public void SubC(float alpha) => Math32f.SubC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha) => Math32f.MulC(this.X.Length, alpha, this.X, 0);
+        public void MulC(float alpha) => Math32f.MulC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Math32f.DivC(this.X.Length, alpha, this.X, 0);
+        public void DivC(float alpha) => Math32f.DivC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(float alpha, float[] y, int offy) => Math32f.AddProductC(this.X.Length, this.X, 0, alpha, y, offy);
+        public void AddProductC(float alpha, float[] y, int offy) => Math32f.AddProductC(this.x.Length, this.x, 0, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float ManhattanDistance(float[] y, int offy) => Math32f.ManhattanDistance(this.X.Length, this.X, 0, y, offy);
+        public float Sum() => Math32f.Sum(this.x.Length, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float EuclideanDistance(float[] y, int offy) => Math32f.EuclideanDistance(this.X.Length, this.X, 0, y, offy);
+        public float ManhattanDistance(float[] y, int offy) => Math32f.ManhattanDistance(this.x.Length, this.x, 0, y, offy);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float EuclideanDistance(float[] y, int offy) => Math32f.EuclideanDistance(this.x.Length, this.x, 0, y, offy);
     }
 }
