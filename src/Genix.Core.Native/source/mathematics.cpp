@@ -1495,6 +1495,15 @@ template<typename T> T __forceinline __euclidean_distance_squared(
 	return sum;
 }
 
+GENIXAPI(float, euclidean_distance_squared_f32)(const int n, const float* x, int offx, const float* y, int offy)
+{
+	return __euclidean_distance_squared(n, x, offx, y, offy);
+}
+GENIXAPI(double, euclidean_distance_squared_f64)(const int n, const double* x, int offx, const double* y, int offy)
+{
+	return __euclidean_distance_squared(n, x, offx, y, offy);
+}
+
 GENIXAPI(float, euclidean_distance_f32)(const int n, const float* x, int offx, const float* y, int offy)
 {
 	return ::sqrtf(__euclidean_distance_squared(n, x, offx, y, offy));

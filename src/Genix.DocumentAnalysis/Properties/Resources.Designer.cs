@@ -70,6 +70,15 @@ namespace Genix.DocumentAnalysis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The classifier is not ready. You have to learn the classifier before using it..
+        /// </summary>
+        internal static string E_Classifier_NotLearned {
+            get {
+                return ResourceManager.GetString("E_Classifier_NotLearned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The image depth {0} is not supported for this operation..
         /// </summary>
         internal static string E_UnsupportedDepth {

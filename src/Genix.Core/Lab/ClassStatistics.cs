@@ -90,7 +90,7 @@ namespace Genix.Lab
         /// <param name="confidence">The classification confidence.</param>
         /// <param name="isAccepted">Determines whether the classification's confidence is greater than or equal to cut-off value.</param>
         /// <param name="isValid">Determines whether the classification's result matches the truth data.</param>
-        public void Add(int confidence, bool isAccepted, bool? isValid)
+        public void Add(float confidence, bool isAccepted, bool? isValid)
         {
             this.All.Add(isAccepted, isValid.GetValueOrDefault(false));
             this.RejectCurveAll.Add(confidence, isValid.GetValueOrDefault(true));

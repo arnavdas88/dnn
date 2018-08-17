@@ -47,6 +47,24 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Copies a range of values from a array starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// <paramref name="x"/> and <paramref name="y"/> can overlap.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Move(int length, float[] x, int offx, float[] y, int offy)
+        {
+            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
+            NativeMethods.move_f32(length, x, offx, y, offy);
+        }
+
+        /// <summary>
         /// Performs thresholding of elements of an array.
         /// Elements that are less than the threshold, are set to a specified value.
         /// </summary>
@@ -104,6 +122,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void copy_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void move_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

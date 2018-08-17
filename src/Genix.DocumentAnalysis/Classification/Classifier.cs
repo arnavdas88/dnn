@@ -38,7 +38,15 @@ namespace Genix.DocumentAnalysis.Classification
         /// <value>
         /// <b>true</b> if the classifier has been trained and is ready for use; otherwise, <b>false</b>.
         /// </value>
-        public abstract bool IsTrained { get; }
+        public abstract bool IsLearned { get; }
+
+        /// <summary>
+        /// Gets a collection of classes the classifier is able to classify to.
+        /// </summary>
+        /// <value>
+        /// The <see cref="IReadOnlyCollection{T}"/> that contains the class names.
+        /// </value>
+        public abstract IReadOnlyCollection<string> Classes { get; }
 
         /// <summary>
         /// Gets the feature builder used by this classifier.

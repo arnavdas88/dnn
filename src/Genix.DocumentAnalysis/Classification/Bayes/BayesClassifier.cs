@@ -19,10 +19,16 @@ namespace Genix.DocumentAnalysis.Classification
         : Classifier<PageSource, BayesFeatures, BayesFeatureBuilder>
     {
         [JsonProperty("classes")]
-        private readonly Dictionary<string, ClassData> classes = new Dictionary<string, ClassData>();
+        private readonly SortedDictionary<string, ClassData> classes = new SortedDictionary<string, ClassData>();
+
+        [JsonProperty("isLearned")]
+        private bool isLearned;
 
         /// <inheritdoc />
-        public override bool IsTrained => false;
+        public override bool IsLearned => this.isLearned;
+
+        /// <inheritdoc />
+        public override IReadOnlyCollection<string> Classes => this.classes.Keys;
 
         /// <summary>
         /// Gets a number of unique words from all pages the classifier was trained on.
@@ -42,6 +48,11 @@ namespace Genix.DocumentAnalysis.Classification
             if (features == null)
             {
                 throw new ArgumentNullException(nameof(features));
+            }
+
+            if (!this.isLearned)
+            {
+                throw new InvalidOperationException(Properties.Resources.E_Classifier_NotLearned);
             }
 
             // calculate candidates scores
@@ -75,13 +86,12 @@ namespace Genix.DocumentAnalysis.Classification
 
                     // scale answer confidence
                     confidence = ScaleConfidence(confidence);
-                    confidence = Convert.ToInt32(Math.Round(100.0 * confidence)); ////.PutInRange(0, 100);
 
                     // scale confidences for the candidates
                     return new Answer(
                         features.Id,
                         answer,
-                        confidence,
+                        confidence.Clip(0, 1),
                         candidates.Select(x => (x.className, ScaleConfidence((float)Math.Exp(x.score - normalizer)))));
                 }
             }
@@ -121,6 +131,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <inheritdoc />
         private protected override void BeginTraining(CancellationToken cancellationToken)
         {
+            this.isLearned = false;
             this.classes.Clear();
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -145,6 +156,8 @@ namespace Genix.DocumentAnalysis.Classification
             }
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            this.isLearned = true;
         }
 
         /// <inheritdoc />

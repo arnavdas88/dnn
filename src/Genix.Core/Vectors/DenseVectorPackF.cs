@@ -86,8 +86,21 @@ namespace Genix.Core
         /// <returns>
         /// The <see cref="DenseVectorPackF"/> object that contains packed dense vectors.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="vectors"/> is <b>null</b>.
+        /// </exception>
         public static DenseVectorPackF Pack(IList<IDenseVector<float>> vectors)
         {
+            if (vectors == null)
+            {
+                throw new ArgumentNullException(nameof(vectors));
+            }
+
+            if (vectors.Count == 0)
+            {
+                return new DenseVectorPackF();
+            }
+
             DenseVectorPackF result = new DenseVectorPackF(vectors.Count, vectors[0].Length);
 
             float[] x = result.X;
@@ -117,5 +130,22 @@ namespace Genix.Core
 
             return result;
         }
+
+        /*public int RemoveWhere(Func<float[], int, bool> action)
+        {
+            float[] x = this.X;
+            for (int i = this.Count - 1, len = this.Length, off = i * len; i >= 0; i--, off -= len)
+            {
+                if (action(x, off))
+                {
+                    if (i + 1 < this.Count)
+                    {
+                        Array32f.Move((this.Count - (i + 1)) * len, x, off + len, x, off);
+                    }
+
+                    this.Count--;
+                }
+            }
+        }*/
     }
 }

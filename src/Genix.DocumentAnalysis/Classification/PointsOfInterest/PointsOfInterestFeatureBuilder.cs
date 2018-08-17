@@ -7,6 +7,8 @@
 namespace Genix.DocumentAnalysis.Classification
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using Genix.DocumentAnalysis.FeatureDetectors;
     using Genix.Imaging;
@@ -22,7 +24,10 @@ namespace Genix.DocumentAnalysis.Classification
         /// The feature detector.
         /// </summary>
         [JsonProperty("detector")]
-        private readonly IFeatureDetector detector = new HistogramsOfOrientedGradients();
+        private readonly IFeatureDetector detector = new HistogramsOfOrientedGradients()
+        {
+            Threshold = 0.2f,
+        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PointsOfInterestFeatureBuilder"/> class.
@@ -49,10 +54,10 @@ namespace Genix.DocumentAnalysis.Classification
         /// should apply to the image before extracting points of interest from it.
         /// </summary>
         /// <value>
-        /// The <see cref="ImageEnhancingOptions"/> enumeration.
+        /// The <see cref="DocumentAnalysis.ImagePreprocessingOptions"/> enumeration.
         /// </value>
-        [JsonProperty("imageEnhancingOptions")]
-        public ImagePreprocessingOptions ImageEnhancingOptions { get; set; } = ImagePreprocessingOptions.None;
+        [JsonProperty("imagePreprocessingOptions")]
+        public ImagePreprocessingOptions ImagePreprocessingOptions { get; set; } = ImagePreprocessingOptions.None;
 
         /// <summary>
         /// Gets the feature detector.
@@ -73,13 +78,19 @@ namespace Genix.DocumentAnalysis.Classification
                 throw new ArgumentNullException(nameof(source));
             }
 
-            Image image = ImagePreprocessing.Process(source.Image, this.ImageEnhancingOptions, 8);
+            Image image = ImagePreprocessing.Process(source.Image, this.ImagePreprocessingOptions, 8);
 
-            image = image.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, Imaging.ScalingOptions.None);
-            image = image.Binarize();
-            ////image = image.Convert8To1(128);
-            image = image.Dilate(StructuringElement.Rectangle(5, 1), 1);
-            image = image.Dilate(StructuringElement.Rectangle(1, 5), 1);
+            image = image.Scale(150.0 / image.HorizontalResolution, 150.0 / image.VerticalResolution, ScalingOptions.None);
+            ////image = image.Binarize();
+            image = image.Convert8To1(128);
+            image = image.Deskew().Despeckle();
+
+            ISet<ConnectedComponent> components = image.FindConnectedComponents();
+            image.RemoveConnectedComponents(components.Where(x => x.Power <= 9));
+
+            image = image.Dilate(StructuringElement.Rectangle(3, 1), 1);
+            image = image.Dilate(StructuringElement.Rectangle(1, 3), 1);
+            ////image = image.CropBlackArea(0, 0);
             image = image.Convert1To8();
 
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);

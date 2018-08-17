@@ -66,23 +66,23 @@ namespace Genix.Lab
         /// Gets the accept rate.
         /// </summary>
         /// <value>
-        /// A <see cref="double"/> structure that represents the accept rate.
+        /// A <see cref="float"/> structure that represents the accept rate.
         /// </value>
         /// <remarks>
         /// The accept rate if the <see cref="AcceptCount"/> divided by the total number of items in the curve.
         /// </remarks>
-        public double AcceptRate => this.Count <= 0 ? 0.0 : (double)this.AcceptCount / this.Count;
+        public float AcceptRate => this.Count <= 0 ? 0.0f : (float)this.AcceptCount / this.Count;
 
         /// <summary>
         /// Gets the error rate.
         /// </summary>
         /// <value>
-        /// A <see cref="double"/> structure that represents the error rate.
+        /// A <see cref="float"/> structure that represents the error rate.
         /// </value>
         /// <remarks>
         /// The error rate if the <see cref="ErrorCount"/> divided by the <see cref="AcceptCount"/>.
         /// </remarks>
-        public double ErrorRate => this.AcceptCount <= 0 ? 0.0 : (double)this.ErrorCount / this.AcceptCount;
+        public float ErrorRate => this.AcceptCount <= 0 ? 0.0f : (float)this.ErrorCount / this.AcceptCount;
 
         /// <summary>
         /// Compares two <see cref="RejectCurvePoint"/> objects. The result specifies whether the properties specified by the two <see cref="RejectCurvePoint"/> objects are equal.

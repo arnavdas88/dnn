@@ -19,7 +19,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="target">The target error rate.</param>
         /// <param name="point">The <see cref="RejectCurvePoint"/> associated with the specified target error rate.</param>
-        public RejectCurveTarget(double target, RejectCurvePoint? point)
+        public RejectCurveTarget(float target, RejectCurvePoint? point)
             : this()
         {
             this.Target = target;
@@ -30,9 +30,9 @@ namespace Genix.Lab
         /// Gets the target error rate.
         /// </summary>
         /// <value>
-        /// A <see cref="double"/> structure that represents the error rate.
+        /// A <see cref="float"/> structure that represents the error rate.
         /// </value>
-        public double Target { get; }
+        public float Target { get; }
 
         /// <summary>
         /// Gets the point on the reject curve associated with the target error rate.
@@ -88,7 +88,7 @@ namespace Genix.Lab
         public override string ToString() =>
             string.Format(
                 CultureInfo.InvariantCulture,
-                "{0} - {1}",
+                "{0:F4} - {1}",
                 this.Target,
                 this.Point.GetValueOrDefault());
     }

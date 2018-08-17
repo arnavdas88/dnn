@@ -9,6 +9,7 @@ namespace Genix.DocumentAnalysis.Classification
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using Genix.Core;
     using Genix.MachineLearning.Clustering;
@@ -24,16 +25,19 @@ namespace Genix.DocumentAnalysis.Classification
     public class PointsOfInterestClassifier
         : Classifier<ImageSource, PointsOfInterestFeatures, PointsOfInterestFeatureBuilder>
     {
-        [JsonProperty("classes")]
-        private readonly List<string> classes = new List<string>();
+        [JsonProperty("isLearned")]
+        private bool isLearned;
 
-        private List<(FeatureDetectors.Features features, string truth)> features = null;
+        [JsonProperty("classes")]
+        private List<string> classes = new List<string>();
 
         [JsonProperty("kmeans")]
-        private KMeans kmeans = null;
+        private KMeans kmeans;
 
         [JsonProperty("svm")]
-        private OneVsAllSupportVectorMachine svm = null;
+        private OneVsAllSupportVectorMachine svm;
+
+        private Learner learner;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PointsOfInterestClassifier"/> class.
@@ -43,7 +47,18 @@ namespace Genix.DocumentAnalysis.Classification
         }
 
         /// <inheritdoc />
-        public override bool IsTrained => false;
+        public override bool IsLearned => this.isLearned;
+
+        /// <inheritdoc />
+        public override IReadOnlyCollection<string> Classes => this.classes;
+
+        /// <summary>
+        /// Gets or sets the length of the feature vector used for classification.
+        /// </summary>
+        /// <value>
+        /// The length of a feature vector. Default value is 32.
+        /// </value>
+        public int VectorLength { get; set; } = 512;
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">
@@ -56,120 +71,148 @@ namespace Genix.DocumentAnalysis.Classification
                 throw new ArgumentNullException(nameof(features));
             }
 
-            // build a feature vector
-            float[] featureVector = this.kmeans.Transform(features.Features, null, null, cancellationToken);
+            if (!this.isLearned)
+            {
+                throw new InvalidOperationException(Properties.Resources.E_Classifier_NotLearned);
+            }
 
-            // classify feature vector
-            float[] w = this.svm.Classify(featureVector, null, cancellationToken);
-            Maximum.SoftMax(w.Length, w, 0);
+            if (features.Features.Count > 0)
+            {
+                // build a feature vector
+                float[] featureVector = PointsOfInterestClassifier.PrepareVector(this.kmeans, features.Features, cancellationToken);
 
-            int[] indices = Arrays.Indexes(w.Length);
-            Arrays.Sort(w.Length, w, 0, indices, 0, false);
+                // classify feature vector
+                float[] w = this.svm.Classify(featureVector, null, cancellationToken);
+                Maximum.SoftMax(w.Length, w, 0);
 
-            float confidence = (float)(-Math.Log(w[indices[1]] / w[indices[0]]));
+                // find best class
+                int[] indices = Arrays.Indexes(w.Length);
+                Arrays.Sort(w.Length, w, 0, indices, 0, false);
+                float confidence = (float)(-Math.Log(w[1] / w[0], 2.0));
 
-            return new Answer(
-                features.Id,
-                this.classes[indices[0]],
-                confidence.Clip(0, 1),
-                w.Take(5).Select((x, i) => (this.classes[indices[i]], w[i])));
+                return new Answer(
+                    features.Id,
+                    this.classes[indices[0]],
+                    confidence.Clip(0, 1),
+                    w.Take(5).Select((x, i) => (this.classes[indices[i]], w[i])));
+            }
+            else
+            {
+                return new Answer(features.Id);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float[] PrepareVector(KMeans kmeans, IVectorPack<float> x, CancellationToken cancellationToken)
+        {
+            return kmeans.Transform(x, null, false, null, cancellationToken);
         }
 
         /// <inheritdoc />
         private protected override void BeginTraining(CancellationToken cancellationToken)
         {
-            this.classes.Clear();
-            this.features = new List<(FeatureDetectors.Features features, string truth)>();
-            this.kmeans = null;
-            this.svm = null;
+            this.learner = new Learner();
         }
 
         /// <inheritdoc />
         private protected override void FinishTraining(CancellationToken cancellationToken)
         {
-            // count classes
-            this.classes.AddRange(this.features.Select(x => x.truth).ToLookup(x => x).Select(x => x.Key));
-            if (this.classes.Count < 2)
-            {
-                throw new ArgumentException();
-            }
-
-            // count vectors
-            int numberOfVectors = this.features.Sum(x => x.features.Count);
-
-            // copy vectors
-            Dictionary<IVector<float>, float> vectors = new Dictionary<IVector<float>, float>(numberOfVectors);
-            for (int i = 0, ii = this.features.Count; i < ii; i++)
-            {
-                FeatureDetectors.Features f = this.features[i].features;
-                for (int j = 0, jj = f.Count, len = f.Length, off = 0; j < jj; j++, off += len)
-                {
-                    DenseVectorF vector = new DenseVectorF(len, f.X, off);
-                    if (vectors.TryGetValue(vector, out float weight))
-                    {
-                        vectors[vector] = weight + 1.0f;
-                    }
-                    else
-                    {
-                        vectors[vector] = 1.0f;
-                    }
-                    ////vectors.Add(SparseVectorF.FromDense(len, f.X, off));
-                }
-            }
-
-            /*List<IVector<float>> vectors = new List<IVector<float>>(numberOfVectors);
-            for (int i = 0, ii = this.features.Count; i < ii; i++)
-            {
-                FeatureDetectors.Features f = this.features[i].features;
-                for (int j = 0, jj = f.Count, len = f.Length, off = 0; j < jj; j++, off += len)
-                {
-                    vectors.Add(new DenseVectorProxyF(len, f.X, off));
-                    ////vectors.Add(SparseVectorF.FromDense(len, f.X, off));
-                }
-            }*/
-
-            // learn k-means
-            this.kmeans = KMeans.Learn(
-                32,
-                KMeansSeeding.Random,
-                default(EuclideanDistance),
-                vectors.Keys.ToList(),
-                vectors.Values.ToList(),
-                cancellationToken);
-
-            // learn svm
-            Dictionary<string, int> classesLookup = this.classes.ToDictionary((x, i) => x, (x, i) => i);
-
-            SequentualMinimalOptimization smo = new SequentualMinimalOptimization(new ChiSquare())
-            {
-                Algorithm = SMOAlgorithm.LibSVM,
-                Tolerance = 0.01f,
-            };
-
-            List<float[]> svmx = new List<float[]>(this.features.Count);
-            List<int> svmy = new List<int>(this.features.Count);
-
-            for (int i = 0, ii = this.features.Count; i < ii; i++)
-            {
-                (FeatureDetectors.Features features, string truth) = this.features[i];
-                svmx.Add(this.kmeans.Transform(features, null, null, cancellationToken));
-                svmy.Add(classesLookup[truth]);
-            }
-
-            this.svm = OneVsAllSupportVectorMachine.Learn(
-                smo,
-                this.classes.Count,
-                svmx,
-                svmy,
-                null,
-                cancellationToken);
+            (this.classes, this.kmeans, this.svm) = this.learner.FinishLearning(this.VectorLength, cancellationToken);
+            this.isLearned = true;
         }
 
         /// <inheritdoc />
         private protected override bool Train(PointsOfInterestFeatures features, string truth, CancellationToken cancellationToken)
         {
-            this.features.Add((features.Features, truth));
+            this.learner.AddFeatures(features, truth);
             return true;
+        }
+
+        private class Learner
+        {
+            private readonly List<(FeatureDetectors.Features features, string truth)> features =
+                new List<(FeatureDetectors.Features features, string truth)>();
+
+            public void AddFeatures(PointsOfInterestFeatures features, string truth)
+            {
+                this.features.Add((features.Features, truth));
+            }
+
+            public (List<string> classes, KMeans kmeans, OneVsAllSupportVectorMachine svm) FinishLearning(
+                int vectorLength,
+                CancellationToken cancellationToken)
+            {
+                // count classes
+                List<string> classes = new List<string>(this.features.Select(x => x.truth).ToLookup(x => x).Select(x => x.Key));
+                if (classes.Count < 2)
+                {
+                    throw new ArgumentException();
+                }
+
+                classes.Sort();
+
+                // count vectors
+                int numberOfVectors = this.features.Sum(x => x.features.Count);
+
+                // copy vectors
+                Dictionary<IVector<float>, float> vectors = new Dictionary<IVector<float>, float>(numberOfVectors);
+                for (int i = 0, ii = this.features.Count; i < ii; i++)
+                {
+                    FeatureDetectors.Features f = this.features[i].features;
+                    for (int j = 0, jj = f.Count, len = f.Length, off = 0; j < jj; j++, off += len)
+                    {
+                        DenseVectorF vector = new DenseVectorF(len, f.X, off);
+                        vectors[vector] = vectors.TryGetValue(vector, out float weight) ? weight + 1.0f : 1.0f;
+                    }
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // learn k-means
+                KMeans kmeans = KMeans.Learn(
+                    vectorLength,
+                    KMeansSeeding.Random,
+                    2,
+                    default(EuclideanDistance),
+                    vectors.Keys.ToList(),
+                    vectors.Values.ToList(),
+                    cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // learn svm
+                Dictionary<string, int> classesLookup = classes.ToDictionary((x, i) => x, (x, i) => i);
+
+                SequentualMinimalOptimization smo = new SequentualMinimalOptimization(new ChiSquare())
+                {
+                    Algorithm = SMOAlgorithm.LibSVM,
+                    Tolerance = 0.01f,
+                };
+
+                List<float[]> svmx = new List<float[]>(this.features.Count);
+                List<int> svmy = new List<int>(this.features.Count);
+
+                for (int i = 0, ii = this.features.Count; i < ii; i++)
+                {
+                    (FeatureDetectors.Features features, string truth) = this.features[i];
+                    svmx.Add(PointsOfInterestClassifier.PrepareVector(kmeans, features, cancellationToken));
+                    svmy.Add(classesLookup[truth]);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                OneVsAllSupportVectorMachine svm = OneVsAllSupportVectorMachine.Learn(
+                    smo,
+                    classes.Count,
+                    svmx,
+                    svmy,
+                    null,
+                    cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return (classes, kmeans, svm);
+            }
         }
     }
 }

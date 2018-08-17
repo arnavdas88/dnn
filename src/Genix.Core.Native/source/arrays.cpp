@@ -59,6 +59,22 @@ extern "C" __declspec(dllexport) void WINAPI scopy_inc(
 	}
 }
 
+// move arrays
+template<typename T> void __forceinline __move(
+	int n,
+	const T* x, int offx,
+	T* y, int offy)
+{
+	::memmove(y + offy, x + offx, n * sizeof(T));
+}
+
+GENIXAPI(void, move_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_f32)(int n, const float* x, int offx, float* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_f64)(int n, const double* x, int offx, double* y, int offy) { __move(n, x, offx, y, offy); }
+
 // set all elements of an array to constant value
 template<typename T> void __forceinline __set(
 	int n,

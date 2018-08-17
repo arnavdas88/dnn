@@ -78,6 +78,7 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="k">The number of clusters.</param>
         /// <param name="seeding">The cluster initialization algorithm.</param>
+        /// <param name="maxiter">The maximum number of iterations.</param>
         /// <param name="distance">The distance function.</param>
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
@@ -96,6 +97,7 @@ namespace Genix.MachineLearning.Clustering
         public static KMeans Learn(
             int k,
             KMeansSeeding seeding,
+            int maxiter,
             IVectorDistance<float, IVector<float>, float> distance,
             IList<IVector<float>> x,
             IList<float> weights,
@@ -117,8 +119,6 @@ namespace Genix.MachineLearning.Clustering
 #if false
             NativeMethods.kmeans(k, 1, dimension, sampleCount, x);
 #else
-            int maxiter = 2;
-
             KMeansClusterCollection clusters = new KMeansClusterCollection(k, dimension, distance);
             switch (seeding)
             {
@@ -228,6 +228,7 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="x">The data points to assign.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point. Can be <b>null</b>.</param>
+        /// <param name="normalize">Determines whether the resulting vector should be normalized.</param>
         /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
@@ -238,7 +239,12 @@ namespace Genix.MachineLearning.Clustering
         /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Transform(IList<IVector<float>> x, IList<float> weights, float[] result, CancellationToken cancellationToken)
+        public float[] Transform(
+            IList<IVector<float>> x,
+            IList<float> weights,
+            bool normalize,
+            float[] result,
+            CancellationToken cancellationToken)
         {
             if (result == null)
             {
@@ -264,6 +270,15 @@ namespace Genix.MachineLearning.Clustering
                 {
                     int cluster = this.Assign(x[i]);
                     result[cluster] += weights[i];
+                }
+            }
+
+            if (normalize)
+            {
+                float sum = Math32f.Sum(result.Length, result, 0);
+                if (sum != 0.0f)
+                {
+                    Math32f.DivC(result.Length, sum, result, 0);
                 }
             }
 
@@ -275,6 +290,7 @@ namespace Genix.MachineLearning.Clustering
         /// </summary>
         /// <param name="x">The data points to assign.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point. Can be <b>null</b>.</param>
+        /// <param name="normalize">Determines whether the resulting vector should be normalized.</param>
         /// <param name="result">The feature vector that receives the result. Can be <b>null</b>.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
         /// <returns>
@@ -285,7 +301,12 @@ namespace Genix.MachineLearning.Clustering
         /// <para><paramref name="weights"/> is not <b>null</b> and the number of elements in <paramref name="weights"/> does not match the number of elements in <paramref name="x"/>.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float[] Transform(IVectorPack<float> x, IList<float> weights, float[] result, CancellationToken cancellationToken)
+        public float[] Transform(
+            IVectorPack<float> x,
+            IList<float> weights,
+            bool normalize,
+            float[] result,
+            CancellationToken cancellationToken)
         {
             if (result == null)
             {
@@ -311,6 +332,15 @@ namespace Genix.MachineLearning.Clustering
                 {
                     int cluster = this.Assign(new DenseVectorProxyF(len, x.X, off));
                     result[cluster] += weights[i];
+                }
+            }
+
+            if (normalize)
+            {
+                float sum = Math32f.Sum(result.Length, result, 0);
+                if (sum != 0.0f)
+                {
+                    Math32f.DivC(result.Length, sum, result, 0);
                 }
             }
 

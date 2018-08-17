@@ -55,6 +55,26 @@ namespace Genix.Core
         /// <inheritdoc />
         public int Offset => 0;
 
+        /// <summary>
+        /// Compares two <see cref="DenseVectorF"/> objects. The result specifies whether the properties specified by the two <see cref="DenseVectorF"/> objects are equal.
+        /// </summary>
+        /// <param name="left">The <see cref="DenseVectorF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="DenseVectorF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="DenseVectorF"/> structures have equal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator ==(DenseVectorF left, DenseVectorF right) => left.Equals(right);
+
+        /// <summary>
+        /// Compares two <see cref="DenseVectorF"/> objects. The result specifies whether the properties specified by the two <see cref="DenseVectorF"/> objects are unequal.
+        /// </summary>
+        /// <param name="left">The <see cref="DenseVectorF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="DenseVectorF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="DenseVectorF"/> structures have unequal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator !=(DenseVectorF left, DenseVectorF right) => !left.Equals(right);
+
         /// <inheritdoc />
         public bool Equals(DenseVectorF other)
         {

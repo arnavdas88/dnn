@@ -34,7 +34,7 @@ namespace Genix.Lab
         /// <param name="expected">The ground truth data for the class.</param>
         /// <param name="confidence">The classification confidence level.</param>
         /// <param name="isAccepted">The value indicating whether the classification result was accepted.</param>
-        public ClassificationResult(DataSourceId sourceId, T predicted, T expected, int confidence, bool isAccepted)
+        public ClassificationResult(DataSourceId sourceId, T predicted, T expected, float confidence, bool isAccepted)
         {
             this.SourceId = sourceId;
             this.Predicted = predicted;
@@ -89,9 +89,9 @@ namespace Genix.Lab
         /// Gets or sets the classification confidence level.
         /// </summary>
         /// <value>
-        /// A <see cref="int"/> that contains the classification confidence level.
+        /// A <see cref="float"/> that contains the classification confidence level.
         /// </value>
-        public int Confidence { get; set; }
+        public float Confidence { get; set; }
 
         /// <summary>
         ///  Gets or sets a value indicating whether the classification result was accepted.
@@ -175,7 +175,7 @@ namespace Genix.Lab
                         string fileName = split[0];
                         int? frameIndex = !string.IsNullOrEmpty(split[1]) ? (int?)int.Parse(split[1]) : null;
                         string predicted = split[2].Unqualify('\"');
-                        int confidence = int.Parse(split[3]);
+                        float confidence = float.Parse(split[3]);
                         bool isAccepted = split[4] == "1";
 
                         yield return new ClassificationResult<T>(

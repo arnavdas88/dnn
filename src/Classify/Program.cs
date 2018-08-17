@@ -10,6 +10,7 @@ namespace Genix.NetClassify
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.ExceptionServices;
     using System.Threading;
     using Genix.DocumentAnalysis;
@@ -60,14 +61,18 @@ namespace Genix.NetClassify
 
             private PointsOfInterestClassifier Learn()
             {
+                this.WriteLine(null, "Learning...");
+
                 PointsOfInterestClassifier classifier = new PointsOfInterestClassifier();
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
                     dataProvider.AddDirectory(
-                        @"Z:\Test\Classification2\Data\Gerber_train.txt",
+                        @"Z:\Test\Classification2\Data\t95_r285_q954_train.txt",
+                        ////@"Z:\Test\Classification2\Data\Gerber_train.txt",
                         false,
-                        @"Z:\Test\Classification2\Data\Gerber_truth.txt",
+                        @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt",
+                        ////@"Z:\Test\Classification2\Data\Gerber_truth.txt",
                         "#Class");
 
                     ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
@@ -110,14 +115,18 @@ namespace Genix.NetClassify
 
             private void Test(PointsOfInterestClassifier classifier)
             {
+                this.WriteLine(null, "Testing...");
+
                 List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
                     dataProvider.AddDirectory(
-                        @"Z:\Test\Classification2\Data\Gerber_test.txt",
+                        @"Z:\Test\Classification2\Data\t95_r285_q954_test.txt",
+                        ////@"Z:\Test\Classification2\Data\Gerber_test.txt",
                         false,
-                        @"Z:\Test\Classification2\Data\Gerber_truth.txt",
+                        @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt",
+                        ////@"Z:\Test\Classification2\Data\Gerber_truth.txt",
                         "#Class");
 
                     ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
@@ -145,7 +154,7 @@ namespace Genix.NetClassify
                             {
                                 this.WriteLine(
                                     null,
-                                    "OK ({0} ms) {1} {2}",
+                                    "OK ({0} ms) {1} {2:F4}",
                                     duration,
                                     answer?.ClassName ?? string.Empty,
                                     answer?.Confidence ?? 0.0);
@@ -162,8 +171,8 @@ namespace Genix.NetClassify
                             answer.Id,
                             answer.ClassName,
                             string.Concat(image.Labels),
-                            (int)((100.0f * answer.Confidence) + 0.5f),
-                            answer.Confidence >= 1));
+                            answer.Confidence,
+                            answer.Confidence >= 0.2f));
                     }
                 }
 

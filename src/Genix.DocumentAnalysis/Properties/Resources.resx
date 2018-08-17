@@ -120,6 +120,9 @@
   <data name="E_Classifier_EmptyTrainset" xml:space="preserve">
     <value>There are not enough data with ground truth to train the classifier.</value>
   </data>
+  <data name="E_Classifier_NotLearned" xml:space="preserve">
+    <value>The classifier is not ready. You have to learn the classifier before using it.</value>
+  </data>
   <data name="E_UnsupportedDepth" xml:space="preserve">
     <value>The image depth {0} is not supported for this operation.</value>
   </data>

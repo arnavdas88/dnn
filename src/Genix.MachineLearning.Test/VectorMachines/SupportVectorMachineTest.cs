@@ -64,7 +64,7 @@
             // test
             List<ClassificationResult<bool?>> results = samples
                 .Skip(LearnCount)
-                .Select(x => new ClassificationResult<bool?>(null, machine.Classify(x.x) > 0.5f, x.y, 100, true))
+                .Select(x => new ClassificationResult<bool?>(null, machine.Classify(x.x) > 0.5f, x.y, 1.0f, true))
                 .ToList();
 
             ClassificationReport<bool?> report = new ClassificationReport<bool?>(results);

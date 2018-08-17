@@ -27,8 +27,8 @@ namespace Genix.Imaging.Lab
         private readonly string[] truthFileNames = new string[] { "truth.txt", "truth.new" };
         private readonly string[] truthFieldNames = new string[] { "#Class", "Word" };
 
-        private readonly List<(string Path, bool Recursive, Truth Truth, string FieldName, string[] Labels)> data =
-            new List<(string, bool, Truth, string, string[])>();
+        private readonly List<(string Path, bool Recursive, Truth Truth, string FieldName, string Label)> data =
+            new List<(string, bool, Truth, string, string)>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
@@ -56,7 +56,12 @@ namespace Genix.Imaging.Lab
         /// <param name="label">The label for all samples in the directory.</param>
         public void AddDirectory(string path, bool recursive, string label)
         {
-            this.data.Add((path, recursive, null, null, new string[] { label }));
+            if (label == null)
+            {
+                throw new ArgumentNullException(nameof(label));
+            }
+
+            this.data.Add((path, recursive, null, null, label));
         }
 
         /// <summary>
@@ -125,10 +130,10 @@ namespace Genix.Imaging.Lab
 
             IEnumerable<TestImage> EnumSamples()
             {
-                foreach ((string path, bool recursive, Truth truth, string fieldName, string[] labels) in this.data)
+                foreach ((string path, bool recursive, Truth truth, string fieldName, string label) in this.data)
                 {
                     // filter by provided label
-                    if (lookup != null && labels != null && !lookup.Contains(string.Concat(labels)))
+                    if (lookup != null && label != null && !lookup.Contains(label))
                     {
                         continue;
                     }
@@ -137,18 +142,17 @@ namespace Genix.Imaging.Lab
                     {
                         foreach ((Imaging.Image image, int? frameIndex) in this.LoadImage(fileName, startingFrame, frameCount))
                         {
-                            yield return new TestImage(
-                                new DataSourceId(fileName, Path.GetFileName(fileName), frameIndex),
-                                null,
-                                null,
-                                image,
-                                ComputeLabels(fileName, frameIndex));
+                            string gt = label ?? truth[fileName, frameIndex, fieldName];
+                            if (!string.IsNullOrEmpty(gt))
+                            {
+                                yield return new TestImage(
+                                    new DataSourceId(fileName, Path.GetFileName(fileName), frameIndex),
+                                    null,
+                                    null,
+                                    image,
+                                    new string[] { gt });
+                            }
                         }
-                    }
-
-                    string[] ComputeLabels(string fileName, int? frameIndex)
-                    {
-                        return labels ?? new string[] { truth[fileName, frameIndex, fieldName] };
                     }
                 }
             }

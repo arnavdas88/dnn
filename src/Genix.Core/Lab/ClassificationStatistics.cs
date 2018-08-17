@@ -70,27 +70,27 @@ namespace Genix.Lab
         /// Gets the percentage of items that were classified correctly.
         /// </summary>
         /// <value><see cref="Valid"/> divided by <see cref="Count"/>; zero if <see cref="Count"/> is zero.</value>
-        public double ValidRate
+        public float ValidRate
         {
-            get { return this.Count > 0 ? (double)this.Valid / this.Count : 0.0; }
+            get { return this.Count > 0 ? (float)this.Valid / this.Count : 0.0f; }
         }
 
         /// <summary>
         /// Gets the percentage of items that were announced as correct.
         /// </summary>
         /// <value><see cref="Accepted"/> divided by <see cref="Count"/>; zero if <see cref="Count"/> is zero.</value>
-        public double AcceptRate
+        public float AcceptRate
         {
-            get { return this.Count > 0 ? (double)this.Accepted / this.Count : 0.0; }
+            get { return this.Count > 0 ? (float)this.Accepted / this.Count : 0.0f; }
         }
 
         /// <summary>
         /// Gets the percentage items that were announced as correct but were incorrect.
         /// </summary>
         /// <value><see cref="Errors"/> divided by <see cref="Accepted"/>; zero if <see cref="Accepted"/> is zero.</value>
-        public double ErrorRate
+        public float ErrorRate
         {
-            get { return this.Accepted > 0 ? (double)this.Errors / this.Accepted : 0.0; }
+            get { return this.Accepted > 0 ? (float)this.Errors / this.Accepted : 0.0f; }
         }
 
         /// <inheritdoc />

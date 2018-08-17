@@ -63,6 +63,8 @@ namespace Genix.Lab
             if (summaries.Any())
             {
                 // print report header
+                writer.WriteLine("=============================================================================");
+                writer.WriteLine("SUMMARY");
                 int maxClassNameLength = Math.Max(summaries.Max(x => x.Label.ToString().Length), 8);
                 writer.Write(string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}},", maxClassNameLength), "Class");
                 writer.Write(ShortFormat, "Total", "%", "#");
@@ -174,7 +176,11 @@ namespace Genix.Lab
                 {
                     ////if (error.IsAccepted)
                     {
-                        writer.WriteLine("{0},{1},{2}", Truth.MakeFileName(error.SourceId.Id, error.SourceId.FrameIndex), error.Predicted, error.Confidence);
+                        writer.WriteLine(
+                            "{0},{1},{2:F4}",
+                            Truth.MakeFileName(error.SourceId.Id, error.SourceId.FrameIndex),
+                            error.Predicted,
+                            error.Confidence);
                     }
                 }
 
@@ -190,7 +196,7 @@ namespace Genix.Lab
         /// <param name="summary">Classification results for the class.</param>
         private static void WriteClassRejectCurve(StreamWriter writer, ClassSummary<T> summary)
         {
-            double[] errorRates = { 0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11 };
+            float[] errorRates = { 0.001f, 0.005f, 0.01f, 0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.07f, 0.08f, 0.09f, 0.10f, 0.11f };
 
             writer.WriteLine(summary.Label);
             writer.WriteLine();
@@ -202,8 +208,8 @@ namespace Genix.Lab
                 "Accept",
                 "Threshold");
 
-            Genix.Lab.RejectCurveTarget[] targets = summary.Statistics.RejectCurveTruth.GetTargets(errorRates);
-            foreach (Genix.Lab.RejectCurveTarget target in targets)
+            RejectCurveTarget[] targets = summary.Statistics.RejectCurveTruth.GetTargets(errorRates);
+            foreach (RejectCurveTarget target in targets)
             {
                 if (target.Point.HasValue)
                 {
@@ -226,7 +232,7 @@ namespace Genix.Lab
             writer.WriteLine();
 
             // write area
-            double average = summary.Statistics.RejectCurveTruth.GetArea(0.0, errorRates.Last(), 100);
+            float average = summary.Statistics.RejectCurveTruth.GetArea(0.0f, errorRates.Last(), 100);
             writer.WriteLine(
                 "Area: {0:P2}",
                 average);
@@ -243,7 +249,7 @@ namespace Genix.Lab
         /// <param name="classes">Classification results for each class.</param>
         private static void WriteRejectCurves(StreamWriter writer, ClassSummary<T> all, IList<ClassSummary<T>> classes)
         {
-            double[] errorRates = { 0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11 };
+            float[] errorRates = { 0.001f, 0.005f, 0.01f, 0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.07f, 0.08f, 0.09f, 0.10f, 0.11f };
 
             List<ClassSummary<T>> combined = new List<ClassSummary<T>>() { all };
             combined.AddRange(classes);
@@ -270,13 +276,13 @@ namespace Genix.Lab
             writer.WriteLine();
 
             // write targets
-            foreach (double errorRate in errorRates)
+            foreach (float errorRate in errorRates)
             {
                 writer.Write("{0,-10:P2}", errorRate);
 
                 foreach (ClassSummary<T> cls in combined)
                 {
-                    Genix.Lab.RejectCurveTarget target = cls.Statistics.RejectCurveTruth.GetTarget(errorRate);
+                    RejectCurveTarget target = cls.Statistics.RejectCurveTruth.GetTarget(errorRate);
                     if (target.Point.HasValue)
                     {
                         writer.Write(
@@ -302,7 +308,7 @@ namespace Genix.Lab
             writer.Write("{0,-10}", "Area:");
             foreach (ClassSummary<T> cls in combined)
             {
-                double average = cls.Statistics.RejectCurveTruth.GetArea(0.0, errorRates.Last(), 100);
+                float average = cls.Statistics.RejectCurveTruth.GetArea(0.0f, errorRates.Last(), 100);
                 writer.Write("{0,-30:P2}", average);
             }
 
@@ -329,7 +335,7 @@ namespace Genix.Lab
         {
             if (denominator > 0)
             {
-                return ((double)nominator / denominator).ToString("P2", CultureInfo.InvariantCulture);
+                return ((float)nominator / denominator).ToString("P2", CultureInfo.InvariantCulture);
             }
             else
             {

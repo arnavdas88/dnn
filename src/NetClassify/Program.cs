@@ -104,24 +104,24 @@ namespace Genix.NetClassify
                         ////string answer = answers.Last().FirstOrDefault()?.Answer;
                         ////int prob = (int)(((answers.Last().FirstOrDefault()?.Probability ?? 0.0f) * 100) + 0.5f);
                         string answer = answers.FirstOrDefault().Answer;
-                        int prob = (int)((answers.FirstOrDefault().Probability * 100) + 0.5f);
+                        float prob = answers.FirstOrDefault().Probability;
 
                         results.Add(new ClassificationResult<string>(
                             sample.SourceId,
                             answer,
                             string.Concat(sample.Labels),
                             prob,
-                            prob >= 38));
+                            prob >= 0.38f));
 
                         ////this.Write(".");
                         this.Write(
                             null,
-                            "({0})\tFile: {1} ... OK ({4} ms) {2} {3}",
+                            "({0})\tFile: {1} ... OK ({4} ms) {2} {3:F4}",
                             this.totalImages,
                             sample.SourceId.ToFileName(),
+                            duration,
                             answer,
-                            prob,
-                            duration);
+                            prob);
                     }
                 }
 

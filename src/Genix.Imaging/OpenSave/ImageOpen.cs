@@ -16,6 +16,7 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.ExceptionServices;
     using System.Windows.Media.Imaging;
+    using System.Windows.Threading;
 
     /// <content>
     /// Provides file opening for the <see cref="Image"/> class.
@@ -420,13 +421,16 @@ namespace Genix.Imaging
 
             private class Enumerator : IEnumerator<(Image, int?, ImageMetadata)>, IEnumerator
             {
-                private readonly LoadedImages parent;
+                private readonly object sync = new object();
 
                 private readonly bool ownStream;
                 private readonly Stream stream;
                 private readonly long streamPosition;
                 private readonly BitmapDecoder decoder;
+
                 private readonly int frameCount;
+                private readonly int firstFrame;    // The index of first frame to load
+                private readonly int lastFrame;     // The index of last frame to load
 
                 // Enumerators are positioned before the first element until the first MoveNext() call.
                 private int currentFrame = -1;
@@ -434,8 +438,6 @@ namespace Genix.Imaging
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public Enumerator(LoadedImages parent)
                 {
-                    this.parent = parent;
-
                     try
                     {
                         if (!string.IsNullOrEmpty(parent.fileName))
@@ -454,10 +456,18 @@ namespace Genix.Imaging
                         }
 
                         this.streamPosition = this.stream.Position;
-                        this.decoder = Enumerator.CreateDecoder(this.stream);
-                        this.frameCount = this.decoder.Frames.Count;
+                        this.decoder = BitmapDecoder.Create(
+                            this.stream,
+                            BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.DelayCreation,
+                            BitmapCacheOption.None);
 
-                        this.currentFrame = this.parent.startingFrame - 1;
+                        this.frameCount = this.decoder.Frames.Count;
+                        this.firstFrame = parent.startingFrame;
+                        this.lastFrame = 0; //// parent.frameCount > 0 ?
+                            ////Math.Min(this.frameCount, parent.startingFrame + parent.frameCount) - 1 :
+                            ////this.frameCount - 1;
+
+                        this.currentFrame = this.firstFrame - 1;
                     }
                     catch (Exception e)
                     {
@@ -480,9 +490,12 @@ namespace Genix.Imaging
                 {
                     get
                     {
-                        BitmapFrame bitmapFrame = this.decoder.Frames[this.currentFrame];
-                        (Image image, ImageMetadata metadata) = bitmapFrame.FromBitmapFrame();
-                        return (image, this.frameCount == 1 ? null : (int?)this.currentFrame, metadata);
+                        lock (this.sync)
+                        {
+                            BitmapFrame bitmapFrame = this.decoder.Frames[this.currentFrame];
+                            (Image image, ImageMetadata metadata) = bitmapFrame.FromBitmapFrame();
+                            return (image, this.frameCount == 1 ? null : (int?)this.currentFrame, metadata);
+                        }
                     }
                 }
 
@@ -491,30 +504,27 @@ namespace Genix.Imaging
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 bool IEnumerator.MoveNext()
                 {
-                    this.currentFrame++;
-
-                    if (this.parent.frameCount > 0)
+                    lock (this.sync)
                     {
-                        return this.currentFrame < Math.Min(this.frameCount, this.parent.startingFrame + this.parent.frameCount);
-                    }
-                    else
-                    {
-                        return this.currentFrame < this.frameCount;
+                        return ++this.currentFrame <= this.lastFrame;
                     }
                 }
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 void IEnumerator.Reset()
                 {
-                    if (this.currentFrame != this.parent.startingFrame - 1)
+                    lock (this.sync)
                     {
-                        if (!this.stream.CanSeek)
+                        if (this.currentFrame != this.firstFrame - 1)
                         {
-                            throw new InvalidOperationException();
-                        }
+                            if (!this.stream.CanSeek)
+                            {
+                                throw new InvalidOperationException();
+                            }
 
-                        this.currentFrame = this.parent.startingFrame - 1;
-                        this.stream.Position = this.streamPosition;
+                            this.currentFrame = this.firstFrame - 1;
+                            this.stream.Position = this.streamPosition;
+                        }
                     }
                 }
 
@@ -526,15 +536,6 @@ namespace Genix.Imaging
                     {
                         this.stream?.Dispose();
                     }
-                }
-
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                private static BitmapDecoder CreateDecoder(Stream stream)
-                {
-                    return BitmapDecoder.Create(
-                        stream,
-                        BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.DelayCreation,
-                        BitmapCacheOption.None);
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace Genix.Lab
         /// Initializes a new instance of the <see cref="RejectCurve"/> class.
         /// </summary>
         public RejectCurve()
-            : this(100)
+            : this(1.0f)
         {
         }
 
@@ -32,12 +32,12 @@ namespace Genix.Lab
         /// Initializes a new instance of the <see cref="RejectCurve"/> class, using the specified maximum confidence value.
         /// </summary>
         /// <param name="maxConfidence">The maximum allowed confidence value.</param>
-        public RejectCurve(int maxConfidence)
+        public RejectCurve(float maxConfidence)
         {
             this.MaxConfidence = maxConfidence;
 
-            this.points = new RejectCurvePoint[this.MaxConfidence + 1];
-            for (int i = 0; i <= this.MaxConfidence; i++)
+            this.points = new RejectCurvePoint[(int)Math.Ceiling(100.0f * this.MaxConfidence) + 1];
+            for (int i = 0, ii = this.points.Length; i < ii; i++)
             {
                 this.points[i] = new RejectCurvePoint(i);
             }
@@ -55,9 +55,9 @@ namespace Genix.Lab
         /// Gets the maximum allowed confidence value.
         /// </summary>
         /// <value>
-        /// An integer that represents the maximum allowed confidence value. The default value is 100.
+        /// An integer that represents the maximum allowed confidence value. The default value is 1.0f.
         /// </value>
-        public int MaxConfidence { get; private set; }
+        public float MaxConfidence { get; private set; }
 
         /// <summary>
         /// Gets the collection of the <see cref="RejectCurvePoint"/> in the curve.
@@ -111,9 +111,9 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="confidence">An item's confidence value.</param>
         /// <param name="isValid">Determines whether the item matches truth data.</param>
-        public void Add(int confidence, bool isValid)
+        public void Add(float confidence, bool isValid)
         {
-            confidence = Math.Max(0, Math.Min(this.MaxConfidence, confidence));
+            confidence = confidence.Clip(0, this.MaxConfidence);
 
             this.Count++;
 
@@ -129,7 +129,7 @@ namespace Genix.Lab
         /// <param name="target">The target error rate.</param>
         /// <returns>The <see cref="RejectCurveTarget"/> object.</returns>
         /// <remarks>The <b>Point</b> property of returned <see cref="RejectCurveTarget"/> object sets to <b>null</b> when the target error rate cannot be reached.</remarks>
-        public RejectCurveTarget GetTarget(double target)
+        public RejectCurveTarget GetTarget(float target)
         {
             int threshold = Array.FindIndex(this.points, x => x.ErrorRate <= target);
 
@@ -143,7 +143,7 @@ namespace Genix.Lab
         /// <returns>The collection of <see cref="RejectCurveTarget"/> objects.</returns>
         /// <remarks>The <b>Point</b> property of returned <see cref="RejectCurveTarget"/> objects sets to <b>null</b> when the target error rates cannot be reached.</remarks>
         /// <exception cref="ArgumentNullException"><c>targets</c> is <b>null</b>.</exception>
-        public RejectCurveTarget[] GetTargets(params double[] targets)
+        public RejectCurveTarget[] GetTargets(params float[] targets)
         {
             if (targets == null)
             {
@@ -159,7 +159,7 @@ namespace Genix.Lab
         /// <param name="errorRateStart">The starting error rate.</param>
         /// <param name="errorRateEnd">The ending error rate.</param>
         /// <returns>The area under the curve.</returns>
-        public double GetArea(double errorRateStart, double errorRateEnd) => this.GetArea(errorRateStart, errorRateEnd, 10);
+        public float GetArea(float errorRateStart, float errorRateEnd) => this.GetArea(errorRateStart, errorRateEnd, 10);
 
         /// <summary>
         /// Gets the area under the curve that has error rate as its x-axis and accept rate as its y-axis.
@@ -168,20 +168,20 @@ namespace Genix.Lab
         /// <param name="errorRateEnd">The ending error rate.</param>
         /// <param name="intervalCount">The number discrete intervals.</param>
         /// <returns>The area under the curve.</returns>
-        public double GetArea(double errorRateStart, double errorRateEnd, int intervalCount)
+        public float GetArea(float errorRateStart, float errorRateEnd, int intervalCount)
         {
             if (!intervalCount.Between(1, 100))
             {
                 throw new ArgumentOutOfRangeException(nameof(intervalCount));
             }
 
-            double step = (errorRateEnd - errorRateStart) / intervalCount;
-            double result = 0.0;
+            float step = (errorRateEnd - errorRateStart) / intervalCount;
+            float result = 0.0f;
 
             // initialize error rates
             checked
             {
-                double[] errorRates = new double[intervalCount + 1];
+                float[] errorRates = new float[intervalCount + 1];
                 for (int i = 0; i < errorRates.Length; i++)
                 {
                     errorRates[i] = errorRateStart + (step * i);
@@ -193,10 +193,10 @@ namespace Genix.Lab
                 RejectCurveTarget[] targets = this.GetTargets(errorRates);
 
                 // calculate area
-                double acceptRate1 = targets[0].Point.HasValue ? targets[0].Point.Value.AcceptRate : 0.0;
+                float acceptRate1 = targets[0].Point.HasValue ? targets[0].Point.Value.AcceptRate : 0.0f;
                 for (int i = 1; i < targets.Length; i++)
                 {
-                    double acceptRate2 = targets[i].Point.HasValue ? targets[i].Point.Value.AcceptRate : 0.0;
+                    float acceptRate2 = targets[i].Point.HasValue ? targets[i].Point.Value.AcceptRate : 0.0f;
                     result += ((acceptRate1 + acceptRate2) / 2) * step;
                     acceptRate1 = acceptRate2;
                 }
