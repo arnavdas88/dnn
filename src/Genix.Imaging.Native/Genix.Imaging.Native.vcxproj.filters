@@ -49,5 +49,8 @@
     <ClCompile Include="source\thresholding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\filters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

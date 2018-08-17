@@ -60,6 +60,7 @@
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\FeatureDetectors.cs" />
+    <Compile Include="Extensions\Filters.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
