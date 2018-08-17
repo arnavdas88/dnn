@@ -67,7 +67,7 @@ namespace Genix.NetClassify
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
-                    dataProvider.AddDirectory(
+                    dataProvider.Add(
                         @"Z:\Test\Classification2\Data\t95_r285_q954_train.txt",
                         ////@"Z:\Test\Classification2\Data\Gerber_train.txt",
                         false,
@@ -89,7 +89,7 @@ namespace Genix.NetClassify
                                 null,
                                 "({0})\tFile: {1} ... ",
                                 index,
-                                source.SourceId.ToFileName());
+                                source.SourceId.ToFileName(false));
 
                             if (exception != null)
                             {
@@ -110,6 +110,8 @@ namespace Genix.NetClassify
                         CancellationToken.None);
                 }
 
+                ////classifier.SaveToFile(@"d:\dnn\" + Guid.NewGuid().ToString() + ".json");
+
                 return classifier;
             }
 
@@ -121,7 +123,7 @@ namespace Genix.NetClassify
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
-                    dataProvider.AddDirectory(
+                    dataProvider.Add(
                         @"Z:\Test\Classification2\Data\t95_r285_q954_test.txt",
                         ////@"Z:\Test\Classification2\Data\Gerber_test.txt",
                         false,
@@ -143,7 +145,7 @@ namespace Genix.NetClassify
                                 null,
                                 "({0})\tFile: {1} ... ",
                                 index,
-                                source.SourceId.ToFileName());
+                                source.SourceId.ToFileName(false));
 
                             if (exception != null)
                             {

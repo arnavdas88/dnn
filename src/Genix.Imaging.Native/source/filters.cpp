@@ -111,6 +111,234 @@ GENIXAPI(int, filterGaussian_24bpp)(
 	return (int)status;
 }
 
+GENIXAPI(int, filterLaplace_8bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterLaplaceBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		1,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterLaplaceBorder_8u_C1R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterLaplace_24bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterLaplaceBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		3,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterLaplaceBorder_8u_C3R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterLaplace_32bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterLaplaceBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		4,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterLaplaceBorder_8u_AC4R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterHipass_8bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterHipassBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		1,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterHipassBorder_8u_C1R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterHipass_24bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterHipassBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		3,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterHipassBorder_8u_C3R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterHipass_32bpp)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	int maskSize /* 3 or 5 */)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterHipassBorderGetBufferSize(
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ipp8u,
+		ipp8u,
+		4,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	check_sts(status = ippiFilterHipassBorder_8u_AC4R(
+		(const Ipp8u*)src,
+		stridesrc * sizeof(unsigned __int64),
+		(Ipp8u*)dst,
+		stridedst * sizeof(unsigned __int64),
+		roiSize,
+		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		ippBorderRepl,
+		0,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
 GENIXAPI(int, filterLowpass_8bpp)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,

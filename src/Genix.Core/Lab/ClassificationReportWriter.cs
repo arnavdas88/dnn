@@ -82,18 +82,18 @@ namespace Genix.Lab
                 ClassificationReportWriter<T>.WriteClassStatistics(writer, report.AllClasses, maxClassNameLength);
 
                 // print confusion matrix
-                writer.WriteLine();
+                /*writer.WriteLine();
                 writer.WriteLine("=============================================================================");
                 writer.WriteLine("CONFUSION MATRIX");
                 writer.WriteLine();
-                ClassificationReportWriter<T>.WriteConfusionMatrix(writer, report.ConfusionMatrix);
+                ClassificationReportWriter<T>.WriteConfusionMatrix(writer, report.ConfusionMatrix);*/
 
                 // print reject curves
-                writer.WriteLine();
+                /*writer.WriteLine();
                 writer.WriteLine("=============================================================================");
                 writer.WriteLine("REJECT CURVES");
                 writer.WriteLine();
-                ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);
+                ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);*/
 
                 // print errors
                 writer.WriteLine();
@@ -178,7 +178,7 @@ namespace Genix.Lab
                     {
                         writer.WriteLine(
                             "{0},{1},{2:F4}",
-                            Truth.MakeFileName(error.SourceId.Id, error.SourceId.FrameIndex),
+                            error.SourceId.ToFileName(true),
                             error.Predicted,
                             error.Confidence);
                     }

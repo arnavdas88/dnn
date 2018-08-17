@@ -117,7 +117,7 @@ namespace Genix.Imaging.Lab
 
                                     foreach (Test test in tests)
                                     {
-                                        provider.AddDirectory(test.Path, test.Recursive, test.Class);
+                                        provider.Add(test.Path, test.Recursive, test.Class);
                                     }
                                 }
                             }

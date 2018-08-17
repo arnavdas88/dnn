@@ -26,6 +26,9 @@ namespace Genix.DocumentAnalysis.Classification
         [JsonProperty("detector")]
         private readonly IFeatureDetector detector = new HistogramsOfOrientedGradients()
         {
+            CellSize = 32,
+            BlockSize = 3,
+            NumberOfBins = 6,
             Threshold = 0.2f,
         };
 
@@ -80,20 +83,24 @@ namespace Genix.DocumentAnalysis.Classification
 
             Image image = ImagePreprocessing.Process(source.Image, this.ImagePreprocessingOptions, 8);
 
-            image = image.Scale(150.0 / image.HorizontalResolution, 150.0 / image.VerticalResolution, ScalingOptions.None);
+            image = image.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None);
             ////image = image.Binarize();
             image = image.Convert8To1(128);
-            image = image.Deskew().Despeckle();
+            image = image.CleanOverscan(0.5f, 0.5f).Deskew().Despeckle();
 
             ISet<ConnectedComponent> components = image.FindConnectedComponents();
-            image.RemoveConnectedComponents(components.Where(x => x.Power <= 9));
+            image.RemoveConnectedComponents(components.Where(x => x.Power <= 16));
 
+            image = image.CropBlackArea(0, 0);
             image = image.Dilate(StructuringElement.Rectangle(3, 1), 1);
             image = image.Dilate(StructuringElement.Rectangle(1, 3), 1);
             ////image = image.CropBlackArea(0, 0);
             image = image.Convert1To8();
 
+            image = image.FilterLowpass(3);
+
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
+
             return new PointsOfInterestFeatures(source.Id, features);
         }
     }

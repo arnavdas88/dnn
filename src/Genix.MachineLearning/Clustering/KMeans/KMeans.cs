@@ -116,9 +116,6 @@ namespace Genix.MachineLearning.Clustering
             int sampleCount = x.Count;
             int dimension = x[0].Length;
 
-#if false
-            NativeMethods.kmeans(k, 1, dimension, sampleCount, x);
-#else
             KMeansClusterCollection clusters = new KMeansClusterCollection(k, dimension, distance);
             switch (seeding)
             {
@@ -186,7 +183,6 @@ namespace Genix.MachineLearning.Clustering
             {
                 Seeding = seeding,
             };
-#endif
         }
 
         /// <summary>
@@ -346,14 +342,5 @@ namespace Genix.MachineLearning.Clustering
 
             return result;
         }
-
-        /*private static class NativeMethods
-        {
-            private const string DllName = "Genix.MachineLearning.Native.dll";
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void kmeans(int k, int iter, int dimension, int samples, float[] x);
-        }*/
     }
 }

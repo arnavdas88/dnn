@@ -8,6 +8,7 @@ namespace Genix.DocumentAnalysis.Classification
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -58,7 +59,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <value>
         /// The length of a feature vector. Default value is 32.
         /// </value>
-        public int VectorLength { get; set; } = 512;
+        public int VectorLength { get; set; } = 192;
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">
@@ -88,6 +89,15 @@ namespace Genix.DocumentAnalysis.Classification
                 // find best class
                 int[] indices = Arrays.Indexes(w.Length);
                 Arrays.Sort(w.Length, w, 0, indices, 0, false);
+
+                /*float confidence = w[0];
+                float diff = w[0] - w[1];
+                if (diff < 0.15f)
+                {
+                    // penalize first answer which score is close to second's
+                    confidence *= 1.0f - (1.0f / (float)Math.Exp(100.0 * diff / Math.PI));
+                }*/
+
                 float confidence = (float)(-Math.Log(w[1] / w[0], 2.0));
 
                 return new Answer(
@@ -124,6 +134,8 @@ namespace Genix.DocumentAnalysis.Classification
         /// <inheritdoc />
         private protected override bool Train(PointsOfInterestFeatures features, string truth, CancellationToken cancellationToken)
         {
+            ////features.SaveToFile(@"d:\dnn\temp3\" + Path.GetFileNameWithoutExtension(features.Id.Id) + ".json");
+
             this.learner.AddFeatures(features, truth);
             return true;
         }
@@ -161,7 +173,8 @@ namespace Genix.DocumentAnalysis.Classification
                     FeatureDetectors.Features f = this.features[i].features;
                     for (int j = 0, jj = f.Count, len = f.Length, off = 0; j < jj; j++, off += len)
                     {
-                        DenseVectorF vector = new DenseVectorF(len, f.X, off);
+                        ////DenseVectorF vector = new DenseVectorF(len, f.X, off);
+                        SparseVectorF vector = SparseVectorF.FromDense(len, f.X, off);
                         vectors[vector] = vectors.TryGetValue(vector, out float weight) ? weight + 1.0f : 1.0f;
                     }
                 }

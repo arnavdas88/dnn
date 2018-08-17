@@ -118,16 +118,19 @@ namespace Genix.Core
         /// <summary>
         /// Constructs the file name for this <see cref="DataSourceId"/> that consist of file name and frame index.
         /// </summary>
+        /// <param name="fullPath">Determines whether the absolute path should be used.</param>
         /// <returns>The file name for this <see cref="DataSourceId"/>.</returns>
-        public string ToFileName()
+        public string ToFileName(bool fullPath)
         {
+            string fileName = fullPath ? this.Id : Path.GetFileName(this.Id);
+
             if (this.FrameIndex.HasValue && this.FrameIndex != 0)
             {
-                return string.Join(";", Path.GetFileName(this.Id), (this.FrameIndex + 1).ToString());
+                return string.Join(";", fileName, (this.FrameIndex + 1).ToString());
             }
             else
             {
-                return Path.GetFileName(this.Id);
+                return fileName;
             }
         }
     }

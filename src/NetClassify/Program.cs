@@ -118,7 +118,7 @@ namespace Genix.NetClassify
                             null,
                             "({0})\tFile: {1} ... OK ({4} ms) {2} {3:F4}",
                             this.totalImages,
-                            sample.SourceId.ToFileName(),
+                            sample.SourceId.ToFileName(false),
                             duration,
                             answer,
                             prob);

@@ -54,7 +54,7 @@ namespace Genix.Imaging.Lab
         /// <param name="path">The path to the directory.</param>
         /// <param name="recursive"><b>true</b> to scan the directory recursively.</param>
         /// <param name="label">The label for all samples in the directory.</param>
-        public void AddDirectory(string path, bool recursive, string label)
+        public void Add(string path, bool recursive, string label)
         {
             if (label == null)
             {
@@ -71,7 +71,7 @@ namespace Genix.Imaging.Lab
         /// <param name="recursive"><b>true</b> to scan the directory recursively.</param>
         /// <param name="truthFileName">The path to a truth file name.</param>
         /// <param name="truthFieldName">The name of a column that contains truth data.</param>
-        public void AddDirectory(string path, bool recursive, string truthFileName, string truthFieldName)
+        public void Add(string path, bool recursive, string truthFileName, string truthFieldName)
         {
             if (string.IsNullOrEmpty(truthFileName))
             {
@@ -158,7 +158,7 @@ namespace Genix.Imaging.Lab
             }
         }
 
-        private static IEnumerable<(string, int, int)> ListPath(string path, bool recursive)
+        private static IEnumerable<(string fileName, int startingFrame, int frameCount)> ListPath(string path, bool recursive)
         {
             if (Directory.Exists(path))
             {
@@ -169,9 +169,16 @@ namespace Genix.Imaging.Lab
             }
             else if (File.Exists(path))
             {
-                foreach (var file in ListFile(path))
+                if (Imaging.Image.SupportedFileExtensions.Contains(Path.GetExtension(path).ToUpperInvariant()))
                 {
-                    yield return file;
+                    yield return (path, 0, -1);
+                }
+                else
+                {
+                    foreach (var file in ListFile(path))
+                    {
+                        yield return file;
+                    }
                 }
             }
 

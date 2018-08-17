@@ -8,9 +8,12 @@ namespace Genix.DocumentAnalysis.Classification
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using Genix.Core;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Defines the contract that provides data classification.
@@ -55,6 +58,33 @@ namespace Genix.DocumentAnalysis.Classification
         /// The <see cref="IFeatureBuilder{TSource, TFeatures}"/> object.
         /// </value>
         public TFeatureBuilder FeatureBuilder => this.featureBuilder;
+
+        /// <summary>
+        /// Saves the current <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/> into the specified file.
+        /// </summary>
+        /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/>.</param>
+        public void SaveToFile(string fileName)
+        {
+            File.WriteAllText(fileName, this.SaveToString(), Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Saves the current <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/> to the memory buffer.
+        /// </summary>
+        /// <returns>The buffer that contains saved <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/>.</returns>
+        public byte[] SaveToMemory()
+        {
+            return UTF8Encoding.UTF8.GetBytes(this.SaveToString());
+        }
+
+        /// <summary>
+        /// Saves the current <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/> to the text string.
+        /// </summary>
+        /// <returns>The string that contains saved <see cref="Classifier{TSource, TFeatures, TFeatureBuilder}"/>.</returns>
+        public string SaveToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
 
         /// <summary>
         /// Extracts features from a <typeparamref name="TSource"/>,

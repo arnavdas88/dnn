@@ -38,13 +38,7 @@ namespace Genix.Imaging
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the image file extensions.
         /// </value>
-        public static ReadOnlyCollection<string> SupportedFileExtensions
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(Image.MapFormats.Keys.ToList());
-            }
-        }
+        public static IReadOnlyCollection<string> SupportedFileExtensions => Image.MapFormats.Keys;
 
         /// <summary>
         /// Saves a range of <see cref="Image"/> objects to the specified file.

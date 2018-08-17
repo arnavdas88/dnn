@@ -50,7 +50,7 @@ namespace Genix.DocumentAnalysis.FeatureDetectors
         /// <value>
         /// The block stride size, in number of <see cref="CellSize"/>. The default value is 1.
         /// </value>
-        [JsonProperty("blockSize")]
+        [JsonProperty("blockStride")]
         public int BlockStride { get; set; } = 1;
 
         /// <summary>
