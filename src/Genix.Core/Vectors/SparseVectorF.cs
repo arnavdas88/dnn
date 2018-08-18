@@ -22,7 +22,8 @@ namespace Genix.Core
     /// </para>
     /// </remarks>
     [JsonObject(MemberSerialization.OptIn)]
-    public struct SparseVectorF : IVector<float>
+    public struct SparseVectorF
+        : IEquatable<SparseVectorF>, IVector<float>
     {
         /// <summary>
         /// The indexes of the elements.
@@ -48,7 +49,7 @@ namespace Genix.Core
         /// <param name="length">The vector length.</param>
         /// <param name="idx">The indexes of the elements.</param>
         /// <param name="x">The values of the elements.</param>
-        private SparseVectorF(int length, int[] idx, float[] x)
+        public SparseVectorF(int length, int[] idx, float[] x)
         {
             this.length = length;
             this.Idx = idx;
@@ -57,6 +58,26 @@ namespace Genix.Core
 
         /// <inheritdoc />
         public int Length => this.length;
+
+        /// <summary>
+        /// Compares two <see cref="SparseVectorF"/> objects. The result specifies whether the properties specified by the two <see cref="SparseVectorF"/> objects are equal.
+        /// </summary>
+        /// <param name="left">The <see cref="SparseVectorF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="SparseVectorF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="SparseVectorF"/> structures have equal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator ==(SparseVectorF left, SparseVectorF right) => left.Equals(right);
+
+        /// <summary>
+        /// Compares two <see cref="SparseVectorF"/> objects. The result specifies whether the properties specified by the two <see cref="SparseVectorF"/> objects are unequal.
+        /// </summary>
+        /// <param name="left">The <see cref="SparseVectorF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="SparseVectorF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="SparseVectorF"/> structures have unequal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator !=(SparseVectorF left, SparseVectorF right) => !left.Equals(right);
 
         /// <summary>
         /// Create a <see cref="SparseVectorF"/> vector from a dense vector's non-zero elements.
@@ -99,6 +120,33 @@ namespace Genix.Core
         }
 
         /// <inheritdoc />
+        public bool Equals(SparseVectorF other)
+        {
+            return this.length == other.length &&
+                this.Idx.Length == other.Idx.Length &&
+                (this.Idx.Length == 0 ||
+                    (Arrays.Equals(this.Idx.Length, this.Idx, 0, other.Idx, 0) &&
+                     Arrays.Equals(this.Idx.Length, this.X, 0, other.X, 0)));
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SparseVectorF))
+            {
+                return false;
+            }
+
+            return this.Equals((SparseVectorF)obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return (int)(CRC.Calculate(this.Idx.Length, this.Idx, 0) & CRC.Calculate(this.Idx.Length, this.X, 0));
+        }
+
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Copy(float[] y, int offy)
         {
@@ -109,13 +157,6 @@ namespace Genix.Core
             {
                 y[offy + idx[i]] = x[i];
             }
-        }
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(float[] y, int offy)
-        {
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc />

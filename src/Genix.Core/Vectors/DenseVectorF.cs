@@ -105,10 +105,6 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(float[] y, int offy) => Arrays.Equals(this.x.Length, this.x, 0, y, offy);
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddC(float alpha) => Math32f.AddC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />

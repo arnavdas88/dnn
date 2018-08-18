@@ -178,7 +178,8 @@ namespace Genix.MachineLearning.Clustering
         /// <param name="x">The data points <paramref name="x"/> to clusterize.</param>
         /// <param name="weights">The <c>weight</c> of importance for each data point.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the clusterizer that the operation should be canceled.</param>
-        internal void RandomSeeding(IList<IVector<float>> x, IList<float> weights, CancellationToken cancellationToken)
+        /// <returns>The array that contains indexes of data points chosen as centroids.</returns>
+        internal int[] RandomSeeding(IList<IVector<float>> x, IList<float> weights, CancellationToken cancellationToken)
         {
             Random random = new Random(0);
 
@@ -186,6 +187,8 @@ namespace Genix.MachineLearning.Clustering
             int dimension = this.Dimension;
             int samples = x.Count;
             ProbabilityDistribution distribution = weights != null ? new ProbabilityDistribution(weights, random) : null;
+
+            int[] indexes = new int[k];
 
             // 1. Choose one center uniformly at random from among the data points.
             int idx = Next();
@@ -198,13 +201,15 @@ namespace Genix.MachineLearning.Clustering
                 cancellationToken.ThrowIfCancellationRequested();
 
                 idx = Next();
-                while (this.Take(centroid).Any(c => x[idx].Equals(c.Centroid, 0)))
+                while (indexes.Take(centroid).Any(i => idx == i || x[idx].Equals(x[i])))
                 {
                     idx = Next();
                 }
 
                 x[idx].Copy(this[centroid].Centroid, 0);
             }
+
+            return indexes;
 
             int Next()
             {

@@ -28,16 +28,6 @@ namespace Genix.Core
         void Copy(T[] y, int offy);
 
         /// <summary>
-        /// Determines whether this vector contains the same data as a dense vector.
-        /// </summary>
-        /// <param name="y">The dense vector to compare.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <returns>
-        /// <b>true</b> if two vectors contain same data; otherwise, <b>false</b>.
-        /// </returns>
-        bool Equals(float[] y, int offy);
-
-        /// <summary>
         /// Adds a constant value to each element of the vector.
         /// </summary>
         /// <param name="alpha">The scalar to add.</param>

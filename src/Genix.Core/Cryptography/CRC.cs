@@ -7,6 +7,7 @@
 namespace Genix.Core
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Provides critical sum calculation methods.
@@ -46,7 +47,20 @@ namespace Genix.Core
         /// <exception cref="ArgumentNullException">
         /// <paramref name="values"/> is <b>null</b>.
         /// </exception>
-        public static uint Calculate(int[] values)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Calculate(int[] values) => CRC.Calculate(values.Length, values, 0);
+
+        /// <summary>
+        /// Calculates a critical sum of the array of <see cref="int"/> values.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="values">The array to calculate the critical sum of.</param>
+        /// <param name="offset">The starting position in <paramref name="values"/>.</param>
+        /// <returns>The calculated critical sum value.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="values"/> is <b>null</b>.
+        /// </exception>
+        public static uint Calculate(int length, int[] values, int offset)
         {
             if (values == null)
             {
@@ -55,9 +69,9 @@ namespace Genix.Core
 
             unsafe
             {
-                fixed (int* bytes = values)
+                fixed (int* bytes = &values[offset])
                 {
-                    return Calculate((byte*)bytes, values.Length * sizeof(int));
+                    return Calculate((byte*)bytes, length * sizeof(int));
                 }
             }
         }
@@ -94,7 +108,20 @@ namespace Genix.Core
         /// <exception cref="ArgumentNullException">
         /// <paramref name="values"/> is <b>null</b>.
         /// </exception>
-        public static uint Calculate(float[] values)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Calculate(float[] values) => CRC.Calculate(values.Length, values, 0);
+
+        /// <summary>
+        /// Calculates a critical sum of the array of <see cref="float"/> values.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="values">The array to calculate the critical sum of.</param>
+        /// <param name="offset">The starting position in <paramref name="values"/>.</param>
+        /// <returns>The calculated critical sum value.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="values"/> is <b>null</b>.
+        /// </exception>
+        public static uint Calculate(int length, float[] values, int offset)
         {
             if (values == null)
             {
@@ -103,9 +130,9 @@ namespace Genix.Core
 
             unsafe
             {
-                fixed (float* bytes = values)
+                fixed (float* bytes = &values[offset])
                 {
-                    return Calculate((byte*)bytes, values.Length * sizeof(float));
+                    return Calculate((byte*)bytes, length * sizeof(float));
                 }
             }
         }

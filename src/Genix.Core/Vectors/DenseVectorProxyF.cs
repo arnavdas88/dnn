@@ -6,13 +6,14 @@
 
 namespace Genix.Core
 {
+    using System;
     using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents a wrapper around dense vector of single-precision floating point numbers.
     /// </summary>
     public struct DenseVectorProxyF
-        : IDenseVector<float>
+        : IEquatable<DenseVectorProxyF>, IDenseVector<float>
     {
         /// <summary>
         /// The vector length.
@@ -52,13 +53,53 @@ namespace Genix.Core
         /// <inheritdoc />
         public int Offset => this.offset;
 
+        /// <summary>
+        /// Compares two <see cref="DenseVectorProxyF"/> objects. The result specifies whether the properties specified by the two <see cref="DenseVectorProxyF"/> objects are equal.
+        /// </summary>
+        /// <param name="left">The <see cref="DenseVectorProxyF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="DenseVectorProxyF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="DenseVectorProxyF"/> structures have equal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator ==(DenseVectorProxyF left, DenseVectorProxyF right) => left.Equals(right);
+
+        /// <summary>
+        /// Compares two <see cref="DenseVectorProxyF"/> objects. The result specifies whether the properties specified by the two <see cref="DenseVectorProxyF"/> objects are unequal.
+        /// </summary>
+        /// <param name="left">The <see cref="DenseVectorProxyF"/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref="DenseVectorProxyF"/> structure that is to the right of the equality operator.</param>
+        /// <returns>
+        /// <b>true</b> if the two <see cref="DenseVectorProxyF"/> structures have unequal properties; otherwise, <b>false</b>.
+        /// </returns>
+        public static bool operator !=(DenseVectorProxyF left, DenseVectorProxyF right) => !left.Equals(right);
+
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Copy(float[] y, int offy) => Array32f.Copy(this.length, this.x, this.offset, y, offy);
+        public bool Equals(DenseVectorProxyF other)
+        {
+            return this.length == other.length &&
+                (this.length == 0 || Arrays.Equals(this.length, this.x, this.offset, other.x, other.offset));
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (!(obj is DenseVectorProxyF))
+            {
+                return false;
+            }
+
+            return this.Equals((DenseVectorProxyF)obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return (int)CRC.Calculate(this.length, this.x, this.offset);
+        }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(float[] y, int offy) => Arrays.Equals(this.length, this.x, this.offset, y, offy);
+        public void Copy(float[] y, int offy) => Array32f.Copy(this.length, this.x, this.offset, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
