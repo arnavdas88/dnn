@@ -321,22 +321,33 @@ namespace Genix.Imaging
                                         void ReplaceComponent(List<Stroke> strokes, int anchorPosition)
                                         {
                                             Rectangle anotherBounds = anotherComponent.Bounds;
-                                            for (int j = anchorPosition, jj = strokes.Count; j < jj && strokes[j].X <= anotherBounds.Right; j++)
+                                            for (int j = anchorPosition, jj = strokes.Count; j < jj; j++)
                                             {
                                                 if (strokes[j].Component == anotherComponent)
                                                 {
                                                     strokes[j].Component = component;
+                                                }
+                                                else if (strokes[j].Component != component && strokes[j].X > anotherBounds.Right)
+                                                {
+                                                    break;
                                                 }
                                             }
 
-                                            for (int j = anchorPosition - 1; j >= 0 && strokes[j].X2 >= anotherBounds.X; j--)
+                                            for (int j = anchorPosition - 1; j >= 0; j--)
                                             {
                                                 if (strokes[j].Component == anotherComponent)
                                                 {
                                                     strokes[j].Component = component;
                                                 }
+                                                else if (strokes[j].Component != component && strokes[j].X < anotherBounds.X)
+                                                {
+                                                    break;
+                                                }
                                             }
                                         }
+
+                                        Debug.Assert(last.All(c => c.Component != anotherComponent), "Component must be removed.");
+                                        Debug.Assert(current.All(c => c.Component != anotherComponent), "Component must be removed.");
                                     }
                                 }
 

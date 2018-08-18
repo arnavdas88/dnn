@@ -441,6 +441,14 @@ namespace Genix.Imaging
                 newline[i++] = line2[i2++];
             }
 
+            /*for (int j1 = 0, jj = newline.Length; j1 < jj - 1; j1++)
+            {
+                for (int j2 = j1 + 1; j2 < jj; j2++)
+                {
+                    Debug.Assert(!StrokesIntersect(newline[j1].X, newline[j1].Length, newline[j2].X, newline[j2].Length));
+                }
+            }*/
+
             return newline;
         }
 
