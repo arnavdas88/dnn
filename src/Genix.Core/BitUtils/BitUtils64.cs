@@ -376,7 +376,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Reverses the order of bits in each byte an array of 32-bit integers not-in-place.
+        /// Reverses the order of bits in each byte an array of 64-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The source array.</param>
@@ -387,6 +387,20 @@ namespace Genix.Core
         public static void BitSwap(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.bits_reverse_64(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Reverses the order of bits in each byte an array of 64-bit integers and places result into array of bytes.
+        /// </summary>
+        /// <param name="length">The number of integers to swap.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, ulong[] x, int offx, byte[] y, int offy)
+        {
+            NativeMethods.bits_reverse_64_u64u8(length, x, offx, y, offy * sizeof(ulong));
         }
 
         /// <summary>
@@ -540,6 +554,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "bits_reverse_64")]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_reverse_64_u64u8(int length, [In] ulong[] x, int offx, [Out] byte[] y, int offy64);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]

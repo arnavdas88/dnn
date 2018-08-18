@@ -15,6 +15,7 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using BitMiracle.LibTiff.Classic;
+    using Genix.Core;
 
     /// <summary>
     /// Provides extension methods that allows integration with Libtiff.NET library.
@@ -111,11 +112,17 @@ namespace Genix.Imaging
             // raster stride MAY be bigger than TIFF stride (due to padding in raster bits)
             for (int i = 0, offset = 0; i < image.Height; i++, offset += image.Stride)
             {
-                // copy and swap bytes
-                NativeMethods.bytesswap_64(image.Stride, image.Bits, offset, buffer, 0);
-                ////ConvertBGRToRGB(bytes, bitmap._width, bitmap._height, image.BitsPerPixel);
+                if (image.BitsPerPixel == 1)
+                {
+                    BitUtils64.BitSwap(image.Stride, image.Bits, offset, buffer, 0);
+                }
+                else
+                {
+                    Buffer.BlockCopy(image.Bits, offset, buffer, 0, image.Stride8);
+                    ////ConvertBGRToRGB(bytes, bitmap._width, bitmap._height, image.BitsPerPixel);
+                }
 
-                if (!tiff.WriteScanline(buffer, 0, i, 0))
+                if (!tiff.WriteScanline(buffer, i))
                 {
                     throw new InvalidOperationException(Properties.Resources.E_CannotEncodeImage);
                 }
@@ -546,13 +553,6 @@ namespace Genix.Imaging
                     return TiffType.UNDEFINED;
                 }
             }
-        }
-
-        private static class NativeMethods
-        {
-            [DllImport("Genix.Core.Native.dll")]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern unsafe void bytesswap_64(int n, [In] ulong[] x, int offx, [Out] byte[] y, int offy);
         }
 
         private sealed class MyTiffErrorHandler : TiffErrorHandler
