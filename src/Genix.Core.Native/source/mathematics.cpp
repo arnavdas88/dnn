@@ -282,6 +282,35 @@ GENIXAPI(void, add_ip_f64)(int n, const double* x, int offx, double* y, int offy
 	}
 }
 
+// Adds the elements of two vectors with increment in-place.
+template<typename T> void __forceinline __add_inc_ip(
+	int n,
+	const T* x, int offx, int incx,
+	T* y, int offy, int incy)
+{
+	if (incx == 1 && incy == 1)
+	{
+		__add_ip(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+
+		for (int i = 0; i < n; i++, x += incx, y += incy)
+		{
+			y[0] += x[0];
+		}
+	}
+}
+
+GENIXAPI(void, add_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, add_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, add_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx, int offb, unsigned __int32* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, add_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, add_inc_ip_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, add_inc_ip_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+
 // Adds the elements of two vectors not in-place.
 template<typename T> void __forceinline __add(
 	int n,
@@ -327,7 +356,37 @@ GENIXAPI(void, add_f64)(int n, const double* a, int offa, const double* b, int o
 }
 
 // Adds the elements of two vectors with increment not in-place.
-GENIXAPI(void, sadd_inc)(
+template<typename T> void __forceinline __add_inc(
+	int n,
+	const T* a, int offa, int inca,
+	const T* b, int offb, int incb,
+	T* y, int offy, int incy)
+{
+	if (inca == 1 && incb == 1 && incy == 1)
+	{
+		__add(n, a, offa, b, offb, y, offy);
+	}
+	else
+	{
+		a += offa;
+		b += offb;
+		y += offy;
+
+		for (int i = 0; i < n; i++, a += inca, b += incb, y += incy)
+		{
+			y[0] = a[0] + b[0];
+		}
+	}
+}
+
+GENIXAPI(void, add_inc_s32)(int n, const __int32* a, int offa, int inca, const __int32* b, int offb, int incb, __int32* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, add_inc_s64)(int n, const __int64* a, int offa, int inca, const __int64* b, int offb, int incb, __int64* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, add_inc_u32)(int n, const unsigned __int32* a, int offa, int inca, const unsigned __int32* b, int offb, int incb, unsigned __int32* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, add_inc_u64)(int n, const unsigned __int64* a, int offa, int inca, const unsigned __int64* b, int offb, int incb, unsigned __int64* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, add_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, add_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+
+/*GENIXAPI(void, sadd_inc)(
 	int n,
 	const float* a, int offa, int inca,
 	const float* b, int offb, int incb,
@@ -358,7 +417,7 @@ GENIXAPI(void, sadd_inc)(
 			*y = *a + *b;
 		}
 	}
-}
+}*/
 
 GENIXAPI(void, smatchandadd)(
 	int n,
@@ -1057,25 +1116,83 @@ GENIXAPI(void, sqr_f64)(int n, const double* x, int offx, double* y, int offy)
 	}
 }
 
-// y = a ^ 1/2
-GENIXAPI(void, sqrt_f32)(
+// y = y ^ 1/2
+GENIXAPI(void, sqrt_ip_f32)(
 	int n,
-	const float* a, int offa,
 	float* y, int offy)
 {
-	a += offa;
 	y += offy;
 
 	if (n <= 32)
 	{
 		for (int i = 0; i < n; i++)
 		{
-			y[i] = ::sqrtf(a[i]);
+			y[i] = ::sqrtf(y[i]);
 		}
 	}
 	else
 	{
-		::vsSqrt(n, a, y);
+		::vsSqrt(n, y, y);
+	}
+}
+GENIXAPI(void, sqrt_ip_f64)(
+	int n,
+	double* y, int offy)
+{
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::sqrt(y[i]);
+		}
+	}
+	else
+	{
+		::vdSqrt(n, y, y);
+	}
+}
+
+// y = x ^ 1/2
+GENIXAPI(void, sqrt_f32)(
+	int n,
+	const float* x, int offx,
+	float* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::sqrtf(x[i]);
+		}
+	}
+	else
+	{
+		::vsSqrt(n, x, y);
+	}
+}
+GENIXAPI(void, sqrt_f64)(
+	int n,
+	const double* x, int offx,
+	double* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::sqrt(x[i]);
+		}
+	}
+	else
+	{
+		::vdSqrt(n, x, y);
 	}
 }
 

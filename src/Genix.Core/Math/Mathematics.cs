@@ -285,22 +285,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds the elements of two arrays of floats with increment in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods.sadd_inc(length, y, offy, incy, x, offx, incx, y, offy, incy);
-        }
-
-        /// <summary>
         /// Adds the elements of two arrays of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -376,25 +360,6 @@ namespace Genix.Core
         public static void Add(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.add_u64(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Adds the elements of two arrays of floats with increment not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
-        {
-            NativeMethods.sadd_inc(length, a, offa, inca, b, offb, incb, y, offy, incy);
         }
 
         /// <summary>
@@ -1302,24 +1267,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes a square root of elements of one array starting at the specified index
-        /// and puts results into another array starting at the specified index.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <paramref name="x"/>.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := sqrt(x(offx + i))</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sqrt(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.sqrt_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
         /// Computes a square root of sum of two squared elements of two array starting at the specified indexes
         /// and puts results into another array starting at the specified index.
         /// </summary>
@@ -1649,10 +1596,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
-            public static extern void sadd_inc(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void smatchandadd(int n, [In] float[] x, [In] float[] xmask, int offx, [Out] float[] y, [In] float[] ymask, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1886,10 +1829,6 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void _saxpby(int n, float a, [In] float[] x, int offx, int incx, float b, [In, Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void sqrt_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
