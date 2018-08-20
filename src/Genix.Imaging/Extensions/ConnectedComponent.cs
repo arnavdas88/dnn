@@ -238,10 +238,10 @@ namespace Genix.Imaging
                 Stroke[][] newstrokes = new Stroke[y2 - y1][];
                 Array.Copy(this.strokes, 0, newstrokes, this.bounds.Y - y1, this.bounds.Height);
                 this.strokes = newstrokes;
-
-                // update position
-                this.bounds.Union(component.bounds);
             }
+
+            // update position
+            this.bounds.Union(component.bounds);
 
             Stroke[][] lines = component.strokes;
             if (checkIntersectingStrokes)

@@ -329,6 +329,7 @@ namespace Genix.Imaging
                                                 }
                                                 else if (strokes[j].Component != component && strokes[j].X > anotherBounds.Right)
                                                 {
+                                                    Debug.Assert(strokes.Skip(anchorPosition).All(s => s.Component != anotherComponent), "Component must be removed.");
                                                     break;
                                                 }
                                             }
@@ -341,13 +342,11 @@ namespace Genix.Imaging
                                                 }
                                                 else if (strokes[j].Component != component && strokes[j].X < anotherBounds.X)
                                                 {
+                                                    Debug.Assert(strokes.Take(anchorPosition - 1).All(s => s.Component != anotherComponent), "Component must be removed.");
                                                     break;
                                                 }
                                             }
                                         }
-
-                                        Debug.Assert(last.All(c => c.Component != anotherComponent), "Component must be removed.");
-                                        Debug.Assert(current.All(c => c.Component != anotherComponent), "Component must be removed.");
                                     }
                                 }
 
