@@ -67,6 +67,13 @@
     <Compile Include="Lab\ClassificationStatistics.cs" />
     <Compile Include="Lab\ClassStatistics.cs" />
     <Compile Include="Lab\ClassSummary.cs" />
+    <Compile Include="Lab\CommandLineArgument.cs" />
+    <Compile Include="Lab\CommandLineArgumentTypes.cs" />
+    <Compile Include="Lab\CommandLineCommand.cs" />
+    <Compile Include="Lab\CommandLineOption.cs" />
+    <Compile Include="Lab\CommandLineOptionTypes.cs" />
+    <Compile Include="Lab\CommandLineParser.cs" />
+    <Compile Include="Lab\CommandLineSwitch.cs" />
     <Compile Include="Lab\ConfusionMatrix.cs" />
     <Compile Include="Lab\Program.cs" />
     <Compile Include="Lab\RejectCurve.cs" />

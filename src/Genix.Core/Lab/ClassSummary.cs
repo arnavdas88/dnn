@@ -81,16 +81,17 @@ namespace Genix.Lab
                 return true;
             }
 
-            ClassSummary<T> other = obj as ClassSummary<T>;
-            if (other == null)
+            if (obj is ClassSummary<T> other)
+            {
+                return object.Equals(this.Label, other.Label) &&
+                       this.Statistics.Equals(other.Statistics) &&
+                       this.Errors.Count == other.Errors.Count &&
+                       Enumerable.SequenceEqual(this.Errors, other.Errors);
+            }
+            else
             {
                 return false;
             }
-
-            return object.Equals(this.Label, other.Label) &&
-                   this.Statistics.Equals(other.Statistics) &&
-                   this.Errors.Count == other.Errors.Count &&
-                   Enumerable.SequenceEqual(this.Errors, other.Errors);
         }
 
         /// <inheritdoc />

@@ -10,7 +10,6 @@ namespace Genix.NetClassify
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Runtime.ExceptionServices;
     using System.Threading;
     using Genix.DocumentAnalysis;
@@ -31,18 +30,37 @@ namespace Genix.NetClassify
         {
             private readonly Stopwatch totalTimeCounter = new Stopwatch();
             private readonly Stopwatch localTimeCounter = new Stopwatch();
+
+            private BaseCommand command;
             private long totalImages = 0;
 
             protected override bool OnConfigure(string[] args)
             {
-                return true;
+                if (args == null)
+                {
+                    throw new ArgumentNullException(nameof(args));
+                }
+
+                CommandLineParser parser = new CommandLineParser("classify");
+                parser.AddCommand(new LearnCommand());
+                parser.AddCommand(new TestCommand());
+
+                this.command = parser.Parse(args) as BaseCommand;
+                if (this.command != null)
+                {
+                    if (!string.IsNullOrEmpty(this.command.LogFileName))
+                    {
+                        this.OpenLogFile(this.command.LogFileName);
+                    }
+                }
+
+                return this.command != null;
             }
 
             protected override int OnRun()
             {
                 this.totalTimeCounter.Start();
-                PointsOfInterestClassifier classifier = this.Learn();
-                this.Test(classifier);
+                this.command.Run(this);
                 this.totalTimeCounter.Stop();
                 return 0;
             }
@@ -59,7 +77,7 @@ namespace Genix.NetClassify
                 }
             }
 
-            private PointsOfInterestClassifier Learn()
+            private PointsOfInterestClassifier Learn(string sourcePath, string truthPath)
             {
                 this.WriteLine(null, "Learning...");
 
@@ -67,13 +85,7 @@ namespace Genix.NetClassify
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
-                    dataProvider.Add(
-                        @"Z:\Test\Classification2\Data\t95_r285_q954_train.txt",
-                        ////@"Z:\Test\Classification2\Data\Gerber_train.txt",
-                        false,
-                        @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt",
-                        ////@"Z:\Test\Classification2\Data\Gerber_truth.txt",
-                        "#Class");
+                    dataProvider.Add(sourcePath, false, truthPath, "#Class");
 
                     ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
                         (source, index) =>
@@ -110,12 +122,10 @@ namespace Genix.NetClassify
                         CancellationToken.None);
                 }
 
-                ////classifier.SaveToFile(@"d:\dnn\" + Guid.NewGuid().ToString() + ".json");
-
                 return classifier;
             }
 
-            private void Test(PointsOfInterestClassifier classifier)
+            private void Test(PointsOfInterestClassifier classifier, string sourcePath, string truthPath)
             {
                 this.WriteLine(null, "Testing...");
 
@@ -123,13 +133,7 @@ namespace Genix.NetClassify
 
                 using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
                 {
-                    dataProvider.Add(
-                        @"Z:\Test\Classification2\Data\t95_r285_q954_test.txt",
-                        ////@"Z:\Test\Classification2\Data\Gerber_test.txt",
-                        false,
-                        @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt",
-                        ////@"Z:\Test\Classification2\Data\Gerber_truth.txt",
-                        "#Class");
+                    dataProvider.Add(sourcePath, false, truthPath, "#Class");
 
                     ClassifierProgress<TestImage> progress = new ClassifierProgress<TestImage>(
                         (source, index) =>
@@ -185,6 +189,82 @@ namespace Genix.NetClassify
                 {
                     ClassificationReportWriter<string>.WriteReport(outputFile, testReport);
                 }
+            }
+
+            private class LearnCommand : BaseCommand
+            {
+                private readonly CommandLineArgument source;
+                private readonly CommandLineArgument truth;
+
+                public LearnCommand()
+                    : base("learn", "learn classifier", false)
+                {
+                    this.source = this.AddArgument("source", "source path or list file", CommandLineArgumentTypes.FileMustExist);
+                    this.truth = this.AddArgument("truth", "path to a truth file", CommandLineArgumentTypes.FileMustExist);
+                }
+
+                private string Source => this.source.Value;
+
+                private string Truth => this.truth.Value;
+
+                public override void Run(InnerProgram program)
+                {
+                    ////string train = @"Z:\Test\Classification2\Data\t95_r285_q954_train.txt";
+                    string test = @"Z:\Test\Classification2\Data\t95_r285_q954_test.txt";
+                    ////string truth = @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt";
+                    ////string source = @"Z:\Test\Classification2\Data\Gerber_test.txt";
+                    ////string source = @"Z:\Test\Classification2\Data\Gerber_test.txt";
+                    ////string truth = @"Z:\Test\Classification2\Data\Gerber_truth.txt";
+
+                    PointsOfInterestClassifier classifier = program.Learn(this.Source, this.Truth);
+                    program.Test(classifier, test, this.Truth);
+                }
+            }
+
+            private class TestCommand : BaseCommand
+            {
+                private readonly CommandLineArgument source;
+                private readonly CommandLineArgument truth;
+
+                public TestCommand()
+                    : base("test", "test classifier", false)
+                {
+                    this.source = this.AddArgument("source", "source path or list file", CommandLineArgumentTypes.FileMustExist);
+                    this.truth = this.AddArgument("truth", "path to a truth file", CommandLineArgumentTypes.FileMustExist);
+                }
+
+                private string Source => this.source.Value;
+
+                private string Truth => this.truth.Value;
+
+                public override void Run(InnerProgram program)
+                {
+                    ////string test = @"Z:\Test\Classification2\Data\t95_r285_q954_test.txt";
+                    ////string source = @"Z:\Test\Classification2\Data\Gerber_test.txt";
+                    ////string truth = @"Z:\Test\Classification2\Data\t95_r285_q954_truth.txt";
+                    ////string truth = @"Z:\Test\Classification2\Data\Gerber_truth.txt";
+
+                    PointsOfInterestClassifier classifier = null;
+                    program.Test(classifier, this.Source, this.Truth);
+                }
+            }
+
+            private abstract class BaseCommand : CommandLineCommand
+            {
+                private readonly CommandLineOption logFileName;
+
+                public BaseCommand(string name, string description, bool useLog)
+                    : base(name, description)
+                {
+                    if (useLog)
+                    {
+                        this.logFileName = this.AddOption("log", "log file", "path to log file", CommandLineOptionTypes.PathMustExist);
+                    }
+                }
+
+                public string LogFileName => this.logFileName?.Value;
+
+                public abstract void Run(InnerProgram program);
             }
         }
     }

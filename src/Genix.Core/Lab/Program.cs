@@ -23,12 +23,12 @@ namespace Genix.Lab
     public abstract class Program
     {
         // Locker for log operations.
-        private object locker = new object();
-        private StreamWriter programLogFile = null;
+        private readonly object locker = new object();
+        private readonly ConcurrentDictionary<int, Stopwatch> threadStopwatches = new ConcurrentDictionary<int, Stopwatch>();
 
+        private StreamWriter programLogFile = null;
         private PerformanceCounter performanceCounterNetTotalHeap = null;
         private PerformanceCounter performanceCounterNetGCHandles = null;
-        private ConcurrentDictionary<int, Stopwatch> threadStopwatches = new ConcurrentDictionary<int, Stopwatch>();
 
         /// <summary>
         /// The main program function. Should be called from parent class <c>Main</c> function.

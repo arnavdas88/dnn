@@ -347,8 +347,7 @@ namespace Genix.Graph
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool ContainsEdge(TVertex sourceVertex, TVertex targetVertex)
         {
-            IList<TEdge> edges;
-            if (!this.TryGetOutEdges(sourceVertex, out edges))
+            if (!this.TryGetOutEdges(sourceVertex, out IList<TEdge> edges))
             {
                 return false;
             }
@@ -524,8 +523,7 @@ namespace Genix.Graph
         /// </returns>
         public bool RemoveVertex(TVertex vertex)
         {
-            BidirectionalVertex<TVertex, TEdge> edges;
-            if (!this.TryGetVertex(vertex, out edges))
+            if (!this.TryGetVertex(vertex, out BidirectionalVertex<TVertex, TEdge> edges))
             {
                 return false;
             }
@@ -535,8 +533,7 @@ namespace Genix.Graph
             {
                 this.OnEdgeRemoved(edge);
 
-                BidirectionalVertex<TVertex, TEdge> s;
-                if (this.vertices.TryGetValue(edge.Source, out s))
+                if (this.vertices.TryGetValue(edge.Source, out BidirectionalVertex<TVertex, TEdge> s))
                 {
                     s.OutEdges.Remove(edge);
                 }
@@ -547,8 +544,7 @@ namespace Genix.Graph
             {
                 this.OnEdgeRemoved(edge);
 
-                BidirectionalVertex<TVertex, TEdge> t;
-                if (this.vertices.TryGetValue(edge.Target, out t))
+                if (this.vertices.TryGetValue(edge.Target, out BidirectionalVertex<TVertex, TEdge> t))
                 {
                     t.InEdges.Remove(edge);
                 }
@@ -628,10 +624,8 @@ namespace Genix.Graph
         /// </returns>
         public bool RemoveEdge(TEdge edge, bool removeIsolatedVertices)
         {
-            BidirectionalVertex<TVertex, TEdge> s;
-            BidirectionalVertex<TVertex, TEdge> t;
-            if (this.vertices.TryGetValue(edge.Source, out s) &&
-                this.vertices.TryGetValue(edge.Target, out t))
+            if (this.vertices.TryGetValue(edge.Source, out BidirectionalVertex<TVertex, TEdge> s) &&
+                this.vertices.TryGetValue(edge.Target, out BidirectionalVertex<TVertex, TEdge> t))
             {
                 this.OnEdgeRemoved(edge);
 
@@ -711,8 +705,7 @@ namespace Genix.Graph
 
         internal bool TryGetInEdges(TVertex vertex, out IList<TEdge> edges)
         {
-            BidirectionalVertex<TVertex, TEdge> v;
-            if (this.vertices.TryGetValue(vertex, out v))
+            if (this.vertices.TryGetValue(vertex, out BidirectionalVertex<TVertex, TEdge> v))
             {
                 edges = v.InEdges;
                 return true;
@@ -724,8 +717,7 @@ namespace Genix.Graph
 
         internal bool TryGetOutEdges(TVertex vertex, out IList<TEdge> edges)
         {
-            BidirectionalVertex<TVertex, TEdge> v;
-            if (this.vertices.TryGetValue(vertex, out v))
+            if (this.vertices.TryGetValue(vertex, out BidirectionalVertex<TVertex, TEdge> v))
             {
                 edges = v.OutEdges;
                 return true;
