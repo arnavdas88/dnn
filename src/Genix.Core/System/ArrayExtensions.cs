@@ -83,6 +83,59 @@ namespace System
         }
 
         /// <summary>
+        /// Adds an element to the end of the array.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements of the array.</typeparam>
+        /// <param name="array">The array to add the element to.</param>
+        /// <param name="element">The element to be added to the end of the array. The value can be null for reference types.</param>
+        /// <returns>The modified array.</returns>
+        public static T[] Add<T>(this T[] array, T element)
+        {
+            if (array == null)
+            {
+                return new T[1] { element };
+            }
+
+            int oldLength = array.Length;
+            T[] newarray = new T[oldLength + 1];
+
+            if (oldLength > 0)
+            {
+                Array.Copy(array, 0, newarray, 0, oldLength);
+            }
+
+            newarray[oldLength] = element;
+            return newarray;
+        }
+
+        /// <summary>
+        /// Expands the arrays by inserting the specified number of elements at the specified position.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
+        /// <param name="array">The array to insert the element into.</param>
+        /// <param name="position">The insertion position.</param>
+        /// <param name="count">The number of elements to insert.</param>
+        /// <returns>The modified array.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T[] Expand<T>(this T[] array, int position, int count)
+        {
+            int oldLength = array.Length;
+            T[] newarray = new T[oldLength + count];
+
+            if (position > 0)
+            {
+                Array.Copy(array, 0, newarray, 0, position);
+            }
+
+            if (position < oldLength)
+            {
+                Array.Copy(array, position, newarray, position + count, oldLength - position);
+            }
+
+            return newarray;
+        }
+
+        /// <summary>
         /// Swaps two elements of the array at the specified positions.
         /// </summary>
         /// <typeparam name="T">The type of elements in the array.</typeparam>

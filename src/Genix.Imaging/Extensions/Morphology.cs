@@ -307,7 +307,7 @@ namespace Genix.Imaging
                                     if (anotherComponent != component)
                                     {
                                         // merge components if strokes touches more than one components
-                                        component.MergeWith(anotherComponent, false);
+                                        component.MergeWith(anotherComponent);
 
                                         // remove merged component from the set
                                         all.Remove(anotherComponent);

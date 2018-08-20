@@ -182,11 +182,11 @@ namespace Genix.Imaging
             }
             else if (y < this.bounds.Y)
             {
-                ConnectedComponent.ExpandStrokes(ref this.strokes, 0, this.bounds.Y - y);
+                this.strokes = this.strokes.Expand(0, this.bounds.Y - y);
             }
             else if (y >= this.bounds.Bottom)
             {
-                ConnectedComponent.ExpandStrokes(ref this.strokes, this.bounds.Height, y - this.bounds.Bottom + 1);
+                this.strokes = this.strokes.Expand(this.bounds.Height, y - this.bounds.Bottom + 1);
             }
 
             // update position
@@ -194,8 +194,7 @@ namespace Genix.Imaging
 
             // insert stroke into the line
             ref Stroke[] line = ref this.strokes[y - this.bounds.Y];
-            ////ConnectedComponent.InsertStroke(ref line, x, length);
-            line = ConnectedComponent.AppendStroke(line, x, length);
+            line = line.Add(new Stroke() { X = x, Length = length });
         }
 
         /// <summary>
@@ -221,8 +220,7 @@ namespace Genix.Imaging
         /// Merges this <see cref="ConnectedComponent"/> with the specified <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <param name="component">The <see cref="ConnectedComponent"/> to merge with.</param>
-        /// <param name="checkIntersectingStrokes">Determines whether the method should check for intersecting strokes in two merging components.</param>
-        public void MergeWith(ConnectedComponent component, bool checkIntersectingStrokes)
+        public void MergeWith(ConnectedComponent component)
         {
             if (component == null)
             {
@@ -244,24 +242,10 @@ namespace Genix.Imaging
             this.bounds.Union(component.bounds);
 
             Stroke[][] lines = component.strokes;
-            if (checkIntersectingStrokes)
+            for (int i = 0, ii = lines.Length, y = component.bounds.Y; i < ii; i++, y++)
             {
-                for (int i = 0, ii = lines.Length, y = component.bounds.Y; i < ii; i++, y++)
-                {
-                    Stroke[] line = lines[i];
-                    for (int j = 0, jj = line.Length; j < jj; j++)
-                    {
-                        this.AddStroke(y, line[j].X, line[j].Length);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0, ii = lines.Length, y = component.bounds.Y; i < ii; i++, y++)
-                {
-                    ref Stroke[] thisline = ref this.strokes[y - this.bounds.Y];
-                    thisline = ConnectedComponent.MergeLines(thisline, lines[i]);
-                }
+                ref Stroke[] thisline = ref this.strokes[y - this.bounds.Y];
+                thisline = ConnectedComponent.MergeLines(thisline, lines[i]);
             }
         }
 
@@ -270,144 +254,6 @@ namespace Genix.Imaging
         {
             return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ExpandStrokes(ref Stroke[][] strokes, int position, int count)
-        {
-            Stroke[][] newstrokes = new Stroke[strokes.Length + count][];
-
-            if (position > 0)
-            {
-                Array.Copy(strokes, 0, newstrokes, 0, position);
-            }
-
-            if (position < strokes.Length)
-            {
-                Array.Copy(strokes, position, newstrokes, position + count, strokes.Length - position);
-            }
-
-            strokes = newstrokes;
-        }
-
-        /*private static void InsertStroke(ref Stroke[] line, int x, int length)
-        {
-            if (line == null || line.Length == 0)
-            {
-                line = new Stroke[] { new Stroke() { X = x, Length = length } };
-            }
-            else
-            {
-                int x2 = x + length;
-                for (int i = 0, ii = line.Length; i < ii; i++)
-                {
-                    int linex1 = line[i].X;
-                    int linelength = line[i].Length;
-
-                    if (x2 < linex1)
-                    {
-                        // insert before the stroke
-                        line = ConnectedComponent.ExpandLine(line, i);
-                        line[i].X = x;
-                        line[i].Length = length;
-                        break;
-                    }
-                    else if (ConnectedComponent.StrokesIntersect(x, length, linex1, linelength))
-                    {
-                        int linex2 = linex1 + linelength;
-
-                        // merge with the stroke
-                        line[i].X = Maximum.Min(x, linex1);
-                        line[i].Length = Maximum.Max(x2, linex2) - line[i].X;
-
-                        // check whether following strokes intersect with a new expanded one
-                        if (x2 > linex2)
-                        {
-                            linex1 = line[i].X;
-                            linelength = line[i].Length;
-                            linex2 = linex1 + linelength;
-
-                            int lastj = -1;
-                            for (int j = i + 1; j < ii; j++)
-                            {
-                                if (!ConnectedComponent.StrokesIntersect(linex1, linelength, line[j].X, line[j].Length))
-                                {
-                                    break;
-                                }
-
-                                lastj = j;
-                            }
-
-                            if (lastj != -1)
-                            {
-                                line[i].Length = Maximum.Max(linex2, line[lastj].Length) - linex1;
-                                line = ConnectedComponent.ShrinkLine(line, i + 1, lastj - i);
-                            }
-                        }
-
-                        break;
-                    }
-                    else if (i + 1 == ii)
-                    {
-                        // insert after last stroke
-                        line = ConnectedComponent.ExpandLine(line, ii);
-                        line[ii].X = x;
-                        line[ii].Length = length;
-                        break;
-                    }
-                }
-            }
-        }*/
-
-        private static Stroke[] AppendStroke(Stroke[] line, int x, int length)
-        {
-            if (line == null || line.Length == 0)
-            {
-                return new Stroke[] { new Stroke() { X = x, Length = length } };
-            }
-
-            int ii = line.Length;
-            Stroke[] newline = ConnectedComponent.ExpandLine(line, ii);
-            newline[ii].X = x;
-            newline[ii].Length = length;
-
-            return newline;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Stroke[] ExpandLine(Stroke[] line, int position)
-        {
-            Stroke[] newline = new Stroke[line.Length + 1];
-
-            if (position > 0)
-            {
-                Array.Copy(line, 0, newline, 0, position);
-            }
-
-            if (position < line.Length)
-            {
-                Array.Copy(line, position, newline, position + 1, line.Length - position);
-            }
-
-            return newline;
-        }
-
-        /*[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Stroke[] ShrinkLine(Stroke[] line, int position, int count)
-        {
-            Stroke[] newline = new Stroke[line.Length - count];
-
-            if (position > 0)
-            {
-                Array.Copy(line, 0, newline, 0, position);
-            }
-
-            if (position + count < line.Length)
-            {
-                Array.Copy(line, position + count, newline, position, line.Length - (position + count));
-            }
-
-            return newline;
-        }*/
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Stroke[] MergeLines(Stroke[] line1, Stroke[] line2)
