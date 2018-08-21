@@ -27,9 +27,11 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="RNNCell"/> class.
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        protected RNNCell(int[] outputShape)
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
+        protected RNNCell(int[] outputShape, RNNCellDirection direction)
             : base(outputShape)
         {
+            this.Direction = direction;
         }
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace Genix.DNN.Layers
         protected RNNCell(RNNCell other)
             : base(other)
         {
+            this.Direction = other.Direction;
             this.U = other.U?.Clone() as Tensor;
         }
 
@@ -48,6 +51,15 @@ namespace Genix.DNN.Layers
         protected RNNCell()
         {
         }
+
+        /// <summary>
+        /// Gets the direction of this <see cref="RNNCell"/> (forward-only or bi-directional).
+        /// </summary>
+        /// <value>
+        /// The <see cref="RNNCellDirection"/> enumeration.
+        /// </value>
+        [JsonProperty("direction")]
+        public RNNCellDirection Direction { get; private set; } = RNNCellDirection.ForwardOnly;
 
         /// <summary>
         /// Gets the hidden weights for the layer.
@@ -96,6 +108,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes the <see cref="StochasticLayer"/>.
         /// </summary>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="weightsShape">The dimensions of the layer's weights tensor.</param>
@@ -103,6 +116,7 @@ namespace Genix.DNN.Layers
         /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
         /// <param name="random">The random numbers generator.</param>
         private protected void Initialize(
+            RNNCellDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             int[] weightsShape,
@@ -119,6 +133,8 @@ namespace Genix.DNN.Layers
             {
                 random = new RandomRangeGenerator(-0.08f, 0.08f);
             }
+
+            this.Direction = direction;
 
             this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
 

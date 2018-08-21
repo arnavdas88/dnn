@@ -90,7 +90,7 @@ namespace Genix.DNN.Layers
         public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, LRNLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, LRNLayer.ArchitecturePattern);
 
             this.KernelSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
             if (this.KernelSize < 3 || (this.KernelSize % 2) == 0)

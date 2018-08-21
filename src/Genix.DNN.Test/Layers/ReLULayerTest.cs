@@ -32,7 +32,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { 2 };
             ReLULayer layer = new ReLULayer(shape, "RELU", null);
@@ -43,7 +43,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "REL";
             try
@@ -61,14 +61,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ReLULayer(null, "RELU", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ReLULayer(new[] { 2 }, null, null));
         }

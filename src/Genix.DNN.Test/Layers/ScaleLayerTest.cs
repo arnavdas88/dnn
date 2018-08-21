@@ -31,7 +31,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             ScaleLayer layer = new ScaleLayer(shape, "S0.7", null);
@@ -42,7 +42,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "S";
             try
@@ -60,14 +60,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ScaleLayer(null, "S0.7", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ScaleLayer(new[] { -1, 20, 20, 10 }, null, null));
         }

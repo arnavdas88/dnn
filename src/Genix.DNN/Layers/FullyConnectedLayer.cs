@@ -46,7 +46,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public FullyConnectedLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, FullyConnectedLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, FullyConnectedLayer.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
 
             this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);

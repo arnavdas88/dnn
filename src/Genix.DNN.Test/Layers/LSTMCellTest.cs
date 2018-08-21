@@ -22,7 +22,7 @@
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
-                LSTMCell layer = new LSTMCell(shape, numberOfNeurons, forgetBias, matrixLayout, null);
+                LSTMCell layer = new LSTMCell(shape, RNNCellDirection.ForwardOnly, numberOfNeurons, forgetBias, matrixLayout, null);
 
                 Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual(forgetBias, layer.ForgetBias);
@@ -56,11 +56,11 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new LSTMCell(null, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new LSTMCell(null, RNNCellDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, "100LSTMC(ForgetBias=3.6)", null);
 
@@ -86,7 +86,7 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "100LSTM";
             try
@@ -104,14 +104,14 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new LSTMCell(null, "100LSTMC", null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new LSTMCell(new[] { -1, 10, 12, 3 }, null, null));
         }
@@ -120,7 +120,7 @@
         public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, RNNCellDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = new LSTMCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -136,7 +136,7 @@
         public void EnumGradientsTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(shape, RNNCellDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
 
@@ -144,7 +144,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, RNNCellDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = layer1.Clone() as LSTMCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -153,7 +153,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            LSTMCell layer1 = new LSTMCell(shape, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer1 = new LSTMCell(shape, RNNCellDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             LSTMCell layer2 = JsonConvert.DeserializeObject<LSTMCell>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -170,7 +170,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -251,7 +251,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -332,7 +332,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -413,7 +413,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {

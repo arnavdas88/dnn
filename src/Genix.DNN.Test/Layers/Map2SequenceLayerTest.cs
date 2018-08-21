@@ -28,7 +28,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 15, 10 };
             Map2SequenceLayer layer = new Map2SequenceLayer(shape, "M2S", null);
@@ -39,7 +39,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "MS";
             try
@@ -57,14 +57,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new Map2SequenceLayer(null, "M2S", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new Map2SequenceLayer(new[] { -1, 20, 15, 10 }, null, null));
         }

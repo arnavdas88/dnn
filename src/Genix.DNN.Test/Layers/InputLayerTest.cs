@@ -32,7 +32,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { -1, 1, 1, 1 };
             InputLayer layer = new InputLayer(shape, "20x15x10", null);
@@ -45,7 +45,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "20x15";
             try
@@ -63,14 +63,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new InputLayer(null, "20x15x10", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new InputLayer(new[] { -1, 20, 15, 10 }, null, null));
         }

@@ -42,7 +42,7 @@ namespace Genix.DNN.Layers
         public Map2SequenceLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
         {
-            Layer.ParseArchitechture(architecture, Map2SequenceLayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, Map2SequenceLayer.ArchitecturePattern);
         }
 
         /// <summary>

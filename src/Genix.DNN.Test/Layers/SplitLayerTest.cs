@@ -31,7 +31,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { -1, 2, 2, 2 };
             SplitLayer layer = new SplitLayer(shape, "SP3", null);
@@ -43,7 +43,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "SP";
             try
@@ -61,14 +61,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new SplitLayer(null, "SP3", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new SplitLayer(new[] { -1, 2, 2, 2 }, null, null));
         }

@@ -57,6 +57,7 @@
     <Compile Include="Layers\Map2SequenceLayer.cs" />
     <Compile Include="Layers\PoolingLayer.cs" />
     <Compile Include="Layers\RNNCell.cs" />
+    <Compile Include="Layers\RNNCellDirection.cs" />
     <Compile Include="Layers\RNNLayer.cs" />
     <Compile Include="Layers\SRNCell.cs" />
     <Compile Include="Layers\SRNLayer.cs" />

@@ -41,7 +41,7 @@ namespace Genix.DNN.Layers
         public SoftMaxLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(inputShape)
         {
-            Layer.ParseArchitechture(architecture, SoftMaxLayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, SoftMaxLayer.ArchitecturePattern);
         }
 
         /// <summary>

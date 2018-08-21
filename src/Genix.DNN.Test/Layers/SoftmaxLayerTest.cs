@@ -37,7 +37,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { 1, SoftMaxLayerTest.weights.Length };
             SoftMaxLayer layer = new SoftMaxLayer(shape, "SM", null);
@@ -48,7 +48,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "SMX";
             try
@@ -66,14 +66,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new SoftMaxLayer(null, "SM", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new SoftMaxLayer(new[] { 1, SoftMaxLayerTest.weights.Length }, null, null));
         }

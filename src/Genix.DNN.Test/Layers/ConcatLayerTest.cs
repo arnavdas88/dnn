@@ -51,7 +51,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
                 new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
@@ -64,7 +64,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "CON";
             try
@@ -85,14 +85,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ConcatLayer(null, "CONCAT", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ConcatLayer(
                 new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },

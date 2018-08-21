@@ -61,7 +61,7 @@
         }
 
         [TestMethod, TestCategory("SRN")]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { 2, 10, 12, 3 };
             const string Architecture = "16C3+4x1(S)+-1(P)";
@@ -92,7 +92,7 @@
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "16C";
             try
@@ -110,14 +110,14 @@
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ConvolutionLayer(null, "16C3", null));
         }
 
         [TestMethod, TestCategory("SRN")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ConvolutionLayer(new[] { -1, 10, 12, 3 }, null, null));
         }

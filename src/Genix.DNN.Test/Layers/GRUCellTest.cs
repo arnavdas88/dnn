@@ -21,7 +21,7 @@
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
-                GRUCell layer = new GRUCell(shape, numberOfNeurons, matrixLayout, null);
+                GRUCell layer = new GRUCell(shape, RNNCellDirection.ForwardOnly, numberOfNeurons, matrixLayout, null);
 
                 Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual("100GRUC", layer.Architecture);
@@ -59,16 +59,49 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new GRUCell(null, 100, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new GRUCell(null, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
-            GRUCell layer = new GRUCell(new[] { -1, 10, 12, 3 }, "100GRUC", null);
+            const string Architecture = "100GRUC";
+            GRUCell layer = new GRUCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
+            Assert.AreEqual(RNNCellDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
-            Assert.AreEqual("100GRUC", layer.Architecture);
+            Assert.AreEqual(Architecture, layer.Architecture);
+
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 3 * 100, 10 * 12 * 3 }, layer.W.Axes);
+            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 2 * 100, 100 }, layer.U.Axes);
+            Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 100, 100 }, layer.UC.Axes);
+            Assert.IsFalse(layer.UC.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.UC.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 3 * 100 }, layer.B.Axes);
+            Assert.IsTrue(layer.B.Weights.Take(2 * 100).All(x => x == 1.0f));
+            Assert.IsTrue(layer.B.Weights.Skip(2 * 100).All(x => x == 0.0f));
+        }
+
+        [TestMethod, TestCategory("GRU")]
+        public void ArchitectureConstructorTest2()
+        {
+            const string Architecture = "100GRUC(Bi=1)";
+            GRUCell layer = new GRUCell(new[] { -1, 10, 12, 3 }, Architecture, null);
+
+            Assert.AreEqual(RNNCellDirection.BiDirectional, layer.Direction);
+            Assert.AreEqual(100, layer.NumberOfNeurons);
+            Assert.AreEqual(Architecture, layer.Architecture);
 
             CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
             Assert.AreEqual(1, layer.NumberOfOutputs);
@@ -93,7 +126,7 @@
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "100GRU";
             try
@@ -111,14 +144,14 @@
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new GRUCell(null, "100GRUC", null));
         }
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest5()
         {
             Assert.IsNotNull(new GRUCell(new[] { -1, 10, 12, 3 }, null, null));
         }
@@ -127,7 +160,7 @@
         public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = new GRUCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -143,7 +176,7 @@
         public void EnumGradientsTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer = new GRUCell(shape, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(4, layer.EnumGradients().Count());
         }
 
@@ -151,7 +184,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = layer1.Clone() as GRUCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -160,7 +193,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRUCell layer2 = JsonConvert.DeserializeObject<GRUCell>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -179,7 +212,7 @@
 
             Session session = new Session();
 
-            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -271,7 +304,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, numberOfNeurons, MatrixLayout.RowMajor, null);
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {

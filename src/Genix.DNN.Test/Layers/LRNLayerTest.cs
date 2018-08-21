@@ -84,7 +84,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             const string Architecture = "LRN5";
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
@@ -100,7 +100,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             const string Architecture = "LRN7(A=0.001;B=0.5;K=3)";
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
@@ -117,7 +117,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "LRN";
             try
@@ -135,14 +135,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new LRNLayer(null, "LRN5", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest5()
+        public void ArchitectureConstructorTest5()
         {
             Assert.IsNotNull(new LRNLayer(LRNLayerTest.sourceShape, null, null));
         }

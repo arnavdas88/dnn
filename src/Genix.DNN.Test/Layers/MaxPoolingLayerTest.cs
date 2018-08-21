@@ -49,7 +49,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             string architecture = "MP3x2";
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
@@ -64,7 +64,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "MP3x2+2(S)";
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
@@ -79,7 +79,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "MP3x2+2x1(S)";
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
@@ -94,7 +94,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             string architecture = "MP2";
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, architecture, null);
@@ -110,7 +110,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest5()
+        public void ArchitectureConstructorTest5()
         {
             string architecture = "MP";
             try
@@ -128,14 +128,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest6()
+        public void ArchitectureConstructorTest6()
         {
             Assert.IsNotNull(new MaxPoolingLayer(null, "MP2", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest7()
+        public void ArchitectureConstructorTest7()
         {
             Assert.IsNotNull(new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, null, null));
         }

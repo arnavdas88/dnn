@@ -57,7 +57,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public MaxOutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, MaxOutLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, MaxOutLayer.ArchitecturePattern);
             int groupSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
             this.Initialize(inputShape, groupSize);
         }

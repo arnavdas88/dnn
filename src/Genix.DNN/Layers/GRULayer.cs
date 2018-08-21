@@ -22,18 +22,24 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)(-\d+)+(GRU)$";
+        public const string ArchitecturePattern = @"^(\d+)(-\d+)+GRU(?:\(Bi=(0|1)\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GRULayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the hidden and fully connected layers.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        public GRULayer(int[] inputShape, IList<int> numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
+        public GRULayer(
+            int[] inputShape,
+            RNNCellDirection direction,
+            IList<int> numberOfNeurons,
+            MatrixLayout matrixLayout,
+            RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+            this.Initialize(inputShape, direction, numberOfNeurons, matrixLayout, random);
         }
 
         /// <summary>
@@ -44,7 +50,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public GRULayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, GRULayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, GRULayer.ArchitecturePattern);
 
             List<int> numberOfNeurons = new List<int>()
             {
@@ -56,7 +62,14 @@ namespace Genix.DNN.Layers
                 numberOfNeurons.Add(Convert.ToInt32(capture.Value.TrimStart('-'), CultureInfo.InvariantCulture));
             }
 
-            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
+            int.TryParse(groups[groups.Count - 1].Value, out int direction);
+
+            this.Initialize(
+                inputShape,
+                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                numberOfNeurons,
+                MatrixLayout.RowMajor,
+                random);
         }
 
         /// <summary>
@@ -79,8 +92,9 @@ namespace Genix.DNN.Layers
         /// <inheritdoc />
         public override string Architecture => string.Format(
             CultureInfo.InvariantCulture,
-            "{0}GRU",
-            string.Join("-", this.Graph.Vertices.Select(x => ((StochasticLayer)x).NumberOfNeurons)));
+            "{0}GRU{1}",
+            string.Join("-", this.Graph.Vertices.Select(x => ((StochasticLayer)x).NumberOfNeurons)),
+            (this.Graph.Vertices.First() as GRUCell).Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
 
         /// <inheritdoc />
         public override object Clone() => new GRULayer(this);
@@ -89,11 +103,13 @@ namespace Genix.DNN.Layers
         /// Initializes the <see cref="GRULayer"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the hidden and fully connected layers.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
+            RNNCellDirection direction,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -120,7 +136,7 @@ namespace Genix.DNN.Layers
             for (int i = 0, ii = numberOfNeurons.Count; i < ii; i++)
             {
                 Layer layer = i + 1 < ii ?
-                    new GRUCell(shape, numberOfNeurons[i], matrixLayout, random) as Layer :
+                    new GRUCell(shape, direction, numberOfNeurons[i], matrixLayout, random) as Layer :
                     new FullyConnectedLayer(shape, numberOfNeurons[i], matrixLayout, random) as Layer;
 
                 layers.Add(layer);

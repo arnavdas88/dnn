@@ -42,7 +42,7 @@ namespace Genix.DNN.Layers
         public TanhLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(inputShape)
         {
-            Layer.ParseArchitechture(architecture, TanhLayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, TanhLayer.ArchitecturePattern);
         }
 
         /// <summary>

@@ -30,18 +30,20 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LSTMLayer"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the hidden and fully connected layers.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public LSTMLayer(
             int[] inputShape,
+            RNNCellDirection direction,
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfNeurons, forgetBias, matrixLayout, random);
+            this.Initialize(inputShape, direction, numberOfNeurons, forgetBias, matrixLayout, random);
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, LSTMLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, LSTMLayer.ArchitecturePattern);
 
             List<int> numberOfNeurons = new List<int>()
             {
@@ -71,7 +73,15 @@ namespace Genix.DNN.Layers
                 forgetBias = Convert.ToSingle(groups[index + 1].Value, CultureInfo.InvariantCulture);
             }
 
-            this.Initialize(inputShape, numberOfNeurons, forgetBias, MatrixLayout.RowMajor, random);
+            int.TryParse(groups[groups.Count - 1].Value, out int direction);
+
+            this.Initialize(
+                inputShape,
+                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                numberOfNeurons,
+                forgetBias,
+                MatrixLayout.RowMajor,
+                random);
         }
 
         /// <summary>
@@ -96,19 +106,24 @@ namespace Genix.DNN.Layers
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat(
-                    CultureInfo.InvariantCulture,
-                    "{0}LSTM",
-                    string.Join("-", this.Graph.Vertices.Select(x => ((StochasticLayer)x).NumberOfNeurons)));
-
                 LSTMCell cell = this.Graph.Sources.First() as LSTMCell;
-                if (cell.ForgetBias != LSTMCell.DefaultForgetBias)
+
+                List<string> prms = new List<string>();
+                if (cell.Direction != RNNCellDirection.ForwardOnly)
                 {
-                    sb.AppendFormat(CultureInfo.InvariantCulture, "(ForgetBias={0})", cell.ForgetBias);
+                    prms.Add("Bi=1");
                 }
 
-                return sb.ToString();
+                if (cell.ForgetBias != LSTMCell.DefaultForgetBias)
+                {
+                    prms.Add(string.Format(CultureInfo.InvariantCulture, "ForgetBias={0}", cell.ForgetBias));
+                }
+
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}LSTM{1}",
+                    string.Join("-", this.Graph.Vertices.Select(x => ((StochasticLayer)x).NumberOfNeurons)),
+                    prms.Count > 0 ? "(" + string.Join(",", prms) + ")" : string.Empty);
             }
         }
 
@@ -120,12 +135,14 @@ namespace Genix.DNN.Layers
         /// Initializes the <see cref="GRULayer"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the hidden and fully connected layers.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
+            RNNCellDirection direction,
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
@@ -153,7 +170,7 @@ namespace Genix.DNN.Layers
             for (int i = 0, ii = numberOfNeurons.Count; i < ii; i++)
             {
                 Layer layer = i + 1 < ii ?
-                    new LSTMCell(shape, numberOfNeurons[i], forgetBias, matrixLayout, random) as Layer :
+                    new LSTMCell(shape, direction, numberOfNeurons[i], forgetBias, matrixLayout, random) as Layer :
                     new FullyConnectedLayer(shape, numberOfNeurons[i], matrixLayout, random) as Layer;
 
                 layers.Add(layer);

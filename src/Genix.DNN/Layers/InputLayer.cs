@@ -47,7 +47,7 @@ namespace Genix.DNN.Layers
         public InputLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape /* temp */)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, InputLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, InputLayer.ArchitecturePattern);
             this.Shape = this.OutputShape = new[]
             {
                 -1,

@@ -43,7 +43,7 @@ namespace Genix.DNN.Layers
         public ReLULayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(inputShape)
         {
-            Layer.ParseArchitechture(architecture, ReLULayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, ReLULayer.ArchitecturePattern);
         }
 
         /// <summary>

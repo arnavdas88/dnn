@@ -50,7 +50,7 @@ namespace Genix.DNN.Layers
         public DropoutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, DropoutLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, DropoutLayer.ArchitecturePattern);
             this.Probability = Convert.ToDouble(groups[2].Value, CultureInfo.InvariantCulture);
         }
 

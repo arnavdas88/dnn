@@ -27,22 +27,24 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)(SRNC)$";
+        public const string ArchitecturePattern = @"^(\d+)SRNC(?:\(Bi=(0|1)\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SRNCell"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public SRNCell(
             int[] inputShape,
+            RNNCellDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+            this.Initialize(inputShape, direction, numberOfNeurons, matrixLayout, random);
         }
 
         /// <summary>
@@ -53,10 +55,16 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public SRNCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, SRNCell.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, SRNCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
+            int.TryParse(groups[2].Value, out int direction);
 
-            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
+            this.Initialize(
+                inputShape,
+                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                numberOfNeurons,
+                MatrixLayout.RowMajor,
+                random);
         }
 
         /// <summary>
@@ -77,7 +85,11 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        public override string Architecture => string.Format(CultureInfo.InvariantCulture, "{0}SRNC", this.NumberOfNeurons);
+        public override string Architecture => string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}SRNC{1}",
+            this.NumberOfNeurons,
+            this.Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -172,11 +184,13 @@ namespace Genix.DNN.Layers
         /// Initializes the <see cref="SRNCell"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
+            RNNCellDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -197,7 +211,7 @@ namespace Genix.DNN.Layers
 
             int[] biasesShape = new[] { numberOfNeurons };
 
-            this.Initialize(numberOfNeurons, matrixLayout, weightsShape, hiddenShape, biasesShape, random);
+            this.Initialize(direction, numberOfNeurons, matrixLayout, weightsShape, hiddenShape, biasesShape, random);
             this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
         }
     }

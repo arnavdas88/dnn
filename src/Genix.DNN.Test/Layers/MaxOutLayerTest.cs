@@ -34,7 +34,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, "MO2", null);
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
@@ -44,7 +44,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "MO";
             try
@@ -62,14 +62,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new MaxOutLayer(null, "MO2", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new MaxOutLayer(new[] { -1, 3, 2, 4 }, null, null));
         }

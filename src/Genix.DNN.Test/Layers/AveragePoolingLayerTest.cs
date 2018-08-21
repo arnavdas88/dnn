@@ -50,7 +50,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest1()
+        public void ArchitectureConstructorTest1()
         {
             string architecture = "AP3x2";
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
@@ -65,7 +65,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest2()
+        public void ArchitectureConstructorTest2()
         {
             string architecture = "AP3x2+2(S)";
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
@@ -80,7 +80,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest3()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "AP3x2+2x1(S)";
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
@@ -95,7 +95,7 @@
         }
 
         [TestMethod]
-        public void ArchitechtureConstructorTest4()
+        public void ArchitectureConstructorTest4()
         {
             string architecture = "AP2";
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, architecture, null);
@@ -111,7 +111,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitechtureConstructorTest5()
+        public void ArchitectureConstructorTest5()
         {
             string architecture = "AP";
             try
@@ -129,14 +129,14 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest6()
+        public void ArchitectureConstructorTest6()
         {
             Assert.IsNotNull(new AveragePoolingLayer(null, "AP2", null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitechtureConstructorTest7()
+        public void ArchitectureConstructorTest7()
         {
             Assert.IsNotNull(new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, null, null));
         }

@@ -98,9 +98,9 @@ namespace Genix.NetLearn
                         DateTime dateStarted = DateTime.Now;
                         this.WriteLine(logFile, string.Format(CultureInfo.InvariantCulture, "Started: {0}", dateStarted.ToString("G", CultureInfo.InvariantCulture)));
 
-                        ClassificationNetwork net = File.Exists(task.Architechture) ?
-                            ClassificationNetwork.FromFile(task.Architechture) :
-                            ClassificationNetwork.FromArchitecture(task.Architechture, task.Classes, task.Classes, task.BlankClass);
+                        ClassificationNetwork net = File.Exists(task.Architecture) ?
+                            ClassificationNetwork.FromFile(task.Architecture) :
+                            ClassificationNetwork.FromArchitecture(task.Architecture, task.Classes, task.Classes, task.BlankClass);
 
                         // learning
                         this.Learn(taskIndex, task, net, logFile, cancellationToken);
@@ -427,7 +427,7 @@ namespace Genix.NetLearn
 
             private class LearningTask
             {
-                public string Architechture { get; private set; }
+                public string Architecture { get; private set; }
 
                 public IList<string> Classes { get; private set; }
 
@@ -472,7 +472,7 @@ namespace Genix.NetLearn
                             {
                                 TaskParameters = task,
 
-                                Architechture = architechture,
+                                Architecture = architechture,
                                 Classes = config.Network.Classes,
                                 BlankClass = config.Network.BlankClass,
 

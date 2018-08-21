@@ -43,7 +43,7 @@ namespace Genix.DNN.Layers
         public SigmoidLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(inputShape)
         {
-            Layer.ParseArchitechture(architecture, SigmoidLayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, SigmoidLayer.ArchitecturePattern);
         }
 
         /// <summary>

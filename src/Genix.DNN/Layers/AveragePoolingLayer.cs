@@ -89,7 +89,7 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Kernel KernelFromArchitecture(string architecture)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, AveragePoolingLayer.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, AveragePoolingLayer.ArchitecturePattern);
             return Layer.ParseKernel(groups, 2, null, false);
         }
     }

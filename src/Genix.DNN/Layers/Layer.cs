@@ -113,23 +113,23 @@ namespace Genix.DNN.Layers
         public abstract string Architecture { get; }
 
         /// <summary>
-        /// Gets or sets the number of outputs of the layer.
+        /// Gets the number of outputs of the layer.
         /// </summary>
         /// <value>
         /// The number of outputs.
         /// </value>
         [JsonProperty("NumberOfOutputs")]
-        public int NumberOfOutputs { get; protected internal set; } = 1;
+        public int NumberOfOutputs { get; private protected set; } = 1;
 
         /// <summary>
-        /// Gets or sets the dimensions of the layer's output tensor.
+        /// Gets the dimensions of the layer's output tensor.
         /// </summary>
         /// <value>
         /// The array that contains output tensor dimensions.
         /// </value>
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonProperty("Output")]
-        public int[] OutputShape { get; protected internal set; }
+        public int[] OutputShape { get; private protected set; }
 
         /// <summary>
         /// Registers a new type of layer.
@@ -255,7 +255,7 @@ namespace Genix.DNN.Layers
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="pattern">The regular expression pattern that matches layer architecture.</param>
         /// <returns>The collection of regular expression groups.</returns>
-        private protected static List<Group> ParseArchitechture(string architecture, string pattern)
+        private protected static List<Group> ParseArchitecture(string architecture, string pattern)
         {
             if (architecture == null)
             {

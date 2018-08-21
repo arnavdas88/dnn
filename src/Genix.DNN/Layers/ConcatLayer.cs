@@ -49,7 +49,7 @@ namespace Genix.DNN.Layers
         public ConcatLayer(IList<int[]> inputShapes, string architecture, RandomNumberGenerator<float> random)
             : base(1, Shape.Concat(inputShapes, ConcatLayer.Axis))
         {
-            Layer.ParseArchitechture(architecture, ConcatLayer.ArchitecturePattern);
+            Layer.ParseArchitecture(architecture, ConcatLayer.ArchitecturePattern);
         }
 
         /// <summary>

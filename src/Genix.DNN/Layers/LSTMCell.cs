@@ -30,7 +30,9 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)(LSTMC)(?:\(ForgetBias=((?:\d*\.)?\d+)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)LSTMC(?:\(Bi=(0|1),ForgetBias=((?:\d*\.)?\d+)\))?$";
+
+        ////(?:\(ForgetBias=((?:\d*\.)?\d+)\))?$";
 
         /// <summary>
         /// The default value for forget bias.
@@ -41,9 +43,13 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LSTMCell"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
-        public LSTMCell(int[] inputShape, int numberOfNeurons)
-            : this(inputShape, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
+        public LSTMCell(
+            int[] inputShape,
+            RNNCellDirection direction,
+            int numberOfNeurons)
+            : this(inputShape, direction, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
         {
         }
 
@@ -51,18 +57,20 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LSTMCell"/> class.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public LSTMCell(
             int[] inputShape,
+            RNNCellDirection direction,
             int numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfNeurons, matrixLayout, forgetBias, random);
+            this.Initialize(inputShape, direction, numberOfNeurons, matrixLayout, forgetBias, random);
         }
 
         /// <summary>
@@ -73,13 +81,20 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitechture(architecture, LSTMCell.ArchitecturePattern);
+            List<Group> groups = Layer.ParseArchitecture(architecture, LSTMCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
-            float forgetBias = groups.Count >= 4 && !string.IsNullOrEmpty(groups[3].Value) ?
-                Convert.ToSingle(groups[3].Value, CultureInfo.InvariantCulture) :
+            int direction = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
+            float forgetBias = groups.Count >= 5 && !string.IsNullOrEmpty(groups[4].Value) ?
+                Convert.ToSingle(groups[4].Value, CultureInfo.InvariantCulture) :
                 LSTMCell.DefaultForgetBias;
 
-            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, forgetBias, random);
+            this.Initialize(
+                inputShape,
+                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                numberOfNeurons,
+                MatrixLayout.RowMajor,
+                forgetBias,
+                random);
         }
 
         /// <summary>
@@ -118,15 +133,22 @@ namespace Genix.DNN.Layers
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat(CultureInfo.InvariantCulture, "{0}LSTMC", this.NumberOfNeurons);
+                List<string> prms = new List<string>();
+                if (this.Direction != RNNCellDirection.ForwardOnly)
+                {
+                    prms.Add("Bi=1");
+                }
 
                 if (this.ForgetBias != LSTMCell.DefaultForgetBias)
                 {
-                    sb.AppendFormat(CultureInfo.InvariantCulture, "(ForgetBias={0})", this.ForgetBias);
+                    prms.Add(string.Format(CultureInfo.InvariantCulture, "ForgetBias={0}", this.ForgetBias));
                 }
 
-                return sb.ToString();
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}LSTMC{1}",
+                    this.NumberOfNeurons,
+                    prms.Count > 0 ? "(" + string.Join(",", prms) + ")" : string.Empty);
             }
         }
 
@@ -265,12 +287,14 @@ namespace Genix.DNN.Layers
         /// Initializes the <see cref="LSTMCell"/>.
         /// </summary>
         /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
+            RNNCellDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             float forgetBias,
@@ -292,6 +316,7 @@ namespace Genix.DNN.Layers
             int[] biasesShape = new[] { 4 * numberOfNeurons };
 
             this.Initialize(
+                direction,
                 numberOfNeurons,
                 matrixLayout,
                 weightsShape,
