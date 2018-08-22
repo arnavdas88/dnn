@@ -136,7 +136,6 @@
             Assert.AreEqual(s1, s2);
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest()

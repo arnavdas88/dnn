@@ -44,7 +44,7 @@ namespace Genix.DNN.Layers
         public SplitLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1 /* temp */, inputShape)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, SplitLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, SplitLayer.ArchitecturePattern);
             this.NumberOfOutputs = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
         }
 

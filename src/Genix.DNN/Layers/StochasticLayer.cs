@@ -84,7 +84,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The tensor that contains weights for the layer.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "W", Justification = "Stands for weights matrix according to DNN notation.")]
         [JsonProperty("W")]
         public Tensor W { get; private set; }
 
@@ -94,7 +93,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The <see cref="Tensor"/> object that contains biases for the layer.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "B", Justification = "Stands for biases vector according to DNN notation.")]
         [JsonProperty("B")]
         public Tensor B { get; private set; }
 
@@ -130,7 +128,16 @@ namespace Genix.DNN.Layers
             // y += W * x (product of weight and input matrices)
             // input and output matrices are column major (one column per mini-batch item)
             // weights matrix might have to be transposed to have a row per neuron
-            return new[] { session.MxM(MatrixLayout.ColumnMajor, this.W, this.MatrixLayout == MatrixLayout.RowMajor, xs[0], false, this.B) };
+            return new[]
+            {
+                session.MxM(
+                    MatrixLayout.ColumnMajor,
+                    this.W,
+                    this.MatrixLayout == MatrixLayout.RowMajor,
+                    xs[0],
+                    false,
+                    this.B),
+            };
         }
 
         /// <inheritdoc />

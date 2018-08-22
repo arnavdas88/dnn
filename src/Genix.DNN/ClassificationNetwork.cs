@@ -220,7 +220,6 @@ namespace Genix.DNN
         /// <returns>
         /// The object that contains the computed results and tensor.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public (IList<IList<(string Answer, float Probability)>> Answers, Tensor Y) Execute(Tensor x)
         {
             const float MaxConfidenceDistance = 0.5f;
@@ -277,7 +276,6 @@ namespace Genix.DNN
         /// <returns>
         /// The object that contains the computed results and tensor.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public (IList<(string Answer, float Probability)> Answers, Tensor Y) ExecuteSequence(Tensor x, Context model)
         {
             Tensor y = this.Forward(null, x);

@@ -36,7 +36,6 @@ namespace Genix.Imaging
         /// <summary>
         /// A PNG image format.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         Png,
 
         /// <summary>

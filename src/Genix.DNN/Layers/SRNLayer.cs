@@ -23,7 +23,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)(-\d+)+SRN(?:\(Bi=(0|1)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)(?:-(\d+))+(SRN)(?:\(([A-Za-z]+)=([0-9.]+)(?:,([A-Za-z]+)=([0-9.]+))*\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SRNLayer"/> class.
@@ -51,7 +51,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public SRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, SRNLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, SRNLayer.ArchitecturePattern);
 
             List<int> numberOfNeurons = new List<int>()
             {
@@ -60,14 +60,17 @@ namespace Genix.DNN.Layers
 
             foreach (Capture capture in groups[2].Captures)
             {
-                numberOfNeurons.Add(Convert.ToInt32(capture.Value.TrimStart('-'), CultureInfo.InvariantCulture));
+                numberOfNeurons.Add(Convert.ToInt32(capture.Value, CultureInfo.InvariantCulture));
             }
 
-            int.TryParse(groups[groups.Count - 1].Value, out int direction);
+            if (!Layer.TryParseArchitectureParameter(groups, "SRN", "Bi", out RNNCellDirection direction))
+            {
+                direction = RNNCellDirection.ForwardOnly;
+            }
 
             this.Initialize(
                 inputShape,
-                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
                 random);

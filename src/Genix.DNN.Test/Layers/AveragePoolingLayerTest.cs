@@ -181,7 +181,6 @@
             Assert.AreEqual(s1, s2);
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest2X2X2X2()
@@ -238,7 +237,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 2x2, stride 1x1.")]
         public void ForwardBackwardTest2X2X1X1()
@@ -297,7 +295,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 3x3, stride 3x3.")]
         public void ForwardBackwardTest3X3X3X3()
@@ -352,7 +349,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 3x3, stride 2x2.")]
         public void ForwardBackwardTest3X3X2X2()
@@ -407,7 +403,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 3x3, stride 1x1.")]
         public void ForwardBackwardTest3X3X1X1()
@@ -464,7 +459,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 4x4, stride 4x4.")]
         public void ForwardBackwardTest4X4X4X4()
@@ -519,7 +513,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", Justification = "Need for testing.")]
         [TestMethod]
         [Description("Filter 4x4, stride 1x1.")]
         public void ForwardBackwardTest4X4X1X1()

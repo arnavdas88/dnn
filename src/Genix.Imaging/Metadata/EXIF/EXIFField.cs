@@ -41,7 +41,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Indicates the ISO Speed and ISO Latitude of the camera or input device as specified in ISO 12232.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         ISOSpeedRatings = 34855,
 
         /// <summary>
@@ -50,13 +49,11 @@ namespace Genix.Imaging
         /// <remarks>
         /// OECF is the relationship between the camera optical input and the image values.
         /// </remarks>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         OECF = 34856,
 
         /// <summary>
         /// The version of the supported EXIF standard.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         ExifVersion = 36864,
 
         /// <summary>
@@ -286,7 +283,6 @@ namespace Genix.Imaging
         /// <summary>
         /// A pointer to the Exif-related Interoperability IFD.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         InteroperabilityIFDPointer = 0xa005,
 
         /// <summary>
@@ -381,7 +377,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Indicates the color filter array (CFA) geometric pattern of the image sensor when a one-chip color area sensor is used.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         CFAPattern = 0xa302,
 
         /// <summary>
@@ -413,7 +408,6 @@ namespace Genix.Imaging
         /// <remarks>
         /// A value of 0 means the focal length is unknown. Note that this tag differs from the <see cref="FocalLength"/> tag.
         /// </remarks>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         FocalLengthIn35mmFilm = 0xa405,
 
         /// <summary>

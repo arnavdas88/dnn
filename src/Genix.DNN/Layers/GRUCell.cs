@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-////#define TENSORFLOW
+#define TENSORFLOW
 
 namespace Genix.DNN.Layers
 {
@@ -29,7 +29,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)GRUC(?:\(Bi=(0|1)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)(GRUC)(?:\(([A-Za-z]+)=([0-9.]+)(?:,([A-Za-z]+)=([0-9.]+))*\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GRUCell"/> class.
@@ -57,13 +57,17 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public GRUCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, GRUCell.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, GRUCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
-            int.TryParse(groups[2].Value, out int direction);
+
+            if (!Layer.TryParseArchitectureParameter(groups, "GRUC", "Bi", out RNNCellDirection direction))
+            {
+                direction = RNNCellDirection.ForwardOnly;
+            }
 
             this.Initialize(
                 inputShape,
-                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
                 random);
@@ -73,7 +77,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="GRUCell"/> class, using the existing <see cref="GRUCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="GRUCell"/> to copy the data from.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "The parameter is validated by the base constructor.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public GRUCell(GRUCell other)
             : base(other)
@@ -102,7 +105,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The tensor that contains candidate weights.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "UW", Justification = "Stands for hidden weights matrix according to DNN notation.")]
         [JsonProperty("UC")]
         public Tensor UC { get; private set; }
 
@@ -128,7 +130,7 @@ namespace Genix.DNN.Layers
 
             states[0] = this.Step(session, states[0], null);
 
-            for (int t = 1, T = states.Length; t < T; t++)
+            for (int t = 1, tt = states.Length; t < tt; t++)
             {
                 states[t] = this.Step(session, states[t], states[t - 1]);
             }

@@ -7,13 +7,11 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Specifies the values for the NewSubfileType field.
     /// </summary>
     [Flags]
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "This is the spelling by TIFF specs.")]
     public enum TIFFNewSubfileTypes
     {
         /// <summary>

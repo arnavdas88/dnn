@@ -454,7 +454,6 @@ namespace Genix.Imaging
             /// </summary>
             /// <returns><b>true</b> if the handle is released successfully; otherwise, in the event of a catastrophic failure, <b>false</b>.</returns>
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This method must never fail.")]
             protected override bool ReleaseHandle()
             {
                 // Here, we must obey all rules for constrained execution regions.
@@ -520,7 +519,6 @@ namespace Genix.Imaging
             /// </summary>
             /// <returns><b>true</b> if the handle is released successfully; otherwise, in the event of a catastrophic failure, <b>false</b>.</returns>
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This method must never fail.")]
             protected override bool ReleaseHandle()
             {
                 // Here, we must obey all rules for constrained execution regions.

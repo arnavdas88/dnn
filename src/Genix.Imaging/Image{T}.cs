@@ -160,7 +160,6 @@ namespace Genix.Imaging
         /// <value>
         /// The array that contains the image bits.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Provide direct access to image data.")]
         public T[] Bits { get; }
 
         internal void ValidatePosition(int x, int y)

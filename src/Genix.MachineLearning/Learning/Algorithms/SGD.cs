@@ -54,7 +54,6 @@ namespace Genix.MachineLearning.Learning
         public bool Nesterov { get; set; } = false;
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Skip argument validation to improve performance.")]
         public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
         {
             float learningRate = this.LearningRate;

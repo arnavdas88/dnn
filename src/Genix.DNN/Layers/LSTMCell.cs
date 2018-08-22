@@ -10,6 +10,7 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -30,7 +31,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)LSTMC(?:\(Bi=(0|1),ForgetBias=((?:\d*\.)?\d+)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)(LSTMC)(?:\(([A-Za-z]+)=([0-9.]+)(?:,([A-Za-z]+)=([0-9.]+))*\))?$";
 
         ////(?:\(ForgetBias=((?:\d*\.)?\d+)\))?$";
 
@@ -81,16 +82,22 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, LSTMCell.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, LSTMCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
-            int direction = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
-            float forgetBias = groups.Count >= 5 && !string.IsNullOrEmpty(groups[4].Value) ?
-                Convert.ToSingle(groups[4].Value, CultureInfo.InvariantCulture) :
-                LSTMCell.DefaultForgetBias;
+
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTMC", "Bi", out RNNCellDirection direction))
+            {
+                direction = RNNCellDirection.ForwardOnly;
+            }
+
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTMC", "ForgetBias", out float forgetBias))
+            {
+                forgetBias = LSTMCell.DefaultForgetBias;
+            }
 
             this.Initialize(
                 inputShape,
-                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
                 forgetBias,
@@ -101,7 +108,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="LSTMCell"/> class, using the existing <see cref="LSTMCell"/> object.
         /// </summary>
         /// <param name="other">The <see cref="LSTMCell"/> to copy the data from.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "The parameter is validated by the base constructor.")]
         public LSTMCell(LSTMCell other)
             : base(other)
         {
@@ -157,7 +163,6 @@ namespace Genix.DNN.Layers
         public override object Clone() => new LSTMCell(this);
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Stands for length of time sequence.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {

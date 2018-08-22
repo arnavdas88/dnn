@@ -269,7 +269,6 @@ namespace Genix.Lab
         /// <param name="fileName">The file representation in the truth.</param>
         /// <param name="frameIndex">The zero-based index of recognized image in a multi-page image file.</param>
         /// <returns>The file name.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two values.")]
         public static string SplitFileName(string fileName, out int frameIndex)
         {
             if (fileName == null)
@@ -538,7 +537,6 @@ namespace Genix.Lab
         private class FileKeyComparer : IEqualityComparer<FileKey>
         {
             /// <inheritdoc />
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Equals(FileKey x, FileKey y)
             {
@@ -547,7 +545,6 @@ namespace Genix.Lab
             }
 
             /// <inheritdoc />
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public int GetHashCode(FileKey obj) => obj.Name.GetHashCode() ^ obj.FrameIndex.GetValueOrDefault();
         }

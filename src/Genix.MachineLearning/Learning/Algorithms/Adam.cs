@@ -52,7 +52,6 @@ namespace Genix.MachineLearning.Learning
         public float Eps { get; set; } = 1e-8f;
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Skip argument validation to improve performance.")]
         public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
         {
             (float[] gsum, float[] xsum) = this.accumulators.GetAccumulator(

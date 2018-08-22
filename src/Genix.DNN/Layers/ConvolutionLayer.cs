@@ -52,7 +52,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public ConvolutionLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, ConvolutionLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, ConvolutionLayer.ArchitecturePattern);
             int numberOfFilters = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
             Kernel kernel = Layer.ParseKernel(groups, 3, 1, true);
 

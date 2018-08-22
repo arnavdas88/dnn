@@ -47,7 +47,7 @@ namespace Genix.DNN.Layers
         public InputLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape /* temp */)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, InputLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, InputLayer.ArchitecturePattern);
             this.Shape = this.OutputShape = new[]
             {
                 -1,
@@ -85,7 +85,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The array of <see cref="Shape"/> objects that contains layer dimensions.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonProperty("Shape")]
         public int[] Shape { get; private set; }
 

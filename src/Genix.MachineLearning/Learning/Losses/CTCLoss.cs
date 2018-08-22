@@ -30,7 +30,6 @@ namespace Genix.MachineLearning.Learning
         public int BlankLabelIndex { get; set; } = 0;
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
         public float Loss(Tensor y, int[] expected, bool calculateGradient)
         {
             if (y == null)
@@ -110,7 +109,6 @@ namespace Genix.MachineLearning.Learning
             return -logLossA;
         }
 
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
 #pragma warning disable SA1313 // Variable names must begin with lower-case letter
         private static int[] InsertBlanks(int[] labels, int A, int blankIndex, out int repeats)
 #pragma warning restore SA1313 // Variable names must begin with lower-case letter

@@ -69,7 +69,6 @@ namespace Genix.MachineLearning.LanguageModel
         /// <param name="characters">The characters to include in the generated sequences and their counts.</param>
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public Charset(IEnumerable<(char, int)> characters, int minRepeatCount, int maxRepeatCount)
             : base(minRepeatCount, maxRepeatCount)
         {
@@ -108,7 +107,6 @@ namespace Genix.MachineLearning.LanguageModel
         /// <param name="characters">The characters to include in the generated sequences and their frequencies.</param>
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public Charset(IEnumerable<(char, float)> characters, int minRepeatCount, int maxRepeatCount)
             : base(minRepeatCount, maxRepeatCount)
         {

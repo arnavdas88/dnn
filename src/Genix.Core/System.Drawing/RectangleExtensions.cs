@@ -117,7 +117,6 @@ namespace System.Drawing
         /// <para>-or-</para>
         /// <para><c>height</c> is a negative value.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Design requirements.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set(this ref Rectangle rect, int x, int y, int width, int height)
         {
@@ -175,7 +174,6 @@ namespace System.Drawing
         /// -or-
         /// <c>height</c> has a negative value.
         /// </exception>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "x and y represent coordinates in 2D space.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Union(this ref Rectangle rect, int x, int y, int width, int height)
         {

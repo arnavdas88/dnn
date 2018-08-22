@@ -36,7 +36,6 @@ namespace Genix.Imaging
         /// <summary>
         /// The multi-spot metering mode.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         MultiSpot = 4,
 
         /// <summary>

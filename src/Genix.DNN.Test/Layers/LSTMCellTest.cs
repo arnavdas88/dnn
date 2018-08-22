@@ -62,11 +62,40 @@
         [TestMethod, TestCategory("LSTM")]
         public void ArchitectureConstructorTest1()
         {
-            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, "100LSTMC(ForgetBias=3.6)", null);
+            const string Architecture = "100LSTMC(ForgetBias=3.6)";
+            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
+            Assert.AreEqual(RNNCellDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(3.6f, layer.ForgetBias);
-            Assert.AreEqual("100LSTMC(ForgetBias=3.6)", layer.Architecture);
+            Assert.AreEqual(Architecture, layer.Architecture);
+
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
+
+            CollectionAssert.AreEqual(new[] { 4 * 100, 10 * 12 * 3 }, layer.W.Axes);
+            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 4 * 100, 100 }, layer.U.Axes);
+            Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+
+            CollectionAssert.AreEqual(new[] { 4 * 100 }, layer.B.Axes);
+            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        public void ArchitectureConstructorTest2()
+        {
+            const string Architecture = "100LSTMC(Bi=1,ForgetBias=3.6)";
+            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, Architecture, null);
+
+            Assert.AreEqual(RNNCellDirection.BiDirectional, layer.Direction);
+            Assert.AreEqual(100, layer.NumberOfNeurons);
+            Assert.AreEqual(3.6f, layer.ForgetBias);
+            Assert.AreEqual(Architecture, layer.Architecture);
 
             CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
             Assert.AreEqual(1, layer.NumberOfOutputs);
@@ -86,7 +115,7 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitectureConstructorTest2()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "100LSTM";
             try
@@ -104,14 +133,14 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitectureConstructorTest3()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new LSTMCell(null, "100LSTMC", null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitectureConstructorTest4()
+        public void ArchitectureConstructorTest5()
         {
             Assert.IsNotNull(new LSTMCell(new[] { -1, 10, 12, 3 }, null, null));
         }

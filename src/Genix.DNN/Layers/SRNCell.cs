@@ -27,7 +27,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)SRNC(?:\(Bi=(0|1)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)(SRNC)(?:\(([A-Za-z]+)=([0-9.]+)(?:,([A-Za-z]+)=([0-9.]+))*\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SRNCell"/> class.
@@ -55,13 +55,17 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public SRNCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, SRNCell.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, SRNCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
-            int.TryParse(groups[2].Value, out int direction);
+
+            if (!Layer.TryParseArchitectureParameter(groups, "SRNC", "Bi", out RNNCellDirection direction))
+            {
+                direction = RNNCellDirection.ForwardOnly;
+            }
 
             this.Initialize(
                 inputShape,
-                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
                 random);
@@ -96,7 +100,6 @@ namespace Genix.DNN.Layers
         public override object Clone() => new SRNCell(this);
 
         /// <inheritdoc />
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Stands for length of time sequence.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {

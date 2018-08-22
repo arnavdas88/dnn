@@ -67,7 +67,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The tensor that contains hidden weights for the layer.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "U", Justification = "Stands for hidden weights matrix according to DNN notation.")]
         [JsonProperty("U")]
         public Tensor U { get; private set; }
 
@@ -132,6 +131,11 @@ namespace Genix.DNN.Layers
             if (random == null)
             {
                 random = new RandomRangeGenerator(-0.08f, 0.08f);
+            }
+
+            if (direction == RNNCellDirection.BiDirectional && (numberOfNeurons % 2) != 0)
+            {
+                throw new ArgumentException("The number of neurons in a bi-directional RNN must be even.", nameof(numberOfNeurons));
             }
 
             this.Direction = direction;

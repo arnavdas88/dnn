@@ -8,10 +8,10 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Genix.Core;
@@ -127,7 +127,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The array that contains output tensor dimensions.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonProperty("Output")]
         public int[] OutputShape { get; private protected set; }
 
@@ -255,7 +254,7 @@ namespace Genix.DNN.Layers
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="pattern">The regular expression pattern that matches layer architecture.</param>
         /// <returns>The collection of regular expression groups.</returns>
-        private protected static List<Group> ParseArchitecture(string architecture, string pattern)
+        private protected static GroupCollection ParseArchitecture(string architecture, string pattern)
         {
             if (architecture == null)
             {
@@ -275,7 +274,49 @@ namespace Genix.DNN.Layers
                     nameof(architecture));
             }
 
-            return match.Groups.OfType<Group>().ToList();
+            return match.Groups;
+        }
+
+        /// <summary>
+        /// Tries to parse a named parameter in an architecture string.
+        /// Named parameters come in pairs that follow some anchor.
+        /// </summary>
+        /// <typeparam name="T">The type of parameter value.</typeparam>
+        /// <param name="groups">The collection of regular expression groups.</param>
+        /// <param name="anchor">The name of the anchor.</param>
+        /// <param name="param">The name of the parameter.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>
+        /// <b>true</b> if the parameter was found and parsed successfully; otherwise, <b>false</b>.
+        /// </returns>
+        private protected static bool TryParseArchitectureParameter<T>(GroupCollection groups, string anchor, string param, out T value)
+        {
+            int anchorIndex = -1;
+            for (int i = 0, ii = groups.Count; i < ii; i++)
+            {
+                if (groups[i].Value == anchor)
+                {
+                    anchorIndex = i;
+                    break;
+                }
+            }
+
+            if (anchorIndex != -1)
+            {
+                for (int i = anchorIndex + 1; i < groups.Count; i += 2)
+                {
+                    if (string.Compare(groups[i].Value, param, StringComparison.OrdinalIgnoreCase) == 0 &&
+                        i + 1 < groups.Count)
+                    {
+                        TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
+                        value = (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, groups[i + 1].Value);
+                        return true;
+                    }
+                }
+            }
+
+            value = default(T);
+            return false;
         }
 
         /// <summary>
@@ -286,7 +327,7 @@ namespace Genix.DNN.Layers
         /// <param name="defaultStride">The default value for stride parameter.</param>
         /// <param name="padding">Determines whether padding should be parsed.</param>
         /// <returns>The <see cref="Kernel"/> object this method creates.</returns>
-        private protected static Kernel ParseKernel(IList<Group> groups, int startingGroup, int? defaultStride, bool padding)
+        private protected static Kernel ParseKernel(GroupCollection groups, int startingGroup, int? defaultStride, bool padding)
         {
             int width = Convert.ToInt32(groups[startingGroup].Value, CultureInfo.InvariantCulture);
             int height = !string.IsNullOrEmpty(groups[startingGroup + 1].Value) ? Convert.ToInt32(groups[startingGroup + 1].Value, CultureInfo.InvariantCulture) : width;

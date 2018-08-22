@@ -6,7 +6,6 @@
 
     public static class GenixAssert
     {
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This method is used for testing arguments.")]
         public static void AreArraysEqual(float[] expected, float[] actual)
         {
             Assert.AreEqual(expected.Length, actual.Length);
@@ -17,7 +16,6 @@
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This method is used for testing arguments.")]
         public static void AreArraysEqual(int length, float[] expected, int expectedIndex, float[] actual, int actualIndex)
         {
             for (int i = 0, ii = length; i < ii; i++)

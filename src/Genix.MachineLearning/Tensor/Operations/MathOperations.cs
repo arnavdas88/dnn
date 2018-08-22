@@ -31,7 +31,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) + b(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Add(this Session session, Tensor a, Tensor b)
         {
@@ -98,7 +97,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := x(i) + alpha</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Add(this Session session, Tensor x, float alpha)
         {
@@ -137,7 +135,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) - b(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Subtract(this Session session, Tensor a, Tensor b)
         {
@@ -198,7 +195,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) * b(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Multiply(this Session session, Tensor a, Tensor b)
         {
@@ -259,7 +255,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := alpha * x(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Multiply(this Session session, Tensor x, float alpha)
         {
@@ -297,7 +292,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := a(i) / b(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Divide(this Session session, Tensor a, Tensor b)
         {
@@ -359,7 +353,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := x(i) * x(i)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Square(this Session session, Tensor x)
         {
@@ -398,7 +391,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := x(i) ^ p</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Pow(this Session session, Tensor x, float power)
         {
@@ -436,7 +428,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := sqrt(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Sqrt(this Session session, Tensor x)
         {
@@ -474,7 +465,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := abs(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Abs(this Session session, Tensor x)
         {
@@ -512,7 +502,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := max(a(i), b(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Max(this Session session, Tensor a, Tensor b)
         {
@@ -565,7 +554,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := min(a(i), b(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Min(this Session session, Tensor a, Tensor b)
         {
@@ -617,7 +605,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := max(x(i), 0)</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor ReLU(this Session session, Tensor x)
         {
@@ -654,7 +641,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := sigmoid(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Sigmoid(this Session session, Tensor x)
         {
@@ -691,7 +677,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := tanh(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Tanh(this Session session, Tensor x)
         {
@@ -725,7 +710,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>x(i) := tanh(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void TanhIP(this Session session, Tensor x)
         {
@@ -759,7 +743,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := sin(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Sin(this Session session, Tensor x)
         {
@@ -796,7 +779,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as <c>y(i) := cos(x(i))</c>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Cos(this Session session, Tensor x)
         {
@@ -839,7 +821,6 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as C := op(A)*op(B) + b.
         /// </remarks>
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Unroll code for better performance. Unit tests for all execution paths are provided.")]
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor MxM(this Session session, MatrixLayout matrixLayout, Tensor a, bool transa, Tensor b, bool transb, Tensor bias)
         {
@@ -1036,7 +1017,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as y := op(<paramref name="a"/>)*<paramref name="x"/> + <paramref name="bias"/>.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor MxV(this Session session, MatrixLayout matrixLayout, Tensor a, bool transa, Tensor x, Tensor bias)
         {
@@ -1153,7 +1133,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The method performs operation defined as A := x*y'.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor VxV(this Session session, MatrixLayout matrixLayout, Tensor x, Tensor y)
         {

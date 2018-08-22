@@ -328,7 +328,6 @@
             Assert.IsTrue(errorL2 < 0.001, errorL2.ToString(CultureInfo.InvariantCulture));
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "This is just a test.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "This is just a test.")]
         [TestMethod, TestCategory("GRU")]
         [Ignore]

@@ -64,7 +64,6 @@ namespace Genix.Imaging
         /// <summary>
         /// JBIG, per ITU-T T.43.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         JBIGMRC = 10,
 
         /// <summary>
@@ -73,10 +72,8 @@ namespace Genix.Imaging
         PackBits = 32773,
 
         /// <summary>
-        /// NeXT RLE 2-bit grey scale encoding.
+        /// NeXT RLE 2-bit gray scale encoding.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         NeXT = 32766,
 
         /// <summary>
@@ -92,25 +89,21 @@ namespace Genix.Imaging
         /// <summary>
         /// RLE for LW (Line Work) encoding.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         RLELW = 32896,
 
         /// <summary>
         /// RLE for HC (High-resolution Continuous-tone) encoding.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         RLEHC = 32897,
 
         /// <summary>
         /// RLE for BL (Binary Line work) encoding.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         RLEBL = 32898,
 
         /// <summary>
         /// Kodak DCS encoding.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         KodakDCS = 32947,
 
         /// <summary>
@@ -126,7 +119,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Nikon NEF Compressed.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         NikonNEF = 34713,
 
         /// <summary>

@@ -131,8 +131,6 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="y">The logits that have been predicted.</param>
         /// <returns>The collection of decoded class sequences along with their weights.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to return results.")]
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
         public IList<(string[] Classes, float Probability)> BeamSearch(Tensor y)
         {
             if (y == null)
@@ -168,7 +166,6 @@ namespace Genix.DNN
             return this.CreateFinalAnswer(flop);
         }
 
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
 #pragma warning disable SA1313 // Variable names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog)
 #pragma warning restore SA1313 // Variable names must begin with lower-case letter
@@ -280,7 +277,6 @@ namespace Genix.DNN
             return flop;
         }
 
-        [SuppressMessage("Microsoft.StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Use CTC notation.")]
 #pragma warning disable SA1313 // Variable names must begin with lower-case letter
         private Buffers BeamSearch(Buffers flip, Buffers flop, int T, int A, float[] ylog, Context context)
 #pragma warning restore SA1313 // Variable names must begin with lower-case letter

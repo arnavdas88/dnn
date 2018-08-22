@@ -88,7 +88,6 @@ namespace Genix.MachineLearning.LanguageModel
         /// <param name="words">The words to include in the vocabulary and their counts.</param>
         /// <param name="minRepeatCount">The minimum number of times the context should be repeated.</param>
         /// <param name="maxRepeatCount">The maximum number of times the context can be repeated.</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public Vocabulary(IEnumerable<(string, int)> words, int minRepeatCount, int maxRepeatCount)
             : base(minRepeatCount, maxRepeatCount)
         {

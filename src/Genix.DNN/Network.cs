@@ -81,7 +81,6 @@ namespace Genix.DNN
         /// <value>
         /// The network input layout.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonIgnore]
         public int[] InputShape => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Shape;
 

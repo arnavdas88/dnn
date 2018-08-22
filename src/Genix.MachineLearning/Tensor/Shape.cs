@@ -88,7 +88,6 @@ namespace Genix.MachineLearning
         /// <value>
         /// The axes dimensions.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonProperty("axes")]
         public int[] Axes { get; private set; }
 
@@ -98,7 +97,6 @@ namespace Genix.MachineLearning
         /// <value>
         /// The axes strides.
         /// </value>
-        [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Need a fast access to the collection.")]
         [JsonProperty("strides")]
         public int[] Strides { get; private set; }
 
@@ -107,7 +105,6 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shape">The shape to evaluate.</param>
         /// <returns>The product of shape dimensions.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ShapeLength(int[] shape)
         {
@@ -245,7 +242,6 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="axes">The element coordinates.</param>
         /// <returns>The dot product of element coordinates and corresponding strides.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Position(params int[] axes)
         {
@@ -266,7 +262,6 @@ namespace Genix.MachineLearning
         /// <param name="shape1">The first shape to evaluate.</param>
         /// <param name="shape2">The second shape to evaluate.</param>
         /// <returns><b>true</b> if <c>shape1</c> is the same as <c>shape2</c>; otherwise; <b>false</b>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(int[] shape1, int[] shape2)
         {
@@ -280,7 +275,6 @@ namespace Genix.MachineLearning
         /// <returns>
         /// <b>true</b> if all shapes in <c>shapes</c> are identical; otherwise; <b>false</b>.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(IList<int[]> shapes)
         {
@@ -302,7 +296,6 @@ namespace Genix.MachineLearning
         /// <returns>
         /// <b>true</b> if shapes of all tensors in <c>xs</c> are identical; otherwise; <b>false</b>.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(IList<Tensor> xs)
         {

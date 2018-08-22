@@ -735,7 +735,6 @@ namespace Genix.Imaging
             /// <param name="x">The first property item to compare.</param>
             /// <param name="y">The second property item to compare.</param>
             /// <returns><b>true</b> if the specified property items are equal; otherwise, <b>false</b>.</returns>
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             public bool Equals(PropertyItem x, PropertyItem y)
             {
                 return x.Id == y.Id;
@@ -749,7 +748,6 @@ namespace Genix.Imaging
             /// <exception cref="ArgumentNullException">
             /// The <paramref name="propertyItem"/> is <b>null</b>.
             /// </exception>
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             public int GetHashCode(PropertyItem propertyItem)
             {
                 return propertyItem.Id;
@@ -767,7 +765,6 @@ namespace Genix.Imaging
             /// <param name="x">The first color to compare.</param>
             /// <param name="y">The second color to compare.</param>
             /// <returns><b>true</b> if the specified colors are equal; otherwise, <b>false</b>.</returns>
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             public bool Equals(System.Drawing.Color x, System.Drawing.Color y)
             {
                 return x.A == y.A && x.R == y.R && x.G == y.G && x.B == y.B;
@@ -778,7 +775,6 @@ namespace Genix.Imaging
             /// </summary>
             /// <param name="color">The color for which a hash code is to be returned.</param>
             /// <returns>A hash code for the specified color.</returns>
-            [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "This is a private method.")]
             public int GetHashCode(System.Drawing.Color color)
             {
                 return color.GetHashCode();

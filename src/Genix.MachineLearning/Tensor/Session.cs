@@ -168,7 +168,6 @@ namespace Genix.MachineLearning
         /// <returns>
         /// The tensor this method allocates.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor AllocateTensor(string name, int[] shape, bool calculateGradient)
         {
@@ -212,7 +211,6 @@ namespace Genix.MachineLearning
         /// <returns>
         /// The tensors this method allocates.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor[] AllocateTensors(string name, int count, int[] shape, bool calculateGradient)
         {
@@ -229,7 +227,6 @@ namespace Genix.MachineLearning
         /// Detaches the tensor from the session.
         /// </summary>
         /// <param name="x">The tensor to detach.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DetachTensor(Tensor x)
         {

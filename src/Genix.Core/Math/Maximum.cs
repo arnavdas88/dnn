@@ -350,7 +350,6 @@ namespace Genix.Core
         /// <returns>
         /// The minimum value in the array.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(int length, float[] x, int offx) => x[Maximum.ArgMin(length, x, offx)];
 
@@ -363,7 +362,6 @@ namespace Genix.Core
         /// <returns>
         /// The maximum value in the array.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Max(int length, float[] x, int offx) => x[Maximum.ArgMax(length, x, offx)];
 
@@ -375,8 +373,6 @@ namespace Genix.Core
         /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <param name="min">The minimum value in the array.</param>
         /// <param name="max">The maximum value in the array.</param>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void MinMax(int length, float[] x, int offx, out float min, out float max)
         {
@@ -441,7 +437,6 @@ namespace Genix.Core
         /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
         /// <param name="min">The position of minimum value in the array.</param>
         /// <param name="max">The position of maximum value in the array.</param>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", Justification = "Need to return two parameters.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgMinMax(int length, float[] x, int offx, out int min, out int max)
         {

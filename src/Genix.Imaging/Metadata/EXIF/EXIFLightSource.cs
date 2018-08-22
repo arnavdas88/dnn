@@ -6,8 +6,6 @@
 
 namespace Genix.Imaging
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Specifies the values for the <see cref="EXIFField.LightSource"/> field.
     /// </summary>
@@ -111,7 +109,6 @@ namespace Genix.Imaging
         /// <summary>
         /// The ISO studio tungsten source.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         ISOStudioTungsten = 24,
 
         /// <summary>

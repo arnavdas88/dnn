@@ -69,7 +69,6 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>The file has zero frames.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromFile(string fileName)
         {
@@ -124,7 +123,6 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>The file has zero frames.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromFile(string fileName, int startingFrame, int frameCount)
         {
@@ -148,7 +146,6 @@ namespace Genix.Imaging
         /// <exception cref="InvalidOperationException">
         /// <para>The file has zero frames.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromMemory(byte[] buffer)
         {
@@ -179,7 +176,6 @@ namespace Genix.Imaging
         /// <exception cref="InvalidOperationException">
         /// <para>The file has zero frames.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromMemory(byte[] buffer, int index, int count)
         {
@@ -205,7 +201,6 @@ namespace Genix.Imaging
         /// <exception cref="InvalidOperationException">
         /// <para>The file has zero frames.</para>
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromStream(Stream stream)
         {

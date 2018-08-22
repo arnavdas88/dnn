@@ -59,23 +59,40 @@
         [TestMethod, TestCategory("LSTM")]
         public void ArchitectureConstructorTest1()
         {
+            const string Architecture = "20-30-40LSTM(ForgetBias=3.6)";
             int[] shape = new[] { -1, 20, 20, 10 };
-            string architecture = "20-30-40LSTM(ForgetBias=3.6)";
-            LSTMLayer layer = new LSTMLayer(shape, architecture, null);
+            LSTMLayer layer = new LSTMLayer(shape, Architecture, null);
 
             Assert.AreEqual(20, ((LSTMCell)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
-            Assert.AreEqual(3.6f, ((LSTMCell)layer.Graph.Vertices.ElementAt(0)).ForgetBias);
             Assert.AreEqual(30, ((LSTMCell)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
-            Assert.AreEqual(3.6f, ((LSTMCell)layer.Graph.Vertices.ElementAt(1)).ForgetBias);
             Assert.AreEqual(40, ((FullyConnectedLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
-            Assert.AreEqual(architecture, layer.Architecture);
+            Assert.AreEqual(Architecture, layer.Architecture);
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<LSTMCell>().All(x => x.Direction == RNNCellDirection.ForwardOnly));
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<LSTMCell>().All(x => x.ForgetBias == 3.6f));
+            Assert.AreEqual(1, layer.NumberOfOutputs);
+            CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
+        }
+
+        [TestMethod, TestCategory("LSTM")]
+        public void ArchitectureConstructorTest2()
+        {
+            const string Architecture = "20-30-40LSTM(Bi=1,ForgetBias=3.6)";
+            int[] shape = new[] { -1, 20, 20, 10 };
+            LSTMLayer layer = new LSTMLayer(shape, Architecture, null);
+
+            Assert.AreEqual(20, ((LSTMCell)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
+            Assert.AreEqual(30, ((LSTMCell)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
+            Assert.AreEqual(40, ((FullyConnectedLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
+            Assert.AreEqual(Architecture, layer.Architecture);
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<LSTMCell>().All(x => x.Direction == RNNCellDirection.BiDirectional));
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<LSTMCell>().All(x => x.ForgetBias == 3.6f));
             Assert.AreEqual(1, layer.NumberOfOutputs);
             CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentException))]
-        public void ArchitectureConstructorTest2()
+        public void ArchitectureConstructorTest3()
         {
             string architecture = "100LSTM";
             try
@@ -93,14 +110,14 @@
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitectureConstructorTest3()
+        public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new LSTMLayer(null, "20-30LSTM", null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ArchitectureConstructorTest4()
+        public void ArchitectureConstructorTest5()
         {
             Assert.IsNotNull(new LSTMLayer(new[] { 1, 20, 20, 10 }, null, null));
         }
@@ -313,7 +330,6 @@
             Assert.IsTrue(errorL2 < 0.001, errorL2.ToString(CultureInfo.InvariantCulture));
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "This is just a test.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "This is just a test.")]
         [TestMethod, TestCategory("LSTM")]
         [Ignore]

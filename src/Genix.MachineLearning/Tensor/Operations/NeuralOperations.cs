@@ -8,12 +8,10 @@
 
 namespace Genix.MachineLearning
 {
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
-    using System.Threading;
     using System.Threading.Tasks;
     using Genix.Core;
 
@@ -35,7 +33,6 @@ namespace Genix.MachineLearning
         /// <remarks>
         /// The <c>x</c> tensor can represent a mini-batch and contain multiple vectors.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor AddBias(this Session session, Tensor x, Tensor b)
         {
@@ -106,7 +103,6 @@ namespace Genix.MachineLearning
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Unroll cycles to improve performance.")]
         [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "Unroll cycles to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -336,7 +332,6 @@ namespace Genix.MachineLearning
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Unroll cycles to improve performance.")]
         [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "Unroll cycles to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -576,7 +571,6 @@ namespace Genix.MachineLearning
         /// During testing stage, weights are multiplied by <c>p</c>.
         /// </para>
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor Dropout(this Session session, Tensor x, RandomNumberGenerator<float> random, float probability)
         {
@@ -656,7 +650,6 @@ namespace Genix.MachineLearning
         /// dx(i) = scale(i) ^ -beta * dy(i) - (2 * alpha * beta / kernelSize) * x(i) * sum(y(j) * dy(j) / scale(j)).
         /// </para>
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor LRN(
@@ -731,7 +724,6 @@ namespace Genix.MachineLearning
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor SoftMax(this Session session, Tensor x)
         {
@@ -786,7 +778,6 @@ namespace Genix.MachineLearning
         /// <param name="xw">The input tensor weights.</param>
         /// <param name="yw">The output tensor weights.</param>
         /// <param name="kernelSize">The number of channels to normalize across. Should be odd number.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Do not validate parameters to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void LRNKernel(Shape shape, float[] xw, float[] yw, int kernelSize)
         {
@@ -827,7 +818,6 @@ namespace Genix.MachineLearning
         {
             private const string DllName = "Genix.DNN.Native.dll";
 
-            [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Use DNN notation.")]
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void LRNKernel(

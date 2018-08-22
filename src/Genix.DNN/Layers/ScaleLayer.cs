@@ -46,7 +46,7 @@ namespace Genix.DNN.Layers
         public ScaleLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, ScaleLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, ScaleLayer.ArchitecturePattern);
             this.Alpha = Convert.ToSingle(groups[2].Value, CultureInfo.InvariantCulture);
         }
 

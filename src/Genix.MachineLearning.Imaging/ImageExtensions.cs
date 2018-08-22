@@ -22,7 +22,6 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="image">The <see cref="Image"/> to create a <see cref="Tensor"/> from.</param>
         /// <param name="name">The tensor name.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 local functions.")]
         public static Tensor ToTensor(this Image image, string name)
         {
             if (image == null)
@@ -179,7 +178,6 @@ namespace Genix.MachineLearning.Imaging
         /// <returns>
         /// The <see cref="System.Drawing.Bitmap"/> this method creates.
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1126:PrefixCallsCorrectly", Justification = "StyleCop incorrectly interprets C# 7.0 out variables.")]
         public static System.Drawing.Bitmap ToBitmap(this Tensor tensor)
         {
             int width;

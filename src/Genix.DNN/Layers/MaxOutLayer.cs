@@ -57,7 +57,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public MaxOutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, MaxOutLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, MaxOutLayer.ArchitecturePattern);
             int groupSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
             this.Initialize(inputShape, groupSize);
         }
@@ -66,7 +66,6 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="MaxOutLayer"/> class, using the existing <see cref="MaxOutLayer"/> object.
         /// </summary>
         /// <param name="other">The <see cref="MaxOutLayer"/> to copy the data from.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Validated by the base constructor.")]
         public MaxOutLayer(MaxOutLayer other)
             : base(other)
         {

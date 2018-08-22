@@ -7,7 +7,6 @@
 namespace Genix.Imaging
 {
     using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Specifies the values for the PhotometricInterpretation field.
@@ -40,7 +39,6 @@ namespace Genix.Imaging
         /// first the Red component plane StripOffsets, then the Green plane StripOffsets, then the Blue plane StripOffsets.
         /// </summary>
         [Description("RGB")]
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         RGB = 2,
 
         /// <summary>
@@ -73,26 +71,21 @@ namespace Genix.Imaging
         /// <summary>
         /// YCbCr photometric interpretation.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         YCbCr = 6,
 
         /// <summary>
         /// CIE L*a*b*.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         CIELab = 8,
 
         /// <summary>
         /// CIE L*a*b*, alternate encoding also known as ICC L*a*b*.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         ICCLab = 9,
 
         /// <summary>
         /// CIE L*a*b*, alternate encoding also known as ITU L*a*b*.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         ITULab = 10,
 
         /// <summary>
@@ -103,7 +96,6 @@ namespace Genix.Imaging
         /// <summary>
         /// Pixar LogLUV.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
         LogLUV = 32845,
 
         /// <summary>

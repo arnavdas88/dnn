@@ -59,7 +59,6 @@ namespace Genix.Imaging
         /// <summary>
         /// For black and white TIFF files that represent shades of gray, the technique used to convert from gray to black and white pixels.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "This is the spelling by TIFF specs.")]
         Threshholding = 263,
 
         /// <summary>
@@ -451,23 +450,16 @@ namespace Genix.Imaging
         /// The transformation from RGB to YCbCr image data.
         /// The transformation is specified as three rational values that represent the coefficients used to compute luminance, Y.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         YCbCrCoefficients = 529,
 
         /// <summary>
         /// Specifies the sub-sampling factors used for the chrominance components of a YCbCr image.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubSampling", Justification = "This is the spelling by TIFF specs.")]
         YCbCrSubSampling = 530,
 
         /// <summary>
         /// Specifies the positioning of sub-sampled chrominance components relative to luminance samples.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "TIFF specifications.")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "TIFF specifications.")]
         YCbCrPositioning = 531,
 
         /*JPEGTables = 0x015b, // TIFF-EP*/

@@ -131,7 +131,6 @@ namespace Genix.MachineLearning.LanguageModel
         /// <returns>
         /// The sequence of tuples containing the word and its frequency.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Use lightweight tuples to simplify design.")]
         public IEnumerable<(string Text, float Probability)> Enumerate()
         {
             char[] chars = new char[256]; // TODO: calculate max word length

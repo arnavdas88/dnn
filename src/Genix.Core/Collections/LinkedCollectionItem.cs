@@ -20,7 +20,6 @@ namespace Genix.Core
         /// <value>
         /// The previous item in the <see cref="LinkedCollection{T}"/>.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Prev", Justification = "The abbreviation for previous to keep in sync with Next.")]
         public T Prev { get; internal set; }
 
         /// <summary>

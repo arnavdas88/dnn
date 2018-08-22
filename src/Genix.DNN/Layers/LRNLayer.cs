@@ -10,7 +10,6 @@ namespace Genix.DNN.Layers
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -66,7 +65,6 @@ namespace Genix.DNN.Layers
         /// <param name="alpha">The α parameter.</param>
         /// <param name="beta">The β parameter.</param>
         /// <param name="k">The k parameter.</param>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "This is a notation used in algorithm description.")]
         public LRNLayer(int[] inputShape, int kernelSize, float alpha, float beta, float k)
             : base(1, inputShape)
         {
@@ -90,7 +88,7 @@ namespace Genix.DNN.Layers
         public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
             : base(1, inputShape)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, LRNLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, LRNLayer.ArchitecturePattern);
 
             this.KernelSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
             if (this.KernelSize < 3 || (this.KernelSize % 2) == 0)
@@ -179,7 +177,6 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The k parameter.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "This is a notation used in algorithm description.")]
         [JsonProperty("K")]
         public float K { get; private set; } = LRNLayer.DefaultK;
 

@@ -11,7 +11,6 @@ namespace Genix.DNN.Layers
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text;
     using System.Text.RegularExpressions;
     using Genix.Core;
     using Newtonsoft.Json;
@@ -24,7 +23,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The regular expression pattern that matches layer architecture.
         /// </summary>
-        public const string ArchitecturePattern = @"^(\d+)(-\d+)+(LSTM)(?:\(ForgetBias=((?:\d*\.)?\d+)\))?$";
+        public const string ArchitecturePattern = @"^(\d+)(?:-(\d+))+(LSTM)(?:\(([A-Za-z]+)=([0-9.]+)(?:,([A-Za-z]+)=([0-9.]+))*\))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LSTMLayer"/> class.
@@ -54,7 +53,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
         {
-            List<Group> groups = Layer.ParseArchitecture(architecture, LSTMLayer.ArchitecturePattern);
+            GroupCollection groups = Layer.ParseArchitecture(architecture, LSTMLayer.ArchitecturePattern);
 
             List<int> numberOfNeurons = new List<int>()
             {
@@ -63,21 +62,22 @@ namespace Genix.DNN.Layers
 
             foreach (Capture capture in groups[2].Captures)
             {
-                numberOfNeurons.Add(Convert.ToInt32(capture.Value.TrimStart('-'), CultureInfo.InvariantCulture));
+                numberOfNeurons.Add(Convert.ToInt32(capture.Value, CultureInfo.InvariantCulture));
             }
 
-            float forgetBias = LSTMCell.DefaultForgetBias;
-            int index = groups.FindIndex(x => x.Value == "LSTM");
-            if (index != -1 && groups.Count >= index + 2 && !string.IsNullOrEmpty(groups[index + 1].Value))
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTM", "Bi", out RNNCellDirection direction))
             {
-                forgetBias = Convert.ToSingle(groups[index + 1].Value, CultureInfo.InvariantCulture);
+                direction = RNNCellDirection.ForwardOnly;
             }
 
-            int.TryParse(groups[groups.Count - 1].Value, out int direction);
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTM", "ForgetBias", out float forgetBias))
+            {
+                forgetBias = LSTMCell.DefaultForgetBias;
+            }
 
             this.Initialize(
                 inputShape,
-                direction == 1 ? RNNCellDirection.BiDirectional : RNNCellDirection.ForwardOnly,
+                direction,
                 numberOfNeurons,
                 forgetBias,
                 MatrixLayout.RowMajor,

@@ -31,7 +31,6 @@ namespace Genix.DNN.Learning
         /// <returns>
         /// The <see cref="TrainingResult"/> object that contains training results for the epoch.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "We need a sequence of generic arguments here.")]
         public TrainingResult RunEpoch(
             int epoch,
             ClassificationNetwork net,
