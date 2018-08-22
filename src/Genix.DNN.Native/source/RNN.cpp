@@ -188,19 +188,19 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 	int steps,
 	int ylen,
 	const float* u,
-	const float* uc,
 	float* g,
 	float* y,
-	BOOL forward,
+	BOOL bidirectional,
 	BOOL rowmajor)
 {
 	const int glen = 3 * ylen;
 	const int m = 2 * ylen;
 	const int n = ylen;
 	const CBLAS_LAYOUT layout = rowmajor ? CblasRowMajor : CblasColMajor;
-	const int lda = rowmajor ? n : m;
+	const int ldu = rowmajor ? n : 3 * ylen;
+	const float* uc = u + (rowmajor ? m * n : m);
 
-	int yinc = ylen, ginc = glen;
+	/*int yinc = ylen, ginc = glen;
 	if (!forward)
 	{
 		yinc = -ylen; ginc = -glen;
@@ -208,9 +208,9 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 		ptrdiff_t tstart = ptrdiff_t(steps) - 1;
 		g += tstart * glen;
 		y += tstart * ylen;
-	}
+	}*/
 
-	for (int t = 0; t < steps; t++, y += yinc, g += ginc)
+	for (int t = 0; t < steps; t++, y += ylen, g += glen)
 	{
 		float* rg = g + ylen;		// reset gate
 		float* cg = rg + ylen;		// candidate
@@ -228,8 +228,8 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 		}
 		else
 		{
-			const float* state = y - yinc;
-			::cblas_sgemv(layout, CblasNoTrans, m, n, 1.0f, u, lda, state, 1, 1.0f, g, 1);
+			const float* state = y - ylen;
+			::cblas_sgemv(layout, CblasNoTrans, m, n, 1.0f, u, ldu, state, 1, 1.0f, g, 1);
 
 			for (int i = 0; i < ylen; i++)
 			{
@@ -240,7 +240,7 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 				y[i] = rg[i] * state[i];
 			}
 
-			::cblas_sgemv(layout, CblasNoTrans, n, n, 1.0f, uc, n, y, 1, 1.0f, cg, 1);
+			::cblas_sgemv(layout, CblasNoTrans, n, n, 1.0f, uc, ldu, y, 1, 1.0f, cg, 1);
 
 			for (int i = 0; i < ylen; i++)
 			{
@@ -251,6 +251,54 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 			}
 		}
 	}
+
+	/*if (bidirectional)
+	{
+		y -= statelen;
+		g -= statelen;
+
+		for (int t = 0; t < steps; t++, y -= ylen, g -= glen)
+		{
+			float* rg = g + ylen;		// reset gate
+			float* cg = rg + ylen;		// candidate
+
+			if (t == 0)
+			{
+				for (int i = 0; i < statelen; i++)
+				{
+					g[i] = __sigmoid(g[i]);
+					rg[i] = __sigmoid(rg[i]);
+					cg[i] = ::tanhf(cg[i]);
+
+					y[i] = g[i] * cg[i];
+				}
+			}
+			else
+			{
+				const float* state = y + ylen;
+				::cblas_sgemv(layout, CblasNoTrans, m, n, 1.0f, u, lda, state, 1, 1.0f, g, 1);
+
+				for (int i = 0; i < statelen; i++)
+				{
+					g[i] = __sigmoid(g[i]);
+					rg[i] = __sigmoid(rg[i]);
+
+					// use y as a temporary buffer for r * state
+					y[i] = rg[i] * state[i];
+				}
+
+				::cblas_sgemv(layout, CblasNoTrans, n, n, 1.0f, uc, n, y, 1, 1.0f, cg, 1);
+
+				for (int i = 0; i < statelen; i++)
+				{
+					cg[i] = ::tanhf(cg[i]);
+
+					const float s = state[i];
+					y[i] = s + (g[i] * (cg[i] - s));
+				}
+			}
+		}
+	}*/
 }
 
 extern "C" __declspec(dllexport) void WINAPI gru_gradient(
@@ -258,8 +306,6 @@ extern "C" __declspec(dllexport) void WINAPI gru_gradient(
 	int ylen,
 	const float* u,
 	float* du,
-	const float* uc,
-	float* duc,
 	const float* g,
 	float* dg,
 	const float* y,
@@ -271,7 +317,9 @@ extern "C" __declspec(dllexport) void WINAPI gru_gradient(
 	const int m = 2 * ylen;
 	const int n = ylen;
 	const CBLAS_LAYOUT layout = rowmajor ? CblasRowMajor : CblasColMajor;
-	const int lda = rowmajor ? n : m;
+	const int ldu = rowmajor ? n : 3 * ylen;
+	const float* uc = u + (rowmajor ? m * n : m);
+	float* duc = du + (rowmajor ? m * n : m);
 
 	int yinc = ylen, ginc = glen;
 	if (forward)
@@ -339,9 +387,9 @@ extern "C" __declspec(dllexport) void WINAPI gru_gradient(
 				dstate[i] += dyi * (1.0f - ugate);
 			}
 
-			::cblas_sger(layout, n, n, 1.0f, dcg, 1, drg, 1, duc, n);
+			::cblas_sger(layout, n, n, 1.0f, dcg, 1, drg, 1, duc, ldu);
 			// use drg as a temporary buffer for d(r * state)
-			::cblas_sgemv(layout, CblasTrans, n, n, 1.0f, uc, n, dcg, 1, 0.0f, drg, 1);
+			::cblas_sgemv(layout, CblasTrans, n, n, 1.0f, uc, ldu, dcg, 1, 0.0f, drg, 1);
 
 			// update state gradient and calculate reset gate
 			for (int i = 0; i < ylen; i++)
@@ -353,8 +401,8 @@ extern "C" __declspec(dllexport) void WINAPI gru_gradient(
 				drg[i] = drg[i] * state[i] * __sigmoid_derivative2(rg[i]);
 			}
 
-			::cblas_sger(layout, m, n, 1.0f, dg, 1, state, 1, du, lda);
-			::cblas_sgemv(layout, CblasTrans, m, n, 1.0f, u, lda, dg, 1, 1.0f, dstate, 1);
+			::cblas_sger(layout, m, n, 1.0f, dg, 1, state, 1, du, ldu);
+			::cblas_sgemv(layout, CblasTrans, m, n, 1.0f, u, ldu, dg, 1, 1.0f, dstate, 1);
 		}
 	}
 }

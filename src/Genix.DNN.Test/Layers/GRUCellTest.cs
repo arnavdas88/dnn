@@ -39,15 +39,11 @@
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
-                        new[] { 2 * numberOfNeurons, numberOfNeurons } :
-                        new[] { numberOfNeurons, 2 * numberOfNeurons },
+                        new[] { 3 * numberOfNeurons, numberOfNeurons } :
+                        new[] { numberOfNeurons, 3 * numberOfNeurons },
                     layer.U.Axes);
                 Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
                 Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
-
-                CollectionAssert.AreEqual(new[] { numberOfNeurons, numberOfNeurons }, layer.UC.Axes);
-                Assert.IsFalse(layer.UC.Weights.All(x => x == 0.0f));
-                Assert.AreEqual(0.0, layer.UC.Weights.Average(), 0.01f);
 
                 CollectionAssert.AreEqual(new[] { 3 * numberOfNeurons }, layer.B.Axes);
                 Assert.IsTrue(layer.B.Weights.Take(2 * numberOfNeurons).All(x => x == 1.0f));
@@ -80,13 +76,9 @@
             Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { 2 * 100, 100 }, layer.U.Axes);
+            CollectionAssert.AreEqual(new[] { 3 * 100, 100 }, layer.U.Axes);
             Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
-
-            CollectionAssert.AreEqual(new[] { 100, 100 }, layer.UC.Axes);
-            Assert.IsFalse(layer.UC.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.UC.Weights.Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 3 * 100 }, layer.B.Axes);
             Assert.IsTrue(layer.B.Weights.Take(2 * 100).All(x => x == 1.0f));
@@ -111,13 +103,9 @@
             Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { 2 * 100, 100 }, layer.U.Axes);
+            CollectionAssert.AreEqual(new[] { 3 * 100, 100 }, layer.U.Axes);
             Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
-
-            CollectionAssert.AreEqual(new[] { 100, 100 }, layer.UC.Axes);
-            Assert.IsFalse(layer.UC.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.UC.Weights.Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 3 * 100 }, layer.B.Axes);
             Assert.IsTrue(layer.B.Weights.Take(2 * 100).All(x => x == 1.0f));
@@ -177,7 +165,7 @@
         {
             int[] shape = new[] { -1, 20, 20, 10 };
             GRUCell layer = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
-            Assert.AreEqual(4, layer.EnumGradients().Count());
+            Assert.AreEqual(3, layer.EnumGradients().Count());
         }
 
         [TestMethod, TestCategory("GRU")]
@@ -223,14 +211,8 @@
 
             layer.U.Set(new float[]
             {
-                0.6758169f, 0.08030099f, 0.6760981f, 0.17049837f,
-                -0.33939722f, 0.44897282f, 0.18849522f, 0.399871f,
-            });
-
-            layer.UC.Set(new float[]
-            {
-                0.6758169f, 0.08030099f,
-                -0.33939722f, 0.44897282f,
+                0.6758169f, 0.08030099f, 0.6760981f, 0.17049837f, 0.6758169f, 0.08030099f,
+                -0.33939722f, 0.44897282f, 0.18849522f, 0.399871f, -0.33939722f, 0.44897282f,
             });
 
             layer.B.Set(new float[]
@@ -270,16 +252,10 @@
             Helpers.AreArraysEqual(
                 new float[]
                 {
-                    0.009080857f, -0.003106385f, 0.001301541f, -0.0004473499f,
-                    -0.004220309f, 0.001443686f, -0.0006048883f, 0.0002079049f
+                    0.009080857f, -0.003106385f, 0.001301541f, -0.0004473499f, 0.0183215f, 0.03444418f,
+                    -0.004220309f, 0.001443686f, -0.0006048883f, 0.0002079049f, -0.006485323f, -0.01219232f,
                 },
                 layer.U.Gradient);
-            Helpers.AreArraysEqual(
-                new float[]
-                {
-                    0.0183215f, 0.03444418f, -0.006485323f, -0.01219232f
-                },
-                layer.UC.Gradient);
             Helpers.AreArraysEqual(
                 new float[]
                 {
@@ -317,12 +293,7 @@
             {
                 0.6758169f, 0.08030099f, 0.6760981f, 0.17049837f,
                 -0.33939722f, 0.44897282f, 0.18849522f, 0.399871f,
-            });
-
-            layer.UC.Set(new float[]
-            {
-                0.6758169f, 0.08030099f,
-                -0.33939722f, 0.44897282f,
+                0.6758169f, 0.08030099f, -0.33939722f, 0.44897282f,
             });
 
             layer.B.Set(new float[]
@@ -364,15 +335,10 @@
                 new float[]
                 {
                     0.006601683f, -0.003457112f, -0.01148537f, 0.006014556f,
-                    0.0007565994f, -0.0003962094f, -0.001441784f, 0.0007550211f
+                    0.0007565994f, -0.0003962094f, -0.001441784f, 0.0007550211f,
+                    0.02053534f, -0.01384354f, 0.02934673f, -0.01978358f,
                 },
                 layer.U.Gradient);
-            Helpers.AreArraysEqual(
-                new float[]
-                {
-                    0.02053534f, -0.01384354f, 0.02934673f, -0.01978358f
-                },
-                layer.UC.Gradient);
             Helpers.AreArraysEqual(
                 new float[]
                 {

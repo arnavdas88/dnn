@@ -10,7 +10,6 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -81,7 +80,6 @@ namespace Genix.DNN.Layers
         public GRUCell(GRUCell other)
             : base(other)
         {
-            this.UC = other.UC?.Clone() as Tensor;
         }
 
         /// <summary>
@@ -98,15 +96,6 @@ namespace Genix.DNN.Layers
             "{0}GRUC{1}",
             this.NumberOfNeurons,
             this.Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
-
-        /// <summary>
-        /// Gets the candidate weights.
-        /// </summary>
-        /// <value>
-        /// The tensor that contains candidate weights.
-        /// </value>
-        [JsonProperty("UC")]
-        public Tensor UC { get; private set; }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -127,16 +116,21 @@ namespace Genix.DNN.Layers
 
 #if TENSORFLOW
             Tensor[] states = session.Unstack(g, 0);
+            Tensor[] u = session.Split(
+                this.U,
+                this.MatrixLayout == MatrixLayout.ColumnMajor ? 1 : 0,
+                new[] { 2 * this.NumberOfNeurons, this.NumberOfNeurons });
 
-            states[0] = this.Step(session, states[0], null);
+            states[0] = this.Step(session, states[0], null, u);
 
             for (int t = 1, tt = states.Length; t < tt; t++)
             {
-                states[t] = this.Step(session, states[t], states[t - 1]);
+                states[t] = this.Step(session, states[t], states[t - 1], u);
             }
 
             return new[] { session.Stack(states, 0) };
 #else
+            const string ActionName = "split";
 #pragma warning disable SA1312 // Variable names must begin with lower-case letter
             int T = g.Axes[(int)Axis.B];            // number of vectors in time sequence
 #pragma warning restore SA1312 // Variable names must begin with lower-case letter
@@ -148,13 +142,12 @@ namespace Genix.DNN.Layers
                 {
                     bool calculateGradient = session.CalculateGradients;
 
-                    Tensor h = session.AllocateTensor("gru", new[] { T, ylen }, calculateGradient);
+                    Tensor h = session.AllocateTensor(ActionName, new[] { T, ylen }, calculateGradient);
 
                     NativeMethods.gru(
                         T,
                         ylen,
                         this.U.Weights,
-                        this.UC.Weights,
                         g.Weights,
                         h.Weights,
                         true,
@@ -163,7 +156,7 @@ namespace Genix.DNN.Layers
                     if (calculateGradient)
                     {
                         session.Push(
-                            "gru",
+                            ActionName,
                             () =>
                             {
                                 NativeMethods.gru_gradient(
@@ -171,8 +164,6 @@ namespace Genix.DNN.Layers
                                     ylen,
                                     this.U.Weights,
                                     this.U.Gradient,
-                                    this.UC.Weights,
-                                    this.UC.Gradient,
                                     g.Weights,
                                     g.Gradient,
                                     h.Weights,
@@ -189,13 +180,6 @@ namespace Genix.DNN.Layers
 #endif
         }
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal override IEnumerable<(Tensor, float, float)> EnumGradients()
-        {
-            return base.EnumGradients().Append((this.UC, 1.0f, 1.0f));
-        }
-
 #if TENSORFLOW
         /// <summary>
         /// Performs one step of recurrent network.
@@ -205,7 +189,7 @@ namespace Genix.DNN.Layers
         /// <param name="state">The hidden state.</param>
         /// <returns>The output vector <c>y</c>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Tensor Step(Session session, Tensor x, Tensor state)
+        private Tensor Step(Session session, Tensor x, Tensor state, Tensor[] u)
         {
             if (state == null)
             {
@@ -222,7 +206,7 @@ namespace Genix.DNN.Layers
                 Tensor h = session.Sigmoid(
                     session.Add(
                         gates[0],
-                        session.MxV(this.MatrixLayout, this.U, false, state, null)));
+                        session.MxV(this.MatrixLayout, u[0], false, state, null)));
 
                 Tensor[] gatesUR = session.Split(h, 0, 2);
 
@@ -230,7 +214,7 @@ namespace Genix.DNN.Layers
                 Tensor candidate = session.Tanh(
                     session.Add(
                         gates[1],
-                        session.MxV(this.MatrixLayout, this.UC, false, rs, null)));
+                        session.MxV(this.MatrixLayout, u[1], false, rs, null)));
 
                 return session.Add(
                     state,
@@ -267,8 +251,8 @@ namespace Genix.DNN.Layers
                 new[] { 3 * numberOfNeurons, mbsize };
 
             int[] hiddenShape = matrixLayout == MatrixLayout.ColumnMajor ?
-                new[] { numberOfNeurons, 2 * numberOfNeurons } :
-                new[] { 2 * numberOfNeurons, numberOfNeurons };
+                new[] { numberOfNeurons, 3 * numberOfNeurons } :
+                new[] { 3 * numberOfNeurons, numberOfNeurons };
 
             // keep all weights in single channel
             // allocate four matrices (one for each of three gates and one for the state)
@@ -285,11 +269,8 @@ namespace Genix.DNN.Layers
 
             this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
 
-            this.UC = new Tensor("hidden weights (2)", new[] { numberOfNeurons, numberOfNeurons });
-            this.UC.Randomize(random);
-
             // initialize biases for update and reset gates only
-            Array32f.Set(numberOfNeurons << 1, 1.0f, this.B.Weights, 0);
+            Array32f.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);
         }
 
 #if !TENSORFLOW
@@ -303,7 +284,6 @@ namespace Genix.DNN.Layers
                 int steps,
                 int ylen,
                 [In] float[] u,
-                [In] float[] uw,
                 [In] float[] g,
                 [Out] float[] y,
                 [MarshalAs(UnmanagedType.Bool)] bool forward,
@@ -316,8 +296,6 @@ namespace Genix.DNN.Layers
                 int ylen,
                 [In] float[] u,
                 [Out] float[] du,
-                [In] float[] uc,
-                [Out] float[] duc,
                 [In] float[] g,
                 [Out] float[] dg,
                 [In] float[] y,

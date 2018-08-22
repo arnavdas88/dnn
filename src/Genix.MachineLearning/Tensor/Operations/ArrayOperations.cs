@@ -324,7 +324,7 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
-        /// Unpacks a rank-N tensor into a range of rank-(N+1) tensors along the specified dimension.
+        /// Unpacks a rank-N tensor into a range of rank-(N-1) tensors along the specified dimension.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="x">The tensor to unstack.</param>

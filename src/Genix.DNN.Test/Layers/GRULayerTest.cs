@@ -141,7 +141,7 @@
         {
             int[] shape = new[] { 1, 20, 20, 10 };
             GRULayer layer = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
-            Assert.AreEqual(6, layer.EnumGradients().Count());
+            Assert.AreEqual(5, layer.EnumGradients().Count());
         }
 
         [TestMethod, TestCategory("GRU")]
