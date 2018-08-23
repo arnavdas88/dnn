@@ -124,6 +124,77 @@
         }
 
         [TestMethod]
+        public void SliceArrayTest0()
+        {
+            int[] axes = new[] { 3, 2, 3 };
+            Session session = new Session();
+
+            Tensor x = new Tensor(null, axes, new float[]
+            {
+                1, 1, 1,    2, 2, 2,
+                3, 3, 3,    4, 4, 4,
+                5, 5, 5,    6, 6, 6
+            });
+            Tensor xe = new Tensor(null, axes);
+
+            Tensor y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 1, 1, 3 });
+            Tensor ye = new Tensor(null, new int[] { 1, 1, 3 }, new float[] { 3, 3, 3 });
+            Helpers.AreTensorsEqual(ye, y);
+
+            y.SetGradient(new float[] { 1, 2, 3 });
+            xe.SetGradient(new float[]
+            {
+                0, 0, 0,    0, 0, 0,
+                1, 2, 3,    0, 0, 0,
+                0, 0, 0,    0, 0, 0,
+            });
+            session.Unroll();
+            Helpers.AreGradientsEqual(xe, x);
+
+            y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 1, 2, 3 });
+            ye = new Tensor(null, new int[] { 1, 2, 3 }, new float[] { 3, 3, 3,     4, 4, 4 });
+            Helpers.AreTensorsEqual(ye, y);
+
+            y.SetGradient(new float[] { 1, 2, 3,    4, 5, 6 });
+            xe.SetGradient(new float[]
+            {
+                0, 0, 0,    0, 0, 0,
+                2, 4, 6,    4, 5, 6,    // accumulate gradient
+                0, 0, 0,    0, 0, 0,
+            });
+            session.Unroll();
+            Helpers.AreGradientsEqual(xe, x);
+
+            y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 2, 1, 3 });
+            ye = new Tensor(null, new int[] { 2, 1, 3 }, new float[] { 3, 3, 3,     5, 5, 5 });
+            Helpers.AreTensorsEqual(ye, y);
+
+            y.SetGradient(new float[] { 1, 2, 3,    4, 5, 6 });
+            xe.SetGradient(new float[]
+            {
+                0, 0, 0,    0, 0, 0,
+                3, 6, 9,    4, 5, 6,    // accumulate gradient
+                4, 5, 6,    0, 0, 0,
+            });
+            session.Unroll();
+            Helpers.AreGradientsEqual(xe, x);
+
+            y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 2, 1, 2 });
+            ye = new Tensor(null, new int[] { 2, 1, 2 }, new float[] { 3, 3,     5, 5 });
+            Helpers.AreTensorsEqual(ye, y);
+
+            y.SetGradient(new float[] { 1, 2,    4, 5 });
+            xe.SetGradient(new float[]
+            {
+                0, 0, 0,    0, 0, 0,
+                4, 8, 9,    4, 5, 6,    // accumulate gradient
+                8, 10, 6,    0, 0, 0,   // accumulate gradient
+            });
+            session.Unroll();
+            Helpers.AreGradientsEqual(xe, x);
+        }
+
+        [TestMethod]
         public void SplitArrayTest0()
         {
             int[] axes = new[] { 3, 5, 7 };

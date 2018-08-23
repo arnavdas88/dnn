@@ -151,6 +151,177 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
+        /// Extracts a slice of size <paramref name="size"/> from a tensor starting at location specified by <paramref name="begin"/>.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor to slice.</param>
+        /// <param name="begin">The starting location for the slice as an offset in each dimension of <paramref name="x"/>.</param>
+        /// <param name="size">The number of elements in each dimension of <paramref name="x"/> you want to slice.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> object that contains a slice of <paramref name="x"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <paramref name="begin"/> is zero based. <paramref name="size"/> is one-based.
+        /// If <paramref name="size"/>[i] is -1, all remaining elements in the dimension i are included in the slice.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor Slice(this Session session, Tensor x, int[] begin, int[] size)
+        {
+            const string ActionName = "slice";
+            int dims = x.Axes.Length;
+
+            if (begin.Length != dims)
+            {
+                throw new ArgumentException("The parameter dimension must match the number of axes in the tensor.", nameof(begin));
+            }
+
+            if (size.Length != dims)
+            {
+                throw new ArgumentException("The parameter dimension must match the number of axes in the tensor.", nameof(size));
+            }
+
+            int[] xaxes = x.Axes;
+            int[] yaxes = GetOutputSize();
+
+            if (Shape.ShapeLength(xaxes) == Shape.ShapeLength(yaxes))
+            {
+                // copy entire tensor
+                return session.Copy(x);
+            }
+
+            return session.RunOperation(
+                ActionName,
+                () =>
+                {
+                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
+
+                    // allocate destination
+                    Tensor y = session.AllocateTensor(ActionName, yaxes, calculateGradient);
+
+                    // 1. find last axis of the slice that occupies the entire tensor
+                    int blocksize = 1;
+                    int lastaxis = dims;
+                    while (lastaxis > 0 && xaxes[lastaxis - 1] == yaxes[lastaxis - 1])
+                    {
+                        blocksize *= xaxes[lastaxis - 1];
+                        lastaxis--;
+                    }
+
+                    if (lastaxis == dims)
+                    {
+                        blocksize = size[dims - 1];
+                    }
+
+                    // now point to the axis where the copying should start
+                    lastaxis--;
+
+                    // 2. do slicing
+                    Slice();
+
+                    void Slice()
+                    {
+                        float[] xw = x.Weights;
+                        float[] yw = y.Weights;
+                        int[] xstrides = x.Strides;
+
+                        int offy = 0;
+                        Do(0, 0);
+                        Debug.Assert(offy == y.Length, "Entire tensor must be filled.");
+
+                        void Do(int axis, int offx)
+                        {
+                            offx += begin[axis] * xstrides[axis];
+
+                            if (axis == lastaxis)
+                            {
+                                Array32f.Copy(blocksize, xw, offx, yw, offy);
+                                offy += blocksize;
+                            }
+                            else
+                            {
+                                for (int i = 0; i < yaxes[axis]; i++, offx += xstrides[axis])
+                                {
+                                    Do(axis + 1, offx);
+                                }
+                            }
+                        }
+                    }
+
+#if !NOLEARNING
+                    if (calculateGradient)
+                    {
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                float[] dxw = x.Gradient;
+                                float[] dyw = y.Gradient;
+                                int[] xstrides = x.Strides;
+
+                                int offy = 0;
+                                Unslice(0, 0);
+                                Debug.Assert(offy == y.Length, "Entire tensor must be filled.");
+
+                                void Unslice(int axis, int offx)
+                                {
+                                    offx += begin[axis] * xstrides[axis];
+
+                                    if (axis == lastaxis)
+                                    {
+                                        Math32f.Add(blocksize, dyw, offy, dxw, offx);
+                                        offy += blocksize;
+                                    }
+                                    else
+                                    {
+                                        for (int i = 0; i < yaxes[axis]; i++, offx += xstrides[axis])
+                                        {
+                                            Unslice(axis + 1, offx);
+                                        }
+                                    }
+                                }
+                            });
+                    }
+#endif
+
+                    return y;
+                });
+
+            int[] GetOutputSize()
+            {
+                int[] ysize = new int[dims];
+                for (int i = 0, ii = ysize.Length; i < ii; i++)
+                {
+                    int axis = x.Axes[i];
+                    int b = begin[i];
+                    int s = size[i];
+
+                    if (!b.InRange(0, axis))
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(begin));
+                    }
+
+                    if (s == -1)
+                    {
+                        ysize[i] = axis - b;
+                    }
+                    else
+                    {
+                        ysize[i] = size[i];
+
+                        if (!(b + ysize[i]).Between(1, axis))
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(size));
+                        }
+                    }
+                }
+
+                return ysize;
+            }
+        }
+
+        /// <summary>
         /// Splits a tensor along the specified axis into the collection of sub tensors.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
