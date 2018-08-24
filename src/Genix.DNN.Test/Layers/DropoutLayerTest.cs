@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +12,7 @@
     [TestClass]
     public class DropoutLayerTest
     {
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         public void ConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
@@ -24,14 +23,14 @@
             Assert.AreEqual("D0.5", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
             Assert.IsNotNull(new DropoutLayer(null, 0.5));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
@@ -42,7 +41,7 @@
             Assert.AreEqual("D0.5", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [ExpectedException(typeof(ArgumentException))]
         public void ArchitectureConstructorTest2()
         {
@@ -60,21 +59,21 @@
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new DropoutLayer(null, "D0.5", null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new DropoutLayer(new[] { -1, 20, 20, 10 }, null, null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         public void CopyConstructorTest1()
         {
             DropoutLayer layer1 = new DropoutLayer(new[] { -1, 20, 20, 10 }, 0.5);
@@ -82,14 +81,14 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new DropoutLayer((DropoutLayer)null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         public void CloneTest()
         {
             DropoutLayer layer1 = new DropoutLayer(new[] { -1, 20, 20, 10 }, 0.5);
@@ -97,7 +96,7 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         public void SerializeTest()
         {
             DropoutLayer layer1 = new DropoutLayer(new[] { -1, 20, 20, 10 }, 0.5);
@@ -107,7 +106,7 @@
             Assert.AreEqual(s1, s2);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [Description("Shall multiply all weights by probability.")]
         public void ForwardTest1()
         {
@@ -128,7 +127,7 @@
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Dropout")]
         [Description("Shall drop some weights based on probability.")]
         public void ForwardBackwardTest2()
         {

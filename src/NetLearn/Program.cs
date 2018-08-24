@@ -139,15 +139,10 @@ namespace Genix.NetLearn
                 int[] shape = net.InputShape;
                 using (TestImageProvider<string> dataProvider = task.CreateTestImageProvider(net))
                 {
-                    ////int n = 0;
+                    int n = 0;
                     for (int epoch = 0; epoch < task.Epochs; epoch++)
                     {
                         timer.Restart();
-
-                        /*foreach (var sample in generateSamples(epoch))
-                        {
-                            n = (int)sample.Item1.L1Norm();
-                        }*/
 
                         TrainingResult result = task.Trainer.RunEpoch(
                             epoch,
@@ -193,8 +188,6 @@ namespace Genix.NetLearn
                                     ////x.Image.Save("e:\\temp\\" + x.Id + "_" + n.ToString(CultureInfo.InvariantCulture) + "_.bmp");
                                 }
 
-                                ////return (Tensor.FromBitmap(null, x.Image), labels);
-
                                 return filter
                                     .Distort(
                                         x.Image,
@@ -206,10 +199,10 @@ namespace Genix.NetLearn
                                         task.Crop)
                                     .Select(bitmap =>
                                     {
-                                            /*if (epoch == 0)
-                                            {
-                                                bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.Id + ".bmp");
-                                            }*/
+                                        if (epoch == 0)
+                                        {
+                                            ////bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
+                                        }
 
                                         return (bitmap.ToTensor(null), labels);
                                     });

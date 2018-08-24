@@ -103,7 +103,7 @@
             Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { 3 * 100, 100 }, layer.U.Axes);
+            CollectionAssert.AreEqual(new[] { 3 * 100, 50 }, layer.U.Axes);
             Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
 
@@ -349,6 +349,86 @@
                 new float[]
                 {
                     0.03742515f, -0.1009044f, 0.03375921f, 0.02073827f, -0.1018581f, 0.05336173f
+                },
+                x.Gradient);
+        }
+
+        /// <summary>
+        /// Bidirectional, MatrixLayout = MatrixLayout.ColumnMajor.
+        /// </summary>
+        [TestMethod, TestCategory("GRU")]
+        public void ForwardTest3()
+        {
+            const int batchSize = 2;
+            const int inputSize = 3;
+            const int numberOfNeurons = 2;
+
+            Session session = new Session();
+
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+
+            layer.W.Set(new float[]
+            {
+                0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f,
+                -0.6668052f, 0.0096491f, 0.17214662f, -0.4206545f, 0.65368795f, -0.07057703f,
+                -0.2414839f, -0.08907348f, 0.42851567f, 0.2056688f, -0.4476247f, 0.02284491f,
+            });
+
+            layer.U.Set(new float[]
+            {
+                0.6758169f, 0.08030099f, 0.6760981f, 0.17049837f, 0.6758169f, 0.08030099f,
+            });
+
+            layer.B.Set(new float[]
+            {
+                0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
+            });
+
+            Tensor x = new Tensor(
+                null,
+                new[] { batchSize, inputSize },
+                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+
+            // set expectations
+            Tensor expected = new Tensor(
+                null,
+                new[] { numberOfNeurons, numberOfNeurons },
+                new float[]
+                {
+                    0.2298902f, -0.2274744f, 0.4774976f, -0.124593f
+                });
+
+            // calculate
+            Tensor y = layer.Forward(session, new[] { x })[0];
+            Helpers.AreTensorsEqual(expected, y);
+
+            y.SetGradient(new float[] { 0.1f, 0.2f, 0.3f, 0.4f });
+            session.Unroll();
+
+            Helpers.AreArraysEqual(
+                new float[]
+                {
+                    0.0156396851f, 0.00146510126f, 0.0510645546f, -0.0120584471f, -2.38707144E-05f, 0.111364923f,
+                    0.0216912664f, 0.00183137658f, 0.07349292f, -0.01574755f, -4.774143E-05f, 0.146852463f,
+                    0.0277428478f, 0.002197652f, 0.09592129f, -0.0194366574f, -7.161214E-05f, 0.182340011f
+                },
+                layer.W.Gradient);
+            Helpers.AreArraysEqual(
+                new float[]
+                {
+                    0.0073473705f, 0.000842030859f, 0.009745982f, 0.001120495f, 2.9741248E-05f, -0.007956707f,
+                },
+                layer.U.Gradient);
+            Helpers.AreArraysEqual(
+                new float[]
+                {
+                    0.0605158024f, 0.00366275315f, 0.224283636f, -0.0368910469f, -0.000238707144f, 0.3548754f,
+                },
+                layer.B.Gradient);
+            Helpers.AreArraysEqual(
+                new float[]
+                {
+                    0.0968419462f, -0.000431704335f, 0.0488961339f, 0.134377331f, -0.0109592406f, 0.03289969f,
                 },
                 x.Gradient);
         }

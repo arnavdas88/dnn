@@ -205,13 +205,13 @@ namespace Genix.MachineLearning
                     int lastaxis = dims;
                     while (lastaxis > 0 && xaxes[lastaxis - 1] == yaxes[lastaxis - 1])
                     {
-                        blocksize *= xaxes[lastaxis - 1];
+                        blocksize *= yaxes[lastaxis - 1];
                         lastaxis--;
                     }
 
                     if (lastaxis == dims)
                     {
-                        blocksize = size[dims - 1];
+                        blocksize = yaxes[dims - 1];
                     }
 
                     // now point to the axis where the copying should start
@@ -308,7 +308,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        ysize[i] = size[i];
+                        ysize[i] = s;
 
                         if (!(b + ysize[i]).Between(1, axis))
                         {

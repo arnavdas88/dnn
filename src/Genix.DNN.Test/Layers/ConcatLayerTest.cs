@@ -33,7 +33,7 @@
             24, 34, 44,   25, 35, 45,   26, 36, 46,
         };
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         public void ConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
@@ -43,14 +43,14 @@
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
             Assert.IsNotNull(new ConcatLayer((IList<int[]>)null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         public void ArchitectureConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
@@ -62,7 +62,7 @@
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [ExpectedException(typeof(ArgumentException))]
         public void ArchitectureConstructorTest2()
         {
@@ -83,14 +83,14 @@
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ConcatLayer(null, "CONCAT", null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
@@ -100,7 +100,7 @@
                 null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         public void CopyConstructorTest1()
         {
             ConcatLayer layer1 = new ConcatLayer(
@@ -109,14 +109,14 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new ConcatLayer((ConcatLayer)null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         public void CloneTest()
         {
             ConcatLayer layer1 = new ConcatLayer(
@@ -125,7 +125,7 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         public void SerializeTest()
         {
             ConcatLayer layer1 = new ConcatLayer(
@@ -136,7 +136,7 @@
             Assert.AreEqual(s1, s2);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Concat")]
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest()
         {

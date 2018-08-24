@@ -15,7 +15,7 @@
         private static Func<float, float> activation = (x) => Math.Max(x, 0);
         private static Func<float, float> derivative = (x) => (x == 0.0f ? 0.0f : 1.0f);
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void ConstructorTest1()
         {
             int[] shape = new[] { 2 };
@@ -24,14 +24,14 @@
             Assert.AreEqual("RELU", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
             Assert.IsNotNull(new ReLULayer((int[])null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void ArchitectureConstructorTest1()
         {
             int[] shape = new[] { 2 };
@@ -41,7 +41,7 @@
             Assert.AreEqual("RELU", layer.Architecture);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         [ExpectedException(typeof(ArgumentException))]
         public void ArchitectureConstructorTest2()
         {
@@ -59,21 +59,21 @@
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ReLULayer(null, "RELU", null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ReLULayer(new[] { 2 }, null, null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void CopyConstructorTest1()
         {
             ReLULayer layer1 = new ReLULayer(new[] { 2 });
@@ -81,14 +81,14 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
             Assert.IsNotNull(new ReLULayer((ReLULayer)null));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void CloneTest()
         {
             ReLULayer layer1 = new ReLULayer(new[] { 2 });
@@ -96,7 +96,7 @@
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void SerializeTest()
         {
             ReLULayer layer1 = new ReLULayer(new[] { 2 });
@@ -106,7 +106,7 @@
             Assert.AreEqual(s1, s2);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("ReLU")]
         public void ForwardBackwardTest()
         {
             int[] shape = new[] { 2 };
