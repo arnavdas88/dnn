@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-#define TENSORFLOW
+////#define TENSORFLOW
 
 namespace Genix.DNN.Layers
 {
@@ -184,7 +184,7 @@ namespace Genix.DNN.Layers
                         this.U.Weights,
                         g.Weights,
                         h.Weights,
-                        true,
+                        this.Direction == RNNCellDirection.BiDirectional,
                         this.MatrixLayout == MatrixLayout.RowMajor);
 
                     if (calculateGradient)
@@ -202,7 +202,7 @@ namespace Genix.DNN.Layers
                                     g.Gradient,
                                     h.Weights,
                                     h.Gradient,
-                                    true,
+                                    this.Direction == RNNCellDirection.BiDirectional,
                                     this.MatrixLayout == MatrixLayout.RowMajor);
                             });
                     }
