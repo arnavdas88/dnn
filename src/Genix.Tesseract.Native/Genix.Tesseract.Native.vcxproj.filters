@@ -1,0 +1,1303 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="tesseract\src\api\baseapi.cpp">
+      <Filter>Tesseract\api</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\api\capi.cpp">
+      <Filter>Tesseract\api</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\api\pdfrenderer.cpp">
+      <Filter>Tesseract\api</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\api\renderer.cpp">
+      <Filter>Tesseract\api</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\api\tesseractmain.cpp">
+      <Filter>Tesseract\api</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\dotproductavx.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\dotproductsse.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\intsimdmatrix.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\intsimdmatrixavx2.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\intsimdmatrixsse.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\arch\simddetect.cpp">
+      <Filter>Tesseract\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\adaptions.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\applybox.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\control.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\docqual.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\equationdetect.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\fixspace.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\fixxht.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\linerec.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\ltrresultiterator.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\osdetect.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\output.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\pageiterator.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\pagesegmain.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\par_control.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\paragraphs.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\paramsd.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\pgedit.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\recogtraining.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\reject.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\resultiterator.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\superscript.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\tessbox.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\tessedit.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\tesseractclass.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\tessvars.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\tfacepp.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\thresholder.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccmain\werdit.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\blamer.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\blobbox.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\blobs.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\blread.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\boxread.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\boxword.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\ccstruct.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\coutln.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\detlinefit.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\dppoint.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\fontinfo.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\genblob.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\imagedata.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\linlsq.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\matrix.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\mod128.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\normalis.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\ocrblock.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\ocrpara.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\ocrrow.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\otsuthr.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\pageres.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\params_training_featdef.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\pdblock.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\points.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\polyaprx.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\polyblk.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\publictypes.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\quadlsq.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\quspline.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\ratngs.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\rect.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\rejctmap.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\seam.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\split.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\statistc.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\stepblob.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\vecfuncs.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccstruct\werd.cpp">
+      <Filter>Tesseract\ccstruct</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\context.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\dawg.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\dawg_cache.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\dict.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\hyphen.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\permdawg.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\stopper.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\dict\trie.cpp">
+      <Filter>Tesseract\dict</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\convolve.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\ctc.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\fullyconnected.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\functions.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\input.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\lstm.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\lstmrecognizer.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\lstmtrainer.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\maxpool.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\network.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\networkbuilder.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\networkio.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\parallel.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\plumbing.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\recodebeam.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\reconfig.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\reversed.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\series.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\stridemap.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\tfnetwork.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\lstm\weightmatrix.cpp">
+      <Filter>Tesseract\lstm</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\associate.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\chop.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\chopper.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\drawfx.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\findseam.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\gradechop.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\language_model.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\lm_consistency.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\lm_pain_points.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\lm_state.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\outlines.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\params_model.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\pieces.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\plotedges.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\render.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\segsearch.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\tface.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\wordclass.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\wordrec\wordrec.cpp">
+      <Filter>Tesseract\wordrec</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\adaptmap.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\affine.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\affinecompose.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\arrayaccess.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bardecode.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\baseline.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bbuffer.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bilateral.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bilinear.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\binarize.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\binexpand.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\binreduce.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\blend.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bmf.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bmpio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bmpiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bootnumgen1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bootnumgen2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bootnumgen3.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\boxbasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\boxfunc1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\boxfunc2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\boxfunc3.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\boxfunc4.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\bytearray.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ccbord.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ccthin.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\classapp.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colorcontent.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\coloring.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colormap.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colormorph.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colorquant1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colorquant2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colorseg.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\colorspace.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\compare.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\conncomp.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\convertfiles.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\correlscore.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dewarp1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dewarp2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dewarp3.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dewarp4.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dnabasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dnafunc1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dnahash.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dwacomb.2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\dwacomblow.2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\edge.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\encoding.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\enhance.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fhmtauto.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fhmtgen.1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fhmtgenlow.1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\finditalic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\flipdetect.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fliphmtgen.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fmorphauto.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fmorphgen.1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fmorphgenlow.1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fpix1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\fpix2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\gifio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\gifiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\gplot.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\graphics.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\graymorph.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\grayquant.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\heap.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jbclass.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jp2kheader.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jp2kheaderstub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jp2kio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jp2kiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jpegio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\jpegiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\kernel.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\leptwin.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\libversions.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\list.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\map.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\maze.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\morph.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\morphapp.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\morphdwa.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\morphseq.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\numabasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\numafunc1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\numafunc2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pageseg.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\paintcmap.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\parseprotos.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\partition.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pdfio1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pdfio1stub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pdfio2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pdfio2stub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pix1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pix2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pix3.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pix4.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pix5.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixabasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixacc.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixafunc1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixafunc2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixalloc.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixarith.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixcomp.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixconv.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixlabel.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pixtiling.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pngio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pngiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pnmio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\pnmiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\projective.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\psio1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\psio1stub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\psio2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\psio2stub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ptabasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ptafunc1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ptafunc2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\ptra.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\quadtree.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\queue.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rank.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rbtree.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\readbarcode.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\readfile.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\recogbasic.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\recogdid.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\recogident.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\recogtrain.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\regutils.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rop.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\roplow.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rotate.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rotateam.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rotateorth.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\rotateshear.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\runlength.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\sarray1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\sarray2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\scale1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\scale2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\seedfill.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\sel1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\sel2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\selgen.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\shear.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\skew.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\spixio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\stack.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\stringcode.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\strokes.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\sudoku.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\textops.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\tiffio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\tiffiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\utils1.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\utils2.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\warper.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\watershed.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\webpio.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\webpiostub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\writefile.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\zlibmem.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\zlibmemstub.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\ambigs.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\basedir.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\bitvector.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\ccutil.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\clst.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\elst.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\elst2.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\errcode.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\globaloc.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\indexmapbidi.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\mainblk.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\params.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\scanutils.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\serialis.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\strngs.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\tessdatamanager.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\tprintf.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\unichar.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\unicharcompress.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\unicharmap.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\unicharset.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\unicodes.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\universalambigs.cpp">
+      <Filter>Tesseract\ccutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\adaptive.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\adaptmatch.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\blobclass.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\classify.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\cluster.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\clusttool.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\cutoffs.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\errorcounter.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\featdefs.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\float2int.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\fpoint.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intfeaturedist.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intfeaturemap.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intfeaturespace.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intfx.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intmatcher.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\intproto.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\kdtree.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\mastertrainer.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\mf.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\mfdefs.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\mfoutline.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\mfx.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\normfeat.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\normmatch.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\ocrfeatures.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\outfeat.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\picofeat.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\protos.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\sampleiterator.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\shapeclassifier.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\shapetable.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\tessclassifier.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\trainingsample.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\classify\trainingsampleset.cpp">
+      <Filter>Tesseract\classify</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\alignedblob.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\baselinedetect.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\bbgrid.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\blkocc.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\blobgrid.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\ccnontextdetect.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\cjkpitch.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\colfind.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\colpartition.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\colpartitiongrid.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\colpartitionset.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\devanagari_processing.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\drawedg.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\drawtord.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\edgblob.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\edgloop.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\equationdetectbase.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\fpchop.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\gap_map.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\imagefind.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\linefind.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\makerow.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\oldbasel.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\pithsync.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\pitsync1.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\scanedg.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\sortflts.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\strokewidth.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tabfind.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tablefind.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tablerecog.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tabvector.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\textlineprojection.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\textord.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\topitch.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tordmain.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tospace.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\tovars.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\underlin.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\wordseg.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\textord\workingpartset.cpp">
+      <Filter>Tesseract\textord</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\viewer\scrollview.cpp">
+      <Filter>Tesseract\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\viewer\svmnode.cpp">
+      <Filter>Tesseract\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\viewer\svpaint.cpp">
+      <Filter>Tesseract\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\viewer\svutil.cpp">
+      <Filter>Tesseract\viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\bitvec.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\callcpp.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\cutil_class.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\emalloc.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\oldlist.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\cutil\structures.cpp">
+      <Filter>Tesseract\cutil</Filter>
+    </ClCompile>
+    <ClCompile Include="tesseract\src\vs2010\port\gettimeofday.cpp">
+      <Filter>Tesseract\vs2010\port</Filter>
+    </ClCompile>
+    <ClCompile Include="leptonica\src\leptonica_convolve.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="tesseract\src\config_auto.h">
+      <Filter>Tesseract</Filter>
+    </ClInclude>
+    <ClInclude Include="tesseract\src\api\apitypes.h">
+      <Filter>Tesseract\api</Filter>
+    </ClInclude>
+    <ClInclude Include="tesseract\src\api\baseapi.h">
+      <Filter>Tesseract\api</Filter>
+    </ClInclude>
+    <ClInclude Include="tesseract\src\api\capi.h">
+      <Filter>Tesseract\api</Filter>
+    </ClInclude>
+    <ClInclude Include="tesseract\src\api\renderer.h">
+      <Filter>Tesseract\api</Filter>
+    </ClInclude>
+    <ClInclude Include="tesseract\src\api\tess_version.h">
+      <Filter>Tesseract\api</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Tesseract">
+      <UniqueIdentifier>{61fc0dc5-8bcb-46c8-9095-3495a60c92e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\api">
+      <UniqueIdentifier>{3b4180de-cb4b-482c-976d-a366bd623318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\arch">
+      <UniqueIdentifier>{8504cc12-0667-4c5d-9bba-cfa9a8e8100b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\ccmain">
+      <UniqueIdentifier>{11a2e30e-953c-4272-9674-af6473d31488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\ccstruct">
+      <UniqueIdentifier>{cba636fd-e697-439c-9500-d65384542abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\dict">
+      <UniqueIdentifier>{359cec64-e54d-4406-b586-5a6f086d9fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\lstm">
+      <UniqueIdentifier>{6da62c6e-e520-4f06-b050-dc2f54e929a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\wordrec">
+      <UniqueIdentifier>{75ed3d99-c703-479b-8398-cc49b35f339a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Leptonica">
+      <UniqueIdentifier>{543a3dce-d5e0-4141-9187-db50fd36221f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\ccutil">
+      <UniqueIdentifier>{ae7c955e-5196-4b51-9b36-13540d0e8d4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\classify">
+      <UniqueIdentifier>{b5f89515-ae9c-4f8d-980c-223b9e4865d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\textord">
+      <UniqueIdentifier>{69cd47f3-6037-4ffb-8e19-ff8736e46568}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\viewer">
+      <UniqueIdentifier>{dc345a23-03be-482a-aa76-9a190b09003a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\cutil">
+      <UniqueIdentifier>{0ba74973-9e5c-497e-afc0-b016c4c83265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\vs2010">
+      <UniqueIdentifier>{fed19631-aa55-4a98-8a53-241120239fda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tesseract\vs2010\port">
+      <UniqueIdentifier>{34ed366a-1240-42bf-8e0b-445d47bf05f7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
