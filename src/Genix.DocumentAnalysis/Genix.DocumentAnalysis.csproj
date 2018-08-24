@@ -64,6 +64,8 @@
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
     <Compile Include="OCR\OCR.cs" />
+    <Compile Include="OCR\Tesseract\Tesseract.cs" />
+    <Compile Include="OCR\Tesseract\TesseractObject.cs" />
     <Compile Include="PageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

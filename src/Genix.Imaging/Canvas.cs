@@ -18,7 +18,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Represents an area that can be used for drawing.
     /// </summary>
-    public class Canvas : IDisposable
+    public class Canvas : DisposableObject
     {
         private readonly int width;
         private readonly int height;
@@ -27,8 +27,6 @@ namespace Genix.Imaging
         private SafeHdcHandle hdc = null;
         private SafeGdiObjectHandle bitmap = null;
         private SafeGdiObjectHandle hfont = null;
-
-        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Canvas"/> class.
@@ -71,45 +69,6 @@ namespace Genix.Imaging
                 this.ReleaseCanvas();
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="Canvas"/> class.
-        /// </summary>
-        ~Canvas()
-        {
-            if (!this.disposed)
-            {
-                this.Dispose(false);
-
-                this.disposed = true;
-            }
-        }
-
-        /// <summary>
-        /// Releases all resources used by this object.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This method frees all unmanaged resources used by the object.
-        /// The method invokes the protected <see cref="Dispose(bool)"/> method with the <c>disposing</c> parameter set to <b>true</b>.
-        /// </para>
-        /// <para>
-        /// Call <b>Dispose</b> when you are finished using the object.
-        /// The <b>Dispose</b> method leaves the object in an unusable state.
-        /// After calling <b>Dispose</b>, you must release all references to the object so the garbage collector can reclaim the memory that the object was occupying.
-        /// </para>
-        /// </remarks>
-        public void Dispose()
-        {
-            if (!this.disposed)
-            {
-                this.Dispose(true);
-
-                this.disposed = true;
-            }
-
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -245,7 +204,8 @@ namespace Genix.Imaging
             }
         }
 
-        private void Dispose(bool disposing)
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
         {
             this.ReleaseCanvas();
         }

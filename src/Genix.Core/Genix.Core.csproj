@@ -84,6 +84,7 @@
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Array32f.cs" />
+    <Compile Include="System\DisposableObject.cs" />
     <Compile Include="System\FloatExtensions.cs" />
     <Compile Include="Vectors\DenseVectorF.cs" />
     <Compile Include="Vectors\DenseVectorProxyF.cs" />

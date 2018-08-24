@@ -86,7 +86,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;.\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -97,7 +97,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;.\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -108,7 +108,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;.\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -119,7 +119,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;.\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -128,8 +128,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="tesseract\src\api\apitypes.h" />
     <ClInclude Include="tesseract\src\api\baseapi.h" />
     <ClInclude Include="tesseract\src\api\capi.h" />
@@ -358,12 +356,7 @@
     </ClCompile>
     <ClCompile Include="leptonica\src\tiffiostub.c" />
     <ClCompile Include="leptonica\src\utils1.c" />
-    <ClCompile Include="leptonica\src\utils2.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="leptonica\src\utils2.c" />
     <ClCompile Include="leptonica\src\warper.c" />
     <ClCompile Include="leptonica\src\watershed.c" />
     <ClCompile Include="leptonica\src\webpio.c">
@@ -373,12 +366,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="leptonica\src\webpiostub.c" />
-    <ClCompile Include="leptonica\src\writefile.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="leptonica\src\writefile.c" />
     <ClCompile Include="leptonica\src\zlibmem.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -386,6 +374,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="leptonica\src\zlibmemstub.c" />
+    <ClCompile Include="temp.cpp" />
     <ClCompile Include="tesseract\src\api\baseapi.cpp" />
     <ClCompile Include="tesseract\src\api\capi.cpp" />
     <ClCompile Include="tesseract\src\api\pdfrenderer.cpp" />
@@ -481,12 +470,7 @@
     <ClCompile Include="tesseract\src\ccutil\indexmapbidi.cpp" />
     <ClCompile Include="tesseract\src\ccutil\mainblk.cpp" />
     <ClCompile Include="tesseract\src\ccutil\params.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\scanutils.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="tesseract\src\ccutil\scanutils.cpp" />
     <ClCompile Include="tesseract\src\ccutil\serialis.cpp" />
     <ClCompile Include="tesseract\src\ccutil\strngs.cpp" />
     <ClCompile Include="tesseract\src\ccutil\tessdatamanager.cpp" />
@@ -637,12 +621,6 @@
     <ClCompile Include="tesseract\src\wordrec\tface.cpp" />
     <ClCompile Include="tesseract\src\wordrec\wordclass.cpp" />
     <ClCompile Include="tesseract\src\wordrec\wordrec.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
