@@ -62,6 +62,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.Tesseract.Native", "G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Tesseract", "Genix.Tesseract\Genix.Tesseract.csproj", "{FE1A4B99-9089-4037-90C7-2546D755F136}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.Leptonica.Native", "Genix.Leptonica.Native\Genix.Leptonica.Native.vcxproj", "{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -374,6 +376,18 @@ Global
 		{FE1A4B99-9089-4037-90C7-2546D755F136}.Release|x64.Build.0 = Release|Any CPU
 		{FE1A4B99-9089-4037-90C7-2546D755F136}.Release|x86.ActiveCfg = Release|Any CPU
 		{FE1A4B99-9089-4037-90C7-2546D755F136}.Release|x86.Build.0 = Release|Any CPU
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|ARM.ActiveCfg = Debug|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|x64.ActiveCfg = Debug|x64
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|x64.Build.0 = Debug|x64
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|x86.ActiveCfg = Debug|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Debug|x86.Build.0 = Debug|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|Any CPU.ActiveCfg = Release|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|ARM.ActiveCfg = Release|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|x64.ActiveCfg = Release|x64
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|x64.Build.0 = Release|x64
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|x86.ActiveCfg = Release|Win32
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -389,6 +403,7 @@ Global
 		{2F51BFFD-6D9F-4B24-A69F-FBD9E9D3C2B3} = {4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}
 		{0C5E8FAF-7B8B-4C81-A20C-01DE9E7A3029} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
 		{B1FCC37D-D168-4827-99E9-BB13F02CE3AB} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D80916AC-677F-4083-B57A-3562C04772D2}
