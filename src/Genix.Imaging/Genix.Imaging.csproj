@@ -74,6 +74,7 @@
     <Compile Include="Lab\TestImage.cs" />
     <Compile Include="Lab\TestImageProvider.cs" />
     <Compile Include="Lab\DirectoryDataProvider.cs" />
+    <Compile Include="Leptonica\Pix.cs" />
     <Compile Include="Metadata\EXIF\EXIFExposureProgram.cs" />
     <Compile Include="Metadata\EXIF\EXIFField.cs" />
     <Compile Include="Metadata\EXIF\EXIFFieldAttribute.cs" />

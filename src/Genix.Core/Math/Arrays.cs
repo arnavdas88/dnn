@@ -230,6 +230,20 @@ namespace Genix.Core
             NativeMethods.copy_u64(length, x, offx, y, offy);
         }
 
+        /// <summary>
+        /// Copies values from source pointer to destination pointer in strides.
+        /// </summary>
+        /// <param name="count">The number of strides to copy.</param>
+        /// <param name="x">The pointer to source data.</param>
+        /// <param name="stridex">The number of bytes in <paramref name="x"/> stride.</param>
+        /// <param name="y">The pointer to destination data.</param>
+        /// <param name="stridey">The number of bytes in <paramref name="y"/> stride.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CopyStrides(int count, IntPtr x, int stridex, IntPtr y, int stridey)
+        {
+            NativeMethods.copy_strides_s8(count, x, stridex, y, stridey);
+        }
+
         /*/// <summary>
          /// Copies a range of values from a array starting at the specified source index
          /// to another array starting at the specified destination index.
@@ -837,6 +851,10 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
             public static extern void scopy_inc(int n, [In] float[] x, int offx, int incx, [Out] float[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern void copy_strides_s8(int nstrides, IntPtr x, int stridex, IntPtr y, int stridey);
 
             [DllImport(NativeMethods.DllName)]
             [SuppressUnmanagedCodeSecurity]
