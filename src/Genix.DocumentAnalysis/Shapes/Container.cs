@@ -41,12 +41,28 @@ namespace Genix.DocumentAnalysis
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Container{T}"/> class.
+        /// </summary>
+        /// <param name="shapes">The shapes contained in this container.</param>
+        /// <param name="bounds">The shape boundaries.</param>
+        protected Container(IList<T> shapes, Rectangle bounds)
+        {
+            if (shapes == null)
+            {
+                throw new ArgumentNullException(nameof(shapes));
+            }
+
+            this.shapes.AddRange(shapes);
+            this.Bounds = bounds;
+        }
+
+        /// <summary>
         /// Gets the shapes this container contains.
         /// </summary>
         /// <value>
         /// The collection of shapes.
         /// </value>
-        public ReadOnlyCollection<T> Shapes => new ReadOnlyCollection<T>(this.shapes);
+        public IReadOnlyCollection<T> Shapes => this.shapes;
 
         /// <summary>
         /// Enumerates all shapes contained in this container.

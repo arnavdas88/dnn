@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis
 {
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Globalization;
     using System.Linq;
     using Newtonsoft.Json;
@@ -15,14 +16,24 @@ namespace Genix.DocumentAnalysis
     /// Represents a horizontal text line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TextLineShape : Container<TextShape>
+    public class TextLineShape : Container<WordShape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLineShape"/> class.
         /// </summary>
-        /// <param name="texts">The collection of <see cref="TextShape"/> contained in this container.</param>
-        protected TextLineShape(IList<TextShape> texts)
-            : base(texts)
+        /// <param name="words">The collection of <see cref="WordShape"/> objects to include in this container.</param>
+        public TextLineShape(IList<WordShape> words)
+            : base(words)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextLineShape"/> class.
+        /// </summary>
+        /// <param name="words">The collection of <see cref="WordShape"/> objects to include in this container.</param>
+        /// <param name="bounds">The shape boundaries.</param>
+        public TextLineShape(IList<WordShape> words, Rectangle bounds)
+            : base(words, bounds)
         {
         }
 

@@ -17,7 +17,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
         /// <summary>
         /// Block of text/image/separator line.
         /// </summary>
-        Block,
+        TextBlock,
 
         /// <summary>
         /// Paragraph within a block.

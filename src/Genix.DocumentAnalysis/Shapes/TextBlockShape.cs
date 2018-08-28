@@ -8,22 +8,33 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Globalization;
     using System.Linq;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Represents a block of text.
+    /// Represents a block of information.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TextBlockShape : Container<TextLineShape>
+    public class TextBlockShape : Container<Shape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextBlockShape"/> class.
         /// </summary>
-        /// <param name="lines">The collection of <see cref="TextLineShape"/> contained in this container.</param>
-        protected TextBlockShape(IList<TextLineShape> lines)
-            : base(lines)
+        /// <param name="textLines">The collection of <see cref="Shape"/> objects to include in this container.</param>
+        public TextBlockShape(IList<Shape> textLines)
+            : base(textLines)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextBlockShape"/> class.
+        /// </summary>
+        /// <param name="textLines">The collection of <see cref="Shape"/> objects to include in this container.</param>
+        /// <param name="bounds">The shape boundaries.</param>
+        public TextBlockShape(IList<Shape> textLines, Rectangle bounds)
+            : base(textLines, bounds)
         {
         }
 

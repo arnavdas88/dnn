@@ -67,11 +67,12 @@
     <Compile Include="OCR\Tesseract\NativeMethods.cs" />
     <Compile Include="OCR\Tesseract\Enums\OcrEngineMode.cs" />
     <Compile Include="OCR\Tesseract\Enums\Orientation.cs" />
-    <Compile Include="OCR\Tesseract\PageIteratorHandle.cs" />
+    <Compile Include="OCR\Tesseract\PageIterator.cs" />
     <Compile Include="OCR\Tesseract\Enums\PageIteratorLevel.cs" />
     <Compile Include="OCR\Tesseract\Enums\PageSegmentationMode.cs" />
     <Compile Include="OCR\Tesseract\Enums\ParagraphJustification.cs" />
     <Compile Include="OCR\Tesseract\Enums\PolyBlockType.cs" />
+    <Compile Include="OCR\Tesseract\ResultIterator.cs" />
     <Compile Include="OCR\Tesseract\Tesseract.cs" />
     <Compile Include="OCR\Tesseract\TesseractHandle.cs" />
     <Compile Include="OCR\Tesseract\Enums\TextLineOrder.cs" />
@@ -88,9 +89,10 @@
     <Compile Include="Shapes\LineShape.cs" />
     <Compile Include="Shapes\LineTypes.cs" />
     <Compile Include="Shapes\PageShape.cs" />
+    <Compile Include="Shapes\ParagraphShape.cs" />
     <Compile Include="Shapes\PictureShape.cs" />
     <Compile Include="Shapes\Shape.cs" />
-    <Compile Include="Shapes\TextShape.cs" />
+    <Compile Include="Shapes\WordShape.cs" />
     <Compile Include="Shapes\TextBlockShape.cs" />
     <Compile Include="Shapes\TextLineShape.cs" />
   </ItemGroup>

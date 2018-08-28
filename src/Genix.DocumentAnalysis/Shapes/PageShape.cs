@@ -8,7 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
+    using System.Drawing;
     using System.Linq;
     using Newtonsoft.Json;
 
@@ -16,14 +16,24 @@ namespace Genix.DocumentAnalysis
     /// Represents a page.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class PageShape : Container<Shape>
+    public class PageShape : Container<TextBlockShape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PageShape"/> class.
         /// </summary>
-        /// <param name="shapes">The collection of <see cref="Shape"/> objects contained in this container.</param>
-        protected PageShape(IList<Shape> shapes)
-            : base(shapes)
+        /// <param name="textBlocks">The collection of <see cref="TextBlockShape"/> objects to include in this container.</param>
+        public PageShape(IList<TextBlockShape> textBlocks)
+            : base(textBlocks)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PageShape"/> class.
+        /// </summary>
+        /// <param name="textBlocks">The collection of <see cref="TextBlockShape"/> objects to include in this container.</param>
+        /// <param name="bounds">The shape boundaries.</param>
+        public PageShape(IList<TextBlockShape> textBlocks, Rectangle bounds)
+            : base(textBlocks, bounds)
         {
         }
 

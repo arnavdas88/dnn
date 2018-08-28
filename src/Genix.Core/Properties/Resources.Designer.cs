@@ -22,7 +22,7 @@ namespace Genix.Core.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Genix.Core.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Genix.Core.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Genix.Core.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,9 +61,18 @@ namespace Genix.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The directory &apos;{0}&apos; does not exist..
+        /// </summary>
+        public static string E_DataDirectoryNotFound {
+            get {
+                return ResourceManager.GetString("E_DataDirectoryNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The rectangle height is negative..
         /// </summary>
-        internal static string E_InvalidRectangleHeight {
+        public static string E_InvalidRectangleHeight {
             get {
                 return ResourceManager.GetString("E_InvalidRectangleHeight", resourceCulture);
             }
@@ -72,7 +81,7 @@ namespace Genix.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The rectangle width is negative..
         /// </summary>
-        internal static string E_InvalidRectangleWidth {
+        public static string E_InvalidRectangleWidth {
             get {
                 return ResourceManager.GetString("E_InvalidRectangleWidth", resourceCulture);
             }
@@ -81,7 +90,7 @@ namespace Genix.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The sequence contains no elements..
         /// </summary>
-        internal static string E_SequenceIsEmpty {
+        public static string E_SequenceIsEmpty {
             get {
                 return ResourceManager.GetString("E_SequenceIsEmpty", resourceCulture);
             }

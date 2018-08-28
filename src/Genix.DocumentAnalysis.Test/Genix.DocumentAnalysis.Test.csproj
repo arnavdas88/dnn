@@ -63,6 +63,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="OCR\TesseractTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +74,10 @@
     <ProjectReference Include="..\Genix.DocumentAnalysis\Genix.DocumentAnalysis.csproj">
       <Project>{1be4c1f8-8cd0-498f-b67d-45d2be1fb0ca}</Project>
       <Name>Genix.DocumentAnalysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
+      <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
+      <Name>Genix.Imaging</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

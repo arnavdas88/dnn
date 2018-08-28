@@ -7,8 +7,13 @@
 namespace Genix.DocumentAnalysis.OCR.Tesseract
 {
     using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Globalization;
     using System.IO;
+    using Genix.Core;
     using Genix.Imaging;
+    using Genix.Imaging.Leptonica;
 
     /// <summary>
     /// Tesseract OCR.
@@ -32,22 +37,31 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
         /// <summary>
         /// Creates and initializes a new <see cref="Tesseract"/> object.
         /// </summary>
-        /// <param name="dataPath">The path to Tesseract data directory.</param>
+        /// <param name="dataDirectory">The path to Tesseract data directory.</param>
         /// <returns>
         /// The <see cref="Tesseract"/> object this method creates.
         /// </returns>
-        public static Tesseract Create(string dataPath)
+        public static Tesseract Create(string dataDirectory)
         {
-            // ensure the data directory exist
-            if (!Directory.Exists(dataPath))
+            if (string.IsNullOrEmpty(dataDirectory))
             {
-                throw new DirectoryNotFoundException("Datapath does not exist.");
+                dataDirectory = Globals.LookupDataDirectory("Tesseract");
+            }
+
+            // ensure the data directory exist
+            if (!Directory.Exists(dataDirectory))
+            {
+                throw new DirectoryNotFoundException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        Genix.Core.Properties.Resources.E_DataDirectoryNotFound,
+                        dataDirectory));
             }
 
             TesseractHandle handle = NativeMethods.TessBaseAPICreate();
             try
             {
-                if (NativeMethods.TessBaseAPIInit2(handle, dataPath, "eng", OcrEngineMode.LstmOnly) != 0)
+                if (NativeMethods.TessBaseAPIInit2(handle, dataDirectory, "eng", OcrEngineMode.LstmOnly) != 0)
                 {
                     throw new InvalidOperationException("Cannot initialize Tesseract engine.");
                 }
@@ -62,13 +76,13 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
         }
 
         /// <summary>
-        /// Processes the <see cref="Image"/>.
+        /// Processes the <see cref="Imaging.Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to process.</param>
+        /// <param name="image">The <see cref="Imaging.Image"/> to process.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>.
         /// </exception>
-        public void SetImage(Image image)
+        public void SetImage(Imaging.Image image)
         {
             using (Pix pix = Pix.FromImage(image))
             {
@@ -85,7 +99,12 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
 
                 ////NativeMethods.BaseAPISetPageSegMode(this.handle, actualPageSegmentMode);
 
-                using (PageIteratorHandle pageIterator = NativeMethods.TessBaseAPIAnalyseLayout(this.handle))
+                NativeMethods.TessBaseAPIRecognize(this.handle, IntPtr.Zero);
+
+                PageShape page = this.ExtractResults(image.Bounds);
+
+#if false
+                using (PageIterator pageIterator = NativeMethods.TessBaseAPIAnalyseLayout(this.handle))
                 {
                     pageIterator.Begin();
 
@@ -102,6 +121,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                         ret_val = EXIT_FAILURE;
                     }*/
                 }
+#endif
             }
         }
 
@@ -121,6 +141,157 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
 
                 this.handle.Dispose();
             }
+        }
+
+        private PageShape ExtractResults(Rectangle pageBounds)
+        {
+            List<TextBlockShape> textBlocks = new List<TextBlockShape>();
+
+            using (ResultIterator iterator = NativeMethods.TessBaseAPIGetIterator(this.handle))
+            {
+                TextBlockShape textBlock = ExtractTextBlock();
+                if (textBlock != null)
+                {
+                    textBlocks.Add(textBlock);
+                }
+
+                TextBlockShape ExtractTextBlock()
+                {
+                    Rectangle bounds = iterator.GetBoundingBox(PageIteratorLevel.TextBlock);
+                    if (bounds.IsEmpty)
+                    {
+                        return null;
+                    }
+
+                    List<Shape> shapes = new List<Shape>();
+                    do
+                    {
+                        PolyBlockType type = iterator.GetBlockType();
+                        switch (type)
+                        {
+                            case PolyBlockType.HorizontalLine:
+                            case PolyBlockType.VerticalLine:
+                                bounds = iterator.GetBoundingBox(PageIteratorLevel.TextBlock);
+                                if (!bounds.IsEmpty)
+                                {
+                                    shapes.Add(new LineShape(
+                                        new Point(bounds.Left, bounds.Top),
+                                        new Point(bounds.Right, bounds.Bottom),
+                                        1,
+                                        type == PolyBlockType.HorizontalLine ? LineTypes.Horizontal : LineTypes.Vertical));
+                                }
+
+                                break;
+
+                            default:
+                                do
+                                {
+                                    ParagraphShape shape = ExtractParagraph();
+                                    if (shape != null)
+                                    {
+                                        shapes.Add(shape);
+                                    }
+                                }
+                                while (!iterator.IsAtFinalElement(PageIteratorLevel.TextBlock, PageIteratorLevel.Paragraph) &&
+                                        iterator.Next(PageIteratorLevel.Paragraph));
+                                break;
+                        }
+                    }
+                    while (iterator.Next(PageIteratorLevel.TextBlock));
+
+                    return shapes.Count > 0 ? new TextBlockShape(shapes, bounds) : null;
+                }
+
+                ParagraphShape ExtractParagraph()
+                {
+                    Rectangle bounds = iterator.GetBoundingBox(PageIteratorLevel.Paragraph);
+                    if (bounds.IsEmpty)
+                    {
+                        return null;
+                    }
+
+                    List<TextLineShape> shapes = new List<TextLineShape>();
+                    do
+                    {
+                        TextLineShape shape = ExtractTextLine();
+                        if (shape != null)
+                        {
+                            shapes.Add(shape);
+                        }
+                    }
+                    while (!iterator.IsAtFinalElement(PageIteratorLevel.Paragraph, PageIteratorLevel.TextLine) &&
+                            iterator.Next(PageIteratorLevel.TextLine));
+
+                    return shapes.Count > 0 ? new ParagraphShape(shapes, bounds) : null;
+                }
+
+                TextLineShape ExtractTextLine()
+                {
+                    Rectangle bounds = iterator.GetBoundingBox(PageIteratorLevel.TextLine);
+                    if (bounds.IsEmpty)
+                    {
+                        return null;
+                    }
+
+                    List<WordShape> shapes = new List<WordShape>();
+                    do
+                    {
+                        WordShape shape = ExtractWord();
+                        if (shape != null)
+                        {
+                            shapes.Add(shape);
+                        }
+                    }
+                    while (!iterator.IsAtFinalElement(PageIteratorLevel.TextLine, PageIteratorLevel.Word) &&
+                            iterator.Next(PageIteratorLevel.Word));
+
+                    return shapes.Count > 0 ? new TextLineShape(shapes, bounds) : null;
+                }
+
+                WordShape ExtractWord()
+                {
+                    Rectangle bounds = iterator.GetBoundingBox(PageIteratorLevel.Word);
+                    if (bounds.IsEmpty)
+                    {
+                        return null;
+                    }
+
+                    /*List<CharacterAnswer> ^ characters = gcnew List<CharacterAnswer>();
+                    do
+                    {
+                        CharacterAnswer character;
+                        if (ExtractCharacter(iterator, character))
+                        {
+                            characters->Add(character);
+                        }
+
+                        if (iterator->IsAtFinalElement(level, RIL_SYMBOL))
+                        {
+                            break;
+                        }
+                    }
+                    while (iterator->Next(RIL_SYMBOL));
+
+                    if (!Enumerable::Any(characters))
+                    {
+                        return nullptr;
+                    }
+
+                    int confidence = MakeConfidence(iterator->Confidence(level));*/
+
+                    string text = iterator.GetUTF8Text(PageIteratorLevel.Word);
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        return null;
+                    }
+
+                    float confidence = iterator.GetConfidence(PageIteratorLevel.Word) / 100.0f;
+
+                    return new WordShape(bounds, text, confidence);
+                }
+            }
+
+            return new PageShape(textBlocks, pageBounds);
         }
     }
 }

@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.Imaging
+namespace Genix.Imaging.Leptonica
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -22,7 +22,7 @@ namespace Genix.Imaging
         /// <summary>
         /// The handle reference for the object.
         /// </summary>
-        private SafePixHandle handle;
+        private readonly SafePixHandle handle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pix"/> class.
@@ -70,11 +70,86 @@ namespace Genix.Imaging
             }
             catch
             {
-                handle.Dispose();
+                handle?.Dispose();
                 throw;
             }
 
             return new Pix(handle);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="Image"/> object from this Leptonica's <see cref="Pix"/> object.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Image"/> object this method creates.
+        /// </returns>
+        public Image ToImage()
+        {
+            NativeMethods.pixGetDimensions(this.handle, out int w, out int h, out int d);
+            NativeMethods.pixGetResolution(this.handle, out int xres, out int yres);
+
+            Image dst = new Image(w, h, d, xres, yres);
+
+            Pix.CopyBits(
+                dst.Height,
+                NativeMethods.pixGetData(this.handle),
+                NativeMethods.pixGetWpl(this.handle) * sizeof(uint),
+                dst.Bits,
+                dst.Stride8,
+                dst.BitsPerPixel);
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts this <see cref="Pix"/> from gray scale to black-and-white using Otsu binarization algorithm.
+        /// </summary>
+        /// <param name="adaptiveThreshold">Indicates whether to use adaptive threshold algorithm.</param>
+        /// <returns>
+        /// A new binary <see cref="Pix"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Pix BinarizeOtsu(bool adaptiveThreshold)
+        {
+            NativeMethods.pixGetDimensions(this.handle, out int w, out int h, out int d);
+
+            /*if (w < 16 || h < 16)
+            {
+                adaptiveThreshold = false;
+            }*/
+
+            if (w < 32 || h < 32)
+            {
+                adaptiveThreshold = true;
+            }
+
+            int minSize = adaptiveThreshold ? 16 : 4;
+
+            int sx = Math.Max(minSize, Math.Min(64, w / 5));        // tile size in pixels
+            int sy = Math.Max(minSize, Math.Min(128, h / 5));
+            const int Thresh = 100;                                 // threshold for determining foreground
+            int mincount = sx * sy / 3;                             // min threshold on counts in a tile
+            const int Smoothx = 2;                                  // half-width of block convolution kernel width
+            const int Smoothy = 2;                                  // half-width of block convolution kernel height
+            const float Scorefact = 0.0f;                           // fraction of the max Otsu score; typ. 0.1
+
+            SafePixHandle pixd;
+            if (adaptiveThreshold)
+            {
+                NativeMethods.pixOtsuAdaptiveThreshold(this.handle, sx, sy, Smoothx, Smoothy, Scorefact, out SafePixHandle pixth, out pixd);
+                pixth?.Dispose();
+            }
+            else
+            {
+                pixd = NativeMethods.pixOtsuThreshOnBackgroundNorm(this.handle, null, sx, sy, Thresh, mincount, 255, Smoothx, Smoothy, Scorefact, out int thresh);
+            }
+
+            if (pixd == null || pixd.IsInvalid)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return new Pix(pixd);
         }
 
         /// <inheritdoc />
@@ -101,6 +176,24 @@ namespace Genix.Imaging
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, int bitsPerPixel)
+        {
+            unsafe
+            {
+                fixed (ulong* udst = dst)
+                {
+                    if (bitsPerPixel == 1)
+                    {
+                    }
+                    else
+                    {
+                        Arrays.CopyStrides(height, src, strideSrc, new IntPtr(udst), strideDst);
+                    }
+                }
+            }
+        }
+
         private static class NativeMethods
         {
             private const string DllName = "Genix.Leptonica.Native.dll";
@@ -120,11 +213,27 @@ namespace Genix.Imaging
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
             [SuppressUnmanagedCodeSecurity]
+            public static extern int pixGetResolution(SafePixHandle pix, out int xres, out int yres);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity]
             public static extern IntPtr pixGetData(SafePixHandle pix);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
             [SuppressUnmanagedCodeSecurity]
             public static extern int pixGetWpl(SafePixHandle pix);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int pixGetDimensions(SafePixHandle pix, out int w, out int h, out int d);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern int pixOtsuAdaptiveThreshold(SafePixHandle pix, int sx, int sy, int smoothx, int smoothy, float scorefract, out SafePixHandle pixth, out SafePixHandle pixd);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity]
+            public static extern SafePixHandle pixOtsuThreshOnBackgroundNorm(SafePixHandle pix, SafePixHandle pixim, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy, float scorefract, out int pthresh);
         }
 
         /// <summary>

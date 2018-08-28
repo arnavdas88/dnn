@@ -139,7 +139,7 @@ namespace Genix.NetLearn
                 int[] shape = net.InputShape;
                 using (TestImageProvider<string> dataProvider = task.CreateTestImageProvider(net))
                 {
-                    int n = 0;
+                    ////int n = 0;
                     for (int epoch = 0; epoch < task.Epochs; epoch++)
                     {
                         timer.Restart();
