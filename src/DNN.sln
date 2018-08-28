@@ -19,11 +19,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Imaging", "Genix.Imaging\Genix.Imaging.csproj", "{D19A13BA-1C8F-4CEB-840C-D485D0936D56}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8AF9EF19-E3F0-4904-82AC-89058117455C} = {8AF9EF19-E3F0-4904-82AC-89058117455C}
+		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67} = {7B1AFB34-FD94-40AA-B58E-F9F900B03A67}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.Imaging.Test", "Genix.Imaging.Test\Genix.Imaging.Test.csproj", "{C3F7181D-F341-4080-B947-745F3408C51D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DocumentAnalysis", "Genix.DocumentAnalysis\Genix.DocumentAnalysis.csproj", "{1BE4C1F8-8CD0-498F-B67D-45D2BE1FB0CA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1FCC37D-D168-4827-99E9-BB13F02CE3AB} = {B1FCC37D-D168-4827-99E9-BB13F02CE3AB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DNN", "Genix.DNN\Genix.DNN.csproj", "{75E41C3E-E491-4D38-9B62-A01E90DECE12}"
 	ProjectSection(ProjectDependencies) = postProject

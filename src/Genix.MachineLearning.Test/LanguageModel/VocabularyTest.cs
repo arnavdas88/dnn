@@ -17,7 +17,7 @@
         public void TestMethod1()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string path = Path.Combine(Path.GetDirectoryName(assembly.Location), @"..\TestData\tinyshakespeare.txt");
+            string path = Path.Combine(Path.GetDirectoryName(assembly.Location), @"..\..\TestData\tinyshakespeare.txt");
 
             Vocabulary context = new Vocabulary(
                 File.ReadAllLines(path)

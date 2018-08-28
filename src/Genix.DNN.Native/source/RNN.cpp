@@ -249,16 +249,9 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 		y -= ystep / 2;
 		g -= gstep / 2;
 
-		if (rowmajor)
-		{
-			u += (m + n) * n;
-			uc += (m + n) * n;
-		}
-		else
-		{
-			u += m + n;
-			uc += m + n;
-		}
+		int off = rowmajor ? (m + n) * n : m + n;
+		u += off;
+		uc += off;
 
 		for (int t = steps - 1; t >= 0; t--, y -= ystep, g -= gstep)
 		{
@@ -405,25 +398,19 @@ extern "C" __declspec(dllexport) void WINAPI gru_gradient(
 	// backward pass
 	if (bidirectional)
 	{
-		y += ystep + (ystep / 2);
-		dy += ystep + (ystep / 2);
-		g += gstep + (gstep / 2);
-		dg += gstep + (gstep / 2);
+		int off = ystep + (ystep / 2);
+		y += off;
+		dy += off;
 
-		if (rowmajor)
-		{
-			u += (m + n) * n;
-			du += (m + n) * n;
-			uc += (m + n) * n;
-			duc += (m + n) * n;
-		}
-		else
-		{
-			u += m + n;
-			du += m + n;
-			uc += m + n;
-			duc += m + n;
-		}
+		off = gstep + (gstep / 2);
+		g += off;
+		dg += off;
+
+		off = rowmajor ? (m + n) * n : m + n;
+		u += off;
+		du += off;
+		uc += off;
+		duc += off;
 
 		for (int t = 0; t < steps; t++, y += ystep, dy += ystep, g += gstep, dg += gstep)
 		{

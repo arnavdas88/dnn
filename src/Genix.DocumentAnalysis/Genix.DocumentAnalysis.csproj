@@ -19,14 +19,14 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\Debug\Genix.DocumentAnalysis.xml</DocumentationFile>
+    <DocumentationFile>..\..\build\Debug\Genix.DocumentAnalysis.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\Release\Genix.DocumentAnalysis.xml</DocumentationFile>
+    <DocumentationFile>..\..\build\Release\Genix.DocumentAnalysis.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

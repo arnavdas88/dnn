@@ -6,12 +6,12 @@
 
 namespace Genix.DocumentAnalysis.OCR.Tesseract
 {
-    using Genix.Win32;
     using System;
     using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
     using System.Security;
     using System.Text;
+    using Genix.Win32;
 
     internal static class NativeMethods
     {
@@ -190,7 +190,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                 return null;
             }
 
-            int nb = Win32Native.lstrlenA(ptr);
+            int nb = Win32NativeMethods.lstrlenA(ptr);
             if (nb == 0)
             {
                 return null;
