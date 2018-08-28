@@ -30,27 +30,23 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -69,7 +65,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <Import Project="..\native.props" />
+  <Import Project="..\tesseract.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -85,300 +81,293 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS;LIBLEPT_IMPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;..\Genix.Leptonica.Native\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\..\leptonica\src;..\..\..\tesseract\vs2017;..\..\..\tesseract\src\arch;..\..\..\tesseract\src\ccmain;..\..\..\tesseract\src\ccstruct;..\..\..\tesseract\src\ccutil;..\..\..\tesseract\src\classify;..\..\..\tesseract\src\cutil;..\..\..\tesseract\src\dict;..\..\..\tesseract\src\lstm;..\..\..\tesseract\src\opencl;..\..\..\tesseract\src\textord;..\..\..\tesseract\src\viewer;..\..\..\tesseract\src\vs2010\port;..\..\..\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS;LIBLEPT_IMPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;..\Genix.Leptonica.Native\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\..\leptonica\src;..\..\..\tesseract\vs2017;..\..\..\tesseract\src\arch;..\..\..\tesseract\src\ccmain;..\..\..\tesseract\src\ccstruct;..\..\..\tesseract\src\ccutil;..\..\..\tesseract\src\classify;..\..\..\tesseract\src\cutil;..\..\..\tesseract\src\dict;..\..\..\tesseract\src\lstm;..\..\..\tesseract\src\opencl;..\..\..\tesseract\src\textord;..\..\..\tesseract\src\viewer;..\..\..\tesseract\src\vs2010\port;..\..\..\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS;LIBLEPT_IMPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;..\Genix.Leptonica.Native\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\..\leptonica\src;..\..\..\tesseract\vs2017;..\..\..\tesseract\src\arch;..\..\..\tesseract\src\ccmain;..\..\..\tesseract\src\ccstruct;..\..\..\tesseract\src\ccutil;..\..\..\tesseract\src\classify;..\..\..\tesseract\src\cutil;..\..\..\tesseract\src\dict;..\..\..\tesseract\src\lstm;..\..\..\tesseract\src\opencl;..\..\..\tesseract\src\textord;..\..\..\tesseract\src\viewer;..\..\..\tesseract\src\vs2010\port;..\..\..\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;HAVE_CONFIG_H;WINDLLNAME="Genix.Tesseract.Native.dll";GRAPHICS_DISABLED;TESS_EXPORTS;LIBLEPT_IMPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;..\Genix.Leptonica.Native\leptonica\src;.\tesseract\src;.\tesseract\src\arch;.\tesseract\src\ccmain;.\tesseract\src\ccstruct;.\tesseract\src\ccutil;.\tesseract\src\classify;.\tesseract\src\cutil;.\tesseract\src\dict;.\tesseract\src\lstm;.\tesseract\src\opencl;.\tesseract\src\textord;.\tesseract\src\viewer;.\tesseract\src\vs2010\port;.\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4018;4068;4101;4244;4267;4566;4703;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\..\leptonica\src;..\..\..\tesseract\vs2017;..\..\..\tesseract\src\arch;..\..\..\tesseract\src\ccmain;..\..\..\tesseract\src\ccstruct;..\..\..\tesseract\src\ccutil;..\..\..\tesseract\src\classify;..\..\..\tesseract\src\cutil;..\..\..\tesseract\src\dict;..\..\..\tesseract\src\lstm;..\..\..\tesseract\src\opencl;..\..\..\tesseract\src\textord;..\..\..\tesseract\src\viewer;..\..\..\tesseract\src\vs2010\port;..\..\..\tesseract\src\wordrec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="tesseract\src\api\apitypes.h" />
-    <ClInclude Include="tesseract\src\api\baseapi.h" />
-    <ClInclude Include="tesseract\src\api\capi.h" />
-    <ClInclude Include="tesseract\src\api\renderer.h" />
-    <ClInclude Include="tesseract\src\api\tess_version.h" />
-    <ClInclude Include="tesseract\src\config_auto.h" />
+    <ClInclude Include="..\..\..\tesseract\src\api\apitypes.h" />
+    <ClInclude Include="..\..\..\tesseract\src\api\baseapi.h" />
+    <ClInclude Include="..\..\..\tesseract\src\api\capi.h" />
+    <ClInclude Include="..\..\..\tesseract\src\api\renderer.h" />
+    <ClInclude Include="..\..\..\tesseract\vs2017\config_auto.h" />
+    <ClInclude Include="..\..\..\tesseract\vs2017\endianness.h" />
+    <ClInclude Include="..\..\..\tesseract\vs2017\tess_version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="tesseract\src\api\baseapi.cpp" />
-    <ClCompile Include="tesseract\src\api\capi.cpp" />
-    <ClCompile Include="tesseract\src\api\pdfrenderer.cpp" />
-    <ClCompile Include="tesseract\src\api\renderer.cpp" />
-    <ClCompile Include="tesseract\src\api\tesseractmain.cpp">
+    <ClCompile Include="..\..\..\tesseract\vs2017\dllmain.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\api\baseapi.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\api\capi.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\api\pdfrenderer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\api\renderer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\api\tesseractmain.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="tesseract\src\arch\dotproductavx.cpp" />
-    <ClCompile Include="tesseract\src\arch\dotproductsse.cpp" />
-    <ClCompile Include="tesseract\src\arch\intsimdmatrix.cpp" />
-    <ClCompile Include="tesseract\src\arch\intsimdmatrixavx2.cpp" />
-    <ClCompile Include="tesseract\src\arch\intsimdmatrixsse.cpp" />
-    <ClCompile Include="tesseract\src\arch\simddetect.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\adaptions.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\applybox.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\control.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\docqual.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\equationdetect.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\fixspace.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\fixxht.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\linerec.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\ltrresultiterator.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\osdetect.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\output.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\pageiterator.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\pagesegmain.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\paragraphs.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\paramsd.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\par_control.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\pgedit.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\recogtraining.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\reject.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\resultiterator.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\superscript.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\tessbox.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\tessedit.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\tesseractclass.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\tessvars.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\tfacepp.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\thresholder.cpp" />
-    <ClCompile Include="tesseract\src\ccmain\werdit.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\blamer.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\blobbox.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\blobs.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\blread.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\boxread.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\boxword.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\ccstruct.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\coutln.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\detlinefit.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\dppoint.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\fontinfo.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\genblob.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\imagedata.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\linlsq.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\matrix.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\mod128.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\normalis.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\ocrblock.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\ocrpara.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\ocrrow.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\otsuthr.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\pageres.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\params_training_featdef.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\pdblock.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\points.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\polyaprx.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\polyblk.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\publictypes.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\quadlsq.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\quspline.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\ratngs.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\rect.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\rejctmap.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\seam.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\split.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\statistc.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\stepblob.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\vecfuncs.cpp" />
-    <ClCompile Include="tesseract\src\ccstruct\werd.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\ambigs.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\basedir.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\bitvector.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\ccutil.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\clst.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\elst.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\elst2.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\errcode.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\globaloc.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\indexmapbidi.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\mainblk.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\params.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\scanutils.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\serialis.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\strngs.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\tessdatamanager.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\tprintf.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\unichar.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\unicharcompress.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\unicharmap.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\unicharset.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\unicodes.cpp" />
-    <ClCompile Include="tesseract\src\ccutil\universalambigs.cpp" />
-    <ClCompile Include="tesseract\src\classify\adaptive.cpp" />
-    <ClCompile Include="tesseract\src\classify\adaptmatch.cpp" />
-    <ClCompile Include="tesseract\src\classify\blobclass.cpp" />
-    <ClCompile Include="tesseract\src\classify\classify.cpp" />
-    <ClCompile Include="tesseract\src\classify\cluster.cpp" />
-    <ClCompile Include="tesseract\src\classify\clusttool.cpp" />
-    <ClCompile Include="tesseract\src\classify\cutoffs.cpp" />
-    <ClCompile Include="tesseract\src\classify\errorcounter.cpp" />
-    <ClCompile Include="tesseract\src\classify\featdefs.cpp" />
-    <ClCompile Include="tesseract\src\classify\float2int.cpp" />
-    <ClCompile Include="tesseract\src\classify\fpoint.cpp" />
-    <ClCompile Include="tesseract\src\classify\intfeaturedist.cpp" />
-    <ClCompile Include="tesseract\src\classify\intfeaturemap.cpp" />
-    <ClCompile Include="tesseract\src\classify\intfeaturespace.cpp" />
-    <ClCompile Include="tesseract\src\classify\intfx.cpp" />
-    <ClCompile Include="tesseract\src\classify\intmatcher.cpp" />
-    <ClCompile Include="tesseract\src\classify\intproto.cpp" />
-    <ClCompile Include="tesseract\src\classify\kdtree.cpp" />
-    <ClCompile Include="tesseract\src\classify\mastertrainer.cpp" />
-    <ClCompile Include="tesseract\src\classify\mf.cpp" />
-    <ClCompile Include="tesseract\src\classify\mfdefs.cpp" />
-    <ClCompile Include="tesseract\src\classify\mfoutline.cpp" />
-    <ClCompile Include="tesseract\src\classify\mfx.cpp" />
-    <ClCompile Include="tesseract\src\classify\normfeat.cpp" />
-    <ClCompile Include="tesseract\src\classify\normmatch.cpp" />
-    <ClCompile Include="tesseract\src\classify\ocrfeatures.cpp" />
-    <ClCompile Include="tesseract\src\classify\outfeat.cpp" />
-    <ClCompile Include="tesseract\src\classify\picofeat.cpp" />
-    <ClCompile Include="tesseract\src\classify\protos.cpp" />
-    <ClCompile Include="tesseract\src\classify\sampleiterator.cpp" />
-    <ClCompile Include="tesseract\src\classify\shapeclassifier.cpp" />
-    <ClCompile Include="tesseract\src\classify\shapetable.cpp" />
-    <ClCompile Include="tesseract\src\classify\tessclassifier.cpp" />
-    <ClCompile Include="tesseract\src\classify\trainingsample.cpp" />
-    <ClCompile Include="tesseract\src\classify\trainingsampleset.cpp" />
-    <ClCompile Include="tesseract\src\cutil\bitvec.cpp" />
-    <ClCompile Include="tesseract\src\cutil\callcpp.cpp" />
-    <ClCompile Include="tesseract\src\cutil\cutil_class.cpp" />
-    <ClCompile Include="tesseract\src\cutil\emalloc.cpp" />
-    <ClCompile Include="tesseract\src\cutil\oldlist.cpp" />
-    <ClCompile Include="tesseract\src\cutil\structures.cpp" />
-    <ClCompile Include="tesseract\src\dict\context.cpp" />
-    <ClCompile Include="tesseract\src\dict\dawg.cpp" />
-    <ClCompile Include="tesseract\src\dict\dawg_cache.cpp" />
-    <ClCompile Include="tesseract\src\dict\dict.cpp" />
-    <ClCompile Include="tesseract\src\dict\hyphen.cpp" />
-    <ClCompile Include="tesseract\src\dict\permdawg.cpp" />
-    <ClCompile Include="tesseract\src\dict\stopper.cpp" />
-    <ClCompile Include="tesseract\src\dict\trie.cpp" />
-    <ClCompile Include="tesseract\src\lstm\convolve.cpp" />
-    <ClCompile Include="tesseract\src\lstm\ctc.cpp" />
-    <ClCompile Include="tesseract\src\lstm\fullyconnected.cpp" />
-    <ClCompile Include="tesseract\src\lstm\functions.cpp" />
-    <ClCompile Include="tesseract\src\lstm\input.cpp" />
-    <ClCompile Include="tesseract\src\lstm\lstm.cpp" />
-    <ClCompile Include="tesseract\src\lstm\lstmrecognizer.cpp" />
-    <ClCompile Include="tesseract\src\lstm\lstmtrainer.cpp" />
-    <ClCompile Include="tesseract\src\lstm\maxpool.cpp" />
-    <ClCompile Include="tesseract\src\lstm\network.cpp" />
-    <ClCompile Include="tesseract\src\lstm\networkbuilder.cpp" />
-    <ClCompile Include="tesseract\src\lstm\networkio.cpp" />
-    <ClCompile Include="tesseract\src\lstm\parallel.cpp" />
-    <ClCompile Include="tesseract\src\lstm\plumbing.cpp" />
-    <ClCompile Include="tesseract\src\lstm\recodebeam.cpp" />
-    <ClCompile Include="tesseract\src\lstm\reconfig.cpp" />
-    <ClCompile Include="tesseract\src\lstm\reversed.cpp" />
-    <ClCompile Include="tesseract\src\lstm\series.cpp" />
-    <ClCompile Include="tesseract\src\lstm\stridemap.cpp" />
-    <ClCompile Include="tesseract\src\lstm\tfnetwork.cpp" />
-    <ClCompile Include="tesseract\src\lstm\weightmatrix.cpp" />
-    <ClCompile Include="tesseract\src\textord\alignedblob.cpp" />
-    <ClCompile Include="tesseract\src\textord\baselinedetect.cpp" />
-    <ClCompile Include="tesseract\src\textord\bbgrid.cpp" />
-    <ClCompile Include="tesseract\src\textord\blkocc.cpp" />
-    <ClCompile Include="tesseract\src\textord\blobgrid.cpp" />
-    <ClCompile Include="tesseract\src\textord\ccnontextdetect.cpp" />
-    <ClCompile Include="tesseract\src\textord\cjkpitch.cpp" />
-    <ClCompile Include="tesseract\src\textord\colfind.cpp" />
-    <ClCompile Include="tesseract\src\textord\colpartition.cpp" />
-    <ClCompile Include="tesseract\src\textord\colpartitiongrid.cpp" />
-    <ClCompile Include="tesseract\src\textord\colpartitionset.cpp" />
-    <ClCompile Include="tesseract\src\textord\devanagari_processing.cpp" />
-    <ClCompile Include="tesseract\src\textord\drawedg.cpp" />
-    <ClCompile Include="tesseract\src\textord\drawtord.cpp" />
-    <ClCompile Include="tesseract\src\textord\edgblob.cpp" />
-    <ClCompile Include="tesseract\src\textord\edgloop.cpp" />
-    <ClCompile Include="tesseract\src\textord\equationdetectbase.cpp" />
-    <ClCompile Include="tesseract\src\textord\fpchop.cpp" />
-    <ClCompile Include="tesseract\src\textord\gap_map.cpp" />
-    <ClCompile Include="tesseract\src\textord\imagefind.cpp" />
-    <ClCompile Include="tesseract\src\textord\linefind.cpp" />
-    <ClCompile Include="tesseract\src\textord\makerow.cpp" />
-    <ClCompile Include="tesseract\src\textord\oldbasel.cpp" />
-    <ClCompile Include="tesseract\src\textord\pithsync.cpp" />
-    <ClCompile Include="tesseract\src\textord\pitsync1.cpp" />
-    <ClCompile Include="tesseract\src\textord\scanedg.cpp" />
-    <ClCompile Include="tesseract\src\textord\sortflts.cpp" />
-    <ClCompile Include="tesseract\src\textord\strokewidth.cpp" />
-    <ClCompile Include="tesseract\src\textord\tabfind.cpp" />
-    <ClCompile Include="tesseract\src\textord\tablefind.cpp" />
-    <ClCompile Include="tesseract\src\textord\tablerecog.cpp" />
-    <ClCompile Include="tesseract\src\textord\tabvector.cpp" />
-    <ClCompile Include="tesseract\src\textord\textlineprojection.cpp" />
-    <ClCompile Include="tesseract\src\textord\textord.cpp" />
-    <ClCompile Include="tesseract\src\textord\topitch.cpp" />
-    <ClCompile Include="tesseract\src\textord\tordmain.cpp" />
-    <ClCompile Include="tesseract\src\textord\tospace.cpp" />
-    <ClCompile Include="tesseract\src\textord\tovars.cpp" />
-    <ClCompile Include="tesseract\src\textord\underlin.cpp" />
-    <ClCompile Include="tesseract\src\textord\wordseg.cpp" />
-    <ClCompile Include="tesseract\src\textord\workingpartset.cpp" />
-    <ClCompile Include="tesseract\src\viewer\scrollview.cpp" />
-    <ClCompile Include="tesseract\src\viewer\svmnode.cpp" />
-    <ClCompile Include="tesseract\src\viewer\svpaint.cpp">
+    <ClCompile Include="..\..\..\tesseract\src\arch\dotproductavx.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\arch\dotproductsse.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\arch\intsimdmatrix.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\arch\intsimdmatrixavx2.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\arch\intsimdmatrixsse.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\arch\simddetect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\adaptions.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\applybox.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\control.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\docqual.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\equationdetect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\fixspace.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\fixxht.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\linerec.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\ltrresultiterator.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\osdetect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\output.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\pageiterator.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\pagesegmain.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\paragraphs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\paramsd.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\par_control.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\pgedit.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\recogtraining.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\reject.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\resultiterator.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\superscript.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\tessbox.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\tessedit.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\tesseractclass.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\tessvars.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\tfacepp.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\thresholder.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\werdit.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\blamer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\blobbox.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\blobs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\blread.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\boxread.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\boxword.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\ccstruct.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\coutln.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\detlinefit.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\dppoint.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\fontinfo.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\genblob.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\imagedata.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\linlsq.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\matrix.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\mod128.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\normalis.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\ocrblock.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\ocrpara.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\ocrrow.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\otsuthr.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\pageres.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\params_training_featdef.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\pdblock.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\points.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\polyaprx.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\polyblk.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\publictypes.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\quadlsq.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\quspline.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\ratngs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\rect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\rejctmap.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\seam.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\split.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\statistc.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\stepblob.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\vecfuncs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccstruct\werd.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\ambigs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\basedir.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\bitvector.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\ccutil.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\clst.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\elst.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\elst2.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\errcode.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\globaloc.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\indexmapbidi.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\mainblk.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\params.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\scanutils.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\serialis.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\strngs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\tessdatamanager.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\tprintf.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\unichar.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\unicharcompress.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\unicharmap.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\unicharset.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\unicodes.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccutil\universalambigs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\adaptive.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\adaptmatch.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\blobclass.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\classify.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\cluster.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\clusttool.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\cutoffs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\errorcounter.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\featdefs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\float2int.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\fpoint.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intfeaturedist.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intfeaturemap.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intfeaturespace.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intfx.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intmatcher.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\intproto.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\kdtree.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\mastertrainer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\mf.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\mfdefs.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\mfoutline.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\mfx.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\normfeat.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\normmatch.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\ocrfeatures.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\outfeat.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\picofeat.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\protos.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\sampleiterator.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\shapeclassifier.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\shapetable.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\tessclassifier.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\trainingsample.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\classify\trainingsampleset.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\bitvec.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\callcpp.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\cutil_class.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\emalloc.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\oldlist.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\cutil\structures.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\context.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\dawg.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\dawg_cache.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\dict.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\hyphen.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\permdawg.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\stopper.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\dict\trie.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\convolve.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\ctc.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\fullyconnected.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\functions.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\input.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\lstm.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\lstmrecognizer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\lstmtrainer.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\maxpool.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\network.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\networkbuilder.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\networkio.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\parallel.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\plumbing.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\recodebeam.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\reconfig.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\reversed.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\series.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\stridemap.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\tfnetwork.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\lstm\weightmatrix.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\alignedblob.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\baselinedetect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\bbgrid.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\blkocc.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\blobgrid.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\ccnontextdetect.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\cjkpitch.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\colfind.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\colpartition.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\colpartitiongrid.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\colpartitionset.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\devanagari_processing.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\drawedg.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\drawtord.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\edgblob.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\edgloop.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\equationdetectbase.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\fpchop.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\gap_map.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\imagefind.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\linefind.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\makerow.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\oldbasel.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\pithsync.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\pitsync1.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\scanedg.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\sortflts.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\strokewidth.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tabfind.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tablefind.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tablerecog.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tabvector.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\textlineprojection.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\textord.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\topitch.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tordmain.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tospace.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\tovars.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\underlin.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\wordseg.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\textord\workingpartset.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\viewer\scrollview.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\viewer\svmnode.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\viewer\svpaint.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="tesseract\src\viewer\svutil.cpp" />
-    <ClCompile Include="tesseract\src\vs2010\port\gettimeofday.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\associate.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\chop.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\chopper.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\drawfx.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\findseam.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\gradechop.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\language_model.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\lm_consistency.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\lm_pain_points.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\lm_state.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\outlines.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\params_model.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\pieces.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\plotedges.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\render.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\segsearch.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\tface.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\wordclass.cpp" />
-    <ClCompile Include="tesseract\src\wordrec\wordrec.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\viewer\svutil.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\vs2010\port\gettimeofday.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\associate.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\chop.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\chopper.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\drawfx.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\findseam.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\gradechop.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\language_model.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\lm_consistency.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\lm_pain_points.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\lm_state.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\outlines.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\params_model.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\pieces.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\plotedges.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\render.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\segsearch.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\tface.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\wordclass.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\wordrec\wordrec.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Genix.Leptonica.Native\Genix.Leptonica.Native.vcxproj">
