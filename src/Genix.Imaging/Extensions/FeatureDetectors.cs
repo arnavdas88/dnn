@@ -272,10 +272,10 @@ namespace Genix.Imaging
             }
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int supresslines(
                int width,
                int height,
@@ -284,7 +284,6 @@ namespace Genix.Imaging
                [Out] ulong[] dst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int hog(
                 int bitsPerPixel,
                 int width,
@@ -293,7 +292,6 @@ namespace Genix.Imaging
                 [In] float[] src);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int cart2polar(
                 int n,
                 [In] float[] re,
@@ -302,7 +300,6 @@ namespace Genix.Imaging
                 [Out] float[] phase);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int gradientVectorPrewitt_f32(
                 int width,
                 int height,

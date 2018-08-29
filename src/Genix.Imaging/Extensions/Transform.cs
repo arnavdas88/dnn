@@ -351,10 +351,10 @@ namespace Genix.Imaging
             }
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int affine(
                int bitsPerPixel,
                int widthsrc,

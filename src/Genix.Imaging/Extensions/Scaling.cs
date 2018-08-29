@@ -394,10 +394,10 @@ namespace Genix.Imaging
             return dst;
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int scale8(
                int widthsrc,
                int heightsrc,

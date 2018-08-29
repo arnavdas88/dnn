@@ -7,6 +7,7 @@
 namespace Genix.Imaging.Leptonica
 {
     using System;
+    using System.IO;
     using System.Runtime.CompilerServices;
     using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
@@ -59,14 +60,23 @@ namespace Genix.Imaging.Leptonica
             try
             {
                 NativeMethods.pixSetResolution(handle, image.HorizontalResolution, image.VerticalResolution);
+                IntPtr dst = NativeMethods.pixGetData(handle);
+                int wpl = NativeMethods.pixGetWpl(handle);
 
-                Pix.CopyBits(
-                    image.Height,
-                    image.Bits,
-                    image.Stride8,
-                    NativeMethods.pixGetData(handle),
-                    NativeMethods.pixGetWpl(handle) * sizeof(uint),
-                    image.BitsPerPixel);
+                unsafe
+                {
+                    fixed (ulong* src = image.Bits)
+                    {
+                        Arrays.CopyStrides(image.Height, new IntPtr(src), image.Stride8, dst, wpl * sizeof(uint));
+
+                        BitUtils32.BiteSwap(image.Height * wpl, dst);
+
+                        if (image.BitsPerPixel == 1)
+                        {
+                            BitUtils32.BitSwap(image.Height * wpl, dst);
+                        }
+                    }
+                }
             }
             catch
             {
@@ -76,6 +86,49 @@ namespace Genix.Imaging.Leptonica
 
             return new Pix(handle);
         }
+
+#if false
+        /// <summary>
+        /// Creates an <see cref="System.Drawing.Bitmap"/> object from this Leptonica's <see cref="Pix"/> object.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="System.Drawing.Bitmap"/> this method creates.
+        /// </returns>
+        public System.Drawing.Bitmap ToBitmap()
+        {
+            if (NativeMethods.pixWriteMemBmp(out IntPtr data, out IntPtr size, this.handle) != 0)
+            {
+                throw new InvalidOperationException("Cannot convert pix object to bitmap.");
+            }
+
+            try
+            {
+                unsafe
+                {
+                    byte[] bytes = new byte[size.ToInt64()];
+                    Marshal.Copy(data, bytes, 0, bytes.Length);
+                    File.WriteAllBytes("d:\\xxxxx.bmp", bytes);
+
+                    ////return System.Drawing.Bitmap.FromFile("d:\\xxxxx.bmp") as System.Drawing.Bitmap;
+
+                    using (MemoryStream stream = new MemoryStream(bytes))
+                    {
+                        return System.Drawing.Bitmap.FromStream(stream, true, true) as System.Drawing.Bitmap;
+                        ////return new System.Drawing.Bitmap(stream);
+                    }
+
+                    /*using (UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)data.ToPointer(), size.ToInt64()))
+                    {
+                        return System.Drawing.Bitmap.FromStream(stream) as System.Drawing.Bitmap;
+                    }*/
+                }
+            }
+            finally
+            {
+                NativeMethods.lept_free(data);
+            }
+        }
+#endif
 
         /// <summary>
         /// Creates an <see cref="Image"/> object from this Leptonica's <see cref="Pix"/> object.
@@ -87,18 +140,27 @@ namespace Genix.Imaging.Leptonica
         {
             NativeMethods.pixGetDimensions(this.handle, out int w, out int h, out int d);
             NativeMethods.pixGetResolution(this.handle, out int xres, out int yres);
+            IntPtr src = NativeMethods.pixGetData(this.handle);
+            int wpl = NativeMethods.pixGetWpl(this.handle);
 
-            Image dst = new Image(w, h, d, xres, yres);
+            Image image = new Image(w, h, d, xres, yres);
 
-            Pix.CopyBits(
-                dst.Height,
-                NativeMethods.pixGetData(this.handle),
-                NativeMethods.pixGetWpl(this.handle) * sizeof(uint),
-                dst.Bits,
-                dst.Stride8,
-                dst.BitsPerPixel);
+            unsafe
+            {
+                fixed (ulong* dst = image.Bits)
+                {
+                    Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), new IntPtr(dst), image.Stride8);
 
-            return dst;
+                    BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
+
+                    if (image.BitsPerPixel == 1)
+                    {
+                        BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0);
+                    }
+                }
+            }
+
+            return image;
         }
 
         /// <summary>
@@ -158,82 +220,44 @@ namespace Genix.Imaging.Leptonica
             this.handle?.Dispose();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, ulong[] src, int strideSrc, IntPtr dst, int strideDst, int bitsPerPixel)
-        {
-            unsafe
-            {
-                fixed (ulong* usrc = src)
-                {
-                    if (bitsPerPixel == 1)
-                    {
-                    }
-                    else
-                    {
-                        Arrays.CopyStrides(height, new IntPtr(usrc), strideSrc, dst, strideDst);
-                    }
-                }
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, int bitsPerPixel)
-        {
-            unsafe
-            {
-                fixed (ulong* udst = dst)
-                {
-                    if (bitsPerPixel == 1)
-                    {
-                    }
-                    else
-                    {
-                        Arrays.CopyStrides(height, src, strideSrc, new IntPtr(udst), strideDst);
-                    }
-                }
-            }
-        }
-
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Leptonica.Native.dll";
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
+            public static extern void lept_free(IntPtr ptr);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
             public static extern SafePixHandle pixCreate(int width, int height, int depth);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void pixDestroy(ref IntPtr ppix);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int pixSetResolution(SafePixHandle pix, int xres, int yres);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int pixGetResolution(SafePixHandle pix, out int xres, out int yres);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern IntPtr pixGetData(SafePixHandle pix);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int pixGetWpl(SafePixHandle pix);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int pixGetDimensions(SafePixHandle pix, out int w, out int h, out int d);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int pixOtsuAdaptiveThreshold(SafePixHandle pix, int sx, int sy, int smoothx, int smoothy, float scorefract, out SafePixHandle pixth, out SafePixHandle pixd);
 
             [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern SafePixHandle pixOtsuThreshOnBackgroundNorm(SafePixHandle pix, SafePixHandle pixim, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy, float scorefract, out int pthresh);
+
+            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int pixWriteMemBmp(out IntPtr fdata, out IntPtr fsize, SafePixHandle pix);
         }
 
         /// <summary>

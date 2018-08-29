@@ -285,10 +285,10 @@ namespace Genix.Imaging
             return dst;
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterGaussian_8bpp(
                 int width,
                 int height,
@@ -300,7 +300,6 @@ namespace Genix.Imaging
                 float sigma);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterGaussian_24bpp(
                 int width,
                 int height,
@@ -312,7 +311,6 @@ namespace Genix.Imaging
                 float sigma);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterLaplace_8bpp(
                 int width,
                 int height,
@@ -323,7 +321,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterLaplace_24bpp(
                 int width,
                 int height,
@@ -334,7 +331,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterLaplace_32bpp(
                 int width,
                 int height,
@@ -345,7 +341,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterHipass_8bpp(
                 int width,
                 int height,
@@ -356,7 +351,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterHipass_24bpp(
                 int width,
                 int height,
@@ -367,7 +361,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterHipass_32bpp(
                 int width,
                 int height,
@@ -378,7 +371,6 @@ namespace Genix.Imaging
                 int maskSize);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int filterLowpass_8bpp(
                 int width,
                 int height,

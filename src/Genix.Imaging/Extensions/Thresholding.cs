@@ -394,10 +394,10 @@ namespace Genix.Imaging
         public Image ThresholdLTGT(Rectangle area, byte thresholdLT, byte valueLT, byte thresholdGT, byte valueGT) =>
             this.ThresholdLTGT(area.X, area.Y, area.Width, area.Height, thresholdLT, valueLT, thresholdGT, valueGT);
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern long threshold_lt_8bpp(
                int x,
                int y,
@@ -411,7 +411,6 @@ namespace Genix.Imaging
                byte value);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern long threshold_gt_8bpp(
                int x,
                int y,
@@ -425,7 +424,6 @@ namespace Genix.Imaging
                byte value);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern long threshold_ltgt_8bpp(
                int x,
                int y,

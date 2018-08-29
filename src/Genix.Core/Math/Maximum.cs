@@ -501,20 +501,18 @@ namespace Genix.Core
             }
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void smin(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void smax(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sminmax_gradient(
                 int n,
                 [In] float[] x,
@@ -526,23 +524,18 @@ namespace Genix.Core
                 int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int i32argmin(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int i32argmax(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int sargmin(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int sargmax(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sargminmax(int n, [In] float[] x, int offx, out int winmin, out int winmax);
         }
     }

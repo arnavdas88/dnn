@@ -53,16 +53,15 @@ namespace Genix.MachineLearning.Kernels
             return 1.0f - (2.0f * sum);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.MachineLearning.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern float chisquare_f32(int n, [In] float[] x, int offx, [In] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern float sparse_chisquare_f32(int n, [In] int[] xidx, [In] float[] x, [In] float y, int offy);
         }
     }

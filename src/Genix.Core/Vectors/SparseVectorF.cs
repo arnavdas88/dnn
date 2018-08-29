@@ -204,20 +204,18 @@ namespace Genix.Core
             return dense;
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sparse_addproductc_f32(int n, [In] int[] xidx, [In] float[] x, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern float sparse_manhattan_distance_f32(int n, [In] int[] xidx, [In] float[] x, [In] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern float sparse_euclidean_distance_f32(int n, [In] int[] xidx, [In] float[] x, [In] float[] y, int offy);
         }
     }

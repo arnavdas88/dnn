@@ -814,12 +814,12 @@ namespace Genix.MachineLearning
                 new ParallelOptions());
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.DNN.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void LRNKernel(
                 [In] float[] x,
                 [In] float[] y,

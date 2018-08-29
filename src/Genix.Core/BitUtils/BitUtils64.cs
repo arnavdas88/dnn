@@ -489,104 +489,81 @@ namespace Genix.Core
             NativeMethods.bits_xor_64(count, x, posx, y, posy);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int byteswap_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bytesswap_ip_64(int n, [In, Out] ulong[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bytesswap_64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bit_scan_forward_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bit_scan_reverse_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_one_forward_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_one_reverse_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_zero_forward_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_zero_reverse_64(int count, ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reset_64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_set_64(int count, [In, Out] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_copy_64(int count, [In] ulong[] bitssrc, int possrc, [Out] ulong[] bitsdst, int posdst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern uint bits_popcount_64(ulong bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern ulong bits_count_64(int count, [In] ulong[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "bits_reverse_64")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_64_u64u8(int length, [In] ulong[] x, int offx, [Out] byte[] y, int offy64);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_ip_64(int length, [In, Out] ulong[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_not1_64(int length, [In, Out] ulong[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_not2_64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_mask_64(int length, [In] ulong mask, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_mask_inc_64(int length, [In] ulong mask, [Out] ulong[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_xor_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
         }
     }

@@ -157,20 +157,18 @@ namespace Genix.Core
             NativeMethods.matrix_transpose(matrixLayout == MatrixLayout.RowMajor, m, n, ab, offab);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern float dot_f32(int n, [In] float[] x, int offx, int incx, [In] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern double dot_f64(int n, [In] double[] x, int offx, int incx, [In] double[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void matrix_vv(
                 [MarshalAs(UnmanagedType.Bool)] bool rowmajor,
                 int m,
@@ -183,7 +181,6 @@ namespace Genix.Core
                 int offa);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void matrix_mv(
                 [MarshalAs(UnmanagedType.Bool)] bool rowmajor,
                 int m,
@@ -198,7 +195,6 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool cleary);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void matrix_mm(
                 [MarshalAs(UnmanagedType.Bool)] bool rowmajor,
                 int m,
@@ -215,7 +211,6 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool clearc);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void matrix_transpose(
                 [MarshalAs(UnmanagedType.Bool)] bool rowmajor,
                 int m,

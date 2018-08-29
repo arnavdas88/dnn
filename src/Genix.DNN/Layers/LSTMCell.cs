@@ -334,12 +334,12 @@ namespace Genix.DNN.Layers
         }
 
 #if !TENSORFLOW
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.DNN.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void lstm(
                 int steps,
                 int ylen,
@@ -352,7 +352,6 @@ namespace Genix.DNN.Layers
                 [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void lstm_gradient(
                 int steps,
                 int ylen,

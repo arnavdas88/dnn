@@ -111,32 +111,27 @@ namespace Genix.Core
             NativeMethods.threshold_ltgt_ip_f32(length, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_f32(int n, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void move_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void threshold_lt_ip_f32(int n, float threshold, float value, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void threshold_gt_ip_f32(int n, float threshold, float value, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void threshold_ltgt_ip_f32(int n, float thresholdLT, float valueLT, float thresholdGT, float valueGT, [In, Out] float[] y, int offy);
         }
     }

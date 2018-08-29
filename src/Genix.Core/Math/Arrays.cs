@@ -812,108 +812,84 @@ namespace Genix.Core
             NativeMethods.xor_u64(length, a, offa, b, offb, y, offy);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int fcompare(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int i32compare(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int ccompare(int n, [In] char[] x, int offx, [Out] char[] y, int offy);
 
             /*[DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "copy_s32")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "copy_s64")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void scopy_inc(int n, [In] float[] x, int offx, int incx, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void copy_strides_s8(int nstrides, IntPtr x, int stridex, IntPtr y, int stridey);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_s32(int n, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "set_s32")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_u32(int n, uint a, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_s64(int n, long a, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "set_s64")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_u64(int n, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void set_f64(int n, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sset_inc(int n, float a, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sreplace(int n, [In] float[] x, int offx, float oldValue, float newValue, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void pack(int n, [In] float[] a, int offa, int inca, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void unpack(int n, [In] float[] a, int offa, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void i32swap(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "i32swap")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void u32swap(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void i64swap(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
 
             [DllImport(NativeMethods.DllName, EntryPoint = "i64swap")]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void u64swap(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void _sswap(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void fqsort(
                 int n,
                 [In, Out] float[] x,
@@ -921,7 +897,6 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void fqsortv(
                 int n,
                 [In, Out] float[] x,
@@ -931,67 +906,51 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void and_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void and_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or3_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or4_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void xor_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void xor_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void and_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void and_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or3_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void or4_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void xor_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void xor_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
         }
     }

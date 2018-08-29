@@ -718,10 +718,10 @@ namespace Genix.MachineLearning.LanguageModel
         /// <summary>
         /// C# Interop interface to msvcrt.dll.
         /// </summary>
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             [DllImport("msvcrt.dll", EntryPoint = "memcmp", CallingConvention = CallingConvention.Cdecl)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int MemCmp(Node[] b1, Node[] b2, int count);
         }
 

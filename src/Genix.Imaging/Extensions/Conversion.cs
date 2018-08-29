@@ -838,10 +838,10 @@ namespace Genix.Imaging
             return dst;
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert1to8(
                int width,
                int height,
@@ -853,7 +853,6 @@ namespace Genix.Imaging
                byte value1);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert2to8(
               int width,
               int height,
@@ -867,7 +866,6 @@ namespace Genix.Imaging
               byte value3);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert4to8(
               int width,
               int height,
@@ -877,7 +875,6 @@ namespace Genix.Imaging
               int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to1(
                 int x,
                 int y,
@@ -890,7 +887,6 @@ namespace Genix.Imaging
                 byte threshold);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to24(
                 int x,
                 int y,
@@ -902,7 +898,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to32(
                 int x,
                 int y,
@@ -915,7 +910,6 @@ namespace Genix.Imaging
                 byte alpha);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert8to32f(
                 int x,
                 int y,
@@ -927,7 +921,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert24to8(
                 int x,
                 int y,
@@ -939,7 +932,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert24to32(
                 int x,
                 int y,
@@ -951,7 +943,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert32to8(
                 int x,
                 int y,
@@ -963,7 +954,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int _convert32to24(
                 int x,
                 int y,
@@ -975,7 +965,6 @@ namespace Genix.Imaging
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int otsu(
                 int width,
                 int height,

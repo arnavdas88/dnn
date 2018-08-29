@@ -489,10 +489,10 @@ namespace Genix.Imaging
         public void MinMax(Rectangle area, out byte min, out byte max) =>
             this.MinMax(area.X, area.Y, area.Width, area.Height, out min, out max);
 
+        [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern long power_1bpp(
                int x,
                int y,
@@ -502,7 +502,6 @@ namespace Genix.Imaging
                int stride);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern long power_8bpp(
                 int x,
                 int y,
@@ -512,7 +511,6 @@ namespace Genix.Imaging
                 int stride);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void grayhist_8bpp(
                 int x,
                 int y,
@@ -523,7 +521,6 @@ namespace Genix.Imaging
                 [Out] int[] hist);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void vhist_1bpp(
                 int x,
                 int y,
@@ -534,7 +531,6 @@ namespace Genix.Imaging
                 [Out] int[] hist);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void vhist_8bpp(
                 int x,
                 int y,
@@ -545,7 +541,6 @@ namespace Genix.Imaging
                 [Out] int[] hist);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void minmax_8bpp(
                 int x,
                 int y,

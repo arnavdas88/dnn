@@ -351,6 +351,17 @@ namespace Genix.Core
         /// Reverses the order of bytes in an array of 32-bit integers.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
+        /// <param name="xy">The pointer to source and destination arrays.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BiteSwap(int length, IntPtr xy)
+        {
+            NativeMethods.bytesswap_ip_32(length, xy, 0);
+        }
+
+        /// <summary>
+        /// Reverses the order of bytes in an array of 32-bit integers.
+        /// </summary>
+        /// <param name="length">The number of integers to swap.</param>
         /// <param name="x">The integers to reverse byte order.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
         /// <param name="y">The integers that receive swapped bytes.</param>
@@ -371,6 +382,17 @@ namespace Genix.Core
         public static void BitSwap(int length, uint[] xy, int offxy)
         {
             NativeMethods.bits_reverse_ip_32(length, xy, offxy);
+        }
+
+        /// <summary>
+        /// Reverses the order of bits in each byte an array of 32-bit integers in-place.
+        /// </summary>
+        /// <param name="length">The number of integers to swap.</param>
+        /// <param name="xy">The pointer to source and destination arrays.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BitSwap(int length, IntPtr xy)
+        {
+            NativeMethods.bits_reverse_ip_32(length, xy, 0);
         }
 
         /// <summary>
@@ -475,100 +497,84 @@ namespace Genix.Core
             NativeMethods.bits_xor_32(count, x, posx, y, posy);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int byteswap_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bytesswap_ip_32(int n, [In, Out] uint[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
+            public static extern void bytesswap_ip_32(int n, IntPtr xy, int offxy);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void bytesswap_32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bit_scan_forward_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bit_scan_reverse_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_one_forward_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_one_reverse_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_zero_forward_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int bits_scan_zero_reverse_32(int count, uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reset_32(int count, [In, Out] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_set_32(int count, [In, Out] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_copy_32(int count, [In] uint[] bitssrc, int possrc, [Out] uint[] bitsdst, int posdst);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern uint bits_popcount_32(uint bits);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern uint bits_count_32(int count, [In] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_reverse_ip_32(int length, [In, Out] uint[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
+            public static extern void bits_reverse_ip_32(int length, IntPtr xy, int offxy);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void bits_not1_32(int length, [In, Out] uint[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_not2_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_or_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_mask_32(int length, [In] uint mask, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_mask_inc_32(int length, [In] uint mask, [Out] uint[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_and_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void bits_xor_32(int count, [In] uint[] x, int posx, [Out] uint[] y, int posy);
         }
     }

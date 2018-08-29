@@ -127,13 +127,13 @@
     <ClCompile Include="..\..\..\leptonica\src\binreduce.c" />
     <ClCompile Include="..\..\..\leptonica\src\blend.c" />
     <ClCompile Include="..\..\..\leptonica\src\bmf.c" />
-    <ClCompile Include="..\..\..\leptonica\src\bmpio.c">
+    <ClCompile Include="..\..\..\leptonica\src\bmpio.c" />
+    <ClCompile Include="..\..\..\leptonica\src\bmpiostub.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\leptonica\src\bmpiostub.c" />
     <ClCompile Include="..\..\..\leptonica\src\bootnumgen1.c" />
     <ClCompile Include="..\..\..\leptonica\src\bootnumgen2.c" />
     <ClCompile Include="..\..\..\leptonica\src\bootnumgen3.c" />
@@ -257,12 +257,7 @@
     <ClCompile Include="..\..\..\leptonica\src\pixconv.c" />
     <ClCompile Include="..\..\..\leptonica\src\pixlabel.c" />
     <ClCompile Include="..\..\..\leptonica\src\pixtiling.c" />
-    <ClCompile Include="..\..\..\leptonica\src\pngio.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\leptonica\src\pngio.c" />
     <ClCompile Include="..\..\..\leptonica\src\pngiostub.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

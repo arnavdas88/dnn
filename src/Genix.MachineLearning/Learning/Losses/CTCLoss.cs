@@ -189,20 +189,18 @@ namespace Genix.MachineLearning.Learning
             }
         }*/
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.DNN.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void CTCComputeAlphas(int T, int A, int S, [In] float[] py, [In] int[] labels, [Out] float[] pa);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void CTCComputeBetas(int T, int A, int S, [In] float[] py, [In] int[] labels, [Out] float[] pb);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void CTCReduceAlphasBetas(int T, int A, int S, [In] float[] pab, [In] int[] labels, [Out] float[] pdy);
         }
     }

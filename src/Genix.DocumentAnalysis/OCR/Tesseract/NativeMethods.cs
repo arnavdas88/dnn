@@ -13,25 +13,22 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
     using System.Text;
     using Genix.Win32;
 
+    [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods
     {
         private const string DllName = "Genix.Tesseract.Native.dll";
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessDeleteText(IntPtr text);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern TesseractHandle TessBaseAPICreate();
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPIDelete(IntPtr handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern int TessBaseAPIInit2(
             TesseractHandle handle,
             [MarshalAs(UnmanagedType.LPStr)] string datapath,
@@ -39,61 +36,48 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             OcrEngineMode oem);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern int TessBaseAPIInit3(
             TesseractHandle handle,
             [MarshalAs(UnmanagedType.LPStr)] string datapath,
             [MarshalAs(UnmanagedType.LPStr)] string language);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPIClear(TesseractHandle handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPIClearAdaptiveClassifier(TesseractHandle handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPIClearPersistentCache(TesseractHandle handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPISetImage2(TesseractHandle handle, SafeHandle pix);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessBaseAPISetPageSegMode(TesseractHandle handle, PageSegmentationMode mode);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern PageIterator TessBaseAPIAnalyseLayout(TesseractHandle handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern int TessBaseAPIRecognize(TesseractHandle handle, IntPtr monitor);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessPageIteratorDelete(IntPtr handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessPageIteratorBegin(PageIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessPageIteratorNext(PageIterator handle, PageIteratorLevel level);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessPageIteratorIsAtBeginningOf(PageIterator handle, PageIteratorLevel level);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessPageIteratorIsAtFinalElement(
             PageIterator handle,
@@ -101,7 +85,6 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             PageIteratorLevel element);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern void TessPageIteratorOrientation(
             PageIterator handle,
             out Orientation orientation,
@@ -110,7 +93,6 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             out float deskewAngle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern PolyBlockType TessPageIteratorBlockType(PageIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -123,29 +105,23 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             out int bottom);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern ResultIterator TessBaseAPIGetIterator(TesseractHandle handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorNext(ResultIterator handle, PageIteratorLevel level);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern IntPtr TessResultIteratorGetUTF8Text(ResultIterator handle, PageIteratorLevel level);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         public static extern float TessResultIteratorConfidence(ResultIterator handle, PageIteratorLevel level);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string TessResultIteratorWordRecognitionLanguage(ResultIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string TessResultIteratorWordFontAttributes(
             ResultIterator handle,
@@ -159,27 +135,22 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             out int fontId);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorWordIsFromDictionary(ResultIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorWordIsNumeric(ResultIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorSymbolIsSuperscript(ResultIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorSymbolIsSubscript(ResultIterator handle);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-        [SuppressUnmanagedCodeSecurity]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TessResultIteratorSymbolIsDropcap(ResultIterator handle);
 

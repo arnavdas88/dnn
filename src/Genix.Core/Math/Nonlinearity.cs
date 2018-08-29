@@ -177,12 +177,12 @@ namespace Genix.Core
             NativeMethods.tanh_gradient2_ip(length, dxy, offdxy, y, offy);
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void relu(
                 int n,
                 [In] float[] x,
@@ -191,7 +191,6 @@ namespace Genix.Core
                 int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void relu_gradient2(
                 int n,
                 [Out] float[] dx,
@@ -203,7 +202,6 @@ namespace Genix.Core
                 int offdy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sigmoid(
                 int n,
                 [In] float[] x,
@@ -212,7 +210,6 @@ namespace Genix.Core
                 int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void sigmoid_gradient2(
                 int n,
                 [Out] float[] dx,
@@ -224,7 +221,6 @@ namespace Genix.Core
                 int offdy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void _tanh(
                 int n,
                 [In] float[] x,
@@ -233,7 +229,6 @@ namespace Genix.Core
                 int offy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void tanh_gradient2(
                 int n,
                 [Out] float[] dx,
@@ -245,7 +240,6 @@ namespace Genix.Core
                 int offdy);
 
             [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern void tanh_gradient2_ip(
                 int n,
                 [In, Out] float[] dxy,
