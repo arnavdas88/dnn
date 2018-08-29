@@ -531,7 +531,4 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\packages\libpng.1.6.28.1\build\native\lib\x64\v140\dynamic\Release\libpng16.lib" />
-  </ItemGroup>
 </Project>

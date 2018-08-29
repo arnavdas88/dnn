@@ -61,22 +61,13 @@ extern "C" __declspec(dllexport) void WINAPI scopy_inc(
 
 GENIXAPI(void, copy_strides_s8)(int nstrides, const __int8* x, int stridex, __int8* y, int stridey)
 {
-	if (stridex < 0)
-	{
-		stridex = -stridex;
-		x += (nstrides - 1) * stridex;
-		for (int i = 0, count = __min(stridex, stridey); i < nstrides; i++, y += stridey, x -= stridex)
-		{
-			memcpy(y, x, count);
-		}
-	}
-	else if (stridex == stridey)
+	if (stridex >= 0 && stridey >= 0 && stridex == stridey)
 	{
 		::memcpy(y, x, (size_t)stridey * nstrides);
 	}
 	else
 	{
-		for (int i = 0, count = __min(stridex, stridey); i < nstrides; i++, x += stridex, y += stridey)
+		for (int i = 0, count = __min(abs(stridex), abs(stridey)); i < nstrides; i++, x += stridex, y += stridey)
 		{
 			::memcpy(y, x, count);
 		}

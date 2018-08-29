@@ -11,6 +11,7 @@ namespace Genix.Imaging
     using System.Drawing;
     using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using System.Security;
     using System.Security.Permissions;
     using System.Windows;
@@ -42,7 +43,7 @@ namespace Genix.Imaging
                 this.height = height;
 
                 // get handle to device context.
-                this.hdc = NativeMethods.CreateCompatibleDC(IntPtr.Zero);
+                this.hdc = NativeMethods.CreateCompatibleDC(new SafeHdcHandle());
                 if (this.hdc.IsInvalid)
                 {
                     throw new InvalidOperationException(Properties.Resources.E_InvalidCanvasOperation);
@@ -186,21 +187,31 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts this canvas to <see cref="Imaging.Image"/>.
+        /// Converts this canvas to <see cref="Bitmap"/>.
+        /// </summary>
+        /// <returns>The <see cref="Imaging.Image"/> this method creates.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", Justification = "Need to comply with .NET interface requirements.")]
+        public Bitmap ToBitmap()
+        {
+            IntPtr hbitmap = this.bitmap.DangerousGetHandle();
+            return this.bitmap != null ? System.Drawing.Image.FromHbitmap(hbitmap) : null;
+        }
+
+        /// <summary>
+        /// Converts this canvas to <see cref="Image"/>.
         /// </summary>
         /// <param name="rect">The area to crop from the bitmap.</param>
         /// <returns>The <see cref="Imaging.Image"/> this method creates.</returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", Justification = "Need to comply with .NET interface requirements.")]
-        public Genix.Imaging.Image ToImage(Rectangle rect)
+        public Image ToImage(Rectangle rect)
         {
-            if (this.bitmap == null)
+            using (Bitmap bmp = this.ToBitmap())
             {
-                return null;
-            }
+                if (bmp == null)
+                {
+                    return null;
+                }
 
-            using (Bitmap bitmap = System.Drawing.Image.FromHbitmap(this.bitmap.DangerousGetHandle()))
-            {
-                return rect.IsEmpty ? BitmapExtensions.FromBitmap(bitmap) : BitmapExtensions.FromBitmap(bitmap, rect);
+                return rect.IsEmpty ? BitmapExtensions.FromBitmap(bmp) : BitmapExtensions.FromBitmap(bmp, rect);
             }
         }
 
@@ -234,6 +245,7 @@ namespace Genix.Imaging
             }
         }
 
+        [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
             // Mapping Modes
@@ -278,51 +290,48 @@ namespace Genix.Imaging
             public const int ETO_PDY = 0x2000;
 
             [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern SafeHdcHandle CreateCompatibleDC(IntPtr hdc);
+            public static extern SafeHdcHandle CreateCompatibleDC(SafeHdcHandle hdc);
 
             [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
-            [SuppressUnmanagedCodeSecurity]
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool DeleteDC(IntPtr hdc);
 
+            [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
+            [ResourceExposure(ResourceScope.None)]
+            public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+            [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
+            [ResourceExposure(ResourceScope.Machine)]
+            public static extern IntPtr GetDC(IntPtr hWnd);
+
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern SafeGdiObjectHandle CreateCompatibleBitmap(SafeHdcHandle hdc, int width, int height);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern IntPtr SelectObject(SafeHdcHandle hdc, SafeHandle objectHandle);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool DeleteObject(IntPtr objectHandle);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int SetMapMode(SafeHdcHandle hdc, int mode);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int SetTextColor(SafeHdcHandle hdc, int color);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int SetBkColor(SafeHdcHandle hdc, int color);
 
             [DllImport("gdi32.dll", ExactSpelling = true)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int SetBkMode(SafeHdcHandle hdc, int mode);
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            [SuppressUnmanagedCodeSecurity]
             public static extern int DrawText(SafeHdcHandle hdc, string s, int count, ref Rect rect, int format);
 
             [DllImport("gdi32.dll", CharSet = CharSet.Unicode)]
-            [SuppressUnmanagedCodeSecurity]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool ExtTextOut(SafeHdcHandle hdc, int x, int y, int options, ref Rect rect, string s, int count, int[] dx);
 
