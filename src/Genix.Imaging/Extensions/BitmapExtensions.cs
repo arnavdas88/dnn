@@ -20,6 +20,7 @@ namespace Genix.Imaging
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Genix.Core;
+    using Genix.Win32;
 
     /// <summary>
     /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="Bitmap"/> class.
@@ -74,14 +75,23 @@ namespace Genix.Imaging
                 ImageLockMode.ReadOnly,
                 bitmap.PixelFormat);
 
-            BitmapExtensions.CopyBits(
-                image.Height,
-                srcData.Scan0,
-                Math.Abs(srcData.Stride),
-                image.Bits,
-                image.Stride8,
-                srcData.Stride < 0,
-                image.BitsPerPixel == 1);
+            unsafe
+            {
+                fixed (ulong* dst = image.Bits)
+                {
+                    Arrays.CopyStrides(
+                        image.Height,
+                        srcData.Scan0,
+                        srcData.Stride,
+                        new IntPtr(dst),
+                        image.Stride8);
+                }
+            }
+
+            if (image.BitsPerPixel == 1)
+            {
+                BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0);
+            }
 
             bitmap.UnlockBits(srcData);
 
@@ -655,41 +665,6 @@ namespace Genix.Imaging
                 for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
                 {
                     NativeMethods.copy_m2m(strideSrc, src, offsrc, dst, offdst);
-                }
-            }
-
-            if (swapBits)
-            {
-                BitUtils64.BitSwap(dst.Length, dst, 0);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyBits(int height, IntPtr src, int strideSrc, ulong[] dst, int strideDst, bool isUpsideDown, bool swapBits)
-        {
-            unsafe
-            {
-                uint* usrc = (uint*)src;
-
-                if (isUpsideDown)
-                {
-                    int offsrc = (height - 1) * strideSrc;
-                    int offdst = (height - 1) * strideDst;
-                    for (int i = 0; i < height; i++, offsrc -= strideSrc, offdst -= strideDst)
-                    {
-                        NativeMethods.copy_u2m(strideSrc, usrc, offsrc, dst, offdst);
-                    }
-                }
-                else if (strideDst == strideSrc)
-                {
-                    NativeMethods.copy_u2m(height * strideSrc, usrc, 0, dst, 0);
-                }
-                else
-                {
-                    for (int i = 0, offsrc = 0, offdst = 0; i < height; i++, offsrc += strideSrc, offdst += strideDst)
-                    {
-                        NativeMethods.copy_u2m(strideSrc, usrc, offsrc, dst, offdst);
-                    }
                 }
             }
 

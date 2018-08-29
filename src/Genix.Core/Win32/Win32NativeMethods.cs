@@ -35,6 +35,17 @@ namespace Genix.Win32
         [ResourceExposure(ResourceScope.None)]
         public static extern int lstrlenA(IntPtr ptr);
 
+        /// <summary>
+        /// Copies bytes between buffers.
+        /// </summary>
+        /// <param name="dst">New buffer.</param>
+        /// <param name="src">Buffer to copy from.</param>
+        /// <param name="size">Number of characters to copy.</param>
+        [SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible", Justification = "Provides access to public Win32 API.")]
+        [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [ResourceExposure(ResourceScope.None)]
+        public static extern void memcpy(IntPtr dst, IntPtr src, IntPtr size);
+
 #pragma warning restore SA1300 // Element should begin with upper-case letter
     }
 }

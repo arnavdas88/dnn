@@ -2,6 +2,8 @@
 namespace Genix.DocumentAnalysis.OCR.Test
 {
     using System;
+    using System.Drawing;
+    using System.Windows;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Genix.DocumentAnalysis.OCR.Tesseract;
     using Genix.Imaging;
@@ -12,11 +14,19 @@ namespace Genix.DocumentAnalysis.OCR.Test
         [TestMethod]
         public void TestMethod1()
         {
-            using (Tesseract tess = Tesseract.Create(null))
+            using (Canvas canvas = new Canvas(1000, 50))
             {
-                foreach ((Image image, int? frameIndex, _) in Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+                ////using (Tesseract tess = Tesseract.Create(null))
                 {
-                    tess.SetImage(image.Convert1To8());
+                    canvas.DrawText("TEST", new Rectangle(0, 0, 100, 50), HorizontalAlignment.Left);
+
+                    Imaging.Image image = canvas.ToImage(Rectangle.Empty);
+                    ////tess.SetImage(image.Convert1To8());
+
+                    /*foreach ((Image image, int? frameIndex, _) in Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+                    {
+                        tess.SetImage(image.Convert1To8());
+                    }*/
                 }
             }
         }
