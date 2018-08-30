@@ -7,7 +7,7 @@
 namespace Genix.Imaging
 {
     using System.Collections.Generic;
-    using System.Drawing;
+    using Genix.Drawing;
 
     /// <summary>
     /// Represents a structuring element of the specified size and shape for morphological operations.

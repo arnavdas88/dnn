@@ -6,8 +6,8 @@
 
 namespace Genix.DocumentAnalysis
 {
-    using System.Drawing;
-    using System.Globalization;
+    using Genix.Drawing;
+    using Genix.Imaging;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -21,7 +21,7 @@ namespace Genix.DocumentAnalysis
         /// </summary>
         /// <param name="bounds">The shape position.</param>
         /// <param name="image">The image of the picture.</param>
-        protected PictureShape(Rectangle bounds, Genix.Imaging.Image image)
+        protected PictureShape(Rectangle bounds, Image image)
             : base(bounds)
         {
             this.Image = image;
@@ -31,9 +31,9 @@ namespace Genix.DocumentAnalysis
         /// Gets the image of the picture.
         /// </summary>
         /// <value>
-        /// The <see cref="Genix.Imaging.Image"/> object.
+        /// The <see cref="Image"/> object.
         /// </value>
-        public Genix.Imaging.Image Image { get; private set; }
+        public Image Image { get; private set; }
 
         /// <inheritdoc />
         public override string Text => null;

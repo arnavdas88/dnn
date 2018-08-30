@@ -4,10 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.Core
+namespace Genix.Drawing
 {
-    using System.Drawing;
-
     /// <summary>
     /// Represents an object that has bounds.
     /// </summary>
@@ -17,7 +15,7 @@ namespace Genix.Core
         /// Gets the bounds of this object.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds of this object.
+        /// A <see cref="Rectangle"/> structure that contains the bounds of this object.
         /// </value>
         Rectangle Bounds { get; }
     }

@@ -9,6 +9,7 @@ namespace Genix.Imaging
     using System;
     using System.Runtime.CompilerServices;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <content>
     /// Provides copy extension methods for the <see cref="Image"/> class.
@@ -70,7 +71,7 @@ namespace Genix.Imaging
         /// <param name="source">The <see cref="Image"/> to copy from.</param>
         /// <param name="origin">The coordinates, in pixels, of the upper-left corner of the source rectangle.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void CopyIP(System.Drawing.Rectangle area, Image source, System.Drawing.Point origin) =>
+        public void CopyIP(Rectangle area, Image source, Point origin) =>
             this.CopyIP(area.X, area.Y, area.Width, area.Height, source, origin.X, origin.Y);
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace Genix.Imaging
         /// <para><see cref="System.Drawing.Rectangle.Height"/> is less than or equal to zero.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Crop(System.Drawing.Rectangle area) => this.Crop(area.X, area.Y, area.Width, area.Height);
+        public Image Crop(Rectangle area) => this.Crop(area.X, area.Y, area.Width, area.Height);
 
         /// <summary>
         /// Crops the <see cref="Image"/> using rectangle calculated by <see cref="Image.BlackArea"/> method.
@@ -123,7 +124,7 @@ namespace Genix.Imaging
         public Image CropBlackArea(int dx, int dy)
         {
             // determine black area of the image
-            System.Drawing.Rectangle blackArea = this.BlackArea();
+            Rectangle blackArea = this.BlackArea();
 
             if (dx == 0 && dy == 0)
             {
@@ -132,13 +133,13 @@ namespace Genix.Imaging
             }
 
             // expand target area
-            System.Drawing.Rectangle bounds = System.Drawing.Rectangle.Inflate(blackArea, dx, dy);
+            Rectangle bounds = Rectangle.Inflate(blackArea, dx, dy);
 
             Image dst = new Image(bounds.Width, bounds.Height, this);
 
             if (!blackArea.IsEmpty)
             {
-                System.Drawing.Rectangle area = System.Drawing.Rectangle.Intersect(bounds, blackArea);
+                Rectangle area = Rectangle.Intersect(bounds, blackArea);
                 int dstx = area.X - bounds.X;
                 int dsty = area.Y - bounds.Y;
                 Image.CopyArea(this, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);

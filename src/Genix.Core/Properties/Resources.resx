@@ -120,6 +120,12 @@
   <data name="E_DataDirectoryNotFound" xml:space="preserve">
     <value>The directory '{0}' does not exist.</value>
   </data>
+  <data name="E_InvalidPointFormat" xml:space="preserve">
+    <value>The string representation of a Point structure is invalid.</value>
+  </data>
+  <data name="E_InvalidRectangleFormat" xml:space="preserve">
+    <value>The string representation of a Rectangle structure is invalid.</value>
+  </data>
   <data name="E_InvalidRectangleHeight" xml:space="preserve">
     <value>The rectangle height is negative.</value>
   </data>
@@ -128,5 +134,8 @@
   </data>
   <data name="E_SequenceIsEmpty" xml:space="preserve">
     <value>The sequence contains no elements.</value>
+  </data>
+  <data name="E_TypeConversionNotSupported" xml:space="preserve">
+    <value>Type converter '{0}' cannot convert to/from type '{1}'.</value>
   </data>
 </root>

@@ -7,10 +7,10 @@
 namespace Genix.DocumentAnalysis.OCR.Tesseract
 {
     using System;
-    using System.Drawing;
     using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
     using System.Security.Permissions;
+    using Genix.Drawing;
 
     /// <summary>
     /// Class to iterate over tesseract page structure,

@@ -9,7 +9,7 @@ namespace Genix.DocumentAnalysis
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Genix.Core;
+    using Genix.Drawing;
     using Genix.Imaging;
 
     /// <summary>
@@ -72,8 +72,8 @@ namespace Genix.DocumentAnalysis
                 {
                     int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
                     lines.Add(new LineShape(
-                        new System.Drawing.Point(component.Bounds.Left, y),
-                        new System.Drawing.Point(component.Bounds.Right, y),
+                        new Point(component.Bounds.Left, y),
+                        new Point(component.Bounds.Right, y),
                         Math.Max(1, component.Bounds.Height - (2 * DilationSize)),
                         LineTypes.Horizontal));
                 }

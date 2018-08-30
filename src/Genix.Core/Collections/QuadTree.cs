@@ -9,7 +9,7 @@ namespace Genix.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
+    using Genix.Drawing;
 
     /// <summary>
     /// This class efficiently stores and retrieves arbitrarily sized and positioned

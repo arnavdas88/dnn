@@ -8,11 +8,10 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
     using System.Globalization;
     using System.IO;
     using Genix.Core;
-    using Genix.Imaging;
+    using Genix.Drawing;
     using Genix.Imaging.Leptonica;
 
     /// <summary>

@@ -70,6 +70,24 @@ namespace Genix.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The string representation of a Point structure is invalid..
+        /// </summary>
+        public static string E_InvalidPointFormat {
+            get {
+                return ResourceManager.GetString("E_InvalidPointFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The string representation of a Rectangle structure is invalid..
+        /// </summary>
+        public static string E_InvalidRectangleFormat {
+            get {
+                return ResourceManager.GetString("E_InvalidRectangleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The rectangle height is negative..
         /// </summary>
         public static string E_InvalidRectangleHeight {
@@ -93,6 +111,15 @@ namespace Genix.Core.Properties {
         public static string E_SequenceIsEmpty {
             get {
                 return ResourceManager.GetString("E_SequenceIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type converter &apos;{0}&apos; cannot convert to/from type &apos;{1}&apos;..
+        /// </summary>
+        public static string E_TypeConversionNotSupported {
+            get {
+                return ResourceManager.GetString("E_TypeConversionNotSupported", resourceCulture);
             }
         }
     }

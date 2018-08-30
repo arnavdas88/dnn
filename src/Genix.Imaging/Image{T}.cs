@@ -7,10 +7,9 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
+    using Genix.Drawing;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
@@ -152,7 +151,7 @@ namespace Genix.Imaging
         /// <value>
         /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
-        public System.Drawing.Rectangle Bounds => new System.Drawing.Rectangle(0, 0, this.Width, this.Height);
+        public Rectangle Bounds => new Rectangle(0, 0, this.Width, this.Height);
 
         /// <summary>
         /// Gets the image data.

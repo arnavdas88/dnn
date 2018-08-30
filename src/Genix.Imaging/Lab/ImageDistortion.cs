@@ -8,8 +8,8 @@ namespace Genix.Imaging.Lab
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
     using Genix.Core;
+    using Genix.Drawing;
     using Genix.Imaging;
 
     /// <summary>
