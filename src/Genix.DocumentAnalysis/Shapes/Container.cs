@@ -36,7 +36,7 @@ namespace Genix.DocumentAnalysis
             }
 
             this.shapes.AddRange(shapes);
-            this.Bounds = shapes.Select(x => x.Bounds).Union();
+            this.Bounds = Rectangle.Union(shapes.Select(x => x.Bounds));
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace Genix.Imaging
 
         /// <summary>
         /// Copies a rectangular area specified by
-        /// by a <see cref="System.Drawing.Rectangle"/> struct from the specified <see cref="Image"/>
+        /// by a <see cref="Rectangle"/> struct from the specified <see cref="Image"/>
         /// to the current <see cref="Image"/> in-place.
         /// </summary>
         /// <param name="area">The coordinates, in pixels, of the destination rectangle.</param>
@@ -94,16 +94,16 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Crops the <see cref="Image"/> using rectangle specified by a <see cref="System.Drawing.Rectangle"/> struct.
+        /// Crops the <see cref="Image"/> using rectangle specified by a <see cref="Rectangle"/> struct.
         /// </summary>
         /// <param name="area">The width, height, and location of the area.</param>
         /// <returns>
         /// A new cropped <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// <para><see cref="System.Drawing.Rectangle.Width"/> is less than or equal to zero.</para>
+        /// <para><see cref="Rectangle.Width"/> is less than or equal to zero.</para>
         /// <para>-or-</para>
-        /// <para><see cref="System.Drawing.Rectangle.Height"/> is less than or equal to zero.</para>
+        /// <para><see cref="Rectangle.Height"/> is less than or equal to zero.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image Crop(Rectangle area) => this.Crop(area.X, area.Y, area.Width, area.Height);

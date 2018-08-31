@@ -557,7 +557,7 @@ namespace Genix.Imaging
             }
 
             // calculate area to crop
-            Rectangle bounds = RectangleExtensions.Union(components.Select(x => x.Bounds));
+            Rectangle bounds = Rectangle.Union(components.Select(x => x.Bounds));
             if (bounds.IsEmpty)
             {
                 return new Image(1, 1, this);

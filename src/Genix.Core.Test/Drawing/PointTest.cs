@@ -218,6 +218,22 @@
         }
 
         [TestMethod, TestCategory("Point")]
+        public void DistanceToXTest()
+        {
+            Point point1 = new Point(10, 20);
+            Point point2 = new Point(5, 18);
+            Assert.AreEqual(5, point1.DistanceToX(point2));
+        }
+
+        [TestMethod, TestCategory("Point")]
+        public void DistanceToYTest()
+        {
+            Point point1 = new Point(10, 20);
+            Point point2 = new Point(5, 18);
+            Assert.AreEqual(2, point1.DistanceToY(point2));
+        }
+
+        [TestMethod, TestCategory("Point")]
         public void DistanceToSquaredTest()
         {
             Point point1 = new Point(10, 20);

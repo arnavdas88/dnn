@@ -227,7 +227,7 @@ namespace Genix.Imaging
         public Image Inflate(int left, int top, int right, int bottom)
         {
             // calculate and verify target area in source coordinates
-            System.Drawing.Rectangle bounds = System.Drawing.Rectangle.FromLTRB(
+            Rectangle bounds = Rectangle.FromLTRB(
                 -left,
                 -top,
                 this.Width + right,

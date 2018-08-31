@@ -9,6 +9,7 @@ namespace Genix.Imaging
     using System;
     using System.Runtime.CompilerServices;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <content>
     /// Provides editing extension methods for the <see cref="Image"/> class.
@@ -149,7 +150,7 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image SetWhite(System.Drawing.Rectangle rect) => this.SetWhite(rect.X, rect.Y, rect.Width, rect.Height);
+        public Image SetWhite(Rectangle rect) => this.SetWhite(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
         /// Sets all <see cref="Image"/> pixels to white color in-place.
@@ -217,7 +218,7 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetWhiteIP(System.Drawing.Rectangle rect) => this.SetWhiteIP(rect.X, rect.Y, rect.Width, rect.Height);
+        public void SetWhiteIP(Rectangle rect) => this.SetWhiteIP(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
         /// Sets all <see cref="Image"/> pixels outside the specified area to white color not-in-place.
@@ -370,7 +371,7 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image SetBlack(System.Drawing.Rectangle rect) => this.SetBlack(rect.X, rect.Y, rect.Width, rect.Height);
+        public Image SetBlack(Rectangle rect) => this.SetBlack(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
         /// Sets all <see cref="Image"/> pixels to black color in-place.
@@ -437,6 +438,6 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetBlackIP(System.Drawing.Rectangle rect) => this.SetBlackIP(rect.X, rect.Y, rect.Width, rect.Height);
+        public void SetBlackIP(Rectangle rect) => this.SetBlackIP(rect.X, rect.Y, rect.Width, rect.Height);
     }
 }

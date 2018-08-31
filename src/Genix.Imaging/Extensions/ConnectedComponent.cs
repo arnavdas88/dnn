@@ -68,7 +68,7 @@ namespace Genix.Imaging
         /// Gets the bounds, in pixels, of this <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="ConnectedComponent"/>.
+        /// A <see cref="Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="ConnectedComponent"/>.
         /// </value>
         public Rectangle Bounds => this.bounds;
 

@@ -1,6 +1,7 @@
 ﻿namespace Genix.Imaging.Test
 {
     using System;
+    using Genix.Drawing;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -62,14 +63,14 @@
         [TestMethod]
         public void SetWhiteTest2()
         {
-            System.Drawing.Rectangle[] areas = new System.Drawing.Rectangle[]
+            Rectangle[] areas = new Rectangle[]
             {
-                new System.Drawing.Rectangle(5, 12, (32 * 0) + 17, 20),
-                new System.Drawing.Rectangle(5, 12, (32 * 1) + 17, 20),
-                new System.Drawing.Rectangle(5, 12, (32 * 2) + 17, 20),
+                new Rectangle(5, 12, (32 * 0) + 17, 20),
+                new Rectangle(5, 12, (32 * 1) + 17, 20),
+                new Rectangle(5, 12, (32 * 2) + 17, 20),
             };
 
-            foreach (System.Drawing.Rectangle area in areas)
+            foreach (Rectangle area in areas)
             {
                 foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
                 {
@@ -117,14 +118,14 @@
         [TestMethod]
         public void SetBlackTest2()
         {
-            System.Drawing.Rectangle[] areas = new System.Drawing.Rectangle[]
+            Rectangle[] areas = new Rectangle[]
             {
-                new System.Drawing.Rectangle(5, 12, (32 * 0) + 17, 20),
-                new System.Drawing.Rectangle(5, 12, (32 * 1) + 17, 20),
-                new System.Drawing.Rectangle(5, 12, (32 * 2) + 17, 20),
+                new Rectangle(5, 12, (32 * 0) + 17, 20),
+                new Rectangle(5, 12, (32 * 1) + 17, 20),
+                new Rectangle(5, 12, (32 * 2) + 17, 20),
             };
 
-            foreach (System.Drawing.Rectangle area in areas)
+            foreach (Rectangle area in areas)
             {
                 foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
                 {

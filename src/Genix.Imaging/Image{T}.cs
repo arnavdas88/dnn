@@ -149,7 +149,7 @@ namespace Genix.Imaging
         /// Gets the bounds, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Drawing.Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image{T}"/>.
+        /// A <see cref="Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public Rectangle Bounds => new Rectangle(0, 0, this.Width, this.Height);
 

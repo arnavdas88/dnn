@@ -275,10 +275,31 @@ namespace Genix.Drawing
         /// <returns>
         /// A value that represents the Euclidean distance between this <see cref="Point"/> and <paramref name="point"/>.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float DistanceTo(Point point) => (float)Math.Sqrt(this.DistanceToSquared(point));
 
         /// <summary>
-        /// Computes the Euclidean distance between this <see cref="Point"/> and the specified <see cref="Point"/>.
+        /// Computes the distance between this <see cref="Point"/> and the specified <see cref="Point"/> along x-axis.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Point"/> and <paramref name="point"/> along x-axis.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int DistanceToX(Point point) => Math.Abs(this.x - point.x);
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Point"/> and the specified <see cref="Point"/> along y-axis.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Point"/> and <paramref name="point"/> along y-axis.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int DistanceToY(Point point) => Math.Abs(this.y - point.y);
+
+        /// <summary>
+        /// Computes the squared Euclidean distance between this <see cref="Point"/> and the specified <see cref="Point"/>.
         /// </summary>
         /// <param name="point">The <see cref="Point"/> to compute the distance to.</param>
         /// <returns>

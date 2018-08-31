@@ -7,6 +7,7 @@
 namespace Genix.Drawing
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
     using System.Runtime.CompilerServices;
@@ -241,8 +242,8 @@ namespace Genix.Drawing
         /// <param name="right">The x-coordinate of the lower-right corner of this <see cref="Rectangle"/> structure.</param>
         /// <param name="bottom">The y-coordinate of the lower-right corner of this <see cref="Rectangle"/> structure.</param>
         /// <returns>The new <see cref="Rectangle"/> that this method creates.</returns>
-        public static Rectangle FromLTRB(int left, int top, int right, int bottom) =>
-            new Rectangle(left, top, right - left, bottom - top);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle FromLTRB(int left, int top, int right, int bottom) => new Rectangle(left, top, right - left, bottom - top);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Rectangle"/> structure using the value represented by the specified string.
@@ -341,7 +342,8 @@ namespace Genix.Drawing
         /// <param name="rect2">The second rectangle to intersect.</param>
         /// <returns>
         /// The intersection of the two rectangles,
-        /// or <see cref="Rectangle.Empty"/> if no intersection exists.</returns>
+        /// or <see cref="Rectangle.Empty"/> if no intersection exists.
+        /// </returns>
         public static Rectangle Intersect(Rectangle rect1, Rectangle rect2)
         {
             int x1 = Math.Max(rect1.x, rect2.x);
@@ -349,12 +351,59 @@ namespace Genix.Drawing
             int y1 = Math.Max(rect1.y, rect2.y);
             int y2 = Math.Min(rect1.y + rect1.h, rect2.y + rect2.h);
 
-            if (x2 >= x1 && y2 >= y1)
-            {
+            return x2 >= x1 && y2 >= y1 ? Rectangle.FromLTRB(x1, y1, x2, y2) : Rectangle.Empty;
+        }
 
-                return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+        /// <summary>
+        /// Returns a <see cref="Rectangle"/> structure that contains the union of two other <see cref="Rectangle"/> structures.
+        /// </summary>
+        /// <param name="rect1">The first rectangle to union.</param>
+        /// <param name="rect2">The second rectangle to union.</param>
+        /// <returns>
+        /// The <see cref="Rectangle"/> structure that bounds the union of the two <see cref="Rectangle"/> structures.
+        /// </returns>
+        public static Rectangle Union(Rectangle rect1, Rectangle rect2)
+        {
+            if (rect1.IsEmpty)
+            {
+                return rect2;
             }
-            return Rectangle.Empty;
+
+            if (rect2.IsEmpty)
+            {
+                return rect1;
+            }
+
+            int x1 = Math.Min(rect1.x, rect2.x);
+            int x2 = Math.Max(rect1.x + rect1.w, rect2.x + rect2.w);
+            int y1 = Math.Min(rect1.y, rect2.y);
+            int y2 = Math.Max(rect1.y + rect1.h, rect2.y + rect2.h);
+
+            return Rectangle.FromLTRB(x1, y1, x2, y2);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Rectangle"/> structure that contains the union of the sequence of <see cref="Rectangle"/> structures.
+        /// </summary>
+        /// <param name="values">The rectangles to union.</param>
+        /// <returns>
+        /// A <see cref="Rectangle"/> structure that bounds the union of the sequence of <see cref="Rectangle"/> structures.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle Union(IEnumerable<Rectangle> values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+
+            Rectangle result = Rectangle.Empty;
+            foreach (Rectangle value in values)
+            {
+                result.Union(value);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -429,6 +478,57 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Determines if the specified point is contained within this <see cref="Rectangle"/> structure.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to test.</param>
+        /// <param name="y">The y-coordinate of the point to test.</param>
+        /// <returns>
+        /// <b>true</b> if the point defined by <paramref name="x"/> and <paramref name="y"/> is contained within this <see cref="Rectangle"/> structure; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Contains(int x, int y) => this.ContainsX(x) && this.ContainsY(y);
+
+        /// <summary>
+        /// Determines if the specified x-coordinate is contained within this <see cref="Rectangle"/> structure.
+        /// </summary>
+        /// <param name="x">The x-coordinate to check.</param>
+        /// <returns><b>true</b> if <paramref name="x"/> is contained within this <see cref="Rectangle"/> along its x-axis; otherwise, <b>false</b>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ContainsX(int x) => x.InRange(this.x, this.x + this.w);
+
+        /// <summary>
+        /// Determines if the specified y-coordinate is contained within this <see cref="Rectangle"/> structure.
+        /// </summary>
+        /// <param name="y">The y-coordinate to check.</param>
+        /// <returns><b>true</b> if <paramref name="y"/> is contained within this <see cref="Rectangle"/> along its y-axis; otherwise, <b>false</b>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ContainsY(int y) => y.InRange(this.y, this.y + this.h);
+
+        /// <summary>
+        /// Determines if the specified <see cref="Point"/> is contained within this <see cref="Rectangle"/> structure.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Point"/> represented by <paramref name="point"/> is contained within this <see cref="Rectangle"/> structure; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Contains(Point point) => this.Contains(point.X, point.Y);
+
+        /// <summary>
+        /// Determines if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle"/> structure.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle"/> structure; otherwise, <b>false</b>.
+        /// </returns>
+        public bool Contains(Rectangle rect)
+        {
+            return
+                this.x <= rect.x && rect.x + rect.w <= this.x + this.w &&
+                this.y <= rect.y && rect.y + rect.h <= this.y + this.h;
+        }
+
+        /// <summary>
         /// Expands or shrinks the rectangle by using the specified width and height amounts, in all directions.
         /// </summary>
         /// <param name="dx">The amount by which to expand or shrink the left and right sides of the rectangle.</param>
@@ -454,6 +554,34 @@ namespace Genix.Drawing
 
             this.y -= dy;
             this.h = Math.Max(this.h + (2 * dy), 0);
+        }
+
+        /// <summary>
+        /// Replaces this <see cref="Rectangle"/> with the intersection of itself and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle with which to intersect.</param>
+        public void Intersect(Rectangle rect)
+        {
+            Rectangle result = Rectangle.Intersect(rect, this);
+
+            this.x = result.x;
+            this.y = result.y;
+            this.w = result.w;
+            this.h = result.h;
+        }
+
+        /// <summary>
+        /// Replaces this <see cref="Rectangle"/> with the union of itself and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle with which to union.</param>
+        public void Union(Rectangle rect)
+        {
+            Rectangle result = Rectangle.Union(rect, this);
+
+            this.x = result.x;
+            this.y = result.y;
+            this.w = result.w;
+            this.h = result.h;
         }
 
         /// <summary>
@@ -512,6 +640,74 @@ namespace Genix.Drawing
         public bool IntersectsWithY(Rectangle rect) =>
             rect.y < this.y + this.h &&
             this.y < rect.y + rect.h;
+
+        /// <summary>
+        /// Computes the Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the Euclidean distance between this <see cref="Rectangle"/> and <paramref name="rect"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float DistanceTo(Rectangle rect) => (float)Math.Sqrt(this.DistanceToSquared(rect));
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/> along x-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="rect"/> along x-axis.
+        /// </returns>
+        public int DistanceToX(Rectangle rect)
+        {
+            int distance = this.x - (rect.x + rect.w);
+            if (distance < 0)
+            {
+                distance = rect.x - (this.x + this.w);
+                if (distance < 0)
+                {
+                    distance = 0;
+                }
+            }
+
+            return distance;
+        }
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/> along y-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="rect"/> along y-axis.
+        /// </returns>
+        public int DistanceToY(Rectangle rect)
+        {
+            int distance = this.y - (rect.y + rect.h);
+            if (distance < 0)
+            {
+                distance = rect.y - (this.y + this.h);
+                if (distance < 0)
+                {
+                    distance = 0;
+                }
+            }
+
+            return distance;
+        }
+
+        /// <summary>
+        /// Computes the squared Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the squared Euclidean distance between this <see cref="Rectangle"/> and <paramref name="rect"/>.
+        /// </returns>
+        public int DistanceToSquared(Rectangle rect)
+        {
+            int dx = this.DistanceToX(rect);
+            int dy = this.DistanceToY(rect);
+            return (dx * dx) + (dy * dy);
+        }
 
 #if false
         /// <summary>

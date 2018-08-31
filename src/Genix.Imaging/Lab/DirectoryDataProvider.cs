@@ -301,7 +301,7 @@ namespace Genix.Imaging.Lab
                         if (component.Power <= 24)
                         {
                             Rectangle position = component.Bounds;
-                            double distance = components.Where((x, j) => j != i).Min(x => position.Distance(x.Bounds));
+                            double distance = components.Where((x, j) => j != i).Min(x => position.DistanceTo(x.Bounds));
                             if (distance >= 3.0 * Math.Min(position.Width, position.Height))
                             {
                                 image.RemoveConnectedComponent(component);
