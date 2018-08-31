@@ -24,6 +24,7 @@ namespace Genix.MachineLearning.Imaging
     /// the <see cref="IntegralImage"/> is one pixel larger in each dimension compared to the <see cref="Image"/> it was created from.
     /// </para>
     /// </remarks>
+    [CLSCompliant(false)]
     public class IntegralImage : Image<uint>
     {
         /// <summary>

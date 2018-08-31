@@ -204,15 +204,12 @@ namespace Genix.Drawing
         public int Bottom => this.y + this.h;
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="Rectangle"/> has zero area.
+        /// Gets a value indicating whether all numeric properties of this <see cref="Rectangle"/> have value of zero.
         /// </summary>
         /// <value>
-        /// <b>true</b> if the <see cref="Rectangle"/> has the zero area; otherwise, <b>false</b>.
+        /// <b>true</b> if <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/> and <see cref="Height"/> properties are zero; otherwise, <b>false</b>.
         /// </value>
-        /// <remarks>
-        /// The <see cref="Rectangle"/> has zero area when either of its <see cref="Width"/> or <see cref="Height"/> properties are zero.
-        /// </remarks>
-        public bool IsEmpty => this.w <= 0 || this.h <= 0;
+        public bool IsEmpty => this.x == 0 && this.y == 0 && this.w == 0 && this.h == 0;
 
         /// <summary>
         /// Compares two <see cref="Rectangle"/> objects.
@@ -244,6 +241,74 @@ namespace Genix.Drawing
         /// <returns>The new <see cref="Rectangle"/> that this method creates.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rectangle FromLTRB(int left, int top, int right, int bottom) => new Rectangle(left, top, right - left, bottom - top);
+
+        /// <summary>
+        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified width and height amounts, in all directions.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="dx">The amount by which to expand or shrink the left and right sides of the rectangle.</param>
+        /// <param name="dy">The amount by which to expand or shrink the top and bottom sides of the rectangle.</param>
+        /// <returns>The resulting rectangle.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by twice the specified width offset,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased or decreased by twice the specified height.
+        /// </para>
+        /// <para>
+        /// If either <paramref name="dx"/> or <paramref name="dy"/> is negative, the <see cref="Rectangle"/> structure is deflated in the corresponding direction.
+        /// </para>
+        /// <para>
+        /// If the specified width or height shrink the rectangle by more than its current <see cref="Width"/> or <see cref="Height"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle.Empty"/> rectangle.</para>
+        /// </remarks>
+        public static Rectangle Inflate(Rectangle rect, int dx, int dy)
+        {
+            return new Rectangle(
+                rect.X - dx,
+                rect.Y - dy,
+                Math.Max(rect.w + (2 * dx), 0),
+                Math.Max(rect.h + (2 * dy), 0));
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Rectangle"/> structure that represents the intersection of two other <see cref="Rectangle"/> structures.
+        /// If there is no intersection, an empty <see cref="Rectangle"/> is returned.
+        /// </summary>
+        /// <param name="rect1">The first rectangle to intersect.</param>
+        /// <param name="rect2">The second rectangle to intersect.</param>
+        /// <returns>
+        /// The intersection of the two rectangles,
+        /// or <see cref="Rectangle.Empty"/> if no intersection exists.
+        /// </returns>
+        public static Rectangle Intersect(Rectangle rect1, Rectangle rect2)
+        {
+            int x1 = Math.Max(rect1.x, rect2.x);
+            int x2 = Math.Min(rect1.x + rect1.w, rect2.x + rect2.w);
+            int y1 = Math.Max(rect1.y, rect2.y);
+            int y2 = Math.Min(rect1.y + rect1.h, rect2.y + rect2.h);
+
+            return x2 >= x1 && y2 >= y1 ? Rectangle.FromLTRB(x1, y1, x2, y2) : Rectangle.Empty;
+        }
+
+        /// <summary>
+        /// Translates the specified <see cref="Rectangle"/> by the specified amount.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to translate.</param>
+        /// <param name="dx">The amount to offset the x-coordinate.</param>
+        /// <param name="dy">The amount to offset the y-coordinate.</param>
+        /// <returns>The translated <see cref="Rectangle"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle Offset(Rectangle rect, int dx, int dy) => new Rectangle(rect.x + dx, rect.y + dy, rect.w, rect.h);
+
+        /// <summary>
+        /// Translates the specified <see cref="Rectangle"/> by the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to translate.</param>
+        /// <param name="offset">The <see cref="Point"/> that contains the offset for the <paramref name="rect"/>.</param>
+        /// <returns>The translated <see cref="Rectangle"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle Offset(Rectangle rect, Point offset) => Rectangle.Offset(rect, offset.X, offset.Y);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Rectangle"/> structure using the value represented by the specified string.
@@ -306,55 +371,6 @@ namespace Genix.Drawing
 #endif
 
         /// <summary>
-        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified width and height amounts, in all directions.
-        /// </summary>
-        /// <param name="rect">The rectangle to shrink or expand.</param>
-        /// <param name="dx">The amount by which to expand or shrink the left and right sides of the rectangle.</param>
-        /// <param name="dy">The amount by which to expand or shrink the top and bottom sides of the rectangle.</param>
-        /// <returns>The resulting rectangle.</returns>
-        /// <remarks>
-        /// <para>
-        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by twice the specified width offset,
-        /// because it is applied to both the left and right sides of the rectangle.
-        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased or decreased by twice the specified height.
-        /// </para>
-        /// <para>
-        /// If either <paramref name="dx"/> or <paramref name="dy"/> is negative, the <see cref="Rectangle"/> structure is deflated in the corresponding direction.
-        /// </para>
-        /// <para>
-        /// If the specified width or height shrink the rectangle by more than its current <see cref="Width"/> or <see cref="Height"/>
-        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle.Empty"/> rectangle.</para>
-        /// </remarks>
-        public static Rectangle Inflate(Rectangle rect, int dx, int dy)
-        {
-            return new Rectangle(
-                rect.X - dx,
-                rect.Y - dy,
-                Math.Max(rect.w + (2 * dx), 0),
-                Math.Max(rect.h + (2 * dy), 0));
-        }
-
-        /// <summary>
-        /// Returns a <see cref="Rectangle"/> structure that represents the intersection of two other <see cref="Rectangle"/> structures.
-        /// If there is no intersection, an empty <see cref="Rectangle"/> is returned.
-        /// </summary>
-        /// <param name="rect1">The first rectangle to intersect.</param>
-        /// <param name="rect2">The second rectangle to intersect.</param>
-        /// <returns>
-        /// The intersection of the two rectangles,
-        /// or <see cref="Rectangle.Empty"/> if no intersection exists.
-        /// </returns>
-        public static Rectangle Intersect(Rectangle rect1, Rectangle rect2)
-        {
-            int x1 = Math.Max(rect1.x, rect2.x);
-            int x2 = Math.Min(rect1.x + rect1.w, rect2.x + rect2.w);
-            int y1 = Math.Max(rect1.y, rect2.y);
-            int y2 = Math.Min(rect1.y + rect1.h, rect2.y + rect2.h);
-
-            return x2 >= x1 && y2 >= y1 ? Rectangle.FromLTRB(x1, y1, x2, y2) : Rectangle.Empty;
-        }
-
-        /// <summary>
         /// Returns a <see cref="Rectangle"/> structure that contains the union of two other <see cref="Rectangle"/> structures.
         /// </summary>
         /// <param name="rect1">The first rectangle to union.</param>
@@ -383,6 +399,53 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Returns a <see cref="Rectangle"/> structure that contains the union of a <see cref="Rectangle"/> structure
+        /// and a rectangular area represented by its x-coordinate, y-coordinate, width, and height.
+        /// </summary>
+        /// <param name="rect">The first rectangle to union.</param>
+        /// <param name="x">The x-coordinate of the top-left corner of the second rectangle to union.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the second rectangle to union.</param>
+        /// <param name="width">The width of the second rectangle to union.</param>
+        /// <param name="height">The height of the second rectangle to union.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="width"/> is a negative value.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is a negative value.</para>
+        /// </exception>
+        /// <returns>
+        /// The <see cref="Rectangle"/> structure that bounds the union of the <see cref="Rectangle"/> structure and a rectangular area.
+        /// </returns>
+        public static Rectangle Union(Rectangle rect, int x, int y, int width, int height)
+        {
+            if (rect.IsEmpty)
+            {
+                return new Rectangle(x, y, width, height);
+            }
+
+            if (x == 0 && y == 0 && width == 0 && height == 0)
+            {
+                return rect;
+            }
+
+            if (width < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), Core.Properties.Resources.E_InvalidRectangleWidth);
+            }
+
+            if (height < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(height), Core.Properties.Resources.E_InvalidRectangleHeight);
+            }
+
+            int x1 = Math.Min(rect.x, x);
+            int x2 = Math.Max(rect.x + rect.w, x + width);
+            int y1 = Math.Min(rect.y, y);
+            int y2 = Math.Max(rect.y + rect.h, y + height);
+
+            return Rectangle.FromLTRB(x1, y1, x2, y2);
+        }
+
+        /// <summary>
         /// Returns a <see cref="Rectangle"/> structure that contains the union of the sequence of <see cref="Rectangle"/> structures.
         /// </summary>
         /// <param name="values">The rectangles to union.</param>
@@ -405,25 +468,6 @@ namespace Genix.Drawing
 
             return result;
         }
-
-        /// <summary>
-        /// Translates the specified <see cref="Rectangle"/> by the specified amount.
-        /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to translate.</param>
-        /// <param name="dx">The amount to offset the x-coordinate.</param>
-        /// <param name="dy">The amount to offset the y-coordinate.</param>
-        /// <returns>The translated <see cref="Rectangle"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rectangle Offset(Rectangle rect, int dx, int dy) => new Rectangle(rect.x + dx, rect.y + dy, rect.w, rect.h);
-
-        /// <summary>
-        /// Translates the specified <see cref="Rectangle"/> by the specified <see cref="Rectangle"/>.
-        /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to translate.</param>
-        /// <param name="offset">The <see cref="Point"/> that contains the offset for the <paramref name="rect"/>.</param>
-        /// <returns>The translated <see cref="Rectangle"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rectangle Offset(Rectangle rect, Point offset) => Rectangle.Offset(rect, offset.X, offset.Y);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -457,27 +501,6 @@ namespace Genix.Drawing
         public void Clear() => this.x = this.y = this.w = this.h = 0;
 
         /// <summary>
-        /// Set the rectangle x-coordinate, y-coordinate, width, and height to the specified values.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the top-left corner of the rectangle.</param>
-        /// <param name="y">The y-coordinate of the top-left corner of the rectangle.</param>
-        /// <param name="width">The width of the rectangle.</param>
-        /// <param name="height">The height of the rectangle.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para><paramref name="width"/> is a negative value.</para>
-        /// <para>-or-</para>
-        /// <para><paramref name="height"/> is a negative value.</para>
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(int x, int y, int width, int height)
-        {
-            this.x = x;
-            this.y = y;
-            this.w = width >= 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Core.Properties.Resources.E_InvalidRectangleWidth);
-            this.h = height >= 0 ? height : throw new ArgumentOutOfRangeException(nameof(height), Core.Properties.Resources.E_InvalidRectangleHeight);
-        }
-
-        /// <summary>
         /// Determines if the specified point is contained within this <see cref="Rectangle"/> structure.
         /// </summary>
         /// <param name="x">The x-coordinate of the point to test.</param>
@@ -487,22 +510,6 @@ namespace Genix.Drawing
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(int x, int y) => this.ContainsX(x) && this.ContainsY(y);
-
-        /// <summary>
-        /// Determines if the specified x-coordinate is contained within this <see cref="Rectangle"/> structure.
-        /// </summary>
-        /// <param name="x">The x-coordinate to check.</param>
-        /// <returns><b>true</b> if <paramref name="x"/> is contained within this <see cref="Rectangle"/> along its x-axis; otherwise, <b>false</b>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsX(int x) => x.InRange(this.x, this.x + this.w);
-
-        /// <summary>
-        /// Determines if the specified y-coordinate is contained within this <see cref="Rectangle"/> structure.
-        /// </summary>
-        /// <param name="y">The y-coordinate to check.</param>
-        /// <returns><b>true</b> if <paramref name="y"/> is contained within this <see cref="Rectangle"/> along its y-axis; otherwise, <b>false</b>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsY(int y) => y.InRange(this.y, this.y + this.h);
 
         /// <summary>
         /// Determines if the specified <see cref="Point"/> is contained within this <see cref="Rectangle"/> structure.
@@ -529,117 +536,20 @@ namespace Genix.Drawing
         }
 
         /// <summary>
-        /// Expands or shrinks the rectangle by using the specified width and height amounts, in all directions.
+        /// Determines if the specified x-coordinate is contained within this <see cref="Rectangle"/> structure.
         /// </summary>
-        /// <param name="dx">The amount by which to expand or shrink the left and right sides of the rectangle.</param>
-        /// <param name="dy">The amount by which to expand or shrink the top and bottom sides of the rectangle.</param>
-        /// <remarks>
-        /// <para>
-        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by twice the specified width offset,
-        /// because it is applied to both the left and right sides of the rectangle.
-        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased or decreased by twice the specified height.
-        /// </para>
-        /// <para>
-        /// If either <paramref name="dx"/> or <paramref name="dy"/> is negative, the <see cref="Rectangle"/> structure is deflated in the corresponding direction.
-        /// </para>
-        /// <para>
-        /// If the specified width or height shrink the rectangle by more than its current <see cref="Width"/> or <see cref="Height"/>
-        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle.Empty"/> rectangle.</para>
-        /// </remarks>
+        /// <param name="x">The x-coordinate to check.</param>
+        /// <returns><b>true</b> if <paramref name="x"/> is contained within this <see cref="Rectangle"/> along its x-axis; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Inflate(int dx, int dy)
-        {
-            this.x -= dx;
-            this.w = Math.Max(this.w + (2 * dx), 0);
-
-            this.y -= dy;
-            this.h = Math.Max(this.h + (2 * dy), 0);
-        }
+        public bool ContainsX(int x) => x.InRange(this.x, this.x + this.w);
 
         /// <summary>
-        /// Replaces this <see cref="Rectangle"/> with the intersection of itself and the specified <see cref="Rectangle"/>.
+        /// Determines if the specified y-coordinate is contained within this <see cref="Rectangle"/> structure.
         /// </summary>
-        /// <param name="rect">The rectangle with which to intersect.</param>
-        public void Intersect(Rectangle rect)
-        {
-            Rectangle result = Rectangle.Intersect(rect, this);
-
-            this.x = result.x;
-            this.y = result.y;
-            this.w = result.w;
-            this.h = result.h;
-        }
-
-        /// <summary>
-        /// Replaces this <see cref="Rectangle"/> with the union of itself and the specified <see cref="Rectangle"/>.
-        /// </summary>
-        /// <param name="rect">The rectangle with which to union.</param>
-        public void Union(Rectangle rect)
-        {
-            Rectangle result = Rectangle.Union(rect, this);
-
-            this.x = result.x;
-            this.y = result.y;
-            this.w = result.w;
-            this.h = result.h;
-        }
-
-        /// <summary>
-        /// Translates this <see cref="Rectangle"/> by the specified amount.
-        /// </summary>
-        /// <param name="dx">The amount to offset the x-coordinate.</param>
-        /// <param name="dy">The amount to offset the y-coordinate.</param>
+        /// <param name="y">The y-coordinate to check.</param>
+        /// <returns><b>true</b> if <paramref name="y"/> is contained within this <see cref="Rectangle"/> along its y-axis; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Offset(int dx, int dy)
-        {
-            this.x += dx;
-            this.y += dy;
-        }
-
-        /// <summary>
-        /// Translates this <see cref="Rectangle"/> by the specified <see cref="Rectangle"/>.
-        /// </summary>
-        /// <param name="point">The <see cref="Point"/> that contains the offset.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Offset(Point point) => this.Offset(point.X, point.Y);
-
-        /// <summary>
-        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/>.
-        /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
-        /// <returns>
-        /// <b>true</b> if two rectangles intersect, otherwise, <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IntersectsWith(Rectangle rect) =>
-            rect.x < this.x + this.w &&
-            this.x < rect.x + rect.w &&
-            rect.y < this.y + this.h &&
-            this.y < rect.y + rect.h;
-
-        /// <summary>
-        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/> along its x-axis.
-        /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
-        /// <returns>
-        /// <b>true</b> if two rectangles intersect along x-axis, otherwise, <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IntersectsWithX(Rectangle rect) =>
-            rect.x < this.x + this.w &&
-            this.x < rect.x + rect.w;
-
-        /// <summary>
-        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/> along its y-axis.
-        /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
-        /// <returns>
-        /// <b>true</b> if two rectangles intersect along y-axis, otherwise, <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IntersectsWithY(Rectangle rect) =>
-            rect.y < this.y + this.h &&
-            this.y < rect.y + rect.h;
+        public bool ContainsY(int y) => y.InRange(this.y, this.y + this.h);
 
         /// <summary>
         /// Computes the Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
@@ -650,6 +560,20 @@ namespace Genix.Drawing
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float DistanceTo(Rectangle rect) => (float)Math.Sqrt(this.DistanceToSquared(rect));
+
+        /// <summary>
+        /// Computes the squared Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the squared Euclidean distance between this <see cref="Rectangle"/> and <paramref name="rect"/>.
+        /// </returns>
+        public int DistanceToSquared(Rectangle rect)
+        {
+            int dx = this.DistanceToX(rect);
+            int dy = this.DistanceToY(rect);
+            return (dx * dx) + (dy * dy);
+        }
 
         /// <summary>
         /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/> along x-axis.
@@ -696,17 +620,160 @@ namespace Genix.Drawing
         }
 
         /// <summary>
-        /// Computes the squared Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
+        /// Expands or shrinks the rectangle by using the specified width and height amounts, in all directions.
         /// </summary>
-        /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
-        /// <returns>
-        /// A value that represents the squared Euclidean distance between this <see cref="Rectangle"/> and <paramref name="rect"/>.
-        /// </returns>
-        public int DistanceToSquared(Rectangle rect)
+        /// <param name="dx">The amount by which to expand or shrink the left and right sides of the rectangle.</param>
+        /// <param name="dy">The amount by which to expand or shrink the top and bottom sides of the rectangle.</param>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by twice the specified width offset,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased or decreased by twice the specified height.
+        /// </para>
+        /// <para>
+        /// If either <paramref name="dx"/> or <paramref name="dy"/> is negative, the <see cref="Rectangle"/> structure is deflated in the corresponding direction.
+        /// </para>
+        /// <para>
+        /// If the specified width or height shrink the rectangle by more than its current <see cref="Width"/> or <see cref="Height"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle.Empty"/> rectangle.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Inflate(int dx, int dy)
         {
-            int dx = this.DistanceToX(rect);
-            int dy = this.DistanceToY(rect);
-            return (dx * dx) + (dy * dy);
+            this.x -= dx;
+            this.w = Math.Max(this.w + (2 * dx), 0);
+
+            this.y -= dy;
+            this.h = Math.Max(this.h + (2 * dy), 0);
+        }
+
+        /// <summary>
+        /// Replaces this <see cref="Rectangle"/> with the intersection of itself and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle with which to intersect.</param>
+        public void Intersect(Rectangle rect)
+        {
+            Rectangle result = Rectangle.Intersect(rect, this);
+
+            this.x = result.x;
+            this.y = result.y;
+            this.w = result.w;
+            this.h = result.h;
+        }
+
+        /// <summary>
+        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if two rectangles intersect, otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IntersectsWith(Rectangle rect) =>
+            rect.x < this.x + this.w &&
+            this.x < rect.x + rect.w &&
+            rect.y < this.y + this.h &&
+            this.y < rect.y + rect.h;
+
+        /// <summary>
+        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/> along its x-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if two rectangles intersect along x-axis, otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IntersectsWithX(Rectangle rect) =>
+            rect.x < this.x + this.w &&
+            this.x < rect.x + rect.w;
+
+        /// <summary>
+        /// Determines if this rectangle <see cref="Rectangle"/> intersects with the specified <see cref="Rectangle"/> along its y-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if two rectangles intersect along y-axis, otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IntersectsWithY(Rectangle rect) =>
+            rect.y < this.y + this.h &&
+            this.y < rect.y + rect.h;
+
+        /// <summary>
+        /// Translates this <see cref="Rectangle"/> by the specified amount.
+        /// </summary>
+        /// <param name="dx">The amount to offset the x-coordinate.</param>
+        /// <param name="dy">The amount to offset the y-coordinate.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Offset(int dx, int dy)
+        {
+            this.x += dx;
+            this.y += dy;
+        }
+
+        /// <summary>
+        /// Translates this <see cref="Rectangle"/> by the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> that contains the offset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Offset(Point point) => this.Offset(point.X, point.Y);
+
+        /// <summary>
+        /// Set the rectangle x-coordinate, y-coordinate, width, and height to the specified values.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the rectangle.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the rectangle.</param>
+        /// <param name="width">The width of the rectangle.</param>
+        /// <param name="height">The height of the rectangle.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="width"/> is a negative value.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is a negative value.</para>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Set(int x, int y, int width, int height)
+        {
+            this.x = x;
+            this.y = y;
+            this.w = width >= 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Core.Properties.Resources.E_InvalidRectangleWidth);
+            this.h = height >= 0 ? height : throw new ArgumentOutOfRangeException(nameof(height), Core.Properties.Resources.E_InvalidRectangleHeight);
+        }
+
+        /// <summary>
+        /// Replaces this <see cref="Rectangle"/> with the union of itself and the specified <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rect">The rectangle with which to union.</param>
+        public void Union(Rectangle rect)
+        {
+            Rectangle result = Rectangle.Union(rect, this);
+
+            this.x = result.x;
+            this.y = result.y;
+            this.w = result.w;
+            this.h = result.h;
+        }
+
+        /// <summary>
+        /// Replaces this <see cref="Rectangle"/> with the union of itself and
+        /// a specified rectangular area represented by its x-coordinate, y-coordinate, width, and height.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the rectangular area with which to union.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the rectangular area with which to union.</param>
+        /// <param name="width">The width of the rectangular area with which to union.</param>
+        /// <param name="height">The height of the rectangular area with which to union.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="width"/> is a negative value.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is a negative value.</para>
+        /// </exception>
+        public void Union(int x, int y, int width, int height)
+        {
+            Rectangle result = Rectangle.Union(this, x, y, width, height);
+
+            this.x = result.x;
+            this.y = result.y;
+            this.w = result.w;
+            this.h = result.h;
         }
 
 #if false

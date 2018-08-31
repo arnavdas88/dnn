@@ -1,8 +1,8 @@
 ﻿namespace Genix.Imaging.Test
 {
     using System.Collections.Generic;
-    using System.Drawing;
     using System.Linq;
+    using Genix.Drawing;
     using Genix.Imaging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
