@@ -79,7 +79,7 @@ namespace Genix.Core
         public bool Equals(DenseVectorF other)
         {
             return this.Length == other.Length &&
-                (this.Length == 0 || Arrays.Equals(this.x.Length, this.x, 0, other.X, 0));
+                (this.Length == 0 || Array32f.Equals(this.x.Length, this.x, 0, other.X, 0));
         }
 
         /// <inheritdoc />

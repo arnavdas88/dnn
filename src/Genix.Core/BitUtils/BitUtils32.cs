@@ -156,7 +156,7 @@ namespace Genix.Core
         /// <returns>The changed bits.</returns>
         [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "64-count", Justification = "Do not validate for performance. Use assert instead.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong CopyBits(uint bits, int position, int count, uint source)
+        public static uint CopyBits(uint bits, int position, int count, uint source)
         {
             Debug.Assert(position + count <= 32, "The position+count must be less than or equal to 32.");
             uint mask = position + count == 32 ?
@@ -373,40 +373,43 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Reverses the order of bits in each byte an array of 32-bit integers in-place.
+        /// Reverses the order of groups of bits in each byte an array of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
+        /// <param name="bitCount">The number of bits in a group (1, 2, or 4).</param>
         /// <param name="xy">The integers to reverse bit order.</param>
         /// <param name="offxy">The index in the <paramref name="xy"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BitSwap(int length, uint[] xy, int offxy)
+        public static void BitSwap(int length, int bitCount, uint[] xy, int offxy)
         {
-            NativeMethods.bits_reverse_ip_32(length, xy, offxy);
+            NativeMethods.bits_reverse_ip_32(length, bitCount, xy, offxy);
         }
 
         /// <summary>
-        /// Reverses the order of bits in each byte an array of 32-bit integers in-place.
+        /// Reverses the order of groups of bits in each byte an array of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
+        /// <param name="bitCount">The number of bits in a group (1, 2, or 4).</param>
         /// <param name="xy">The pointer to source and destination arrays.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BitSwap(int length, IntPtr xy)
+        public static void BitSwap(int length, int bitCount, IntPtr xy)
         {
-            NativeMethods.bits_reverse_ip_32(length, xy, 0);
+            NativeMethods.bits_reverse_ip_32(length, bitCount, xy, 0);
         }
 
         /// <summary>
-        /// Reverses the order of bits in each byte an array of 32-bit integers not-in-place.
+        /// Reverses the order of groups of bits in each byte an array of 32-bit integers not-in-place.
         /// </summary>
         /// <param name="length">The number of integers to swap.</param>
+        /// <param name="bitCount">The number of bits in a group (1, 2, or 4).</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BitSwap(int length, uint[] x, int offx, uint[] y, int offy)
+        public static void BitSwap(int length, int bitCount, uint[] x, int offx, uint[] y, int offy)
         {
-            NativeMethods.bits_reverse_32(length, x, offx, y, offy);
+            NativeMethods.bits_reverse_32(length, bitCount, x, offx, y, offy);
         }
 
         /// <summary>
@@ -548,13 +551,13 @@ namespace Genix.Core
             public static extern uint bits_count_32(int count, [In] uint[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void bits_reverse_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            public static extern void bits_reverse_32(int length, int bitCount, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void bits_reverse_ip_32(int length, [In, Out] uint[] xy, int offxy);
+            public static extern void bits_reverse_ip_32(int length, int bitCount, [In, Out] uint[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void bits_reverse_ip_32(int length, IntPtr xy, int offxy);
+            public static extern void bits_reverse_ip_32(int length, int bitCount, IntPtr xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_not1_32(int length, [In, Out] uint[] xy, int offxy);

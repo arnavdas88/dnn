@@ -112,9 +112,9 @@ namespace Genix.Imaging
             // raster stride MAY be bigger than TIFF stride (due to padding in raster bits)
             for (int i = 0, offset = 0; i < image.Height; i++, offset += image.Stride)
             {
-                if (image.BitsPerPixel == 1)
+                if (image.BitsPerPixel < 8)
                 {
-                    BitUtils64.BitSwap(image.Stride, image.Bits, offset, buffer, 0);
+                    BitUtils64.BitSwap(image.Stride, image.BitsPerPixel, image.Bits, offset, buffer, 0);
                 }
                 else
                 {

@@ -512,7 +512,7 @@ BITSAPI(__bits, bits_count)(
 }
 
 // reshuffle n-bits at a time
-__forceinline __bits _bitswap(const __bits bits)
+__forceinline __bits _bitswap1(const __bits bits)
 {
 #if BITS_COUNT == 64
 	return
@@ -537,30 +537,98 @@ __forceinline __bits _bitswap(const __bits bits)
 #endif
 }
 
+__forceinline __bits _bitswap2(const __bits bits)
+{
+#if BITS_COUNT == 64
+	return
+		((bits >> 6) & 0x0303030303030303ul) |
+		((bits >> 2) & 0x0c0c0c0c0c0c0c0cul) |
+		((bits << 2) & 0x3030303030303030ul) |
+		((bits << 6) & 0xc0c0c0c0c0c0c0c0ul);
+#else
+	return
+		((bits >> 6) & 0x03030303ul) |
+		((bits >> 2) & 0x0c0c0c0cul) |
+		((bits << 2) & 0x30303030ul) |
+		((bits << 6) & 0xc0c0c0c0ul);
+#endif
+}
+
+__forceinline __bits _bitswap4(const __bits bits)
+{
+#if BITS_COUNT == 64
+	return
+		((bits >> 4) & 0x0f0f0f0f0f0f0f0ful) |
+		((bits << 4) & 0xf0f0f0f0f0f0f0f0ul);
+#else
+	return
+		((bits >> 4) & 0x0f0f0f0ful) |
+		((bits << 4) & 0xf0f0f0f0ul);
+#endif
+}
+
 BITSAPI(void, bits_reverse)(
-	const int length,
+	const int n, const int bitCount, /* 1, 2, or 4 */
 	const __bits* x, const int offx,
 	__bits* y, const int offy)
 {
 	x += offx;
 	y += offy;
 
-	for (int i = 0; i < length; i++)
+	switch (bitCount)
 	{
-		y[i] = _bitswap(x[i]);
+	case 1:
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = _bitswap1(x[i]);
+		}
+		break;
+
+	case 2:
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = _bitswap2(x[i]);
+		}
+		break;
+
+	case 4:
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = _bitswap4(x[i]);
+		}
+		break;
 	}
 }
 
 BITSAPI(void, bits_reverse_ip)(
-	const int length,
+	const int n, const int bitCount, /* 1, 2, or 4 */
 	__bits* xy,
 	const int offxy)
 {
 	xy += offxy;
 
-	for (int i = 0; i < length; i++)
+	switch (bitCount)
 	{
-		xy[i] = _bitswap(xy[i]);
+	case 1:
+		for (int i = 0; i < n; i++)
+		{
+			xy[i] = _bitswap1(xy[i]);
+		}
+		break;
+
+	case 2:
+		for (int i = 0; i < n; i++)
+		{
+			xy[i] = _bitswap2(xy[i]);
+		}
+		break;
+
+	case 4:
+		for (int i = 0; i < n; i++)
+		{
+			xy[i] = _bitswap4(xy[i]);
+		}
+		break;
 	}
 }
 

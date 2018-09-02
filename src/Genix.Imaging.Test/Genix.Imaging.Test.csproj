@@ -64,6 +64,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BitmapHelpers.cs" />
     <Compile Include="Extensions\BitmapExtensionsTest.cs" />
     <Compile Include="Extensions\MorphologyTest.cs" />
     <Compile Include="Extensions\ConvertTest.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Extensions\CopyCropTest.cs" />
     <Compile Include="Extensions\ScaleTest.cs" />
     <Compile Include="Extensions\ConnectedComponentsTest.cs" />
+    <Compile Include="EncoderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Imaging.Test.snk" />

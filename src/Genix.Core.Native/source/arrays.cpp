@@ -11,9 +11,11 @@ template<typename T> int __forceinline __compare(
 	return ::memcmp(x + offx, y + offy, n * sizeof(T));
 }
 
-GENIXAPI(int, ccompare)(int n, const wchar_t* x, int offx, const wchar_t* y, int offy) { return __compare(n, x, offx, y, offy); }
-GENIXAPI(int, i32compare)(int n, const __int32* x, int offx, const __int32* y, int offy) { return __compare(n, x, offx, y, offy); }
-GENIXAPI(int, fcompare)(int n, const float* x, int offx, const float* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_s16)(int n, const __int16* x, int offx, const __int16* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_s32)(int n, const __int32* x, int offx, const __int32* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_s64)(int n, const __int64* x, int offx, const __int64* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_f32)(int n, const float* x, int offx, const float* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_f64)(int n, const double* x, int offx, const double* y, int offy) { return __compare(n, x, offx, y, offy); }
 
 // copy arrays
 template<typename T> void __forceinline __copy(

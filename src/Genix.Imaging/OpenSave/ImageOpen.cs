@@ -212,7 +212,7 @@ namespace Genix.Imaging
             return new LoadedImages(stream, 0, -1);
         }
 
-        internal static Image OnLoaded(Image image, ImageMetadata metadata, IList<System.Drawing.Color> palette)
+        internal static Image OnLoaded(Image image, ImageMetadata metadata, IList<Color> palette)
         {
             // apply orientation
             ApplyOrientation();

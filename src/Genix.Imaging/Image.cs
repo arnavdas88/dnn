@@ -73,6 +73,69 @@ namespace Genix.Imaging
         internal ulong EndMask => ulong.MaxValue >> (64 - (this.WidthBits & 63));
 
         /// <summary>
+        /// Create a gray palette used by the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <returns>
+        /// The array of <see cref="Color"/> objects that contains the palette.
+        /// </returns>
+        public static Color[] CreatePalette(int bitsPerPixel)
+        {
+            switch (bitsPerPixel)
+            {
+                case 1:
+                    return new Color[2]
+                    {
+                        Color.FromArgb(0xff, 0xff, 0xff, 0xff),
+                        Color.FromArgb(0xff, 0x00, 0x00, 0x00),
+                    };
+
+                case 2:
+                    return new Color[4]
+                    {
+                        Color.FromArgb(0xff, 0x00, 0x00, 0x00),
+                        Color.FromArgb(0xff, 0x55, 0x55, 0x55),
+                        Color.FromArgb(0xff, 0xaa, 0xaa, 0xaa),
+                        Color.FromArgb(0xff, 0xff, 0xff, 0xff),
+                    };
+
+                case 4:
+                    return new Color[16]
+                    {
+                        Color.FromArgb(0xff, 0x00, 0x00, 0x00),
+                        Color.FromArgb(0xff, 0x14, 0x14, 0x14),
+                        Color.FromArgb(0xff, 0x20, 0x20, 0x20),
+                        Color.FromArgb(0xff, 0x2c, 0x2c, 0x2c),
+                        Color.FromArgb(0xff, 0x38, 0x38, 0x38),
+                        Color.FromArgb(0xff, 0x45, 0x45, 0x45),
+                        Color.FromArgb(0xff, 0x51, 0x51, 0x51),
+                        Color.FromArgb(0xff, 0x61, 0x61, 0x61),
+                        Color.FromArgb(0xff, 0x71, 0x71, 0x71),
+                        Color.FromArgb(0xff, 0x82, 0x82, 0x82),
+                        Color.FromArgb(0xff, 0x92, 0x92, 0x92),
+                        Color.FromArgb(0xff, 0xa2, 0xa2, 0xa2),
+                        Color.FromArgb(0xff, 0xb6, 0xb6, 0xb6),
+                        Color.FromArgb(0xff, 0xcb, 0xcb, 0xcb),
+                        Color.FromArgb(0xff, 0xe3, 0xe3, 0xe3),
+                        Color.FromArgb(0xff, 0xff, 0xff, 0xff),
+                    };
+
+                case 8:
+                    Color[] colors = new Color[256];
+                    for (int i = 0; i < 256; i++)
+                    {
+                        byte c = (byte)i;
+                        colors[i] = Color.FromArgb(0xff, c, c, c);
+                    }
+
+                    return colors;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Image"/> that is a copy of the current instance.
         /// </summary>
         /// <param name="copyBits">The value indicating whether the <see cref="Image{T}.Bits"/> should be copied to the new <see cref="Image"/>.</param>
@@ -113,6 +176,8 @@ namespace Genix.Imaging
                           (ulong)(uint)random.Next() << 32 |
                           (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
             }
+
+            this.ZeroTail();
         }
 
         /// <summary>
@@ -126,6 +191,20 @@ namespace Genix.Imaging
         public uint GetCRC()
         {
             return CRC.Calculate(this.Bits);
+        }
+
+        /// <summary>
+        /// Sets unused bits on the right side of the image to zero.
+        /// </summary>
+        private void ZeroTail()
+        {
+            ulong mask = this.EndMask;
+            ulong[] bits = this.Bits;
+            int stride = this.Stride;
+            for (int i = 0, ii = this.Height, off = stride - 1; i < ii; i++, off += stride)
+            {
+                bits[off] &= mask;
+            }
         }
 
         private static partial class NativeMethods

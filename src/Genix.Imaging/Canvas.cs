@@ -60,7 +60,7 @@ namespace Genix.Imaging
 
                 // select color
                 this.oldMapMode = NativeMethods.SetBkMode(this.hdc, NativeMethods.TRANSPARENT);
-                this.oldBkColor = NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(Color.Black));
+                this.oldBkColor = NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.Black));
 
                 // erase background
                 this.Clear();
@@ -81,7 +81,7 @@ namespace Genix.Imaging
             if (this.hdc != null)
             {
                 int mapMode = NativeMethods.SetMapMode(this.hdc, NativeMethods.MM_TEXT);
-                int backColor = NativeMethods.SetBkColor(this.hdc, ColorTranslator.ToWin32(Color.White));
+                int backColor = NativeMethods.SetBkColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.White));
 
                 NativeMethods.Rect bounds = new NativeMethods.Rect(0, 0, this.width, this.height);
                 NativeMethods.ExtTextOut(this.hdc, 0, 0, NativeMethods.ETO_OPAQUE, ref bounds, null, 0, null);
@@ -117,7 +117,7 @@ namespace Genix.Imaging
 
                 // select color
                 NativeMethods.SetBkMode(this.hdc, NativeMethods.TRANSPARENT);
-                NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(Color.Black));
+                NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.Black));
             }
         }
 

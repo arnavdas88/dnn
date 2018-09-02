@@ -17,6 +17,23 @@ namespace Genix.Core
     public static class Array32f
     {
         /// <summary>
+        /// Determines whether the two array contain same data.
+        /// </summary>
+        /// <param name="length">The number of elements to compare.</param>
+        /// <param name="x">The first array to compare.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The second array to compare.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int length, float[] x, int offx, float[] y, int offy)
+        {
+            return NativeMethods.compare_f32(length, x, offx, y, offy) == 0;
+        }
+
+        /// <summary>
         /// Sets all elements in the array to the specified value.
         /// </summary>
         /// <param name="length">The number of elements to set.</param>
@@ -115,6 +132,9 @@ namespace Genix.Core
         private static class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int compare_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void set_f32(int n, float a, [Out] float[] y, int offy);

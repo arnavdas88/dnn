@@ -14,13 +14,10 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Security;
     using System.Text.RegularExpressions;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Genix.Core;
-    using Genix.Win32;
 
     /// <summary>
     /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="Bitmap"/> class.
@@ -88,14 +85,17 @@ namespace Genix.Imaging
                 }
             }
 
-            if (image.BitsPerPixel == 1)
+            if (image.BitsPerPixel < 8)
             {
-                BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0);
+                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             bitmap.UnlockBits(srcData);
 
-            return Image.OnLoaded(image, null, bitmap.Palette?.Entries);
+            return Image.OnLoaded(
+                image,
+                null,
+                bitmap.Palette?.Entries?.Select(x => Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
         }
 
         /// <summary>
@@ -162,12 +162,18 @@ namespace Genix.Imaging
                             dstData.Scan0,
                             dstData.Stride);
 
-                        if (image.BitsPerPixel == 1)
+                        if (image.BitsPerPixel < 8)
                         {
-                            NativeMethods.bits_reverse_ip_32(
-                                image.Height * dstData.Stride / sizeof(uint),
-                                dstData.Scan0,
-                                dstData.Stride > 0 ? 0 : -(image.Height - 1) * dstData.Stride);
+                            IntPtr dst = dstData.Scan0;
+                            if (dstData.Stride < 0)
+                            {
+                                dst = IntPtr.Add(dst, (image.Height - 1) * dstData.Stride);
+                            }
+
+                            BitUtils32.BitSwap(
+                                image.Height * Math.Abs(dstData.Stride) / sizeof(uint),
+                                image.BitsPerPixel,
+                                dstData.Scan0);
                         }
                     }
                 }
@@ -178,13 +184,13 @@ namespace Genix.Imaging
                 // as our color map is different from default map used by System.Drawing.Bitmap
                 if (image.BitsPerPixel <= 8 && bitmap.Palette != null)
                 {
-                    System.Drawing.Color[] palette = BitmapExtensions.CreatePalette(image.BitsPerPixel);
+                    Color[] palette = Image.CreatePalette(image.BitsPerPixel);
                     ColorPalette dst = bitmap.Palette;
                     if (dst.Entries.Length == palette.Length)
                     {
                         for (int i = 0, ii = palette.Length; i < ii; i++)
                         {
-                            dst.Entries[i] = palette[i];
+                            dst.Entries[i] = System.Drawing.Color.FromArgb(palette[i].Argb);
                         }
                     }
 
@@ -230,7 +236,7 @@ namespace Genix.Imaging
 
             // get palette
             BitmapPalette bitmapPalette = null;
-            System.Drawing.Color[] palette = BitmapExtensions.CreatePalette(image.BitsPerPixel);
+            Color[] palette = Image.CreatePalette(image.BitsPerPixel);
             if (palette != null)
             {
                 bitmapPalette = new BitmapPalette(palette.Select(x => System.Windows.Media.Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
@@ -245,11 +251,11 @@ namespace Genix.Imaging
                 bitmapPalette);
 
             System.Windows.Int32Rect sourceRect = new System.Windows.Int32Rect(0, 0, image.Width, image.Height);
-            if (image.BitsPerPixel == 1)
+            if (image.BitsPerPixel < 8)
             {
                 // swap bits to make storage big-endian
                 ulong[] bits = new ulong[image.Bits.Length];
-                BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0, bits, 0);
+                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0, bits, 0);
                 bitmapSource.WritePixels(sourceRect, bits, image.Stride8, 0);
             }
             else
@@ -337,9 +343,9 @@ namespace Genix.Imaging
                 }
             }
 
-            if (image.BitsPerPixel == 1)
+            if (image.BitsPerPixel < 8)
             {
-                BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0);
+                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             // special case for BitmapFrame BlackWhite pixel format
@@ -353,17 +359,17 @@ namespace Genix.Imaging
                 Image.OnLoaded(
                     image,
                     metadata,
-                    bitmapFrame.Palette?.Colors?.Select(x => System.Drawing.Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray()),
+                    bitmapFrame.Palette?.Colors?.Select(x => Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray()),
                 metadata);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool IsGrayScalePalette(int bitsPerPixel, IList<System.Drawing.Color> palette, out bool invertedPalette)
+        internal static bool IsGrayScalePalette(int bitsPerPixel, IList<Color> palette, out bool invertedPalette)
         {
             invertedPalette = false;
 
             // create a gray-scale palette to compare with
-            System.Drawing.Color[] testPalette = BitmapExtensions.CreatePalette(bitsPerPixel);
+            Color[] testPalette = Image.CreatePalette(bitsPerPixel);
             if (testPalette == null)
             {
                 return false;
@@ -392,7 +398,7 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Image ApplyPalette(this Image image, IList<System.Drawing.Color> palette)
+        internal static Image ApplyPalette(this Image image, IList<Color> palette)
         {
             Image dst = new Image(
                 image.Width,
@@ -487,63 +493,6 @@ namespace Genix.Imaging
                 default:
                     throw new NotImplementedException(
                         string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, bitsPerPixel));
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static System.Drawing.Color[] CreatePalette(int bitsPerPixel)
-        {
-            switch (bitsPerPixel)
-            {
-                case 1:
-                    return new System.Drawing.Color[2]
-                    {
-                        System.Drawing.Color.FromArgb(0xff, 0xff, 0xff, 0xff),
-                        System.Drawing.Color.FromArgb(0xff, 0x00, 0x00, 0x00),
-                    };
-
-                case 2:
-                    return new System.Drawing.Color[4]
-                    {
-                        System.Drawing.Color.FromArgb(0xff, 0x00, 0x00, 0x00),
-                        System.Drawing.Color.FromArgb(0xff, 0x55, 0x55, 0x55),
-                        System.Drawing.Color.FromArgb(0xff, 0xaa, 0xaa, 0xaa),
-                        System.Drawing.Color.FromArgb(0xff, 0xff, 0xff, 0xff),
-                    };
-
-                case 4:
-                    return new System.Drawing.Color[16]
-                    {
-                        System.Drawing.Color.FromArgb(0xff, 0x00, 0x00, 0x00),
-                        System.Drawing.Color.FromArgb(0xff, 0x14, 0x14, 0x14),
-                        System.Drawing.Color.FromArgb(0xff, 0x20, 0x20, 0x20),
-                        System.Drawing.Color.FromArgb(0xff, 0x2c, 0x2c, 0x2c),
-                        System.Drawing.Color.FromArgb(0xff, 0x38, 0x38, 0x38),
-                        System.Drawing.Color.FromArgb(0xff, 0x45, 0x45, 0x45),
-                        System.Drawing.Color.FromArgb(0xff, 0x51, 0x51, 0x51),
-                        System.Drawing.Color.FromArgb(0xff, 0x61, 0x61, 0x61),
-                        System.Drawing.Color.FromArgb(0xff, 0x71, 0x71, 0x71),
-                        System.Drawing.Color.FromArgb(0xff, 0x82, 0x82, 0x82),
-                        System.Drawing.Color.FromArgb(0xff, 0x92, 0x92, 0x92),
-                        System.Drawing.Color.FromArgb(0xff, 0xa2, 0xa2, 0xa2),
-                        System.Drawing.Color.FromArgb(0xff, 0xb6, 0xb6, 0xb6),
-                        System.Drawing.Color.FromArgb(0xff, 0xcb, 0xcb, 0xcb),
-                        System.Drawing.Color.FromArgb(0xff, 0xe3, 0xe3, 0xe3),
-                        System.Drawing.Color.FromArgb(0xff, 0xff, 0xff, 0xff),
-                    };
-
-                case 8:
-                    System.Drawing.Color[] colors = new System.Drawing.Color[256];
-                    for (int i = 0; i < 256; i++)
-                    {
-                        byte c = (byte)i;
-                        colors[i] = System.Drawing.Color.FromArgb(0xff, c, c, c);
-                    }
-
-                    return colors;
-
-                default:
-                    return null;
             }
         }
 
@@ -643,15 +592,6 @@ namespace Genix.Imaging
             return new ImageMetadata(items.Distinct(new PropertyItemComparer()).OrderBy(x => x.Id));
         }
 
-        private static class NativeMethods
-        {
-            private const string DllName = "Genix.Core.Native.dll";
-
-            [DllImport(NativeMethods.DllName)]
-            [SuppressUnmanagedCodeSecurity]
-            public static extern void bits_reverse_ip_32(int length, IntPtr xy, int offxy);
-        }
-
         /// <summary>
         /// Defines methods to support the comparison of property items for equality.
         /// </summary>
@@ -685,7 +625,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Defines methods to support the comparison of colors for equality.
         /// </summary>
-        private class ColorEqualityComparer : IEqualityComparer<System.Drawing.Color>
+        private class ColorEqualityComparer : IEqualityComparer<Color>
         {
             /// <summary>
             /// Determines whether the specified colors are equal.
@@ -693,9 +633,9 @@ namespace Genix.Imaging
             /// <param name="x">The first color to compare.</param>
             /// <param name="y">The second color to compare.</param>
             /// <returns><b>true</b> if the specified colors are equal; otherwise, <b>false</b>.</returns>
-            public bool Equals(System.Drawing.Color x, System.Drawing.Color y)
+            public bool Equals(Color x, Color y)
             {
-                return x.A == y.A && x.R == y.R && x.G == y.G && x.B == y.B;
+                return x.Argb == y.Argb;
             }
 
             /// <summary>
@@ -703,9 +643,9 @@ namespace Genix.Imaging
             /// </summary>
             /// <param name="color">The color for which a hash code is to be returned.</param>
             /// <returns>A hash code for the specified color.</returns>
-            public int GetHashCode(System.Drawing.Color color)
+            public int GetHashCode(Color color)
             {
-                return color.GetHashCode();
+                return color.Argb;
             }
         }
     }

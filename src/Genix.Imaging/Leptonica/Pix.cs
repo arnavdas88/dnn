@@ -71,9 +71,9 @@ namespace Genix.Imaging.Leptonica
 
                         BitUtils32.BiteSwap(image.Height * wpl, dst);
 
-                        if (image.BitsPerPixel == 1)
+                        if (image.BitsPerPixel < 8)
                         {
-                            BitUtils32.BitSwap(image.Height * wpl, dst);
+                            BitUtils32.BitSwap(image.Height * wpl, image.BitsPerPixel, dst);
                         }
                     }
                 }
@@ -153,9 +153,9 @@ namespace Genix.Imaging.Leptonica
 
                     BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
 
-                    if (image.BitsPerPixel == 1)
+                    if (image.BitsPerPixel < 8)
                     {
-                        BitUtils64.BitSwap(image.Bits.Length, image.Bits, 0);
+                        BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
                     }
                 }
             }

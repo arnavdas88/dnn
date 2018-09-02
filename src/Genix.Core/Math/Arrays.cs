@@ -110,9 +110,9 @@ namespace Genix.Core
         /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals(int length, float[] x, int offx, float[] y, int offy)
+        public static bool Equals(int length, int[] x, int offx, int[] y, int offy)
         {
-            return NativeMethods.fcompare(length, x, offx, y, offy) == 0;
+            return NativeMethods.compare_s32(length, x, offx, y, offy) == 0;
         }
 
         /// <summary>
@@ -127,9 +127,10 @@ namespace Genix.Core
         /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals(int length, int[] x, int offx, int[] y, int offy)
+        [CLSCompliant(false)]
+        public static bool Equals(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
-            return NativeMethods.i32compare(length, x, offx, y, offy) == 0;
+            return NativeMethods.compare_u64(length, x, offx, y, offy) == 0;
         }
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals(int length, char[] x, int offx, char[] y, int offy)
         {
-            return NativeMethods.ccompare(length, x, offx, y, offy) == 0;
+            return NativeMethods.compare_s16(length, x, offx, y, offy) == 0;
         }
 
         /// <summary>
@@ -818,13 +819,13 @@ namespace Genix.Core
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int fcompare(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern int compare_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern int i32compare(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+            [DllImport(NativeMethods.DllName, EntryPoint = "compare_s64")]
+            public static extern int compare_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
-            public static extern int ccompare(int n, [In] char[] x, int offx, [Out] char[] y, int offy);
+            public static extern int compare_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);
 
             /*[DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
             public static extern void copy_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/

@@ -46,6 +46,17 @@ namespace Genix.Win32
         [ResourceExposure(ResourceScope.None)]
         public static extern void memcpy(IntPtr dst, IntPtr src, IntPtr size);
 
+        /// <summary>
+        /// Sets buffers to a specified character.
+        /// </summary>
+        /// <param name="dst">Pointer to destination.</param>
+        /// <param name="value">Character to set.</param>
+        /// <param name="size">Number of characters.</param>
+        [SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible", Justification = "Provides access to public Win32 API.")]
+        [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        [ResourceExposure(ResourceScope.None)]
+        public static extern void memset(IntPtr dst, int value, IntPtr size);
+
 #pragma warning restore SA1300 // Element should begin with upper-case letter
     }
 }

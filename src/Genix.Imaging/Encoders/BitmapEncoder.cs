@@ -8,8 +8,8 @@ namespace Genix.Imaging.Encoders
 {
     using System;
     using System.IO;
-    using System.Runtime.InteropServices;
     using System.Text;
+    using Genix.Core;
 
     public class BitmapEncoder
     {
@@ -27,11 +27,6 @@ namespace Genix.Imaging.Encoders
 
         public void Save(Stream stream, Image image)
         {
-            uint fsize = 0;
-            uint offbytes = 0;
-            uint imagesize = 0;
-            int ncolors = image.BitsPerPixel <= 8 ? 1 << image.BitsPerPixel : 0;
-
             if (image.Width > BitmapEncoder.MaxAllowedWidth)
             {
                 throw new InvalidOperationException("Cannot save the image. The image width is too large.");
@@ -41,6 +36,19 @@ namespace Genix.Imaging.Encoders
             {
                 throw new InvalidOperationException("Cannot save the image. The image height is too large.");
             }
+
+            if ((long)image.Width * image.Height > BitmapEncoder.MaxAllowedPixels)
+            {
+                throw new InvalidOperationException("Cannot save the image. The number of pixels in the image is too large.");
+            }
+
+            int stride32 = ((image.Width * image.BitsPerPixel) + 31) / 32;
+            int stride8 = stride32 * 4;
+            int imagesize = stride8 * image.Height;
+            int ncolors = image.BitsPerPixel <= 8 ? 1 << image.BitsPerPixel : 0;
+
+            int offbytes = 14 /* file header */ + 40 /* bmp header */ + (ncolors * 4) /* colors */;
+            int fsize = offbytes + imagesize;
 
             using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, true))
             {
@@ -56,6 +64,7 @@ namespace Genix.Imaging.Encoders
                 writer.Write(image.Height);
                 writer.Write((ushort)1);
                 writer.Write((ushort)image.BitsPerPixel);
+                writer.Write(0);    // compression (0 == uncompressed)
                 writer.Write(imagesize);
                 writer.Write((int)((39.37 * image.HorizontalResolution) + 0.5));
                 writer.Write((int)((39.37 * image.VerticalResolution) + 0.5));
@@ -65,22 +74,35 @@ namespace Genix.Imaging.Encoders
                 // write colors if necessary
                 if (ncolors > 0)
                 {
+                    Color[] palette = Image.CreatePalette(image.BitsPerPixel);
+                    for (int i = 0, ii = palette.Length; i < ii; i++)
+                    {
+                        writer.Write(palette[i].Argb);
+                    }
                 }
 
-                // write image data
-                if (image.BitsPerPixel <= 8)
+                // write bits
+                byte[] bitsdst = new byte[imagesize];
+                unsafe
                 {
-                    /*ulong[] bits = image.Bits;
-                    int stride8 = image.Stride8;
-                    data = (l_uint8*)pixGetData(pix) + pixBpl * (h - 1);
-                    for (int i = 0, ii = image.Height, offset = ; i < ii; i++)
+                    // positive height indicates that bitmap is bottom-up
+                    fixed (ulong* src = &image.Bits[(image.Height - 1) * image.Stride])
                     {
-                        writer.Write()
-                        memcpy(fmdata, data, fBpl);
-                        data -= pixBpl;
-                        fmdata += fBpl;
-                    }*/
+                        fixed (byte* dst = bitsdst)
+                        {
+                            Arrays.CopyStrides(image.Height, new IntPtr(src), -image.Stride8, new IntPtr(dst), stride8);
+
+                            if (image.BitsPerPixel < 8)
+                            {
+                                // make bits big-endian
+                                BitUtils32.BitSwap(image.Height * stride32, image.BitsPerPixel, new IntPtr(dst));
+                            }
+                        }
+                    }
                 }
+
+                writer.Write(bitsdst);
+                writer.Flush();
             }
         }
 
@@ -99,10 +121,5 @@ namespace Genix.Imaging.Encoders
             public int biClrUsed;       // number of colors used
             public int biClrImportant;  // number of important colors used
         };*/
-
-        ////typedef struct BMP_InfoHeader  BMP_IH;
-
-        /*! Number of bytes in a BMP info header */
-        ////#define BMP_IHBYTES  sizeof(BMP_IH)
     }
 }

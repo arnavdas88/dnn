@@ -34,91 +34,29 @@
         [TestMethod]
         public void FromBitmapTest()
         {
-            foreach (bool whiteOnBlack in new bool[] { true, false })
+            foreach (int bitsPerPixel in new int[] { 1, 4, 8, 24, 32 })
             {
-                using (System.Drawing.Bitmap bitmap = BitmapExtensionsTest.Create1bppIndexed(20, 35, whiteOnBlack))
+                foreach (bool whiteOnBlack in new bool[] { true, false })
                 {
-                    bitmap.SetResolution(252, 345);
-                    BitmapExtensionsTest.SetPixelIndexed(bitmap, 1, 1, whiteOnBlack);
-                    BitmapExtensionsTest.SetPixelIndexed(bitmap, 18, 33, whiteOnBlack);
-
-                    Image image = BitmapExtensions.FromBitmap(bitmap);
-                    Assert.AreEqual(20, image.Width);
-                    Assert.AreEqual(35, image.Height);
-                    Assert.AreEqual(1, image.BitsPerPixel);
-                    Assert.AreEqual(252, image.HorizontalResolution);
-                    Assert.AreEqual(345, image.VerticalResolution);
-
-                    Assert.AreEqual(1u, image.GetPixel(1, 1));
-                    Assert.AreEqual(1u, image.GetPixel(18, 33));
-                }
-            }
-        }
-
-        private static System.Drawing.Bitmap Create1bppIndexed(int width, int height, bool whiteOnBlack)
-        {
-            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format1bppIndexed);
-            try
-            {
-                if (whiteOnBlack)
-                {
-                    System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
-                        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                        System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                        bitmap.PixelFormat);
-
-                    unsafe
+                    using (System.Drawing.Bitmap bitmap = BitmapHelpers.CreateBitmap(20, 35, bitsPerPixel, whiteOnBlack))
                     {
-                        byte* p = (byte*)data.Scan0;
-                        for (int i = 0, ii = data.Stride * data.Height; i < ii; i++)
-                        {
-                            p[i] = (byte)0xff;
-                        }
+                        bitmap.SetResolution(252, 345);
+                        BitmapHelpers.SetPixel(bitmap, 1, 1, whiteOnBlack);
+                        BitmapHelpers.SetPixel(bitmap, 18, 33, whiteOnBlack);
+
+                        Image image = BitmapExtensions.FromBitmap(bitmap);
+                        Assert.AreEqual(20, image.Width);
+                        Assert.AreEqual(35, image.Height);
+                        Assert.AreEqual(bitsPerPixel, image.BitsPerPixel);
+                        Assert.AreEqual(252, image.HorizontalResolution);
+                        Assert.AreEqual(345, image.VerticalResolution);
+
+                        uint color = bitsPerPixel == 1 ? 1u : 0u;
+                        Assert.AreEqual(color, image.GetPixel(1, 1));
+                        Assert.AreEqual(color, image.GetPixel(18, 33));
                     }
-
-                    bitmap.UnlockBits(data);
-                }
-                else
-                {
-                    System.Drawing.Imaging.ColorPalette palette = bitmap.Palette;
-                    palette.Entries[0] = System.Drawing.Color.White;
-                    palette.Entries[1] = System.Drawing.Color.Black;
-                    bitmap.Palette = palette;
-                }
-
-                return bitmap;
-            }
-            catch
-            {
-                bitmap?.Dispose();
-                throw;
-            }
-        }
-
-        private static void SetPixelIndexed(System.Drawing.Bitmap bitmap, int x, int y, bool whiteOnBlack)
-        {
-            System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                bitmap.PixelFormat);
-
-            unsafe
-            {
-                byte* p = (byte*)data.Scan0;
-                int index = (y * data.Stride) + (x / 8);
-                int mask = 0x80 >> (x & 7);
-
-                if (whiteOnBlack)
-                {
-                    p[index] &= (byte)~mask;
-                }
-                else
-                {
-                    p[index] |= (byte)mask;
                 }
             }
-
-            bitmap.UnlockBits(data);
         }
     }
 }
