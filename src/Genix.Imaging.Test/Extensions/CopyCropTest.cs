@@ -9,7 +9,7 @@
         [TestMethod]
         public void CopyTest1()
         {
-            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
                 Image image = new Image(87, 43, bitsPerPixel, 200, 200);
                 image.Randomize();

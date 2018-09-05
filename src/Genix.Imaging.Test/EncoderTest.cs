@@ -11,12 +11,12 @@
         [TestMethod]
         public void BitmapEncoderTest()
         {
-            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\TestData\2bpp.bmp"))
+            /*foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\TestData\2bpp.bmp"))
             {
 
-            }
+            }*/
 
-            foreach (int bitCount in new int[] { /*1, 2,*/ 4, 8, 16, 24, 32 })
+            foreach (int bitCount in new int[] { 1, /*2,*/ 4, 8, 16, 24, 32 })
             {
                 Image image1 = new Image(65, 1, bitCount, 168, 204);
                 image1.Randomize();
@@ -33,7 +33,7 @@
                 byte[] ba2;
                 using (MemoryStream stream = new MemoryStream())
                 {
-                    encoder.Save(stream, image1);
+                    encoder.Save(stream, image1, null);
                     ba2 = stream.ToArray();
                 }
 

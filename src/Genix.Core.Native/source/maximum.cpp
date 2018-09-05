@@ -93,7 +93,7 @@ GENIXAPI(void, maxc_f32)(int n, const float* x, int offx, float a, float* y, int
 GENIXAPI(void, maxc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __maxc(n, x, offx, a, y, offy); }
 
 // Returns the smaller of each pair of elements of the two vector arguments.
-extern "C" __declspec(dllexport) void WINAPI smin(
+extern "C" __declspec(dllexport) void WINAPI min_f32(
 	int n,
 	const float* a, int offa,
 	float* b, int offb,
@@ -103,7 +103,7 @@ extern "C" __declspec(dllexport) void WINAPI smin(
 }
 
 // Returns the larger of each pair of elements of the two vector arguments.
-extern "C" __declspec(dllexport) void WINAPI smax(
+extern "C" __declspec(dllexport) void WINAPI max_f32(
 	int n,
 	const float* a, int offa,
 	float* b, int offb,
@@ -112,7 +112,7 @@ extern "C" __declspec(dllexport) void WINAPI smax(
 	::vsFmax(n, a + offa, b + offb, y + offy);
 }
 
-extern "C" __declspec(dllexport) void WINAPI sminmax_gradient(
+extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* y, const float* dy, int offy)
@@ -178,27 +178,12 @@ template<typename T> int __forceinline __argmax(int n, const T* x, int offx)
 	return offx + win;
 }
 
-extern "C" __declspec(dllexport) int WINAPI i32argmin(int n, const int* x, int offx)
-{
-	return __argmin<int>(n, x, offx);
-}
+extern "C" __declspec(dllexport) int WINAPI argmin_s32(int n, const int* x, int offx) { return __argmin<int>(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_s32(int n, const int* x, int offx) {	return __argmax<int>(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_f32(int n, const float* x, int offx) { return __argmin<float>(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_f32(int n, const float* x, int offx) { return __argmax<float>(n, x, offx); }
 
-extern "C" __declspec(dllexport) int WINAPI i32argmax(int n, const int* x, int offx)
-{
-	return __argmax<int>(n, x, offx);
-}
-
-extern "C" __declspec(dllexport) int WINAPI sargmin(int n, const float* x, int offx)
-{
-	return __argmin<float>(n, x, offx);
-}
-
-extern "C" __declspec(dllexport) int WINAPI sargmax(int n, const float* x, int offx)
-{
-	return __argmax<float>(n, x, offx);
-}
-
-extern "C" __declspec(dllexport) void WINAPI sargminmax(int n, const float* x, int offx, int& winmin, int& winmax)
+extern "C" __declspec(dllexport) void WINAPI argminmax_f32(int n, const float* x, int offx, int& winmin, int& winmax)
 {
 	x += offx;
 

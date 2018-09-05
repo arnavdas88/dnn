@@ -59,6 +59,8 @@
     <Compile Include="Canvas.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Encoders\BitmapEncoder.cs" />
+    <Compile Include="Encoders\ImageEncoder.cs" />
+    <Compile Include="Encoders\TiffEncoder.cs" />
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\FeatureDetectors.cs" />

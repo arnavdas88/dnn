@@ -35,7 +35,19 @@ namespace Genix.Imaging
             this.ValidatePosition(x, y);
 
             int xpos = x * this.BitsPerPixel;
-            return (uint)BitUtils64.GetBits(this.Bits[(y * this.Stride) + (xpos >> 6)], xpos & 63, this.BitsPerPixel);
+            int pos = (y * this.Stride) + (xpos >> 6);
+            xpos &= 63;
+
+            if (this.BitsPerPixel == 24 && xpos + 24 > 64)
+            {
+                int rem = 64 - xpos;
+                return (uint)BitUtils64.GetBits(this.Bits[pos], xpos, rem) |
+                       (uint)(BitUtils64.GetBits(this.Bits[pos + 1], 0, 24 - rem) << rem);
+            }
+            else
+            {
+                return (uint)BitUtils64.GetBits(this.Bits[pos], xpos, this.BitsPerPixel);
+            }
         }
 
         /// <summary>
@@ -66,20 +78,28 @@ namespace Genix.Imaging
 
             int xpos = x * this.BitsPerPixel;
             int pos = (y * this.Stride) + (xpos >> 6);
+            xpos &= 63;
+
             if (this.BitsPerPixel == 1)
             {
                 if (color > 0)
                 {
-                    this.Bits[pos] = BitUtils64.SetBit(this.Bits[pos], xpos & 63);
+                    this.Bits[pos] = BitUtils64.SetBit(this.Bits[pos], xpos);
                 }
                 else
                 {
-                    this.Bits[pos] = BitUtils64.ResetBit(this.Bits[pos], xpos & 63);
+                    this.Bits[pos] = BitUtils64.ResetBit(this.Bits[pos], xpos);
                 }
+            }
+            else if (this.BitsPerPixel == 24 && xpos + 24 > 64)
+            {
+                int rem = 64 - xpos;
+                this.Bits[pos] = BitUtils64.CopyBits(this.Bits[pos], xpos, rem, color);
+                this.Bits[pos + 1] = BitUtils64.CopyBits(this.Bits[pos + 1], 0, 24 - rem, color >> rem);
             }
             else
             {
-                this.Bits[pos] = BitUtils64.CopyBits(this.Bits[pos], xpos & 63, this.BitsPerPixel, color);
+                this.Bits[pos] = BitUtils64.CopyBits(this.Bits[pos], xpos, this.BitsPerPixel, color);
             }
         }
 

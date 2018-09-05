@@ -70,7 +70,7 @@ namespace Genix.Imaging
         }
 #endif
 
-        public static void SaveToTiff(this Image image, Stream stream)
+        public static void SaveToTiff(Stream stream, Image image, ImageMetadata metadata, TIFFCompression compression)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -78,14 +78,14 @@ namespace Genix.Imaging
 
                 using (Tiff tiff = Tiff.ClientOpen("in-memory", "w", ms, new TiffStream()))
                 {
-                    Libtiff.Save(tiff, image);
+                    Libtiff.Save(tiff, image, metadata, compression);
 
                     stream.Write(ms.GetBuffer(), 0, (int)ms.Length);
                 }
             }
         }
 
-        public static void SaveToTiff(this IEnumerable<Image> images, Stream stream)
+        public static void SaveToTiff(Stream stream, IEnumerable<(Image image, ImageMetadata metadata)> images, TIFFCompression compression)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -93,9 +93,9 @@ namespace Genix.Imaging
 
                 using (Tiff tiff = Tiff.ClientOpen("in-memory", "w", ms, new TiffStream()))
                 {
-                    foreach (Image image in images)
+                    foreach ((Image image, ImageMetadata metadata) in images)
                     {
-                        Libtiff.Save(tiff, image);
+                        Libtiff.Save(tiff, image, metadata, compression);
                     }
 
                     stream.Write(ms.GetBuffer(), 0, (int)ms.Length);
@@ -103,9 +103,9 @@ namespace Genix.Imaging
             }
         }
 
-        private static void Save(Tiff tiff, Image image)
+        private static void Save(Tiff tiff, Image image, ImageMetadata metadata, TIFFCompression compression)
         {
-            Libtiff.SaveTags(tiff, image, null);
+            Libtiff.SaveTags(tiff, image, metadata, compression);
 
             byte[] buffer = new byte[image.Stride8];
 
@@ -135,7 +135,7 @@ namespace Genix.Imaging
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Do not rethrow Libtiff exceptions.")]
-        private static void SaveTags(Tiff tiff, Image image, ImageMetadata metadata)
+        private static void SaveTags(Tiff tiff, Image image, ImageMetadata metadata, TIFFCompression compression)
         {
             tiff.SetField(TiffTag.IMAGEWIDTH, image.Width);
             tiff.SetField(TiffTag.IMAGELENGTH, image.Height);
@@ -162,6 +162,12 @@ namespace Genix.Imaging
                     tiff.SetField(TiffTag.SAMPLESPERPIXEL, 1);
                     break;
 
+                case 24:
+                    tiff.SetField(TiffTag.PHOTOMETRIC, Photometric.RGB);
+                    tiff.SetField(TiffTag.BITSPERSAMPLE, 8);
+                    tiff.SetField(TiffTag.SAMPLESPERPIXEL, 3);
+                    break;
+
                 case 32:
                     tiff.SetField(TiffTag.PHOTOMETRIC, Photometric.RGB);
                     tiff.SetField(TiffTag.BITSPERSAMPLE, 8);
@@ -173,81 +179,84 @@ namespace Genix.Imaging
             }
 
             // fill color tables
-            /*BitmapPalette palette = frame.Palette;
+            Color[] palette = Image.CreatePalette(image.BitsPerPixel);
             if (palette != null)
             {
-                IList<System.Windows.Media.Color> colors = palette.Colors;
-                if (colors != null)
-                {
-                    tiff.SetField(
-                        TiffTag.COLORMAP,
-                        colors.Select(x => (ushort)x.R).ToArray(),
-                        colors.Select(x => (ushort)x.G).ToArray(),
-                        colors.Select(x => (ushort)x.B).ToArray());
-                }
-            }*/
+                tiff.SetField(
+                    TiffTag.COLORMAP,
+                    palette.Select(x => (ushort)x.R).ToArray(),
+                    palette.Select(x => (ushort)x.G).ToArray(),
+                    palette.Select(x => (ushort)x.B).ToArray());
+            }
 
             SaveCompressionTag();
 
             void SaveCompressionTag()
             {
-                // set compression; update compression scheme for most common situations
-                Compression compression = Compression.NONE;
+                Compression value = Compression.NONE;
 
-                object itemCompression = metadata?.GetPropertyItem((int)TiffTag.COMPRESSION);
-                if (itemCompression != null)
+                if (compression == TIFFCompression.Default)
                 {
-                    compression = (Compression)System.Convert.ToInt32(itemCompression, CultureInfo.InvariantCulture);
-
-                    // 'old-style' JPEG compression is not supported
-                    if (compression == Compression.OJPEG)
+                    // preserve existing compression
+                    object item = metadata?.GetPropertyItem((int)TiffTag.COMPRESSION);
+                    if (item != null)
                     {
-                        compression = Compression.JPEG;
-                    }
+                        value = (Compression)Convert.ToInt32(item, CultureInfo.InvariantCulture);
 
-                    if (image.BitsPerPixel == 1)
-                    {
-                        if (compression == Compression.JPEG)
+                        // 'old-style' JPEG compression is not supported
+                        if (value == Compression.OJPEG)
                         {
-                            // switch from JPEG compression for binary images
-                            compression = Compression.CCITT_T6;
+                            value = Compression.JPEG;
+                        }
+
+                        if (image.BitsPerPixel == 1)
+                        {
+                            if (value == Compression.JPEG)
+                            {
+                                // switch from JPEG compression for binary images
+                                value = Compression.CCITT_T6;
+                            }
+                        }
+                        else
+                        {
+                            if (value == Compression.CCITT_T4 || value == Compression.CCITT_T6)
+                            {
+                                // switch from Group 3/4 compression for non-binary images
+                                value = image.BitsPerPixel <= 8 ? Compression.LZW : Compression.DEFLATE;
+                            }
                         }
                     }
                     else
                     {
-                        if (compression == Compression.CCITT_T4 ||
-                            compression == Compression.CCITT_T6)
+                        if (image.BitsPerPixel == 1)
                         {
-                            // switch from Group 3/4 compression for non-binary images
-                            compression = image.BitsPerPixel <= 8 ? Compression.LZW : Compression.DEFLATE;
+                            // use default Group 4 compression for binary images
+                            value = Compression.CCITT_T6;
                         }
-                        else if (compression == Compression.JPEG)
+                        else
                         {
-                            // set JPEG quality to 100% percent if not set (default is 75%)
-                            if (metadata.GetPropertyItem((int)TiffTag.JPEGQUALITY) == null)
-                            {
-                                metadata.SetPropertyItem((int)TiffTag.JPEGQUALITY, 100);
-                            }
+                            // use LZW/ZIP compression for gray scale and colored images
+                            value = image.BitsPerPixel <= 8 ? Compression.LZW : Compression.DEFLATE;
                         }
                     }
                 }
                 else
                 {
-                    if (image.BitsPerPixel == 1)
-                    {
-                        // use default Group 4 compression for binary images
-                        compression = Compression.CCITT_T6;
-                    }
-                    else
-                    {
-                        // use LZW/ZIP compression for gray scale and colored images
-                        compression = image.BitsPerPixel <= 8 ? Compression.LZW : Compression.DEFLATE;
-                    }
+                    value = (Compression)compression;
                 }
 
-                if (compression != Compression.NONE)
+                if (value != Compression.NONE)
                 {
-                    tiff.SetField(TiffTag.COMPRESSION, compression);
+                    tiff.SetField(TiffTag.COMPRESSION, value);
+
+                    if (value == Compression.JPEG)
+                    {
+                        // set JPEG quality to 100% percent if not set (default is 75%)
+                        if (metadata != null && metadata.GetPropertyItem((int)TiffTag.JPEGQUALITY) == null)
+                        {
+                            metadata.SetPropertyItem((int)TiffTag.JPEGQUALITY, 100);
+                        }
+                    }
                 }
             }
 
@@ -257,64 +266,64 @@ namespace Genix.Imaging
                 foreach (PropertyItem item in metadata.PropertyItems.Where(x => CanSaveTiffTag(x)))
                 {
 #if !DEBUG
-                try
-                {
-#endif
-                    switch (item.Id)
+                    try
                     {
-                        case (int)TIFFField.PageNumber:
-                        case (int)TIFFField.HalftoneHints:
-                        case (int)TIFFField.YCbCrSubSampling:
-                            {
-                                if (item.Value is Array array && array.Length == 2)
+#endif
+                        switch (item.Id)
+                        {
+                            case (int)TIFFField.PageNumber:
+                            case (int)TIFFField.HalftoneHints:
+                            case (int)TIFFField.YCbCrSubSampling:
                                 {
-                                    tiff.SetField((TiffTag)item.Id, array.GetValue(0), array.GetValue(1));
-                                }
-                            }
-
-                            break;
-
-                        // known Photoshop tag issue
-                        case (int)TIFFField.Photoshop:
-                            {
-                                byte[] bytes = item.Value as byte[];
-                                if (bytes == null)
-                                {
-                                    if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
+                                    if (item.Value is Array array && array.Length == 2)
                                     {
-                                        bytes = blob.GetBlobValue();
+                                        tiff.SetField((TiffTag)item.Id, array.GetValue(0), array.GetValue(1));
                                     }
                                 }
 
-                                if (bytes != null)
-                                {
-                                    tiff.SetField((TiffTag)item.Id, bytes.Length, bytes);
-                                }
-                            }
+                                break;
 
-                            break;
-
-                        default:
-                            {
-                                if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
+                            // known Photoshop tag issue
+                            case (int)TIFFField.Photoshop:
                                 {
-                                    byte[] blobValue = blob.GetBlobValue();
-                                    SaveTiffTag((TiffTag)item.Id, blobValue);
-                                }
-                                else
-                                {
-                                    SaveTiffTag((TiffTag)item.Id, item.Value);
-                                }
-                            }
+                                    byte[] bytes = item.Value as byte[];
+                                    if (bytes == null)
+                                    {
+                                        if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
+                                        {
+                                            bytes = blob.GetBlobValue();
+                                        }
+                                    }
 
-                            break;
-                    }
+                                    if (bytes != null)
+                                    {
+                                        tiff.SetField((TiffTag)item.Id, bytes.Length, bytes);
+                                    }
+                                }
+
+                                break;
+
+                            default:
+                                {
+                                    if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
+                                    {
+                                        byte[] blobValue = blob.GetBlobValue();
+                                        SaveTiffTag((TiffTag)item.Id, blobValue);
+                                    }
+                                    else
+                                    {
+                                        SaveTiffTag((TiffTag)item.Id, item.Value);
+                                    }
+                                }
+
+                                break;
+                        }
 #if !DEBUG
-                }
-                catch
-                {
-                    // catch all exception, do not allow bad tags to fail whole image save operation
-                }
+                    }
+                    catch
+                    {
+                        // catch all exception, do not allow bad tags to fail whole image save operation
+                    }
 #endif
                 }
 
@@ -343,16 +352,6 @@ namespace Genix.Imaging
                         (item.Id >= 512 && item.Id <= 521) /* old JPEG tags */)
                     {
                         return false;
-                    }
-
-                    // unsupported compression modes
-                    if (item.Id == (int)TIFFField.Compression)
-                    {
-                        int compression = System.Convert.ToInt32(item.Value, CultureInfo.InvariantCulture);
-                        if (compression == (int)TIFFCompression.JPEG)
-                        {
-                            return false;
-                        }
                     }
 
                     // fix known issues
@@ -462,27 +461,27 @@ namespace Genix.Imaging
                             switch (fip.Type)
                             {
                                 case TiffType.SHORT:
-                                    value = System.Convert.ToUInt16(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToUInt16(value, CultureInfo.InvariantCulture);
                                     break;
 
                                 case TiffType.SSHORT:
-                                    value = System.Convert.ToInt16(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToInt16(value, CultureInfo.InvariantCulture);
                                     break;
 
                                 case TiffType.LONG:
-                                    value = System.Convert.ToUInt32(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToUInt32(value, CultureInfo.InvariantCulture);
                                     break;
 
                                 case TiffType.SLONG:
-                                    value = System.Convert.ToInt32(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToInt32(value, CultureInfo.InvariantCulture);
                                     break;
 
                                 case TiffType.LONG8:
-                                    value = System.Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToUInt64(value, CultureInfo.InvariantCulture);
                                     break;
 
                                 case TiffType.SLONG8:
-                                    value = System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
+                                    value = Convert.ToInt64(value, CultureInfo.InvariantCulture);
                                     break;
                             }
                         }

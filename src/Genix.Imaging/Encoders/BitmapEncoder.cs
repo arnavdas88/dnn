@@ -7,11 +7,15 @@
 namespace Genix.Imaging.Encoders
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
     using Genix.Core;
 
-    public class BitmapEncoder
+    /// <summary>
+    /// Represents an encoder used to encode bitmap (BMP) format images.
+    /// </summary>
+    public class BitmapEncoder : ImageEncoder
     {
         /// <summary>
         /// The file signature.
@@ -25,7 +29,21 @@ namespace Genix.Imaging.Encoders
         private const int MaxAllowedHeight = 1000000;
         private const long MaxAllowedPixels = 400000000L;
 
-        public void Save(Stream stream, Image image)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BitmapEncoder"/> class.
+        /// </summary>
+        public BitmapEncoder()
+        {
+        }
+
+        /// <inheritdoc />
+        public override bool SupportsMultipleFrames => false;
+
+        /// <inheritdoc />
+        public override string FileExtensions => ".bmp";
+
+        /// <inheritdoc />
+        public override void Save(Stream stream, Image image, ImageMetadata metadata)
         {
             if (image.Width > BitmapEncoder.MaxAllowedWidth)
             {
@@ -106,20 +124,24 @@ namespace Genix.Imaging.Encoders
             }
         }
 
-        /*[StructLayout(LayoutKind.Sequential)]
-        private struct BMPINFOHEADER
+        /// <inheritdoc />
+        public override void Save(Stream stream, IEnumerable<(Image image, ImageMetadata metadata)> images)
         {
-            public int biSize;          // size of the BMP_InfoHeader struct
-            public int biWidth;         // bitmap width in pixels
-            public int biHeight;        // bitmap height in pixels
-            public short biPlanes;      // number of bitmap planes
-            public short biBitCount;    // number of bits per pixel
-            public int biCompression;   // compress format (0 == uncompressed)
-            public int biSizeImage;     // size of image in bytes
-            public int biXPelsPerMeter; // pixels per meter in x direction
-            public int biYPelsPerMeter; // pixels per meter in y direction
-            public int biClrUsed;       // number of colors used
-            public int biClrImportant;  // number of important colors used
-        };*/
+            if (images == null)
+            {
+                throw new ArgumentNullException(nameof(images));
+            }
+
+            int frames = 0;
+            foreach ((Image image, ImageMetadata metadata) in images)
+            {
+                if (++frames > 1)
+                {
+                    throw new NotSupportedException("Bitmap (BMP) format does not support multiple frames.");
+                }
+
+                this.Save(stream, image, metadata);
+            }
+        }
     }
 }

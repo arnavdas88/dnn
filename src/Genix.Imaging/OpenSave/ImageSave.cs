@@ -8,10 +8,10 @@ namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Windows.Media.Imaging;
+    using Genix.Imaging.Encoders;
 
     /// <content>
     /// Provides file saving for the <see cref="Image"/> class.
@@ -32,6 +32,12 @@ namespace Genix.Imaging
             { ".DIB", ImageFormat.Bmp },
         };
 
+        private static readonly Dictionary<ImageFormat, ImageEncoder> Encoders = new Dictionary<ImageFormat, ImageEncoder>()
+        {
+            { ImageFormat.Tiff, new TiffEncoder() },
+            { ImageFormat.Bmp, new Encoders.BitmapEncoder() },
+        };
+
         /// <summary>
         /// Gets an collection of supported image file extensions.
         /// </summary>
@@ -45,7 +51,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="images">The <see cref="Image"/> objects to save.</param>
         /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="Image"/> objects.</param>
-        public static void Save(IEnumerable<Image> images, string fileName)
+        public static void Save(IEnumerable<(Image image, ImageMetadata metadata)> images, string fileName)
         {
             using (FileStream stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -59,26 +65,27 @@ namespace Genix.Imaging
         /// <param name="images">The <see cref="Image"/> objects to save.</param>
         /// <param name="stream">The <see cref="Stream"/> where the images will be saved.</param>
         /// <param name="format">An <see cref="ImageFormat"/> that specifies the format of the saved image.</param>
-        public static void Save(IEnumerable<Image> images, Stream stream, ImageFormat format)
+        public static void Save(IEnumerable<(Image image, ImageMetadata metadata)> images, Stream stream, ImageFormat format)
         {
             if (images == null)
             {
                 throw new ArgumentNullException(nameof(images));
             }
 
-            if (format == ImageFormat.Tiff)
+            // try to use built-in encoder first
+            if (Image.Encoders.TryGetValue(format, out ImageEncoder imageEncoder))
             {
-                images.SaveToTiff(stream);
+                imageEncoder.Save(stream, images);
             }
             else
             {
-                BitmapEncoder encoder = Image.CreateEncoder(format);
+                System.Windows.Media.Imaging.BitmapEncoder encoder = Image.CreateEncoder(format);
                 if (!encoder.CodecInfo.SupportsMultipleFrames)
                 {
                     throw new InvalidOperationException(Properties.Resources.E_UnsupportedMultipleFrames);
                 }
 
-                foreach (Image image in images)
+                foreach ((Image image, _) in images)
                 {
                     if (encoder is TiffBitmapEncoder tiffBitmapEncoder)
                     {
@@ -100,7 +107,7 @@ namespace Genix.Imaging
         /// <returns>
         /// The buffer containing saved <see cref="Image"/> objects.
         /// </returns>
-        public static byte[] Save(IEnumerable<Image> images, ImageFormat format)
+        public static byte[] Save(IEnumerable<(Image image, ImageMetadata metadata)> images, ImageFormat format)
         {
             using (MemoryStream stream = new MemoryStream(1000000))
             {
@@ -159,13 +166,14 @@ namespace Genix.Imaging
         /// <param name="format">An <see cref="ImageFormat"/> that specifies the format of the saved image.</param>
         public void Save(Stream stream, ImageFormat format)
         {
-            if (format == ImageFormat.Tiff)
+            // try to use built-in encoder first
+            if (Image.Encoders.TryGetValue(format, out ImageEncoder imageEncoder))
             {
-                this.SaveToTiff(stream);
+                imageEncoder.Save(stream, this, null);
             }
             else
             {
-                BitmapEncoder encoder = Image.CreateEncoder(format);
+                System.Windows.Media.Imaging.BitmapEncoder encoder = Image.CreateEncoder(format);
 
                 if (encoder is TiffBitmapEncoder tiffBitmapEncoder)
                 {
@@ -199,7 +207,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="format">An <see cref="ImageFormat"/> that specifies the format of the image.</param>
         /// <returns>The <see cref="BitmapEncoder"/> this method creates.</returns>
-        private static BitmapEncoder CreateEncoder(ImageFormat format)
+        private static System.Windows.Media.Imaging.BitmapEncoder CreateEncoder(ImageFormat format)
         {
             switch (format)
             {

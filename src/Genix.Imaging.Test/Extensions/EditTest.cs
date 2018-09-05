@@ -10,7 +10,7 @@
         [TestMethod]
         public void GetPixelSetPixelTest1()
         {
-            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
                 uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)~(ulong.MaxValue << bitsPerPixel);
                 uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
@@ -41,7 +41,7 @@
         [TestMethod]
         public void SetWhiteTest1()
         {
-            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
                 uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
 
@@ -72,7 +72,7 @@
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
                 {
                     uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
 
@@ -96,7 +96,7 @@
         [TestMethod]
         public void SetBlackTest1()
         {
-            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
                 uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
 
@@ -127,7 +127,7 @@
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
                 {
                     uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
 
@@ -151,7 +151,7 @@
         [TestMethod]
         public void InvertTest1()
         {
-            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 32 })
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
                 uint maxColor = (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
 

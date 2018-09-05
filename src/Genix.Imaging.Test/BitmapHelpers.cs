@@ -149,6 +149,11 @@ namespace Genix.Imaging.Test
                         bits[pos] = BitUtils32.SetBit(bits[pos], xpos);
                     }
                 }
+                else if (bitsPerPixel == 24 && xpos + bitsPerPixel > 32)
+                {
+                    bits[pos] = BitUtils32.CopyBits(bits[pos], xpos, 32 - xpos, 0);
+                    bits[pos + 1] = BitUtils32.CopyBits(bits[pos + 1], 0, xpos + bitsPerPixel - 32, 0);
+                }
                 else
                 {
                     bits[pos] = BitUtils32.CopyBits(bits[pos], xpos, bitsPerPixel, 0);

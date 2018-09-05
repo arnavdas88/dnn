@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include <math.h>
+#include <intrin.h>
+#include <immintrin.h>
 #include "mkl.h"
+#include "simddetect.h"
 
 // compare two arrays element-wise
 template<typename T> int __forceinline __compare(
@@ -187,23 +190,6 @@ extern "C" __declspec(dllexport) void WINAPI unpack(
 }
 
 // swaps elements of two arrays
-#include <intrin.h>
-#include <immintrin.h>
-
-bool __detect_avx2()
-{
-	int cpui[4];
-	__cpuid(cpui, 0);
-	int nIds_ = cpui[0];
-	if (nIds_ >= 7)
-	{
-		__cpuidex(cpui, 7, 0);
-		return (cpui[1] & (1 << 5)) ? true : false;
-	}
-
-	return false;
-}
-
 template<typename T> void __forceinline __swap(
 	const int n,
 	T* x, const int offx,
@@ -214,7 +200,7 @@ template<typename T> void __forceinline __swap(
 
 	int i = 0;
 
-	if (__detect_avx2())
+	if (SIMDDetect::IsAVX2Available())
 	{
 		const int TStep = 256 / 8 / sizeof(T);
 		for (int ii = (n / TStep) * TStep; i < ii; i += TStep)
@@ -238,7 +224,7 @@ GENIXAPI(void, i32swap)(const int n, __int32* x, const int offx, __int32* y, con
 GENIXAPI(void, i64swap)(const int n, __int64* x, const int offx, __int64* y, const int offy) { __swap(n, x, offx, y, offy); }
 GENIXAPI(void, _sswap)(const int n, float* x, const int offx, float* y, const int offy) {
 
-	/*__swap(n, x, offx, y, offy);*/
+	////__swap(n, x, offx, y, offy);
 	const int incxy = 1;
 	::sswap(&n, x, &incxy, y, &incxy);
 }

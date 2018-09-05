@@ -300,7 +300,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Min(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.smin(length, a, offa, b, offb, y, offy);
+            NativeMethods.min_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Max(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
         {
-            NativeMethods.smax(length, a, offa, b, offb, y, offy);
+            NativeMethods.max_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void MinMaxGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float[] y, float[] dy, int offy)
         {
-            NativeMethods.sminmax_gradient(length, x, dx, offx, cleardx, y, dy, offy);
+            NativeMethods.minmax_gradient_f32(length, x, dx, offx, cleardx, y, dy, offy);
         }
 
         /// <summary>
@@ -391,7 +391,7 @@ namespace Genix.Core
         /// The position of minimum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, int[] x, int offx) => NativeMethods.i32argmin(length, x, offx);
+        public static int ArgMin(int length, int[] x, int offx) => NativeMethods.argmin_s32(length, x, offx);
 
         /// <summary>
         /// Returns the position of maximum value in the array of 32-bit integers.
@@ -403,7 +403,7 @@ namespace Genix.Core
         /// The position of maximum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, int[] x, int offx) => NativeMethods.i32argmax(length, x, offx);
+        public static int ArgMax(int length, int[] x, int offx) => NativeMethods.argmax_s32(length, x, offx);
 
         /// <summary>
         /// Returns the position of minimum value in the array of floats.
@@ -415,7 +415,7 @@ namespace Genix.Core
         /// The position of minimum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, float[] x, int offx) => NativeMethods.sargmin(length, x, offx);
+        public static int ArgMin(int length, float[] x, int offx) => NativeMethods.argmin_f32(length, x, offx);
 
         /// <summary>
         /// Returns the position of maximum value in the array of floats.
@@ -427,7 +427,7 @@ namespace Genix.Core
         /// The position of maximum value in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, float[] x, int offx) => NativeMethods.sargmax(length, x, offx);
+        public static int ArgMax(int length, float[] x, int offx) => NativeMethods.argmax_f32(length, x, offx);
 
         /// <summary>
         /// Returns the position of minimum and maximum values in the array.
@@ -440,7 +440,7 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgMinMax(int length, float[] x, int offx, out int min, out int max)
         {
-            NativeMethods.sargminmax(length, x, offx, out min, out max);
+            NativeMethods.argminmax_f32(length, x, offx, out min, out max);
         }
 
         /// <summary>
@@ -507,13 +507,13 @@ namespace Genix.Core
             private const string DllName = "Genix.Core.Native.dll";
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void smin(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void min_f32(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void smax(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
+            public static extern void max_f32(int n, [In] float[] a, int offa, [In, Out] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sminmax_gradient(
+            public static extern void minmax_gradient_f32(
                 int n,
                 [In] float[] x,
                 [Out] float[] dx,
@@ -524,19 +524,19 @@ namespace Genix.Core
                 int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int i32argmin(int n, [In] int[] x, int offx);
+            public static extern int argmin_s32(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int i32argmax(int n, [In] int[] x, int offx);
+            public static extern int argmax_s32(int n, [In] int[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int sargmin(int n, [In] float[] x, int offx);
+            public static extern int argmin_f32(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int sargmax(int n, [In] float[] x, int offx);
+            public static extern int argmax_f32(int n, [In] float[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sargminmax(int n, [In] float[] x, int offx, out int winmin, out int winmax);
+            public static extern void argminmax_f32(int n, [In] float[] x, int offx, out int winmin, out int winmax);
         }
     }
 }

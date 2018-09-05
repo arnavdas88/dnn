@@ -6,14 +6,16 @@
 
 namespace Genix.Imaging
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Specifies the values for the Compression field.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue", Justification = "This enumeration does not have zero value.")]
     public enum TIFFCompression
     {
+        /// <summary>
+        /// The encoder attempts to save the image with the best possible compression schema.
+        /// </summary>
+        Default = 0,
+
         /// <summary>
         /// No compression, but pack data into bytes as tightly as possible, leaving no unused bits (except at the end of a row).
         /// The component values are stored as an array of type BYTE.
