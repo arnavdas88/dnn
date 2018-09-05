@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="source\arithmetic.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\affine.cpp" />
     <ClCompile Include="source\filters.cpp" />

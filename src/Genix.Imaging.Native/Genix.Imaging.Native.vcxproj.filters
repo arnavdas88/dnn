@@ -52,5 +52,8 @@
     <ClCompile Include="source\filters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\arithmetic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
