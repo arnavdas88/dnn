@@ -11,10 +11,9 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Core;
 
     /// <content>
-    /// Provides logical extension methods for the <see cref="Image"/> class.
+    /// Provides arithmetic extension methods for the <see cref="Image"/> class.
     /// </content>
     public partial class Image
     {
@@ -23,6 +22,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="a">The first source <see cref="Image"/>.</param>
         /// <param name="b">The second source <see cref="Image"/>.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
@@ -32,7 +32,10 @@ namespace Genix.Imaging
         /// </para>
         /// <para>
         /// <paramref name="a"/> and <paramref name="b"/> do not have to have the same width and height.
-        /// If image sizes are different, the desination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// If image sizes are different, the destination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -47,7 +50,7 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image Add(Image a, Image b)
+        public Image Add(Image a, Image b, int scaleFactor)
         {
             if (a == null)
             {
@@ -71,6 +74,7 @@ namespace Genix.Imaging
                 case 32:
                     Image dst = a.Clone(false);
                     NativeMethods._add(
+                        a.BitsPerPixel,
                         Math.Min(a.Width, b.Width),
                         Math.Min(a.Height, b.Height),
                         a.Bits,
@@ -79,7 +83,7 @@ namespace Genix.Imaging
                         b.Stride8,
                         dst.Bits,
                         dst.Stride8,
-                        a.BitsPerPixel);
+                        scaleFactor);
                     return dst;
 
                 default:
@@ -94,6 +98,7 @@ namespace Genix.Imaging
         /// Adds pixel values of two images in-place.
         /// </summary>
         /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
         /// This method adds corresponding pixel values of the source image of equal depth to this image.
@@ -101,6 +106,9 @@ namespace Genix.Imaging
         /// <para>
         /// <paramref name="a"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
+        /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -114,7 +122,7 @@ namespace Genix.Imaging
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddIP(Image a)
+        public void AddIP(Image a, int scaleFactor)
         {
             if (a == null)
             {
@@ -132,6 +140,7 @@ namespace Genix.Imaging
                 case 24:
                 case 32:
                     NativeMethods._add(
+                        this.BitsPerPixel,
                         Math.Min(a.Width, this.Width),
                         Math.Min(a.Height, this.Height),
                         a.Bits,
@@ -140,7 +149,7 @@ namespace Genix.Imaging
                         0,
                         this.Bits,
                         this.Stride8,
-                        this.BitsPerPixel);
+                        scaleFactor);
                     break;
 
                 default:
@@ -156,6 +165,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="a">The source <see cref="Image"/>.</param>
         /// <param name="value">The constant value to add to image pixel values.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
@@ -171,6 +181,9 @@ namespace Genix.Imaging
         /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
         /// The alpha channel is not affected by this method.
         /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="a"/> is <b>null</b>.</para>
@@ -178,7 +191,7 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image AddC(Image a, int value)
+        public Image AddC(Image a, int value, int scaleFactor)
         {
             if (a == null)
             {
@@ -192,6 +205,7 @@ namespace Genix.Imaging
                 case 32:
                     Image dst = a.Clone(false);
                     NativeMethods._addc(
+                        a.BitsPerPixel,
                         a.Width,
                         a.Height,
                         a.Bits,
@@ -199,7 +213,7 @@ namespace Genix.Imaging
                         value,
                         dst.Bits,
                         dst.Stride8,
-                        a.BitsPerPixel);
+                        scaleFactor);
                     return dst;
 
                 default:
@@ -214,6 +228,7 @@ namespace Genix.Imaging
         /// Adds a constant to pixel values of an image in-place.
         /// </summary>
         /// <param name="value">The constant value to add to image pixel values.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
         /// This method changes the image intensity by adding value to image pixel values.
@@ -226,12 +241,15 @@ namespace Genix.Imaging
         /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
         /// The alpha channel is not affected by this method.
         /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// </para>
         /// </remarks>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddCIP(int value)
+        public void AddCIP(int value, int scaleFactor)
         {
             switch (this.BitsPerPixel)
             {
@@ -239,6 +257,7 @@ namespace Genix.Imaging
                 case 24:
                 case 32:
                     NativeMethods._addc(
+                        this.BitsPerPixel,
                         this.Width,
                         this.Height,
                         null,
@@ -246,7 +265,7 @@ namespace Genix.Imaging
                         value,
                         this.Bits,
                         this.Stride8,
-                        this.BitsPerPixel);
+                        scaleFactor);
                     break;
 
                 default:
@@ -262,6 +281,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="a">The first source <see cref="Image"/>.</param>
         /// <param name="b">The second source <see cref="Image"/>.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
@@ -271,7 +291,10 @@ namespace Genix.Imaging
         /// </para>
         /// <para>
         /// <paramref name="a"/> and <paramref name="b"/> do not have to have the same width and height.
-        /// If image sizes are different, the desination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// If image sizes are different, the destination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -286,7 +309,7 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image Sub(Image a, Image b)
+        public Image Sub(Image a, Image b, int scaleFactor)
         {
             if (a == null)
             {
@@ -310,6 +333,7 @@ namespace Genix.Imaging
                 case 32:
                     Image dst = a.Clone(false);
                     NativeMethods._sub(
+                        a.BitsPerPixel,
                         Math.Min(a.Width, b.Width),
                         Math.Min(a.Height, b.Height),
                         a.Bits,
@@ -318,7 +342,7 @@ namespace Genix.Imaging
                         b.Stride8,
                         dst.Bits,
                         dst.Stride8,
-                        a.BitsPerPixel);
+                        scaleFactor);
                     return dst;
 
                 default:
@@ -333,6 +357,7 @@ namespace Genix.Imaging
         /// Subtracts pixel values of two images in-place.
         /// </summary>
         /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
         /// This method subtracts corresponding pixel values of the source image of equal depth to this image.
@@ -340,6 +365,9 @@ namespace Genix.Imaging
         /// <para>
         /// <paramref name="a"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
+        /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -353,7 +381,7 @@ namespace Genix.Imaging
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubIP(Image a)
+        public void SubIP(Image a, int scaleFactor)
         {
             if (a == null)
             {
@@ -371,6 +399,7 @@ namespace Genix.Imaging
                 case 24:
                 case 32:
                     NativeMethods._sub(
+                        a.BitsPerPixel,
                         Math.Min(a.Width, this.Width),
                         Math.Min(a.Height, this.Height),
                         a.Bits,
@@ -379,7 +408,7 @@ namespace Genix.Imaging
                         0,
                         this.Bits,
                         this.Stride8,
-                        this.BitsPerPixel);
+                        scaleFactor);
                     break;
 
                 default:
@@ -395,6 +424,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="a">The source <see cref="Image"/>.</param>
         /// <param name="value">The constant value to subtract from image pixel values.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
@@ -410,6 +440,9 @@ namespace Genix.Imaging
         /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
         /// The alpha channel is not affected by this method.
         /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="a"/> is <b>null</b>.</para>
@@ -417,7 +450,7 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image SubC(Image a, int value)
+        public Image SubC(Image a, int value, int scaleFactor)
         {
             if (a == null)
             {
@@ -431,6 +464,7 @@ namespace Genix.Imaging
                 case 32:
                     Image dst = a.Clone(false);
                     NativeMethods._subc(
+                        a.BitsPerPixel,
                         a.Width,
                         a.Height,
                         a.Bits,
@@ -438,7 +472,7 @@ namespace Genix.Imaging
                         value,
                         dst.Bits,
                         dst.Stride8,
-                        a.BitsPerPixel);
+                        scaleFactor);
                     return dst;
 
                 default:
@@ -453,6 +487,7 @@ namespace Genix.Imaging
         /// Subtracts a constant from pixel values of an image in-place.
         /// </summary>
         /// <param name="value">The constant value to subtract from image pixel values.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
         /// This method changes the image intensity by subtracting value from image pixel values.
@@ -465,12 +500,15 @@ namespace Genix.Imaging
         /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
         /// The alpha channel is not affected by this method.
         /// </para>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// </para>
         /// </remarks>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubCIP(int value)
+        public void SubCIP(int value, int scaleFactor)
         {
             switch (this.BitsPerPixel)
             {
@@ -478,6 +516,7 @@ namespace Genix.Imaging
                 case 24:
                 case 32:
                     NativeMethods._subc(
+                        this.BitsPerPixel,
                         this.Width,
                         this.Height,
                         null,
@@ -485,7 +524,7 @@ namespace Genix.Imaging
                         value,
                         this.Bits,
                         this.Stride8,
-                        this.BitsPerPixel);
+                        scaleFactor);
                     break;
 
                 default:
@@ -501,6 +540,7 @@ namespace Genix.Imaging
         {
             [DllImport(NativeMethods.DllName)]
             public static extern int _add(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src1,
@@ -509,10 +549,11 @@ namespace Genix.Imaging
                 int src2step,
                 [Out] ulong[] dst,
                 int dststep,
-                int bitsPerPixel);
+                int scaleFactor);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _addc(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -520,10 +561,11 @@ namespace Genix.Imaging
                 int value,
                 [Out] ulong[] dst,
                 int dststep,
-                int bitsPerPixel);
+                int scaleFactor);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _sub(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src1,
@@ -532,10 +574,11 @@ namespace Genix.Imaging
                 int src2step,
                 [Out] ulong[] dst,
                 int dststep,
-                int bitsPerPixel);
+                int scaleFactor);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _subc(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -543,7 +586,7 @@ namespace Genix.Imaging
                 int value,
                 [Out] ulong[] dst,
                 int dststep,
-                int bitsPerPixel);
+                int scaleFactor);
         }
     }
 }

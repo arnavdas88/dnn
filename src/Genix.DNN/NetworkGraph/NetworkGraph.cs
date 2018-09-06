@@ -158,7 +158,7 @@ namespace Genix.DNN
                 throw new ArgumentNullException(nameof(sources));
             }
 
-            return base.AddEdges(sources.Select(x => new NetworkEdge(x, target)));
+            return this.AddEdges(sources.Select(x => new NetworkEdge(x, target)));
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Genix.DNN
                 throw new ArgumentNullException(nameof(targets));
             }
 
-            return base.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
+            return this.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
         }
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace Genix.DNN
             int count = 0;
             foreach (Layer source in sources)
             {
-                count += base.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
+                count += this.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
             }
 
             return count;
