@@ -220,9 +220,9 @@ template<typename T> void __forceinline __swap(
 	}
 }
 
-GENIXAPI(void, i32swap)(const int n, __int32* x, const int offx, __int32* y, const int offy) { __swap(n, x, offx, y, offy); }
-GENIXAPI(void, i64swap)(const int n, __int64* x, const int offx, __int64* y, const int offy) { __swap(n, x, offx, y, offy); }
-GENIXAPI(void, _sswap)(const int n, float* x, const int offx, float* y, const int offy) {
+GENIXAPI(void, swap_s32)(const int n, __int32* x, const int offx, __int32* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_s64)(const int n, __int64* x, const int offx, __int64* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_f32)(const int n, float* x, const int offx, float* y, const int offy) {
 
 	////__swap(n, x, offx, y, offy);
 	const int incxy = 1;

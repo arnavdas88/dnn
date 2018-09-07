@@ -82,6 +82,17 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Swaps elements of two arrays.
+        /// </summary>
+        /// <param name="length">The number of elements to swap.</param>
+        /// <param name="x">The first array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The second array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Swap(int length, float[] x, int offx, float[] y, int offy) => NativeMethods.swap_f32(length, x, offx, y, offy);
+
+        /// <summary>
         /// Performs thresholding of elements of an array.
         /// Elements that are less than the threshold, are set to a specified value.
         /// </summary>
@@ -144,6 +155,9 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void move_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void swap_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_lt_ip_f32(int n, float threshold, float value, [In, Out] float[] y, int offy);

@@ -309,7 +309,7 @@ namespace Genix.Core
         /// <param name="y">The second array.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, int[] x, int offx, int[] y, int offy) => NativeMethods.i32swap(length, x, offx, y, offy);
+        public static void Swap(int length, int[] x, int offx, int[] y, int offy) => NativeMethods.swap_s32(length, x, offx, y, offy);
 
         /// <summary>
         /// Swaps elements of two arrays of 32-bit unsigned integers.
@@ -321,7 +321,7 @@ namespace Genix.Core
         /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void Swap(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.u32swap(length, x, offx, y, offy);
+        public static void Swap(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.swap_u32(length, x, offx, y, offy);
 
         /// <summary>
         /// Swaps elements of two arrays of 64-bit integers.
@@ -332,7 +332,7 @@ namespace Genix.Core
         /// <param name="y">The second array.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, long[] x, int offx, long[] y, int offy) => NativeMethods.i64swap(length, x, offx, y, offy);
+        public static void Swap(int length, long[] x, int offx, long[] y, int offy) => NativeMethods.swap_s64(length, x, offx, y, offy);
 
         /// <summary>
         /// Swaps elements of two arrays of 64-bit unsigned integers.
@@ -344,18 +344,7 @@ namespace Genix.Core
         /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void Swap(int length, ulong[] x, int offx, ulong[] y, int offy) => NativeMethods.u64swap(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Swaps elements of two arrays of floats.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, float[] x, int offx, float[] y, int offy) => NativeMethods._sswap(length, x, offx, y, offy);
+        public static void Swap(int length, ulong[] x, int offx, ulong[] y, int offy) => NativeMethods.swap_u64(length, x, offx, y, offy);
 
         /// <summary>
         /// Copies elements of an array to another array with unit increment.
@@ -792,19 +781,16 @@ namespace Genix.Core
             public static extern void unpack(int n, [In] float[] a, int offa, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void i32swap(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
+            public static extern void swap_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
-            [DllImport(NativeMethods.DllName, EntryPoint = "i32swap")]
-            public static extern void u32swap(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void i64swap(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "i64swap")]
-            public static extern void u64swap(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            [DllImport(NativeMethods.DllName, EntryPoint = "swap_s32")]
+            public static extern void swap_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void _sswap(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
+            public static extern void swap_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "swap_s64")]
+            public static extern void swap_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void fqsort(
