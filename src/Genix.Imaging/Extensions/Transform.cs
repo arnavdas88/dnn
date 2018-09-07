@@ -39,14 +39,14 @@ namespace Genix.Imaging
             System.Windows.Point br = TransformPoint(this.Width, this.Height);
             System.Windows.Point bl = TransformPoint(0, this.Height);
 
-            double x1dst = Maximum.Min(bl.X, tr.X, br.X, 0.0);
-            double x2dst = Maximum.Max(bl.X, tr.X, br.X, 0.0);
-            double y1dst = Maximum.Min(bl.Y, tr.Y, br.Y, 0.0);
-            double y2dst = Maximum.Max(bl.Y, tr.Y, br.Y, 0.0);
+            double x1dst = Math64f.Min(bl.X, tr.X, br.X, 0.0);
+            double x2dst = Math64f.Max(bl.X, tr.X, br.X, 0.0);
+            double y1dst = Math64f.Min(bl.Y, tr.Y, br.Y, 0.0);
+            double y2dst = Math64f.Max(bl.Y, tr.Y, br.Y, 0.0);
 
             // translate matrix so the transformed image fits into new frame
-            matrix.OffsetX = -Maximum.Min(x1dst, x2dst);
-            matrix.OffsetY = -Maximum.Min(y1dst, y2dst);
+            matrix.OffsetX = -Math.Min(x1dst, x2dst);
+            matrix.OffsetY = -Math.Min(y1dst, y2dst);
 
             // note: add epsilon to avoid rounding problems
             int widthdst = (int)Math.Floor(x2dst - x1dst + Eps);

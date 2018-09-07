@@ -121,6 +121,7 @@
     <ClInclude Include="..\..\..\tesseract\vs2017\tess_version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\mutableiterator.cpp" />
     <ClCompile Include="..\..\..\tesseract\vs2017\dllmain.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\api\baseapi.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\api\capi.cpp" />
@@ -177,7 +178,6 @@
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\detlinefit.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\dppoint.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\fontinfo.cpp" />
-    <ClCompile Include="..\..\..\tesseract\src\ccstruct\genblob.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\imagedata.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\linlsq.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\matrix.cpp" />

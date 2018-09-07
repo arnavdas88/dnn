@@ -138,7 +138,7 @@ namespace Genix.Imaging
 
             for (int iy = 0, offy = 0; iy < cellCountY; iy++, offy += stride * cellSize)
             {
-                float[] h = hist[Maximum.Min(iy, blockSize - 1)];
+                float[] h = hist[Math.Min(iy, blockSize - 1)];
                 ComputeHistLine(offy, h);
 
                 if (iy + 1 >= blockSize)
@@ -202,13 +202,13 @@ namespace Genix.Imaging
                 {
                     int kernelSize = cellSize * blockSize;
                     int kernelStride = cellSize * blockStride;
-                    return Mathematics.RoundUp(Maximum.Max(size - kernelSize, 0), kernelStride) + kernelSize;
+                    return Mathematics.RoundUp(Math.Max(size - kernelSize, 0), kernelStride) + kernelSize;
                 }
             }
 
             int ComputeBlockCount(int cellCount)
             {
-                return (Maximum.Max(cellCount - blockSize, 0) / blockStride) + 1;
+                return (Math.Max(cellCount - blockSize, 0) / blockStride) + 1;
             }
 
             List<float[]> CreateRotatingHist()

@@ -91,6 +91,8 @@
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Array32f.cs" />
+    <Compile Include="Math\Math64f.cs" />
+    <Compile Include="Math\Math8u.cs" />
     <Compile Include="Win32\Win32NativeMethods.cs" />
     <Compile Include="System\DisposableObject.cs" />
     <Compile Include="System\FloatExtensions.cs" />

@@ -412,7 +412,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Maximum.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
@@ -423,7 +423,7 @@ namespace Genix.MachineLearning
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    Maximum.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Math32f.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
@@ -442,7 +442,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Maximum.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
@@ -467,11 +467,11 @@ namespace Genix.MachineLearning
                             }
                             else
                             {
-                                Maximum.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    Maximum.Max(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Math32f.Max(xstride1, xw, pos, wspw, 0, wspw, 0);
                                 }
                             }
 
@@ -484,11 +484,11 @@ namespace Genix.MachineLearning
                                 }
                                 else
                                 {
-                                    Maximum.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Math32f.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        Maximum.Max(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Math32f.Max(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
                                     }
                                 }
                             }

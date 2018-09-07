@@ -569,6 +569,22 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Computes a smaller of each pair of elements of the two array arguments not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Min(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.min_f32(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
         /// Computes a larger of each element of an array and a scalar value in-place.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -594,6 +610,22 @@ namespace Genix.Core
         public static void MaxC(int length, float[] x, int offx, float a, float[] y, int offy)
         {
             NativeMethods.maxc_f32(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each pair of elements of the two array arguments not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Max(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
+        {
+            NativeMethods.max_f32(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
@@ -860,10 +892,16 @@ namespace Genix.Core
             public static extern void minc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
+            public static extern void min_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void maxc_ip_f32(int n, float a, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void maxc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void max_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern float sum_f32(int n, [In] float[] x, int offx);

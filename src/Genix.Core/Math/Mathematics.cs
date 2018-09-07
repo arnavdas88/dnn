@@ -1379,21 +1379,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the sum of all elements in the array of 8-bit unsigned integers.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Sum(int length, byte[] x, int offx)
-        {
-            return NativeMethods.sum_u8(length, x, offx);
-        }
-
-        /// <summary>
         /// Computes the sum of all elements in the array of 32-bit integers.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -1780,9 +1765,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int sum_u8(int n, [In] byte[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int sum_s32(int n, [In] int[] x, int offx);

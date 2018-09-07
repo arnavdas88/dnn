@@ -30,7 +30,7 @@ namespace Genix.Imaging
         /// <returns>
         /// The combined <see cref="Image"/>.
         /// </returns>
-        public static Image operator &(Image left, Image right) => left.AND(right);
+        public static Image operator &(Image left, Image right) => left.And(right);
 
         /// <summary>
         /// Performs a bitwise logical OR operation on two images with equal depth and returns a combined image.
@@ -40,7 +40,7 @@ namespace Genix.Imaging
         /// <returns>
         /// The combined <see cref="Image"/>.
         /// </returns>
-        public static Image operator |(Image left, Image right) => left.OR(right);
+        public static Image operator |(Image left, Image right) => left.Or(right);
 
         /// <summary>
         /// Performs a bitwise logical XOR operation on two images with equal depth and returns a combined image.

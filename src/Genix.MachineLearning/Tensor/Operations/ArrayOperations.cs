@@ -885,7 +885,7 @@ namespace Genix.MachineLearning
                         for (int i = 1; i < count; i++)
                         {
                             Arrays.Pack(length, xw, i, count, wsp, 0);
-                            Maximum.Max(length, yw, 0, wsp, 0, yw, 0);
+                            Math32f.Max(length, yw, 0, wsp, 0, yw, 0);
                         }
                     }
                     else
@@ -897,7 +897,7 @@ namespace Genix.MachineLearning
 
                             for (int i = 1; i < count; i++, offx += xstride)
                             {
-                                Maximum.Max(xstride, yw, offy, xw, offx, yw, offy);
+                                Math32f.Max(xstride, yw, offy, xw, offx, yw, offy);
                             }
                         }
                     }

@@ -104,6 +104,183 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Sets all <see cref="Image"/> pixels to maximum value (2^bpp - 1) not-in-place.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to maximum value (2^bpp - 1).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMax()
+        {
+            Image dst = this.Clone(false);
+            dst.SetToMaxIP();
+            return dst;
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to maximum value (2^bpp - 1) not-in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to maximum value (2^bpp - 1).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMax(int x, int y, int width, int height)
+        {
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                return this.SetToMax();
+            }
+            else
+            {
+                Image dst = this.Copy();
+                dst.SetToMaxIP(x, y, width, height);
+                return dst;
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to maximum value (2^bpp - 1) not-in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to maximum value (2^bpp - 1).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMax(Rectangle rect) => this.SetToMax(rect.X, rect.Y, rect.Width, rect.Height);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels to maximum value (2^bpp - 1) in-place.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMaxIP() => Arrays.Set(this.Bits.Length, ulong.MaxValue, this.Bits, 0);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to maximum value (2^bpp - 1) in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMaxIP(int x, int y, int width, int height)
+        {
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                this.SetToMaxIP();
+            }
+            else
+            {
+                this.ValidateArea(x, y, width, height);
+
+                ulong[] bits = this.Bits;
+                int count = width * this.BitsPerPixel;
+                int stride1 = this.Stride1;
+
+                for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
+                {
+                    BitUtils64.SetBits(count, bits, off);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to maximum value (2^bpp - 1) in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMaxIP(Rectangle rect) => this.SetToMaxIP(rect.X, rect.Y, rect.Width, rect.Height);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels to minimum value (zero) not-in-place.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to minimum value (zero).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMin() => this.Clone(false);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to minimum value (zero) not-in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to minimum value (zero).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMin(int x, int y, int width, int height)
+        {
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                return this.SetToMin();
+            }
+            else
+            {
+                Image dst = this.Copy();
+                dst.SetToMinIP(x, y, width, height);
+                return dst;
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to minimum value (zero) not-in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <returns>
+        /// A new <see cref="Image"/> with all pixels set to minimum value (zero).
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetToMin(Rectangle rect) => this.SetToMin(rect.X, rect.Y, rect.Width, rect.Height);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels to minimum value (zero) in-place.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMinIP() => Arrays.Set(this.Bits.Length, 0ul, this.Bits, 0);
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to minimum value (zero) in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMinIP(int x, int y, int width, int height)
+        {
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                this.SetToMinIP();
+            }
+            else
+            {
+                this.ValidateArea(x, y, width, height);
+
+                ulong[] bits = this.Bits;
+                int count = width * this.BitsPerPixel;
+                int stride1 = this.Stride1;
+
+                for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
+                {
+                    BitUtils64.ResetBits(count, bits, off);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all <see cref="Image"/> pixels in the specified rectangular area to minimum value (zero) in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetToMinIP(Rectangle rect) => this.SetToMinIP(rect.X, rect.Y, rect.Width, rect.Height);
+
+        /// <summary>
         /// Sets all <see cref="Image"/> pixels to white color not-in-place.
         /// </summary>
         /// <returns>

@@ -93,24 +93,60 @@ GENIXAPI(void, maxc_f32)(int n, const float* x, int offx, float a, float* y, int
 GENIXAPI(void, maxc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __maxc(n, x, offx, a, y, offy); }
 
 // Returns the smaller of each pair of elements of the two vector arguments.
-extern "C" __declspec(dllexport) void WINAPI min_f32(
+template<typename T> void __forceinline ___min(
 	int n,
-	const float* a, int offa,
-	float* b, int offb,
-	float* y, int offy)
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
 {
-	::vsFmin(n, a + offa, b + offb, y + offy);
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = __min(a[i], b[i]);
+	}
 }
 
+GENIXAPI(void, min_s8)(int n, const __int8* a, int offa, const __int8* b, int offb, __int8* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_s16)(int n, const __int16* a, int offa, const __int16* b, int offb, __int16* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_u8)(int n, const unsigned __int8* a, int offa, const unsigned __int8* b, int offb, unsigned __int8* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_u16)(int n, const unsigned __int16* a, int offa, const unsigned __int16* b, int offb, unsigned __int16* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, min_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
+
 // Returns the larger of each pair of elements of the two vector arguments.
-extern "C" __declspec(dllexport) void WINAPI max_f32(
+template<typename T> void __forceinline ___max(
 	int n,
-	const float* a, int offa,
-	float* b, int offb,
-	float* y, int offy)
+	const T* a, int offa,
+	const T* b, int offb,
+	T* y, int offy)
 {
-	::vsFmax(n, a + offa, b + offb, y + offy);
+	a += offa;
+	b += offb;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = __max(a[i], b[i]);
+	}
 }
+
+GENIXAPI(void, max_s8)(int n, const __int8* a, int offa, const __int8* b, int offb, __int8* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_s16)(int n, const __int16* a, int offa, const __int16* b, int offb, __int16* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_u8)(int n, const unsigned __int8* a, int offa, const unsigned __int8* b, int offb, unsigned __int8* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_u16)(int n, const unsigned __int16* a, int offa, const unsigned __int16* b, int offb, unsigned __int16* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, max_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
 
 extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
 	int n,

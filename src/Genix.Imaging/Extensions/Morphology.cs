@@ -46,14 +46,59 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(kernel));
             }
 
-            // create mask
-            ulong[] mask = new ulong[this.Bits.Length];
+            Image mask = this.Clone(false);
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Image.BuildORMask(this, kernel, null, mask, iteration > 0);
+                // create mask
+                if (iteration > 0)
+                {
+                    mask.SetToMinIP();
+                }
 
-                // process image
-                Arrays.OR(mask.Length, mask, 0, this.Bits, 0);
+                // special case for rectangular kernel
+                // instead of applying m x n mask
+                // we sequentially apply n x 1 and 1 x n masks
+                if (kernel is RectangleStructuringElement rectangularKernel)
+                {
+                    // create vertical mask
+                    foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
+                    {
+                        MakeMask(point);
+                    }
+
+                    // apply mask
+                    this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+
+                    // create horizontal mask
+                    mask.SetToMinIP();
+
+                    foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
+                    {
+                        MakeMask(point);
+                    }
+                }
+                else
+                {
+                    foreach (Point point in kernel.GetElements())
+                    {
+                        MakeMask(point);
+                    }
+                }
+
+                // apply mask
+                this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+            }
+
+            void MakeMask(Point point)
+            {
+                mask.MaximumIP(
+                    Math.Max(-point.X, 0),
+                    Math.Max(-point.Y, 0),
+                    this.Width - Math.Abs(point.X),
+                    this.Height - Math.Abs(point.Y),
+                    this,
+                    Math.Max(point.X, 0),
+                    Math.Max(point.Y, 0));
             }
         }
 
@@ -84,14 +129,56 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(kernel));
             }
 
-            // create mask
-            ulong[] mask = new ulong[this.Bits.Length];
+            Image mask = this.Clone(false);
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                Image.BuildANDMask(this, kernel, null, mask, true);
+                // create mask
+                mask.SetToMaxIP();
 
-                // process image
-                Arrays.AND(mask.Length, mask, 0, this.Bits, 0);
+                // special case for rectangular kernel
+                // instead of applying m x n mask
+                // we sequentially apply n x 1 and 1 x n masks
+                if (kernel is RectangleStructuringElement rectangularKernel)
+                {
+                    // create vertical mask
+                    foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
+                    {
+                        MakeMask(point);
+                    }
+
+                    // apply mask
+                    this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+
+                    // create horizontal mask
+                    mask.SetToMaxIP();
+
+                    foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
+                    {
+                        MakeMask(point);
+                    }
+                }
+                else
+                {
+                    foreach (Point point in kernel.GetElements())
+                    {
+                        MakeMask(point);
+                    }
+                }
+
+                // apply mask
+                this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+            }
+
+            void MakeMask(Point point)
+            {
+                mask.MinimumIP(
+                    Math.Max(-point.X, 0),
+                    Math.Max(-point.Y, 0),
+                    this.Width - Math.Abs(point.X),
+                    this.Height - Math.Abs(point.Y),
+                    this,
+                    Math.Max(point.X, 0),
+                    Math.Max(point.Y, 0));
             }
         }
 

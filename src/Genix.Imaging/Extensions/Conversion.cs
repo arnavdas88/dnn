@@ -635,8 +635,8 @@ namespace Genix.Imaging
                 this.VerticalResolution);
 
             // convert pixels
-            int areaWidth = Maximum.Min(width, this.Width);
-            int areaHeight = Maximum.Min(height, this.Height);
+            int areaWidth = Math.Min(width, this.Width);
+            int areaHeight = Math.Min(height, this.Height);
             if (NativeMethods._convert8to32f(
                 0,
                 0,

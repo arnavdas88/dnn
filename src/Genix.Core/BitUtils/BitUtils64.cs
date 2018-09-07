@@ -568,6 +568,9 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_xor_64(int count, [In] ulong[] x, int posx, [Out] ulong[] y, int posy);
+
+            [DllImport(NativeMethods.DllName, EntryPoint = "max_u8")]
+            public static extern void max_u8_u64(int n, [In] ulong[] a, int offa8, [In] ulong[] b, int offb8, [Out] ulong[] y, int offy8);
         }
     }
 }

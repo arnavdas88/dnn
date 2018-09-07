@@ -151,9 +151,6 @@
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\fontinfo.cpp">
       <Filter>Tesseract\ccstruct</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\tesseract\src\ccstruct\genblob.cpp">
-      <Filter>Tesseract\ccstruct</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\tesseract\src\ccstruct\imagedata.cpp">
       <Filter>Tesseract\ccstruct</Filter>
     </ClCompile>
@@ -709,6 +706,10 @@
     <ClCompile Include="..\..\..\tesseract\src\vs2010\port\gettimeofday.cpp">
       <Filter>Tesseract\vs2010\port</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tesseract\vs2017\dllmain.cpp" />
+    <ClCompile Include="..\..\..\tesseract\src\ccmain\mutableiterator.cpp">
+      <Filter>Tesseract\ccmain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\tesseract\src\api\apitypes.h">
@@ -723,6 +724,9 @@
     <ClInclude Include="..\..\..\tesseract\src\api\renderer.h">
       <Filter>Tesseract\api</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\tesseract\vs2017\config_auto.h" />
+    <ClInclude Include="..\..\..\tesseract\vs2017\endianness.h" />
+    <ClInclude Include="..\..\..\tesseract\vs2017\tess_version.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tesseract">
