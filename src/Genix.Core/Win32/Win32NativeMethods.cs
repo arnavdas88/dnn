@@ -58,5 +58,24 @@ namespace Genix.Win32
         public static extern void memset(IntPtr dst, int value, IntPtr size);
 
 #pragma warning restore SA1300 // Element should begin with upper-case letter
+
+        /// <summary>
+        /// Multiplies two 32-bit integers and then divides the 64-bit result by a third 32-bit value.
+        /// </summary>
+        /// <param name="number">The multiplicand.</param>
+        /// <param name="numerator">The multiplier.</param>
+        /// <param name="denominator">The number by which the result of the multiplication operation is to be divided.</param>
+        /// <returns>
+        /// <para>
+        /// If the function succeeds, the return value is the result of the multiplication and division, rounded to the nearest integer.
+        /// If the result is a positive half integer (ends in .5), it is rounded up.
+        /// If the result is a negative half integer, it is rounded down.
+        /// </para>
+        /// <para>
+        /// If either an overflow occurred or <c>denominator</c> was 0, the return value is -1.
+        /// </para>
+        /// </returns>
+        [DllImport(Win32NativeMethods.KERNEL32)]
+        public static extern int MulDiv(int number, int numerator, int denominator);
     }
 }
