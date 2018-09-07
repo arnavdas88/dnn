@@ -60,21 +60,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes the absolute value of elements of an array of double-precision floating point numbers in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) = Math.Abs(y(offy + i))</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Abs(int length, double[] y, int offy)
-        {
-            NativeMethods.abs_ip_f64(length, y, offy);
-        }
-
-        /// <summary>
         /// Adds a constant value to each element of an array of 32-bit integers in-place.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -773,22 +758,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Multiplies each element of an array of double-precision floating point numbers by a constant value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) *= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MulC(int length, double alpha, double[] y, int offy)
-        {
-            NativeMethods.mulc_ip_f64(length, alpha, y, offy);
-        }
-
-        /// <summary>
         /// Multiplies each element of an array of 32-bit integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to multiply.</param>
@@ -860,24 +829,6 @@ namespace Genix.Core
         public static void MulC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
         {
             NativeMethods.mulc_u64(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Multiplies each element of an array of double-precision floating point numbers by a constant value not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MulC(int length, double[] x, int offx, double alpha, double[] y, int offy)
-        {
-            NativeMethods.mulc_f64(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -1095,22 +1046,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Divides each element of an array of double-precision floating point numbers by a constant value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to divide.</param>
-        /// <param name="alpha">The scalar to divide.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) /= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DivC(int length, double alpha, double[] y, int offy)
-        {
-            NativeMethods.divc_ip_f64(length, alpha, y, offy);
-        }
-
-        /// <summary>
         /// Divides each element of an array of 32-bit integers by a constant value not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to divide.</param>
@@ -1182,24 +1117,6 @@ namespace Genix.Core
         public static void DivC(int length, ulong[] x, int offx, ulong alpha, ulong[] y, int offy)
         {
             NativeMethods.divc_u64(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Divides each element of an array of double-precision floating point numbers by a constant value not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to divide.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to divide.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) / alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DivC(int length, double[] x, int offx, double alpha, double[] y, int offy)
-        {
-            NativeMethods.divc_f64(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
@@ -1455,46 +1372,6 @@ namespace Genix.Core
             return NativeMethods.svariance(length, x, offx);
         }
 
-        /// <summary>
-        /// Computes the Manhattan distance between two arrays of double-precision floating point numbers.
-        /// </summary>
-        /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="x">The first array <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The first array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <returns>
-        /// The Manhattan distance between two vectors.
-        /// </returns>
-        /// <remarks>
-        /// The method performs operation defined as sum(abs(x[offx + i] - y[offy + i])).
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double ManhattanDistance(int length, double[] x, int offx, double[] y, int offy)
-        {
-            return NativeMethods.manhattan_distance_f64(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes the Euclidean distance between two arrays of double-precision floating point numbers.
-        /// </summary>
-        /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="x">The first array <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The first array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <returns>
-        /// The Euclidean distance between two vectors.
-        /// </returns>
-        /// <remarks>
-        /// The method performs operation defined as sqrt(sum((x[offx + i] - y[offy + i])^2)).
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double EuclideanDistance(int length, double[] x, int offx, double[] y, int offy)
-        {
-            return NativeMethods.euclidean_distance_f64(length, x, offx, y, offy);
-        }
-
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
@@ -1505,9 +1382,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void abs_ip_s64(int n, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void abs_ip_f64(int n, [Out] double[] y, int offy);
 
             /*[DllImport(NativeMethods.DllName)]
              public static extern void sinv(int n, [In] float[] a, int offa, [Out] float[] y, int offy);*/
@@ -1645,9 +1519,6 @@ namespace Genix.Core
             public static extern void mulc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void mulc_ip_f64(int n, double a, [In, Out] double[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void mulc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1660,12 +1531,6 @@ namespace Genix.Core
             public static extern void mulc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void mulc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mulc_f64(int n, [In] double[] x, int offx, double a, [Out] double[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void mul_ip_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1676,9 +1541,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void mul_ip_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mul_ip_f32(int n, [In] float[] x, int offx, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void mul_s32(int n, [In] int[] a, int offa, [In] int[] b, int offb, [Out] int[] y, int offy);
@@ -1708,12 +1570,6 @@ namespace Genix.Core
             public static extern void divc_ip_u64(int n, ulong a, [In, Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void divc_ip_f32(int n, float a, [In, Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void divc_ip_f64(int n, double a, [In, Out] double[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void divc_s32(int n, [In] int[] x, int offx, int a, [Out] int[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1724,12 +1580,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void divc_u64(int n, [In] ulong[] x, int offx, ulong a, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void divc_f32(int n, [In] float[] x, int offx, float a, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void divc_f64(int n, [In] double[] x, int offx, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sdiv(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
@@ -1780,12 +1630,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern float svariance(int n, [In] float[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern double manhattan_distance_f64(int n, [In] double[] x, int offx, [In] double[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern double euclidean_distance_f64(int n, [In] double[] x, int offx, [In] double[] y, int offy);
         }
     }
 }

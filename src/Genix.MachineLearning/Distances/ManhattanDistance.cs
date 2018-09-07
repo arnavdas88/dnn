@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double Distance(double[] x, double[] y)
         {
-            return Mathematics.ManhattanDistance(x.Length, x, 0, y, 0);
+            return Math64f.ManhattanDistance(x.Length, x, 0, y, 0);
         }
 
         /// <inheritdoc />
