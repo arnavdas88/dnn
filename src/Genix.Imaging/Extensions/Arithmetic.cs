@@ -20,67 +20,59 @@ namespace Genix.Imaging
         /// <summary>
         /// Adds pixel values of two images not-in-place.
         /// </summary>
-        /// <param name="a">The first source <see cref="Image"/>.</param>
-        /// <param name="b">The second source <see cref="Image"/>.</param>
+        /// <param name="src">The <see cref="Image"/> to add.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// <para>
-        /// This method adds corresponding pixel values of two source images with equal depth and places the results in a destination image.
+        /// This method adds corresponding pixel values of <paramref name="src"/> to this <see cref="Image"/> and places the results in a destination image.
         /// </para>
         /// <para>
-        /// <paramref name="a"/> and <paramref name="b"/> do not have to have the same width and height.
-        /// If image sizes are different, the destination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><paramref name="b"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="a"/> and <paramref name="b"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image Add(Image a, Image b, int scaleFactor)
+        public Image Add(Image src, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            if (b == null)
-            {
-                throw new ArgumentNullException(nameof(b));
-            }
-
-            if (a.BitsPerPixel != b.BitsPerPixel)
+            if (src.BitsPerPixel != this.BitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            switch (a.BitsPerPixel)
+            switch (src.BitsPerPixel)
             {
                 case 8:
                 case 24:
                 case 32:
-                    Image dst = a.Clone(false);
+                    Image dst = src.Clone(false);
                     NativeMethods._add(
-                        a.BitsPerPixel,
-                        Math.Min(a.Width, b.Width),
-                        Math.Min(a.Height, b.Height),
-                        a.Bits,
-                        a.Stride8,
-                        b.Bits,
-                        b.Stride8,
+                        this.BitsPerPixel,
+                        Math.Min(src.Width, this.Width),
+                        Math.Min(src.Height, this.Height),
+                        this.Bits,
+                        this.Stride8,
+                        src.Bits,
+                        src.Stride8,
                         dst.Bits,
                         dst.Stride8,
                         scaleFactor);
@@ -90,21 +82,21 @@ namespace Genix.Imaging
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        a.BitsPerPixel));
+                        src.BitsPerPixel));
             }
         }
 
         /// <summary>
         /// Adds pixel values of two images in-place.
         /// </summary>
-        /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="src">The <see cref="Image"/> to add.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
-        /// This method adds corresponding pixel values of the source image of equal depth to this image.
+        /// This method adds corresponding pixel values of <paramref name="src"/> to this <see cref="Image"/>.
         /// </para>
         /// <para>
-        /// <paramref name="a"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
         /// <para>
@@ -112,24 +104,24 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="a"/> and this <see cref="Image"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddIP(Image a, int scaleFactor)
+        public void AddIP(Image src, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            if (a.BitsPerPixel != this.BitsPerPixel)
+            if (src.BitsPerPixel != this.BitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
@@ -141,10 +133,10 @@ namespace Genix.Imaging
                 case 32:
                     NativeMethods._add(
                         this.BitsPerPixel,
-                        Math.Min(a.Width, this.Width),
-                        Math.Min(a.Height, this.Height),
-                        a.Bits,
-                        a.Stride8,
+                        Math.Min(src.Width, this.Width),
+                        Math.Min(src.Height, this.Height),
+                        src.Bits,
+                        src.Stride8,
                         null,
                         0,
                         this.Bits,
@@ -163,7 +155,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Adds a constant to pixel values of an image not-in-place.
         /// </summary>
-        /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="src">The source <see cref="Image"/>.</param>
         /// <param name="value">The constant value to add to image pixel values.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
@@ -186,30 +178,30 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image AddC(Image a, int value, int scaleFactor)
+        public Image AddC(Image src, int value, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            switch (a.BitsPerPixel)
+            switch (src.BitsPerPixel)
             {
                 case 8:
                 case 24:
                 case 32:
-                    Image dst = a.Clone(false);
+                    Image dst = src.Clone(false);
                     NativeMethods._addc(
-                        a.BitsPerPixel,
-                        a.Width,
-                        a.Height,
-                        a.Bits,
-                        a.Stride8,
+                        src.BitsPerPixel,
+                        src.Width,
+                        src.Height,
+                        src.Bits,
+                        src.Stride8,
                         value,
                         dst.Bits,
                         dst.Stride8,
@@ -220,7 +212,7 @@ namespace Genix.Imaging
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        a.BitsPerPixel));
+                        src.BitsPerPixel));
             }
         }
 
@@ -279,67 +271,62 @@ namespace Genix.Imaging
         /// <summary>
         /// Subtracts pixel values of two images not-in-place.
         /// </summary>
-        /// <param name="a">The first source <see cref="Image"/>.</param>
-        /// <param name="b">The second source <see cref="Image"/>.</param>
+        /// <param name="src">The <see cref="Image"/> to subtract.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
         /// A new destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// <para>
-        /// This method subtracts corresponding pixel values of two source images with equal depth and places the results in a destination image.
+        /// This method subtracts corresponding pixel values of <paramref name="src"/> to this <see cref="Image"/> and places the results in a destination image.
         /// </para>
         /// <para>
-        /// <paramref name="a"/> and <paramref name="b"/> do not have to have the same width and height.
-        /// If image sizes are different, the destination image has the size of <paramref name="a"/> and the operation is performed in its upper-left corner.
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><paramref name="b"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="a"/> and <paramref name="b"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image Sub(Image a, Image b, int scaleFactor)
+        public Image Sub(Image src, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            if (b == null)
-            {
-                throw new ArgumentNullException(nameof(b));
-            }
-
-            if (a.BitsPerPixel != b.BitsPerPixel)
+            if (src.BitsPerPixel != this.BitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            switch (a.BitsPerPixel)
+            switch (src.BitsPerPixel)
             {
+                case 1:
+                    return this.Xand(src);
+
                 case 8:
                 case 24:
                 case 32:
-                    Image dst = a.Clone(false);
+                    Image dst = src.Clone(false);
                     NativeMethods._sub(
-                        a.BitsPerPixel,
-                        Math.Min(a.Width, b.Width),
-                        Math.Min(a.Height, b.Height),
-                        a.Bits,
-                        a.Stride8,
-                        b.Bits,
-                        b.Stride8,
+                        this.BitsPerPixel,
+                        Math.Min(src.Width, this.Width),
+                        Math.Min(src.Height, this.Height),
+                        this.Bits,
+                        this.Stride8,
+                        src.Bits,
+                        src.Stride8,
                         dst.Bits,
                         dst.Stride8,
                         scaleFactor);
@@ -349,21 +336,21 @@ namespace Genix.Imaging
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        a.BitsPerPixel));
+                        src.BitsPerPixel));
             }
         }
 
         /// <summary>
         /// Subtracts pixel values of two images in-place.
         /// </summary>
-        /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="src">The source <see cref="Image"/>.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <remarks>
         /// <para>
         /// This method subtracts corresponding pixel values of the source image of equal depth to this image.
         /// </para>
         /// <para>
-        /// <paramref name="a"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
         /// <para>
@@ -371,24 +358,24 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="a"/> and this <see cref="Image"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubIP(Image a, int scaleFactor)
+        public void SubIP(Image src, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            if (a.BitsPerPixel != this.BitsPerPixel)
+            if (src.BitsPerPixel != this.BitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
@@ -399,11 +386,11 @@ namespace Genix.Imaging
                 case 24:
                 case 32:
                     NativeMethods._sub(
-                        a.BitsPerPixel,
-                        Math.Min(a.Width, this.Width),
-                        Math.Min(a.Height, this.Height),
-                        a.Bits,
-                        a.Stride8,
+                        src.BitsPerPixel,
+                        Math.Min(src.Width, this.Width),
+                        Math.Min(src.Height, this.Height),
+                        src.Bits,
+                        src.Stride8,
                         null,
                         0,
                         this.Bits,
@@ -422,7 +409,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Subtracts a constant from pixel values of an image not-in-place.
         /// </summary>
-        /// <param name="a">The source <see cref="Image"/>.</param>
+        /// <param name="src">The source <see cref="Image"/>.</param>
         /// <param name="value">The constant value to subtract from image pixel values.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
@@ -445,30 +432,30 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
-        public Image SubC(Image a, int value, int scaleFactor)
+        public Image SubC(Image src, int value, int scaleFactor)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            switch (a.BitsPerPixel)
+            switch (src.BitsPerPixel)
             {
                 case 8:
                 case 24:
                 case 32:
-                    Image dst = a.Clone(false);
+                    Image dst = src.Clone(false);
                     NativeMethods._subc(
-                        a.BitsPerPixel,
-                        a.Width,
-                        a.Height,
-                        a.Bits,
-                        a.Stride8,
+                        src.BitsPerPixel,
+                        src.Width,
+                        src.Height,
+                        src.Bits,
+                        src.Stride8,
                         value,
                         dst.Bits,
                         dst.Stride8,
@@ -479,7 +466,7 @@ namespace Genix.Imaging
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        a.BitsPerPixel));
+                        src.BitsPerPixel));
             }
         }
 

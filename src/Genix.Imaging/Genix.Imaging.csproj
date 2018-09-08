@@ -67,6 +67,11 @@
     <Compile Include="Extensions\CrossStructuringElement.cs" />
     <Compile Include="Extensions\FeatureDetectors.cs" />
     <Compile Include="Extensions\Filters.cs" />
+    <Compile Include="Extensions\Logical.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Logical.tt</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\RectangleStructuringElement.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
@@ -145,6 +150,15 @@
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Extensions\Logical.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Logical.Generated.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

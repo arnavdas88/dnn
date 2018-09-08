@@ -185,7 +185,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
@@ -196,7 +196,7 @@ namespace Genix.MachineLearning
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    Math32f.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Vectors.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
@@ -215,7 +215,7 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
@@ -238,11 +238,11 @@ namespace Genix.MachineLearning
                             }
                             else
                             {
-                                Math32f.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    Math32f.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Vectors.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
                                 }
                             }
 
@@ -255,11 +255,11 @@ namespace Genix.MachineLearning
                                 }
                                 else
                                 {
-                                    Math32f.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Vectors.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        Math32f.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Vectors.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
                                     }
                                 }
                             }
@@ -617,7 +617,7 @@ namespace Genix.MachineLearning
                     else
 #endif
                     {
-                        Math32f.MulC(x.Length, xw, 0, probability, yw, 0);
+                        Vectors.MulC(x.Length, xw, 0, probability, yw, 0);
                     }
 
                     return y;

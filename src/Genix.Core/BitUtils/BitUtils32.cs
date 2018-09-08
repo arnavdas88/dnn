@@ -436,7 +436,7 @@ namespace Genix.Core
             NativeMethods.bits_not2_32(length, x, offx, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical OR operation on two 32-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -447,7 +447,7 @@ namespace Genix.Core
         public static void BitsOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
             NativeMethods.bits_or_32(count, x, posx, y, posy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical AND operation between 32-bits array and a scalar value.
@@ -474,7 +474,7 @@ namespace Genix.Core
             NativeMethods.bits_and_mask_inc_32(length, mask, y, offy, incy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical AND operation on two 32-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -498,7 +498,7 @@ namespace Genix.Core
         public static void BitsXOR(int count, uint[] x, int posx, uint[] y, int posy)
         {
             NativeMethods.bits_xor_32(count, x, posx, y, posy);
-        }
+        }*/
 
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods

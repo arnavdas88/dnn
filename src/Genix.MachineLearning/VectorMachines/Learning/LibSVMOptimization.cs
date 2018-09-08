@@ -634,7 +634,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     return;
                 }
 
-                Math32f.Add(
+                Vectors.Add(
                     numberOfVariables - activeSize,
                     gbar,
                     activeSize,

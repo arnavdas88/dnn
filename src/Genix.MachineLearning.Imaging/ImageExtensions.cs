@@ -122,7 +122,7 @@ namespace Genix.MachineLearning.Imaging
                 }
 
                 // normalize tensor to 1
-                Math32f.MulC(tensor.Length, (float)(1.0 / ((1 << bitsPerPixel) - 1)), w, 0);
+                Vectors.MulC(tensor.Length, (float)(1.0 / ((1 << bitsPerPixel) - 1)), w, 0);
 
                 return tensor;
             }

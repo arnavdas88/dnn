@@ -103,15 +103,15 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha) => Math32f.AddC(this.length, alpha, this.x, this.offset);
+        public void AddC(float alpha) => Vectors.AddC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha) => Math32f.SubC(this.length, alpha, this.x, this.offset);
+        public void SubC(float alpha) => Vectors.SubC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha) => Math32f.MulC(this.length, alpha, this.x, this.offset);
+        public void MulC(float alpha) => Vectors.MulC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -243,6 +243,11 @@ template<typename T> T __forceinline logical_and(T a, T b, T c, T d)
 	return a & b & c & d;
 }
 
+template<typename T> T __forceinline logical_xand(T a, T b)
+{
+	return b & ~a;
+}
+
 template<typename T> T __forceinline logical_or(T a, T b)
 {
 	return a | b;
@@ -395,6 +400,24 @@ GENIXAPI(void, and_u32)(int length, const unsigned __int32* a, int offa, const u
 GENIXAPI(void, and_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
 {
 	__logical<unsigned __int64, logical_and>(length, a, offa, b, offb, y, offy);
+}
+
+// Logical XAND (A AND NOT B)
+GENIXAPI(void, xand_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy)
+{
+	__logical<unsigned __int32, logical_xand>(length, x, offx, y, offy);
+}
+GENIXAPI(void, xand_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy)
+{
+	__logical<unsigned __int64, logical_xand>(length, x, offx, y, offy);
+}
+GENIXAPI(void, xand_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy)
+{
+	__logical<unsigned __int32, logical_xand>(length, a, offa, b, offb, y, offy);
+}
+GENIXAPI(void, xand_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
+{
+	__logical<unsigned __int64, logical_xand>(length, a, offa, b, offb, y, offy);
 }
 
 // Logical OR

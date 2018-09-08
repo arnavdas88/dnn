@@ -250,7 +250,7 @@
                 }
 
                 // should be dy
-                Math32f.Add(2, dy, oi, expectedBG, 0);
+                Vectors.Add(2, dy, oi, expectedBG, 0);
             }
 
             Helpers.AreArraysEqual(expectedWG, layer.W.Gradient);

@@ -46,7 +46,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Math32f.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -270,7 +270,7 @@ namespace Genix.MachineLearning
 
                                     if (axis == lastaxis)
                                     {
-                                        Math32f.Add(blocksize, dyw, offy, dxw, offx);
+                                        Vectors.Add(blocksize, dyw, offy, dxw, offx);
                                         offy += blocksize;
                                     }
                                     else
@@ -814,7 +814,7 @@ namespace Genix.MachineLearning
                                         end = x2;
                                     }
 
-                                    Math32f.Add((end - start) * xstride2, dyw, yposk2, dxw, xposk2);
+                                    Vectors.Add((end - start) * xstride2, dyw, yposk2, dxw, xposk2);
                                 }
                             }
 
@@ -989,7 +989,7 @@ namespace Genix.MachineLearning
                     if (calculateGradient)
                     {
                         // simply copy tensors
-                        session.Push(ActionName, () => Math32f.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -1033,7 +1033,7 @@ namespace Genix.MachineLearning
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => Math32f.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -1077,7 +1077,7 @@ namespace Genix.MachineLearning
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => Math32f.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
                     }
 #endif
 
@@ -1146,7 +1146,7 @@ namespace Genix.MachineLearning
 
                     if (useGradients)
                     {
-                        Math32f.Add(xstride, x.Gradient, 0, yw, offy);
+                        Vectors.Add(xstride, x.Gradient, 0, yw, offy);
                     }
                     else
                     {
@@ -1189,7 +1189,7 @@ namespace Genix.MachineLearning
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Math32f.Add(xstride, x.Gradient, offx, yw, offyy);
+                            Vectors.Add(xstride, x.Gradient, offx, yw, offyy);
                         }
                     }
                     else
@@ -1229,7 +1229,7 @@ namespace Genix.MachineLearning
                 {
                     if (useGradients)
                     {
-                        Math32f.Add(ystride, xw, offxx, yw, offy);
+                        Vectors.Add(ystride, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1262,7 +1262,7 @@ namespace Genix.MachineLearning
                 {
                     if (useGradients)
                     {
-                        Math32f.Add(ystride, xs[i].Gradient, offx, yw, offy);
+                        Vectors.Add(ystride, xs[i].Gradient, offx, yw, offy);
                     }
                     else
                     {
@@ -1296,7 +1296,7 @@ namespace Genix.MachineLearning
                 {
                     if (useGradients)
                     {
-                        Math32f.Add(xstride0, xw, offxx, yw, offy);
+                        Vectors.Add(xstride0, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1329,7 +1329,7 @@ namespace Genix.MachineLearning
                 {
                     if (useGradients)
                     {
-                        Math32f.Add(xstride, xw, offx, yw, offy);
+                        Vectors.Add(xstride, xw, offx, yw, offy);
                     }
                     else
                     {
@@ -1362,7 +1362,7 @@ namespace Genix.MachineLearning
                 {
                     if (useGradients || i > 0)
                     {
-                        Math32f.Add(ystride, xw, offx, yw, offy);
+                        Vectors.Add(ystride, xw, offx, yw, offy);
                     }
                     else
                     {

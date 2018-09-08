@@ -426,7 +426,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) + x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(Tensor x) => Math32f.Add(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Add(Tensor x) => Vectors.Add(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Subtracts all values of a tensor.
@@ -436,7 +436,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) - x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Sub(Tensor x) => Math32f.Sub(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Sub(Tensor x) => Vectors.Sub(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor by a scalar.
@@ -446,7 +446,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) * alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(float alpha) => Math32f.MulC(this.Length, alpha, this.Weights, 0);
+        public void Multiply(float alpha) => Vectors.MulC(this.Length, alpha, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor to elements of another tensor.

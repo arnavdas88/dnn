@@ -50,6 +50,6 @@ namespace Genix.Imaging
         /// <returns>
         /// The combined <see cref="Image"/>.
         /// </returns>
-        public static Image operator ^(Image left, Image right) => left.XOR(right);
+        public static Image operator ^(Image left, Image right) => left.Xor(right);
     }
 }

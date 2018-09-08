@@ -428,7 +428,7 @@ namespace Genix.Core
             NativeMethods.bits_not2_64(length, x, offx, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical OR operation on two 64-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -436,7 +436,7 @@ namespace Genix.Core
         /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
-        public static void OR(int count, ulong[] x, int posx, ulong[] y, int posy)
+        public static void Or(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_or_64(count, x, posx, y, posy);
         }
@@ -449,10 +449,10 @@ namespace Genix.Core
         /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
-        public static void BitsAND(int count, ulong[] x, int posx, ulong[] y, int posy)
+        public static void And(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_and_64(count, x, posx, y, posy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical AND operation between 64-bits array and a scalar value in-place.
@@ -461,7 +461,7 @@ namespace Genix.Core
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        public static void AND(int length, ulong mask, ulong[] y, int offy)
+        public static void WordsAnd(int length, ulong mask, ulong[] y, int offy)
         {
             NativeMethods.bits_and_mask_64(length, mask, y, offy);
         }
@@ -474,12 +474,12 @@ namespace Genix.Core
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        public static void AND(int length, ulong mask, ulong[] y, int offy, int incy)
+        public static void WordsAnd(int length, ulong mask, ulong[] y, int offy, int incy)
         {
             NativeMethods.bits_and_mask_inc_64(length, mask, y, offy, incy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical XOR operation on two 64-bits arrays bit-wise.
         /// </summary>
         /// <param name="count">The number of bits to compute.</param>
@@ -487,10 +487,10 @@ namespace Genix.Core
         /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
-        public static void XOR(int count, ulong[] x, int posx, ulong[] y, int posy)
+        public static void Xor(int count, ulong[] x, int posx, ulong[] y, int posy)
         {
             NativeMethods.bits_xor_64(count, x, posx, y, posy);
-        }
+        }*/
 
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods

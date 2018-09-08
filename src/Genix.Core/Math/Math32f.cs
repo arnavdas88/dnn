@@ -64,6 +64,7 @@ namespace Genix.Core
             NativeMethods.abs_gradient_f32(length, x, dx, offx, cleardx, y, dy, offy);
         }
 
+#if false
         /// <summary>
         /// Adds a constant value to each element of an array in-place.
         /// </summary>
@@ -114,6 +115,7 @@ namespace Genix.Core
         {
             NativeMethods.add_ip_f32(length, x, offx, y, offy);
         }
+#endif
 
         /// <summary>
         /// Adds the elements of two arrays with increment in-place.
@@ -131,6 +133,7 @@ namespace Genix.Core
             NativeMethods.add_inc_ip_f32(length, x, offx, incx, y, offy, incy);
         }
 
+#if false
         /// <summary>
         /// Adds the elements of two arrays not-in-place.
         /// </summary>
@@ -149,6 +152,7 @@ namespace Genix.Core
         {
             NativeMethods.add_f32(length, a, offa, b, offb, y, offy);
         }
+#endif
 
         /// <summary>
         /// Adds the elements of two arrays with increment not-in-place.
@@ -169,6 +173,7 @@ namespace Genix.Core
             NativeMethods.add_inc_f32(length, a, offa, inca, b, offb, incb, y, offy, incy);
         }
 
+#if false
         /// <summary>
         /// Subtracts a constant value from each element of an array in-place.
         /// </summary>
@@ -272,6 +277,7 @@ namespace Genix.Core
         {
             NativeMethods.mulc_f32(length, x, offx, alpha, y, offy);
         }
+#endif
 
         /// <summary>
         /// Multiplies the elements of two arrays in-place.

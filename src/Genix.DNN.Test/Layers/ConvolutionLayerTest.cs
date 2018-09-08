@@ -430,7 +430,7 @@
                     subdy.Set(dy.Weights.Skip(dy.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
 
                     float[] dw = FullyConnectedLayerTest.CalculateDW(subx, subdy, matrixLayout);
-                    Math32f.Add(res.Length, dw, 0, res, 0);
+                    Vectors.Add(res.Length, dw, 0, res, 0);
                 }
             }
 

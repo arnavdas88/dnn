@@ -17,7 +17,7 @@ namespace Genix.Core
     /// <summary>
     /// Provides array manipulation methods.
     /// </summary>
-    public static class Arrays
+    public static partial class Arrays
     {
         /// <summary>
         /// Creates an array of 32-bit integers with the specified length and starting value.
@@ -443,6 +443,7 @@ namespace Genix.Core
         /// <param name="x">The array to sort.</param>
         /// <param name="offx">The index in the <paramref name="x"/> at which sorting begins.</param>
         /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sort(int length, float[] x, int offx, bool ascending) => NativeMethods.fqsort(length, x, offx, ascending);
 
         /// <summary>
@@ -456,9 +457,10 @@ namespace Genix.Core
         /// <param name="y">The array that contains the items that correspond to each of the keys in the <paramref name="x"/>.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which sorting begins.</param>
         /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sort(int length, float[] x, int offx, int[] y, int offy, bool ascending) => NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical AND operation on two 32-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -468,7 +470,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void AND(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.and_ip_u32(length, x, offx, y, offy);
+        public static void And(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.and_ip_u32(length, x, offx, y, offy);*/
 
         /// <summary>
         /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
@@ -482,9 +484,9 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void AND(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy) => NativeMethods.and_u32(length, a, offa, b, offb, y, offy);
+        public static void And(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy) => NativeMethods.and_u32(length, a, offa, b, offb, y, offy);
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical OR operation on two 32-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -494,7 +496,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.or_ip_u32(length, x, offx, y, offy);
+        public static void Or(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.or_ip_u32(length, x, offx, y, offy);*/
 
         /// <summary>
         /// Performs logical OR operation on two 32-bits arrays element-wise not-in-pace.
@@ -508,7 +510,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy) => NativeMethods.or_u32(length, a, offa, b, offb, y, offy);
+        public static void Or(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy) => NativeMethods.or_u32(length, a, offa, b, offb, y, offy);
 
         /// <summary>
         /// Performs logical OR operation on three 32-bits arrays element-wise not-in-pace.
@@ -524,7 +526,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
+        public static void Or(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
         {
             NativeMethods.or3_u32(length, a, offa, b, offb, c, offc, y, offy);
         }
@@ -545,12 +547,12 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
+        public static void Or(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
         {
             NativeMethods.or4_u32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical XOR operation on two 32-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -560,10 +562,10 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void XOR(int length, uint[] x, int offx, uint[] y, int offy)
+        public static void Xor(int length, uint[] x, int offx, uint[] y, int offy)
         {
             NativeMethods.xor_ip_u32(length, x, offx, y, offy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
@@ -577,12 +579,12 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void XOR(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
+        public static void Xor(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy)
         {
             NativeMethods.xor_u32(length, a, offa, b, offb, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -592,10 +594,10 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void AND(int length, ulong[] x, int offx, ulong[] y, int offy)
+        public static void And(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.and_ip_u64(length, x, offx, y, offy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
@@ -609,12 +611,12 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void AND(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        public static void And(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.and_u64(length, a, offa, b, offb, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical OR operation on two 64-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -624,10 +626,10 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, ulong[] x, int offx, ulong[] y, int offy)
+        public static void Or(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.or_ip_u64(length, x, offx, y, offy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical OR operation on two 64-bits arrays element-wise not-in-pace.
@@ -641,7 +643,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        public static void Or(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.or_u64(length, a, offa, b, offb, y, offy);
         }
@@ -660,7 +662,7 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
+        public static void Or(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
         {
             NativeMethods.or3_u64(length, a, offa, b, offb, c, offc, y, offy);
         }
@@ -681,12 +683,12 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void OR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
+        public static void Or(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
         {
             NativeMethods.or4_u64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Performs logical XOR operation on two 64-bits arrays element-wise in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -696,10 +698,10 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void XOR(int length, ulong[] x, int offx, ulong[] y, int offy)
+        public static void Xor(int length, ulong[] x, int offx, ulong[] y, int offy)
         {
             NativeMethods.xor_ip_u64(length, x, offx, y, offy);
-        }
+        }*/
 
         /// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
@@ -713,13 +715,13 @@ namespace Genix.Core
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public static void XOR(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
+        public static void Xor(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] y, int offy)
         {
             NativeMethods.xor_u64(length, a, offa, b, offb, y, offy);
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
+        private static partial class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 
@@ -808,14 +810,14 @@ namespace Genix.Core
                 int offy,
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void and_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void and_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void and_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void or_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void or_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
@@ -826,20 +828,20 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void or4_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void xor_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void xor_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void xor_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void and_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void and_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void and_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void or_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void or_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
@@ -850,8 +852,8 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void or4_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
 
-            [DllImport(NativeMethods.DllName)]
-            public static extern void xor_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
+            ////[DllImport(NativeMethods.DllName)]
+            ////public static extern void xor_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void xor_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);

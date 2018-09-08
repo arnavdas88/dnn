@@ -733,6 +733,16 @@ void __forceinline logical_and3(__bits &result, __bits value, __bits mask)
 	result &= value | mask;
 }
 
+void __forceinline logical_xand2(__bits &result, __bits value)
+{
+	result &= ~value;
+}
+
+void __forceinline logical_xand3(__bits &result, __bits value, __bits mask)
+{
+	result &= ~value | mask;
+}
+
 void __forceinline logical_xor2(__bits &result, __bits value)
 {
 	result ^= value;
@@ -841,6 +851,18 @@ BITSAPI(void, bits_and)(
 	)
 {
 	__bits_logical<logical_and2, logical_and3>(count, x, posx, y, posy);
+}
+
+// Logical XAND (A AND NOT B)
+BITSAPI(void, bits_xand)(
+	int count,				// number of bits to process
+	const __bits* x, 		// the source array
+	int posx, 				// the zero-based index of starting bit in x
+	__bits* y, 				// the destination array
+	int posy 				// the zero-based index of starting bit in y
+	)
+{
+	__bits_logical<logical_xand2, logical_xand3>(count, x, posx, y, posy);
 }
 
 // Logical XOR

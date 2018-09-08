@@ -75,6 +75,7 @@ namespace Genix.Win32
         /// If either an overflow occurred or <c>denominator</c> was 0, the return value is -1.
         /// </para>
         /// </returns>
+        [SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible", Justification = "Provides access to public Win32 API.")]
         [DllImport(Win32NativeMethods.KERNEL32)]
         public static extern int MulDiv(int number, int numerator, int denominator);
     }

@@ -18,6 +18,11 @@ namespace Genix.DocumentAnalysis
     public static class LineDetector
     {
         /// <summary>
+        /// The maximum line width, in pixels, for images with resolution 200 dpi.
+        /// </summary>
+        private const int MaxLineWidth = 10;
+
+        /// <summary>
         /// Finds and removes lines from the <see cref="Image"/>.
         /// The type of lines to find is determined by the <c>options</c> parameter.
         /// </summary>
@@ -50,6 +55,15 @@ namespace Genix.DocumentAnalysis
 
             Image cleanedImage = null;
             lines = new List<LineShape>();
+
+            // close up small holes
+            int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
+            Image closedImage = image.Close(StructuringElement.Square(maxLineWidth / 3), 1);
+
+            // open up to detect big solid areas
+            Image openedImage = image.Open(StructuringElement.Square(maxLineWidth), 1);
+
+            Image hollowImage = closedImage.Sub(openedImage, 0);
 
             // find horizontal lines
             if (options.Types.HasFlag(LineTypes.Horizontal))

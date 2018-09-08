@@ -46,6 +46,11 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitUtils\BitUtils.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BitUtils.tt</DependentUpon>
+    </Compile>
     <Compile Include="BitUtils\BitUtils32.cs" />
     <Compile Include="BitUtils\BitUtils64.cs" />
     <Compile Include="Collections\Histogram.cs" />
@@ -91,9 +96,19 @@
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
     <Compile Include="Math\Array32f.cs" />
+    <Compile Include="Math\Arrays.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Arrays.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\Math32s.cs" />
     <Compile Include="Math\Math64f.cs" />
     <Compile Include="Math\Math8u.cs" />
+    <Compile Include="Math\Vectors.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="Win32\Win32NativeMethods.cs" />
     <Compile Include="System\DisposableObject.cs" />
     <Compile Include="System\FloatExtensions.cs" />
@@ -150,6 +165,23 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BitUtils\BitUtils.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BitUtils.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Math\Arrays.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Arrays.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Math\Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.Generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

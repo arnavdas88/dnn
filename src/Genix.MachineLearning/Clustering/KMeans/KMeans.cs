@@ -163,8 +163,8 @@ namespace Genix.MachineLearning.Clustering
 
                         lock (sync)
                         {
-                            Math32f.Add(lcounts.Length, lcounts, 0, counts, 0);
-                            Math32f.Add(lmeans.Length, lmeans, 0, means, 0);
+                            Vectors.Add(lcounts.Length, lcounts, 0, counts, 0);
+                            Vectors.Add(lmeans.Length, lmeans, 0, means, 0);
                         }
                     },
                     new ParallelOptions());
