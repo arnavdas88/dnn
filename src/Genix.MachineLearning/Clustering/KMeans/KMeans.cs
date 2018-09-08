@@ -174,7 +174,7 @@ namespace Genix.MachineLearning.Clustering
                 {
                     if (counts[i] != 0)
                     {
-                        Math32f.DivC(dimension, means, off, counts[i], clusters[i].Centroid, 0);
+                        Vectors.DivC(dimension, means, off, counts[i], clusters[i].Centroid, 0);
                     }
                 }
             }
@@ -274,7 +274,7 @@ namespace Genix.MachineLearning.Clustering
                 float sum = Math32f.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
-                    Math32f.DivC(result.Length, sum, result, 0);
+                    Vectors.DivC(result.Length, sum, result, 0);
                 }
             }
 
@@ -336,7 +336,7 @@ namespace Genix.MachineLearning.Clustering
                 float sum = Math32f.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
-                    Math32f.DivC(result.Length, sum, result, 0);
+                    Vectors.DivC(result.Length, sum, result, 0);
                 }
             }
 

@@ -35,7 +35,7 @@ namespace Genix.MachineLearning.Kernels
         /// <inheritdoc />
         public float Execute(int length, float[] x, int offx, float[] y, int offy)
         {
-            float norm = Math32f.EuclideanDistanceSquared(length, x, offx, y, offy);
+            float norm = Vectors.EuclideanDistanceSquared(length, x, offx, y, offy);
             return (float)Math.Exp(-this.gamma * norm);
         }
     }

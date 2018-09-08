@@ -113,10 +113,10 @@ GENIXAPI(void, abs_f64)(int n, const double* x, int offx, double* y, int offy)
 	}
 }
 
-GENIXAPI(void, abs_gradient_f32)(
+template<typename T> void __forceinline __abs_gradient(
 	int n,
-	const float* x, float* dx, int offx, BOOL cleardx,
-	const float* y, const float* dy, int offy)
+	const T* x, T* dx, int offx, BOOL cleardx,
+	const T* y, const T* dy, int offy)
 {
 	x += offx;
 	dx += offx;
@@ -127,16 +127,31 @@ GENIXAPI(void, abs_gradient_f32)(
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] = (x[i] == y[i] ? 1.0f : -1.0f) * dy[i];
+			dx[i] = (x[i] == y[i] ? (T)1 : (T)-1) * dy[i];
 		}
 	}
 	else
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] += (x[i] == y[i] ? 1.0f : -1.0f) * dy[i];
+			dx[i] += (x[i] == y[i] ? (T)1 : (T)-1) * dy[i];
 		}
 	}
+}
+
+GENIXAPI(void, abs_gradient_f32)(
+	int n,
+	const float* x, float* dx, int offx, BOOL cleardx,
+	const float* y, const float* dy, int offy)
+{
+	__abs_gradient(n, x, dx, offx, cleardx, y, dy, offy);
+}
+GENIXAPI(void, abs_gradient_f64)(
+	int n,
+	const double* x, double* dx, int offx, BOOL cleardx,
+	const double* y, const double* dy, int offy)
+{
+	__abs_gradient(n, x, dx, offx, cleardx, y, dy, offy);
 }
 
 // inverts vector element-wise
@@ -1297,20 +1312,60 @@ GENIXAPI(void, exp_f32)(
 }
 
 // y = sin(x)
-GENIXAPI(void, sin_f32)(
-	int n,
-	const float* x, int offx,
-	float* y, int offy)
-{
-	::vsSin(n, x + offx, y + offy);
-}
+GENIXAPI(void, sin_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsSin(n, x + offx, y + offy); }
+GENIXAPI(void, sin_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdSin(n, x + offx, y + offy); }
 
 // y += sin(x)'
+template<typename T> void __forceinline __sin_gradient(
+	int n,
+	const T* x, T* dx, int offx, BOOL cleardx,
+	const T* dy, int offdy)
+{
+	x += offx;
+	dx += offx;
+	dy += offdy;
+
+	if (cleardx)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] = cos(x[i]) * dy[i];
+		}
+	}
+	else
+	{
+		for (int i = 0; i < n; i++)
+		{
+			dx[i] += cos(x[i]) * dy[i];
+		}
+	}
+}
+
 GENIXAPI(void, sin_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
 {
+	__sin_gradient(n, x, dx, offx, cleardx, dy, offdy);
+}
+GENIXAPI(void, sin_gradient_f64)(
+	int n,
+	const double* x, double* dx, int offx, BOOL cleardx,
+	const double* dy, int offdy)
+{
+	__sin_gradient(n, x, dx, offx, cleardx, dy, offdy);
+}
+
+// y = cos(x)
+GENIXAPI(void, cos_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsCos(n, x + offx, y + offy); }
+GENIXAPI(void, cos_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdCos(n, x + offx, y + offy); }
+
+// y += cos(x)'
+template<typename T> void __forceinline __cos_gradient(
+	int n,
+	const T* x, T* dx, int offx, BOOL cleardx,
+	const T* dy, int offdy)
+{
 	x += offx;
 	dx += offx;
 	dy += offdy;
@@ -1319,51 +1374,31 @@ GENIXAPI(void, sin_gradient_f32)(
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] = ::cosf(x[i]) * dy[i];
+			dx[i] = -sin(x[i]) * dy[i];
 		}
 	}
 	else
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] += ::cosf(x[i]) * dy[i];
+			dx[i] -= sin(x[i]) * dy[i];
 		}
 	}
 }
 
-// y = cos(x)
-GENIXAPI(void, cos_f32)(
-	int n,
-	const float* x, int offx,
-	float* y, int offy)
-{
-	::vsCos(n, x + offx, y + offy);
-}
-
-// y += cos(x)'
 GENIXAPI(void, cos_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* dy, int offdy)
 {
-	x += offx;
-	dx += offx;
-	dy += offdy;
-
-	if (cleardx)
-	{
-		for (int i = 0; i < n; i++)
-		{
-			dx[i] = -::sinf(x[i]) * dy[i];
-		}
-	}
-	else
-	{
-		for (int i = 0; i < n; i++)
-		{
-			dx[i] -= ::sinf(x[i]) * dy[i];
-		}
-	}
+	__cos_gradient(n, x, dx, offx, cleardx, dy, offdy);
+}
+GENIXAPI(void, cos_gradient_f64)(
+	int n,
+	const double* x, double* dx, int offx, BOOL cleardx,
+	const double* dy, int offdy)
+{
+	__cos_gradient(n, x, dx, offx, cleardx, dy, offdy);
 }
 
 // y = atan2(a/b)

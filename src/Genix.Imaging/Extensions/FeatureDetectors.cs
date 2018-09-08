@@ -118,8 +118,8 @@ namespace Genix.Imaging
             NativeMethods.gradientVectorPrewitt_f32(width, height, bits, stride, mag, stride, ang, stride);
 
             // convert angles to bins
-            Math32f.DivC(ang.Length, (float)(Math.PI / numberOfBins), ang, 0);
-            Math32f.Abs(ang.Length, ang, 0);
+            Vectors.DivC(ang.Length, (float)(Math.PI / numberOfBins), ang, 0);
+            Vectors.Abs(ang.Length, ang, 0);
 
             // calculate histograms
             int cellCountX = width / cellSize;
@@ -163,8 +163,8 @@ namespace Genix.Imaging
             const float Eps = 1e-10f;
             for (int i = 0, off = 0; i < blockCount; i++, off += blockSizeInBins)
             {
-                float norm = Math32f.L2Norm(blockSizeInBins, blocks, off);
-                Math32f.DivC(blockSizeInBins, norm + Eps, blocks, off);
+                float norm = Vectors.L2Norm(blockSizeInBins, blocks, off);
+                Vectors.DivC(blockSizeInBins, norm + Eps, blocks, off);
             }
 
             // apply threshold

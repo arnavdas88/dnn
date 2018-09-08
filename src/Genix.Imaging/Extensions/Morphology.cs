@@ -356,13 +356,13 @@ namespace Genix.Imaging
                 int lastIndex = 0;
                 for (int xpos = ypos, xposend = ypos + width; xpos < xposend;)
                 {
-                    int start = BitUtils64.BitScanOneForward(xposend - xpos, bits, xpos);
+                    int start = BitUtils.BitScanOneForward(xposend - xpos, bits, xpos);
                     if (start == -1)
                     {
                         break;
                     }
 
-                    int end = BitUtils64.BitScanZeroForward(xposend - (start + 1), bits, start + 1);
+                    int end = BitUtils.BitScanZeroForward(xposend - (start + 1), bits, start + 1);
                     if (end == -1)
                     {
                         end = xposend;
@@ -492,7 +492,7 @@ namespace Genix.Imaging
 
             foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                BitUtils64.SetBits(length, bits, (y * stride1) + x);
+                BitUtils.SetBits(length, bits, (y * stride1) + x);
             }
         }
 
@@ -546,7 +546,7 @@ namespace Genix.Imaging
 
             foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                BitUtils64.ResetBits(length, bits, (y * stride1) + x);
+                BitUtils.ResetBits(length, bits, (y * stride1) + x);
             }
         }
 
@@ -612,7 +612,7 @@ namespace Genix.Imaging
             // copy bits
             foreach ((int y, int x, int length) in component.EnumStrokes())
             {
-                BitUtils64.CopyBits(length, bitssrc, (y * stridesrc) + x, bitsdst, ((y - bounds.Y) * stridedst) + x - bounds.X);
+                BitUtils.CopyBits(length, bitssrc, (y * stridesrc) + x, bitsdst, ((y - bounds.Y) * stridedst) + x - bounds.X);
             }
 
             return dst;
@@ -663,7 +663,7 @@ namespace Genix.Imaging
             {
                 foreach ((int y, int x, int length) in component.EnumStrokes())
                 {
-                    BitUtils64.CopyBits(length, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - bounds.Y) * stridedst1) + x - bounds.X);
+                    BitUtils.CopyBits(length, bitssrc, (y * stridesrc1) + x, bitsdst, ((y - bounds.Y) * stridedst1) + x - bounds.X);
                 }
             }
 

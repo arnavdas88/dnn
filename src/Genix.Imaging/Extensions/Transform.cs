@@ -217,14 +217,14 @@ namespace Genix.Imaging
 
                 if (offset > 0)
                 {
-                    BitUtils64.ResetBits(offset, bitsdst, posdst);
+                    BitUtils.ResetBits(offset, bitsdst, posdst);
                 }
 
-                BitUtils64.CopyBits(widthsrc1, bitssrc, possrc, bitsdst, posdst + offset);
+                BitUtils.CopyBits(widthsrc1, bitssrc, possrc, bitsdst, posdst + offset);
 
                 if (offset < maxoffset)
                 {
-                    BitUtils64.ResetBits(widthdst1 - widthsrc1 - offset, bitsdst, posdst + offset + widthsrc1);
+                    BitUtils.ResetBits(widthdst1 - widthsrc1 - offset, bitsdst, posdst + offset + widthsrc1);
                 }
             }
 
@@ -254,7 +254,7 @@ namespace Genix.Imaging
                 ulong mask = ix == stride - 1 ? endMask : ulong.MaxValue;
                 for (int iy = 0, off = ix; iy < height; iy++, off += stride)
                 {
-                    h[iy] = BitUtils64.CountOneBits(bits[off] & mask);
+                    h[iy] = BitUtils.CountOneBits(bits[off] & mask);
                 }
             }
 

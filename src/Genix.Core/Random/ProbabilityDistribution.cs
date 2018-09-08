@@ -44,7 +44,7 @@ namespace Genix.Core
             float sum = Math32f.CumulativeSum(this.pdf.Length, this.pdf, 0);
             if (sum != 0.0f)
             {
-                Math32f.DivC(this.pdf.Length, sum, this.pdf, 0);
+                Vectors.DivC(this.pdf.Length, sum, this.pdf, 0);
             }
         }
 

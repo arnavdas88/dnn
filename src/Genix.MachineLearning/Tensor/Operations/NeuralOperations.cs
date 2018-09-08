@@ -173,7 +173,7 @@ namespace Genix.MachineLearning
                     PoolNxN();
                 }
 
-                Math32f.DivC(y.Length, ksize1 * ksize2, yw, 0);
+                Vectors.DivC(y.Length, ksize1 * ksize2, yw, 0);
 
                 return y;
 
@@ -696,7 +696,7 @@ namespace Genix.MachineLearning
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
-                                Math32f.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
+                                Vectors.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
                                 Math32f.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
@@ -704,7 +704,7 @@ namespace Genix.MachineLearning
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
                                 Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
-                                Math32f.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
+                                Vectors.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
                                 Math32f.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);

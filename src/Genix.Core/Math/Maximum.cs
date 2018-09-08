@@ -345,7 +345,7 @@ namespace Genix.Core
             // normalize and output to sum to one
             if (esum != 0.0f)
             {
-                Math32f.DivC(length, esum, x, offx);
+                Vectors.DivC(length, esum, x, offx);
             }
         }
 
@@ -375,7 +375,7 @@ namespace Genix.Core
             // normalize and output to sum to one
             if (esum != 0.0f)
             {
-                Math32f.DivC(length, esum, y, offy);
+                Vectors.DivC(length, esum, y, offy);
             }
         }
 

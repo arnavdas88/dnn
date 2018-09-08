@@ -101,7 +101,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arrays.tt</DependentUpon>
     </Compile>
-    <Compile Include="Math\Math32s.cs" />
     <Compile Include="Math\Math64f.cs" />
     <Compile Include="Math\Math8u.cs" />
     <Compile Include="Math\Vectors.Generated.cs">

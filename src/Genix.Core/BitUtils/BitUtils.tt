@@ -23,6 +23,7 @@
 namespace Genix.Core
 {
     using System;
+	using System.Diagnostics;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -34,18 +35,342 @@ namespace Genix.Core
     public static class BitUtils
     {
 <#
-				Tuple<string, string, string>[] types = 
+				Tuple<string, int, string, string>[] types = 
 								{
-								Tuple.Create("uint", "32", "32-bit unsigned integers"),
-								Tuple.Create("ulong", "64", "64-bit unsigned integers"),
+								Tuple.Create("uint", 32, "32", "32-bit unsigned integers"),
+								Tuple.Create("ulong", 64, "64", "64-bit unsigned integers"),
 								};
 
-				foreach (Tuple<string, string, string> type in types)
+				foreach (Tuple<string, int, string, string> type in types)
 				{
 								string typeName = type.Item1;
-								string nativeSuffix = type.Item2;
-								string typeDescription = type.Item3;
+								int bitCount = type.Item2;
 #>
+
+        /// <summary>
+        /// The first bit.
+        /// </summary>
+        public const <#=typeName#> LSB<#=bitCount#> = 1;
+<#
+				}
+
+				foreach (Tuple<string, int, string, string> type in types)
+				{
+								string typeName = type.Item1;
+								int bitCount = type.Item2;
+								string nativeSuffix = type.Item3;
+								string typeDescription = type.Item4;
+#>
+
+        /// <summary>
+        /// Examines the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to examine.</param>
+        /// <param name="position">The bit position to test.</param>
+        /// <returns>
+        /// <b>true</b> if the bit at the specified position is set; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TestBit(<#=typeName#> bits, int position)
+        {
+            Debug.Assert(position < <#=bitCount#>, "The bit position must be less than <#=bitCount#>.");
+            return (bits & (BitUtils.LSB<#=bitCount#> << position)) != 0;
+        }
+
+        /// <summary>
+        /// Sets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The bit position to set.</param>
+        /// <returns>The changed bits.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> SetBit(<#=typeName#> bits, int position)
+        {
+            Debug.Assert(position < <#=bitCount#>, "The bit position must be less than <#=bitCount#>.");
+            return bits | (BitUtils.LSB<#=bitCount#> << position);
+        }
+
+        /// <summary>
+        /// Resets the bit at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        /// <returns>The changed bits.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> ResetBit(<#=typeName#> bits, int position)
+        {
+            Debug.Assert(position < <#=bitCount#>, "The bit position must be less than <#=bitCount#>.");
+            return bits & ~(BitUtils.LSB<#=bitCount#> << position);
+        }
+
+        /// <summary>
+        /// Examines the bit at the specified position in the the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="bits">The bits to examine.</param>
+        /// <param name="position">The bit position to test.</param>
+        /// <returns>
+        /// <b>true</b> if the bit at the specified position is set; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TestBit(<#=typeName#>[] bits, int position)
+        {
+            return (bits[position >> <#=(int)Math.Log(bitCount, 2)#>] & (BitUtils.LSB<#=bitCount#> << (position & <#=bitCount - 1#>))) != 0;
+        }
+
+        /// <summary>
+        /// Sets the bit at the specified position in the the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBit(<#=typeName#>[] bits, int position)
+        {
+            bits[position >> <#=(int)Math.Log(bitCount, 2)#>] |= BitUtils.LSB<#=bitCount#> << (position & <#=bitCount - 1#>);
+        }
+
+        /// <summary>
+        /// Resets the bit at the specified position in the the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ResetBit(<#=typeName#>[] bits, int position)
+        {
+            bits[position >> <#=(int)Math.Log(bitCount, 2)#>] &= ~(BitUtils.LSB<#=bitCount#> << (position & <#=bitCount - 1#>));
+        }
+
+        /// <summary>
+        /// Sets the range bits at the specified starting position in the the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="count">The number of bits to set.</param>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The starting bit position to set.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBits(int count, <#=typeName#>[] bits, int position)
+        {
+            NativeMethods.bits_set_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Resets the range bits at the specified starting position in the the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="count">The number of bits to reset.</param>
+        /// <param name="bits">The bits to reset.</param>
+        /// <param name="position">The starting bit position to reset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ResetBits(int count, <#=typeName#>[] bits, int position)
+        {
+            NativeMethods.bits_reset_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Gets the specified number of bits at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to examine.</param>
+        /// <param name="position">The bits index; in the range of 0 - <#=bitCount - 1#>.</param>
+        /// <param name="count">The number of bits to get.</param>
+        /// <returns>
+        /// The value at the index specified.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> GetBits(<#=typeName#> bits, int position, int count)
+        {
+            Debug.Assert(position + count <= <#=bitCount#>, "The position+count must be less than or equal to <#=bitCount#>.");
+            return (bits >> position) & ~(<#=typeName#>.MaxValue << count);
+        }
+
+        /// <summary>
+        /// Sets the specified number of bits at the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The bits index; in the range of 0 - <#=bitCount - 1#>.</param>
+        /// <param name="count">The number of bits to set.</param>
+        /// <returns>The changed bits.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> SetBits(<#=typeName#> bits, int position, int count)
+        {
+            Debug.Assert(position + count <= <#=bitCount#>, "The position+count must be less than or equal to <#=bitCount#>.");
+            <#=typeName#> mask = position + count == <#=bitCount#> ?
+                <#=typeName#>.MaxValue << position :
+                (<#=typeName#>.MaxValue << position) & ~(<#=typeName#>.MaxValue << (position + count));
+            return bits | mask;
+        }
+
+        /// <summary>
+        /// Copies the specified number of bits to the specified position.
+        /// </summary>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The bits index; in the range of 0 - <#=bitCount - 1#>.</param>
+        /// <param name="count">The number of bits to set.</param>
+        /// <param name="source">The bits to copy.</param>
+        /// <returns>The changed bits.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> CopyBits(<#=typeName#> bits, int position, int count, <#=typeName#> source)
+        {
+            Debug.Assert(position + count <= <#=bitCount#>, "The position+count must be less than or equal to <#=bitCount#>.");
+            <#=typeName#> mask = position + count == <#=bitCount#> ?
+                <#=typeName#>.MaxValue << position :
+                (<#=typeName#>.MaxValue << position) & ~(<#=typeName#>.MaxValue << (position + count));
+            return (bits & ~mask) | ((source << position) & mask);
+        }
+
+        /// <summary>
+        /// Copies the range of bits from a source array of <#=typeDescription#> at the specified position
+        /// to the destination array at the specified position.
+        /// </summary>
+        /// <param name="count">The number of bits to copy.</param>
+        /// <param name="x">The bits to copy from.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
+        /// <param name="y">The bits to copy to.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CopyBits(int count, <#=typeName#>[] x, int posx, <#=typeName#>[] y, int posy)
+        {
+            NativeMethods.bits_copy_<#=nativeSuffix#>(count, x, posx, y, posy);
+        }
+
+        /// <summary>
+        /// Searches the value for a first set bit (1).
+        /// </summary>
+        /// <param name="bits">The bits to search.</param>
+        /// <returns>
+        /// The bit position of the first set bit (1) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanOneForward(<#=typeName#> bits)
+        {
+            return NativeMethods.bit_scan_forward_<#=nativeSuffix#>(bits);
+        }
+
+        /// <summary>
+        /// Searches the value for a last set bit (1).
+        /// </summary>
+        /// <param name="bits">The bits to search.</param>
+        /// <returns>
+        /// The bit position of the last set bit (1) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanOneReverse(<#=typeName#> bits)
+        {
+            return NativeMethods.bit_scan_reverse_<#=nativeSuffix#>(bits);
+        }
+
+        /// <summary>
+        /// Searches the array of <#=typeDescription#> for a first set bit (1).
+        /// </summary>
+        /// <param name="count">The number of bits to search.</param>
+        /// <param name="bits">The array that contains the data to search.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
+        /// <returns>
+        /// The bit position of the first set bit (1) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanOneForward(int count, <#=typeName#>[] bits, int position)
+        {
+            return NativeMethods.bits_scan_one_forward_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Searches the array of <#=typeDescription#> for a last set bit (1).
+        /// </summary>
+        /// <param name="count">The number of bits to search.</param>
+        /// <param name="bits">The array that contains the data to search.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
+        /// <returns>
+        /// The bit position of the last set bit (1) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanOneReverse(int count, <#=typeName#>[] bits, int position)
+        {
+            return NativeMethods.bits_scan_one_reverse_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Searches the array of <#=typeDescription#> for a first reset bit (0).
+        /// </summary>
+        /// <param name="count">The number of bits to search.</param>
+        /// <param name="bits">The array that contains the data to search.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
+        /// <returns>
+        /// The bit position of the first reset bit (0) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanZeroForward(int count, <#=typeName#>[] bits, int position)
+        {
+            return NativeMethods.bits_scan_zero_forward_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Searches the array of <#=typeDescription#> for a last reset bit (0).
+        /// </summary>
+        /// <param name="count">The number of values to search.</param>
+        /// <param name="bits">The array that contains the data to search.</param>
+        /// <param name="position">The starting bit position in <paramref name="bits"/>.</param>
+        /// <returns>
+        /// The bit position of the last reset bit (0) found.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int BitScanZeroReverse(int count, <#=typeName#>[] bits, int position)
+        {
+            return NativeMethods.bits_scan_zero_reverse_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Counts the number of one bits (population count).
+        /// </summary>
+        /// <param name="bits">The bits to count.</param>
+        /// <returns>
+        /// The number of one bits.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CountOneBits(<#=typeName#> bits)
+        {
+            return (int)NativeMethods.bits_popcount_<#=nativeSuffix#>(bits);
+        }
+
+        /// <summary>
+        /// Counts the number of zero bits (population count).
+        /// </summary>
+        /// <param name="bits">The bits to count.</param>
+        /// <returns>
+        /// The number of zero bits.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CountZeroBits(<#=typeName#> bits)
+        {
+            return <#=bitCount#> - BitUtils.CountOneBits(bits);
+        }
+
+        /// <summary>
+        /// Counts the number of one bits (population count) in the array of <#=typeDescription#> starting at the specified position.
+        /// </summary>
+        /// <param name="count">The number of bits to examine.</param>
+        /// <param name="bits">The bits to count.</param>
+        /// <param name="position">The starting bit position to count.</param>
+        /// <returns>
+        /// The number of one bits.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CountOneBits(int count, <#=typeName#>[] bits, int position)
+        {
+            return (int)NativeMethods.bits_count_<#=nativeSuffix#>(count, bits, position);
+        }
+
+        /// <summary>
+        /// Counts the number of zero bits (population count) in the array of <#=typeDescription#> starting at the specified position.
+        /// </summary>
+        /// <param name="count">The number of bits to examine.</param>
+        /// <param name="bits">The bits to count.</param>
+        /// <param name="position">The starting bit position to count.</param>
+        /// <returns>
+        /// The number of zero bits.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CountZeroBits(int count, <#=typeName#>[] bits, int position)
+        {
+            return count - BitUtils.CountOneBits(count, bits, position);
+        }
+
         /// <summary>
         /// Performs logical OR operation on two arrays of <#=typeDescription#> in-place.
         /// </summary>
@@ -110,12 +435,44 @@ namespace Genix.Core
         {
             private const string DllName = "Genix.Core.Native.dll";
 <#
-				foreach (Tuple<string, string, string> type in types)
+				foreach (Tuple<string, int, string, string> type in types)
 				{
 								string typeName = type.Item1;
-								string nativeSuffix = type.Item2;
-								string typeDescription = type.Item3;
+								string nativeSuffix = type.Item3;
 #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_set_<#=nativeSuffix#>(int count, [In, Out] <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_reset_<#=nativeSuffix#>(int count, [In, Out] <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_copy_<#=nativeSuffix#>(int count, [In] <#=typeName#>[] x, int posx, [Out] <#=typeName#>[] y, int posy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bit_scan_forward_<#=nativeSuffix#>(<#=typeName#> bits);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bit_scan_reverse_<#=nativeSuffix#>(<#=typeName#> bits);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bits_scan_one_forward_<#=nativeSuffix#>(int count, <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bits_scan_one_reverse_<#=nativeSuffix#>(int count, <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bits_scan_zero_forward_<#=nativeSuffix#>(int count, <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int bits_scan_zero_reverse_<#=nativeSuffix#>(int count, <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=typeName#> bits_popcount_<#=nativeSuffix#>(<#=typeName#> bits);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=typeName#> bits_count_<#=nativeSuffix#>(int count, [In] <#=typeName#>[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_or_<#=nativeSuffix#>(int count, [In] <#=typeName#>[] x, int posx, [Out] <#=typeName#>[] y, int posy);

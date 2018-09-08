@@ -120,7 +120,7 @@ namespace Genix.MachineLearning.Imaging
                 // sum with previous line
                 if (iy > 0)
                 {
-                    Mathematics.Add(stridedst, bitsdst, offydst - stridedst, bitsdst, offydst);
+                    Vectors.Add(stridedst, bitsdst, offydst - stridedst, bitsdst, offydst);
                 }
             }
 

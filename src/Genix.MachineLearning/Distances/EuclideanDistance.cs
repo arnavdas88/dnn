@@ -40,7 +40,7 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Distance(float[] x, float[] y)
         {
-            return Math32f.EuclideanDistance(x.Length, x, 0, y, 0);
+            return Vectors.EuclideanDistance(x.Length, x, 0, y, 0);
         }
 
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double Distance(double[] x, double[] y)
         {
-            return Math64f.EuclideanDistance(x.Length, x, 0, y, 0);
+            return Vectors.EuclideanDistance(x.Length, x, 0, y, 0);
         }
 
         /// <inheritdoc />

@@ -117,7 +117,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Math32f.DivC(this.x.Length, alpha, this.x, 0);
+        public void DivC(float alpha) => Vectors.DivC(this.x.Length, alpha, this.x, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -129,10 +129,10 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float ManhattanDistance(float[] y, int offy) => Math32f.ManhattanDistance(this.x.Length, this.x, 0, y, offy);
+        public float ManhattanDistance(float[] y, int offy) => Vectors.ManhattanDistance(this.x.Length, this.x, 0, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float EuclideanDistance(float[] y, int offy) => Math32f.EuclideanDistance(this.x.Length, this.x, 0, y, offy);
+        public float EuclideanDistance(float[] y, int offy) => Vectors.EuclideanDistance(this.x.Length, this.x, 0, y, offy);
     }
 }

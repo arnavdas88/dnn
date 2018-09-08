@@ -40,7 +40,7 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Distance(float[] x, float[] y)
         {
-            return Math32f.ManhattanDistance(x.Length, x, 0, y, 0);
+            return Vectors.ManhattanDistance(x.Length, x, 0, y, 0);
         }
 
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Distances
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double Distance(double[] x, double[] y)
         {
-            return Math64f.ManhattanDistance(x.Length, x, 0, y, 0);
+            return Vectors.ManhattanDistance(x.Length, x, 0, y, 0);
         }
 
         /// <inheritdoc />

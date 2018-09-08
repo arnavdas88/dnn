@@ -416,7 +416,7 @@ namespace Genix.MachineLearning
         /// Computes absolute value of elements of the tensor.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Abs() => Math32f.Abs(this.Length, this.Weights, 0);
+        public void Abs() => Vectors.Abs(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Adds all values from a tensor.
@@ -456,7 +456,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) * x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor x) => Math32f.Mul(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Multiply(Tensor x) => Vectors.Mul(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Divides elements of this tensor to elements of another tensor.
@@ -605,7 +605,7 @@ namespace Genix.MachineLearning
         /// The L1-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L1Norm() => Math32f.L1Norm(this.Length, this.Weights, 0);
+        public float L1Norm() => Vectors.L1Norm(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Computes the L2-Norm (Euclidian norm) of the tensor elements.
@@ -614,7 +614,7 @@ namespace Genix.MachineLearning
         /// The L2-Norm of tensor elements in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float L2Norm() => Math32f.L2Norm(this.Length, this.Weights, 0);
+        public float L2Norm() => Vectors.L2Norm(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Clips tensor values to a specified minimum and maximum values.

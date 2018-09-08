@@ -184,7 +184,7 @@ namespace Genix.Imaging
             {
                 for (int i = 0; i < height; i++, offsrc += stride1src, offdst += stride1dst)
                 {
-                    BitUtils64.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
+                    BitUtils.CopyBits(count, bitssrc, offsrc, bitsdst, offdst);
                 }
             }
         }

@@ -431,13 +431,13 @@ namespace Genix.Imaging
                 {
                     for (int i = 0; i < 32; i += bitsPerPixel, offd++)
                     {
-                        dstbits[offd] = colormap[BitUtils64.GetBits(srcbits[offs], i, bitsPerPixel)];
+                        dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
                     }
                 }
 
                 for (int i = 0; i < srctail; i += bitsPerPixel, offd++)
                 {
-                    dstbits[offd] = colormap[BitUtils64.GetBits(srcbits[offs], i, bitsPerPixel)];
+                    dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
                 }
             }
 

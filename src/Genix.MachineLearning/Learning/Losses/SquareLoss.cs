@@ -66,7 +66,7 @@ namespace Genix.MachineLearning.Learning
 
             float Calculate(int length, int offy, int offe)
             {
-                return Math32f.EuclideanDistance(length, yw, offy, ew, offe) / length;
+                return Vectors.EuclideanDistance(length, yw, offy, ew, offe) / length;
             }
         }
     }

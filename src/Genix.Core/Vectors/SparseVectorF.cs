@@ -173,7 +173,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Math32f.DivC(this.Idx.Length, alpha, this.X, 0);
+        public void DivC(float alpha) => Vectors.DivC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

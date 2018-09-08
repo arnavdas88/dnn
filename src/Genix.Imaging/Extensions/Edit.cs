@@ -41,12 +41,12 @@ namespace Genix.Imaging
             if (this.BitsPerPixel == 24 && xpos + 24 > 64)
             {
                 int rem = 64 - xpos;
-                return (uint)BitUtils64.GetBits(this.Bits[pos], xpos, rem) |
-                       (uint)(BitUtils64.GetBits(this.Bits[pos + 1], 0, 24 - rem) << rem);
+                return (uint)BitUtils.GetBits(this.Bits[pos], xpos, rem) |
+                       (uint)(BitUtils.GetBits(this.Bits[pos + 1], 0, 24 - rem) << rem);
             }
             else
             {
-                return (uint)BitUtils64.GetBits(this.Bits[pos], xpos, this.BitsPerPixel);
+                return (uint)BitUtils.GetBits(this.Bits[pos], xpos, this.BitsPerPixel);
             }
         }
 
@@ -84,22 +84,22 @@ namespace Genix.Imaging
             {
                 if (color > 0)
                 {
-                    this.Bits[pos] = BitUtils64.SetBit(this.Bits[pos], xpos);
+                    this.Bits[pos] = BitUtils.SetBit(this.Bits[pos], xpos);
                 }
                 else
                 {
-                    this.Bits[pos] = BitUtils64.ResetBit(this.Bits[pos], xpos);
+                    this.Bits[pos] = BitUtils.ResetBit(this.Bits[pos], xpos);
                 }
             }
             else if (this.BitsPerPixel == 24 && xpos + 24 > 64)
             {
                 int rem = 64 - xpos;
-                this.Bits[pos] = BitUtils64.CopyBits(this.Bits[pos], xpos, rem, color);
-                this.Bits[pos + 1] = BitUtils64.CopyBits(this.Bits[pos + 1], 0, 24 - rem, color >> rem);
+                this.Bits[pos] = BitUtils.CopyBits(this.Bits[pos], xpos, rem, color);
+                this.Bits[pos + 1] = BitUtils.CopyBits(this.Bits[pos + 1], 0, 24 - rem, color >> rem);
             }
             else
             {
-                this.Bits[pos] = BitUtils64.CopyBits(this.Bits[pos], xpos, this.BitsPerPixel, color);
+                this.Bits[pos] = BitUtils.CopyBits(this.Bits[pos], xpos, this.BitsPerPixel, color);
             }
         }
 
@@ -182,7 +182,7 @@ namespace Genix.Imaging
 
                 for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
                 {
-                    BitUtils64.SetBits(count, bits, off);
+                    BitUtils.SetBits(count, bits, off);
                 }
             }
         }
@@ -268,7 +268,7 @@ namespace Genix.Imaging
 
                 for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
                 {
-                    BitUtils64.ResetBits(count, bits, off);
+                    BitUtils.ResetBits(count, bits, off);
                 }
             }
         }
@@ -395,11 +395,11 @@ namespace Genix.Imaging
                 {
                     if (this.BitsPerPixel == 1)
                     {
-                        BitUtils64.ResetBits(count, bits, off);
+                        BitUtils.ResetBits(count, bits, off);
                     }
                     else
                     {
-                        BitUtils64.SetBits(count, bits, off);
+                        BitUtils.SetBits(count, bits, off);
                     }
                 }
             }
@@ -479,7 +479,7 @@ namespace Genix.Imaging
                 int pos = y * this.Stride1;
                 for (int i = 0; i < height; i++, pos += this.Stride1)
                 {
-                    BitUtils64.SetBits(count, bits, pos);
+                    BitUtils.SetBits(count, bits, pos);
                 }
             }
 
@@ -490,7 +490,7 @@ namespace Genix.Imaging
                 int pos = (y * this.Stride1) + ((x + width) * this.BitsPerPixel);
                 for (int i = 0; i < height; i++, pos += this.Stride1)
                 {
-                    BitUtils64.SetBits(count, bits, pos);
+                    BitUtils.SetBits(count, bits, pos);
                 }
             }
 
@@ -615,11 +615,11 @@ namespace Genix.Imaging
                 {
                     if (this.BitsPerPixel == 1)
                     {
-                        BitUtils64.SetBits(count, bits, off);
+                        BitUtils.SetBits(count, bits, off);
                     }
                     else
                     {
-                        BitUtils64.ResetBits(count, bits, off);
+                        BitUtils.ResetBits(count, bits, off);
                     }
                 }
             }
