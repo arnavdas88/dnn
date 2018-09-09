@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Learning
             float loss = 0.0f;
             for (int i = 0, ii = y.Length; i < ii; i++)
             {
-                loss += Maximum.Max(0, 1.0f - Score(i));
+                loss += MinMax.Max(0, 1.0f - Score(i));
             }
 
             if (calculateGradient)

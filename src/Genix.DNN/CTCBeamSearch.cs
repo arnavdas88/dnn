@@ -397,7 +397,7 @@ namespace Genix.DNN
 
         private IList<(string[], float)> CreateFinalAnswer(Buffers flop)
         {
-            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(Maximum.Max(this.ResultCount, flop.Count));
+            List<(string[] Classes, float Prob)> final = new List<(string[], float)>(MinMax.Max(this.ResultCount, flop.Count));
             float amax = 0.0f;
             float esum = float.NegativeInfinity;
 

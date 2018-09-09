@@ -235,8 +235,8 @@ namespace Genix.MachineLearning.Imaging
                         {
                             float weight = w[offy];
                             int color = (int)((weight - min) / (max - min) * 255);
-                            color = Math.Max(color, 0);
-                            color = Math.Min(color, 255);
+                            color = MinMax.Max(color, 0);
+                            color = MinMax.Min(color, 255);
 
                             p[(iy * data.Stride) + ix] = (byte)(255 - color);
                         }

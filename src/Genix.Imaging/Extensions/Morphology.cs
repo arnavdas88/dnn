@@ -92,13 +92,13 @@ namespace Genix.Imaging
             void MakeMask(Point point)
             {
                 mask.MaximumIP(
-                    Math.Max(-point.X, 0),
-                    Math.Max(-point.Y, 0),
+                    Core.MinMax.Max(-point.X, 0),
+                    Core.MinMax.Max(-point.Y, 0),
                     this.Width - Math.Abs(point.X),
                     this.Height - Math.Abs(point.Y),
                     this,
-                    Math.Max(point.X, 0),
-                    Math.Max(point.Y, 0));
+                    Core.MinMax.Max(point.X, 0),
+                    Core.MinMax.Max(point.Y, 0));
             }
         }
 
@@ -172,13 +172,13 @@ namespace Genix.Imaging
             void MakeMask(Point point)
             {
                 mask.MinimumIP(
-                    Math.Max(-point.X, 0),
-                    Math.Max(-point.Y, 0),
+                    Core.MinMax.Max(-point.X, 0),
+                    Core.MinMax.Max(-point.Y, 0),
                     this.Width - Math.Abs(point.X),
                     this.Height - Math.Abs(point.Y),
                     this,
-                    Math.Max(point.X, 0),
-                    Math.Max(point.Y, 0));
+                    Core.MinMax.Max(point.X, 0),
+                    Core.MinMax.Max(point.Y, 0));
             }
         }
 
@@ -694,15 +694,15 @@ namespace Genix.Imaging
                     Arrays.Or(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
-                        Math.Max(point.Y, 0) * stride,
+                        Core.MinMax.Max(point.Y, 0) * stride,
                         mask,
-                        Math.Max(-point.Y, 0) * stride);
+                        Core.MinMax.Max(-point.Y, 0) * stride);
                 }
                 else
                 {
                     int count = width - Math.Abs(point.X);
-                    int offx = (Math.Max(point.Y, 0) * stride1) + Math.Max(point.X, 0);
-                    int offy = (Math.Max(-point.Y, 0) * stride1) + Math.Max(-point.X, 0);
+                    int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
+                    int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
                     for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
                     {
                         BitUtils.Or(count, bits, offx, mask, offy);
@@ -735,15 +735,15 @@ namespace Genix.Imaging
                     Arrays.And(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
-                        Math.Max(point.Y, 0) * stride,
+                        Core.MinMax.Max(point.Y, 0) * stride,
                         mask,
-                        Math.Max(-point.Y, 0) * stride);
+                        Core.MinMax.Max(-point.Y, 0) * stride);
                 }
                 else
                 {
                     int count = width - Math.Abs(point.X);
-                    int offx = (Math.Max(point.Y, 0) * stride1) + Math.Max(point.X, 0);
-                    int offy = (Math.Max(-point.Y, 0) * stride1) + Math.Max(-point.X, 0);
+                    int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
+                    int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
                     for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
                     {
                         BitUtils.And(count, bits, offx, mask, offy);

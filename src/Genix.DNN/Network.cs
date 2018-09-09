@@ -277,7 +277,7 @@ namespace Genix.DNN
             session.DetachTensor(y);
             session.EndSession();
 
-            return (y, Maximum.Min(loss, 100.0f));  // limit loss on top
+            return (y, MinMax.Min(loss, 100.0f));  // limit loss on top
         }
 
         /*/// <summary>

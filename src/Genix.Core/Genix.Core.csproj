@@ -101,8 +101,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arrays.tt</DependentUpon>
     </Compile>
-    <Compile Include="Math\Math64f.cs" />
     <Compile Include="Math\Math8u.cs" />
+    <Compile Include="Math\MinMax.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MinMax.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\Vectors.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -176,6 +180,10 @@
     <Content Include="Math\Arrays.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Arrays.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Math\MinMax.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MinMax.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Math\Vectors.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

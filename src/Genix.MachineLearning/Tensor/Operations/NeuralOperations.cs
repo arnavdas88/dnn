@@ -231,7 +231,7 @@ namespace Genix.MachineLearning
                     {
                         for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                         {
-                            int ix1e = Maximum.Min(ix1 + ksize1, x1);
+                            int ix1e = MinMax.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
                                 Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
@@ -248,7 +248,7 @@ namespace Genix.MachineLearning
 
                             for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
                             {
-                                int ix2e = Maximum.Min(ix2 + ksize2, x2);
+                                int ix2e = MinMax.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
                                     Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
@@ -306,8 +306,8 @@ namespace Genix.MachineLearning
                         for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
                         {
                             // cycle by the kernel
-                            int ike1 = Maximum.Min(ix1 + ksize1, x1);
-                            int ike2 = Maximum.Min(ix2 + ksize2, x2);
+                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
                             for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
@@ -460,7 +460,7 @@ namespace Genix.MachineLearning
                     {
                         for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                         {
-                            int ix1e = Maximum.Min(ix1 + ksize1, x1);
+                            int ix1e = MinMax.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
                                 Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
@@ -477,7 +477,7 @@ namespace Genix.MachineLearning
 
                             for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
                             {
-                                int ix2e = Maximum.Min(ix2 + ksize2, x2);
+                                int ix2e = MinMax.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
                                     Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
@@ -536,8 +536,8 @@ namespace Genix.MachineLearning
                         for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
                         {
                             // cycle by the kernel
-                            int ike1 = Maximum.Min(ix1 + ksize1, x1);
-                            int ike2 = Maximum.Min(ix2 + ksize2, x2);
+                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
                             for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)

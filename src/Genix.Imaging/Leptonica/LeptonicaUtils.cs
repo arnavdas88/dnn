@@ -88,8 +88,8 @@ namespace Genix.Imaging
 
             int minSize = adaptiveThreshold ? 16 : 4;
 
-            int sx = Math.Max(minSize, Math.Min(64, w / 5));        // tile size in pixels
-            int sy = Math.Max(minSize, Math.Min(128, h / 5));
+            int sx = MinMax.Max(minSize, MinMax.Min(64, w / 5));        // tile size in pixels
+            int sy = MinMax.Max(minSize, MinMax.Min(128, h / 5));
             const int Thresh = 100;                                 // threshold for determining foreground
             int mincount = sx * sy / 3;                             // min threshold on counts in a tile
             const int Smoothx = 2;                                  // half-width of block convolution kernel width

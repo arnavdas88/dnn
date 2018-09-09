@@ -11,6 +11,7 @@ namespace Genix.Drawing
     using System.ComponentModel;
     using System.Globalization;
     using System.Runtime.CompilerServices;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -267,8 +268,8 @@ namespace Genix.Drawing
             return new Rectangle(
                 rect.X - dx,
                 rect.Y - dy,
-                Math.Max(rect.w + (2 * dx), 0),
-                Math.Max(rect.h + (2 * dy), 0));
+                MinMax.Max(rect.w + (2 * dx), 0),
+                MinMax.Max(rect.h + (2 * dy), 0));
         }
 
         /// <summary>
@@ -283,10 +284,10 @@ namespace Genix.Drawing
         /// </returns>
         public static Rectangle Intersect(Rectangle rect1, Rectangle rect2)
         {
-            int x1 = Math.Max(rect1.x, rect2.x);
-            int x2 = Math.Min(rect1.x + rect1.w, rect2.x + rect2.w);
-            int y1 = Math.Max(rect1.y, rect2.y);
-            int y2 = Math.Min(rect1.y + rect1.h, rect2.y + rect2.h);
+            int x1 = MinMax.Max(rect1.x, rect2.x);
+            int x2 = MinMax.Min(rect1.x + rect1.w, rect2.x + rect2.w);
+            int y1 = MinMax.Max(rect1.y, rect2.y);
+            int y2 = MinMax.Min(rect1.y + rect1.h, rect2.y + rect2.h);
 
             return x2 >= x1 && y2 >= y1 ? Rectangle.FromLTRB(x1, y1, x2, y2) : Rectangle.Empty;
         }
@@ -390,10 +391,10 @@ namespace Genix.Drawing
                 return rect1;
             }
 
-            int x1 = Math.Min(rect1.x, rect2.x);
-            int x2 = Math.Max(rect1.x + rect1.w, rect2.x + rect2.w);
-            int y1 = Math.Min(rect1.y, rect2.y);
-            int y2 = Math.Max(rect1.y + rect1.h, rect2.y + rect2.h);
+            int x1 = MinMax.Min(rect1.x, rect2.x);
+            int x2 = MinMax.Max(rect1.x + rect1.w, rect2.x + rect2.w);
+            int y1 = MinMax.Min(rect1.y, rect2.y);
+            int y2 = MinMax.Max(rect1.y + rect1.h, rect2.y + rect2.h);
 
             return Rectangle.FromLTRB(x1, y1, x2, y2);
         }
@@ -437,10 +438,10 @@ namespace Genix.Drawing
                 throw new ArgumentOutOfRangeException(nameof(height), Core.Properties.Resources.E_InvalidRectangleHeight);
             }
 
-            int x1 = Math.Min(rect.x, x);
-            int x2 = Math.Max(rect.x + rect.w, x + width);
-            int y1 = Math.Min(rect.y, y);
-            int y2 = Math.Max(rect.y + rect.h, y + height);
+            int x1 = MinMax.Min(rect.x, x);
+            int x2 = MinMax.Max(rect.x + rect.w, x + width);
+            int y1 = MinMax.Min(rect.y, y);
+            int y2 = MinMax.Max(rect.y + rect.h, y + height);
 
             return Rectangle.FromLTRB(x1, y1, x2, y2);
         }
@@ -641,10 +642,10 @@ namespace Genix.Drawing
         public void Inflate(int dx, int dy)
         {
             this.x -= dx;
-            this.w = Math.Max(this.w + (2 * dx), 0);
+            this.w = MinMax.Max(this.w + (2 * dx), 0);
 
             this.y -= dy;
-            this.h = Math.Max(this.h + (2 * dy), 0);
+            this.h = MinMax.Max(this.h + (2 * dy), 0);
         }
 
         /// <summary>

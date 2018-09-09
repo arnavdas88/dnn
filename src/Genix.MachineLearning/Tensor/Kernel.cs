@@ -10,6 +10,7 @@ namespace Genix.MachineLearning
     using System.Globalization;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using Genix.Core;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -292,7 +293,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int CalculateOutputSize(int size, int kernelSize, int stride, int padding)
         {
-            return size != -1 ? ((Math.Max(size - kernelSize + (2 * padding), 0) + stride - 1) / stride) + 1 : -1;
+            return size != -1 ? ((MinMax.Max(size - kernelSize + (2 * padding), 0) + stride - 1) / stride) + 1 : -1;
         }
     }
 }

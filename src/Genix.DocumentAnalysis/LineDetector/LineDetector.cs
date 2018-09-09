@@ -9,6 +9,7 @@ namespace Genix.DocumentAnalysis
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Genix.Core;
     using Genix.Drawing;
     using Genix.Imaging;
 
@@ -88,7 +89,7 @@ namespace Genix.DocumentAnalysis
                     lines.Add(new LineShape(
                         new Point(component.Bounds.Left, y),
                         new Point(component.Bounds.Right, y),
-                        Math.Max(1, component.Bounds.Height - (2 * DilationSize)),
+                        MinMax.Max(1, component.Bounds.Height - (2 * DilationSize)),
                         LineTypes.Horizontal));
                 }
 

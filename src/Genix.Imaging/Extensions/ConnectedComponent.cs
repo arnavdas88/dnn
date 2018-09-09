@@ -230,8 +230,8 @@ namespace Genix.Imaging
             // pre-allocate stroke holders
             if (component.bounds.Y < this.bounds.Y || component.bounds.Bottom > this.bounds.Bottom)
             {
-                int y1 = Maximum.Min(component.bounds.Y, this.bounds.Y);
-                int y2 = Maximum.Max(component.bounds.Bottom, this.bounds.Bottom);
+                int y1 = MinMax.Min(component.bounds.Y, this.bounds.Y);
+                int y2 = MinMax.Max(component.bounds.Bottom, this.bounds.Bottom);
 
                 Stroke[][] newstrokes = new Stroke[y2 - y1][];
                 Array.Copy(this.strokes, 0, newstrokes, this.bounds.Y - y1, this.bounds.Height);

@@ -6,8 +6,8 @@
 
 namespace Genix.DocumentAnalysis
 {
-    using System;
     using System.Globalization;
+    using Genix.Core;
     using Genix.Drawing;
     using Newtonsoft.Json;
 
@@ -32,10 +32,10 @@ namespace Genix.DocumentAnalysis
             this.Types = types;
 
             this.Bounds = Rectangle.FromLTRB(
-                Math.Min(begin.X, end.X),
-                Math.Min(begin.Y, end.Y),
-                Math.Max(begin.X, end.X),
-                Math.Max(begin.Y, end.Y));
+                MinMax.Min(begin.X, end.X),
+                MinMax.Min(begin.Y, end.Y),
+                MinMax.Max(begin.X, end.X),
+                MinMax.Max(begin.Y, end.Y));
         }
 
         /// <summary>

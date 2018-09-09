@@ -183,15 +183,15 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
             // optimization step
             int iter = 0;
-            int max_iter = Maximum.Max(10000000, numberOfVariables > int.MaxValue / 100 ? int.MaxValue : 100 * numberOfVariables);
-            int counter = Maximum.Min(numberOfVariables, 1000) + 1;
+            int max_iter = MinMax.Max(10000000, numberOfVariables > int.MaxValue / 100 ? int.MaxValue : 100 * numberOfVariables);
+            int counter = MinMax.Min(numberOfVariables, 1000) + 1;
 
             while (iter < max_iter)
             {
                 // show progress and do shrinking
                 if (--counter == 0)
                 {
-                    counter = Maximum.Min(numberOfVariables, 1000);
+                    counter = MinMax.Min(numberOfVariables, 1000);
                     if (this.Shrinking)
                     {
                         Shrink();
@@ -758,22 +758,22 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     {
                         if (y[i] == -1)
                         {
-                            ub = Maximum.Min(ub, yg);
+                            ub = MinMax.Min(ub, yg);
                         }
                         else
                         {
-                            lb = Maximum.Max(lb, yg);
+                            lb = MinMax.Max(lb, yg);
                         }
                     }
                     else if (IsLowerBound(i))
                     {
                         if (y[i] == 1)
                         {
-                            ub = Maximum.Min(ub, yg);
+                            ub = MinMax.Min(ub, yg);
                         }
                         else
                         {
-                            lb = Maximum.Max(lb, yg);
+                            lb = MinMax.Max(lb, yg);
                         }
                     }
                     else

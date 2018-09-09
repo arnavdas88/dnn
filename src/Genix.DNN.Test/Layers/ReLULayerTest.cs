@@ -3,7 +3,6 @@
     using System;
     using System.Globalization;
     using System.Linq;
-    using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

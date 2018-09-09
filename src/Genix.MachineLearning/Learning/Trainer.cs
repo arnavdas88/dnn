@@ -69,7 +69,7 @@ namespace Genix.MachineLearning.Learning
         /// The degree of parallelism for the query.
         /// The default value is Math.Min(System.Environment.ProcessorCount, 512).
         /// </value>
-        public int MaxDegreeOfParallelism { get; set; } = Math.Min(System.Environment.ProcessorCount, 512);
+        public int MaxDegreeOfParallelism { get; set; } = MinMax.Min(System.Environment.ProcessorCount, 512);
 
         /// <summary>
         /// Performs one epoch of SGD algorithm.

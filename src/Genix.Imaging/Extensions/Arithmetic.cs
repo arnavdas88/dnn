@@ -67,8 +67,8 @@ namespace Genix.Imaging
                     Image dst = src.Clone(false);
                     NativeMethods._add(
                         this.BitsPerPixel,
-                        Math.Min(src.Width, this.Width),
-                        Math.Min(src.Height, this.Height),
+                        Core.MinMax.Min(src.Width, this.Width),
+                        Core.MinMax.Min(src.Height, this.Height),
                         this.Bits,
                         this.Stride8,
                         src.Bits,
@@ -133,8 +133,8 @@ namespace Genix.Imaging
                 case 32:
                     NativeMethods._add(
                         this.BitsPerPixel,
-                        Math.Min(src.Width, this.Width),
-                        Math.Min(src.Height, this.Height),
+                        Core.MinMax.Min(src.Width, this.Width),
+                        Core.MinMax.Min(src.Height, this.Height),
                         src.Bits,
                         src.Stride8,
                         null,
@@ -321,8 +321,8 @@ namespace Genix.Imaging
                     Image dst = src.Clone(false);
                     NativeMethods._sub(
                         this.BitsPerPixel,
-                        Math.Min(src.Width, this.Width),
-                        Math.Min(src.Height, this.Height),
+                        Core.MinMax.Min(src.Width, this.Width),
+                        Core.MinMax.Min(src.Height, this.Height),
                         this.Bits,
                         this.Stride8,
                         src.Bits,
@@ -387,8 +387,8 @@ namespace Genix.Imaging
                 case 32:
                     NativeMethods._sub(
                         src.BitsPerPixel,
-                        Math.Min(src.Width, this.Width),
-                        Math.Min(src.Height, this.Height),
+                        Core.MinMax.Min(src.Width, this.Width),
+                        Core.MinMax.Min(src.Height, this.Height),
                         src.Bits,
                         src.Stride8,
                         null,

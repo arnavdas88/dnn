@@ -459,8 +459,8 @@ namespace Genix.Imaging
                         this.frameCount = this.decoder.Frames.Count;
                         this.firstFrame = parent.startingFrame;
                         this.lastFrame = 0; //// parent.frameCount > 0 ?
-                            ////Math.Min(this.frameCount, parent.startingFrame + parent.frameCount) - 1 :
-                            ////this.frameCount - 1;
+                                            ////MinMax.Min(this.frameCount, parent.startingFrame + parent.frameCount) - 1 :
+                                            ////this.frameCount - 1;
 
                         this.currentFrame = this.firstFrame - 1;
                     }

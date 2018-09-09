@@ -194,10 +194,10 @@ namespace System.Drawing
                 }
                 else
                 {
-                    int x1 = Maximum.Min(rect.X, x);
-                    int y1 = Maximum.Min(rect.Y, y);
-                    int x2 = Maximum.Max(rect.Right, x + width);
-                    int y2 = Maximum.Max(rect.Bottom, y + height);
+                    int x1 = MinMax.Min(rect.X, x);
+                    int y1 = MinMax.Min(rect.Y, y);
+                    int x2 = MinMax.Max(rect.Right, x + width);
+                    int y2 = MinMax.Max(rect.Bottom, y + height);
 
                     rect.Set(x1, y1, x2 - x1, y2 - y1);
                 }

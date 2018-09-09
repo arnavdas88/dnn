@@ -164,7 +164,7 @@ namespace Genix.Imaging
             {
                 double horizontalFactor = (double)width / image.Width;
                 double verticalFactor = (double)height / image.Height;
-                double scaleFactor = Math.Min(horizontalFactor, verticalFactor);
+                double scaleFactor = Core.MinMax.Min(horizontalFactor, verticalFactor);
 
                 int newWidth = (int)((image.Width * scaleFactor) + 0.5f);
                 int newHeight = (int)((image.Height * scaleFactor) + 0.5f);
