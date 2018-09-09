@@ -24,6 +24,7 @@
 namespace Genix.Core
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -53,10 +54,92 @@ namespace Genix.Core
 								bool isSigned = type.Item4;
 								bool isFloating = type.Item5;
 #>
+
+        /// <summary>
+        /// Creates an arrayof <#=typeDescription#> with the specified length and starting value.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <param name="value">The initial value for the array values.</param>
+        /// <returns>
+        /// The allocated array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#>[] Create(int length, <#=typeName#> value)
+        {
+            <#=typeName#>[] a = new <#=typeName#>[length];
+            if (value != default(<#=typeName#>))
+            {
+                Vectors.Set(length, value, a, 0);
+            }
+
+            return a;
+        }
+
+        /// <summary>
+        /// Copies a range of <#=typeDescription#> from a array starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Copy(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.copy_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Copies a range of values from an array of <#=typeDescription#> starting at the specified source index
+        /// to another array starting at the specified destination index.
+        /// <paramref name="x"/> and <paramref name="y"/> can overlap.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Move(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
+            NativeMethods.move_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Sets values in the array of <#=typeDescription#>
+        /// starting at the specified source index to the specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to set.</param>
+        /// <param name="value">The value to set.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Set(int length, <#=typeName#> value, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.set_<#=nativeSuffix#>(length, value, y, offy);
+        }
+
+        /// <summary>
+        /// Swaps elements of two arrays of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to swap.</param>
+        /// <param name="x">The first array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The second array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Swap(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.swap_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
 <#
 					if (isSigned)
 					{
 #>
+
         /// <summary>
         /// Computes the absolute value of elements of an array of <#=typeDescription#> in-place.
         /// </summary>
@@ -358,6 +441,191 @@ namespace Genix.Core
         {
             NativeMethods.divc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
         }
+
+        /// <summary>
+        /// Adds product of element of an array of <#=typeDescription#> and a constant to the elements of destination array.
+        /// </summary>
+        /// <param name="length">The number of elements to add.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar to multiply.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] += x[i] * alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddProductC(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.addproductc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
+        }
+
+        /// <summary>
+        /// Adds product of elements of two arrays of <#=typeDescription#> to the elements of destination array.
+        /// </summary>
+        /// <param name="length">The number of elements to multiply.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y += a * b</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddProduct(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.addproduct_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Squares elements of an array of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to square.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] = y[i] * y[i]</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Square(int length, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.sqr_ip_<#=nativeSuffix#>(length, y, offy);
+        }
+
+        /// <summary>
+        /// Squares elements of an array of <#=typeDescription#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to square.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>y[i] = x[i] * x[i]</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Square(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.sqr_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each element of an array of <#=typeDescription#> and a scalar value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinC(int length, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.minc_ip_<#=nativeSuffix#>(length, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each element of an array of <#=typeDescription#> and a scalar value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinC(int length, <#=typeName#>[] x, int offx, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.minc_<#=nativeSuffix#>(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pair of elements of the two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Min(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.min_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pair of elements of the two arrays of <#=typeDescription#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Min(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.min_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each element of an array of <#=typeDescription#> and a scalar value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MaxC(int length, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.maxc_ip_<#=nativeSuffix#>(length, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each element of an array of <#=typeDescription#> and a scalar value not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="a">The scalar value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MaxC(int length, <#=typeName#>[] x, int offx, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.maxc_<#=nativeSuffix#>(length, x, offx, a, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each pair of elements of the two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Max(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.max_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes a larger of each pair of elements of the two arrays of <#=typeDescription#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Max(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.max_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
 <#
 						if (isFloating)
 						{
@@ -573,13 +841,75 @@ namespace Genix.Core
             return NativeMethods.euclidean_distance_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 <#
-                        }
+					}
+#>
+<#
+					if (typeName == "uint" || typeName == "ulong")
+					{
 #>
 
+        /// <summary>
+        /// Performs logical OR operation on two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Or(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.or_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
 
+        /// <summary>
+        /// Performs logical AND operation on two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void And(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.and_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Xor(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.xor_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XAND (A AND NOT B) operation on two arrays of <#=typeDescription#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Xand(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.xand_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+<#
+					}
+#>
 <#
 				}
 #>
+
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
@@ -593,6 +923,18 @@ namespace Genix.Core
 								bool isSigned = type.Item4;
 								bool isFloating = type.Item5;
 #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void copy_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void move_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void set_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void swap_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 <#
 					if (isSigned)
 					{
@@ -666,9 +1008,45 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void divc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void addproductc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void addproduct_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void sqr_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void sqr_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void minc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void minc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void min_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void min_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void maxc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void maxc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void max_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void max_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
 <#
-						if (isFloating)
-						{
+					if (isFloating)
+					{
 #>
 
             [DllImport(NativeMethods.DllName)]
@@ -724,7 +1102,25 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern <#=typeName#> euclidean_distance_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#>[] y, int offy);
 <#
-                        }
+					}
+#>
+<#
+					if (typeName == "uint" || typeName == "ulong")
+					{
+#>
+            [DllImport(NativeMethods.DllName)]
+            public static extern void or_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void and_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void xor_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void xand_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+<#
+					}
 #>
 <#
 				}

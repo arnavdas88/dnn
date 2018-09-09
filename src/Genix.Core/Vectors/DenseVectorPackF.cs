@@ -106,7 +106,7 @@ namespace Genix.Core
             float[] x = result.X;
             for (int i = 0, ii = result.Count, len = result.Length, off = 0; i < ii; i++, off += len)
             {
-                Array32f.Copy(len, vectors[i].X, vectors[i].Offset, x, off);
+                Vectors.Copy(len, vectors[i].X, vectors[i].Offset, x, off);
             }
 
             return result;

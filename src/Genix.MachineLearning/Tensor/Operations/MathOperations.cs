@@ -223,7 +223,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (a)
                                     {
-                                        Math32f.AddProduct(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
+                                        Vectors.AddProduct(y.Length, b.Weights, 0, y.Gradient, 0, a.Gradient, 0);
                                     }
                                 }
 
@@ -232,7 +232,7 @@ namespace Genix.MachineLearning
                                 {
                                     lock (b)
                                     {
-                                        Math32f.AddProduct(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
+                                        Vectors.AddProduct(y.Length, a.Weights, 0, y.Gradient, 0, b.Gradient, 0);
                                     }
                                 }
                             });
@@ -272,7 +272,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Math32f.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0));
                     }
 #endif
 
@@ -365,7 +365,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Math32f.Square(x.Length, x.Weights, 0, y.Weights, 0);
+                    Vectors.Square(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -516,7 +516,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Math32f.Max(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Vectors.Max(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -568,7 +568,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Math32f.Min(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Vectors.Min(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -984,7 +984,7 @@ namespace Genix.MachineLearning
 
                                     if (bias?.CalculateGradient ?? false)
                                     {
-                                        float[] ones = Arrays.Create(n, 1.0f);
+                                        float[] ones = Vectors.Create(n, 1.0f);
 
                                         lock (bias)
                                         {
@@ -1059,7 +1059,7 @@ namespace Genix.MachineLearning
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        Array32f.Copy(ylen, bias.Weights, 0, y.Weights, 0);
+                        Vectors.Copy(ylen, bias.Weights, 0, y.Weights, 0);
                         cleary = false;
                     }
 

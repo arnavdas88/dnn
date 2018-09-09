@@ -265,67 +265,67 @@ namespace Genix.Imaging
 
             // remove isolated pixels
             Image.BuildORMask(this, StructuringElement.Square(3), null, mask, false);
-            Arrays.And(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.And(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // 0 x 0
             // x x x
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            Arrays.And(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.And(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // 0 x 0
             // 0 0 0
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            Arrays.And(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.And(mask.Length, mask, 0, this.Bits, 0);
 
             // x 0 0
             // x x 0
             // x 0 0
             Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            Arrays.And(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.And(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 x
             // 0 x x
             // 0 0 x
             Image.BuildORMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
             Image.BuildORMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            Arrays.And(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.And(mask.Length, mask, 0, this.Bits, 0);
 
             // fill isolated gaps
             Image.BuildANDMask(this, StructuringElement.Cross(3, 3), null, mask, true);
-            Arrays.Or(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.Or(mask.Length, mask, 0, this.Bits, 0);
 
             // x x x
             // x 0 x
             // 0 0 0
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
-            Arrays.Or(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.Or(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 0 0
             // x 0 x
             // x x x
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
-            Arrays.Or(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.Or(mask.Length, mask, 0, this.Bits, 0);
 
             // 0 x x
             // 0 0 x
             // 0 x x
             Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
-            Arrays.Or(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.Or(mask.Length, mask, 0, this.Bits, 0);
 
             // x x 0
             // x 0 0
             // x x 0
             Image.BuildANDMask(this, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
             Image.BuildANDMask(this, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
-            Arrays.Or(mask.Length, mask, 0, this.Bits, 0);
+            Vectors.Or(mask.Length, mask, 0, this.Bits, 0);
         }
 
         /// <summary>
@@ -679,7 +679,7 @@ namespace Genix.Imaging
 
             if (cleanMask)
             {
-                Arrays.Set(mask.Length, 0, mask, 0);
+                Vectors.Set(mask.Length, 0, mask, 0);
             }
 
             if (bits == null)
@@ -691,7 +691,7 @@ namespace Genix.Imaging
             {
                 if (point.X == 0)
                 {
-                    Arrays.Or(
+                    Vectors.Or(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
                         Core.MinMax.Max(point.Y, 0) * stride,
@@ -720,7 +720,7 @@ namespace Genix.Imaging
 
             if (cleanMask)
             {
-                Arrays.Set(mask.Length, ulong.MaxValue, mask, 0);
+                Vectors.Set(mask.Length, ulong.MaxValue, mask, 0);
             }
 
             if (bits == null)
@@ -732,7 +732,7 @@ namespace Genix.Imaging
             {
                 if (point.X == 0)
                 {
-                    Arrays.And(
+                    Vectors.And(
                         (height - Math.Abs(point.Y)) * stride,
                         bits,
                         Core.MinMax.Max(point.Y, 0) * stride,

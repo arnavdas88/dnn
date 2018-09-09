@@ -139,8 +139,8 @@ namespace Genix.MachineLearning.Clustering
                 // reset means and counts
                 if (iter > 0)
                 {
-                    Array32f.Set(counts.Length, 0.0f, counts, 0);
-                    Array32f.Set(means.Length, 0.0f, means, 0);
+                    Vectors.Set(counts.Length, 0.0f, counts, 0);
+                    Vectors.Set(means.Length, 0.0f, means, 0);
                 }
 
                 // assign vectors to new clusters

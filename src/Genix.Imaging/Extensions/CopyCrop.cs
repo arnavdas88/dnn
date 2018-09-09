@@ -155,7 +155,7 @@ namespace Genix.Imaging
                 if (this.BitsPerPixel > 1)
                 {
                     // set all image to white
-                    Arrays.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                    Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
                 }
             }
 
@@ -178,7 +178,7 @@ namespace Genix.Imaging
 
             if (stride1src == stride1dst && x == 0 && dstx == 0 && width == src.Width)
             {
-                Arrays.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
+                Vectors.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
             }
             else
             {

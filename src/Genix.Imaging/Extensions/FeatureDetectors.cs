@@ -227,7 +227,7 @@ namespace Genix.Imaging
                 float[] temp = h[0];
                 h.RemoveAt(0);
                 h.Add(temp);
-                Array32f.Set(temp.Length, 0, temp, 0);
+                Vectors.Set(temp.Length, 0, temp, 0);
             }
 
             void ComputeHistLine(int offy, float[] h)
@@ -265,7 +265,7 @@ namespace Genix.Imaging
                 {
                     for (int iyc = 0; iyc < blockSize; iyc++)
                     {
-                        Array32f.Copy(blockLengthInBins, hist[iyc], offh, blocks, offblock);
+                        Vectors.Copy(blockLengthInBins, hist[iyc], offh, blocks, offblock);
                         offblock += blockLengthInBins;
                     }
                 }

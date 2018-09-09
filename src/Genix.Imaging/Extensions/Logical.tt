@@ -195,7 +195,7 @@ namespace Genix.Imaging
             {
                 // operation is performed on entire pixel line
                 // do all lines at once
-                Arrays.<#=functionName#>(stridesrc * height / 64, bitssrc, possrc / 64, bitsdst, posdst / 64);
+                Vectors.<#=functionName#>(stridesrc * height / 64, bitssrc, possrc / 64, bitsdst, posdst / 64);
             }
             else
             {

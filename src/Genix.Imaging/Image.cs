@@ -153,7 +153,7 @@ namespace Genix.Imaging
 
             if (copyBits)
             {
-                Arrays.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+                Vectors.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
             }
 
             dst.Transform = this.Transform;

@@ -237,7 +237,7 @@ namespace Genix.DNN
             for (int i = 0, offy = 0; i < mb; i++, offy += numAnswers)
             {
                 // copy weights into temporary buffer and sort along with their indexes
-                Array32f.Copy(numAnswers, yw, offy, ywmb, 0);
+                Vectors.Copy(numAnswers, yw, offy, ywmb, 0);
                 for (int j = 0; j < numAnswers; j++)
                 {
                     ywidx[j] = j;

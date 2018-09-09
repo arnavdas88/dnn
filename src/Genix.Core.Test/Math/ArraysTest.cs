@@ -123,7 +123,7 @@
                 Assert.AreEqual(array2[i], workarray2[i]);
             }
 
-            Arrays.Swap(Length, workarray1, 0, workarray2, 0);
+            Vectors.Swap(Length, workarray1, 0, workarray2, 0);
             for (int i = 0; i < Length; i++)
             {
                 Assert.AreEqual(array2[i], workarray1[i]);

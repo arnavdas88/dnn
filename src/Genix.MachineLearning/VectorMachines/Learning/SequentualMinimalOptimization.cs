@@ -192,7 +192,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     s.Optimize(
                         sampleCount,
                         c,
-                        Arrays.Create(sampleCount, -1.0f),
+                        Vectors.Create(sampleCount, -1.0f),
                         expected,
                         q,
                         out float[] solution,

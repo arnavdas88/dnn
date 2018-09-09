@@ -295,7 +295,7 @@ namespace Genix.Imaging
 
             if ((this.Height & 1) != 0)
             {
-                Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+                Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
             }
 
             dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.5));
@@ -334,7 +334,7 @@ namespace Genix.Imaging
             switch (this.Height % 3)
             {
                 case 1:
-                    Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+                    Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
                     break;
 
                 case 2:
@@ -378,7 +378,7 @@ namespace Genix.Imaging
             switch (this.Height % 4)
             {
                 case 1:
-                    Arrays.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
+                    Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
                     break;
 
                 case 2:

@@ -99,7 +99,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Copy(float[] y, int offy) => Array32f.Copy(this.length, this.x, this.offset, y, offy);
+        public void Copy(float[] y, int offy) => Vectors.Copy(this.length, this.x, this.offset, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -119,7 +119,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(float alpha, float[] y, int offy) => Math32f.AddProductC(this.length, this.x, this.offset, alpha, y, offy);
+        public void AddProductC(float alpha, float[] y, int offy) => Vectors.AddProductC(this.length, this.x, this.offset, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -149,8 +149,8 @@ namespace Genix.MachineLearning.VectorMachines.Learning
             int[] indices = Arrays.Indexes(numberOfVariables);
 
             // initialize gradient
-            Array32f.Copy(numberOfVariables, p, 0, g, 0);
-            Array32f.Set(numberOfVariables, 0.0f, gbar, 0);
+            Vectors.Copy(numberOfVariables, p, 0, g, 0);
+            Vectors.Set(numberOfVariables, 0.0f, gbar, 0);
             /*for (int i = 0; i < numberOfVariables; i++)
             {
                 g[i] = p[i];
@@ -163,7 +163,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                 {
                     q(i, indices, numberOfVariables, qi);
 
-                    Math32f.AddProductC(numberOfVariables, qi, 0, alpha[i], g, 0);
+                    Vectors.AddProductC(numberOfVariables, qi, 0, alpha[i], g, 0);
                     /*float alpha_i = alpha[i];
                     for (int j = 0; j < numberOfVariables; j++)
                     {
@@ -172,7 +172,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
                     if (IsUpperBound(i))
                     {
-                        Math32f.AddProductC(numberOfVariables, qi, 0, c[i], gbar, 0);
+                        Vectors.AddProductC(numberOfVariables, qi, 0, c[i], gbar, 0);
                         /*for (int j = 0; j < numberOfVariables; j++)
                         {
                             gbar[j] += c[i] * qi[j];
@@ -345,7 +345,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     if (ui != IsUpperBound(i))
                     {
                         q(i, indices, numberOfVariables, qi);
-                        Math32f.AddProductC(numberOfVariables, qi, 0, ui ? -ci : ci, gbar, 0);
+                        Vectors.AddProductC(numberOfVariables, qi, 0, ui ? -ci : ci, gbar, 0);
                         /*if (ui)
                         {
                             for (int k = 0; k < numberOfVariables; k++)
@@ -365,7 +365,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     if (uj != IsUpperBound(j))
                     {
                         q(j, indices, numberOfVariables, qj);
-                        Math32f.AddProductC(numberOfVariables, qj, 0, uj ? -cj : cj, gbar, 0);
+                        Vectors.AddProductC(numberOfVariables, qj, 0, uj ? -cj : cj, gbar, 0);
                         /*if (uj)
                         {
                             for (int k = 0; k < numberOfVariables; k++)
@@ -684,7 +684,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                         {
                             q(indices[i], indices, numberOfVariables, temp);
 
-                            Math32f.AddProductC(
+                            Vectors.AddProductC(
                                 numberOfVariables - activeSize,
                                 temp,
                                 activeSize,

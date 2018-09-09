@@ -308,7 +308,7 @@ namespace Genix.DNN.Layers
             this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
 
             // initialize biases for update and reset gates only
-            Array32f.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);
+            Vectors.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);
         }
 
 #if !TENSORFLOW

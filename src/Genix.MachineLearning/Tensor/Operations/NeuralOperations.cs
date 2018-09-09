@@ -189,7 +189,7 @@ namespace Genix.MachineLearning
                             }
                             else
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
 
                             for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
@@ -200,7 +200,7 @@ namespace Genix.MachineLearning
                                 }
                                 else
                                 {
-                                    Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                             }
                         }
@@ -219,7 +219,7 @@ namespace Genix.MachineLearning
                             }
                             else
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
                             }
                         }
                     }
@@ -234,7 +234,7 @@ namespace Genix.MachineLearning
                             int ix1e = MinMax.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
                             else
                             {
@@ -251,7 +251,7 @@ namespace Genix.MachineLearning
                                 int ix2e = MinMax.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
-                                    Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                                 else
                                 {
@@ -312,7 +312,7 @@ namespace Genix.MachineLearning
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
                                 {
-                                    Math32f.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                    Vectors.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
                                 }
                             }
                         }
@@ -412,22 +412,22 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
 
                             for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    Math32f.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
-                                    Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                             }
                         }
@@ -442,11 +442,11 @@ namespace Genix.MachineLearning
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
                             }
                         }
                     }
@@ -463,15 +463,15 @@ namespace Genix.MachineLearning
                             int ix1e = MinMax.Min(ix1 + ksize1, x1);
                             if (ix1e - ix1 == 1)
                             {
-                                Array32f.Copy(xstride1, xw, xpos1, wspw, 0);
+                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
                             }
                             else
                             {
-                                Math32f.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    Math32f.Max(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Vectors.Max(xstride1, xw, pos, wspw, 0);
                                 }
                             }
 
@@ -480,15 +480,15 @@ namespace Genix.MachineLearning
                                 int ix2e = MinMax.Min(ix2 + ksize2, x2);
                                 if (ix2e - ix2 == 1)
                                 {
-                                    Array32f.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
                                 }
                                 else
                                 {
-                                    Math32f.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        Math32f.Max(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Vectors.Max(xstride2, wspw, pos, yw, ypos2);
                                     }
                                 }
                             }
@@ -675,7 +675,7 @@ namespace Genix.MachineLearning
                     // scale(i) = k + alpha / n * sum(x(j) ^ 2)
                     // scale will be later reused in back-propagation
                     // use output as a temporary buffer
-                    Math32f.Square(x.Length, x.Weights, 0, scale.Weights, 0);
+                    Vectors.Square(x.Length, x.Weights, 0, scale.Weights, 0);
                     NeuralOperations.LRNKernel(scale, scale.Weights, y.Weights, kernelSize);
                     scale.Set(k);
                     scale.AddProductC(y, alpha / kernelSize);
@@ -707,7 +707,7 @@ namespace Genix.MachineLearning
                                 Vectors.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
-                                Math32f.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);
+                                Vectors.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);
                             });
                     }
 #endif
@@ -758,7 +758,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Array32f.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
 
                         /* TODO:
                                 Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0);

@@ -200,7 +200,7 @@
                 for (int i = 0; i < size; i++)
                 {
                     v ^= random.Next(0, AlphabetSize);
-                    Array32f.Copy(VectorSize, vectors, v * VectorSize, input.Weights, i * VectorSize);
+                    Vectors.Copy(VectorSize, vectors, v * VectorSize, input.Weights, i * VectorSize);
 
                     if (i > 0)
                     {
@@ -417,7 +417,7 @@
                 Tensor x = new Tensor(null, Shape.Reshape(network.InputShape, (int)Axis.B, w1.Length));
                 for (int i = 0, ii = w1.Length; i < ii; i++)
                 {
-                    Array32f.Copy(letterSize, letters.Weights, alphabet[w1[i]] * letterSize, x.Weights, i * letterSize);
+                    Vectors.Copy(letterSize, letters.Weights, alphabet[w1[i]] * letterSize, x.Weights, i * letterSize);
                 }
 
                 /*                Tensor x = Tensor.OneHot(

@@ -41,7 +41,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -77,7 +77,7 @@ namespace Genix.MachineLearning
                     Tensor[] ys = session.AllocateTensors(ActionName, count, x.Axes, calculateGradient);
                     for (int i = 0; i < count; i++)
                     {
-                        Array32f.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
+                        Vectors.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
                     }
 
 #if !NOLEARNING
@@ -90,7 +90,7 @@ namespace Genix.MachineLearning
                                 float alpha = 1.0f / count;
                                 for (int i = 0; i < count; i++)
                                 {
-                                    Math32f.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
+                                    Vectors.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
                                 }
                             });
 
@@ -236,7 +236,7 @@ namespace Genix.MachineLearning
 
                             if (axis == lastaxis)
                             {
-                                Array32f.Copy(blocksize, xw, offx, yw, offy);
+                                Vectors.Copy(blocksize, xw, offx, yw, offy);
                                 offy += blocksize;
                             }
                             else
@@ -726,7 +726,7 @@ namespace Genix.MachineLearning
                                     if (start < 0)
                                     {
                                         int count = -start * xstride2;
-                                        Array32f.Set(count, 0.0f, yw, yposk2);
+                                        Vectors.Set(count, 0.0f, yw, yposk2);
                                         xposk2 += count;
                                         yposk2 += count;
 
@@ -735,16 +735,16 @@ namespace Genix.MachineLearning
 
                                     if (end > x2)
                                     {
-                                        Array32f.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
+                                        Vectors.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
 
                                         end = x2;
                                     }
 
-                                    Array32f.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
+                                    Vectors.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
                                 }
                                 else
                                 {
-                                    Array32f.Set(ksize2 * xstride2, 0.0f, yw, yposk);
+                                    Vectors.Set(ksize2 * xstride2, 0.0f, yw, yposk);
                                 }
                             }
 
@@ -885,19 +885,19 @@ namespace Genix.MachineLearning
                         for (int i = 1; i < count; i++)
                         {
                             Arrays.Pack(length, xw, i, count, wsp, 0);
-                            Math32f.Max(length, yw, 0, wsp, 0, yw, 0);
+                            Vectors.Max(length, wsp, 0, yw, 0);
                         }
                     }
                     else
                     {
                         for (int offx = 0, offy = 0, ylen = y.Length; offy < ylen; offy += xstride)
                         {
-                            Array32f.Copy(xstride, xw, offx, yw, offy);
+                            Vectors.Copy(xstride, xw, offx, yw, offy);
                             offx += xstride;
 
                             for (int i = 1; i < count; i++, offx += xstride)
                             {
-                                Math32f.Max(xstride, yw, offy, xw, offx, yw, offy);
+                                Vectors.Max(xstride, xw, offx, yw, offy);
                             }
                         }
                     }
@@ -983,7 +983,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -1027,7 +1027,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, axes, calculateGradient);
 
                     // simply copy tensor content
-                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -1071,7 +1071,7 @@ namespace Genix.MachineLearning
                     Tensor y = session.AllocateTensor(ActionName, shape, calculateGradient);
 
                     // simply copy tensor content
-                    Array32f.Copy(x.Length, x.Weights, 0, y.Weights, 0);
+                    Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -1150,7 +1150,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(xstride, x.Weights, 0, yw, offy);
+                        Vectors.Copy(xstride, x.Weights, 0, yw, offy);
                     }
 
                     offy += xstride;
@@ -1196,7 +1196,7 @@ namespace Genix.MachineLearning
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Array32f.Copy(xstride, x.Weights, offx, yw, offyy);
+                            Vectors.Copy(xstride, x.Weights, offx, yw, offyy);
                         }
                     }
 
@@ -1233,7 +1233,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(ystride, xw, offxx, yw, offy);
+                        Vectors.Copy(ystride, xw, offxx, yw, offy);
                     }
                 }
 
@@ -1266,7 +1266,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(ystride, xs[i].Weights, offx, yw, offy);
+                        Vectors.Copy(ystride, xs[i].Weights, offx, yw, offy);
                     }
                 }
             }
@@ -1300,7 +1300,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(xstride0, xw, offxx, yw, offy);
+                        Vectors.Copy(xstride0, xw, offxx, yw, offy);
                     }
                 }
             }
@@ -1333,7 +1333,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(xstride, xw, offx, yw, offy);
+                        Vectors.Copy(xstride, xw, offx, yw, offy);
                     }
                 }
             }
@@ -1366,7 +1366,7 @@ namespace Genix.MachineLearning
                     }
                     else
                     {
-                        Array32f.Copy(ystride, xw, offx, yw, offy);
+                        Vectors.Copy(ystride, xw, offx, yw, offy);
                     }
                 }
             }

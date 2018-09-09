@@ -43,7 +43,7 @@ namespace Genix.Core
         public DenseVectorF(int length, float[] x, int offx)
             : this(length)
         {
-            Array32f.Copy(length, x, offx, this.x, 0);
+            Vectors.Copy(length, x, offx, this.x, 0);
         }
 
         /// <inheritdoc />
@@ -101,7 +101,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Copy(float[] y, int offy) => Array32f.Copy(this.x.Length, this.x, 0, y, offy);
+        public void Copy(float[] y, int offy) => Vectors.Copy(this.x.Length, this.x, 0, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,7 +121,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(float alpha, float[] y, int offy) => Math32f.AddProductC(this.x.Length, this.x, 0, alpha, y, offy);
+        public void AddProductC(float alpha, float[] y, int offy) => Vectors.AddProductC(this.x.Length, this.x, 0, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

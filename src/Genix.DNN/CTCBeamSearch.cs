@@ -548,7 +548,7 @@ namespace Genix.DNN
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Set(int[] classes, int length, int hash, float probBlank, float probNoBlank, State state)
             {
-                Arrays.Copy(length, classes, 0, this.Classes, 0);
+                Vectors.Copy(length, classes, 0, this.Classes, 0);
                 this.Length = length;
                 this.Hash = hash;
 

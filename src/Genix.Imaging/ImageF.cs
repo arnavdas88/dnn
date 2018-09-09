@@ -84,7 +84,7 @@ namespace Genix.Imaging
                 {
                     for (int i = y, off = offy; i < height; i++, off += stride)
                     {
-                        Array32f.Set(x, bits[off + x], bits, off);
+                        Vectors.Set(x, bits[off + x], bits, off);
                     }
                 }
 
@@ -94,7 +94,7 @@ namespace Genix.Imaging
                 {
                     for (int i = y, off = offy + right; i < height; i++, off += stride)
                     {
-                        Array32f.Set(len, bits[off - 1], bits, off);
+                        Vectors.Set(len, bits[off - 1], bits, off);
                     }
                 }
 
@@ -111,7 +111,7 @@ namespace Genix.Imaging
                 // set top
                 if (y > 0)
                 {
-                    Array32f.Set(offy, borderValue, bits, 0);
+                    Vectors.Set(offy, borderValue, bits, 0);
                 }
 
                 // set left
@@ -119,7 +119,7 @@ namespace Genix.Imaging
                 {
                     for (int i = y, off = offy; i < height; i++, off += stride)
                     {
-                        Array32f.Set(x, borderValue, bits, off);
+                        Vectors.Set(x, borderValue, bits, off);
                     }
                 }
 
@@ -129,7 +129,7 @@ namespace Genix.Imaging
                 {
                     for (int i = y, off = offy + right; i < height; i++, off += stride)
                     {
-                        Array32f.Set(len, borderValue, bits, off);
+                        Vectors.Set(len, borderValue, bits, off);
                     }
                 }
 
@@ -137,7 +137,7 @@ namespace Genix.Imaging
                 len = this.Height - bottom;
                 if (len > 0)
                 {
-                    Array32f.Set(len * stride, borderValue, bits, bottom * stride);
+                    Vectors.Set(len * stride, borderValue, bits, bottom * stride);
                 }
             }
         }

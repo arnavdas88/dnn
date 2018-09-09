@@ -325,7 +325,7 @@ namespace Genix.MachineLearning
         public Tensor Copy()
         {
             Tensor y = new Tensor("copy", this.Axes);
-            Array32f.Copy(this.Length, this.Weights, 0, y.Weights, 0);
+            Vectors.Copy(this.Length, this.Weights, 0, y.Weights, 0);
             return y;
         }
 
@@ -333,7 +333,7 @@ namespace Genix.MachineLearning
         /// Sets all the weights in the tensor to zero.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => Array32f.Set(this.Length, 0.0f, this.Weights, 0);
+        public void Clear() => Vectors.Set(this.Length, 0.0f, this.Weights, 0);
 
         /// <summary>
         /// Sets all the weights in the tensor's gradient to zero.
@@ -343,7 +343,7 @@ namespace Genix.MachineLearning
         {
             if (this.gradient != null)
             {
-                Array32f.Set(this.Length, 0, this.gradient, 0);
+                Vectors.Set(this.Length, 0, this.gradient, 0);
             }
         }
 
@@ -352,7 +352,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Set(float value) => Array32f.Set(this.Length, value, this.Weights, 0);
+        public void Set(float value) => Vectors.Set(this.Length, value, this.Weights, 0);
 
         /// <summary>
         /// Sets all values in the tensor to the specified values.
@@ -371,7 +371,7 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            Array32f.Copy(this.Length, weights, 0, this.Weights, 0);
+            Vectors.Copy(this.Length, weights, 0, this.Weights, 0);
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value) => Array32f.Set(this.Length, value, this.Gradient, 0);
+        public void SetGradient(float value) => Vectors.Set(this.Length, value, this.Gradient, 0);
 
         /// <summary>
         /// Sets all values in the tensor gradient to the specified values.
@@ -398,7 +398,7 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
             }
 
-            Array32f.Copy(this.Length, weights, 0, this.Gradient, 0);
+            Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this := alpha * x + this</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(Tensor x, float alpha) => Math32f.AddProductC(this.Length, x.Weights, 0, alpha, this.Weights, 0);
+        public void AddProductC(Tensor x, float alpha) => Vectors.AddProductC(this.Length, x.Weights, 0, alpha, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.
@@ -500,7 +500,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) += a(i) * b(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProduct(Tensor a, Tensor b) => Math32f.AddProduct(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
+        public void AddProduct(Tensor a, Tensor b) => Vectors.AddProduct(this.Length, a.Weights, 0, b.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Randomizes all values in the tensor.

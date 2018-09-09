@@ -33,6 +33,10 @@ GENIXAPI(void, copy_s8)(int n, const __int8* x, int offx, __int8* y, int offy) {
 GENIXAPI(void, copy_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, copy_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, copy_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_u16)(int n, const unsigned __int16* x, int offx, unsigned  __int16* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { __copy(n, x, offx, y, offy); }
+GENIXAPI(void, copy_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, copy_f32)(int n, const float* x, int offx, float* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, copy_f64)(int n, const double* x, int offx, double* y, int offy) { __copy(n, x, offx, y, offy); }
 
@@ -92,6 +96,10 @@ GENIXAPI(void, move_s8)(int n, const __int8* x, int offx, __int8* y, int offy) {
 GENIXAPI(void, move_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __move(n, x, offx, y, offy); }
 GENIXAPI(void, move_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __move(n, x, offx, y, offy); }
 GENIXAPI(void, move_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { __move(n, x, offx, y, offy); }
+GENIXAPI(void, move_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __move(n, x, offx, y, offy); }
 GENIXAPI(void, move_f32)(int n, const float* x, int offx, float* y, int offy) { __move(n, x, offx, y, offy); }
 GENIXAPI(void, move_f64)(int n, const double* x, int offx, double* y, int offy) { __move(n, x, offx, y, offy); }
 
@@ -109,8 +117,14 @@ template<typename T> void __forceinline __set(
 	}
 }
 
+GENIXAPI(void, set_s8)(int n, __int8 a, __int8* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_s16)(int n, __int16 a, __int16* y, int offy) { __set(n, a, y, offy); }
 GENIXAPI(void, set_s32)(int n, __int32 a, __int32* y, int offy) { __set(n, a, y, offy); }
 GENIXAPI(void, set_s64)(int n, __int64 a, __int64* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __set(n, a, y, offy); }
+GENIXAPI(void, set_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __set(n, a, y, offy); }
 GENIXAPI(void, set_f32)(int n, float a, float* y, int offy) { __set(n, a, y, offy); }
 GENIXAPI(void, set_f64)(int n, double a, double* y, int offy) { __set(n, a, y, offy); }
 
@@ -220,13 +234,25 @@ template<typename T> void __forceinline __swap(
 	}
 }
 
+GENIXAPI(void, swap_s8)(const int n, __int8* x, const int offx, __int8* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_s16)(const int n, __int16* x, const int offx, __int16* y, const int offy) { __swap(n, x, offx, y, offy); }
 GENIXAPI(void, swap_s32)(const int n, __int32* x, const int offx, __int32* y, const int offy) { __swap(n, x, offx, y, offy); }
 GENIXAPI(void, swap_s64)(const int n, __int64* x, const int offx, __int64* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_u8)(const int n, unsigned __int8* x, const int offx, unsigned __int8* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_u16)(const int n, unsigned __int16* x, const int offx, unsigned __int16* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_u32)(const int n, unsigned __int32* x, const int offx, unsigned __int32* y, const int offy) { __swap(n, x, offx, y, offy); }
+GENIXAPI(void, swap_u64)(const int n, unsigned __int64* x, const int offx, unsigned __int64* y, const int offy) { __swap(n, x, offx, y, offy); }
 GENIXAPI(void, swap_f32)(const int n, float* x, const int offx, float* y, const int offy) {
 
 	////__swap(n, x, offx, y, offy);
 	const int incxy = 1;
 	::sswap(&n, x, &incxy, y, &incxy);
+}
+GENIXAPI(void, swap_f64)(const int n, double* x, const int offx, double* y, const int offy) {
+
+	////__swap(n, x, offx, y, offy);
+	const int incxy = 1;
+	::dswap(&n, x, &incxy, y, &incxy);
 }
 
 // logical operations

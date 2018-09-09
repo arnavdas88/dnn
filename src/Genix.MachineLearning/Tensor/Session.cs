@@ -181,7 +181,7 @@ namespace Genix.MachineLearning
                 if (calculateGradient && stack.Count > 0)
                 {
                     float[] dw = stack.Pop();
-                    Array32f.Set(length, 0.0f, dw, 0);
+                    Vectors.Set(length, 0.0f, dw, 0);
 
                     x = new Tensor(name, shape, w, dw);
                 }

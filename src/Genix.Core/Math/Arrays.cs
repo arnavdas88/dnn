@@ -20,66 +20,6 @@ namespace Genix.Core
     public static partial class Arrays
     {
         /// <summary>
-        /// Creates an array of 32-bit integers with the specified length and starting value.
-        /// </summary>
-        /// <param name="length">The number of elements in the array.</param>
-        /// <param name="value">The initial value for the array values.</param>
-        /// <returns>
-        /// The allocated array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] Create(int length, int value)
-        {
-            int[] a = new int[length];
-            if (value != 0)
-            {
-                Arrays.Set(length, value, a, 0);
-            }
-
-            return a;
-        }
-
-        /// <summary>
-        /// Creates an array of single-precision floating-point numbers with the specified length and starting value.
-        /// </summary>
-        /// <param name="length">The number of elements in the array.</param>
-        /// <param name="value">The initial value for the array values.</param>
-        /// <returns>
-        /// The allocated array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float[] Create(int length, float value)
-        {
-            float[] a = new float[length];
-            if (value != 0.0f)
-            {
-                Array32f.Set(length, value, a, 0);
-            }
-
-            return a;
-        }
-
-        /// <summary>
-        /// Creates an array of double-precision floating-point numbers with the specified length and starting value.
-        /// </summary>
-        /// <param name="length">The number of elements in the array.</param>
-        /// <param name="value">The initial value for the array values.</param>
-        /// <returns>
-        /// The allocated array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double[] Create(int length, double value)
-        {
-            double[] a = new double[length];
-            if (value != 0.0f)
-            {
-                Arrays.Set(length, value, a, 0);
-            }
-
-            return a;
-        }
-
-        /// <summary>
         /// Creates an array of zero-based indexes of 32-bit integers.
         /// </summary>
         /// <param name="length">The number of elements in the array.</param>
@@ -161,56 +101,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Copies a range of signed 32-bit values from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, int[] x, int offx, int[] y, int offy) => NativeMethods.copy_s32(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Copies a range of unsigned 32-bit values from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Copy(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.copy_u32(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Copies a range of signed 64-bit values from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, long[] x, int offx, long[] y, int offy) => NativeMethods.copy_s64(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Copies a range of unsigned 64-bit values from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Copy(int length, ulong[] x, int offx, ulong[] y, int offy) => NativeMethods.copy_u64(length, x, offx, y, offy);
-
-        /// <summary>
         /// Copies values from source pointer to destination pointer in strides.
         /// </summary>
         /// <param name="count">The number of strides to copy.</param>
@@ -237,59 +127,6 @@ namespace Genix.Core
          }*/
 
         /// <summary>
-        /// Sets signed 32-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, int value, int[] y, int offy) => NativeMethods.set_s32(length, value, y, offy);
-
-        /// <summary>
-        /// Sets unsigned 32-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, uint value, uint[] y, int offy) => NativeMethods.set_u32(length, value, y, offy);
-
-        /// <summary>
-        /// Sets signed 64-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, long value, long[] y, int offy) => NativeMethods.set_s64(length, value, y, offy);
-
-        /// <summary>
-        /// Sets unsigned 64-bit values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, ulong value, ulong[] y, int offy) => NativeMethods.set_u64(length, value, y, offy);
-
-        /// <summary>
-        /// Sets values in the array of double-precision floating point numbers
-        /// starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which setting begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, double value, double[] y, int offy) => NativeMethods.set_f64(length, value, y, offy);
-
-        /// <summary>
         /// Sets values in the array starting at the specified source index to the specified value.
         /// </summary>
         /// <param name="length">The number of elements to set.</param>
@@ -299,52 +136,6 @@ namespace Genix.Core
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set(int length, float value, float[] y, int offy, int incy) => NativeMethods.sset_inc(length, value, y, offy, incy);
-
-        /// <summary>
-        /// Swaps elements of two arrays of 32-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, int[] x, int offx, int[] y, int offy) => NativeMethods.swap_s32(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Swaps elements of two arrays of 32-bit unsigned integers.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Swap(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.swap_u32(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Swaps elements of two arrays of 64-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, long[] x, int offx, long[] y, int offy) => NativeMethods.swap_s64(length, x, offx, y, offy);
-
-        /// <summary>
-        /// Swaps elements of two arrays of 64-bit unsigned integers.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which swapping begins.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which swapping begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Swap(int length, ulong[] x, int offx, ulong[] y, int offy) => NativeMethods.swap_u64(length, x, offx, y, offy);
 
         /// <summary>
         /// Copies elements of an array to another array with unit increment.
@@ -386,12 +177,12 @@ namespace Genix.Core
         {
             if (!float.IsNaN(minValue))
             {
-                Math32f.MaxC(length, minValue, x, offx);
+                Vectors.MaxC(length, minValue, x, offx);
             }
 
             if (!float.IsNaN(maxValue))
             {
-                Math32f.MinC(length, maxValue, x, offx);
+                Vectors.MinC(length, maxValue, x, offx);
             }
         }
 
@@ -411,7 +202,7 @@ namespace Genix.Core
         {
             for (int i = 0; i < count; i++, offy += length)
             {
-                Array32f.Copy(length, x, offx, y, offy);
+                Vectors.Copy(length, x, offx, y, offy);
             }
         }
 
@@ -460,18 +251,6 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sort(int length, float[] x, int offx, int[] y, int offy, bool ascending) => NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
 
-        /*/// <summary>
-        /// Performs logical AND operation on two 32-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void And(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.and_ip_u32(length, x, offx, y, offy);*/
-
         /// <summary>
         /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
         /// </summary>
@@ -485,18 +264,6 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public static void And(int length, uint[] a, int offa, uint[] b, int offb, uint[] y, int offy) => NativeMethods.and_u32(length, a, offa, b, offb, y, offy);
-
-        /*/// <summary>
-        /// Performs logical OR operation on two 32-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, uint[] x, int offx, uint[] y, int offy) => NativeMethods.or_ip_u32(length, x, offx, y, offy);*/
 
         /// <summary>
         /// Performs logical OR operation on two 32-bits arrays element-wise not-in-pace.
@@ -552,21 +319,6 @@ namespace Genix.Core
             NativeMethods.or4_u32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
         }
 
-        /*/// <summary>
-        /// Performs logical XOR operation on two 32-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Xor(int length, uint[] x, int offx, uint[] y, int offy)
-        {
-            NativeMethods.xor_ip_u32(length, x, offx, y, offy);
-        }*/
-
         /// <summary>
         /// Performs logical AND operation on two 32-bits arrays element-wise not-in-pace.
         /// </summary>
@@ -584,21 +336,6 @@ namespace Genix.Core
             NativeMethods.xor_u32(length, a, offa, b, offb, y, offy);
         }
 
-        /*/// <summary>
-        /// Performs logical AND operation on two 64-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void And(int length, ulong[] x, int offx, ulong[] y, int offy)
-        {
-            NativeMethods.and_ip_u64(length, x, offx, y, offy);
-        }*/
-
         /// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
         /// </summary>
@@ -615,21 +352,6 @@ namespace Genix.Core
         {
             NativeMethods.and_u64(length, a, offa, b, offb, y, offy);
         }
-
-        /*/// <summary>
-        /// Performs logical OR operation on two 64-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, ulong[] x, int offx, ulong[] y, int offy)
-        {
-            NativeMethods.or_ip_u64(length, x, offx, y, offy);
-        }*/
 
         /// <summary>
         /// Performs logical OR operation on two 64-bits arrays element-wise not-in-pace.
@@ -688,21 +410,6 @@ namespace Genix.Core
             NativeMethods.or4_u64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
         }
 
-        /*/// <summary>
-        /// Performs logical XOR operation on two 64-bits arrays element-wise in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Xor(int length, ulong[] x, int offx, ulong[] y, int offy)
-        {
-            NativeMethods.xor_ip_u64(length, x, offx, y, offy);
-        }*/
-
         /// <summary>
         /// Performs logical AND operation on two 64-bits arrays element-wise not-in-pace.
         /// </summary>
@@ -738,37 +445,10 @@ namespace Genix.Core
             public static extern void copy_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void copy_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s32")]
-            public static extern void copy_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void copy_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "copy_s64")]
-            public static extern void copy_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void scopy_inc(int n, [In] float[] x, int offx, int incx, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void copy_strides_s8(int nstrides, IntPtr x, int stridex, IntPtr y, int stridey);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void set_s32(int n, int a, [Out] int[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "set_s32")]
-            public static extern void set_u32(int n, uint a, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void set_s64(int n, long a, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "set_s64")]
-            public static extern void set_u64(int n, ulong a, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void set_f64(int n, double a, [Out] double[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sset_inc(int n, float a, [Out] float[] y, int offy, int incy);
@@ -781,18 +461,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void unpack(int n, [In] float[] a, int offa, [Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void swap_s32(int n, [In] int[] x, int offx, [Out] int[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "swap_s32")]
-            public static extern void swap_u32(int n, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void swap_s64(int n, [In] long[] x, int offx, [Out] long[] y, int offy);
-
-            [DllImport(NativeMethods.DllName, EntryPoint = "swap_s64")]
-            public static extern void swap_u64(int n, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void fqsort(
@@ -810,14 +478,8 @@ namespace Genix.Core
                 int offy,
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
 
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void and_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
             [DllImport(NativeMethods.DllName)]
             public static extern void and_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
-
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void or_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void or_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
@@ -828,20 +490,11 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void or4_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
 
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void xor_ip_u32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
             [DllImport(NativeMethods.DllName)]
             public static extern void xor_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [Out] uint[] y, int offy);
 
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void and_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
-
             [DllImport(NativeMethods.DllName)]
             public static extern void and_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
-
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void or_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void or_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);
@@ -851,9 +504,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void or4_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
-
-            ////[DllImport(NativeMethods.DllName)]
-            ////public static extern void xor_ip_u64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void xor_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [Out] ulong[] y, int offy);

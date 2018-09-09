@@ -156,7 +156,7 @@ namespace Genix.Imaging
         /// Sets all <see cref="Image"/> pixels to maximum value (2^bpp - 1) in-place.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetToMaxIP() => Arrays.Set(this.Bits.Length, ulong.MaxValue, this.Bits, 0);
+        public void SetToMaxIP() => Vectors.Set(this.Bits.Length, ulong.MaxValue, this.Bits, 0);
 
         /// <summary>
         /// Sets all <see cref="Image"/> pixels in the specified rectangular area to maximum value (2^bpp - 1) in-place.
@@ -242,7 +242,7 @@ namespace Genix.Imaging
         /// Sets all <see cref="Image"/> pixels to minimum value (zero) in-place.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetToMinIP() => Arrays.Set(this.Bits.Length, 0ul, this.Bits, 0);
+        public void SetToMinIP() => Vectors.Set(this.Bits.Length, 0ul, this.Bits, 0);
 
         /// <summary>
         /// Sets all <see cref="Image"/> pixels in the specified rectangular area to minimum value (zero) in-place.
@@ -297,7 +297,7 @@ namespace Genix.Imaging
 
             if (dst.BitsPerPixel != 1)
             {
-                Arrays.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
 
             return dst;
@@ -358,7 +358,7 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetWhiteIP() => Arrays.Set(
+        public void SetWhiteIP() => Vectors.Set(
             this.Bits.Length,
             this.BitsPerPixel == 1 ? 0ul : ulong.MaxValue,
             this.Bits,
@@ -469,7 +469,7 @@ namespace Genix.Imaging
             // clear top
             if (y > 0)
             {
-                Arrays.Set(y * this.Stride, white, bits, 0);
+                Vectors.Set(y * this.Stride, white, bits, 0);
             }
 
             // clear left
@@ -497,7 +497,7 @@ namespace Genix.Imaging
             // clear bottom
             if (y + height < this.Height)
             {
-                Arrays.Set((this.Height - (y + height)) * this.Stride, white, bits, (y + height) * this.Stride);
+                Vectors.Set((this.Height - (y + height)) * this.Stride, white, bits, (y + height) * this.Stride);
             }
         }
 
@@ -518,7 +518,7 @@ namespace Genix.Imaging
 
             if (dst.BitsPerPixel == 1)
             {
-                Arrays.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
+                Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
 
             return dst;
@@ -579,7 +579,7 @@ namespace Genix.Imaging
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetBlackIP() => Arrays.Set(
+        public void SetBlackIP() => Vectors.Set(
             this.Bits.Length,
             this.BitsPerPixel == 1 ? ulong.MaxValue : 0ul,
             this.Bits,
