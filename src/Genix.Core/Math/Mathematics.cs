@@ -218,34 +218,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes a natural logarithm element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Log(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.log_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes an exponential element wise on one array and puts results into another array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The array that contains data used for computation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Exp(int length, float[] x, int offx, float[] y, int offy)
-        {
-            NativeMethods.exp_f32(length, x, offx, y, offy);
-        }
-
-        /// <summary>
         /// Computes the angle whose tangent is the quotient of two specified numbers element-wise.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -380,12 +352,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern float slogSumExp2(float a, float b);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void log_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void exp_f32(int n, [In] float[] a, int offa, [Out] float[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);

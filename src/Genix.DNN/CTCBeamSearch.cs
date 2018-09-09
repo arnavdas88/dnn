@@ -151,7 +151,7 @@ namespace Genix.DNN
 
             // convert predicted probabilities into log space
             float[] ylog = new float[y.Length];
-            Mathematics.Log(y.Length, y.Weights, 0, ylog, 0);
+            Vectors.Log(y.Length, y.Weights, 0, ylog, 0);
 
             // run algoritm
             if (this.languageModel != null)

@@ -1294,22 +1294,12 @@ GENIXAPI(void, powx_gradient_f32)(
 }
 
 // y = ln(a)
-GENIXAPI(void, log_f32)(
-	int n,
-	const float* a, int offa,
-	float* y, int offy)
-{
-	::vsLn(n, a + offa, y + offy);
-}
+GENIXAPI(void, log_f32)(int n, const float* a, int offa, float* y, int offy) { ::vsLn(n, a + offa, y + offy); }
+GENIXAPI(void, log_f64)(int n, const double* a, int offa, double* y, int offy) { ::vdLn(n, a + offa, y + offy); }
 
 // y = exp(a)
-GENIXAPI(void, exp_f32)(
-	int n,
-	const float* a, int offa,
-	float* y, int offy)
-{
-	::vsExp(n, a + offa, y + offy);
-}
+GENIXAPI(void, exp_f32)(int n, const float* a, int offa, float* y, int offy) { ::vsExp(n, a + offa, y + offy); }
+GENIXAPI(void, exp_f64)(int n, const double* a, int offa, double* y, int offy) { ::vdExp(n, a + offa, y + offy); }
 
 // y = sin(x)
 GENIXAPI(void, sin_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsSin(n, x + offx, y + offy); }

@@ -396,6 +396,34 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Computes a natural logarithm of elements of an array of <#=typeDescription#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Log(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.log_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// Computes an exponential of elements of an array of <#=typeDescription#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Exp(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.exp_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
         /// Computes a sines of elements of an array of <#=typeDescription#> not-in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -648,6 +676,12 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sqrt_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void log_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void exp_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sin_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);

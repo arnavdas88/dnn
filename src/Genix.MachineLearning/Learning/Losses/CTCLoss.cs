@@ -66,7 +66,7 @@ namespace Genix.MachineLearning.Learning
 
             // convert predicted probabilities into log space
             float[] ylog = new float[y.Length];
-            Mathematics.Log(y.Length, y.Weights, 0, ylog, 0);
+            Vectors.Log(y.Length, y.Weights, 0, ylog, 0);
 
             // compute alphas
             float[] alphas = new float[T * S];
@@ -96,7 +96,7 @@ namespace Genix.MachineLearning.Learning
                 NativeMethods.CTCReduceAlphasBetas(T, A, S, alphas, labels, y.Gradient);
                 Vectors.Sub(y.Length, ylog, 0, y.Gradient, 0);
                 Vectors.SubC(y.Length, logLossA, y.Gradient, 0);
-                Mathematics.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
+                Vectors.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
 
                 // remove NaN
                 // NaN may come from various sources (for instance log(y) where y = 0)
