@@ -697,7 +697,7 @@ namespace Genix.MachineLearning
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
                                 Vectors.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
-                                Math32f.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
+                                Vectors.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
                                 work.Multiply(x);

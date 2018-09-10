@@ -167,165 +167,72 @@ GENIXAPI(void, sinv)(
 	::vsInv(n, a + offa, y + offy);
 }
 
-// Adds a constant value to each element of a vector in-place.
-template<typename T> void __forceinline __addc_ip(
-	int n,
-	T a,
-	T* y, int offy)
+// Generic operation between a constant and a vector in-place.
+template<typename T, T OP(T, T)> void __forceinline __opc_ip(int n, T a, T* y, int offy)
 {
 	y += offy;
 
 	for (int i = 0; i < n; i++)
 	{
-		y[i] += a;
+		y[i] = OP(y[i], a);
 	}
 }
-
-GENIXAPI(void, addc_ip_s8)(int n, __int8 a, __int8* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_s16)(int n, __int16 a, __int16* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_f32)(int n, float a, float* y, int offy) { __addc_ip(n, a, y, offy); }
-GENIXAPI(void, addc_ip_f64)(int n, double a, double* y, int offy) { __addc_ip(n, a, y, offy); }
-
-// Adds a constant value to each element of a vector not in-place.
-template<typename T> void __forceinline __addc(
-	int n,
-	const T* x, int offx,
-	T a,
-	T* y, int offy)
+template<typename T, T OP(T, T)> void __forceinline __opc_inc_ip(int n, T a, T* y, int offy, int incy)
 {
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
+	if (incy == 1)
 	{
-		y[i] = x[i] + a;
-	}
-}
-
-GENIXAPI(void, addc_s8)(int n, const __int8* x, int offx, __int8 a, __int8* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_s16)(int n, const __int16* x, int offx, __int16 a, __int16* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8 a, unsigned __int8* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16 a, unsigned __int16* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __addc(n, x, offx, a, y, offy); }
-GENIXAPI(void, addc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __addc(n, x, offx, a, y, offy); }
-
-// Subtracts a constant value from each element of a vector in-place.
-template<typename T> void __forceinline __subc_ip(
-	int n,
-	T a,
-	T* y, int offy)
-{
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] -= a;
-	}
-}
-
-GENIXAPI(void, subc_ip_s8)(int n, __int8 a, __int8* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_s16)(int n, __int16 a, __int16* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_f32)(int n, float a, float* y, int offy) { __subc_ip(n, a, y, offy); }
-GENIXAPI(void, subc_ip_f64)(int n, double a, double* y, int offy) { __subc_ip(n, a, y, offy); }
-
-// Subtracts a constant value from each element of a vector not in-place.
-template<typename T> void __forceinline __subc(
-	int n,
-	const T* x, int offx,
-	T a,
-	T* y, int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = x[i] - a;
-	}
-}
-
-GENIXAPI(void, subc_s8)(int n, const __int8* x, int offx, __int8 a, __int8* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_s16)(int n, const __int16* x, int offx, __int16 a, __int16* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8 a, unsigned __int8* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16 a, unsigned __int16* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __subc(n, x, offx, a, y, offy); }
-GENIXAPI(void, subc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __subc(n, x, offx, a, y, offy); }
-
-// Adds the elements of two vectors in-place.
-template<typename T> void __forceinline __add_ip(
-	int n,
-	const T* x, int offx,
-	T* y, int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] += x[i];
-	}
-}
-
-GENIXAPI(void, add_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __add_ip(n, x, offx, y, offy); }
-GENIXAPI(void, add_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __add_ip(n, x, offx, y, offy); }
-GENIXAPI(void, add_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __add_ip(n, x, offx, y, offy); }
-GENIXAPI(void, add_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __add_ip(n, x, offx, y, offy); }
-GENIXAPI(void, add_ip_f32)(int n, const float* x, int offx, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__add_ip(n, x, offx, y, offy);
+		__opc_ip<T, OP>(n, a, y, offy);
 	}
 	else
 	{
-		x += offx;
 		y += offy;
-		::vsAdd(n, y, x, y);
-	}
-}
-GENIXAPI(void, add_ip_f64)(int n, const double* x, int offx, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__add_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vdAdd(n, y, x, y);
+
+		for (int i = 0; i < n; i++, y += incy)
+		{
+			y[0] = OP(y[0], a);
+		}
 	}
 }
 
-// Adds the elements of two vectors with increment in-place.
-template<typename T> void __forceinline __add_inc_ip(
-	int n,
-	const T* x, int offx, int incx,
-	T* y, int offy, int incy)
+#define OPC_IP(op) \
+GENIXAPI(void, op##c_ip_s8)(int n, __int8 a, __int8* y, int offy) { __opc_ip<__int8, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_s16)(int n, __int16 a, __int16* y, int offy) { __opc_ip<__int16, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_s32)(int n, __int32 a, __int32* y, int offy) { __opc_ip<__int32, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_s64)(int n, __int64 a, __int64* y, int offy) { __opc_ip<__int64, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy) { __opc_ip<unsigned __int8, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy) { __opc_ip<unsigned __int16, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __opc_ip<unsigned __int32, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __opc_ip<unsigned __int64, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_f32)(int n, float a, float* y, int offy) { __opc_ip<float, op>(n, a, y, offy); } \
+GENIXAPI(void, op##c_ip_f64)(int n, double a, double* y, int offy) { __opc_ip<double, op>(n, a, y, offy); } \
+\
+GENIXAPI(void, op##c_inc_ip_s8)(int n, __int8 a, __int8* y, int offy, int incy) { __opc_inc_ip<__int8, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_s16)(int n, __int16 a, __int16* y, int offy, int incy) { __opc_inc_ip<__int16, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_s32)(int n, __int32 a, __int32* y, int offy, int incy) { __opc_inc_ip<__int32, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_s64)(int n, __int64 a, __int64* y, int offy, int incy) { __opc_inc_ip<__int64, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy, int incy) { __opc_inc_ip<unsigned __int8, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy, int incy) { __opc_inc_ip<unsigned __int16, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy, int incy) { __opc_inc_ip<unsigned __int32, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy, int incy) { __opc_inc_ip<unsigned __int64, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_f32)(int n, float a, float* y, int offy, int incy) { __opc_inc_ip<float, op>(n, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_ip_f64)(int n, double a, double* y, int offy, int incy) { __opc_inc_ip<double, op>(n, a, y, offy, incy); }
+
+// Generic operation between a constant and a vector not-in-place.
+template<typename T, T OP(T, T)> void __forceinline __opc(int n, const T* x, int offx, T a, T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = OP(x[i], a);
+	}
+}
+template<typename T, T OP(T, T)> void __forceinline __opc_inc(int n, const T* x, int offx, int incx, T a, T* y, int offy, int incy)
 {
 	if (incx == 1 && incy == 1)
 	{
-		__add_ip(n, x, offx, y, offy);
+		__opc<T, OP>(n, x, offx, a, y, offy);
 	}
 	else
 	{
@@ -334,24 +241,88 @@ template<typename T> void __forceinline __add_inc_ip(
 
 		for (int i = 0; i < n; i++, x += incx, y += incy)
 		{
-			y[0] += x[0];
+			y[0] = OP(x[0], a);
 		}
 	}
 }
 
-GENIXAPI(void, add_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
-GENIXAPI(void, add_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
-GENIXAPI(void, add_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx, int offb, unsigned __int32* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
-GENIXAPI(void, add_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
-GENIXAPI(void, add_inc_ip_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
-GENIXAPI(void, add_inc_ip_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __add_inc_ip(n, x, offx, incx, y, offy, incy); }
+#define OPC(op) \
+GENIXAPI(void, op##c_s8)(int n, const __int8* x, int offx, __int8 a, __int8* y, int offy) { __opc<__int8, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_s16)(int n, const __int16* x, int offx, __int16 a, __int16* y, int offy) { __opc<__int16, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __opc<__int32, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __opc<__int64, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8 a, unsigned __int8* y, int offy) { __opc<unsigned __int8, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16 a, unsigned __int16* y, int offy) { __opc<unsigned __int16, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __opc<unsigned __int32, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __opc<unsigned __int64, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __opc<float, op>(n, x, offx, a, y, offy); } \
+GENIXAPI(void, op##c_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __opc<double, op>(n, x, offx, a, y, offy); } \
+\
+GENIXAPI(void, op##c_inc_s8)(int n, const __int8* x, int offx, int incx, __int8 a, __int8* y, int offy, int incy) { __opc_inc<__int8, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_s16)(int n, const __int16* x, int offx, int incx, __int16 a, __int16* y, int offy, int incy) { __opc_inc<__int16, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_s32)(int n, const __int32* x, int offx, int incx, __int32 a, __int32* y, int offy, int incy) { __opc_inc<__int32, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_s64)(int n, const __int64* x, int offx, int incx, __int64 a, __int64* y, int offy, int incy) { __opc_inc<__int64, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8 a, unsigned __int8* y, int offy, int incy) { __opc_inc<unsigned __int8, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_u16)(int n, const unsigned __int16* x, int offx, int incx, unsigned __int16 a, unsigned __int16* y, int offy, int incy) { __opc_inc<unsigned __int16, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_u32)(int n, const unsigned __int32* x, int offx, int incx, unsigned __int32 a, unsigned __int32* y, int offy, int incy) { __opc_inc<unsigned __int32, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64 a, unsigned __int64* y, int offy, int incy) { __opc_inc<unsigned __int64, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_f32)(int n, const float* x, int offx, int incx, float a, float* y, int offy, int incy) { __opc_inc<float, op>(n, x, offx, incx, a, y, offy, incy); } \
+GENIXAPI(void, op##c_inc_f64)(int n, const double* x, int offx, int incx, double a, double* y, int offy, int incy) { __opc_inc<double, op>(n, x, offx, incx, a, y, offy, incy); }
 
-// Adds the elements of two vectors not in-place.
-template<typename T> void __forceinline __add(
-	int n,
-	const T* a, int offa,
-	const T* b, int offb,
-	T* y, int offy)
+// Generic operation between two vectors in-place.
+template<typename T, T OP(T, T)> void __forceinline __op_ip(int n, const T* x, int offx, T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = OP(y[i], x[i]);
+	}
+}
+template<typename T, T OP(T, T)> void __forceinline __op_inc_ip(int n, const T* x, int offx, int incx, T* y, int offy, int incy)
+{
+	if (incx == 1 && incy == 1)
+	{
+		__op_ip<T, OP>(n, x, offx, y, offy);
+	}
+	else
+	{
+		x += offx;
+		y += offy;
+
+		for (int i = 0; i < n; i++, x += incx, y += incy)
+		{
+			y[0] = OP(y[0], x[0]);
+		}
+	}
+}
+
+#define OP_IP(op) \
+GENIXAPI(void, op##_ip_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __op_ip<__int8, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_s18)(int n, const __int16* x, int offx, __int16* y, int offy) { __op_ip<__int16, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __op_ip<__int32, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __op_ip<__int64, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { __op_ip<unsigned __int8, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16* y, int offy) { __op_ip<unsigned __int16, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { __op_ip<unsigned __int32, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __op_ip<unsigned __int64, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_f32)(int n, const float* x, int offx, float* y, int offy) { __op_ip<float, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_f64)(int n, const double* x, int offx, double* y, int offy) { __op_ip<double, op>(n, x, offx, y, offy); } \
+\
+GENIXAPI(void, op##_inc_ip_s8)(int n, const __int8* x, int offx, int incx, __int8* y, int offy, int incy) { __op_inc_ip<__int8, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_s18)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __op_inc_ip<__int16, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __op_inc_ip<__int32, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __op_inc_ip<__int64, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8* y, int offy, int incy) { __op_inc_ip<unsigned __int8, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_u16)(int n, const unsigned __int16* x, int offx, int incx, unsigned __int16* y, int offy, int incy) { __op_inc_ip<unsigned __int16, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx, unsigned __int32* y, int offy, int incy) { __op_inc_ip<unsigned __int32, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __op_inc_ip<unsigned __int64, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __op_inc_ip<float, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __op_inc_ip<double, op>(n, x, offx, incx, y, offy, incy); }
+
+// Generic operation between two vectors not-in-place.
+template<typename T, T OP(T, T)> void __forceinline __op(int n, const T* a, int offa, const T* b, int offb, T* y, int offy)
 {
 	a += offa;
 	b += offb;
@@ -359,47 +330,14 @@ template<typename T> void __forceinline __add(
 
 	for (int i = 0; i < n; i++)
 	{
-		y[i] = a[i] + b[i];
+		y[i] = OP(a[i], b[i]);
 	}
 }
-
-GENIXAPI(void, add_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __add(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, add_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __add(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, add_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __add(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, add_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __add(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, add_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__add(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vsAdd(n, a + offa, b + offb, y + offy);
-	}
-}
-GENIXAPI(void, add_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__add(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vdAdd(n, a + offa, b + offb, y + offy);
-	}
-}
-
-// Adds the elements of two vectors with increment not in-place.
-template<typename T> void __forceinline __add_inc(
-	int n,
-	const T* a, int offa, int inca,
-	const T* b, int offb, int incb,
-	T* y, int offy, int incy)
+template<typename T, T OP(T, T)> void __forceinline __op_inc(int n, const T* a, int offa, int inca, const T* b, int offb, int incb, T* y, int offy, int incy)
 {
 	if (inca == 1 && incb == 1 && incy == 1)
 	{
-		__add(n, a, offa, b, offb, y, offy);
+		__op<T, OP>(n, a, offa, b, offb, y, offy);
 	}
 	else
 	{
@@ -409,50 +347,51 @@ template<typename T> void __forceinline __add_inc(
 
 		for (int i = 0; i < n; i++, a += inca, b += incb, y += incy)
 		{
-			y[0] = a[0] + b[0];
+			y[0] = OP(a[0], b[0]);
 		}
 	}
 }
 
-GENIXAPI(void, add_inc_s32)(int n, const __int32* a, int offa, int inca, const __int32* b, int offb, int incb, __int32* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
-GENIXAPI(void, add_inc_s64)(int n, const __int64* a, int offa, int inca, const __int64* b, int offb, int incb, __int64* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
-GENIXAPI(void, add_inc_u32)(int n, const unsigned __int32* a, int offa, int inca, const unsigned __int32* b, int offb, int incb, unsigned __int32* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
-GENIXAPI(void, add_inc_u64)(int n, const unsigned __int64* a, int offa, int inca, const unsigned __int64* b, int offb, int incb, unsigned __int64* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
-GENIXAPI(void, add_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
-GENIXAPI(void, add_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __add_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+#define OP(op) \
+GENIXAPI(void, op##_s8)(int n, const __int8* a, int offa, const __int8* b, int offb, __int8* y, int offy) { __op<__int8, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_s16)(int n, const __int16* a, int offa, const __int16* b, int offb, __int16* y, int offy) { __op<__int16, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __op<__int32, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __op<__int64, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_u8)(int n, const unsigned __int8* a, int offa, const unsigned __int8* b, int offb, unsigned __int8* y, int offy) { __op<unsigned __int8, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_u16)(int n, const unsigned __int16* a, int offa, const unsigned __int16* b, int offb, unsigned __int16* y, int offy) { __op<unsigned __int16, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __op<unsigned __int32, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __op<unsigned __int64, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { __op<float, op>(n, a, offa, b, offb, y, offy); } \
+GENIXAPI(void, op##_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { __op<double, op>(n, a, offa, b, offb, y, offy); } \
+\
+GENIXAPI(void, op##_inc_s8)(int n, const __int8* a, int offa, int inca, const __int8* b, int offb, int incb, __int8* y, int offy, int incy) { __op_inc<__int8, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_s16)(int n, const __int16* a, int offa, int inca, const __int16* b, int offb, int incb, __int16* y, int offy, int incy) { __op_inc<__int16, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_s32)(int n, const __int32* a, int offa, int inca, const __int32* b, int offb, int incb, __int32* y, int offy, int incy) { __op_inc<__int32, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_s64)(int n, const __int64* a, int offa, int inca, const __int64* b, int offb, int incb, __int64* y, int offy, int incy) { __op_inc<__int64, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_u8)(int n, const unsigned __int8* a, int offa, int inca, const unsigned __int8* b, int offb, int incb, unsigned __int8* y, int offy, int incy) { __op_inc<unsigned __int8, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_u16)(int n, const unsigned __int16* a, int offa, int inca, const unsigned __int16* b, int offb, int incb, unsigned __int16* y, int offy, int incy) { __op_inc<unsigned __int16, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_u32)(int n, const unsigned __int32* a, int offa, int inca, const unsigned __int32* b, int offb, int incb, unsigned __int32* y, int offy, int incy) { __op_inc<unsigned __int32, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_u64)(int n, const unsigned __int64* a, int offa, int inca, const unsigned __int64* b, int offb, int incb, unsigned __int64* y, int offy, int incy) { __op_inc<unsigned __int64, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __op_inc<float, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); } \
+GENIXAPI(void, op##_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __op_inc<double, op>(n, a, offa, inca, b, offb, incb, y, offy, incy); }
 
-/*GENIXAPI(void, sadd_inc)(
-	int n,
-	const float* a, int offa, int inca,
-	const float* b, int offb, int incb,
-	float* y, int offy, int incy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
+// Adds a constant value to each element of a vector.
+template<typename T> T __forceinline add(T a, T b) { return a + b; }
+OPC_IP(add);
+OPC(add);
 
-	if (inca == 1 && incb == 1 && incy == 1)
-	{
-		if (n <= 32)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				y[i] = a[i] + b[i];
-			}
-		}
-		else
-		{
-			::vsAdd(n, a, b, y);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < n; i++, a += inca, b += incb, y += incy)
-		{
-			*y = *a + *b;
-		}
-	}
-}*/
+// Adds the elements of two vectors.
+OP_IP(add);
+OP(add);
+
+// Subtracts a constant value from each element of a vector.
+template<typename T> T __forceinline sub(T a, T b) { return a - b; }
+OPC_IP(sub);
+OPC(sub);
+
+// Subtracts the elements of two vectors.
+OP_IP(sub);
+OP(sub);
 
 GENIXAPI(void, smatchandadd)(
 	int n,
@@ -470,481 +409,23 @@ GENIXAPI(void, smatchandadd)(
 	}
 }
 
-// Subtracts the elements of two vectors in-place.
-template<typename T> void __forceinline __sub_ip(
-	int n,
-	const T* x, int offx,
-	T* y, int offy)
-{
-	x += offx;
-	y += offy;
+// Multiplies each element of a vector by a constant value.
+template<typename T> T __forceinline mul(T a, T b) { return a * b; }
+OPC_IP(mul);
+OPC(mul);
 
-	for (int i = 0; i < n; i++)
-	{
-		y[i] -= x[i];
-	}
-}
+// Multiplies the elements of two vectors.
+OP_IP(mul);
+OP(mul);
 
-GENIXAPI(void, sub_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __sub_ip(n, x, offx, y, offy); }
-GENIXAPI(void, sub_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __sub_ip(n, x, offx, y, offy); }
-GENIXAPI(void, sub_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __sub_ip(n, x, offx, y, offy); }
-GENIXAPI(void, sub_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __sub_ip(n, x, offx, y, offy); }
-GENIXAPI(void, sub_ip_f32)(int n, const float* x, int offx, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__sub_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vsSub(n, y, x, y);
-	}
-}
-GENIXAPI(void, sub_ip_f64)(int n, const double* x, int offx, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__sub_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vdSub(n, y, x, y);
-	}
-}
+// Divides each element of a vector by a constant value.
+template<typename T> T __forceinline div(T a, T b) { return a / b; }
+OPC_IP(div);
+OPC(div);
 
-// Subtracts the elements of two vectors not in-place.
-template<typename T> void __forceinline __sub(
-	int n,
-	const T* a, int offa,
-	const T* b, int offb,
-	T* y, int offy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = a[i] - b[i];
-	}
-}
-
-GENIXAPI(void, sub_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __sub(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, sub_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __sub(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, sub_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __sub(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, sub_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __sub(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, sub_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__sub(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vsSub(n, a + offa, b + offb, y + offy);
-	}
-}
-GENIXAPI(void, sub_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__sub(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vdSub(n, a + offa, b + offb, y + offy);
-	}
-}
-
-// Subtracts the elements of two vectors with increment not in-place.
-GENIXAPI(void, ssub_inc)(
-	int n,
-	const float* a, int offa, int inca,
-	const float* b, int offb, int incb,
-	float* y, int offy, int incy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	if (inca == 1 && incb == 1 && incy == 1)
-	{
-		if (n <= 32)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				y[i] = a[i] - b[i];
-			}
-		}
-		else
-		{
-			::vsSub(n, a, b, y);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < n; i++, a += inca, b += incb, y += incy)
-		{
-			*y = *a - *b;
-		}
-	}
-}
-
-// Multiplies each element of a vector by a constant value in-place.
-template<typename T> void __forceinline __mulc_ip(
-	const int n,
-	const T a,
-	T* y, const int offy)
-{
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] *= a;
-	}
-}
-
-GENIXAPI(void, mulc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __mulc_ip(n, a, y, offy); }
-GENIXAPI(void, mulc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __mulc_ip(n, a, y, offy); }
-GENIXAPI(void, mulc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __mulc_ip(n, a, y, offy); }
-GENIXAPI(void, mulc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __mulc_ip(n, a, y, offy); }
-GENIXAPI(void, mulc_ip_f32)(int n, float a, float* y, int offy)
-{
-	if (n <= 256)
-	{
-		__mulc_ip(n, a, y, offy);
-	}
-	else
-	{
-		::cblas_sscal(n, a, y + offy, 1);
-	}
-}
-GENIXAPI(void, mulc_ip_f64)(int n, double a, double* y, int offy)
-{
-	if (n <= 256)
-	{
-		__mulc_ip(n, a, y, offy);
-	}
-	else
-	{
-		::cblas_dscal(n, a, y + offy, 1);
-	}
-}
-
-GENIXAPI(void, smulc_inc)(
-	int n,
-	float a,
-	float* x, int offx, int incx)
-{
-	x += offx;
-
-	if (incx == 1)
-	{
-		if (n <= 256)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				x[i] *= a;
-			}
-		}
-		else
-		{
-			::cblas_sscal(n, a, x, incx);
-		}
-	}
-	else
-	{
-		// VS provides better performance than MKL
-		for (int i = 0, xi = 0; i < n; i++, xi += incx)
-		{
-			x[xi] *= a;
-		}
-	}
-}
-
-// Multiplies each element of a vector by a constant value not-in-place.
-template<typename T> void __forceinline __mulc(
-	const int n,
-	const T* x, const int offx,
-	const T a,
-	T* y, const int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = x[i] * a;
-	}
-}
-
-GENIXAPI(void, mulc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-GENIXAPI(void, mulc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-GENIXAPI(void, mulc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-GENIXAPI(void, mulc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-GENIXAPI(void, mulc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-GENIXAPI(void, mulc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __mulc(n, x, offx, a, y, offy); }
-
-// Multiplies two vectors element-wise in-place
-template<typename T> void __forceinline __mul_ip(
-	int n,
-	const T* x, int offx,
-	T* y, int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] *= x[i];
-	}
-}
-
-GENIXAPI(void, mul_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __mul_ip(n, x, offx, y, offy); }
-GENIXAPI(void, mul_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __mul_ip(n, x, offx, y, offy); }
-GENIXAPI(void, mul_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __mul_ip(n, x, offx, y, offy); }
-GENIXAPI(void, mul_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __mul_ip(n, x, offx, y, offy); }
-GENIXAPI(void, mul_ip_f32)(int n, const float* x, int offx, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__mul_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vsMul(n, y, x, y);
-	}
-}
-GENIXAPI(void, mul_ip_f64)(int n, const double* x, int offx, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__mul_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vdMul(n, y, x, y);
-	}
-}
-
-// Multiplies two vectors element-wise not-in-place
-template<typename T> void __forceinline __mul(
-	int n,
-	const T* a, int offa,
-	const T* b, int offb,
-	T* y, int offy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = a[i] * b[i];
-	}
-}
-
-GENIXAPI(void, mul_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, mul_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, mul_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, mul_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __mul(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, mul_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__mul(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vsMul(n, a + offa, b + offb, y + offy);
-	}
-}
-GENIXAPI(void, mul_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__mul(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vdMul(n, a + offa, b + offb, y + offy);
-	}
-}
-
-// divides each element of a vector by a constant value in-place.
-template<typename T> void __forceinline __divc_ip(
-	const int n,
-	const T a,
-	T* y, const int offy)
-{
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] /= a;
-	}
-}
-
-GENIXAPI(void, divc_ip_s32)(int n, __int32 a, __int32* y, int offy) { __divc_ip(n, a, y, offy); }
-GENIXAPI(void, divc_ip_s64)(int n, __int64 a, __int64* y, int offy) { __divc_ip(n, a, y, offy); }
-GENIXAPI(void, divc_ip_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy) { __divc_ip(n, a, y, offy); }
-GENIXAPI(void, divc_ip_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy) { __divc_ip(n, a, y, offy); }
-GENIXAPI(void, divc_ip_f32)(int n, float a, float* y, int offy) { __divc_ip(n, a, y, offy); }
-GENIXAPI(void, divc_ip_f64)(int n, double a, double* y, int offy) { __divc_ip(n, a, y, offy); }
-
-// divides each element of a vector by a constant value not-in-place.
-template<typename T> void __forceinline __divc(
-	const int n,
-	const T* x, const int offx,
-	const T a,
-	T* y, const int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = x[i] / a;
-	}
-}
-
-GENIXAPI(void, divc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __divc(n, x, offx, a, y, offy); }
-GENIXAPI(void, divc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __divc(n, x, offx, a, y, offy); }
-GENIXAPI(void, divc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __divc(n, x, offx, a, y, offy); }
-GENIXAPI(void, divc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __divc(n, x, offx, a, y, offy); }
-GENIXAPI(void, divc_f32)(int n, const float* x, int offx, float a, float* y, int offy) { __divc(n, x, offx, a, y, offy); }
-GENIXAPI(void, divc_f64)(int n, const double* x, int offx, double a, double* y, int offy) { __divc(n, x, offx, a, y, offy); }
-
-// divides two vectors element-wise in-place.
-template<typename T> void __forceinline __div_ip(
-	int n,
-	const T* x, int offx,
-	T* y, int offy)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] /= x[i];
-	}
-}
-
-GENIXAPI(void, div_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __div_ip(n, x, offx, y, offy); }
-GENIXAPI(void, div_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __div_ip(n, x, offx, y, offy); }
-GENIXAPI(void, div_ip_u32)(int n, const unsigned __int32* x, int offx, int offb, unsigned __int32* y, int offy) { __div_ip(n, x, offx, y, offy); }
-GENIXAPI(void, div_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __div_ip(n, x, offx, y, offy); }
-GENIXAPI(void, div_ip_f32)(int n, const float* x, int offx, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__div_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vsDiv(n, y, x, y);
-	}
-}
-GENIXAPI(void, div_ip_f64)(int n, const double* x, int offx, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__div_ip(n, x, offx, y, offy);
-	}
-	else
-	{
-		x += offx;
-		y += offy;
-		::vdDiv(n, y, x, y);
-	}
-}
-
-// divides two vectors element-wise not-in-place.
-template<typename T> void __forceinline __div(
-	int n,
-	const T* a, int offa,
-	const T* b, int offb,
-	T* y, int offy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	for (int i = 0; i < n; i++)
-	{
-		y[i] = a[i] / b[i];
-	}
-}
-
-GENIXAPI(void, div_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, div_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, div_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, div_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __div(n, a, offa, b, offb, y, offy); }
-GENIXAPI(void, div_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy)
-{
-	if (n <= 32)
-	{
-		__div(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vsDiv(n, a + offa, b + offb, y + offy);
-	}
-}
-GENIXAPI(void, div_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy)
-{
-	if (n <= 32)
-	{
-		__div(n, a, offa, b, offb, y, offy);
-	}
-	else
-	{
-		::vdDiv(n, a + offa, b + offb, y + offy);
-	}
-}
-
-GENIXAPI(void, sdiv)(
-	int n,
-	const float* a, int offa, int inca,
-	const float* b, int offb, int incb,
-	float* y, int offy, int incy)
-{
-	a += offa;
-	b += offb;
-	y += offy;
-
-	if (inca == 1 && incb == 1 && incy == 1)
-	{
-		if (n <= 32)
-		{
-			for (int i = 0; i < n; i++)
-			{
-				y[i] = a[i] / b[i];
-			}
-		}
-		else
-		{
-			::vsDiv(n, a, b, y);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < n; i++, a += inca, b += incb, y += incy)
-		{
-			*y = *a / *b;
-		}
-	}
-}
+// Divides the elements of two vectors.
+OP_IP(div);
+OP(div);
 
 // Adds product of a vector and a constant to the accumulator vector.
 // y += a * x

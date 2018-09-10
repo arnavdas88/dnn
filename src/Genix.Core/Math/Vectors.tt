@@ -36,31 +36,31 @@ namespace Genix.Core
     public static class Vectors
     {
 <#
-				Tuple<string, string, string, bool, bool>[] types = 
-								{
-								/*Tuple.Create("sbyte", "s8", "8-bit signed integers", true, false),
-								Tuple.Create("byte", "u8", "8-bit unsigned integers", false, false),
-								Tuple.Create("short", "s16", "16-bit signed integers", true, false),
-								Tuple.Create("ushort", "u16", "16-bit unsigned integers", false, false),*/
-								Tuple.Create("int", "s32", "32-bit signed integers", true, false),
-								Tuple.Create("uint", "u32", "32-bit unsigned integers", false, false),
-								Tuple.Create("long", "s64", "64-bit signed integers", true, false),
-								Tuple.Create("ulong", "u64", "64-bit unsigned integers", false, false),
-								Tuple.Create("float", "f32", "single-precision floating point numbers", true, true),
-								Tuple.Create("double", "f64", "double-precision floating point numbers", true, true),
-								};
+	Tuple<string, string, string, bool, bool>[] types = 
+	{
+		/*Tuple.Create("sbyte", "s8", "8-bit signed integers", true, false),
+		Tuple.Create("byte", "u8", "8-bit unsigned integers", false, false),
+		Tuple.Create("short", "s16", "16-bit signed integers", true, false),
+		Tuple.Create("ushort", "u16", "16-bit unsigned integers", false, false),*/
+		Tuple.Create("int", "s32", "32-bit signed integers", true, false),
+		Tuple.Create("uint", "u32", "32-bit unsigned integers", false, false),
+		Tuple.Create("long", "s64", "64-bit signed integers", true, false),
+		Tuple.Create("ulong", "u64", "64-bit unsigned integers", false, false),
+		Tuple.Create("float", "f32", "single-precision floating point numbers", true, true),
+		Tuple.Create("double", "f64", "double-precision floating point numbers", true, true),
+	};
 
-				foreach (Tuple<string, string, string, bool, bool> type in types)
-				{
-								string typeName = type.Item1;
-								string nativeSuffix = type.Item2;
-								string typeDescription = type.Item3;
-								bool isSigned = type.Item4;
-								bool isFloating = type.Item5;
+	foreach (Tuple<string, string, string, bool, bool> type in types)
+	{
+		string typeName = type.Item1;
+		string nativeSuffix = type.Item2;
+		string typeDescription = type.Item3;
+		bool isSigned = type.Item4;
+		bool isFloating = type.Item5;
 #>
 
         /// <summary>
-        /// Creates an arrayof <#=typeDescription#> with the specified length and starting value.
+        /// Creates an array of <#=typeDescription#> with the specified length and starting value.
         /// </summary>
         /// <param name="length">The number of elements in the array.</param>
         /// <param name="value">The initial value for the array values.</param>
@@ -157,8 +157,8 @@ namespace Genix.Core
             NativeMethods.swap_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 <#
-					if (isSigned)
-					{
+        if (isSigned)
+        {
 #>
 
         /// <summary>
@@ -191,8 +191,8 @@ namespace Genix.Core
         }
 
 <#
-						if (isFloating)
-						{
+            if (isFloating)
+            {
 #>
         /// <summary>
         /// Computes the derivative of the argument of the <see cref="Abs(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
@@ -214,66 +214,160 @@ namespace Genix.Core
             NativeMethods.abs_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, y, dy, offy);
         }
 <#
-						}
+            }
 #>
 <#
-					}
+        }
 #>
+<#
+        // operations between a scalar and a vector
+        Tuple<string, string, string, string>[] cfuncs = 
+        {
+            Tuple.Create("Add", $"Adds a constant value to each element of an array of {typeDescription}", "y[i] += alpha", "y[i] = x[i] + alpha"),
+            Tuple.Create("Sub", $"Subtracts a constant value from each element of an array of {typeDescription}", "y[i] -= alpha", "y[i] = x[i] - alpha"),
+            Tuple.Create("Mul", $"Multiplies each element of an array of {typeDescription} by a constant value", "y[i] *= alpha", "y[i] = x[i] * alpha"),
+            Tuple.Create("Div", $"Divides each element of an array of {typeDescription} by a constant value", "y[i] /= alpha", "y[i] = x[i] / alpha"),
+        };
+
+        foreach (Tuple<string, string, string, string> func in cfuncs)
+        {
+            string funcName = func.Item1;
+            string summary = func.Item2;
+            string opInPlace = func.Item3;
+            string opNotInPlace = func.Item3;
+#>
+
         /// <summary>
-        /// Adds a constant value to each element of an array of <#=typeDescription#> in-place.
+        /// <#=summary#> in-place.
         /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="alpha">The scalar.</param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y[i] += alpha</c>.
+        /// The method performs operation defined as <c><#=opInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddC(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>C(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.addc_ip_<#=nativeSuffix#>(length, alpha, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_ip_<#=nativeSuffix#>(length, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds a constant value to each element of an array of <#=typeDescription#> not-in-place.
+        /// <#=summary#> with increment in-place.
         /// </summary>
-        /// <param name="length">The number of elements to add.</param>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="alpha">The scalar.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=opInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=funcName#>C(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_inc_ip_<#=nativeSuffix#>(length, alpha, y, offy, incy);
+        }
+
+        /// <summary>
+        /// <#=summary#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to add.</param>
+        /// <param name="alpha">The scalar.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y[i] = x[i] + alpha</c>.
+        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddC(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.addc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
         }
 
         /// <summary>
-        /// Adds the elements of two arrays of <#=typeDescription#> in-place.
+        /// <#=summary#> with increment not-in-place.
         /// </summary>
-        /// <param name="length">The number of elements to add.</param>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="alpha">The scalar.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#> alpha, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_inc_<#=nativeSuffix#>(length, x, offx, incx, alpha, y, offy, incy);
+        }
+<#
+        }
+#>
+<#
+        // operations between two vectors
+        Tuple<string, string, string, string>[] vfuncs = 
+        {
+            Tuple.Create("Add", $"Adds the elements of two arrays of {typeDescription}", "y += x", "y = a + b"),
+            Tuple.Create("Sub", $"Subtracts the elements of two arrays of {typeDescription}", "y -= x", "y = a - b"),
+            Tuple.Create("Mul", $"Multiplies the elements of two arrays of {typeDescription}", "y *= x", "y = a * b"),
+            Tuple.Create("Div", $"Divides the elements of two arrays of {typeDescription}", "y /= x", "y = a / b"),
+        };
+
+        foreach (Tuple<string, string, string, string> func in vfuncs)
+        {
+            string funcName = func.Item1;
+            string summary = func.Item2;
+            string opInPlace = func.Item3;
+            string opNotInPlace = func.Item3;
+#>
+
+        /// <summary>
+        /// <#=summary#> in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y += x</c>.
+        /// The method performs operation defined as <c><#=opInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.add_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Adds the elements of two arrays of <#=typeDescription#> not-in-place.
+        /// <#=summary#> with increment in-place.
         /// </summary>
-        /// <param name="length">The number of elements to add.</param>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=opInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_inc_ip_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
+        }
+
+        /// <summary>
+        /// <#=summary#> not-in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
         /// <param name="offa">The starting position in <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
@@ -281,187 +375,38 @@ namespace Genix.Core
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y = a + b</c>.
+        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.add_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
         }
 
         /// <summary>
-        /// Subtracts a constant value from each element of an array of <#=typeDescription#> in-place.
+        /// <#=summary#> with increment not-in-place.
         /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] -= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, [In] <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.subc_ip_<#=nativeSuffix#>(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts a constant value from each element of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to subtract.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] = x[i] - alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SubC(int length, <#=typeName#>[] x, int offx, [In] <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.subc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts the elements of two arrays of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y -= x</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.sub_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Subtracts the elements of two arrays of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
         /// <param name="offa">The starting position in <paramref name="a"/>.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
         /// <param name="b">The second source array.</param>
         /// <param name="offb">The starting position in <paramref name="b"/>.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y = a - b</c>.
+        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, int inca, <#=typeName#>[] b, int offb, int incb, <#=typeName#>[] y, int offy, int incy)
         {
-            NativeMethods.sub_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_inc_<#=nativeSuffix#>(length, a, offa, inca, b, offb, incb, y, offy, incy);
         }
-
-        /// <summary>
-        /// Multiplies each element of an array of <#=typeDescription#> by a constant value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] *= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MulC(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.mulc_ip_<#=nativeSuffix#>(length, alpha, y, offy);
+<#
         }
-
-        /// <summary>
-        /// Multiplies each element of an array of <#=typeDescription#> by a constant value not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] := x[i] * alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MulC(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.mulc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Multiplies the elements of two arrays of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y *= x</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Mul(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.mul_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Multiplies the elements of two arrays of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y = a * b</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Mul(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.mul_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Divides each element of an array of <#=typeDescription#> by a constant value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to divide.</param>
-        /// <param name="alpha">The scalar to divide.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] /= alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DivC(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.divc_ip_<#=nativeSuffix#>(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Divides each element of an array of <#=typeDescription#> by a constant value not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to divide.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to divide.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] = x[i] / alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DivC(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.divc_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
-        }
+#>
 
         /// <summary>
         /// Adds product of element of an array of <#=typeDescription#> and a constant to the elements of destination array.
@@ -1129,13 +1074,13 @@ namespace Genix.Core
         {
             private const string DllName = "Genix.Core.Native.dll";
 <#
-				foreach (Tuple<string, string, string, bool, bool> type in types)
-				{
-								string typeName = type.Item1;
-								string nativeSuffix = type.Item2;
-								string typeDescription = type.Item3;
-								bool isSigned = type.Item4;
-								bool isFloating = type.Item5;
+    foreach (Tuple<string, string, string, bool, bool> type in types)
+    {
+        string typeName = type.Item1;
+        string nativeSuffix = type.Item2;
+        string typeDescription = type.Item3;
+        bool isSigned = type.Item4;
+        bool isFloating = type.Item5;
 #>
 
             [DllImport(NativeMethods.DllName)]
@@ -1153,8 +1098,8 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void swap_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 <#
-					if (isSigned)
-					{
+        if (isSigned)
+        {
 #>
 
             [DllImport(NativeMethods.DllName)]
@@ -1164,8 +1109,8 @@ namespace Genix.Core
             public static extern void abs_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [Out] <#=typeName#>[] y, int offy);
 
 <#
-						if (isFloating)
-						{
+            if (isFloating)
+            {
 #>
             [DllImport(NativeMethods.DllName)]
             public static extern void abs_gradient_<#=nativeSuffix#>(
@@ -1178,53 +1123,51 @@ namespace Genix.Core
                 [In] <#=typeName#>[] dy,
                 int offy);
 <#
-						}
+            }
 #>
 <#
-					}
+        }
+#>
+<#
+        // operations between a scalar and a vector
+        foreach (string func in new string[] {"add", "sub", "mul", "div"})
+        {
 #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void addc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void addc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_inc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void add_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void add_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy, int incy);
+<#
+        }
+#>
+<#
+        // operations between two vectors
+        foreach (string func in new string[] {"add", "sub", "mul", "div"})
+        {
+#>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void subc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void subc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sub_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sub_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mulc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mulc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mul_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void mul_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void divc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void divc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [Out] <#=typeName#>[] y, int offy, int incy);
+<#
+        }
+#>
 
             [DllImport(NativeMethods.DllName)]
             public static extern void addproductc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);

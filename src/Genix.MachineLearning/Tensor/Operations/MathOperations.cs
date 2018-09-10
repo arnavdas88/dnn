@@ -306,7 +306,7 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
                     Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
-                    Math32f.Div(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
+                    Vectors.Div(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)

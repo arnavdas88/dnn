@@ -466,7 +466,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) / x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Divide(Tensor x) => Math32f.Div(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Divide(Tensor x) => Vectors.Div(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.

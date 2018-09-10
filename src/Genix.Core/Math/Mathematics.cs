@@ -30,41 +30,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Subtracts the elements of two arrays of floats with increment in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            NativeMethods.ssub_inc(length, y, offy, incy, x, offx, incx, y, offy, incy);
-        }
-
-        /// <summary>
-        /// Subtracts the elements of two arrays of floats with increment not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to subtract.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
-        {
-            NativeMethods.ssub_inc(length, a, offa, inca, b, offb, incb, y, offy, incy);
-        }
-
-        /// <summary>
         /// Adds a range of values from one array starting at the specified source index
         /// to another array starting at the specified destination index
         /// if values in mask arrays match.
@@ -83,30 +48,6 @@ namespace Genix.Core
         public static void MatchAndAdd(int length, float[] x, float[] maskx, int offx, float[] y, float[] masky, int offy)
         {
             NativeMethods.smatchandadd(length, x, maskx, offx, y, masky, offy);
-        }
-
-        /// <summary>
-        /// Divides elements of one array starting at the specified index
-        /// to elements of another array starting at the specified index
-        /// and puts results into destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The input array <paramref name="a"/>.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
-        /// <param name="inca">the increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The input array <paramref name="b"/>.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
-        /// <param name="incb">the increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">the increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i * incy) := a(offa + i * inca) / b(offb + i * incb)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Divide(int length, float[] a, int offa, int inca, float[] b, int offb, int incb, float[] y, int offy, int incy)
-        {
-            NativeMethods.sdiv(length, a, offa, inca, b, offb, incb, y, offy, incy);
         }
 
         /// <summary>
@@ -320,15 +261,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void smatchandadd(int n, [In] float[] x, [In] float[] xmask, int offx, [Out] float[] y, [In] float[] ymask, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void ssub_inc(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
-
-            /*[DllImport(NativeMethods.DllName)]
-            public static extern void smulc_inc(int n, float a, [In, Out] float[] x, int offx, int incx);*/
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void sdiv(int n, [In] float[] a, int offa, int inca, [In] float[] b, int offb, int incb, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void _saxpby(int n, float a, [In] float[] x, int offx, int incx, float b, [In, Out] float[] y, int offy, int incy);
