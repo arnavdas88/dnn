@@ -40,108 +40,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Returns the minimum value in the array.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The minimum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Min(int length, float[] x, int offx) => x[Maximum.ArgMin(length, x, offx)];
-
-        /// <summary>
-        /// Returns the maximum value in the array.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The maximum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Max(int length, float[] x, int offx) => x[Maximum.ArgMax(length, x, offx)];
-
-        /// <summary>
-        /// Returns the minimum and maximum values in the array.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <param name="min">The minimum value in the array.</param>
-        /// <param name="max">The maximum value in the array.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MinMax(int length, float[] x, int offx, out float min, out float max)
-        {
-            Maximum.ArgMinMax(length, x, offx, out int argmin, out int argmax);
-            min = x[argmin];
-            max = x[argmax];
-        }
-
-        /// <summary>
-        /// Returns the position of minimum value in the array of 32-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The position of minimum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, int[] x, int offx) => NativeMethods.argmin_s32(length, x, offx);
-
-        /// <summary>
-        /// Returns the position of maximum value in the array of 32-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The position of maximum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, int[] x, int offx) => NativeMethods.argmax_s32(length, x, offx);
-
-        /// <summary>
-        /// Returns the position of minimum value in the array of floats.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The position of minimum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, float[] x, int offx) => NativeMethods.argmin_f32(length, x, offx);
-
-        /// <summary>
-        /// Returns the position of maximum value in the array of floats.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The position of maximum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, float[] x, int offx) => NativeMethods.argmax_f32(length, x, offx);
-
-        /// <summary>
-        /// Returns the position of minimum and maximum values in the array.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <param name="min">The position of minimum value in the array.</param>
-        /// <param name="max">The position of maximum value in the array.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ArgMinMax(int length, float[] x, int offx, out int min, out int max)
-        {
-            NativeMethods.argminmax_f32(length, x, offx, out min, out max);
-        }
-
-        /// <summary>
         /// Calculates softmax probabilities for values of array in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -151,7 +49,7 @@ namespace Genix.Core
         public static void SoftMax(int length, float[] x, int offx)
         {
             // compute max activation
-            float amax = Maximum.Max(length, x, offx);
+            float amax = Vectors.Max(length, x, offx);
 
             // compute exponentials (carefully to not blow up)
             float esum = 0.0f;
@@ -181,7 +79,7 @@ namespace Genix.Core
         public static void SoftMax(int length, float[] x, int offx, float[] y, int offy)
         {
             // compute max activation
-            float amax = Maximum.Max(length, x, offx);
+            float amax = Vectors.Max(length, x, offx);
 
             // compute exponentials (carefully to not blow up)
             float esum = 0.0f;
@@ -214,21 +112,6 @@ namespace Genix.Core
                 [In] float[] y,
                 [In] float[] dy,
                 int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int argmin_s32(int n, [In] int[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int argmax_s32(int n, [In] int[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int argmin_f32(int n, [In] float[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int argmax_f32(int n, [In] float[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void argminmax_f32(int n, [In] float[] x, int offx, out int winmin, out int winmax);
         }
     }
 }

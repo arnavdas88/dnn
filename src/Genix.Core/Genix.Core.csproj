@@ -95,7 +95,6 @@
     <Compile Include="Lab\ClassificationReport.cs" />
     <Compile Include="Lab\ClassificationReportWriter.cs" />
     <Compile Include="Lab\Truth.cs" />
-    <Compile Include="Math\Array32f.cs" />
     <Compile Include="Math\Math8u.cs" />
     <Compile Include="Math\MinMax.Generated.cs">
       <AutoGen>True</AutoGen>

@@ -265,7 +265,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(int[] shape1, int[] shape2)
         {
-            return shape1.Length == shape2.Length && Arrays.Equals(shape1.Length, shape1, 0, shape2, 0);
+            return shape1.Length == shape2.Length && Vectors.Equals(shape1.Length, shape1, 0, shape2, 0);
         }
 
         /// <summary>

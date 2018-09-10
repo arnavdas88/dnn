@@ -170,7 +170,7 @@ namespace Genix.Imaging
             // apply threshold
             if (threshold > 0.0f)
             {
-                Array32f.ThresholdLT(blocks.Length, threshold, 0.0f, blocks, 0);
+                Vectors.ThresholdLT(blocks.Length, threshold, 0.0f, blocks, 0);
             }
 
             /*DenseVectorProxyF[] dense = new DenseVectorProxyF[blockCount];

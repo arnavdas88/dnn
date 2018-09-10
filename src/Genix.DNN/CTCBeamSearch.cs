@@ -618,7 +618,7 @@ namespace Genix.DNN
                     if (buffer.Length == length &&
                         buffer.Hash == hash &&
                         buffer.Classes[0] == classes[0] &&
-                        Arrays.Equals(length, buffer.Classes, 0, classes, 0))
+                        Vectors.Equals(length, buffer.Classes, 0, classes, 0))
                     {
                         // update buffer
                         buffer.Update(probBlank, probNoBlank, state);

@@ -192,10 +192,7 @@ namespace Genix.Core
         /// The zero-based index of the first bin that contains minimum value.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMin()
-        {
-            return Maximum.ArgMin(this.bins.Length, this.bins, 0);
-        }
+        public int ArgMin() => Vectors.ArgMin(this.bins.Length, this.bins, 0);
 
         /// <summary>
         /// Returns the zero-based index of the first bin that contains maximum value.
@@ -204,10 +201,7 @@ namespace Genix.Core
         /// The zero-based index of the first bin that contains maximum value.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMax()
-        {
-            return Maximum.ArgMax(this.bins.Length, this.bins, 0);
-        }
+        public int ArgMax() => Vectors.ArgMax(this.bins.Length, this.bins, 0);
 
         /// <summary>
         /// Converts this <see cref="Histogram"/> to a cumulative <see cref="Histogram"/>.

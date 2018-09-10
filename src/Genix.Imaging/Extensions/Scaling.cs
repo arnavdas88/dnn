@@ -290,7 +290,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = this.Height >> 1; i < ii; i++, offsrc += 2 * stride, offdst += stride)
             {
-                Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
             }
 
             if ((this.Height & 1) != 0)
@@ -338,7 +338,7 @@ namespace Genix.Imaging
                     break;
 
                 case 2:
-                    Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
                     break;
             }
 
@@ -382,7 +382,7 @@ namespace Genix.Imaging
                     break;
 
                 case 2:
-                    Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
+                    Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
                     break;
 
                 case 3:

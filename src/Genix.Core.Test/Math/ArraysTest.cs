@@ -130,8 +130,8 @@
                 Assert.AreEqual(array1[i], workarray2[i]);
             }
 
-            Assert.IsTrue(Arrays.Equals(Length, workarray1, 0, array2, 0));
-            Assert.IsTrue(Arrays.Equals(Length, workarray2, 0, array1, 0));
+            Assert.IsTrue(Vectors.Equals(Length, workarray1, 0, array2, 0));
+            Assert.IsTrue(Vectors.Equals(Length, workarray2, 0, array1, 0));
         }
     }
 }

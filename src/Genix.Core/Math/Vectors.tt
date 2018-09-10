@@ -38,6 +38,10 @@ namespace Genix.Core
 <#
 				Tuple<string, string, string, bool, bool>[] types = 
 								{
+								/*Tuple.Create("sbyte", "s8", "8-bit signed integers", true, false),
+								Tuple.Create("byte", "u8", "8-bit unsigned integers", false, false),
+								Tuple.Create("short", "s16", "16-bit signed integers", true, false),
+								Tuple.Create("ushort", "u16", "16-bit unsigned integers", false, false),*/
 								Tuple.Create("int", "s32", "32-bit signed integers", true, false),
 								Tuple.Create("uint", "u32", "32-bit unsigned integers", false, false),
 								Tuple.Create("long", "s64", "64-bit signed integers", true, false),
@@ -73,6 +77,23 @@ namespace Genix.Core
             }
 
             return a;
+        }
+
+        /// <summary>
+        /// Determines whether the two arrays of <#=typeDescription#> contain same data.
+        /// </summary>
+        /// <param name="length">The number of elements to compare.</param>
+        /// <param name="x">The first array to compare.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The second array to compare.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// <b>true</b> if two arrays contain same data; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            return NativeMethods.compare_<#=nativeSuffix#>(length, x, offx, y, offy) == 0;
         }
 
         /// <summary>
@@ -512,6 +533,84 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Returns the position of minimum value in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The position of minimum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ArgMin(int length, <#=typeName#>[] x, int offx) => NativeMethods.argmin_<#=nativeSuffix#>(length, x, offx);
+
+        /// <summary>
+        /// Returns the position of maximum value in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The position of maximum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ArgMax(int length, <#=typeName#>[] x, int offx) => NativeMethods.argmax_<#=nativeSuffix#>(length, x, offx);
+
+        /// <summary>
+        /// Returns the position of minimum and maximum values in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="min">The position of minimum value in the array.</param>
+        /// <param name="max">The position of maximum value in the array.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgMinMax(int length, <#=typeName#>[] x, int offx, out int min, out int max)
+        {
+            NativeMethods.argminmax_<#=nativeSuffix#>(length, x, offx, out min, out max);
+        }
+
+        /// <summary>
+        /// Returns the minimum value in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The array that contains data used for evaluation.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
+        /// <returns>
+        /// The minimum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> Min(int length, <#=typeName#>[] x, int offx) => x[Vectors.ArgMin(length, x, offx)];
+
+        /// <summary>
+        /// Returns the maximum value in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The array that contains data used for evaluation.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <returns>
+        /// The maximum value in the array.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=typeName#> Max(int length, <#=typeName#>[] x, int offx) => x[Vectors.ArgMax(length, x, offx)];
+
+        /// <summary>
+        /// Returns the minimum and maximum values in the array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to evaluate.</param>
+        /// <param name="x">The array that contains data used for evaluation.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="min">The minimum value in the array.</param>
+        /// <param name="max">The maximum value in the array.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinMax(int length, <#=typeName#>[] x, int offx, out <#=typeName#> min, out <#=typeName#> max)
+        {
+            Vectors.ArgMinMax(length, x, offx, out int argmin, out int argmax);
+            min = x[argmin];
+            max = x[argmax];
+        }
+
+        /// <summary>
         /// Computes a smaller of each element of an array of <#=typeDescription#> and a scalar value in-place.
         /// </summary>
         /// <param name="length">The number of elements to calculate.</param>
@@ -625,6 +724,53 @@ namespace Genix.Core
         public static void Max(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
         {
             NativeMethods.max_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs thresholding of elements of an array of <#=typeDescription#>.
+        /// Elements that are less than the threshold, are set to a specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="threshold">The threshold value to use for each element.</param>
+        /// <param name="value">The value to set for each element that is smaller than the <paramref name="threshold"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThresholdLT(int length, <#=typeName#> threshold, <#=typeName#> value, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.threshold_lt_ip_<#=nativeSuffix#>(length, threshold, value, y, offy);
+        }
+
+        /// <summary>
+        /// Performs thresholding of elements of an array of <#=typeDescription#>.
+        /// Elements that are greater than the threshold, are set to a specified value.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="threshold">The threshold value to use for each element.</param>
+        /// <param name="value">The value to set for each element that is greater than the <paramref name="threshold"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThresholdGT(int length, <#=typeName#> threshold, <#=typeName#> value, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.threshold_gt_ip_<#=nativeSuffix#>(length, threshold, value, y, offy);
+        }
+
+        /// <summary>
+        /// Performs thresholding of elements of an array of <#=typeDescription#>.
+        /// Elements that are smaller or greater than the thresholds, are set to a specified values.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="thresholdLT">The lower threshold value to use for each element.</param>
+        /// <param name="valueLT">The value to set for each element that is smaller than the <paramref name="thresholdLT"/>.</param>
+        /// <param name="thresholdGT">The upper threshold value to use for each element.</param>
+        /// <param name="valueGT">The value to set for each element that is greater than the <paramref name="thresholdGT"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThresholdLTGT(int length, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.threshold_ltgt_ip_<#=nativeSuffix#>(length, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
         }
 <#
 						if (isFloating)
@@ -903,6 +1049,74 @@ namespace Genix.Core
         {
             NativeMethods.xand_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
+
+        /// <summary>
+        /// Performs logical OR operation on two arrays of <#=typeDescription#> not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Or(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.or_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical AND operation on two arrays of <#=typeDescription#> not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void And(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.and_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XOR operation on two arrays of <#=typeDescription#> not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Xor(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.xor_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical XAND (A AND NOT B) operation on two arrays of <#=typeDescription#> not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public static void Xand(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.xand_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
 <#
 					}
 #>
@@ -923,6 +1137,9 @@ namespace Genix.Core
 								bool isSigned = type.Item4;
 								bool isFloating = type.Item5;
 #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int compare_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void copy_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
@@ -1022,6 +1239,15 @@ namespace Genix.Core
             public static extern void sqr_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
+            public static extern int argmin_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int argmax_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void argminmax_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, out int winmin, out int winmax);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void minc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
@@ -1044,6 +1270,15 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void max_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void threshold_lt_ip_<#=nativeSuffix#>(int n, <#=typeName#> threshold, <#=typeName#> value, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void threshold_gt_ip_<#=nativeSuffix#>(int n, <#=typeName#> threshold, <#=typeName#> value, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void threshold_ltgt_ip_<#=nativeSuffix#>(int n, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, [In, Out] <#=typeName#>[] y, int offy);
 <#
 					if (isFloating)
 					{
@@ -1119,6 +1354,18 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void xand_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void or_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void and_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void xor_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void xand_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
 <#
 					}
 #>

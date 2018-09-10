@@ -553,7 +553,7 @@ namespace Genix.MachineLearning
         /// The position of minimum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMin() => Maximum.ArgMin(this.Length, this.Weights, 0);
+        public int ArgMin() => Vectors.ArgMin(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the position of maximum value in the tensor.
@@ -562,7 +562,7 @@ namespace Genix.MachineLearning
         /// The position of maximum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int ArgMax() => Maximum.ArgMax(this.Length, this.Weights, 0);
+        public int ArgMax() => Vectors.ArgMax(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the position of minimum and maximum values in the tensor.
@@ -570,7 +570,7 @@ namespace Genix.MachineLearning
         /// <param name="min">The position of minimum value in the array.</param>
         /// <param name="max">The position of maximum value in the array.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ArgMinMax(out int min, out int max) => Maximum.ArgMinMax(this.Length, this.Weights, 0, out min, out max);
+        public void ArgMinMax(out int min, out int max) => Vectors.ArgMinMax(this.Length, this.Weights, 0, out min, out max);
 
         /// <summary>
         /// Returns the minimum value in the tensor.
@@ -579,7 +579,7 @@ namespace Genix.MachineLearning
         /// The minimum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Min() => Maximum.Min(this.Length, this.Weights, 0);
+        public float Min() => Vectors.Min(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the maximum value in the tensor.
@@ -588,7 +588,7 @@ namespace Genix.MachineLearning
         /// The maximum value in the tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Max() => Maximum.Max(this.Length, this.Weights, 0);
+        public float Max() => Vectors.Max(this.Length, this.Weights, 0);
 
         /// <summary>
         /// Returns the minimum and maximum values in the tensor.
@@ -596,7 +596,7 @@ namespace Genix.MachineLearning
         /// <param name="min">The minimum value in the array.</param>
         /// <param name="max">The maximum value in the array.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MinMax(out float min, out float max) => Maximum.MinMax(this.Length, this.Weights, 0, out min, out max);
+        public void MinMax(out float min, out float max) => Vectors.MinMax(this.Length, this.Weights, 0, out min, out max);
 
         /// <summary>
         /// Computes the L1-Norm (sum of magnitudes) of the tensor elements.

@@ -14,9 +14,14 @@ template<typename T> int __forceinline __compare(
 	return ::memcmp(x + offx, y + offy, n * sizeof(T));
 }
 
+GENIXAPI(int, compare_s8)(int n, const __int8* x, int offx, const __int8* y, int offy) { return __compare(n, x, offx, y, offy); }
 GENIXAPI(int, compare_s16)(int n, const __int16* x, int offx, const __int16* y, int offy) { return __compare(n, x, offx, y, offy); }
 GENIXAPI(int, compare_s32)(int n, const __int32* x, int offx, const __int32* y, int offy) { return __compare(n, x, offx, y, offy); }
 GENIXAPI(int, compare_s64)(int n, const __int64* x, int offx, const __int64* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_u8)(int n, const unsigned __int8* x, int offx, const unsigned __int8* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_u16)(int n, const unsigned __int16* x, int offx, const unsigned __int16* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_u32)(int n, const unsigned __int32* x, int offx, const unsigned __int32* y, int offy) { return __compare(n, x, offx, y, offy); }
+GENIXAPI(int, compare_u64)(int n, const unsigned __int64* x, int offx, const unsigned __int64* y, int offy) { return __compare(n, x, offx, y, offy); }
 GENIXAPI(int, compare_f32)(int n, const float* x, int offx, const float* y, int offy) { return __compare(n, x, offx, y, offy); }
 GENIXAPI(int, compare_f64)(int n, const double* x, int offx, const double* y, int offy) { return __compare(n, x, offx, y, offy); }
 

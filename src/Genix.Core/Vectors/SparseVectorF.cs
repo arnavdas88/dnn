@@ -125,8 +125,8 @@ namespace Genix.Core
             return this.length == other.length &&
                 this.Idx.Length == other.Idx.Length &&
                 (this.Idx.Length == 0 ||
-                    (Arrays.Equals(this.Idx.Length, this.Idx, 0, other.Idx, 0) &&
-                     Array32f.Equals(this.Idx.Length, this.X, 0, other.X, 0)));
+                    (Vectors.Equals(this.Idx.Length, this.Idx, 0, other.Idx, 0) &&
+                     Vectors.Equals(this.Idx.Length, this.X, 0, other.X, 0)));
         }
 
         /// <inheritdoc />

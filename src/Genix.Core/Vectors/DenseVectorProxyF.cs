@@ -77,7 +77,7 @@ namespace Genix.Core
         public bool Equals(DenseVectorProxyF other)
         {
             return this.length == other.length &&
-                (this.length == 0 || Array32f.Equals(this.length, this.x, this.offset, other.x, other.offset));
+                (this.length == 0 || Vectors.Equals(this.length, this.x, this.offset, other.x, other.offset));
         }
 
         /// <inheritdoc />
