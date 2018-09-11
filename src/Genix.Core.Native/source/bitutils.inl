@@ -799,21 +799,6 @@ BITSAPI(void, bits_or)(
 }
 
 // Logical AND
-BITSAPI(void, bits_and_mask)(
-	int length,				// number of elements to process
-	__bits mask,			// the mask to apply
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] &= mask;
-	}
-}
-
 BITSAPI(void, bits_and_mask_inc)(
 	int length,				// number of elements to process
 	__bits mask,			// the mask to apply

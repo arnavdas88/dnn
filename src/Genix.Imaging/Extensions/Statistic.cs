@@ -101,6 +101,110 @@ namespace Genix.Imaging
         public long Power(Rectangle area) => this.Power(area.X, area.Y, area.Width, area.Height);
 
         /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only white pixels.
+        /// </summary>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only white pixels; otherwise, <b>false</b>.
+        /// </returns>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image{T}.BitsPerPixel"/> - 1.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAllWhite() => this.IsAllWhite(0, 0, this.Width, this.Height);
+
+        /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only white pixels withing a rectangular area
+        /// specified by a pair of coordinates, a width, and a height.
+        /// </summary>
+        /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="width">The width, in pixels, of the area.</param>
+        /// <param name="height">The height, in pixels, of the area.</param>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only white pixels withing the specified area; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image{T}.BitsPerPixel"/> - 1.
+        /// </remarks>
+        public bool IsAllWhite(int x, int y, int width, int height)
+        {
+            this.ValidateArea(x, y, width, height);
+            return NativeMethods.is_all_white(this.BitsPerPixel, x, y, width, height, this.Bits, this.Stride);
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only white pixels withing a rectangular area
+        /// specified by a <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only white pixels withing the specified area; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the white color is 0; otherwise, the white color is 2^<see cref="Image{T}.BitsPerPixel"/> - 1.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAllWhite(Rectangle area) => this.IsAllWhite(area.X, area.Y, area.Width, area.Height);
+
+        /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only black pixels.
+        /// </summary>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only black pixels; otherwise, <b>false</b>.
+        /// </returns>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the black color is 1; otherwise, the black color is 0.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAllBlack() => this.IsAllBlack(0, 0, this.Width, this.Height);
+
+        /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only black pixels withing a rectangular area
+        /// specified by a pair of coordinates, a width, and a height.
+        /// </summary>
+        /// <param name="x">The x-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the area.</param>
+        /// <param name="width">The width, in pixels, of the area.</param>
+        /// <param name="height">The height, in pixels, of the area.</param>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only black pixels withing the specified area; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the black color is 1; otherwise, the black color is 0.
+        /// </remarks>
+        public bool IsAllBlack(int x, int y, int width, int height)
+        {
+            this.ValidateArea(x, y, width, height);
+            return NativeMethods.is_all_black(this.BitsPerPixel, x, y, width, height, this.Bits, this.Stride);
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="Image"/> contains only black pixels withing a rectangular area
+        /// specified by a <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <returns>
+        /// <b>true</b> if the <see cref="Image"/> contains only black pixels withing the specified area; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        /// <remarks>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1, the black color is 1; otherwise, the black color is 0.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAllBlack(Rectangle area) => this.IsAllBlack(area.X, area.Y, area.Width, area.Height);
+
+        /// <summary>
         /// Returns the area on this <see cref="Image"/> that contains black pixels.
         /// </summary>
         /// <returns>
@@ -503,6 +607,28 @@ namespace Genix.Imaging
 
             [DllImport(NativeMethods.DllName)]
             public static extern long power_8bpp(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride);
+
+            [DllImport(NativeMethods.DllName)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool is_all_white(
+                int bitsPerPixel,
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] bits,
+                int stride);
+
+            [DllImport(NativeMethods.DllName)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool is_all_black(
+                int bitsPerPixel,
                 int x,
                 int y,
                 int width,

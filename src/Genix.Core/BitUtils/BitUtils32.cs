@@ -145,18 +145,6 @@ namespace Genix.Core
         /// <param name="mask">The mask to apply.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        public static void WordsAND(int length, uint mask, uint[] y, int offy)
-        {
-            NativeMethods.bits_and_mask_32(length, mask, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical AND operation between 32-bits array and a scalar value.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="mask">The mask to apply.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         public static void WordsAND(int length, uint mask, uint[] y, int offy, int incy)
         {
@@ -197,9 +185,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_not2_32(int length, [In] uint[] x, int offx, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void bits_and_mask_32(int length, [In] uint mask, [Out] uint[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_and_mask_inc_32(int length, [In] uint mask, [Out] uint[] y, int offy, int incy);

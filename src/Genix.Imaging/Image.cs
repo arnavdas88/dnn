@@ -135,6 +135,49 @@ namespace Genix.Imaging
             }
         }
 
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+
+            if (obj is Image other)
+            {
+                return this.Width == other.Width &&
+                    this.Height == other.Height &&
+                    this.BitsPerPixel == other.BitsPerPixel &&
+                    this.HorizontalResolution == other.HorizontalResolution &&
+                    this.VerticalResolution == other.VerticalResolution &&
+                    CompareBits(this.Bits, other.Bits);
+
+                bool CompareBits(ulong[] bits1, ulong[] bits2)
+                {
+                    if (this.Width * this.BitsPerPixel == this.Stride1)
+                    {
+                        return Vectors.Equals(this.Height * this.Stride, bits1, 0, bits2, 0);
+                    }
+
+                    ulong endMask = this.EndMask;
+                    for (int i = 0, ii = this.Height, stride = this.Stride, off = 0; i < ii; i++, off += stride)
+                    {
+                        if (!Vectors.Equals(stride - 1, bits1, off, bits2, off) ||
+                            (bits1[off + stride - 1] & endMask) != (bits2[off + stride - 1] & endMask))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Creates a new <see cref="Image"/> that is a copy of the current instance.
         /// </summary>

@@ -11,6 +11,9 @@
 extern "C" __declspec(dllimport) unsigned __int64 WINAPI bits_count_64(int count, const unsigned __int64* bits, int pos);
 extern "C" __declspec(dllimport) __int32 WINAPI sum_u8(const int n, const unsigned __int8* x, const int offx);
 
+extern "C" __declspec(dllimport) int WINAPI bits_scan_one_forward_64(int count, const unsigned __int64* bits, int pos);
+extern "C" __declspec(dllimport) int WINAPI bits_scan_zero_forward_64(int count, const unsigned __int64* bits, int pos);
+
 GENIXAPI(__int64, power_1bpp)(
 	const int x, const int y, const int width, const int height,
 	const unsigned __int64* bits, const int stride)
@@ -43,6 +46,66 @@ GENIXAPI(__int64, power_8bpp)(
 	}*/
 
 	return (__int64)sum;
+}
+
+GENIXAPI(BOOL, is_all_white)(
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride)
+{
+	const int stridebits = stride * 64;	// 64 bits per word
+	const int count = width * bitsPerPixel;
+	const auto f = bitsPerPixel == 1 ? bits_scan_one_forward_64 : bits_scan_zero_forward_64;
+
+	if (x == 0 && stridebits == count)
+	{
+		if (f(height * stridebits, bits, y * stridebits) != -1)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		for (int iy = 0, pos = (y * stridebits) + (x * bitsPerPixel); iy < height; iy++, pos += stridebits)
+		{
+			if (f(count, bits, pos) != -1)
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+GENIXAPI(BOOL, is_all_black)(
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride)
+{
+	const int stridebits = stride * 64;	// 64 bits per word
+	const int count = width * bitsPerPixel;
+	const auto f = bitsPerPixel == 1 ? bits_scan_zero_forward_64 : bits_scan_one_forward_64;
+
+	if (x == 0 && stridebits == count)
+	{
+		if (f(height * stridebits, bits, y * stridebits) != -1)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		for (int iy = 0, pos = (y * stridebits) + (x * bitsPerPixel); iy < height; iy++, pos += stridebits)
+		{
+			if (f(count, bits, pos) != -1)
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
 }
 
 GENIXAPI(void, grayhist_8bpp)(

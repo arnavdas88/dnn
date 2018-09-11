@@ -56,13 +56,13 @@ namespace Genix.Imaging
     /// +-----------+---+---+---+---+.
     /// </para>
     /// </content>
-	public partial class Image
+    public partial class Image
     {
 <#
-				string[] functionNames = { "And", "Or", "Xor", "Xand" };
+    string[] functionNames = { "And", "Or", "Xor", "Xand" };
 
-				foreach (string functionName in functionNames)
-				{
+    foreach (string functionName in functionNames)
+    {
 #>
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Genix.Imaging
             }
         }
 <#
-				}
+    }
 #>
 	}
 }

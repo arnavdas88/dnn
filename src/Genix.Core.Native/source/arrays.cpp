@@ -339,6 +339,24 @@ template<typename T, T OP(T, T)> void __forceinline __logical(
 
 template<typename T, T OP(T, T)> void __forceinline __logical(
 	int length,				// number of elements to process
+	const T* x, 			// the source array
+	int offx, 				// the zero-based index of starting element in x
+	T mask,					// the mask
+	T* y, 					// the destination array
+	int offy 				// the zero-based index of starting element in y
+)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < length; i++)
+	{
+		y[i] = OP(x[i], mask);
+	}
+}
+
+template<typename T, T OP(T, T)> void __forceinline __logical(
+	int length,				// number of elements to process
 	const T* a, 			// the first source array
 	int offa, 				// the zero-based index of starting element in a
 	const T* b, 			// the second source array
@@ -406,68 +424,50 @@ template<typename T, T OP(T, T, T, T)> void __forceinline __logical(
 	}
 }
 
-// Logical AND
-GENIXAPI(void, andc_ip_u32)(int length, const unsigned __int32 mask, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_and>(length, mask, y, offy);
-}
-GENIXAPI(void, andc_ip_u64)(int length, const unsigned __int64 mask, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_and>(length, mask, y, offy);
+// Generic logical operation
+#define LOGICAL(op) \
+GENIXAPI(void, op##c_ip_u32)(int length, const unsigned __int32 mask, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, mask, y, offy); \
+} \
+GENIXAPI(void, op##c_ip_u64)(int length, const unsigned __int64 mask, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, mask, y, offy); \
+} \
+GENIXAPI(void, op##_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, x, offx, y, offy); \
+} \
+GENIXAPI(void, op##_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, x, offx, y, offy); \
+} \
+GENIXAPI(void, op##c_u32)(int length, const unsigned __int32* x, int offx, const unsigned __int32 mask, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, x, offx, mask, y, offy); \
+} \
+GENIXAPI(void, op##c_u64)(int length, const unsigned __int64* x, int offx, const unsigned __int64 mask, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, x, offx, mask, y, offy); \
+} \
+GENIXAPI(void, op##_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, a, offa, b, offb, y, offy); \
+} \
+GENIXAPI(void, op##_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, a, offa, b, offb, y, offy); \
 }
 
-GENIXAPI(void, and_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_and>(length, x, offx, y, offy);
-}
-GENIXAPI(void, and_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_and>(length, x, offx, y, offy);
-}
-GENIXAPI(void, and_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_and>(length, a, offa, b, offb, y, offy);
-}
-GENIXAPI(void, and_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_and>(length, a, offa, b, offb, y, offy);
-}
+// Logical AND
+LOGICAL(and);
 
 // Logical XAND (A AND NOT B)
-GENIXAPI(void, xand_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_xand>(length, x, offx, y, offy);
-}
-GENIXAPI(void, xand_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_xand>(length, x, offx, y, offy);
-}
-GENIXAPI(void, xand_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_xand>(length, a, offa, b, offb, y, offy);
-}
-GENIXAPI(void, xand_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_xand>(length, a, offa, b, offb, y, offy);
-}
+LOGICAL(xand);
 
 // Logical OR
-GENIXAPI(void, or_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_or>(length, x, offx, y, offy);
-}
-GENIXAPI(void, or_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_or>(length, x, offx, y, offy);
-}
-GENIXAPI(void, or_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_or>(length, a, offa, b, offb, y, offy);
-}
-GENIXAPI(void, or_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_or>(length, a, offa, b, offb, y, offy);
-}
+LOGICAL(or);
+
 GENIXAPI(void, or3_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, const unsigned __int32* c, int offc, unsigned __int32* y, int offy)
 {
 	__logical<unsigned __int32, logical_or>(length, a, offa, b, offb, c, offc, y, offy);
@@ -486,19 +486,4 @@ GENIXAPI(void, or4_u64)(int length, const unsigned __int64* a, int offa, const u
 }
 
 // Logical XOR
-GENIXAPI(void, xor_ip_u32)(int length, const unsigned __int32* x, int offx, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_xor>(length, x, offx, y, offy);
-}
-GENIXAPI(void, xor_ip_u64)(int length, const unsigned __int64* x, int offx, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_xor>(length, x, offx, y, offy);
-}
-GENIXAPI(void, xor_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_xor>(length, a, offa, b, offb, y, offy);
-}
-GENIXAPI(void, xor_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_xor>(length, a, offa, b, offb, y, offy);
-}
+LOGICAL(xor);

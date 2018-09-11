@@ -131,18 +131,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Performs logical AND operation between 64-bits array and a scalar value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="mask">The mask to apply.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        public static void WordsAnd(int length, ulong mask, ulong[] y, int offy)
-        {
-            NativeMethods.bits_and_mask_64(length, mask, y, offy);
-        }
-
-        /// <summary>
         /// Performs logical AND operation between 64-bits array and a scalar value with increment in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
@@ -186,9 +174,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_not2_64(int length, [In] ulong[] x, int offx, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void bits_and_mask_64(int length, [In] ulong mask, [Out] ulong[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_and_mask_inc_64(int length, [In] ulong mask, [Out] ulong[] y, int offy, int incy);

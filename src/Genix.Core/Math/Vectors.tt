@@ -718,8 +718,8 @@ namespace Genix.Core
             NativeMethods.threshold_ltgt_ip_<#=nativeSuffix#>(length, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
         }
 <#
-						if (isFloating)
-						{
+        if (isFloating)
+        {
 #>
 
         /// <summary>
@@ -932,15 +932,56 @@ namespace Genix.Core
             return NativeMethods.euclidean_distance_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 <#
-					}
+        }
 #>
 <#
-					if (typeName == "uint" || typeName == "ulong")
-					{
+        // logical operations
+        if (typeName == "uint" || typeName == "ulong")
+        {
+            Tuple<string, string>[] lfuncs = 
+            {
+                Tuple.Create("Or", "OR"),
+                Tuple.Create("And", "AND"),
+                Tuple.Create("Xor", "XOR"),
+                Tuple.Create("Xand", "XAND (A AND NOT B)"),
+            };
+
+            foreach (Tuple<string, string> func in lfuncs)
+            {
+                string funcName = func.Item1;
+                string summary = func.Item2;
 #>
 
         /// <summary>
-        /// Performs logical OR operation on two arrays of <#=typeDescription#> in-place.
+        /// Performs logical <#=summary#> operation between elements of array of <#=typeDescription#> and a constant value in-place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="mask">The mask.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=funcName#>C(int length, <#=typeName#> mask, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_ip_<#=nativeSuffix#>(length, mask, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical <#=summary#> operation between elements of array of <#=typeDescription#> and a constant value not-in-pace.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The first source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="mask">The mask.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, <#=typeName#> mask, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=funcName.ToLowerInvariant()#>c_<#=nativeSuffix#>(length, x, offx, mask, y, offy);
+        }
+
+        /// <summary>
+        /// Performs logical <#=summary#> operation on two arrays of <#=typeDescription#> in-place.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
@@ -948,55 +989,13 @@ namespace Genix.Core
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Or(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.or_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 
         /// <summary>
-        /// Performs logical AND operation on two arrays of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void And(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.and_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical XOR operation on two arrays of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Xor(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.xor_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical XAND (A AND NOT B) operation on two arrays of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Xand(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.xand_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical OR operation on two arrays of <#=typeDescription#> not-in-pace.
+        /// Performs logical <#=summary#> operation on two arrays of <#=typeDescription#> not-in-pace.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="a">The first source array.</param>
@@ -1006,67 +1005,16 @@ namespace Genix.Core
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.or_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical AND operation on two arrays of <#=typeDescription#> not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void And(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.and_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical XOR operation on two arrays of <#=typeDescription#> not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Xor(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.xor_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical XAND (A AND NOT B) operation on two arrays of <#=typeDescription#> not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Xand(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.xand_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+            NativeMethods.<#=funcName.ToLowerInvariant()#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
         }
 <#
-					}
+            }
+        }
 #>
 <#
-				}
+    }
 #>
 
         [SuppressUnmanagedCodeSecurity]
@@ -1223,8 +1171,8 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_ltgt_ip_<#=nativeSuffix#>(int n, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, [In, Out] <#=typeName#>[] y, int offy);
 <#
-					if (isFloating)
-					{
+        if (isFloating)
+        {
 #>
 
             [DllImport(NativeMethods.DllName)]
@@ -1280,40 +1228,33 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern <#=typeName#> euclidean_distance_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#>[] y, int offy);
 <#
-					}
+        }
 #>
 <#
-					if (typeName == "uint" || typeName == "ulong")
-					{
+        // logical operations
+        if (typeName == "uint" || typeName == "ulong")
+        {
+            foreach (string func in new string[] {"or", "and", "xor", "xand"})
+            {
 #>
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void and_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_ip_<#=nativeSuffix#>(int length, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void xor_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>c_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void xand_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void or_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void and_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void xor_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void xand_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=func#>_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
 <#
-					}
+            }
+        }
 #>
 <#
-				}
+    }
 #>
         }
     }

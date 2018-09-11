@@ -24,6 +24,21 @@ namespace Genix.DocumentAnalysis
         private const int MaxLineWidth = 10;
 
         /// <summary>
+        /// The minimum line length, in pixels, for images with resolution 200 dpi.
+        /// </summary>
+        private const int MinLineLength = 50;
+
+        /// <summary>
+        /// The maximum size of line residue, in pixels, for images with resolution 200 dpi.
+        /// </summary>
+        /// <remarks>
+        /// These are the pixels that fail the long thin opening,
+        /// and therefore don't make it to the candidate line mask,
+        /// but are nevertheless part of the line.
+        /// </remarks>
+        private const int MaxLineResidue = 6;
+
+        /// <summary>
         /// Finds and removes lines from the <see cref="Image"/>.
         /// The type of lines to find is determined by the <c>options</c> parameter.
         /// </summary>
@@ -63,8 +78,51 @@ namespace Genix.DocumentAnalysis
 
             // open up to detect big solid areas
             Image openedImage = image.Open(StructuringElement.Square(maxLineWidth), 1);
-
             Image hollowImage = closedImage.Sub(openedImage, 0);
+
+            // open up in both directions to find lines
+            int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
+            Image hlinesImage = hollowImage.Open(StructuringElement.Rectangle(minLineLength, 1), 1);
+            Image vlinesImage = hollowImage.Open(StructuringElement.Rectangle(1, minLineLength), 1);
+
+            // check for line presence
+            bool hasHLines = !hlinesImage.IsAllWhite();
+            bool hasVLines = !vlinesImage.IsAllWhite();
+            if (!hasHLines && !hasVLines)
+            {
+                // return the original image
+                return image;
+            }
+
+            // create image that has no lines
+            Image noLinesImage = hasVLines ? image.Sub(vlinesImage, 0) : null;
+            if (hasHLines)
+            {
+                if (noLinesImage != null)
+                {
+                    noLinesImage.SubIP(hlinesImage, 0);
+                }
+                else
+                {
+                    noLinesImage = image.Sub(hlinesImage, 0);
+                }
+            }
+
+            // vertical lines
+            if (hasVLines)
+            {
+                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                Image noVLinesImage = noLinesImage.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1);
+            }
+
+            // horizontal lines
+            if (hasHLines)
+            {
+                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                Image noHLinesImage = noLinesImage.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1);
+            }
+
+            Image res = image.Sub(hlinesImage, 0).Sub(vlinesImage, 0);
 
             // find horizontal lines
             if (options.Types.HasFlag(LineTypes.Horizontal))
@@ -77,7 +135,7 @@ namespace Genix.DocumentAnalysis
                 workImage.DilateIP(StructuringElement.Square(1 + (2 * DilationSize)), 1);
 
                 // find line components and filter out non-line components
-                int minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
+                /*int*/ minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
                 List<ConnectedComponent> components = workImage.FindConnectedComponents()
                                                                .Where(x => x.Bounds.Width >= minLineLength)
                                                                .ToList();

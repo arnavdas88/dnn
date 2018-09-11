@@ -382,6 +382,10 @@ namespace Genix.Imaging
 
             switch (this.BitsPerPixel)
             {
+                case 1:
+                    this.XandIP(src);
+                    break;
+
                 case 8:
                 case 24:
                 case 32:
