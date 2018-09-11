@@ -133,51 +133,6 @@ namespace Genix.Core
         public static void Unpack(int length, float[] a, int offa, float[] y, int offy, int incy) => NativeMethods.unpack(length, a, offa, y, offy, incy);
 
         /// <summary>
-        /// Clips array values to a specified minimum and maximum values.
-        /// </summary>
-        /// <param name="length">The number of elements to clip.</param>
-        /// <param name="minValue">The minimum value to clip by.</param>
-        /// <param name="maxValue">The maximum value to clip by.</param>
-        /// <param name="x">The array that contains the data to clip.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which clipping begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>x(offx + i) := min(max(x(offx + i), minValue), maxValue)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Clip(int length, float minValue, float maxValue, float[] x, int offx)
-        {
-            if (!float.IsNaN(minValue))
-            {
-                Vectors.MaxC(length, minValue, x, offx);
-            }
-
-            if (!float.IsNaN(maxValue))
-            {
-                Vectors.MinC(length, maxValue, x, offx);
-            }
-        }
-
-        /// <summary>
-        /// Copies a range of values from a array starting at the specified source index
-        /// to another array starting at the specified destination index
-        /// specified number of times.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="count">The number of times to copy <paramref name="x"/>.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Tile(int length, int count, float[] x, int offx, float[] y, int offy)
-        {
-            for (int i = 0; i < count; i++, offy += length)
-            {
-                Vectors.Copy(length, x, offx, y, offy);
-            }
-        }
-
-        /// <summary>
         /// Replaces all occurrences of the specified value in the array with another specified value.
         /// </summary>
         /// <param name="length">The number of elements to replace.</param>

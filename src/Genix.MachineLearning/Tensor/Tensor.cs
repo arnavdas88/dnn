@@ -625,10 +625,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>tensor(i) := min(max(tensor(i), minValue), maxValue)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clip(float minValue, float maxValue)
-        {
-            Arrays.Clip(this.Length, minValue, maxValue, this.Weights, 0);
-        }
+        public void Clip(float minValue, float maxValue) => Vectors.Clip(this.Length, minValue, maxValue, this.Weights, 0);
 
         /// <summary>
         /// Clips tensor values to a specified minimum and maximum values.
@@ -639,10 +636,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>gradient(i) := min(max(gradient(i), minValue), maxValue)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClipGradient(float minValue, float maxValue)
-        {
-            Arrays.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
-        }
+        public void ClipGradient(float minValue, float maxValue) => Vectors.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
 
         /// <summary>
         /// Transposes a rank-2 tensor.

@@ -87,7 +87,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel < 8)
             {
-                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             bitmap.UnlockBits(srcData);
@@ -255,7 +255,7 @@ namespace Genix.Imaging
             {
                 // swap bits to make storage big-endian
                 ulong[] bits = new ulong[image.Bits.Length];
-                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0, bits, 0);
+                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0, bits, 0);
                 bitmapSource.WritePixels(sourceRect, bits, image.Stride8, 0);
             }
             else
@@ -345,7 +345,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel < 8)
             {
-                BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             // special case for BitmapFrame BlackWhite pixel format

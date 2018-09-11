@@ -76,7 +76,7 @@ namespace Genix.Imaging
                 // set top
                 if (y > 0)
                 {
-                    Arrays.Tile(this.Width, y, bits, offy + stride, bits, 0);
+                    Vectors.Tile(this.Width, y, bits, offy + stride, bits, 0);
                 }
 
                 // set left
@@ -102,7 +102,7 @@ namespace Genix.Imaging
                 len = this.Height - bottom;
                 if (len > 0)
                 {
-                    Arrays.Tile(this.Width, len, bits, (bottom - 1) * stride, bits, bottom * stride);
+                    Vectors.Tile(this.Width, len, bits, (bottom - 1) * stride, bits, bottom * stride);
                 }
             }
 

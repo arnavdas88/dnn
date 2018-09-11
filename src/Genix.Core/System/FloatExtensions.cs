@@ -14,7 +14,7 @@ namespace System
     public static class FloatExtensions
     {
         /// <summary>
-        /// Determines whether this instance falls within the range of specified single-presicion floating point numbers.
+        /// Determines whether this instance falls within the range of specified single-precision floating point numbers.
         /// </summary>
         /// <param name="value">This instance value.</param>
         /// <param name="lowerBound">The lower inclusive bound of the range.</param>

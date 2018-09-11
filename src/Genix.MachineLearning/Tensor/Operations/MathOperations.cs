@@ -877,7 +877,7 @@ namespace Genix.MachineLearning
                             throw new ArgumentException("The number of rows in matrix op(A) must match the length of bias vector.");
                         }
 
-                        Arrays.Tile(m, n, bias.Weights, 0, c.Weights, 0);
+                        Vectors.Tile(m, n, bias.Weights, 0, c.Weights, 0);
                         cleary = false;
                     }
 

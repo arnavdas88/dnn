@@ -151,11 +151,11 @@ namespace Genix.Imaging.Leptonica
                 {
                     Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), new IntPtr(dst), image.Stride8);
 
-                    BitUtils64.BiteSwap(image.Bits.Length, image.Bits, 0);
+                    BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0);
 
                     if (image.BitsPerPixel < 8)
                     {
-                        BitUtils64.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                        BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
                     }
                 }
             }

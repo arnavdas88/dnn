@@ -1916,7 +1916,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1969,7 +1969,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2022,7 +2022,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2074,7 +2074,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { n, m });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2127,7 +2127,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2180,7 +2180,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2233,7 +2233,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -2285,7 +2285,7 @@
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, bias);
 
             Tensor expected = new Tensor(null, new[] { m, n });
-            Arrays.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
+            Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
 

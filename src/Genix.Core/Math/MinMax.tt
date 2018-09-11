@@ -32,24 +32,24 @@ namespace Genix.Core
     public static class MinMax
     {
 <#
-				Tuple<string, string>[] types = 
-								{
-								Tuple.Create("sbyte", "8-bit signed integers"),
-								Tuple.Create("byte", "8-bit unsigned integers"),
-								Tuple.Create("short", "16-bit signed integers"),
-								Tuple.Create("ushort", "16-bit unsigned integers"),
-								Tuple.Create("int", "32-bit signed integers"),
-								Tuple.Create("uint", "32-bit unsigned integers"),
-								Tuple.Create("long", "64-bit signed integers"),
-								Tuple.Create("ulong", "64-bit unsigned integers"),
-								Tuple.Create("float", "single-precision floating point numbers"),
-								Tuple.Create("double", "double-precision floating point numbers"),
-								};
+    Tuple<string, string>[] types = 
+    {
+        Tuple.Create("sbyte", "8-bit signed integers"),
+        Tuple.Create("byte", "8-bit unsigned integers"),
+        Tuple.Create("short", "16-bit signed integers"),
+        Tuple.Create("ushort", "16-bit unsigned integers"),
+        Tuple.Create("int", "32-bit signed integers"),
+        Tuple.Create("uint", "32-bit unsigned integers"),
+        Tuple.Create("long", "64-bit signed integers"),
+        Tuple.Create("ulong", "64-bit unsigned integers"),
+        Tuple.Create("float", "single-precision floating point numbers"),
+        Tuple.Create("double", "double-precision floating point numbers"),
+    };
 
-				foreach (Tuple<string, string> type in types)
-				{
-								string name = type.Item1;
-								string desc = type.Item2;
+    foreach (Tuple<string, string> type in types)
+    {
+        string name = type.Item1;
+        string desc = type.Item2;
 #>
         /// <summary>
         /// Returns the larger of two <#=desc#>.
@@ -142,7 +142,7 @@ namespace Genix.Core
         }
 
 <#
-				}
+    }
 #>
     }
 }
