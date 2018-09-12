@@ -760,7 +760,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Vectors.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -796,7 +796,7 @@ namespace Genix.MachineLearning
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Vectors.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 

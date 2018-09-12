@@ -22,37 +22,336 @@
 //------------------------------------------------------------------------------
 
 <#
-	MethodDescriptor[] methods = new MethodDescriptor[]
-	{
-		new MethodDescriptor()
-		{
-			Name = "Copy",
-			NativeName = "copy",
-			Argument = ArgumentType.Vector,
-			Summary = "Copies a range of {0} from an array starting at the specified source index to another array starting at the specified destination index"
-		},
-		new MethodDescriptor()
-		{
-			Name = "Move",
-			NativeName = "move",
-			Argument = ArgumentType.Vector,
-			Summary = "Copies an ovelapping range of {0} from an array starting at the specified source index to another array starting at the specified destination index"
-		},
-		new MethodDescriptor()
-		{
-			Name = "Set",
-			NativeName = "set",
-			Argument = ArgumentType.Constant,
-			Summary = "Sets all elements in the array of {0} starting at the specified source index to the specified value"
-		},
-		new MethodDescriptor()
-		{
-			Name = "Swap",
-			NativeName = "swap",
-			Argument = ArgumentType.Vector,
-			Summary = "Swaps elements of two arrays of {0}"
-		}
-	};
+    MethodDescriptor[] methods = new MethodDescriptor[]
+    {
+        new MethodDescriptor()
+        {
+            Name = "Copy",
+            NativeName = "copy",
+            Argument = ArgumentType.Vector,
+            Summary = "Copies a range of {0} from an array starting at the specified source index to another array starting at the specified destination index",
+            Op = "y = x",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Move",
+            NativeName = "move",
+            Argument = ArgumentType.Vector,
+            Summary = "Copies an overlapping range of {0} from an array starting at the specified source index to another array starting at the specified destination index",
+            Op = "y = x",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Set",
+            NativeName = "set",
+            Argument = ArgumentType.Constant,
+            Summary = "Sets all elements in the array of {0} starting at the specified source index to the specified value",
+            Op = "y[i] = a",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Swap",
+            NativeName = "swap",
+            Argument = ArgumentType.Vector,
+            Summary = "Swaps elements of two arrays of {0}",
+            Op = "y = x, x = y",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Abs",
+            NativeName = "abs",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes an absolute value of elements of an array of {0}",
+            HasInPlace = true,
+            HasGradient = true,
+            Op = "y = abs(x)",
+            OpInPlace = "y = abs(y)",
+            SupportedTypes = "sbyte;short;int;long;float;double",
+        },
+        new MethodDescriptor()
+        {
+            Name = "AddC",
+            NativeName = "addc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Adds a constant value to each element of an array of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y[i] = x[i] + a",
+            OpInPlace = "y[i] += a",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SubC",
+            NativeName = "subc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Subtracts a constant value from each element of an array of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y[i] = x[i] - a",
+            OpInPlace = "y[i] -= a",
+        },
+        new MethodDescriptor()
+        {
+            Name = "MulC",
+            NativeName = "mulc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Multiplies each element of an array of {0} by a constant value",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y[i] = x[i] * a",
+            OpInPlace = "y[i] *= a",
+            },
+        new MethodDescriptor()
+        {
+            Name = "DivC",
+            NativeName = "divc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Divides each element of an array of {0} by a constant value",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y[i] = x[i] / a",
+            OpInPlace = "y[i] /= a",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Add",
+            NativeName = "add",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Adds the elements of two arrays of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y = a + b",
+            OpInPlace = "y += x",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Sub",
+            NativeName = "sub",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Subtracts the elements of two arrays of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y = a - b",
+            OpInPlace = "y -= x",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Mul",
+            NativeName = "mul",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Multiplies the elements of two arrays of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y = a * b",
+            OpInPlace = "y *= x",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Div",
+            NativeName = "div",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Divides the elements of two arrays of {0}",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y = a / b",
+            OpInPlace = "y /= x",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Square",
+            NativeName = "sqr",
+            Argument = ArgumentType.Vector,
+            Summary = "Squares elements of an array of {0}",
+            HasInPlace = true,
+            Op = "y[i] = x[i] * x[i]",
+            OpInPlace = "y[i] = y[i] * y[i]",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Sqrt",
+            NativeName = "sqrt",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes a square root of elements of an array of {0}",
+            HasInPlace = true,
+            Op = "y[i] = sqrt(x[i])",
+            OpInPlace = "y[i] = sqrt(y[i])",
+            SupportedTypes = "float;double",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Log",
+            NativeName = "log",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes a natural logarithm of elements of an array of {0}",
+            HasInPlace = true,
+            Op = "y[i] = ln(x[i])",
+            OpInPlace = "y[i] = ln(y[i])",
+            SupportedTypes = "float;double",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Exp",
+            NativeName = "exp",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes an exponential logarithm of elements of an array of {0}",
+            HasInPlace = true,
+            Op = "y[i] = exp(x[i])",
+            OpInPlace = "y[i] = exp(y[i])",
+            SupportedTypes = "float;double",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Sin",
+            NativeName = "sin",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes a sine logarithm of elements of an array of {0}",
+            HasInPlace = true,
+            HasGradient = true,
+            Op = "y[i] = sin(x[i])",
+            OpInPlace = "y[i] = sin(y[i])",
+            SupportedTypes = "float;double",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Cos",
+            NativeName = "cos",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes a cosine logarithm of elements of an array of {0}",
+            HasInPlace = true,
+            HasGradient = true,
+            Op = "y[i] = cos(x[i])",
+            OpInPlace = "y[i] = cos(y[i])",
+            SupportedTypes = "float;double",
+            },
+        new MethodDescriptor()
+        {
+            Name = "MinC",
+            NativeName = "minc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Computes a smaller of each element of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = min(y[i], a)",
+            OpInPlace = "y[i] = min(x[i], a)",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Min",
+            NativeName = "min",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Computes a smaller of each element of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = min(a, b)",
+            OpInPlace = "y = min(x, y)",
+            },
+        new MethodDescriptor()
+        {
+            Name = "MaxC",
+            NativeName = "maxc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Computes a larger of each element of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = max(y[i], a)",
+            OpInPlace = "y[i] = max(x[i], a)",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Max",
+            NativeName = "max",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Computes a larger of each element of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = max(a, b)",
+            OpInPlace = "y = max(x, y)",
+        },
+        new MethodDescriptor()
+        {
+            Name = "OrC",
+            NativeName = "orc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Performs logical OR operation between elements of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = x[i] | a",
+            OpInPlace = "y[i] |= a",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Or",
+            NativeName = "or",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Performs logical OR operation between elements of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = a | b",
+            OpInPlace = "y |= x",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "AndC",
+            NativeName = "andc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Performs logical AND operation between elements of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = x[i] &amp; a",
+            OpInPlace = "y[i] &amp;= a",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "And",
+            NativeName = "and",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Performs logical AND operation between elements of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = a &amp; b",
+            OpInPlace = "y &amp;= x",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "XorC",
+            NativeName = "xorc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Performs logical XOR operation between elements of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = x[i] ^ a",
+            OpInPlace = "y[i] ^= a",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Xor",
+            NativeName = "xor",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Performs logical XOR operation between elements of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = a ^ b",
+            OpInPlace = "y ^= x",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "XandC",
+            NativeName = "xandc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Performs logical XAND (A AND NOT B) operation between elements of an array of {0} and a constant value",
+            HasInPlace = true,
+            Op = "y[i] = x[i] &amp; ~a",
+            OpInPlace = "y[i] &amp;= ~a",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Xand",
+            NativeName = "xand",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Performs logical XAND (A AND NOT B) operation between elements of two arrays of {0}",
+            HasInPlace = true,
+            Op = "y = a &amp; ~b",
+            OpInPlace = "y &amp;= ~x",
+            SupportedTypes = "uint;ulong",
+        },
+    };
 #>
 
 namespace Genix.Core
@@ -130,7 +429,7 @@ namespace Genix.Core
             return NativeMethods.compare_<#=nativeSuffix#>(length, x, offx, y, offy) == 0;
         }
 <#
-    foreach (MethodDescriptor method in methods)
+    foreach (MethodDescriptor method in methods.Where(x => string.IsNullOrEmpty(x.SupportedTypes) || x.SupportedTypes.Split(new char[] {';'}).Contains(typeName)))
     {
         switch (method.Argument) {
             case ArgumentType.Constant:
@@ -143,30 +442,233 @@ namespace Genix.Core
         /// <param name="value">The constant value.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void <#=method.Name#>(int length, <#=typeName#> value, <#=typeName#>[] y, int offy)
         {
             NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, value, y, offy);
         }
-<#
-                break;
+<#              break;
             case ArgumentType.Vector:
-#>
+                if (method.HasInPlace) { #>
 
         /// <summary>
-        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, y, offy);
+        }
+<#              } #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " not-in-place" : ""#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
             NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
-<#  
+<#             if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
+
+        /// <summary>
+        /// Computes the derivative of the argument of the <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="x"/>.</param>
+        /// <param name="dx">The destination array that receives calculated gradient for <paramref name="x"/>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/> and <paramref name="dx"/>.</param>
+        /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
+        /// <param name="y">The <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
+        /// <param name="dy">The array that contains gradient <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <c>y</c>.</param>
+        /// <param name="offdy">The starting element position in <paramref name="dy"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>Gradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] y, <#=typeName#>[] dy, int offdy)
+        {
+            NativeMethods.<#=method.NativeName#>_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, y, dy, offdy);
+        }
+<#              }
+                break;
+            case ArgumentType.ConstantAndVector:
+                if (method.HasInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The constant value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, a, y, offy);
+        }
+<#                  if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The constant value.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, a, y, offy, incy);
+        }
+<#                  }
+                } #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " not-in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="a">The constant value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, a, y, offy);
+        }
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " not-in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="a">The constant value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, a, y, offy, incy);
+        }
+<#              }
+                break;
+            case ArgumentType.TwoVectors:
+                if (method.HasInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+<#                  if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The source and destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
+        }
+<#                  }
+                } #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " not-in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " not-in-place" : ""#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] a, int offa, int inca, <#=typeName#>[] b, int offb, int incb, <#=typeName#>[] y, int offy, int incy)
+        {
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, a, offa, inca, b, offb, incb, y, offy, incy);
+        }
+<#              }
                 break;
         }
     } 
@@ -230,257 +732,6 @@ namespace Genix.Core
                 Vectors.Copy(length, x, offx, y, offy);
             }
         }
-<#
-        if (isSigned)
-        {
-#>
-
-        /// <summary>
-        /// Computes the absolute value of elements of an array of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y = Math.Abs(y)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Abs(int length, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.abs_ip_<#=nativeSuffix#>(length, y, offy);
-        }
-
-        /// <summary>
-        /// Computes the absolute value of elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Abs(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.abs_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-<#
-            if (isFloating)
-            {
-#>
-        /// <summary>
-        /// Computes the derivative of the argument of the <see cref="Abs(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The <see cref="Abs(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="x"/>.</param>
-        /// <param name="dx">The destination array that receives calculated gradient for <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/> and <paramref name="dx"/>.</param>
-        /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
-        /// <param name="y">The <see cref="Abs(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
-        /// <param name="dy">The array that contains gradient for <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/> and <paramref name="dy"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>dx[i] += x[i] == y[i] ? dy[i] : -dy[i]</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AbsGradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] y, <#=typeName#>[] dy, int offy)
-        {
-            NativeMethods.abs_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, y, dy, offy);
-        }
-<#
-            }
-#>
-<#
-        }
-#>
-<#
-        // operations between a scalar and a vector
-        Tuple<string, string, string, string>[] cfuncs = 
-        {
-            Tuple.Create("Add", $"Adds a constant value to each element of an array of {typeDescription}", "y[i] += alpha", "y[i] = x[i] + alpha"),
-            Tuple.Create("Sub", $"Subtracts a constant value from each element of an array of {typeDescription}", "y[i] -= alpha", "y[i] = x[i] - alpha"),
-            Tuple.Create("Mul", $"Multiplies each element of an array of {typeDescription} by a constant value", "y[i] *= alpha", "y[i] = x[i] * alpha"),
-            Tuple.Create("Div", $"Divides each element of an array of {typeDescription} by a constant value", "y[i] /= alpha", "y[i] = x[i] / alpha"),
-        };
-
-        foreach (Tuple<string, string, string, string> func in cfuncs)
-        {
-            string funcName = func.Item1;
-            string summary = func.Item2;
-            string opInPlace = func.Item3;
-            string opNotInPlace = func.Item3;
-#>
-
-        /// <summary>
-        /// <#=summary#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_ip_<#=nativeSuffix#>(length, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> with increment in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="alpha">The scalar.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#> alpha, <#=typeName#>[] y, int offy, int incy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_inc_ip_<#=nativeSuffix#>(length, alpha, y, offy, incy);
-        }
-
-        /// <summary>
-        /// <#=summary#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_<#=nativeSuffix#>(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> with increment not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#> alpha, <#=typeName#>[] y, int offy, int incy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_inc_<#=nativeSuffix#>(length, x, offx, incx, alpha, y, offy, incy);
-        }
-<#
-        }
-#>
-<#
-        // operations between two vectors
-        Tuple<string, string, string, string>[] vfuncs = 
-        {
-            Tuple.Create("Add", $"Adds the elements of two arrays of {typeDescription}", "y += x", "y = a + b"),
-            Tuple.Create("Sub", $"Subtracts the elements of two arrays of {typeDescription}", "y -= x", "y = a - b"),
-            Tuple.Create("Mul", $"Multiplies the elements of two arrays of {typeDescription}", "y *= x", "y = a * b"),
-            Tuple.Create("Div", $"Divides the elements of two arrays of {typeDescription}", "y /= x", "y = a / b"),
-        };
-
-        foreach (Tuple<string, string, string, string> func in vfuncs)
-        {
-            string funcName = func.Item1;
-            string summary = func.Item2;
-            string opInPlace = func.Item3;
-            string opNotInPlace = func.Item4;
-#>
-
-        /// <summary>
-        /// <#=summary#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> with increment in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_inc_ip_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
-        }
-
-        /// <summary>
-        /// <#=summary#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> with increment not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, int inca, <#=typeName#>[] b, int offb, int incb, <#=typeName#>[] y, int offy, int incy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_inc_<#=nativeSuffix#>(length, a, offa, inca, b, offb, incb, y, offy, incy);
-        }
-<#
-        }
-#>
 
         /// <summary>
         /// Adds product of element of an array of <#=typeDescription#> and a constant to the elements of destination array.
@@ -644,101 +895,9 @@ namespace Genix.Core
             NativeMethods.threshold_ltgt_ip_<#=nativeSuffix#>(length, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
         }
 <#
-        // operations between two vectors
-        Tuple<string, string, string, string, string, bool>[] opfuncs = 
-        {
-            Tuple.Create("Square", "sqr", $"Squares elements of an array of {typeDescription}", "y[i] = y[i] * y[i]", "y[i] = x[i] * x[i]", false),
-            Tuple.Create("Sqrt", "sqrt", $"Computes a square root of elements of an array of {typeDescription}", "y[i] = sqrt(y[i])", "y[i] = sqrt(x[i])", true),
-            Tuple.Create("Log", "log", $"Computes a natural logarithm of elements of an array of {typeDescription}", "y[i] = ln(y[i])", "y[i] = ln(x[i])", true),
-            Tuple.Create("Exp", "exp", $"Computes an exponential of elements of an array of {typeDescription}", "y[i] = exp(y[i])", "y[i] = exp(x[i])", true),
-            Tuple.Create("Sin", "sin", $"Computes a sine of elements of an array of {typeDescription}", "y[i] = sin(y[i])", "y[i] = sin(x[i])", true),
-            Tuple.Create("Cos", "cos", $"Computes a cosine of elements of an array of {typeDescription}", "y[i] = cos(y[i])", "y[i] = cos(x[i])", true),
-        };
-
-        foreach (Tuple<string, string, string, string, string, bool> func in opfuncs)
-        {
-            string funcName = func.Item1;
-            string nativeName = func.Item2;
-            string summary = func.Item3;
-            string opInPlace = func.Item4;
-            string opNotInPlace = func.Item5;
-            bool opIsFloating = func.Item6;
-
-            if (!opIsFloating || (isFloating && opIsFloating))
-            {
-#>
-
-        /// <summary>
-        /// <#=summary#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=nativeName#>_ip_<#=nativeSuffix#>(length, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> not in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=nativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-<#
-            }
-        }
-#>
-<#
         if (isFloating)
         {
 #>
-
-        /// <summary>
-        /// Computes the derivative of the argument of the <see cref="Sin(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The <see cref="Sin(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="x"/>.</param>
-        /// <param name="dx">The destination array that receives calculated gradient for <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/> and <paramref name="dx"/>.</param>
-        /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
-        /// <param name="dy">The array that contains gradient <see cref="Sin(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <c>y</c>.</param>
-        /// <param name="offdy">The starting position in <paramref name="dy"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SinGradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] dy, int offdy)
-        {
-            NativeMethods.sin_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, dy, offdy);
-        }
-
-        /// <summary>
-        /// Computes the derivative of the argument of the <see cref="Cos(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The <see cref="Cos(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="x"/>.</param>
-        /// <param name="dx">The destination array that receives calculated gradient for <paramref name="x"/>.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/> and <paramref name="dx"/>.</param>
-        /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
-        /// <param name="dy">The array that contains gradient <see cref="Cos(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <c>y</c>.</param>
-        /// <param name="offdy">The starting position in <paramref name="dy"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CosGradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] dy, int offdy)
-        {
-            NativeMethods.cos_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, dy, offdy);
-        }
 
         /// <summary>
         /// Computes the L1-Norm (sum of magnitudes) of the array of <#=typeDescription#> elements.
@@ -831,91 +990,6 @@ namespace Genix.Core
         }
 <#
         }
-#>
-<#
-        // logical operations
-        Tuple<string, string, bool>[] lfuncs = 
-        {
-            Tuple.Create("Min", "Computes a smaller of each element of an array", false),
-            Tuple.Create("Max", "Computes a larger of each element of an array", false),
-            Tuple.Create("Or", "Performs logical OR operation between elements of array", true),
-            Tuple.Create("And", "Performs logical AND operation between elements of array", true),
-            Tuple.Create("Xor", "Performs logical XOR operation between elements of array", true),
-            Tuple.Create("Xand", "Performs logical XAND (A AND NOT B) operation between elements of array", true),
-        };
-
-        foreach (Tuple<string, string, bool> func in lfuncs)
-        {
-            string funcName = func.Item1;
-            string summary = func.Item2;
-            bool isBitwise = func.Item3;
-
-            if (!isBitwise || typeName == "uint" || typeName == "ulong")
-            {
-#>
-
-        /// <summary>
-        /// <#=summary#> of <#=typeDescription#> and a constant value in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="mask">The mask.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#> mask, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_ip_<#=nativeSuffix#>(length, mask, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> of <#=typeDescription#> and a constant value not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The first source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="mask">The mask.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>C(int length, <#=typeName#>[] x, int offx, <#=typeName#> mask, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>c_<#=nativeSuffix#>(length, x, offx, mask, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_ip_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// <#=summary#> of <#=typeDescription#> not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=funcName#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.<#=funcName.ToLowerInvariant()#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-<#
-            }
-        }
-#>
-<#
     }
 #>
 
@@ -936,7 +1010,7 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern int compare_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 <#
-    foreach (MethodDescriptor method in methods)
+    foreach (MethodDescriptor method in methods.Where(x => string.IsNullOrEmpty(x.SupportedTypes) || x.SupportedTypes.Split(new char[] {';'}).Contains(typeName)))
     {
         switch (method.Argument) {
             case ArgumentType.Constant:
@@ -944,35 +1018,20 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-<#
-                break;
+<#              break;
             case ArgumentType.Vector:
-#>
+                if (method.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
+<#              } #>
 
             [DllImport(NativeMethods.DllName)]
             public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-<#  
-                break;
-        }
-    } 
-#>
-<#
-        if (isSigned)
-        {
-#>
+<#              if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void abs_ip_<#=nativeSuffix#>(int n, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void abs_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [Out] <#=typeName#>[] y, int offy);
-
-<#
-            if (isFloating)
-            {
-#>
-            [DllImport(NativeMethods.DllName)]
-            public static extern void abs_gradient_<#=nativeSuffix#>(
+            public static extern void <#=method.NativeName#>_gradient_<#=nativeSuffix#>(
                 int n,
                 [In] <#=typeName#>[] x,
                 [Out] <#=typeName#>[] dx,
@@ -980,52 +1039,51 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool cleardx,
                 [In] <#=typeName#>[] y,
                 [In] <#=typeName#>[] dy,
-                int offy);
-<#
-            }
-#>
-<#
+                int offdy);
+<#              }
+                break;
+            case ArgumentType.ConstantAndVector:
+                if (method.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy, int incy);
+<#                  }
+                } #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+<#              if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy, int incy);
+<#              }
+                break;
+            case ArgumentType.TwoVectors:
+                if (method.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In, Out] <#=typeName#>[] y, int offy);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [In, Out] <#=typeName#>[] y, int offy, int incy);
+<#                  }
+                } #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+<#              if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [Out] <#=typeName#>[] y, int offy, int incy);
+<#              }
+                break;
         }
-#>
-<#
-        // operations between a scalar and a vector
-        foreach (string func in new string[] {"add", "sub", "mul", "div"})
-        {
-#>
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_inc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy, int incy);
-<#
-        }
-#>
-<#
-        // operations between two vectors
-        foreach (string func in new string[] {"add", "sub", "mul", "div"})
-        {
-#>
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [Out] <#=typeName#>[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [Out] <#=typeName#>[] y, int offy, int incy);
-<#
-        }
+    } 
 #>
 
             [DllImport(NativeMethods.DllName)]
@@ -1052,59 +1110,9 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_ltgt_ip_<#=nativeSuffix#>(int n, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, [In, Out] <#=typeName#>[] y, int offy);
 <#
-        // operations between two vectors
-        Tuple<string, bool>[] opfuncs = 
-        {
-            Tuple.Create("sqr", false),
-            Tuple.Create("sqrt", true),
-            Tuple.Create("log", true),
-            Tuple.Create("exp", true),
-            Tuple.Create("sin", true),
-            Tuple.Create("cos", true),
-        };
-
-        foreach (Tuple<string, bool> func in opfuncs)
-        {
-            string funcName = func.Item1;
-            bool opIsFloating = func.Item2;
-
-            if (!opIsFloating || (isFloating && opIsFloating))
-            {
-#>
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=funcName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=funcName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-<#
-            }
-        }
-#>
-<#
         if (isFloating)
         {
 #>
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void sin_gradient_<#=nativeSuffix#>(
-                int n,
-                [In] <#=typeName#>[] x,
-                [Out] <#=typeName#>[] dx,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] <#=typeName#>[] dy,
-                int offdy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void cos_gradient_<#=nativeSuffix#>(
-                int n,
-                [In] <#=typeName#>[] x,
-                [Out] <#=typeName#>[] dx,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                [In] <#=typeName#>[] dy,
-                int offdy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern <#=typeName#> nrm1_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
@@ -1122,31 +1130,6 @@ namespace Genix.Core
             public static extern <#=typeName#> euclidean_distance_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#>[] y, int offy);
 <#
         }
-#>
-<#
-        // logical operations
-        foreach (string func in new string[] {"min", "max", "or", "and", "xor", "xand"})
-        {
-            if (func == "min" || func == "max" || typeName == "uint" || typeName == "ulong")
-            {
-#>
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_ip_<#=nativeSuffix#>(int length, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>c_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_ip_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void <#=func#>_<#=nativeSuffix#>(int length, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
-<#
-            }
-        }
-#>
-<#
     }
 #>
         }
@@ -1158,6 +1141,8 @@ namespace Genix.Core
 	{
 		Constant = 0,
 		Vector = 1,
+        ConstantAndVector = 2,
+		TwoVectors = 3,
 	}
 
 	class MethodDescriptor
@@ -1166,5 +1151,11 @@ namespace Genix.Core
 		public string NativeName { get; set; }
 		public ArgumentType Argument { get; set; }
 		public string Summary { get; set; }
+		public bool HasInPlace { get; set; }
+		public bool HasIncrement { get; set; }
+		public bool HasGradient { get; set; }
+		public string Op { get; set; }
+		public string OpInPlace { get; set; }
+        public string SupportedTypes { get; set; }
 	}
 #>

@@ -841,14 +841,14 @@ template<typename T> void __forceinline __sin_gradient(
 GENIXAPI(void, sin_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
-	const float* dy, int offdy)
+	const float* y, const float* dy, int offdy)
 {
 	__sin_gradient(n, x, dx, offx, cleardx, dy, offdy);
 }
 GENIXAPI(void, sin_gradient_f64)(
 	int n,
 	const double* x, double* dx, int offx, BOOL cleardx,
-	const double* dy, int offdy)
+	const double* y, const double* dy, int offdy)
 {
 	__sin_gradient(n, x, dx, offx, cleardx, dy, offdy);
 }
@@ -888,14 +888,14 @@ template<typename T> void __forceinline __cos_gradient(
 GENIXAPI(void, cos_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
-	const float* dy, int offdy)
+	const float* y, const float* dy, int offdy)
 {
 	__cos_gradient(n, x, dx, offx, cleardx, dy, offdy);
 }
 GENIXAPI(void, cos_gradient_f64)(
 	int n,
 	const double* x, double* dx, int offx, BOOL cleardx,
-	const double* dy, int offdy)
+	const double* y, const double* dy, int offdy)
 {
 	__cos_gradient(n, x, dx, offx, cleardx, dy, offdy);
 }
