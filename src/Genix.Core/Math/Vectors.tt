@@ -21,6 +21,40 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+<#
+	MethodDescriptor[] methods = new MethodDescriptor[]
+	{
+		new MethodDescriptor()
+		{
+			Name = "Copy",
+			NativeName = "copy",
+			Argument = ArgumentType.Vector,
+			Summary = "Copies a range of {0} from an array starting at the specified source index to another array starting at the specified destination index"
+		},
+		new MethodDescriptor()
+		{
+			Name = "Move",
+			NativeName = "move",
+			Argument = ArgumentType.Vector,
+			Summary = "Copies an ovelapping range of {0} from an array starting at the specified source index to another array starting at the specified destination index"
+		},
+		new MethodDescriptor()
+		{
+			Name = "Set",
+			NativeName = "set",
+			Argument = ArgumentType.Constant,
+			Summary = "Sets all elements in the array of {0} starting at the specified source index to the specified value"
+		},
+		new MethodDescriptor()
+		{
+			Name = "Swap",
+			NativeName = "swap",
+			Argument = ArgumentType.Vector,
+			Summary = "Swaps elements of two arrays of {0}"
+		}
+	};
+#>
+
 namespace Genix.Core
 {
     using System;
@@ -95,67 +129,48 @@ namespace Genix.Core
         {
             return NativeMethods.compare_<#=nativeSuffix#>(length, x, offx, y, offy) == 0;
         }
+<#
+    foreach (MethodDescriptor method in methods)
+    {
+        switch (method.Argument) {
+            case ArgumentType.Constant:
+#>
 
         /// <summary>
-        /// Copies a range of <#=typeDescription#> from a array starting at the specified source index
-        /// to another array starting at the specified destination index.
+        /// <#=string.Format(method.Summary, typeDescription)#>.
         /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="value">The constant value.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#> value, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, value, y, offy);
+        }
+<#
+                break;
+            case ArgumentType.Vector:
+#>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.copy_<#=nativeSuffix#>(length, x, offx, y, offy);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
-
-        /// <summary>
-        /// Copies a range of values from an array of <#=typeDescription#> starting at the specified source index
-        /// to another array starting at the specified destination index.
-        /// <paramref name="x"/> and <paramref name="y"/> can overlap.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Move(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
-            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
-            NativeMethods.move_<#=nativeSuffix#>(length, x, offx, y, offy);
+<#  
+                break;
         }
-
-        /// <summary>
-        /// Sets values in the array of <#=typeDescription#>
-        /// starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, <#=typeName#> value, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.set_<#=nativeSuffix#>(length, value, y, offy);
-        }
-
-        /// <summary>
-        /// Swaps elements of two arrays of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="x">The first array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The second array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Swap(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.swap_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
+    } 
+#>
 
         /// <summary>
         /// Clips elements of an array of <#=typeDescription#> to a specified minimum and maximum values.
@@ -920,18 +935,27 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern int compare_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+<#
+    foreach (MethodDescriptor method in methods)
+    {
+        switch (method.Argument) {
+            case ArgumentType.Constant:
+#>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void copy_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+<#
+                break;
+            case ArgumentType.Vector:
+#>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void move_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void set_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void swap_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+<#  
+                break;
+        }
+    } 
+#>
 <#
         if (isSigned)
         {
@@ -1128,3 +1152,19 @@ namespace Genix.Core
         }
     }
 }
+
+<#+
+	enum ArgumentType
+	{
+		Constant = 0,
+		Vector = 1,
+	}
+
+	class MethodDescriptor
+	{
+		public string Name { get; set; }
+		public string NativeName { get; set; }
+		public ArgumentType Argument { get; set; }
+		public string Summary { get; set; }
+	}
+#>
