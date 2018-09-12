@@ -384,7 +384,7 @@ namespace Genix.Core
             string funcName = func.Item1;
             string summary = func.Item2;
             string opInPlace = func.Item3;
-            string opNotInPlace = func.Item3;
+            string opNotInPlace = func.Item4;
 #>
 
         /// <summary>
@@ -502,38 +502,6 @@ namespace Genix.Core
         public static void AddProduct(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
         {
             NativeMethods.addproduct_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
-        /// Squares elements of an array of <#=typeDescription#> in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="y">The source and destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] = y[i] * y[i]</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Square(int length, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.sqr_ip_<#=nativeSuffix#>(length, y, offy);
-        }
-
-        /// <summary>
-        /// Squares elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] = x[i] * x[i]</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Square(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.sqr_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -661,83 +629,69 @@ namespace Genix.Core
             NativeMethods.threshold_ltgt_ip_<#=nativeSuffix#>(length, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
         }
 <#
-        if (isFloating)
+        // operations between two vectors
+        Tuple<string, string, string, string, string, bool>[] opfuncs = 
         {
+            Tuple.Create("Square", "sqr", $"Squares elements of an array of {typeDescription}", "y[i] = y[i] * y[i]", "y[i] = x[i] * x[i]", false),
+            Tuple.Create("Sqrt", "sqrt", $"Computes a square root of elements of an array of {typeDescription}", "y[i] = sqrt(y[i])", "y[i] = sqrt(x[i])", true),
+            Tuple.Create("Log", "log", $"Computes a natural logarithm of elements of an array of {typeDescription}", "y[i] = ln(y[i])", "y[i] = ln(x[i])", true),
+            Tuple.Create("Exp", "exp", $"Computes an exponential of elements of an array of {typeDescription}", "y[i] = exp(y[i])", "y[i] = exp(x[i])", true),
+            Tuple.Create("Sin", "sin", $"Computes a sine of elements of an array of {typeDescription}", "y[i] = sin(y[i])", "y[i] = sin(x[i])", true),
+            Tuple.Create("Cos", "cos", $"Computes a cosine of elements of an array of {typeDescription}", "y[i] = cos(y[i])", "y[i] = cos(x[i])", true),
+        };
+
+        foreach (Tuple<string, string, string, string, string, bool> func in opfuncs)
+        {
+            string funcName = func.Item1;
+            string nativeName = func.Item2;
+            string summary = func.Item3;
+            string opInPlace = func.Item4;
+            string opNotInPlace = func.Item5;
+            bool opIsFloating = func.Item6;
+
+            if (!opIsFloating || (isFloating && opIsFloating))
+            {
 #>
 
         /// <summary>
-        /// Computes a square root of elements of an array of <#=typeDescription#> in-place.
+        /// <#=summary#> in-place.
         /// </summary>
-        /// <param name="length">The number of elements to square.</param>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y[i] = sqrt(y[i])</c>.
+        /// The method performs operation defined as <c><#=opInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sqrt(int length, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.sqrt_ip_<#=nativeSuffix#>(length, y, offy);
+            NativeMethods.<#=nativeName#>_ip_<#=nativeSuffix#>(length, y, offy);
         }
 
         /// <summary>
-        /// Computes a square root of elements of an array of <#=typeDescription#> not in-place.
+        /// <#=summary#> not in-place.
         /// </summary>
-        /// <param name="length">The number of elements to square.</param>
+        /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <remarks>
-        /// The method performs operation defined as <c>y[i] = sqrt(x[i])</c>.
+        /// The method performs operation defined as <c><#=opNotInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sqrt(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        public static void <#=funcName#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.sqrt_<#=nativeSuffix#>(length, x, offx, y, offy);
+            NativeMethods.<#=nativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
-
-        /// <summary>
-        /// Computes a natural logarithm of elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Log(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+<#
+            }
+        }
+#>
+<#
+        if (isFloating)
         {
-            NativeMethods.log_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes an exponential of elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Exp(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.exp_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
-
-        /// <summary>
-        /// Computes a sines of elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sin(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.sin_<#=nativeSuffix#>(length, x, offx, y, offy);
-        }
+#>
 
         /// <summary>
         /// Computes the derivative of the argument of the <see cref="Sin(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method.
@@ -753,20 +707,6 @@ namespace Genix.Core
         public static void SinGradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] dy, int offdy)
         {
             NativeMethods.sin_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, dy, offdy);
-        }
-
-        /// <summary>
-        /// Computes a cosines of elements of an array of <#=typeDescription#> not-in-place.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Cos(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.cos_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -1071,12 +1011,6 @@ namespace Genix.Core
             public static extern void addproduct_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sqr_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void sqr_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern int argmin_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
 
             [DllImport(NativeMethods.DllName)]
@@ -1094,24 +1028,39 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_ltgt_ip_<#=nativeSuffix#>(int n, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, [In, Out] <#=typeName#>[] y, int offy);
 <#
-        if (isFloating)
+        // operations between two vectors
+        Tuple<string, bool>[] opfuncs = 
         {
+            Tuple.Create("sqr", false),
+            Tuple.Create("sqrt", true),
+            Tuple.Create("log", true),
+            Tuple.Create("exp", true),
+            Tuple.Create("sin", true),
+            Tuple.Create("cos", true),
+        };
+
+        foreach (Tuple<string, bool> func in opfuncs)
+        {
+            string funcName = func.Item1;
+            bool opIsFloating = func.Item2;
+
+            if (!opIsFloating || (isFloating && opIsFloating))
+            {
 #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sqrt_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=funcName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void sqrt_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void log_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void exp_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void sin_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=funcName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+<#
+            }
+        }
+#>
+<#
+        if (isFloating)
+        {
+#>
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sin_gradient_<#=nativeSuffix#>(
@@ -1122,9 +1071,6 @@ namespace Genix.Core
                 [MarshalAs(UnmanagedType.Bool)] bool cleardx,
                 [In] <#=typeName#>[] dy,
                 int offdy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void cos_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void cos_gradient_<#=nativeSuffix#>(

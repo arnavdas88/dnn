@@ -794,15 +794,21 @@ GENIXAPI(void, powx_gradient_f32)(
 	}
 }
 
-// y = ln(a)
-GENIXAPI(void, log_f32)(int n, const float* a, int offa, float* y, int offy) { ::vsLn(n, a + offa, y + offy); }
-GENIXAPI(void, log_f64)(int n, const double* a, int offa, double* y, int offy) { ::vdLn(n, a + offa, y + offy); }
+// y = ln(x)
+GENIXAPI(void, log_ip_f32)(int n, float* y, int offy) { ::vsLn(n, y + offy, y + offy); }
+GENIXAPI(void, log_ip_f64)(int n, double* y, int offy) { ::vdLn(n, y + offy, y + offy); }
+GENIXAPI(void, log_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsLn(n, x + offx, y + offy); }
+GENIXAPI(void, log_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdLn(n, x + offx, y + offy); }
 
-// y = exp(a)
-GENIXAPI(void, exp_f32)(int n, const float* a, int offa, float* y, int offy) { ::vsExp(n, a + offa, y + offy); }
-GENIXAPI(void, exp_f64)(int n, const double* a, int offa, double* y, int offy) { ::vdExp(n, a + offa, y + offy); }
+// y = exp(x)
+GENIXAPI(void, exp_ip_f32)(int n, float* y, int offy) { ::vsExp(n, y + offy, y + offy); }
+GENIXAPI(void, exp_ip_f64)(int n,  double* y, int offy) { ::vdExp(n, y + offy, y + offy); }
+GENIXAPI(void, exp_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsExp(n, x + offx, y + offy); }
+GENIXAPI(void, exp_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdExp(n, x + offx, y + offy); }
 
 // y = sin(x)
+GENIXAPI(void, sin_ip_f32)(int n, float* y, int offy) { ::vsSin(n, y + offy, y + offy); }
+GENIXAPI(void, sin_ip_f64)(int n, double* y, int offy) { ::vdSin(n, y + offy, y + offy); }
 GENIXAPI(void, sin_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsSin(n, x + offx, y + offy); }
 GENIXAPI(void, sin_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdSin(n, x + offx, y + offy); }
 
@@ -848,6 +854,8 @@ GENIXAPI(void, sin_gradient_f64)(
 }
 
 // y = cos(x)
+GENIXAPI(void, cos_ip_f32)(int n, float* y, int offy) { ::vsCos(n, y + offy, y + offy); }
+GENIXAPI(void, cos_ip_f64)(int n, double* y, int offy) { ::vdCos(n, y + offy, y + offy); }
 GENIXAPI(void, cos_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsCos(n, x + offx, y + offy); }
 GENIXAPI(void, cos_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdCos(n, x + offx, y + offy); }
 
