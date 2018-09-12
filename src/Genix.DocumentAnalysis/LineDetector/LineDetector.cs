@@ -74,16 +74,16 @@ namespace Genix.DocumentAnalysis
 
             // close up small holes
             int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-            Image closedImage = image.Close(StructuringElement.Square(maxLineWidth / 3), 1);
+            Image closedImage = Image.Close(image, StructuringElement.Square(maxLineWidth / 3), 1);
 
             // open up to detect big solid areas
-            Image openedImage = image.Open(StructuringElement.Square(maxLineWidth), 1);
+            Image openedImage = Image.Open(image, StructuringElement.Square(maxLineWidth), 1);
             Image hollowImage = closedImage.Sub(openedImage, 0);
 
             // open up in both directions to find lines
             int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-            Image hlinesImage = hollowImage.Open(StructuringElement.Rectangle(minLineLength, 1), 1);
-            Image vlinesImage = hollowImage.Open(StructuringElement.Rectangle(1, minLineLength), 1);
+            Image hlinesImage = Image.Open(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
+            Image vlinesImage = Image.Open(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
 
             // check for line presence
             bool hasHLines = !hlinesImage.IsAllWhite();
@@ -108,18 +108,39 @@ namespace Genix.DocumentAnalysis
                 }
             }
 
+            // find intersections
+            Image hvlinesItersectionsImage = hasHLines && hasVLines ? hlinesImage.And(vlinesImage) : null;
+
             // vertical lines
             if (hasVLines)
             {
                 int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image noVLinesImage = noLinesImage.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1);
+                Image nonVLinesImage = Image.Erode(noLinesImage, StructuringElement.Rectangle(maxLineResidue, 1), 1);
+                nonVLinesImage.FloodFill(noLinesImage);
+
+                if (hasHLines)
+                {
+                    nonVLinesImage.AddIP(hlinesImage, 0);
+                    nonVLinesImage.SubIP(hvlinesItersectionsImage, 0);
+                }
+
+                FilterFalsePositives(vlinesImage, nonVLinesImage, hvlinesItersectionsImage);
             }
 
             // horizontal lines
             if (hasHLines)
             {
                 int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image noHLinesImage = noLinesImage.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1);
+                Image nonHLinesImage = Image.Erode(noLinesImage, StructuringElement.Rectangle(1, maxLineResidue), 1);
+                nonHLinesImage.FloodFill(noLinesImage);
+
+                if (hasVLines)
+                {
+                    nonHLinesImage.AddIP(vlinesImage, 0);
+                    nonHLinesImage.SubIP(hvlinesItersectionsImage, 0);
+                }
+
+                FilterFalsePositives(hlinesImage, nonHLinesImage, hvlinesItersectionsImage);
             }
 
             Image res = image.Sub(hlinesImage, 0).Sub(vlinesImage, 0);
@@ -128,11 +149,11 @@ namespace Genix.DocumentAnalysis
             if (options.Types.HasFlag(LineTypes.Horizontal))
             {
                 // morphology open leaves only pixels that have required number of horizontal neighbors
-                Image workImage = image.Open(StructuringElement.Rectangle(30, 1), 1);
+                Image workImage = Image.Open(image, StructuringElement.Rectangle(30, 1), 1);
 
                 // dilate lines to merge small gaps and include neighboring isolated pixels
                 const int DilationSize = 2;
-                workImage.DilateIP(StructuringElement.Square(1 + (2 * DilationSize)), 1);
+                workImage.Dilate(StructuringElement.Square(1 + (2 * DilationSize)), 1);
 
                 // find line components and filter out non-line components
                 /*int*/ minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
@@ -165,11 +186,20 @@ namespace Genix.DocumentAnalysis
                 cleanedImage = image ^ mask;
 
                 // dilate vertically to close gaps in vertical lines opened by lines removal
-                cleanedImage.DilateIP(StructuringElement.Rectangle(1, 7), 1);
+                cleanedImage.Dilate(StructuringElement.Rectangle(1, 7), 1);
                 cleanedImage = cleanedImage & image;
             }
 
             return cleanedImage ?? image.Copy();
+
+            void FilterFalsePositives(Image linesImage, Image nonLinesImage, Image intersectionsImage)
+            {
+                ISet<ConnectedComponent> components = linesImage.FindConnectedComponents();
+                foreach (ConnectedComponent component in components)
+                {
+                    Rectangle bounds = component.Bounds;
+                }
+            }
         }
     }
 }

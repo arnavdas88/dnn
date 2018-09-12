@@ -147,7 +147,7 @@ namespace Genix.Imaging
                 if (this.BitsPerPixel > 1)
                 {
                     // set frame to white
-                    dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
+                    dst.SetWhiteBorder(dstx, dsty, area.Width, area.Height);
                 }
             }
             else

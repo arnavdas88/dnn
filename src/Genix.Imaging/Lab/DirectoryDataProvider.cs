@@ -315,7 +315,8 @@ namespace Genix.Imaging.Lab
 
                 if (this.Width > 0 || this.Height > 0)
                 {
-                    image = image.FitToSize(
+                    image = Image.FitToSize(
+                        image,
                         this.Width > 0 ? this.Width : image.Width,
                         this.Height > 0 ? this.Height : image.Height,
                         ScalingOptions.None);

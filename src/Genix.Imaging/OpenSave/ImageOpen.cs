@@ -258,25 +258,25 @@ namespace Genix.Imaging
                         switch (orientation)
                         {
                             case TIFFOrientation.TopRight:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate180FlipY);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate180FlipY);
                                 break;
                             case TIFFOrientation.BottomRight:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate180FlipNone);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate180FlipNone);
                                 break;
                             case TIFFOrientation.BottomLeft:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.RotateNoneFlipX);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.RotateNoneFlipX);
                                 break;
                             case TIFFOrientation.LeftTop:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate270FlipY);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipY);
                                 break;
                             case TIFFOrientation.RightTop:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate90FlipNone);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate90FlipNone);
                                 break;
                             case TIFFOrientation.RightBottom:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate90FlipY);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate90FlipY);
                                 break;
                             case TIFFOrientation.LeftBottom:
-                                image = image.RotateFlip(Genix.Imaging.RotateFlip.Rotate270FlipNone);
+                                image = Image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipNone);
                                 break;
 
                             case TIFFOrientation.TopLeft:

@@ -61,6 +61,9 @@ namespace Genix.Imaging
 
             switch (src.BitsPerPixel)
             {
+                case 1:
+                    return this.Or(src);
+
                 case 8:
                 case 24:
                 case 32:
@@ -128,6 +131,10 @@ namespace Genix.Imaging
 
             switch (this.BitsPerPixel)
             {
+                case 1:
+                    this.OrIP(src);
+                    break;
+
                 case 8:
                 case 24:
                 case 32:

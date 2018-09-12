@@ -18,7 +18,7 @@
                     Image image = new Image(Width, Height, 1, 200, 200);
                     image.SetPixel(ix, iy, 1);
 
-                    Image dilatedImage = image.Dilate(StructuringElement.Square(3), 1);
+                    Image dilatedImage = Image.Dilate(image, StructuringElement.Square(3), 1);
 
                     if ((ix == 0 || ix == Width - 1) && (iy == 0 || iy == Height - 1))
                     {
@@ -55,10 +55,10 @@
                 for (int iy = 0; iy < Height; iy++)
                 {
                     Image image = new Image(Width, Height, 1, 200, 200);
-                    image.SetBlackIP();
+                    image.SetBlack();
                     image.SetPixel(ix, iy, 0);
 
-                    Image dilatedImage = image.Erode(StructuringElement.Square(3), 1);
+                    Image dilatedImage = Image.Erode(image, StructuringElement.Square(3), 1);
 
                     if ((ix == 0 || ix == Width - 1) && (iy == 0 || iy == Height - 1))
                     {

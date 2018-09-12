@@ -19,19 +19,117 @@ namespace Genix.Imaging
     /// </content>
     public partial class Image
     {
-        /// <summary>
-        /// Dilates this <see cref="Image"/> by using the specified structuring element.
-        /// </summary>
-        /// <param name="kernel">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
-        /// <returns>
-        /// The dilated <see cref="Image"/>.
-        /// </returns>
-        public Image Dilate(StructuringElement kernel, int iterations)
+        public void FloodFill(Image mask)
         {
-            Image dst = this.Copy();
-            dst.DilateIP(kernel, iterations);
-            return dst;
+            if (mask == null)
+            {
+                throw new ArgumentNullException(nameof(mask));
+            }
+
+            if (mask.BitsPerPixel != this.BitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+            int bitsPerPixel = this.BitsPerPixel;
+            int stridesrc = this.Stride;
+            int stridemask = mask.Stride;
+
+            int width = Math.Min(this.Width, mask.Width);
+            int bitwidth = width * bitsPerPixel;
+            int height = Math.Min(this.Height, mask.Height);
+            int stride = Math.Min(stridesrc, stridemask);
+
+            ulong[] bits = this.Bits;
+            ulong[] bitsmask = mask.Bits;
+            ulong[] buffer = new ulong[stride];
+
+            int top = 0;
+            int bottom = height - 1;
+            while (top <= bottom)
+            {
+                // scan from upper-left to bottom-right corner
+                Vectors.Set(stride, 0, buffer, 0);
+                for (int i = top, off = i * stridesrc, offmask = i * stridemask; i < height; i++, off += stridesrc, offmask += stridemask)
+                {
+                    // or from above
+                    if (i > 0)
+                    {
+                        Vectors.Copy(stride, bits, off - stridesrc, buffer, 0);
+                    }
+
+                    // or from left
+                    BitUtils.Or(bitwidth - bitsPerPixel, bits, off * 64, buffer, bitsPerPixel);
+
+                    // mask pixels
+                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
+
+                    // copy back to image
+                    int oldcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
+                    BitUtils.Or(bitwidth, buffer, 0, bits, off * 64);
+                    int newcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
+
+                    if (oldcount == newcount)
+                    {
+                        // pixel count did not change - shrink upper boundary if we are at the top
+                        if (i == top)
+                        {
+                            top++;
+                        }
+
+                        if (i >= bottom)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // pixel count did change - expand lower boundary
+                        bottom = Core.MinMax.Max(i, bottom);
+                    }
+                }
+
+                // scan from bottom-right to upper-left corner
+                Vectors.Set(stride, 0, buffer, 0);
+                for (int i = bottom, off = i * stridesrc, offmask = i * stridemask; i >= 0; i--, off -= stridesrc, offmask -= stridemask)
+                {
+                    // or from below
+                    if (i < height - 1)
+                    {
+                        Vectors.Copy(stride, bits, off + stridesrc, buffer, 0);
+                    }
+
+                    // or from right
+                    BitUtils.Or(bitwidth - bitsPerPixel, bits, (off * 64) + bitsPerPixel, buffer, 0);
+
+                    // mask pixels
+                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
+
+                    // copy back to image
+                    int oldcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
+                    BitUtils.Or(bitwidth, buffer, 0, bits, off * 64);
+                    int newcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
+
+                    if (oldcount == newcount)
+                    {
+                        // pixel count did not change - shrink lower boundary if we are at the bottom
+                        if (i == bottom)
+                        {
+                            bottom--;
+                        }
+
+                        if (i <= top)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // pixel count did change - expand upper boundary
+                        top = Core.MinMax.Min(i, top);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -39,7 +137,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void DilateIP(StructuringElement kernel, int iterations)
+        public void Dilate(StructuringElement kernel, int iterations)
         {
             if (kernel == null)
             {
@@ -52,7 +150,7 @@ namespace Genix.Imaging
                 // create mask
                 if (iteration > 0)
                 {
-                    mask.SetToMinIP();
+                    mask.SetToMin();
                 }
 
                 // special case for rectangular kernel
@@ -70,7 +168,7 @@ namespace Genix.Imaging
                     this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
 
                     // create horizontal mask
-                    mask.SetToMinIP();
+                    mask.SetToMin();
 
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {
@@ -107,22 +205,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        /// <returns>
-        /// The eroded <see cref="Image"/>.
-        /// </returns>
-        public Image Erode(StructuringElement kernel, int iterations)
-        {
-            Image dst = this.Copy();
-            dst.ErodeIP(kernel, iterations);
-            return dst;
-        }
-
-        /// <summary>
-        /// Erodes this <see cref="Image"/> by using the specified structuring element.
-        /// </summary>
-        /// <param name="kernel">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
-        public void ErodeIP(StructuringElement kernel, int iterations)
+        public void Erode(StructuringElement kernel, int iterations)
         {
             if (kernel == null)
             {
@@ -133,7 +216,7 @@ namespace Genix.Imaging
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 // create mask
-                mask.SetToMaxIP();
+                mask.SetToMax();
 
                 // special case for rectangular kernel
                 // instead of applying m x n mask
@@ -150,7 +233,7 @@ namespace Genix.Imaging
                     this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
 
                     // create horizontal mask
-                    mask.SetToMaxIP();
+                    mask.SetToMax();
 
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {
@@ -187,27 +270,12 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        /// <returns>
-        /// The opened <see cref="Image"/>.
-        /// </returns>
-        public Image Open(StructuringElement kernel, int iterations)
-        {
-            Image dst = this.Copy();
-            dst.OpenIP(kernel, iterations);
-            return dst;
-        }
-
-        /// <summary>
-        /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
-        /// </summary>
-        /// <param name="kernel">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
-        public void OpenIP(StructuringElement kernel, int iterations)
+        public void Open(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.ErodeIP(kernel, 1);
-                this.DilateIP(kernel, 1);
+                this.Erode(kernel, 1);
+                this.Dilate(kernel, 1);
             }
         }
 
@@ -216,47 +284,19 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        /// <returns>
-        /// The closed <see cref="Image"/>.
-        /// </returns>
-        public Image Close(StructuringElement kernel, int iterations)
-        {
-            Image dst = this.Copy();
-            dst.CloseIP(kernel, iterations);
-            return dst;
-        }
-
-        /// <summary>
-        /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
-        /// </summary>
-        /// <param name="kernel">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
-        public void CloseIP(StructuringElement kernel, int iterations)
+        public void Close(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.DilateIP(kernel, 1);
-                this.ErodeIP(kernel, 1);
+                this.Dilate(kernel, 1);
+                this.Erode(kernel, 1);
             }
         }
 
         /// <summary>
         /// Removes small isolated pixels from this <see cref="Image"/>.
         /// </summary>
-        /// <returns>
-        /// The cleaned <see cref="Image"/>.
-        /// </returns>
-        public Image Despeckle()
-        {
-            Image dst = this.Copy();
-            dst.DespeckleIP();
-            return dst;
-        }
-
-        /// <summary>
-        /// Removes small isolated pixels from this <see cref="Image"/>.
-        /// </summary>
-        public void DespeckleIP()
+        public void Despeckle()
         {
             // create masks
             ulong[] mask = new ulong[this.Bits.Length];

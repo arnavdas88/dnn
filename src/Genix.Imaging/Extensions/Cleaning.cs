@@ -16,31 +16,40 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Cleans scan border noise from this <see cref="Image"/>.
+        /// Cleans scan border noise from the <see cref="Image"/>.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="maxNoiseWidth">The maximum width of the noise, in inches.</param>
         /// <param name="maxNoiseHeight">The maximum height of the noise, in inches.</param>
         /// <returns>
         /// A new cleaned <see cref="Image"/>.
         /// </returns>
-        public Image CleanOverscan(float maxNoiseWidth, float maxNoiseHeight)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image CleanOverscan(Image image, float maxNoiseWidth, float maxNoiseHeight)
         {
-            int width = this.Width;
-            int height = this.Height;
-            int stride1 = this.Stride1;
-            int stride = this.Stride;
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
 
-            Image dst = this.Clone(true);
+            int width = image.Width;
+            int height = image.Height;
+            int stride1 = image.Stride1;
+            int stride = image.Stride;
+
+            Image dst = image.Copy();
             ulong[] bits = dst.Bits;
 
-            int maxwidth = (int)((maxNoiseWidth * this.HorizontalResolution) + 0.5f);
+            int maxwidth = (int)((maxNoiseWidth * image.HorizontalResolution) + 0.5f);
             if (maxwidth > 0)
             {
                 ClearLeft(FindLeft(maxwidth));
                 ClearRight(FindRight(maxwidth));
             }
 
-            int maxheight = (int)((maxNoiseHeight * this.VerticalResolution) + 0.5f);
+            int maxheight = (int)((maxNoiseHeight * image.VerticalResolution) + 0.5f);
             if (maxheight > 0)
             {
                 ClearTop(FindTop(maxheight));

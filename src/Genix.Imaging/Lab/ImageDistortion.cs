@@ -51,14 +51,14 @@ namespace Genix.Imaging.Lab
 
             if (image.BitsPerPixel == 8)
             {
-                image = image.Binarize();
+                image = Image.Binarize(image);
             }
 
             // rotate image randomly
             if (rotate)
             {
                 double angle = (width > 0 ? 18 : 3) * this.normalDistribution.Generate();
-                image = image.Rotate(angle);
+                image = Image.Rotate(image, angle);
             }
 
             // reduce image size to black area
@@ -73,7 +73,7 @@ namespace Genix.Imaging.Lab
                     double verticalFactor = (double)height / image.Height;
                     double scaleFactor = Math.Min(horizontalFactor, verticalFactor);
 
-                    image = image.Scale(scaleFactor, ScalingOptions.None);
+                    image = Image.Scale(image, scaleFactor, ScalingOptions.None);
                 }
             }
             else
@@ -81,7 +81,7 @@ namespace Genix.Imaging.Lab
                 if (image.Height > height)
                 {
                     double scaleFactor = (double)height / image.Height;
-                    image = image.Scale(scaleFactor, ScalingOptions.None);
+                    image = Image.Scale(image, scaleFactor, ScalingOptions.None);
                 }
             }
 
@@ -92,17 +92,17 @@ namespace Genix.Imaging.Lab
                 {
                     int newWidth = image.Width - Math.Abs(this.Random(-width / 4, width / 4));
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
-                    image = image.ScaleToSize(newWidth, newHeight, ScalingOptions.None);
+                    image = Image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
                 }
                 else
                 {
                     int newWidth = image.Width + this.Random(-image.Width / 10, image.Width / 10);
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
-                    image = image.ScaleToSize(newWidth, newHeight, ScalingOptions.None);
+                    image = Image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
 
                     double angle = 0.5 * this.normalDistribution.Generate();
-                    image = image.Inflate(image.Height, 0, image.Height, 0);
-                    image = image.Shear(angle);
+                    image = Image.Inflate(image, image.Height, 0, image.Height, 0);
+                    image = Image.Shear(image, angle);
 
                     Rectangle blackArea = image.BlackArea();
                     int left = Math.Max(blackArea.Left - 1, 0);
@@ -127,7 +127,7 @@ namespace Genix.Imaging.Lab
                         offsety = this.Random(0, dy);
                     }
 
-                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety);
+                    image = Image.Inflate(image, offsetx, offsety, dx - offsetx, dy - offsety);
                 }
             }
             else
@@ -149,7 +149,7 @@ namespace Genix.Imaging.Lab
                         offsety = this.Random(0, dy);
                     }
 
-                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety);
+                    image = Image.Inflate(image, offsetx, offsety, dx - offsetx, dy - offsety);
                 }
             }
 
@@ -161,7 +161,7 @@ namespace Genix.Imaging.Lab
                 int oldHeight = image.Height;
                 int inflatex = image.Width / 8;
                 int inflatey = image.Height / 8;
-                image = image.Inflate(inflatex, inflatey, inflatex, inflatey);
+                image = Image.Inflate(image, inflatex, inflatey, inflatex, inflatey);
 
                 yield return image.Crop(0, 0, oldWidth, oldHeight);
                 yield return image.Crop(2 * inflatex, 0, oldWidth, oldHeight);

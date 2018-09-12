@@ -10,9 +10,9 @@
         public void ScaleToSizeTest()
         {
             Image image = new Image(118, 133, 1, 200, 200);
-            image = image.SetWhite();
+            image = Image.SetWhite(image);
 
-            image = image.ScaleToSize(113, 124, ScalingOptions.None);
+            image = Image.ScaleToSize(image, 113, 124, ScalingOptions.None);
         }
     }
 }

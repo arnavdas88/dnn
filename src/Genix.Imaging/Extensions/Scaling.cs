@@ -20,53 +20,76 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Scales this <see cref="Image"/> proportionally in both dimensions without changing its resolution.
+        /// Scales the <see cref="Image"/> proportionally in both dimensions without changing its resolution.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
         /// A new scaled <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Scale(double scaleFactor, ScalingOptions options) => this.Scale(scaleFactor, scaleFactor, options);
+        public static Image Scale(Image image, double scaleFactor, ScalingOptions options) =>
+            Image.Scale(image, scaleFactor, scaleFactor, options);
 
         /// <summary>
-        /// Scales this <see cref="Image"/> in both dimensions without changing its resolution.
+        /// Scales the <see cref="Image"/> in both dimensions without changing its resolution.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="scaleFactorX">The horizontal scaling factor.</param>
         /// <param name="scaleFactorY">The vertical scaling factor.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
         /// A new scaled <see cref="Image"/>.
         /// </returns>
-        public Image Scale(double scaleFactorX, double scaleFactorY, ScalingOptions options)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Scale(Image image, double scaleFactorX, double scaleFactorY, ScalingOptions options)
         {
-            int newWidth = (int)((this.Width * scaleFactorX) + 0.5);
-            int newHeight = (int)((this.Height * scaleFactorY) + 0.5);
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
 
-            return this.ScaleToSize(newWidth, newHeight, options);
+            int newWidth = (int)((image.Width * scaleFactorX) + 0.5);
+            int newHeight = (int)((image.Height * scaleFactorY) + 0.5);
+
+            return Image.ScaleToSize(image, newWidth, newHeight, options);
         }
 
         /// <summary>
-        /// Scales this <see cref="Image"/> vertically and horizontally without changing its resolution.
+        /// Scales the <see cref="Image"/> vertically and horizontally without changing its resolution.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="width">The desired width of the image, in pixels.</param>
         /// <param name="height">The desired height of the image, in pixels.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
         /// A new scaled <see cref="Image"/>.
         /// </returns>
-        public Image ScaleToSize(int width, int height, ScalingOptions options)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image ScaleToSize(Image image, int width, int height, ScalingOptions options)
         {
-            if (width == this.Width && height == this.Height)
+            if (image == null)
             {
-                return this.Copy();
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (width == image.Width && height == image.Height)
+            {
+                return image.Copy();
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
-            matrix.Scale((double)width / this.Width, (double)height / this.Height);
+            matrix.Scale((double)width / image.Width, (double)height / image.Height);
 
-            Image dst = this.Affine(matrix);
+            Image dst = Image.Affine(image, matrix);
             Debug.Assert(width == dst.Width && height == dst.Height, "Image dimensions are wrong.");
             return dst;
 #if false
@@ -134,6 +157,7 @@ namespace Genix.Imaging
         /// <summary>
         /// Fits the <see cref="Image"/> into the area of specified dimensions.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="width">The width, in pixels, of the required image.</param>
         /// <param name="height">The height, in pixels, of the required image.</param>
         /// <param name="options">The scaling options.</param>
@@ -147,9 +171,17 @@ namespace Genix.Imaging
         /// This method modifies the current <see cref="Image"/> by resizing and inflating it when necessary.
         /// The resulting image should be <paramref name="width"/> x <paramref name="height"/> in size.
         /// </remarks>
-        public Image FitToSize(int width, int height, ScalingOptions options)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image FitToSize(Image image, int width, int height, ScalingOptions options)
         {
-            Image image = this;
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            bool modified = false;
 
             if (image.Width > width || image.Height > height)
             {
@@ -157,6 +189,7 @@ namespace Genix.Imaging
                 if (!blackArea.IsEmpty && blackArea != image.Bounds)
                 {
                     image = image.Crop(blackArea);
+                    modified = true;
                 }
             }
 
@@ -171,7 +204,8 @@ namespace Genix.Imaging
 
                 if (image.Width != newWidth || image.Height != newHeight)
                 {
-                    image = image.ScaleToSize(newWidth, newHeight, options);
+                    image = Image.ScaleToSize(image, newWidth, newHeight, options);
+                    modified = true;
                 }
             }
 
@@ -179,22 +213,32 @@ namespace Genix.Imaging
             {
                 int dx = width - image.Width;
                 int dy = height - image.Height;
-                image = image.Inflate(dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2));
+                image = Image.Inflate(image, dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2));
+                modified = true;
             }
 
-            return image == this ? image.Copy() : image;
+            return modified ? image : image.Copy();
         }
 
         /// <summary>
-        /// Changes the size of this <see cref="Image"/> to the specified dimensions without changing its scale.
+        /// Changes the size of the <see cref="Image"/> to the specified dimensions without changing its scale.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="width">The desired width of the image, in pixels.</param>
         /// <param name="height">The desired height of the image, in pixels.</param>
         /// <returns>
         /// A new resized <see cref="Image"/>.
         /// </returns>
-        public Image Resize(int width, int height)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Resize(Image image, int width, int height)
         {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
             if (width <= 0)
             {
                 throw new ArgumentException(Properties.Resources.E_InvalidWidth);
@@ -205,13 +249,14 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight);
             }
 
-            return this.Inflate(0, 0, width - this.Width, height - this.Height);
+            return Image.Inflate(image, 0, 0, width - image.Width, height - image.Height);
         }
 
         /// <summary>
         /// Creates and returns an enlarged copy of the specified <see cref="Image"/>.
         /// Positive input parameters mean inflating, negative mean cropping.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="left">The amount by which to expand or shrink the left side of the <see cref="Image"/>.</param>
         /// <param name="top">The amount by which to expand or shrink the top side of the <see cref="Image"/>.</param>
         /// <param name="right">The amount by which to expand or shrink the right side of the <see cref="Image"/>. </param>
@@ -224,14 +269,22 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>Result height is less than or equal to zero.</para>
         /// </exception>
-        public Image Inflate(int left, int top, int right, int bottom)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Inflate(Image image, int left, int top, int right, int bottom)
         {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
             // calculate and verify target area in source coordinates
             Rectangle bounds = Rectangle.FromLTRB(
                 -left,
                 -top,
-                this.Width + right,
-                this.Height + bottom);
+                image.Width + right,
+                image.Height + bottom);
 
             if (bounds.Width <= 0)
             {
@@ -243,95 +296,113 @@ namespace Genix.Imaging
                 throw new ArgumentException("The new image height is invalid.");
             }
 
-            Image dst = new Image(bounds.Width, bounds.Height, this);
+            Image dst = new Image(bounds.Width, bounds.Height, image);
 
             // calculate source area to copy from
-            Rectangle area = Rectangle.Intersect(bounds, this.Bounds);
+            Rectangle area = Rectangle.Intersect(bounds, image.Bounds);
 
             // calculate destination area to copy to
             int dstx = area.X - bounds.X;
             int dsty = area.Y - bounds.Y;
 
-            Image.CopyArea(this, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);
+            Image.CopyArea(image, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);
 
-            if (this.BitsPerPixel > 1)
+            if (image.BitsPerPixel > 1)
             {
                 // set frame to white
-                dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
+                dst.SetWhiteBorder(dstx, dsty, area.Width, area.Height);
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(left, top));
+            dst.Transform = image.Transform.Append(new MatrixTransform(left, top));
             return dst;
         }
 
         /// <summary>
         /// Reduces the height of the <see cref="Image"/> by the factor of 2.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <returns>The scaled <see cref="Image"/>.</returns>
-        public Image Reduce1x2()
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Reduce1x2(Image image)
         {
-            if (this.BitsPerPixel != 1)
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
-                this.Width,
-                (this.Height + 1) >> 1,
-                this.BitsPerPixel,
-                this.HorizontalResolution,
-                this.VerticalResolution / 2);
+                image.Width,
+                (image.Height + 1) >> 1,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 2);
 
-            int stride = this.Stride;
-            ulong[] bitssrc = this.Bits;
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
             ulong[] bitsdst = dst.Bits;
 
             int offsrc = 0;
             int offdst = 0;
-            for (int i = 0, ii = this.Height >> 1; i < ii; i++, offsrc += 2 * stride, offdst += stride)
+            for (int i = 0, ii = image.Height >> 1; i < ii; i++, offsrc += 2 * stride, offdst += stride)
             {
                 Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitsdst, offdst);
             }
 
-            if ((this.Height & 1) != 0)
+            if ((image.Height & 1) != 0)
             {
                 Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.5));
+            dst.Transform = image.Transform.Append(new MatrixTransform(1.0, 0.5));
             return dst;
         }
 
         /// <summary>
         /// Reduces the height of the <see cref="Image"/> by the factor of 3.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <returns>The scaled <see cref="Image"/>.</returns>
-        public Image Reduce1x3()
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Reduce1x3(Image image)
         {
-            if (this.BitsPerPixel != 1)
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
-                this.Width,
-                (this.Height + 2) / 3,
-                this.BitsPerPixel,
-                this.HorizontalResolution,
-                this.VerticalResolution / 3);
+                image.Width,
+                (image.Height + 2) / 3,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 3);
 
-            int stride = this.Stride;
-            ulong[] bitssrc = this.Bits;
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
             ulong[] bitsdst = dst.Bits;
 
             int offsrc = 0;
             int offdst = 0;
-            for (int i = 0, ii = this.Height / 3; i < ii; i++, offsrc += 3 * stride, offdst += stride)
+            for (int i = 0, ii = image.Height / 3; i < ii; i++, offsrc += 3 * stride, offdst += stride)
             {
                 Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
             }
 
-            switch (this.Height % 3)
+            switch (image.Height % 3)
             {
                 case 1:
                     Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
@@ -342,40 +413,49 @@ namespace Genix.Imaging
                     break;
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 1.0 / 3));
+            dst.Transform = image.Transform.Append(new MatrixTransform(1.0, 1.0 / 3));
             return dst;
         }
 
         /// <summary>
         /// Reduces the height of the <see cref="Image"/> by the factor of 4.
         /// </summary>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <returns>The scaled <see cref="Image"/>.</returns>
-        public Image Reduce1x4()
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        public static Image Reduce1x4(Image image)
         {
-            if (this.BitsPerPixel != 1)
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             Image dst = new Image(
-                this.Width,
-                (this.Height + 3) / 4,
-                this.BitsPerPixel,
-                this.HorizontalResolution,
-                this.VerticalResolution / 4);
+                image.Width,
+                (image.Height + 3) / 4,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution / 4);
 
-            int stride = this.Stride;
-            ulong[] bitssrc = this.Bits;
+            int stride = image.Stride;
+            ulong[] bitssrc = image.Bits;
             ulong[] bitsdst = dst.Bits;
 
             int offsrc = 0;
             int offdst = 0;
-            for (int i = 0, ii = this.Height / 4; i < ii; i++, offsrc += 4 * stride, offdst += stride)
+            for (int i = 0, ii = image.Height / 4; i < ii; i++, offsrc += 4 * stride, offdst += stride)
             {
                 Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
             }
 
-            switch (this.Height % 4)
+            switch (image.Height % 4)
             {
                 case 1:
                     Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
@@ -390,7 +470,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.25));
+            dst.Transform = image.Transform.Append(new MatrixTransform(1.0, 0.25));
             return dst;
         }
 

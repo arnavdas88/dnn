@@ -11,7 +11,7 @@
             foreach (int bitsPerPixel in new[] { 1, /*4,*/ 8, /*16,*/ 32 })
             {
                 Image image = new Image(64 + 47, 35, bitsPerPixel, 200, 200);
-                image.SetWhiteIP();
+                image.SetWhite();
 
                 image.SetPixel(11, 1, 1);
                 image.SetPixel(67, 15, 1);

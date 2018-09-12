@@ -65,12 +65,22 @@
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\CrossStructuringElement.cs" />
+    <Compile Include="Extensions\Edit.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Edit.tt</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\FeatureDetectors.cs" />
     <Compile Include="Extensions\Filters.cs" />
     <Compile Include="Extensions\Logical.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Logical.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions\Morphology.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Morphology.tt</DependentUpon>
     </Compile>
     <Compile Include="Extensions\RectangleStructuringElement.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
@@ -152,9 +162,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Extensions\Edit.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Edit.Generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Extensions\Logical.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Logical.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Extensions\Morphology.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Morphology.Generated.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
