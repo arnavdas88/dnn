@@ -135,7 +135,7 @@ namespace Genix.Imaging
         /// <value>
         /// The horizontal resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </value>
-        public int HorizontalResolution { get; }
+        public int HorizontalResolution { get; private set; }
 
         /// <summary>
         /// Gets the vertical resolution, in pixels per inch, of this <see cref="Image{T}"/>.
@@ -143,7 +143,7 @@ namespace Genix.Imaging
         /// <value>
         /// The vertical resolution, in pixels per inch, of this <see cref="Image{T}"/>.
         /// </value>
-        public int VerticalResolution { get; }
+        public int VerticalResolution { get; private set; }
 
         /// <summary>
         /// Gets the bounds, in pixels, of this <see cref="Image{T}"/>.
@@ -160,6 +160,17 @@ namespace Genix.Imaging
         /// The array that contains the image bits.
         /// </value>
         public T[] Bits { get; }
+
+        /// <summary>
+        /// Changes image resolution whithout changing its size.
+        /// </summary>
+        /// <param name="horizontalResolution">The horizontal resolution, in pixels per inch.</param>
+        /// <param name="verticalResolution">The vertical resolution, in pixels per inch.</param>
+        public void SetResolution(int horizontalResolution, int verticalResolution)
+        {
+            this.HorizontalResolution = horizontalResolution;
+            this.VerticalResolution = verticalResolution;
+        }
 
         internal void ValidatePosition(int x, int y)
         {

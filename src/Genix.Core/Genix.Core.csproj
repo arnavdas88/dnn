@@ -60,6 +60,7 @@
     <Compile Include="Cryptography\CRC.cs" />
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
+    <Compile Include="Drawing\BoundedObjectGrid.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
     <Compile Include="Drawing\Point.cs" />
     <Compile Include="Drawing\PointConverter.cs" />

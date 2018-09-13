@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="OCR\TesseractTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTest1.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">

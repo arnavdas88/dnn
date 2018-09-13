@@ -37,6 +37,18 @@ namespace System
         }
 
         /// <summary>
+        /// Rounds the value up to a next specified multiple.
+        /// </summary>
+        /// <param name="value">The value to round.</param>
+        /// <param name="multiple">The multiple.</param>
+        /// <returns>The rounded value.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RoundUp(this int value, int multiple)
+        {
+            return (value + multiple - 1) / multiple * multiple;
+        }
+
+        /// <summary>
         /// Determines whether this instance falls within the range of specified 32-bit signed integers.
         /// </summary>
         /// <param name="value">This instance value.</param>

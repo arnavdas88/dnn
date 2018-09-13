@@ -72,16 +72,16 @@ namespace Genix.DocumentAnalysis
 
             // close up small holes
             int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-            Image closedImage = Image.Close(image, StructuringElement.Square(maxLineWidth / 3), 1);
+            Image closedImage = Image.MorphClose(image, StructuringElement.Square(maxLineWidth / 3), 1);
 
             // open up to detect big solid areas
-            Image openedImage = Image.Open(image, StructuringElement.Square(maxLineWidth), 1);
+            Image openedImage = Image.MorphOpen(image, StructuringElement.Square(maxLineWidth), 1);
             Image hollowImage = Image.Sub(closedImage, openedImage, 0);
 
             // open up in both directions to find lines
             int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-            Image hlines = Image.Open(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
-            Image vlines = Image.Open(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
+            Image hlines = Image.MorphOpen(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
+            Image vlines = Image.MorphOpen(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
 
             // check for line presence
             if (hlines.IsAllWhite())

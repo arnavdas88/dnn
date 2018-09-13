@@ -270,7 +270,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void Open(StructuringElement kernel, int iterations)
+        public void MorphOpen(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
@@ -284,7 +284,7 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void Close(StructuringElement kernel, int iterations)
+        public void MorphClose(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {

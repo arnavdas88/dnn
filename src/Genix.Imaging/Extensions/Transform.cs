@@ -266,16 +266,27 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The source <see cref="Image"/>.</param>
         /// <returns>
-        /// The aligned <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>.
         /// </exception>
+        /// <exception cref="NotImplementedException">
+        /// <see cref="Image{T}.BitsPerPixel"/> is not one.
+        /// </exception>
+        /// <remarks>
+        /// <para>This method works with binary (1bpp) images only.</para>
+        /// </remarks>
         public static Image Deskew(Image image)
         {
             if (image == null)
             {
                 throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
             int width = image.Width;

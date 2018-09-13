@@ -18,18 +18,6 @@ namespace Genix.Core
     public static class Mathematics
     {
         /// <summary>
-        /// Rounds the value up to a next specified multiple.
-        /// </summary>
-        /// <param name="value">The value to round.</param>
-        /// <param name="multiple">The multiple.</param>
-        /// <returns>The rounded value.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int RoundUp(int value, int multiple)
-        {
-            return (value + multiple - 1) / multiple * multiple;
-        }
-
-        /// <summary>
         /// Adds a range of values from one array starting at the specified source index
         /// to another array starting at the specified destination index
         /// if values in mask arrays match.

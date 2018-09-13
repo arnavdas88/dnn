@@ -17,6 +17,7 @@ namespace Genix.Imaging
     using System.Runtime.ExceptionServices;
     using System.Windows.Media.Imaging;
     using System.Windows.Threading;
+    using Genix.Core;
 
     /// <content>
     /// Provides file opening for the <see cref="Image"/> class.
@@ -214,6 +215,9 @@ namespace Genix.Imaging
 
         internal static Image OnLoaded(Image image, ImageMetadata metadata, IList<Color> palette)
         {
+            // try to fix invalid image resolution
+            FixResolution();
+
             // apply orientation
             ApplyOrientation();
 
@@ -246,7 +250,35 @@ namespace Genix.Imaging
 
             return image;
 
-            // internal methods
+            // private methods
+            void FixResolution()
+            {
+                (float w, float h)[] standardResolutions = new (float, float)[]
+                {
+                    (8.5f, 11.0f),  // letter
+                    (8.5f, 14.0f),  // legal
+                    (7.75f, 10.5f),  // W-2
+                };
+
+                // some scanners do not set correct resolution tags and leave them to 72 dpi
+                if (image.HorizontalResolution == 72 && image.VerticalResolution == 72)
+                {
+                    // calculate width to height ratio
+                    float[] ratios = new float[standardResolutions.Length];
+                    for (int i = 0, ii = standardResolutions.Length; i < ii; i++)
+                    {
+                        ratios[i] = Math.Abs(1.0f - (((float)image.Width / standardResolutions[i].w) / ((float)image.Height / standardResolutions[i].h)));
+                    }
+
+                    int argmin = Vectors.ArgMin(ratios.Length, ratios, 0);
+                    if (ratios[argmin] < 0.1f)
+                    {
+                        int res = (int)((((float)image.Width / standardResolutions[argmin].w) + ((float)image.Height / standardResolutions[argmin].h)) / 2);
+                        image.SetResolution(res, res);
+                    }
+                }
+            }
+
             void ApplyOrientation()
             {
                 // change image orientation to top-left

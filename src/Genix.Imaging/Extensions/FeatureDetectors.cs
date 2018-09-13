@@ -201,7 +201,7 @@ namespace Genix.Imaging
                 {
                     int kernelSize = cellSize * blockSize;
                     int kernelStride = cellSize * blockStride;
-                    return Mathematics.RoundUp(Core.MinMax.Max(size - kernelSize, 0), kernelStride) + kernelSize;
+                    return Core.MinMax.Max(size - kernelSize, 0).RoundUp(kernelStride) + kernelSize;
                 }
             }
 

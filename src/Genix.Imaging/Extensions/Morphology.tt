@@ -30,8 +30,8 @@ namespace Genix.Imaging
     {
         Tuple.Create("Dilate", "Dilates the <see cref=\"Image\"/> by using the specified structuring element."),
         Tuple.Create("Erode", "Erodes the <see cref=\"Image\"/> by using the specified structuring element."),
-        Tuple.Create("Open", "Perform morphological opening operation on the <see cref=\"Image\"/> by using the specified structuring element."),
-        Tuple.Create("Close", "Perform morphological closing operation on the <see cref=\"Image\"/> by using the specified structuring element."),
+        Tuple.Create("MorphOpen", "Perform morphological opening operation on the <see cref=\"Image\"/> by using the specified structuring element."),
+        Tuple.Create("MorphClose", "Perform morphological closing operation on the <see cref=\"Image\"/> by using the specified structuring element."),
     };
 
     foreach (Tuple<string, string> func in sefuncs)
