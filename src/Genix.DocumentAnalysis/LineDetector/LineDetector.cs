@@ -39,14 +39,13 @@ namespace Genix.DocumentAnalysis
         private const int MaxLineResidue = 6;
 
         /// <summary>
-        /// Finds and removes lines from the <see cref="Image"/>.
+        /// Finds the horizontal and vertical lines on the <see cref="Image"/>.
         /// The type of lines to find is determined by the <c>options</c> parameter.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to find the lines on.</param>
+        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="options">The parameters of this method.</param>
-        /// <param name="lines">The detected lines.</param>
         /// <returns>
-        /// The <see cref="Image"/> with lines removed.
+        /// The detected lines.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <c>image</c> is <b>null</b>.
@@ -57,7 +56,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static Image FindAndRemoveLines(Image image, LineDetectionOptions options, out IList<LineShape> lines)
+        public static ISet<ConnectedComponent> FindLines(Image image, LineDetectionOptions options)
         {
             if (image == null)
             {
@@ -69,8 +68,7 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            Image cleanedImage = null;
-            lines = new List<LineShape>();
+            HashSet<ConnectedComponent> result = new HashSet<ConnectedComponent>();
 
             // close up small holes
             int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
@@ -78,72 +76,77 @@ namespace Genix.DocumentAnalysis
 
             // open up to detect big solid areas
             Image openedImage = Image.Open(image, StructuringElement.Square(maxLineWidth), 1);
-            Image hollowImage = closedImage.Sub(openedImage, 0);
+            Image hollowImage = Image.Sub(closedImage, openedImage, 0);
 
             // open up in both directions to find lines
             int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-            Image hlinesImage = Image.Open(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
-            Image vlinesImage = Image.Open(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
+            Image hlines = Image.Open(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
+            Image vlines = Image.Open(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
 
             // check for line presence
-            bool hasHLines = !hlinesImage.IsAllWhite();
-            bool hasVLines = !vlinesImage.IsAllWhite();
-            if (!hasHLines && !hasVLines)
+            if (hlines.IsAllWhite())
             {
-                // return the original image
-                return image;
+                hlines = null;
             }
 
-            // create image that has no lines
-            Image noLinesImage = hasVLines ? image.Sub(vlinesImage, 0) : null;
-            if (hasHLines)
+            if (vlines.IsAllWhite())
             {
-                if (noLinesImage != null)
-                {
-                    noLinesImage.SubIP(hlinesImage, 0);
-                }
-                else
-                {
-                    noLinesImage = image.Sub(hlinesImage, 0);
-                }
+                vlines = null;
             }
 
-            // find intersections
-            Image hvlinesItersectionsImage = hasHLines && hasVLines ? hlinesImage.And(vlinesImage) : null;
+            // various working images
+            Image nonLines = null;
+            Image itersections = null;
+            Image nonHLinesExtra = null;
 
             // vertical lines
-            if (hasVLines)
+            if (vlines != null)
             {
-                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image nonVLinesImage = Image.Erode(noLinesImage, StructuringElement.Rectangle(maxLineResidue, 1), 1);
-                nonVLinesImage.FloodFill(noLinesImage);
-
-                if (hasHLines)
+                nonLines = Image.Sub(image, vlines, 0);
+                if (hlines != null)
                 {
-                    nonVLinesImage.AddIP(hlinesImage, 0);
-                    nonVLinesImage.SubIP(hvlinesItersectionsImage, 0);
+                    nonLines.Sub(hlines, 0);
+                    itersections = Image.And(hlines, vlines);
+                    nonHLinesExtra = Image.Sub(vlines, itersections, 0);
                 }
 
-                FilterFalsePositives(vlinesImage, nonVLinesImage, hvlinesItersectionsImage);
+                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                Image nonVLines = Image.Erode(nonLines, StructuringElement.Rectangle(maxLineResidue, 1), 1);
+
+                nonVLines.FloodFill(nonLines);
+
+                if (hlines != null)
+                {
+                    nonVLines.Add(hlines, 0);
+                    nonVLines.Sub(itersections, 0);
+                }
+
+                result.UnionWith(FilterLines(vlines, true));
             }
 
             // horizontal lines
-            if (hasHLines)
+            if (hlines != null)
             {
-                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image nonHLinesImage = Image.Erode(noLinesImage, StructuringElement.Rectangle(1, maxLineResidue), 1);
-                nonHLinesImage.FloodFill(noLinesImage);
-
-                if (hasVLines)
+                if (nonLines == null)
                 {
-                    nonHLinesImage.AddIP(vlinesImage, 0);
-                    nonHLinesImage.SubIP(hvlinesItersectionsImage, 0);
+                    nonLines = Image.Sub(image, hlines, 0);
                 }
 
-                FilterFalsePositives(hlinesImage, nonHLinesImage, hvlinesItersectionsImage);
+                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                Image nonHLines = Image.Erode(nonLines, StructuringElement.Rectangle(1, maxLineResidue), 1);
+
+                nonHLines.FloodFill(nonLines);
+
+                if (nonHLinesExtra != null)
+                {
+                    nonHLines.Or(nonHLinesExtra);
+                }
+
+                result.UnionWith(FilterLines(hlines, false));
             }
 
-            Image res = image.Sub(hlinesImage, 0).Sub(vlinesImage, 0);
+            /*Image res = Image.Sub(image, hlines, 0);
+            res.Sub(vlines, 0);
 
             // find horizontal lines
             if (options.Types.HasFlag(LineTypes.Horizontal))
@@ -156,7 +159,7 @@ namespace Genix.DocumentAnalysis
                 workImage.Dilate(StructuringElement.Square(1 + (2 * DilationSize)), 1);
 
                 // find line components and filter out non-line components
-                /*int*/ minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
+                minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
                 List<ConnectedComponent> components = workImage.FindConnectedComponents()
                                                                .Where(x => x.Bounds.Width >= minLineLength)
                                                                .ToList();
@@ -165,7 +168,7 @@ namespace Genix.DocumentAnalysis
                 foreach (ConnectedComponent component in components)
                 {
                     int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
-                    lines.Add(new LineShape(
+                    lineShapes.Add(new LineShape(
                         new Point(component.Bounds.Left, y),
                         new Point(component.Bounds.Right, y),
                         MinMax.Max(1, component.Bounds.Height - (2 * DilationSize)),
@@ -180,7 +183,7 @@ namespace Genix.DocumentAnalysis
                     workImage.HorizontalResolution,
                     workImage.VerticalResolution);
                 mask.AddConnectedComponents(components);
-                mask.AndIP(image);
+                mask.And(image);
 
                 // apply mask
                 cleanedImage = image ^ mask;
@@ -188,16 +191,43 @@ namespace Genix.DocumentAnalysis
                 // dilate vertically to close gaps in vertical lines opened by lines removal
                 cleanedImage.Dilate(StructuringElement.Rectangle(1, 7), 1);
                 cleanedImage = cleanedImage & image;
-            }
+            }*/
 
-            return cleanedImage ?? image.Copy();
+            return result;
 
-            void FilterFalsePositives(Image linesImage, Image nonLinesImage, Image intersectionsImage)
+            IEnumerable<ConnectedComponent> FilterLines(Image lines, bool vertical)
             {
-                ISet<ConnectedComponent> components = linesImage.FindConnectedComponents();
+                ISet<ConnectedComponent> components = lines.FindConnectedComponents();
+
                 foreach (ConnectedComponent component in components)
                 {
                     Rectangle bounds = component.Bounds;
+                    bool isBad = false;
+
+                    if (isBad)
+                    {
+                        lines.SetWhite(bounds);
+                    }
+                    else
+                    {
+                        yield return component;
+                        /*if (vertical)
+                        {
+                            yield return new LineShape(
+                                new Point(bounds.X + (bounds.Width / 2), bounds.Y),
+                                new Point(bounds.X + (bounds.Width / 2), bounds.Bottom),
+                                bounds.Width,
+                                LineTypes.Vertical);
+                        }
+                        else
+                        {
+                            yield return new LineShape(
+                                new Point(bounds.X, bounds.Y + (bounds.Height / 2)),
+                                new Point(bounds.Right, bounds.Y + (bounds.Height / 2)),
+                                bounds.Height,
+                                LineTypes.Horizontal);
+                        }*/
+                    }
                 }
             }
         }

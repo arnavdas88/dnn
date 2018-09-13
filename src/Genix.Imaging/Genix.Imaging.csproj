@@ -62,6 +62,11 @@
     <Compile Include="Encoders\ImageEncoder.cs" />
     <Compile Include="Encoders\TiffEncoder.cs" />
     <Compile Include="Extensions\Arithmetic.cs" />
+    <Compile Include="Extensions\Arithmetic.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Arithmetic.tt</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\CrossStructuringElement.cs" />
@@ -162,6 +167,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Extensions\Arithmetic.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Arithmetic.Generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Extensions\Edit.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Edit.Generated.cs</LastGenOutput>
