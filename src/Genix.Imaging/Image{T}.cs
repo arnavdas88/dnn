@@ -45,6 +45,16 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
             }
 
+            if (horizontalResolution <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidHorizontalResolution, nameof(horizontalResolution));
+            }
+
+            if (verticalResolution <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidVerticalResolution, nameof(verticalResolution));
+            }
+
             this.Width = width;
             this.Height = height;
             this.BitsPerPixel = bitsPerPixel;

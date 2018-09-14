@@ -101,7 +101,16 @@
     <Compile Include="Lab\TestImage.cs" />
     <Compile Include="Lab\TestImageProvider.cs" />
     <Compile Include="Lab\DirectoryDataProvider.cs" />
+    <Compile Include="Leptonica\Box.cs" />
+    <Compile Include="Leptonica\Boxa.cs" />
+    <Compile Include="Leptonica\NativeMethods.cs" />
     <Compile Include="Leptonica\Pix.cs" />
+    <Compile Include="Leptonica\Pixa.cs" />
+    <Compile Include="Leptonica\SafeHandles.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SafeHandles.tt</DependentUpon>
+    </Compile>
     <Compile Include="Metadata\EXIF\EXIFExposureProgram.cs" />
     <Compile Include="Metadata\EXIF\EXIFField.cs" />
     <Compile Include="Metadata\EXIF\EXIFFieldAttribute.cs" />
@@ -121,7 +130,6 @@
     <Compile Include="OpenSave\ImageOpen.cs" />
     <Compile Include="OpenSave\ImageSave.cs" />
     <Compile Include="Image{T}.cs" />
-    <Compile Include="Leptonica\LeptonicaUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
@@ -182,6 +190,10 @@
     <Content Include="Extensions\Morphology.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Morphology.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Leptonica\SafeHandles.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SafeHandles.Generated.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

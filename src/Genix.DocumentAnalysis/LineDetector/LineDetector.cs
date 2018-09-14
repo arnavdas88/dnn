@@ -12,6 +12,7 @@ namespace Genix.DocumentAnalysis
     using Genix.Core;
     using Genix.Drawing;
     using Genix.Imaging;
+    using Genix.Imaging.Leptonica;
 
     /// <summary>
     /// Detects and removes vertical and horizontal lines.
@@ -37,6 +38,22 @@ namespace Genix.DocumentAnalysis
         /// but are nevertheless part of the line.
         /// </remarks>
         private const int MaxLineResidue = 6;
+
+        /// <summary>
+        /// The minimum line thickness, in pixels, for images with resolution 200 dpi.
+        /// </summary>
+        private const int MinThickLineWidth = 12;
+
+        /// <summary>
+        /// The minimum length of a line segment, in pixels, for images with resolution 200 dpi,
+        /// that is thicker than <see cref="MinThickLineWidth"/>.
+        /// </summary>
+        private const int MinThickLineLength = 150;
+
+        /// <summary>
+        /// The maximum fraction of the area adjacent to line that can be occupied by pixels.
+        /// </summary>
+        private const float MaxNonLineDensity = 0.25f;
 
         /// <summary>
         /// Finds the horizontal and vertical lines on the <see cref="Image"/>.
@@ -121,7 +138,7 @@ namespace Genix.DocumentAnalysis
                     nonVLines.Sub(itersections, 0);
                 }
 
-                result.UnionWith(FilterLines(vlines, true));
+                result.UnionWith(FilterLines(vlines, nonVLines, true));
             }
 
             // horizontal lines
@@ -142,7 +159,7 @@ namespace Genix.DocumentAnalysis
                     nonHLines.Or(nonHLinesExtra);
                 }
 
-                result.UnionWith(FilterLines(hlines, false));
+                result.UnionWith(FilterLines(hlines, nonHLines, false));
             }
 
             /*Image res = Image.Sub(image, hlines, 0);
@@ -195,18 +212,81 @@ namespace Genix.DocumentAnalysis
 
             return result;
 
-            IEnumerable<ConnectedComponent> FilterLines(Image lines, bool vertical)
+            IEnumerable<ConnectedComponent> FilterLines(Image linesImage, Image nonLinesImage, bool vertical)
             {
-                ISet<ConnectedComponent> components = lines.FindConnectedComponents();
+                /*using (Pix pixLines = Pix.FromImage(lines))
+                {
+                    Pixa pixa = null;
+                    try
+                    {
+                        using (Boxa boxa = pixLines.FindConnectedComponents(8, out pixa))
+                        {
+                            for (int i = 0, ii = boxa.Count; i < ii; i++)
+                            {
+                                using (Box box = boxa[i])
+                                {
+                                    Rectangle bounds = box.GetBounds();
+                                    using (Pix pixComp = pixa[i])
+                                    {
+                                        using (Pix pixDist = pixComp.DistanceFunction(4, 8, 1))
+                                        {
+                                            pixDist.ToImage().MinMax(out byte min, out byte max);
+                                            int maxWidth = max * 2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        pixa?.Dispose();
+                    }
+                }*/
+
+                ISet<ConnectedComponent> components = linesImage.FindConnectedComponents();
+                int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(image.HorizontalResolution, 200);
+                int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(image.HorizontalResolution, 200);
 
                 foreach (ConnectedComponent component in components)
                 {
                     Rectangle bounds = component.Bounds;
+                    Image comp = component.ToImage();
+
+                    // calculate maximum component width as twice the maximum distance between its points and the background
+                    int maxWidth;
+                    using (Pix pixComp = Pix.FromImage(comp))
+                    {
+                        using (Pix pixDist = pixComp.DistanceFunction(4, 8, 1))
+                        {
+                            pixDist.ToImage().MinMax(out byte min, out byte max);
+                            maxWidth = max * 2;
+                        }
+                    }
+
                     bool isBad = false;
+
+                    if (bounds.Width.InRange(minThickLineWidth, minThickLineLength) &&
+                        bounds.Height.InRange(minThickLineWidth, minThickLineLength) &&
+                        maxWidth > minThickLineLength)
+                    {
+                        // too thick for the length
+                        isBad = true;
+                    }
+
+                    // Test density near the line
+                    if (!isBad)
+                    {
+                        long count = CountAdjacentPixels(maxWidth, bounds);
+                        if (count > bounds.Area * LineDetector.MaxNonLineDensity)
+                        {
+                            isBad = true;
+                        }
+                    }
 
                     if (isBad)
                     {
-                        lines.SetWhite(bounds);
+                        linesImage.SetWhite(bounds);
                     }
                     else
                     {
@@ -228,6 +308,24 @@ namespace Genix.DocumentAnalysis
                                 LineTypes.Horizontal);
                         }*/
                     }
+                }
+
+                long CountAdjacentPixels(int lineWidth, Rectangle bounds)
+                {
+                    if (vertical)
+                    {
+                        bounds.Inflate(lineWidth, 0);
+                    }
+                    else
+                    {
+                        bounds.Inflate(0, lineWidth);
+                    }
+
+                    bounds.Intersect(nonLines.Bounds);
+
+                    Image temp = nonLinesImage.Crop(bounds);
+
+                    return nonLinesImage.Power(bounds);
                 }
             }
         }

@@ -168,6 +168,30 @@ namespace Genix.Imaging
         public override string ToString() => this.Bounds.ToString();
 
         /// <summary>
+        /// Create the <see cref="Image"/> that contains this <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <returns>The <see cref="Image"/> this method creates.</returns>
+        public Image ToImage()
+        {
+            int left = this.bounds.X;
+            int top = this.bounds.Y;
+            int width = this.bounds.Width;
+            int height = this.bounds.Height;
+
+            Image dst = new Image(width, height, 1, 200, 200);
+
+            ulong[] bits = dst.Bits;
+            int stride1 = dst.Stride1;
+
+            foreach ((int y, int x, int length) in this.EnumStrokes())
+            {
+                BitUtils.SetBits(length, bits, ((y - top) * stride1) + x - left);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Adds a stroke to this <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <param name="y">The y-coordinate of the stroke.</param>

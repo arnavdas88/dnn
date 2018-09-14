@@ -142,11 +142,29 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The image horizontal resolution is invalid..
+        /// </summary>
+        internal static string E_InvalidHorizontalResolution {
+            get {
+                return ResourceManager.GetString("E_InvalidHorizontalResolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The image does not contain the requested property item..
         /// </summary>
         internal static string E_InvalidPropertyItem {
             get {
                 return ResourceManager.GetString("E_InvalidPropertyItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The image vertical resolution is invalid..
+        /// </summary>
+        internal static string E_InvalidVerticalResolution {
+            get {
+                return ResourceManager.GetString("E_InvalidVerticalResolution", resourceCulture);
             }
         }
         

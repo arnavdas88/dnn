@@ -84,8 +84,13 @@ namespace Genix.Imaging
         /// <returns>
         /// A new cropped <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// </exception>
         public Image Crop(int x, int y, int width, int height)
         {
+            this.ValidateArea(x, y, width, height);
+
             Image dst = new Image(width, height, this);
             Image.CopyArea(this, x, y, width, height, dst, 0, 0);
 
@@ -100,10 +105,8 @@ namespace Genix.Imaging
         /// <returns>
         /// A new cropped <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// <para><see cref="Rectangle.Width"/> is less than or equal to zero.</para>
-        /// <para>-or-</para>
-        /// <para><see cref="Rectangle.Height"/> is less than or equal to zero.</para>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image Crop(Rectangle area) => this.Crop(area.X, area.Y, area.Width, area.Height);

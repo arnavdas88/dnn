@@ -213,6 +213,14 @@ namespace Genix.Drawing
         public bool IsEmpty => this.x == 0 && this.y == 0 && this.w == 0 && this.h == 0;
 
         /// <summary>
+        /// Gets the area of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <value>
+        /// <see cref="Width"/> * <see cref="Height"/>.
+        /// </value>
+        public int Area => this.w * this.h;
+
+        /// <summary>
         /// Compares two <see cref="Rectangle"/> objects.
         /// The result specifies whether the values of the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties of the two <see cref="Rectangle"/> objects are equal.
         /// </summary>

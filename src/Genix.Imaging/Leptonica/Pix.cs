@@ -7,41 +7,15 @@
 namespace Genix.Imaging.Leptonica
 {
     using System;
-    using System.IO;
     using System.Runtime.CompilerServices;
-    using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
-    using System.Security;
-    using System.Security.Permissions;
     using Genix.Core;
 
     /// <summary>
-    /// Represents the Leptonica image.
+    /// Represents the Leptonica's Pix object.
     /// </summary>
-    public sealed class Pix : DisposableObject
+    public sealed partial class Pix : DisposableObject
     {
-        /// <summary>
-        /// The handle reference for the object.
-        /// </summary>
-        private readonly SafePixHandle handle;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Pix"/> class.
-        /// </summary>
-        /// <param name="handle">The pointer to Leptonica's <see cref="Pix"/> object.</param>
-        private Pix(SafePixHandle handle)
-        {
-            this.handle = handle;
-        }
-
-        /// <summary>
-        /// Gets the pointer to Leptonica's <see cref="Pix"/> object.
-        /// </summary>
-        /// <value>
-        /// The pointer to Leptonica's <see cref="Pix"/> object.
-        /// </value>
-        public SafeHandle Handle => this.handle;
-
         /// <summary>
         /// Creates a new Leptonica's <see cref="Pix"/> object from the <see cref="Image"/>.
         /// </summary>
@@ -69,11 +43,12 @@ namespace Genix.Imaging.Leptonica
                     {
                         Arrays.CopyStrides(image.Height, new IntPtr(src), image.Stride8, dst, wpl * sizeof(uint));
 
-                        BitUtils32.BiteSwap(image.Height * wpl, dst);
+                        int count = image.Height * wpl;
+                        BitUtils32.BiteSwap(count, dst);
 
                         if (image.BitsPerPixel < 8)
                         {
-                            BitUtils32.BitSwap(image.Height * wpl, image.BitsPerPixel, dst);
+                            BitUtils32.BitSwap(count, image.BitsPerPixel, dst);
                         }
                     }
                 }
@@ -143,19 +118,21 @@ namespace Genix.Imaging.Leptonica
             IntPtr src = NativeMethods.pixGetData(this.handle);
             int wpl = NativeMethods.pixGetWpl(this.handle);
 
-            Image image = new Image(w, h, d, xres, yres);
+            Image image = new Image(w, h, d, xres == 0 ? 200 : xres, yres == 0 ? 200 : yres);
 
             unsafe
             {
-                fixed (ulong* dst = image.Bits)
+                fixed (ulong* bits = image.Bits)
                 {
-                    Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), new IntPtr(dst), image.Stride8);
+                    IntPtr dst = new IntPtr(bits);
+                    Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), dst, image.Stride8);
 
-                    BitUtils.BiteSwap(image.Bits.Length, image.Bits, 0);
+                    int count = image.Bits.Length * 2; // work with 32-bit words
+                    BitUtils32.BiteSwap(count, dst);
 
                     if (image.BitsPerPixel < 8)
                     {
-                        BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                        BitUtils32.BitSwap(count, image.BitsPerPixel, dst);
                     }
                 }
             }
@@ -170,7 +147,6 @@ namespace Genix.Imaging.Leptonica
         /// <returns>
         /// A new binary <see cref="Pix"/>.
         /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Pix BinarizeOtsu(bool adaptiveThreshold)
         {
             NativeMethods.pixGetDimensions(this.handle, out int w, out int h, out int d);
@@ -214,105 +190,47 @@ namespace Genix.Imaging.Leptonica
             return new Pix(pixd);
         }
 
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
+        /// <summary>
+        /// Finds connected components on this <see cref="Pix"/>.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <returns>
+        /// The <see cref="Boxa"/> that contains bounding boxes for found c.c.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Boxa FindConnectedComponents(int connectivity)
         {
-            this.handle?.Dispose();
-        }
-
-        [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
-        {
-            private const string DllName = "Genix.Leptonica.Native.dll";
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void lept_free(IntPtr ptr);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern SafePixHandle pixCreate(int width, int height, int depth);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-            public static extern void pixDestroy(ref IntPtr ppix);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixSetResolution(SafePixHandle pix, int xres, int yres);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixGetResolution(SafePixHandle pix, out int xres, out int yres);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr pixGetData(SafePixHandle pix);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixGetWpl(SafePixHandle pix);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixGetDimensions(SafePixHandle pix, out int w, out int h, out int d);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixOtsuAdaptiveThreshold(SafePixHandle pix, int sx, int sy, int smoothx, int smoothy, float scorefract, out SafePixHandle pixth, out SafePixHandle pixd);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern SafePixHandle pixOtsuThreshOnBackgroundNorm(SafePixHandle pix, SafePixHandle pixim, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy, float scorefract, out int pthresh);
-
-            [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int pixWriteMemBmp(out IntPtr fdata, out IntPtr fsize, SafePixHandle pix);
+            SafeBoxaHandle boxaHandle = NativeMethods.pixConnComp(this.handle, out SafePixaHandle pixaHandle, connectivity);
+            pixaHandle?.Dispose();
+            return boxaHandle.IsInvalid ? null : new Boxa(boxaHandle);
         }
 
         /// <summary>
-        /// Represents a wrapper class for the Leptonica's <see cref="Pix"/> object.
+        /// Finds connected components on this <see cref="Pix"/>.
         /// </summary>
-        private sealed class SafePixHandle : SafeHandle
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="pixa">The <see cref="Boxa"/> that contains c.c. images.</param>
+        /// <returns>
+        /// The <see cref="Boxa"/> that contains bounding boxes for found c.c.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Boxa FindConnectedComponents(int connectivity, out Pixa pixa)
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SafePixHandle"/> class.
-            /// </summary>
-            [SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
-            [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
-            public SafePixHandle()
-                : this(IntPtr.Zero, true)
-            {
-            }
+            SafeBoxaHandle boxaHandle = NativeMethods.pixConnComp(this.handle, out SafePixaHandle pixaHandle, connectivity);
+            pixa = pixaHandle.IsInvalid ? null : new Pixa(pixaHandle);
+            return boxaHandle.IsInvalid ? null : new Boxa(boxaHandle);
+        }
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SafePixHandle"/> class.
-            /// </summary>
-            /// <param name="preexistingHandle">An object that represents the pre-existing handle to use.</param>
-            [SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
-            [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
-            public SafePixHandle(IntPtr preexistingHandle)
-                : this(preexistingHandle, true)
-            {
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SafePixHandle"/> class.
-            /// </summary>
-            /// <param name="preexistingHandle">An object that represents the pre-existing handle to use.</param>
-            /// <param name="ownsHandle"><b>true</b> to reliably release the handle during the finalization phase; <b>false</b> to prevent reliable release (not recommended).</param>
-            [SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
-            [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
-            public SafePixHandle(IntPtr preexistingHandle, bool ownsHandle)
-                : base(IntPtr.Zero, ownsHandle)
-            {
-                this.SetHandle(preexistingHandle);
-            }
-
-            /// <inheritdoc />
-            public override bool IsInvalid => this.handle == IntPtr.Zero;
-
-            /// <inheritdoc />
-            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-            protected override bool ReleaseHandle()
-            {
-                // Here, we must obey all rules for constrained execution regions.
-                // If ReleaseHandle failed, it can be reported via the "releaseHandleFailed" managed debugging assistant (MDA).
-                // This MDA is disabled by default, but can be enabled in a debugger or during testing to diagnose handle corruption problems.
-                // We do not throw an exception because most code could not recover from the problem.
-                NativeMethods.pixDestroy(ref this.handle);
-                return true;
-            }
+        /// <summary>
+        /// Computes the distance of each pixel from the nearest background pixel.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="outdepth">The depth of destination <see cref="Image"/> (8 or 16).</param>
+        /// <param name="boundcond">The boundary conditions (1 for L_BOUNDARY_BG, 2, for L_BOUNDARY_FG).</param>
+        /// <returns>The destination <see cref="Pix"/> this method creates.</returns>
+        public Pix DistanceFunction(int connectivity, int outdepth, int boundcond)
+        {
+            return new Pix(NativeMethods.pixDistanceFunction(this.handle, connectivity, outdepth, boundcond));
         }
     }
 }
