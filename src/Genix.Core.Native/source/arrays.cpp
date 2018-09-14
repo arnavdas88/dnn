@@ -45,33 +45,35 @@ GENIXAPI(void, copy_u64)(int n, const unsigned __int64* x, int offx, unsigned __
 GENIXAPI(void, copy_f32)(int n, const float* x, int offx, float* y, int offy) { __copy(n, x, offx, y, offy); }
 GENIXAPI(void, copy_f64)(int n, const double* x, int offx, double* y, int offy) { __copy(n, x, offx, y, offy); }
 
-extern "C" __declspec(dllexport) void WINAPI scopy_inc(
+// copy arrays with increment
+template<typename T> void __forceinline __copy_inc(
 	int n,
-	const float* x, int offx, int incx,
-	float* y, int offy, int incy)
+	const T* x, int offx, int incx,
+	T* y, int offy, int incy)
 {
-	x += offx;
-	y += offy;
-
-	if (n <= 64)
+	if (incx == 1 && incy == 1)
 	{
-		if (incx == 1 && incy == 1)
-		{
-			::memcpy(y, x, n * sizeof(float));
-		}
-		else
-		{
-			for (int i = 0, xi = 0, yi = 0; i < n; i++, xi += incx, yi += incy)
-			{
-				y[yi] = x[xi];
-			}
-		}
+		__copy(n, x, offx, y, offy);
 	}
 	else
 	{
-		::cblas_scopy(n, x, incx, y, incy);
+		for (int i = 0; i < n; i++, offx += incx, offy += incy)
+		{
+			y[offy] = x[offx];
+		}
 	}
 }
+
+GENIXAPI(void, copy_inc_s8)(int n, const __int8* x, int offx, int incx, __int8* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_s16)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_u16)(int n, const unsigned __int16* x, int offx, int incx, unsigned  __int16* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_u32)(int n, const unsigned __int32* x, int offx, int incx, unsigned __int32* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, copy_inc_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __copy_inc(n, x, offx, incx, y, offy, incy); }
 
 GENIXAPI(void, copy_strides_s8)(int nstrides, const __int8* x, int stridex, __int8* y, int stridey)
 {

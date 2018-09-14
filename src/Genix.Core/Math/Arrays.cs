@@ -53,25 +53,6 @@ namespace Genix.Core
         public static bool Equals(int length, char[] x, int offx, char[] y, int offy) => NativeMethods.compare_s16(length, x, offx, y, offy) == 0;
 
         /// <summary>
-        /// Copies a range of values from a array starting at the specified source index to another array starting at the specified destination index.
-        /// </summary>
-        /// <param name="length">The number of elements to copy.</param>
-        /// <param name="x">The array that contains the data to copy.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which copying begins.</param>
-        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which copying begins.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "length-1", Justification = "Done in debug mode only.")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Copy(int length, float[] x, int offx, int incx, float[] y, int offy, int incy)
-        {
-            Debug.Assert(x.Length > offx + ((length - 1) * incx), "The source array should be big enough.");
-            Debug.Assert(y.Length > offy + ((length - 1) * incy), "The destination array should be big enough.");
-            NativeMethods.scopy_inc(length, x, offx, incx, y, offy, incy);
-        }
-
-        /// <summary>
         /// Copies values from source pointer to destination pointer in strides.
         /// </summary>
         /// <param name="count">The number of strides to copy.</param>
@@ -187,9 +168,6 @@ namespace Genix.Core
 
             /*[DllImport(NativeMethods.DllName, CharSet = CharSet.Unicode)]
             public static extern void copy_s16(int n, [In] char[] x, int offx, [Out] char[] y, int offy);*/
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void scopy_inc(int n, [In] float[] x, int offx, int incx, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void copy_strides_s8(int nstrides, IntPtr x, int stridex, IntPtr y, int stridey);
