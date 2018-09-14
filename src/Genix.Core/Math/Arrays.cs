@@ -177,86 +177,6 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Sort(int length, float[] x, int offx, int[] y, int offy, bool ascending) => NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
 
-        /// <summary>
-        /// Performs logical OR operation on three 32-bits arrays element-wise not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] y, int offy)
-        {
-            NativeMethods.or3_u32(length, a, offa, b, offb, c, offc, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical OR operation on four 32-bits arrays element-wise not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
-        /// <param name="d">The fourth source array.</param>
-        /// <param name="offd">The starting element position in <paramref name="d"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, uint[] a, int offa, uint[] b, int offb, uint[] c, int offc, uint[] d, int offd, uint[] y, int offy)
-        {
-            NativeMethods.or4_u32(length, a, offa, b, offb, c, offc, d, offd, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical OR operation on three 64-bits arrays element-wise not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] y, int offy)
-        {
-            NativeMethods.or3_u64(length, a, offa, b, offb, c, offc, y, offy);
-        }
-
-        /// <summary>
-        /// Performs logical OR operation on four 64-bits arrays element-wise not-in-pace.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
-        /// <param name="c">The third source array.</param>
-        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
-        /// <param name="d">The fourth source array.</param>
-        /// <param name="offd">The starting element position in <paramref name="d"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static void Or(int length, ulong[] a, int offa, ulong[] b, int offb, ulong[] c, int offc, ulong[] d, int offd, ulong[] y, int offy)
-        {
-            NativeMethods.or4_u64(length, a, offa, b, offb, c, offc, d, offd, y, offy);
-        }
-
         [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
@@ -301,18 +221,6 @@ namespace Genix.Core
                 [In, Out] int[] y,
                 int offy,
                 [MarshalAs(UnmanagedType.Bool)] bool ascending);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or3_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or4_u32(int length, [In] uint[] a, int offa, [In] uint[] b, int offb, [In] uint[] c, int offc, [In] uint[] d, int offd, [Out] uint[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or3_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [Out] ulong[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void or4_u64(int length, [In] ulong[] a, int offa, [In] ulong[] b, int offb, [In] ulong[] c, int offc, [In] ulong[] d, int offd, [Out] ulong[] y, int offy);
         }
     }
 }

@@ -459,31 +459,39 @@ GENIXAPI(void, op##_u64)(int length, const unsigned __int64* a, int offa, const 
 	__logical<unsigned __int64, logical_##op>(length, a, offa, b, offb, y, offy); \
 }
 
+#define LOGICAL3(op) \
+GENIXAPI(void, op##3_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, const unsigned __int32* c, int offc, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, a, offa, b, offb, c, offc, y, offy); \
+} \
+GENIXAPI(void, op##3_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, const unsigned __int64* c, int offc, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, a, offa, b, offb, c, offc, y, offy); \
+}
+
+#define LOGICAL4(op) \
+GENIXAPI(void, op##4_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, const unsigned __int32* c, int offc, const unsigned __int32* d, int offd, unsigned __int32* y, int offy) \
+{ \
+	__logical<unsigned __int32, logical_##op>(length, a, offa, b, offb, c, offc, d, offd, y, offy); \
+} \
+GENIXAPI(void, op##4_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, const unsigned __int64* c, int offc, const unsigned __int64* d, int offd, unsigned __int64* y, int offy) \
+{ \
+	__logical<unsigned __int64, logical_##op>(length, a, offa, b, offb, c, offc, d, offd, y, offy); \
+}
+
+
 // Logical AND
 LOGICAL(and);
+LOGICAL3(and);
+LOGICAL4(and);
 
 // Logical XAND (A AND NOT B)
 LOGICAL(xand);
 
 // Logical OR
 LOGICAL(or);
-
-GENIXAPI(void, or3_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, const unsigned __int32* c, int offc, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_or>(length, a, offa, b, offb, c, offc, y, offy);
-}
-GENIXAPI(void, or3_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, const unsigned __int64* c, int offc, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_or>(length, a, offa, b, offb, c, offc, y, offy);
-}
-GENIXAPI(void, or4_u32)(int length, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, const unsigned __int32* c, int offc, const unsigned __int32* d, int offd, unsigned __int32* y, int offy)
-{
-	__logical<unsigned __int32, logical_or>(length, a, offa, b, offb, c, offc, d, offd, y, offy);
-}
-GENIXAPI(void, or4_u64)(int length, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, const unsigned __int64* c, int offc, const unsigned __int64* d, int offd, unsigned __int64* y, int offy)
-{
-	__logical<unsigned __int64, logical_or>(length, a, offa, b, offb, c, offc, d, offd, y, offy);
-}
+LOGICAL3(or);
+LOGICAL4(or);
 
 // Logical XOR
 LOGICAL(xor);

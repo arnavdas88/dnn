@@ -287,6 +287,24 @@
         },
         new MethodDescriptor()
         {
+            Name = "Or",
+            NativeName = "or3",
+            Argument = ArgumentType.ThreeVectors,
+            Summary = "Performs logical OR operation between elements of three arrays of {0}",
+            Op = "y = a | b | c",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Or",
+            NativeName = "or4",
+            Argument = ArgumentType.FourVectors,
+            Summary = "Performs logical OR operation between elements of four arrays of {0}",
+            Op = "y = a | b | c | d",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
             Name = "AndC",
             NativeName = "andc",
             Argument = ArgumentType.ConstantAndVector,
@@ -305,6 +323,24 @@
             HasInPlace = true,
             Op = "y = a &amp; b",
             OpInPlace = "y &amp;= x",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "And",
+            NativeName = "and3",
+            Argument = ArgumentType.ThreeVectors,
+            Summary = "Performs logical AND operation between elements of three arrays of {0}",
+            Op = "y = a &amp; b &amp; c",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "And",
+            NativeName = "and4",
+            Argument = ArgumentType.FourVectors,
+            Summary = "Performs logical AND operation between elements of four arrays of {0}",
+            Op = "y = a &amp; b &amp; c &amp; d",
             SupportedTypes = "uint;ulong",
         },
         new MethodDescriptor()
@@ -670,6 +706,54 @@ namespace Genix.Core
         }
 <#              }
                 break;
+            case ArgumentType.ThreeVectors:#>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] c, int offc, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, offa, b, offb, c, offc, y, offy);
+        }
+<#              break;
+            case ArgumentType.FourVectors:#>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="c">The third source array.</param>
+        /// <param name="offc">The starting element position in <paramref name="c"/>.</param>
+        /// <param name="d">The fourth source array.</param>
+        /// <param name="offd">The starting element position in <paramref name="d"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] c, int offc, <#=typeName#>[] d, int offd, <#=typeName#>[] y, int offy)
+        {
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, offa, b, offb, c, offc, d, offd, y, offy);
+        }
+<#               break;
         }
     } 
 #>
@@ -1082,6 +1166,16 @@ namespace Genix.Core
             public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [Out] <#=typeName#>[] y, int offy, int incy);
 <#              }
                 break;
+            case ArgumentType.ThreeVectors:#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=typeName#>[] c, int offc, [Out] <#=typeName#>[] y, int offy);
+<#              break;
+            case ArgumentType.FourVectors:#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=typeName#>[] c, int offc, [In] <#=typeName#>[] d, int offd, [Out] <#=typeName#>[] y, int offy);
+<#              break;
         }
     } 
 #>
@@ -1143,6 +1237,8 @@ namespace Genix.Core
 		Vector = 1,
         ConstantAndVector = 2,
 		TwoVectors = 3,
+		ThreeVectors = 4,
+		FourVectors = 5,
 	}
 
 	class MethodDescriptor

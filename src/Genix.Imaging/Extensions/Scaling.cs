@@ -399,7 +399,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = image.Height / 3; i < ii; i++, offsrc += 3 * stride, offdst += stride)
             {
-                Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+                Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
             }
 
             switch (image.Height % 3)
@@ -452,7 +452,7 @@ namespace Genix.Imaging
             int offdst = 0;
             for (int i = 0, ii = image.Height / 4; i < ii; i++, offsrc += 4 * stride, offdst += stride)
             {
-                Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
+                Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitssrc, offsrc + (3 * stride), bitsdst, offdst);
             }
 
             switch (image.Height % 4)
@@ -466,7 +466,7 @@ namespace Genix.Imaging
                     break;
 
                 case 3:
-                    Arrays.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
+                    Vectors.Or(stride, bitssrc, offsrc, bitssrc, offsrc + stride, bitssrc, offsrc + (2 * stride), bitsdst, offdst);
                     break;
             }
 
