@@ -135,28 +135,34 @@ GENIXAPI(void, set_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy
 GENIXAPI(void, set_f32)(int n, float a, float* y, int offy) { __set(n, a, y, offy); }
 GENIXAPI(void, set_f64)(int n, double a, double* y, int offy) { __set(n, a, y, offy); }
 
-extern "C" __declspec(dllexport) void WINAPI sset_inc(
+template<typename T> void __forceinline __set_inc(
 	int n,
-	float a,
-	float* y, int offy, int incy)
+	T a,
+	T* y, int offy, int incy)
 {
-	y += offy;
-
 	if (incy == 1)
 	{
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = a;
-		}
+		__set(n, a, y, offy);
 	}
 	else
 	{
-		for (int i = 0; i < n; i++, y += incy)
+		for (int i = 0; i < n; i++, offy += incy)
 		{
-			*y = a;
+			y[offy] = a;
 		}
 	}
 }
+
+GENIXAPI(void, set_inc_s8)(int n, __int8 a, __int8* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_s16)(int n, __int16 a, __int16* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_s32)(int n, __int32 a, __int32* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_s64)(int n, __int64 a, __int64* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_u8)(int n, unsigned __int8 a, unsigned __int8* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_u16)(int n, unsigned __int16 a, unsigned __int16* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_u32)(int n, unsigned __int32 a, unsigned __int32* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_u64)(int n, unsigned __int64 a, unsigned __int64* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_f32)(int n, float a, float* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
+GENIXAPI(void, set_inc_f64)(int n, double a, double* y, int offy, int incy) { __set_inc(n, a, y, offy, offy); }
 
 extern "C" __declspec(dllexport) void WINAPI sreplace(
 	int n,

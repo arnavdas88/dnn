@@ -133,6 +133,95 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Computes the distance from each pixel to the nearest background pixel.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="bitsPerPixel">The destination image color depth, in number of bits per pixel (8 or 16).</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> of depth <paramref name="bitsPerPixel"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>The method works on binary images only.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="bitsPerPixel"/> is neither 8 nor 16.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        public Image DistanceFunction(int connectivity, int bitsPerPixel)
+        {
+            if (this.BitsPerPixel != 1)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            if (connectivity != 4 && connectivity != 8)
+            {
+                throw new ArgumentException("The connectivity is neither 4 nor 8.");
+            }
+
+            switch (bitsPerPixel)
+            {
+                case 8:
+                    return Compute8();
+
+                case 16:
+                    return Compute16();
+
+                default:
+                    throw new ArgumentException("The destination image depth is neither 8 nor 16.");
+            }
+
+            Image Compute8()
+            {
+                Image dst = Image.Convert1To8(this, 0, 1);
+                int stride8 = dst.Stride8;
+                int count = dst.Width - 2;
+                byte[] buffer = new byte[count];
+
+                unsafe
+                {
+                    fixed (ulong* ubits = dst.Bits)
+                    {
+                        fixed (byte* buf = buffer)
+                        {
+                            // scan from upper-left to bottom-right corner
+                            byte* bits = (byte*)ubits + stride8 + 1; // position to pixel with coordinates { 1, 1 }
+                            for (int i = 1, ii = dst.Height - 1; i < ii; i++, bits += stride8)
+                            {
+                                Vectors.Min(count, bits - stride8, bits - 1, buf);
+                                Vectors.MinC(count, byte.MaxValue - 1, buf);
+                                Vectors.AddC(count, 1, buf);
+                                Vectors.Mul(count, buf, bits);  // bits are either 0 or 1
+                                ////Vectors.AddC(count, buf, 1, bits); // TODO: add to nonzero elements only
+                            }
+
+                            // scan from bottom-right to upper-left corner
+                            bits -= stride8; // position to pixel with coordinates { 1, height - 2 }
+                            for (int i = dst.Height - 2; i > 0; i--, bits -= stride8)
+                            {
+                                Vectors.Min(count, bits + stride8, bits + 1, buf);
+                                Vectors.MinC(count, byte.MaxValue - 1, buf);
+                                Vectors.AddC(count, 1, buf);
+                                Vectors.Min(count, buf, bits);
+                            }
+                        }
+                    }
+                }
+
+                return dst;
+            }
+
+            Image Compute16()
+            {
+                Image dst = Image.Convert1To16(this, 0, 1);
+                return dst;
+            }
+        }
+
+        /// <summary>
         /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>

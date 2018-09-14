@@ -171,6 +171,12 @@ namespace Genix.Imaging
         /// Create the <see cref="Image"/> that contains this <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <returns>The <see cref="Image"/> this method creates.</returns>
+        /// <remarks>
+        /// <para>
+        /// The destination image has width and height of this c.c.
+        /// The top-left corner of c.c. corresponds to the top-left corner of the image.
+        /// </para>
+        /// </remarks>
         public Image ToImage()
         {
             int left = this.bounds.X;

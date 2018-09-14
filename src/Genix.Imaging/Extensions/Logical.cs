@@ -191,33 +191,30 @@ namespace Genix.Imaging
                         throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
                     }
 
-                    int stridesrc = src.Stride8;
-                    int stridedst = this.Stride8;
+                    int stridesrc8 = src.Stride8;
+                    int stridedst8 = this.Stride8;
                     unsafe
                     {
                         fixed (ulong* pbitssrc = src.Bits, pbitsdst = this.Bits)
                         {
-                            IntPtr bitssrc = new IntPtr(pbitssrc);
-                            IntPtr bitsdst = new IntPtr(pbitsdst);
+                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * this.BitsPerPixel / 8);
+                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * this.BitsPerPixel / 8);
 
-                            bitssrc = IntPtr.Add(bitssrc, (ysrc * stridesrc) + (xsrc * this.BitsPerPixel / 8));
-                            bitsdst = IntPtr.Add(bitsdst, (y * stridedst) + (x * this.BitsPerPixel / 8));
-
-                            if (x == 0 && xsrc == 0 && stridesrc == stridedst && width == this.Width)
+                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == this.Width)
                             {
                                 // operation is performed on entire pixel line
                                 // do all lines at once
-                                Math8u.Max(stridesrc * height, bitssrc, bitsdst, bitsdst);
+                                Vectors.Max(stridesrc8 * height, bitssrc, bitsdst);
                             }
                             else
                             {
                                 int count = width * this.BitsPerPixel / 8;
                                 for (int iy = 0; iy < height; iy++)
                                 {
-                                    Math8u.Max(count, bitssrc, bitsdst, bitsdst);
+                                    Vectors.Max(count, bitssrc, bitsdst);
 
-                                    bitssrc = IntPtr.Add(bitssrc, stridesrc);
-                                    bitsdst = IntPtr.Add(bitsdst, stridedst);
+                                    bitssrc += stridesrc8;
+                                    bitsdst += stridedst8;
                                 }
                             }
                         }
@@ -360,33 +357,30 @@ namespace Genix.Imaging
                         throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
                     }
 
-                    int stridesrc = src.Stride8;
-                    int stridedst = this.Stride8;
+                    int stridesrc8 = src.Stride8;
+                    int stridedst8 = this.Stride8;
                     unsafe
                     {
                         fixed (ulong* pbitssrc = src.Bits, pbitsdst = this.Bits)
                         {
-                            IntPtr bitssrc = new IntPtr(pbitssrc);
-                            IntPtr bitsdst = new IntPtr(pbitsdst);
+                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * this.BitsPerPixel / 8);
+                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * this.BitsPerPixel / 8);
 
-                            bitssrc = IntPtr.Add(bitssrc, (ysrc * stridesrc) + (xsrc * this.BitsPerPixel / 8));
-                            bitsdst = IntPtr.Add(bitsdst, (y * stridedst) + (x * this.BitsPerPixel / 8));
-
-                            if (x == 0 && xsrc == 0 && stridesrc == stridedst && width == this.Width)
+                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == this.Width)
                             {
                                 // operation is performed on entire pixel line
                                 // do all lines at once
-                                Math8u.Min(stridesrc * height, bitssrc, bitsdst, bitsdst);
+                                Vectors.Min(stridesrc8 * height, bitssrc, bitsdst);
                             }
                             else
                             {
                                 int count = width * this.BitsPerPixel / 8;
                                 for (int iy = 0; iy < height; iy++)
                                 {
-                                    Math8u.Min(count, bitssrc, bitsdst, bitsdst);
+                                    Vectors.Min(count, bitssrc, bitsdst);
 
-                                    bitssrc = IntPtr.Add(bitssrc, stridesrc);
-                                    bitsdst = IntPtr.Add(bitsdst, stridedst);
+                                    bitssrc += stridesrc8;
+                                    bitsdst += stridedst8;
                                 }
                             }
                         }

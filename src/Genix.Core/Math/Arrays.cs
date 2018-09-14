@@ -79,17 +79,6 @@ namespace Genix.Core
          }*/
 
         /// <summary>
-        /// Sets values in the array starting at the specified source index to the specified value.
-        /// </summary>
-        /// <param name="length">The number of elements to set.</param>
-        /// <param name="value">The value to set.</param>
-        /// <param name="y">The array that receives the data.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
-        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Set(int length, float value, float[] y, int offy, int incy) => NativeMethods.sset_inc(length, value, y, offy, incy);
-
-        /// <summary>
         /// Copies elements of an array to another array with unit increment.
         /// </summary>
         /// <param name="length">The number of elements to copy.</param>
@@ -171,9 +160,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void copy_strides_s8(int nstrides, IntPtr x, int stridex, IntPtr y, int stridey);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void sset_inc(int n, float a, [Out] float[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sreplace(int n, [In] float[] x, int offx, float oldValue, float newValue, [Out] float[] y, int offy);

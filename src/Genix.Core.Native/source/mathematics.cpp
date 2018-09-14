@@ -300,7 +300,7 @@ template<typename T, T OP(T, T)> void __forceinline __op_inc_ip(int n, const T* 
 
 #define OP_IP(op) \
 GENIXAPI(void, op##_ip_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __op_ip<__int8, op>(n, x, offx, y, offy); } \
-GENIXAPI(void, op##_ip_s18)(int n, const __int16* x, int offx, __int16* y, int offy) { __op_ip<__int16, op>(n, x, offx, y, offy); } \
+GENIXAPI(void, op##_ip_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __op_ip<__int16, op>(n, x, offx, y, offy); } \
 GENIXAPI(void, op##_ip_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __op_ip<__int32, op>(n, x, offx, y, offy); } \
 GENIXAPI(void, op##_ip_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __op_ip<__int64, op>(n, x, offx, y, offy); } \
 GENIXAPI(void, op##_ip_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { __op_ip<unsigned __int8, op>(n, x, offx, y, offy); } \
@@ -311,7 +311,7 @@ GENIXAPI(void, op##_ip_f32)(int n, const float* x, int offx, float* y, int offy)
 GENIXAPI(void, op##_ip_f64)(int n, const double* x, int offx, double* y, int offy) { __op_ip<double, op>(n, x, offx, y, offy); } \
 \
 GENIXAPI(void, op##_inc_ip_s8)(int n, const __int8* x, int offx, int incx, __int8* y, int offy, int incy) { __op_inc_ip<__int8, op>(n, x, offx, incx, y, offy, incy); } \
-GENIXAPI(void, op##_inc_ip_s18)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __op_inc_ip<__int16, op>(n, x, offx, incx, y, offy, incy); } \
+GENIXAPI(void, op##_inc_ip_s16)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __op_inc_ip<__int16, op>(n, x, offx, incx, y, offy, incy); } \
 GENIXAPI(void, op##_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __op_inc_ip<__int32, op>(n, x, offx, incx, y, offy, incy); } \
 GENIXAPI(void, op##_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __op_inc_ip<__int64, op>(n, x, offx, incx, y, offy, incy); } \
 GENIXAPI(void, op##_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8* y, int offy, int incy) { __op_inc_ip<unsigned __int8, op>(n, x, offx, incx, y, offy, incy); } \
@@ -444,8 +444,12 @@ template<typename T> void __forceinline __addproductc(
 	}
 }
 
+GENIXAPI(void, addproductc_s8)(int n, const __int8* x, int offx, __int8 a, __int8* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_s16)(int n, const __int16* x, int offx, __int16 a, __int16* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addproductc_s32)(int n, const __int32* x, int offx, __int32 a, __int32* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addproductc_s64)(int n, const __int64* x, int offx, __int64 a, __int64* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8 a, unsigned __int8* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
+GENIXAPI(void, addproductc_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16 a, unsigned __int16* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addproductc_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32 a, unsigned __int32* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addproductc_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64 a, unsigned __int64* y, int offy) { __addproductc(n, x, offx, a, y, offy); }
 GENIXAPI(void, addproductc_f32)(int n, const float* x, int offx, float a, float* y, int offy)
@@ -510,8 +514,12 @@ template<typename T> void __forceinline __addproduct(
 	}
 }
 
+GENIXAPI(void, addproduct_s8)(int n, const __int8* a, int offa, const __int8* b, int offb, __int8* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_s16)(int n, const __int16* a, int offa, const __int16* b, int offb, __int16* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, addproduct_s32)(int n, const __int32* a, int offa, const __int32* b, int offb, __int32* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, addproduct_s64)(int n, const __int64* a, int offa, const __int64* b, int offb, __int64* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_u8)(int n, const unsigned __int8* a, int offa, const unsigned __int8* b, int offb, unsigned __int8* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
+GENIXAPI(void, addproduct_u16)(int n, const unsigned __int16* a, int offa, const unsigned __int16* b, int offb, unsigned __int16* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, addproduct_u32)(int n, const unsigned __int32* a, int offa, const unsigned __int32* b, int offb, unsigned __int32* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, addproduct_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, addproduct_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { __addproduct(n, a, offa, b, offb, y, offy); }
@@ -564,8 +572,12 @@ template<typename T> void __forceinline __sqr_ip(
 	}
 }
 
+GENIXAPI(void, sqr_ip_s8)(int n, __int8* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_s16)(int n, __int16* y, int offy) { __sqr_ip(n, y, offy); }
 GENIXAPI(void, sqr_ip_s32)(int n, __int32* y, int offy) { __sqr_ip(n, y, offy); }
 GENIXAPI(void, sqr_ip_s64)(int n, __int64* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_u8)(int n, unsigned __int8* y, int offy) { __sqr_ip(n, y, offy); }
+GENIXAPI(void, sqr_ip_u16)(int n, unsigned __int16* y, int offy) { __sqr_ip(n, y, offy); }
 GENIXAPI(void, sqr_ip_u32)(int n, unsigned __int32* y, int offy) { __sqr_ip(n, y, offy); }
 GENIXAPI(void, sqr_ip_u64)(int n, unsigned __int64* y, int offy) { __sqr_ip(n, y, offy); }
 GENIXAPI(void, sqr_ip_f32)(int n, float* y, int offy)
@@ -605,8 +617,12 @@ template<typename T> void __forceinline __sqr(
 	}
 }
 
+GENIXAPI(void, sqr_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __sqr(n, x, offx, y, offy); }
 GENIXAPI(void, sqr_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __sqr(n, x, offx, y, offy); }
 GENIXAPI(void, sqr_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { __sqr(n, x, offx, y, offy); }
+GENIXAPI(void, sqr_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16* y, int offy) { __sqr(n, x, offx, y, offy); }
 GENIXAPI(void, sqr_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { __sqr(n, x, offx, y, offy); }
 GENIXAPI(void, sqr_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __sqr(n, x, offx, y, offy); }
 GENIXAPI(void, sqr_f32)(int n, const float* x, int offx, float* y, int offy)

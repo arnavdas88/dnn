@@ -83,6 +83,93 @@ GENIXAPI(int, _convert1to8)(
 	return 0;
 }
 
+GENIXAPI(int, _convert1to16)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const unsigned __int16 value0,
+	const unsigned __int16 value1)
+{
+	unsigned __int64 map[16];
+	const unsigned __int64 values[2] = { value0, value1 };
+	for (int i = 0; i < 256; i++)
+	{
+		map[i] =
+			(values[(i >> 3) & 1] << (3 * 16)) |
+			(values[(i >> 2) & 1] << (2 * 16)) |
+			(values[(i >> 1) & 1] << (1 * 16)) |
+			(values[(i >> 0) & 1] << (0 * 16));
+	}
+
+	const int width64 = width & ~63;
+	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	{
+		int offxsrc = offysrc;
+		int offxdst = offydst;
+
+		// convert 64 bits at a time (16 pixels)
+		int x = 0;
+		for (; x < width64; x += 64)
+		{
+			unsigned __int64 b = src[offxsrc++];
+			for (int i = 0; i < 64; i += 4, b >>= 4)
+			{
+				dst[offxdst++] = map[b & 15];
+			}
+		}
+
+		// convert remaining bits
+		if (x < width)
+		{
+			unsigned __int64 b = src[offxsrc];
+			for (; x < width; x += 4, b >>= 4)
+			{
+				dst[offxdst++] = map[b & 15];
+			}
+		}
+	}
+
+	return 0;
+}
+
+GENIXAPI(int, _convert1to32f)(
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	float* dst, const int stridedst,
+	const float value0,
+	const float value1)
+{
+	const int width64 = width & ~63;
+	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	{
+		int offxsrc = offysrc;
+		int offxdst = offydst;
+
+		// convert 64 bits at a time
+		int x = 0;
+		for (; x < width64; x += 64)
+		{
+			unsigned __int64 b = src[offxsrc++];
+			for (int i = 0; i < 64; i++, b >>= 1)
+			{
+				dst[offxdst++] = (b & 1) ? value1 : value0;
+			}
+		}
+
+		// convert remaining bits
+		if (x < width)
+		{
+			unsigned __int64 b = src[offxsrc];
+			for (; x < width; x++, b >>= 1)
+			{
+				dst[offxdst++] = (b & 1) ? value1 : value0;
+			}
+		}
+	}
+
+	return 0;
+}
+
 GENIXAPI(int, _convert2to8)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,

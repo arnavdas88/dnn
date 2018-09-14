@@ -16,11 +16,27 @@ template<typename T> void __forceinline __threshold_lt_ip(
 	}
 }
 
+GENIXAPI(void, threshold_lt_ip_s8)(int n, __int8 threshold, __int8 value, __int8* y, int offy)
+{
+	__threshold_lt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_lt_ip_s16)(int n, __int16 threshold, __int16 value, __int16* y, int offy)
+{
+	__threshold_lt_ip(n, threshold, value, y, offy);
+}
 GENIXAPI(void, threshold_lt_ip_s32)(int n, __int32 threshold, __int32 value, __int32* y, int offy)
 {
 	__threshold_lt_ip(n, threshold, value, y, offy);
 }
 GENIXAPI(void, threshold_lt_ip_s64)(int n, __int64 threshold, __int64 value, __int64* y, int offy)
+{
+	__threshold_lt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_lt_ip_u8)(int n, unsigned __int8 threshold, unsigned  __int8 value, unsigned __int8* y, int offy)
+{
+	__threshold_lt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_lt_ip_u16)(int n, unsigned __int16 threshold, unsigned __int16 value, unsigned __int16* y, int offy)
 {
 	__threshold_lt_ip(n, threshold, value, y, offy);
 }
@@ -56,11 +72,27 @@ template<typename T> void __forceinline __threshold_gt_ip(
 	}
 }
 
+GENIXAPI(void, threshold_gt_ip_s8)(int n, __int8 threshold, __int8 value, __int8* y, int offy)
+{
+	__threshold_gt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_gt_ip_s16)(int n, __int16 threshold, __int16 value, __int16* y, int offy)
+{
+	__threshold_gt_ip(n, threshold, value, y, offy);
+}
 GENIXAPI(void, threshold_gt_ip_s32)(int n, __int32 threshold, __int32 value, __int32* y, int offy)
 {
 	__threshold_gt_ip(n, threshold, value, y, offy);
 }
 GENIXAPI(void, threshold_gt_ip_s64)(int n, __int64 threshold, __int64 value, __int64* y, int offy)
+{
+	__threshold_gt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_gt_ip_u8)(int n, unsigned __int8 threshold, unsigned  __int8 value, unsigned __int8* y, int offy)
+{
+	__threshold_gt_ip(n, threshold, value, y, offy);
+}
+GENIXAPI(void, threshold_gt_ip_u16)(int n, unsigned __int16 threshold, unsigned __int16 value, unsigned __int16* y, int offy)
 {
 	__threshold_gt_ip(n, threshold, value, y, offy);
 }
@@ -99,11 +131,27 @@ template<typename T> void __forceinline __threshold_ltgt_ip(
 	}
 }
 
+GENIXAPI(void, threshold_ltgt_ip_s8)(int n, __int8 thresholdLT, __int8 valueLT, __int8 thresholdGT, __int8 valueGT, __int8* y, int offy)
+{
+	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
+}
+GENIXAPI(void, threshold_ltgt_ip_s16)(int n, __int16 thresholdLT, __int16 valueLT, __int16 thresholdGT, __int16 valueGT, __int16* y, int offy)
+{
+	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
+}
 GENIXAPI(void, threshold_ltgt_ip_s32)(int n, __int32 thresholdLT, __int32 valueLT, __int32 thresholdGT, __int32 valueGT, __int32* y, int offy)
 {
 	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
 }
 GENIXAPI(void, threshold_ltgt_ip_s64)(int n, __int64 thresholdLT, __int64 valueLT, __int64 thresholdGT, __int64 valueGT, __int64* y, int offy)
+{
+	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
+}
+GENIXAPI(void, threshold_ltgt_ip_u8)(int n, unsigned __int8 thresholdLT, unsigned __int8 valueLT, unsigned __int8 thresholdGT, unsigned  __int8 valueGT, unsigned __int8* y, int offy)
+{
+	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
+}
+GENIXAPI(void, threshold_ltgt_ip_u16)(int n, unsigned __int16 thresholdLT, unsigned __int16 valueLT, unsigned __int16 thresholdGT, unsigned __int16 valueGT, unsigned __int16* y, int offy)
 {
 	__threshold_ltgt_ip(n, thresholdLT, valueLT, thresholdGT, valueGT, y, offy);
 }

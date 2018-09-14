@@ -254,6 +254,9 @@ namespace Genix.DocumentAnalysis
                     Image comp = component.ToImage();
 
                     // calculate maximum component width as twice the maximum distance between its points and the background
+                    Image compDist = comp.DistanceFunction(4, 8);
+                    compDist.MinMax(out byte min1, out byte max1);
+
                     int maxWidth;
                     using (Pix pixComp = Pix.FromImage(comp))
                     {

@@ -52,6 +52,7 @@ namespace Genix.Imaging
             {
                 case 1: return ConvertTo1bpp();
                 case 8: return ConvertTo8bpp();
+                case 16: return ConvertTo16bpp();
                 case 24: return ConvertTo24bpp();
                 case 32: return ConvertTo32bpp();
 
@@ -85,6 +86,19 @@ namespace Genix.Imaging
                     case 8: return image;
                     case 24: return Image.Convert24To8(image);
                     case 32: return Image.Convert32To8(image);
+
+                    default:
+                        throw new NotImplementedException(
+                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
+                }
+            }
+
+            Image ConvertTo16bpp()
+            {
+                switch (image.BitsPerPixel)
+                {
+                    case 1: return Image.Convert1To16(image);
+                    case 16: return image;
 
                     default:
                         throw new NotImplementedException(
@@ -252,14 +266,14 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts a binary <see cref="Image"/> to gray scale.
+        /// Converts a binary <see cref="Image"/> to 8-bit gray scale image.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to convert.</param>
         /// <returns>
-        /// A new gray scale <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
-        /// A simple unpacking that uses 255 for zero pixels and 0 for one pixels.
+        /// A simple unpacking that uses 255 for zero (white) pixels and 0 for one (black) pixels.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>.
@@ -274,13 +288,13 @@ namespace Genix.Imaging
         public static Image Convert1To8(Image image) => Image.Convert1To8(image, 255, 0);
 
         /// <summary>
-        /// Converts a binary <see cref="Image"/> to gray scale.
+        /// Converts a binary <see cref="Image"/> to 8-bit gray scale image.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to convert.</param>
         /// <param name="value0">8-bit value to be used for 0s pixels.</param>
         /// <param name="value1">8-bit value to be used for 1s pixels.</param>
         /// <returns>
-        /// A new gray scale <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// A simple unpacking might use <paramref name="value0"/> = 255 and <paramref name="value1"/> = 0.
@@ -314,6 +328,162 @@ namespace Genix.Imaging
                 image.VerticalResolution);
 
             if (NativeMethods._convert1to8(
+                image.Width,
+                image.Height,
+                image.Bits,
+                image.Stride,
+                dst.Bits,
+                dst.Stride,
+                value0,
+                value1) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to 16-bit gray scale image.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to convert.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking that uses 65535 for zero (white) pixels and 0 for one (black) pixels.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Image Convert1To16(Image image) => Image.Convert1To16(image, ushort.MaxValue, 0);
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to 16-bit gray scale image.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to convert.</param>
+        /// <param name="value0">16-bit value to be used for 0s pixels.</param>
+        /// <param name="value1">16-bit value to be used for 1s pixels.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking might use <paramref name="value0"/> = 255 and <paramref name="value1"/> = 0.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [CLSCompliant(false)]
+        public static Image Convert1To16(Image image, ushort value0, ushort value1)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            Image dst = new Image(
+                image.Width,
+                image.Height,
+                8,
+                image.HorizontalResolution,
+                image.VerticalResolution);
+
+            if (NativeMethods._convert1to16(
+                image.Width,
+                image.Height,
+                image.Bits,
+                image.Stride,
+                dst.Bits,
+                dst.Stride,
+                value0,
+                value1) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to convert.</param>
+        /// <returns>
+        /// The destination <see cref="ImageF"/> this method creates.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking that uses 0.0f for zero (white) pixels and 1.0f for one (black) pixels.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ImageF Convert1To32f(Image image) => Image.Convert1To32f(image, 0, 1);
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// </summary>
+        /// <param name="image">The <see cref="Image"/> to convert.</param>
+        /// <param name="value0">8-bit value to be used for 0s pixels.</param>
+        /// <param name="value1">8-bit value to be used for 1s pixels.</param>
+        /// <returns>
+        /// The destination <see cref="ImageF"/> this method creates.
+        /// </returns>
+        /// <remarks>
+        /// A simple unpacking might use <paramref name="value0"/> = 255 and <paramref name="value1"/> = 0.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="image"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The <see cref="Image{T}.BitsPerPixel"/> is not 1.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public static ImageF Convert1To32f(Image image, float value0, float value1)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
+            if (image.BitsPerPixel != 1)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            ImageF dst = new ImageF(
+                image.Width,
+                image.Height,
+                image.HorizontalResolution,
+                image.VerticalResolution);
+
+            if (NativeMethods._convert1to32f(
                 image.Width,
                 image.Height,
                 image.Bits,
@@ -722,7 +892,12 @@ namespace Genix.Imaging
         /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
         /// </para>
         /// </remarks>
-        public static ImageF Convert8To32f(Image image, int width, int height, BorderType borderType, float borderValue)
+        public static ImageF Convert8To32f(
+            Image image,
+            int width,
+            int height,
+            BorderType borderType,
+            float borderValue)
         {
             if (image == null)
             {
@@ -993,6 +1168,28 @@ namespace Genix.Imaging
                int stridedst,
                byte value0,
                byte value1);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int _convert1to16(
+               int width,
+               int height,
+               [In] ulong[] src,
+               int stridesrc,
+               [Out] ulong[] dst,
+               int stridedst,
+               ushort value0,
+               ushort value1);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int _convert1to32f(
+               int width,
+               int height,
+               [In] ulong[] src,
+               int stridesrc,
+               [Out] float[] dst,
+               int stridedst,
+               float value0,
+               float value1);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _convert2to8(
