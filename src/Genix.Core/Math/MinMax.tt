@@ -97,6 +97,25 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Returns the larger of five <#=desc#>.
+        /// </summary>
+        /// <param name="a">The first of five <#=desc#> to compare.</param>
+        /// <param name="b">The second of five <#=desc#> to compare.</param>
+        /// <param name="c">The third of five <#=desc#> to compare.</param>
+        /// <param name="d">The forth of five <#=desc#> to compare.</param>
+        /// <param name="e">The fifth of five <#=desc#> to compare.</param>
+        /// <returns>
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <paramref name="c"/> or <paramref name="d"/> or <paramref name="e"/>, whichever is larger.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=name#> Max(<#=name#> a, <#=name#> b, <#=name#> c, <#=name#> d, <#=name#> e)
+        {
+            <#=name#> ab = MinMax.Max(a, b);
+            <#=name#> cd = MinMax.Max(c, d);
+            return MinMax.Max(ab, cd, e);
+        }
+
+        /// <summary>
         /// Returns the smaller of two <#=desc#>.
         /// </summary>
         /// <param name="a">The first of two <#=desc#> to compare.</param>
@@ -139,6 +158,25 @@ namespace Genix.Core
             <#=name#> ab = MinMax.Min(a, b);
             <#=name#> cd = MinMax.Min(c, d);
             return MinMax.Min(ab, cd);
+        }
+
+        /// <summary>
+        /// Returns the smaller of five <#=desc#>.
+        /// </summary>
+        /// <param name="a">The first of five <#=desc#> to compare.</param>
+        /// <param name="b">The second of five <#=desc#> to compare.</param>
+        /// <param name="c">The third of five <#=desc#> to compare.</param>
+        /// <param name="d">The forth of five <#=desc#> to compare.</param>
+        /// <param name="e">The fifth of five <#=desc#> to compare.</param>
+        /// <returns>
+        /// Parameter <paramref name="a"/> or <paramref name="b"/> or <paramref name="c"/> or <paramref name="d"/> or <paramref name="e"/>, whichever is smaller.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=name#> Min(<#=name#> a, <#=name#> b, <#=name#> c, <#=name#> d, <#=name#> e)
+        {
+            <#=name#> ab = MinMax.Min(a, b);
+            <#=name#> cd = MinMax.Min(c, d);
+            return MinMax.Min(ab, cd, e);
         }
 
 <#

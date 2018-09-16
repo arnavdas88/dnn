@@ -158,7 +158,7 @@ GENIXAPI(void, minmax_8bpp)(
 	unsigned __int8* min, unsigned __int8* max)
 {
 	const int stridebytes = stride * sizeof(unsigned __int64);	// 8 bytes per word
-	const Ipp8u* bits_u8 = ((const Ipp8u*)bits) + (ptrdiff_t(y) * stridebytes) + x;
+	const Ipp8u* bits_u8 = (const Ipp8u*)bits + (ptrdiff_t(y) * stridebytes) + x;
 
 	ippiMinMax_8u_C1R(
 		bits_u8,
@@ -167,3 +167,20 @@ GENIXAPI(void, minmax_8bpp)(
 		min,
 		max);
 }
+
+GENIXAPI(void, minmax_16bpp)(
+	const int x, const int y, const int width, const int height,
+	const unsigned __int64* bits, const int stride,
+	unsigned __int16* min, unsigned __int16* max)
+{
+	const int stridebytes = stride * sizeof(unsigned __int64);	// 8 bytes per word
+	const Ipp16u* bits_u16 = (const Ipp16u*)((const Ipp8u*)bits + (ptrdiff_t(y) * stridebytes)) + x;
+
+	ippiMinMax_16u_C1R(
+		bits_u16,
+		stridebytes,
+		{ width, height },
+		min,
+		max);
+}
+

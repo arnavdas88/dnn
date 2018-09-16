@@ -43,6 +43,64 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Computes the minimum of <see cref="ImageF"/> values.
+        /// </summary>
+        /// <returns>
+        /// The minimum of <see cref="ImageF"/> values.
+        /// </returns>
+        public float Min()
+        {
+            int width = this.Width;
+            int height = this.Height;
+            int stride = this.Stride;
+            float[] bits = this.Bits;
+
+            if (width == stride)
+            {
+                return Vectors.Min(stride * height, bits, 0);
+            }
+            else
+            {
+                float result = Vectors.Min(width, bits, 0);
+                for (int i = 1, off = stride; i < height; i++, off += stride)
+                {
+                    result = MinMax.Min(result, Vectors.Min(width, bits, off));
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Computes the maximum of <see cref="ImageF"/> values.
+        /// </summary>
+        /// <returns>
+        /// The maximum of <see cref="ImageF"/> values.
+        /// </returns>
+        public float Max()
+        {
+            int width = this.Width;
+            int height = this.Height;
+            int stride = this.Stride;
+            float[] bits = this.Bits;
+
+            if (width == stride)
+            {
+                return Vectors.Max(stride * height, bits, 0);
+            }
+            else
+            {
+                float result = Vectors.Max(width, bits, 0);
+                for (int i = 1, off = stride; i < height; i++, off += stride)
+                {
+                    result = MinMax.Max(result, Vectors.Max(width, bits, off));
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
         /// Sets the border outside specified area of interest.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>

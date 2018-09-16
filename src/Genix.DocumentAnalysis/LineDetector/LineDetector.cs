@@ -8,6 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using Genix.Core;
     using Genix.Drawing;
@@ -254,18 +255,19 @@ namespace Genix.DocumentAnalysis
                     Image comp = component.ToImage();
 
                     // calculate maximum component width as twice the maximum distance between its points and the background
-                    Image compDist = comp.DistanceFunction(4, 8);
-                    compDist.MinMax(out byte min1, out byte max1);
+                    Image compDist = comp.DistanceToBackground(4, 8);
+                    int maxWidth = (int)compDist.Max() * 2;
 
-                    int maxWidth;
+                    /*int maxWidth = 0;
                     using (Pix pixComp = Pix.FromImage(comp))
                     {
                         using (Pix pixDist = pixComp.DistanceFunction(4, 8, 1))
                         {
-                            pixDist.ToImage().MinMax(out byte min, out byte max);
-                            maxWidth = max * 2;
+                            pixDist.ToImage().MinMax(out uint min, out uint max);
+                            int maxWidth2 = (int)(max * 2);
+                            Debug.Assert(maxWidth == maxWidth2);
                         }
-                    }
+                    }*/
 
                     bool isBad = false;
 

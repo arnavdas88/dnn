@@ -92,7 +92,7 @@ GENIXAPI(int, _convert1to16)(
 {
 	unsigned __int64 map[16];
 	const unsigned __int64 values[2] = { value0, value1 };
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		map[i] =
 			(values[(i >> 3) & 1] << (3 * 16)) |
