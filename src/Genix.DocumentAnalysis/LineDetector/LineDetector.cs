@@ -86,6 +86,9 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
+            // result
+            ISet<ConnectedComponent> hlinesResult = null;
+            ISet<ConnectedComponent> vlinesResult = null;
             HashSet<ConnectedComponent> result = new HashSet<ConnectedComponent>();
 
             // close up small holes
@@ -139,7 +142,7 @@ namespace Genix.DocumentAnalysis
                     nonVLines.Sub(itersections, 0);
                 }
 
-                result.UnionWith(FilterLines(vlines, nonVLines, true));
+                vlinesResult = FilterLines(vlines, nonVLines, true);
             }
 
             // horizontal lines
@@ -160,7 +163,7 @@ namespace Genix.DocumentAnalysis
                     nonHLines.Or(nonHLinesExtra);
                 }
 
-                result.UnionWith(FilterLines(hlines, nonHLines, false));
+                hlinesResult = FilterLines(hlines, nonHLines, false);
             }
 
             /*Image res = Image.Sub(image, hlines, 0);
@@ -213,7 +216,7 @@ namespace Genix.DocumentAnalysis
 
             return result;
 
-            IEnumerable<ConnectedComponent> FilterLines(Image linesImage, Image nonLinesImage, bool vertical)
+            ISet<ConnectedComponent> FilterLines(Image linesImage, Image nonLinesImage, bool vertical)
             {
                 /*using (Pix pixLines = Pix.FromImage(lines))
                 {
@@ -245,11 +248,11 @@ namespace Genix.DocumentAnalysis
                     }
                 }*/
 
-                ISet<ConnectedComponent> components = linesImage.FindConnectedComponents();
                 int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(image.HorizontalResolution, 200);
                 int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(image.HorizontalResolution, 200);
 
-                foreach (ConnectedComponent component in components)
+                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(linesImage.FindConnectedComponents());
+                components.RemoveWhere(component =>
                 {
                     Rectangle bounds = component.Bounds;
                     Image comp = component.ToImage();
@@ -295,7 +298,6 @@ namespace Genix.DocumentAnalysis
                     }
                     else
                     {
-                        yield return component;
                         /*if (vertical)
                         {
                             yield return new LineShape(
@@ -313,7 +315,11 @@ namespace Genix.DocumentAnalysis
                                 LineTypes.Horizontal);
                         }*/
                     }
-                }
+
+                    return isBad;
+                });
+
+                return components;
 
                 long CountAdjacentPixels(int lineWidth, Rectangle bounds)
                 {

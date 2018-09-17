@@ -1830,8 +1830,7 @@ namespace Genix.Core
         {
             switch (this.Name)
             {
-                case "Min":
-                case "Max":
+                case "Sum":
                     if (typeName == "byte") return "uint";
                     else if (typeName == "sbyte") return "int";
                     break;
