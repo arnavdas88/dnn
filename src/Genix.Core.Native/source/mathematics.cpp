@@ -818,7 +818,7 @@ GENIXAPI(void, log_f64)(int n, const double* x, int offx, double* y, int offy) {
 
 // y = exp(x)
 GENIXAPI(void, exp_ip_f32)(int n, float* y, int offy) { ::vsExp(n, y + offy, y + offy); }
-GENIXAPI(void, exp_ip_f64)(int n,  double* y, int offy) { ::vdExp(n, y + offy, y + offy); }
+GENIXAPI(void, exp_ip_f64)(int n, double* y, int offy) { ::vdExp(n, y + offy, y + offy); }
 GENIXAPI(void, exp_f32)(int n, const float* x, int offx, float* y, int offy) { ::vsExp(n, x + offx, y + offy); }
 GENIXAPI(void, exp_f64)(int n, const double* x, int offx, double* y, int offy) { ::vdExp(n, x + offx, y + offy); }
 
@@ -994,54 +994,43 @@ template<typename T, typename TArg> T __forceinline __sum(
 	return sum;
 }
 
-GENIXAPI(__int32, sum_u8)(const int n, const unsigned __int8* x, int offx)
-{
-	return __sum<__int32, unsigned __int8>(n, x, offx);
-}
-GENIXAPI(__int32, sum_s32)(const int n, const __int32* x, const int offx)
-{
-	return __sum<__int32, __int32>(n, x, offx);
-}
-GENIXAPI(__int64, sum_s64)(const int n, const __int64* x, const int offx)
-{
-	return __sum<__int64, __int64>(n, x, offx);
-}
-GENIXAPI(unsigned __int32, sum_u32)(const int n, const unsigned __int32* x, const int offx)
-{
-	return __sum<unsigned __int32, unsigned __int32>(n, x, offx);
-}
-GENIXAPI(unsigned __int64, sum_u64)(const int n, const unsigned __int64* x, const int offx)
-{
-	return __sum<unsigned __int64, unsigned __int64>(n, x, offx);
-}
-GENIXAPI(float, sum_f32)(const int n, const float* x, const int offx)
-{
-	return __sum<float, float>(n, x, offx);
-}
-GENIXAPI(double, sum_f64)(const int n, const double* x, const int offx)
-{
-	return __sum<double, double>(n, x, offx);
-}
+GENIXAPI(__int32, sum_ip_s8)(const int n, const __int8* x, int offx) { return __sum<__int32, __int8>(n, x, offx); }
+GENIXAPI(__int32, sum_ip_s16)(const int n, const __int16* x, int offx) { return __sum<__int32, __int16>(n, x, offx); }
+GENIXAPI(__int32, sum_ip_s32)(const int n, const __int32* x, const int offx) { return __sum<__int32, __int32>(n, x, offx); }
+GENIXAPI(__int64, sum_ip_s64)(const int n, const __int64* x, const int offx) { return __sum<__int64, __int64>(n, x, offx); }
+GENIXAPI(unsigned __int32, sum_ip_u8)(const int n, const unsigned __int8* x, int offx) { return __sum<unsigned __int32, unsigned __int8>(n, x, offx); }
+GENIXAPI(unsigned __int32, sum_ip_u16)(const int n, const unsigned __int16* x, int offx) { return __sum<unsigned __int32, unsigned __int16>(n, x, offx); }
+GENIXAPI(unsigned __int32, sum_ip_u32)(const int n, const unsigned __int32* x, const int offx) { return __sum<unsigned __int32, unsigned __int32>(n, x, offx); }
+GENIXAPI(unsigned __int64, sum_ip_u64)(const int n, const unsigned __int64* x, const int offx) { return __sum<unsigned __int64, unsigned __int64>(n, x, offx); }
+GENIXAPI(float, sum_ip_f32)(const int n, const float* x, const int offx) { return __sum<float, float>(n, x, offx); }
+GENIXAPI(double, sum_ip_f64)(const int n, const double* x, const int offx) { return __sum<double, double>(n, x, offx); }
 
 // cumulative sum(x)
 template<typename T> T __forceinline __cumulative_sum_ip(
 	const int n,
 	T* y, const int offy)
 {
-	y += offy;
-
-	T sum = T(0);
-	for (int i = 0; i < n; i++)
+	if (n == 0)
 	{
-		sum += y[i];
-		y[i] = sum;
+		return T(0);
 	}
 
-	return sum;
+	y += offy;
+
+	for (int i = 1; i < n; i++)
+	{
+		y[i] += y[i - 1];
+	}
+
+	return y[n - 1];
 }
 
+GENIXAPI(__int8, cumulative_sum_ip_s8)(const int n, __int8* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
+GENIXAPI(__int16, cumulative_sum_ip_s16)(const int n, __int16* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
 GENIXAPI(__int32, cumulative_sum_ip_s32)(const int n, __int32* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
 GENIXAPI(__int64, cumulative_sum_ip_s64)(const int n, __int64* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
+GENIXAPI(unsigned __int8, cumulative_sum_ip_u8)(const int n, unsigned __int8* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
+GENIXAPI(unsigned __int16, cumulative_sum_ip_u16)(const int n, unsigned __int16* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
 GENIXAPI(unsigned __int32, cumulative_sum_ip_u32)(const int n, unsigned __int32* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
 GENIXAPI(unsigned __int64, cumulative_sum_ip_u64)(const int n, unsigned __int64* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
 GENIXAPI(float, cumulative_sum_ip_f32)(const int n, float* x, const int offx) { return __cumulative_sum_ip(n, x, offx); }
@@ -1052,21 +1041,29 @@ template<typename T> T __forceinline __cumulative_sum(
 	const T* x, const int offx,
 	T* y, const int offy)
 {
+	if (n == 0)
+	{
+		return T(0);
+	}
+
 	x += offx;
 	y += offy;
 
-	T sum = T(0);
-	for (int i = 0; i < n; i++)
+	y[0] = x[0];
+	for (int i = 1; i < n; i++)
 	{
-		sum += x[i];
-		y[i] = sum;
+		y[i] = y[i - 1] + x[i];
 	}
 
-	return sum;
+	return y[n - 1];
 }
 
+GENIXAPI(__int8, cumulative_sum_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
+GENIXAPI(__int16, cumulative_sum_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
 GENIXAPI(__int32, cumulative_sum_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
 GENIXAPI(__int64, cumulative_sum_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
+GENIXAPI(unsigned __int8, cumulative_sum_u8)(int n, const unsigned __int8* x, int offx, unsigned __int8* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
+GENIXAPI(unsigned __int16, cumulative_sum_u16)(int n, const unsigned __int16* x, int offx, unsigned __int16* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
 GENIXAPI(unsigned __int32, cumulative_sum_u32)(int n, const unsigned __int32* x, int offx, unsigned __int32* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
 GENIXAPI(unsigned __int64, cumulative_sum_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
 GENIXAPI(float, cumulative_sum_f32)(int n, const float* x, int offx, float* y, int offy) { return __cumulative_sum(n, x, offx, y, offy); }
@@ -1089,7 +1086,8 @@ template<typename T> T __forceinline __variance(int n, T* x, int offx)
 	return variance / n;
 }
 
-GENIXAPI(float, svariance)(int n, float* x, int offx) { return __variance(n, x, offx); }
+GENIXAPI(float, variance_ip_f32)(int n, float* x, int offx) { return __variance(n, x, offx); }
+GENIXAPI(double, variance_ip_f64)(int n, double* x, int offx) { return __variance(n, x, offx); }
 
 // Manhattan distance
 template<typename T> T __forceinline __manhattan_distance(

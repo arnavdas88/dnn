@@ -9,7 +9,7 @@
 
 // from Genix.Core.Native.dll
 extern "C" __declspec(dllimport) unsigned __int64 WINAPI bits_count_64(int count, const unsigned __int64* bits, int pos);
-extern "C" __declspec(dllimport) __int32 WINAPI sum_u8(const int n, const unsigned __int8* x, const int offx);
+extern "C" __declspec(dllimport) unsigned __int32 WINAPI sum_ip_u8(const int n, const unsigned __int8* x, const int offx);
 
 extern "C" __declspec(dllimport) int WINAPI bits_scan_one_forward_64(int count, const unsigned __int64* bits, int pos);
 extern "C" __declspec(dllimport) int WINAPI bits_scan_zero_forward_64(int count, const unsigned __int64* bits, int pos);
@@ -42,7 +42,7 @@ GENIXAPI(__int64, power_8bpp)(
 	/*unsigned __int64 sum = 0;
 	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
 	{
-		sum += (unsigned __int64)::sum_u8(width, bits_u8, 0);
+		sum += (unsigned __int64)::sum_ip_u8(width, bits_u8, 0);
 	}*/
 
 	return (__int64)sum;
@@ -148,7 +148,7 @@ GENIXAPI(void, vhist_8bpp)(
 
 	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
 	{
-		hist[iy] = ::sum_u8(width, bits_u8, 0);
+		hist[iy] = ::sum_ip_u8(width, bits_u8, 0);
 	}
 }
 

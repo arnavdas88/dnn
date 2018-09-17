@@ -157,7 +157,7 @@
             HasIncrement = true,
             Op = "y = a / b",
             OpInPlace = "y /= x",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Square",
@@ -167,7 +167,7 @@
             HasInPlace = true,
             Op = "y[i] = x[i] * x[i]",
             OpInPlace = "y[i] = y[i] * y[i]",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Sqrt",
@@ -178,7 +178,7 @@
             Op = "y[i] = sqrt(x[i])",
             OpInPlace = "y[i] = sqrt(y[i])",
             SupportedTypes = "float;double",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Log",
@@ -189,7 +189,7 @@
             Op = "y[i] = ln(x[i])",
             OpInPlace = "y[i] = ln(y[i])",
             SupportedTypes = "float;double",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Exp",
@@ -200,7 +200,7 @@
             Op = "y[i] = exp(x[i])",
             OpInPlace = "y[i] = exp(y[i])",
             SupportedTypes = "float;double",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Sin",
@@ -224,7 +224,53 @@
             Op = "y[i] = cos(x[i])",
             OpInPlace = "y[i] = cos(y[i])",
             SupportedTypes = "float;double",
-            },
+        },
+        new MethodDescriptor()
+        {
+            Name = "ArgMin",
+            NativeName = "argmin",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Returns the position of minimum value in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            ReturnType = "int",
+            Returns = "The zero-based index of minimum value in the array.",
+            OpInPlace = "argmin(x)",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Min",
+            NativeName = "_min",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Returns the minimum value in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            Returns = "The minimum value in the array.",
+            OpInPlace = "x[argmin(x)]",
+        },
+        new MethodDescriptor()
+        {
+            Name = "ArgMax",
+            NativeName = "argmax",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Returns the position of maximum value in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            ReturnType = "int",
+            Returns = "The zero-based index of maximum value in the array.",
+            OpInPlace = "argmax(x)",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Max",
+            NativeName = "_max",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Returns the maximum value in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            Returns = "The maximum value in the array.",
+            OpInPlace = "x[argmax(x)]",
+        },
         new MethodDescriptor()
         {
             Name = "MinC",
@@ -234,7 +280,7 @@
             HasInPlace = true,
             Op = "y[i] = min(y[i], a)",
             OpInPlace = "y[i] = min(x[i], a)",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "Min",
@@ -244,7 +290,7 @@
             HasInPlace = true,
             Op = "y = min(a, b)",
             OpInPlace = "y = min(x, y)",
-            },
+        },
         new MethodDescriptor()
         {
             Name = "MaxC",
@@ -389,6 +435,40 @@
             OpInPlace = "y &amp;= ~x",
             SupportedTypes = "uint;ulong",
         },
+        new MethodDescriptor()
+        {
+            Name = "Sum",
+            NativeName = "sum",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Computes the sum of all elements in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            Returns = "The sum of elements in the array.",
+            OpInPlace = "sum(x[i])"
+        },
+        new MethodDescriptor()
+        {
+            Name = "CumulativeSum",
+            NativeName = "cumulative_sum",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Computes the cumulative sum of elements of an array of {0}",
+            HasInPlace = true,
+            Returns = "The sum of elements in <paramref name=\"x\"/>",
+            Op = "sum(x[i])",
+            OpInPlace = "sum(x[i])"
+        },
+        new MethodDescriptor()
+        {
+            Name = "Variance",
+            NativeName = "variance",
+            Argument = ArgumentType.VectorAggregate,
+            Summary = "Computes the variance of all elements in the array of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            Returns = "The variance of elements in the array.",
+            OpInPlace = "variance(x)",
+            SupportedTypes = "float;double",
+        },
     };
 #>
 
@@ -403,7 +483,7 @@ namespace Genix.Core
     /// <summary>
     /// Provides mathematical methods for numeric vectors manipulation.
     /// </summary>
-	[CLSCompliant(false)]
+    [CLSCompliant(false)]
     public static class Vectors
     {
 <#
@@ -557,10 +637,10 @@ namespace Genix.Core
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] y, int offy)
         {
             Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, y, offy);
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, y, offy);
         }
 
         /// <summary>
@@ -568,16 +648,13 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="y">The source and destination array.</param>
-<# if (!string.IsNullOrEmpty(method.Returns)) { #>
-        /// <returns><#=method.Returns#></returns>
-<# } #>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>* y)
+        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* y)
         {
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, y, 0);
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, y, 0);
         }
 <#              } #>
 
@@ -589,18 +666,15 @@ namespace Genix.Core
         /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-<# if (!string.IsNullOrEmpty(method.Returns)) { #>
-        /// <returns><#=method.Returns#></returns>
-<# } #>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
         {
             Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
             Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
 
         /// <summary>
@@ -609,16 +683,13 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="y">The destination array.</param>
-<# if (!string.IsNullOrEmpty(method.Returns)) { #>
-        /// <returns><#=method.Returns#></returns>
-<# } #>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>* x, <#=typeName#>* y)
+        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, <#=typeName#>* y)
         {
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, 0, y, 0);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, 0, y, 0);
         }
 <#              if (method.HasIncrement) { #>
 
@@ -632,18 +703,15 @@ namespace Genix.Core
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-<# if (!string.IsNullOrEmpty(method.Returns)) { #>
-        /// <returns><#=method.Returns#></returns>
-<# } #>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
         {
             Debug.Assert(x.Length > offx + ((length - 1) * incx), "The source array should be big enough.");
             Debug.Assert(y.Length > offy + ((length - 1) * incy), "The destination array should be big enough.");
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
         }
 
         /// <summary>
@@ -654,16 +722,13 @@ namespace Genix.Core
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
-<# if (!string.IsNullOrEmpty(method.Returns)) { #>
-        /// <returns><#=method.Returns#></returns>
-<# } #>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe <#=method.ReturnType ?? "void"#> <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=typeName#>* y, int incy)
+        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=typeName#>* y, int incy)
         {
-            <#=string.IsNullOrEmpty(method.ReturnType) ? string.Empty : "returns "#>NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, y, 0, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, y, 0, incy);
         }
 <#             }
                if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
@@ -684,7 +749,161 @@ namespace Genix.Core
         {
             NativeMethods.<#=method.NativeName#>_gradient_<#=nativeSuffix#>(length, x, dx, offx, cleardx, y, dy, offdy);
         }
+<#            }
+              break;
+            case ArgumentType.VectorAggregate:
+               if (method.HasInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx)
+        {
+            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, x, offx);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* x)
+        {
+            return NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, x, 0);
+        }
+
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.OpInPlace#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx)
+        {
+            Debug.Assert(x.Length > offx + ((length - 1) * incx), "The source array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, x, offx, incx);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.OpInPlace#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* x, int incx)
+        {
+            return NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, x, 0, incx);
+        }
 <#              }
+            }
+            if (method.HasNotInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
+        {
+            Debug.Assert(x.Length > offx + length - 1, "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, y, offy);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="y">The destination array.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* x, <#=typeName#>* y)
+        {
+            return NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, 0, y, 0);
+        }
+
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#>[] y, int offy, int incy)
+        {
+            Debug.Assert(x.Length > offx + ((length - 1) * incx), "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + ((length - 1) * incy), "The destination array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, y, offy, incy);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=typeName#>* y, int incy)
+        {
+            return NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, y, 0, incy);
+        }
+<#                  }
+                }
                 break;
             case ArgumentType.ConstantAndVector:
                 if (method.HasInPlace) { #>
@@ -1166,30 +1385,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Returns the position of minimum value in the array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The position of minimum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMin(int length, <#=typeName#>[] x, int offx) => NativeMethods.argmin_<#=nativeSuffix#>(length, x, offx);
-
-        /// <summary>
-        /// Returns the position of maximum value in the array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The position of maximum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ArgMax(int length, <#=typeName#>[] x, int offx) => NativeMethods.argmax_<#=nativeSuffix#>(length, x, offx);
-
-        /// <summary>
         /// Returns the position of minimum and maximum values in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
@@ -1202,30 +1397,6 @@ namespace Genix.Core
         {
             NativeMethods.argminmax_<#=nativeSuffix#>(length, x, offx, out min, out max);
         }
-
-        /// <summary>
-        /// Returns the minimum value in the array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which evaluation begins.</param>
-        /// <returns>
-        /// The minimum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static <#=typeName#> Min(int length, <#=typeName#>[] x, int offx) => x[Vectors.ArgMin(length, x, offx)];
-
-        /// <summary>
-        /// Returns the maximum value in the array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to evaluate.</param>
-        /// <param name="x">The array that contains data used for evaluation.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The maximum value in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static <#=typeName#> Max(int length, <#=typeName#>[] x, int offx) => x[Vectors.ArgMax(length, x, offx)];
 
         /// <summary>
         /// Returns the minimum and maximum values in the array of <#=typeDescription#>.
@@ -1429,24 +1600,24 @@ namespace Genix.Core
                 if (method.HasInPlace) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>* y, int offy);
+            public static extern unsafe void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>* y, int offy);
 <#              } #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, [Out] <#=typeName#>* y, int offy);
+            public static extern unsafe void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, [Out] <#=typeName#>* y, int offy);
 <#              if (method.HasIncrement) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [Out] <#=typeName#>[] y, int offy, int incy);
+            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe <#=method.ReturnType ?? "void"#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx, [Out] <#=typeName#>* y, int offy, int incy);
+            public static extern unsafe void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx, [Out] <#=typeName#>* y, int offy, int incy);
 <#              }
                 if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
 
@@ -1461,6 +1632,38 @@ namespace Genix.Core
                 [In] <#=typeName#>[] dy,
                 int offdy);
 <#              }
+                break;
+            case ArgumentType.VectorAggregate:
+                if (method.HasInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx);
+<#                  }
+                }
+                if (method.HasNotInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, [In] <#=typeName#>* y, int offy);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [In] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx, [In] <#=typeName#>* y, int offy, int incy);
+<#                  }
+                }
                 break;
             case ArgumentType.ConstantAndVector:
                 if (method.HasInPlace) { #>
@@ -1553,12 +1756,6 @@ namespace Genix.Core
             public static extern void addproduct_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int argmin_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int argmax_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void argminmax_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, out int winmin, out int winmax);
 
             [DllImport(NativeMethods.DllName)]
@@ -1597,29 +1794,50 @@ namespace Genix.Core
 }
 
 <#+
-	enum ArgumentType
-	{
-		Constant = 0,
-		Vector = 1,
-        ConstantAndVector = 2,
-		TwoVectors = 3,
-		ThreeVectors = 4,
-		FourVectors = 5,
-	}
+    enum ArgumentType
+    {
+        Constant = 0,
+        Vector = 1,
+        VectorAggregate = 2,
+        ConstantAndVector = 3,
+        TwoVectors = 4,
+        ThreeVectors = 5,
+        FourVectors = 6,
+    }
 
-	class MethodDescriptor
-	{
-		public string Name { get; set; }
-		public string NativeName { get; set; }
-		public ArgumentType Argument { get; set; }
-		public string Summary { get; set; }
-		public bool HasInPlace { get; set; }
-		public bool HasIncrement { get; set; }
-		public bool HasGradient { get; set; }
-		public string ReturnType { get; set; }
-		public string Returns { get; set; }
-		public string Op { get; set; }
-		public string OpInPlace { get; set; }
+    class MethodDescriptor
+    {
+        public MethodDescriptor()
+        {
+            this.HasNotInPlace = true; 
+        }
+
+        public string Name { get; set; }
+        public string NativeName { get; set; }
+        public ArgumentType Argument { get; set; }
+        public string Summary { get; set; }
+        public bool HasNotInPlace { get; set; }
+        public bool HasInPlace { get; set; }
+        public bool HasIncrement { get; set; }
+        public bool HasGradient { get; set; }
+        public string ReturnType { get; set; }
+        public string Returns { get; set; }
+        public string Op { get; set; }
+        public string OpInPlace { get; set; }
         public string SupportedTypes { get; set; }
-	}
+
+        public string GetReturnType(string typeName)
+        {
+            switch (this.Name)
+            {
+                case "Min":
+                case "Max":
+                    if (typeName == "byte") return "uint";
+                    else if (typeName == "sbyte") return "int";
+                    break;
+            }
+
+            return this.ReturnType ?? typeName;
+        }
+    }
 #>

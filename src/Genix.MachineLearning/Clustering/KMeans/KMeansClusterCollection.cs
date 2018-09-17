@@ -247,7 +247,7 @@ namespace Genix.MachineLearning.Clustering
                 // 3. Choose one new data point at random as a new center,
                 // using a weighted probability distribution where a point x is chosen with probability proportional to D(x)^2.
                 Vectors.Square(samples, distances, 0);
-                float sum = Math32f.Sum(samples, distances, 0);
+                float sum = Vectors.Sum(samples, distances, 0);
                 if (sum < 1e-10f)
                 {
                     // all points are the same

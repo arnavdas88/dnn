@@ -162,83 +162,6 @@ namespace Genix.Core
             NativeMethods.atan2_f32(length, a, offa, b, offb, y, offy);
         }
 
-        /// <summary>
-        /// Computes the sum of all elements in the array of 32-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Sum(int length, int[] x, int offx)
-        {
-            return NativeMethods.sum_s32(length, x, offx);
-        }
-
-        /// <summary>
-        /// Computes the sum of all elements in the array of 32-bit unsigned integers.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static uint Sum(int length, uint[] x, int offx)
-        {
-            return NativeMethods.sum_u32(length, x, offx);
-        }
-
-        /// <summary>
-        /// Computes the sum of all elements in the array of 64-bit integers.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Sum(int length, long[] x, int offx)
-        {
-            return NativeMethods.sum_s64(length, x, offx);
-        }
-
-        /// <summary>
-        /// Computes the sum of all elements in the array of 64-bit unsigned integers.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <returns>
-        /// The sum of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [CLSCompliant(false)]
-        public static ulong Sum(int length, ulong[] x, int offx)
-        {
-            return NativeMethods.sum_u64(length, x, offx);
-        }
-
-        /// <summary>
-        /// Computes the variance of all elements in the array of floats.
-        /// </summary>
-        /// <param name="length">The number of elements to calculate.</param>
-        /// <param name="x">The array that contains data.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which calculation begins.</param>
-        /// <returns>
-        /// The variance of elements in the array.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Variance(int length, float[] x, int offx)
-        {
-            return NativeMethods.svariance(length, x, offx);
-        }
-
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
@@ -275,21 +198,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int sum_s32(int n, [In] int[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern uint sum_u32(int n, [In] uint[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern long sum_s64(int n, [In] long[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern ulong sum_u64(int n, [In] ulong[] x, int offx);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern float svariance(int n, [In] float[] x, int offx);
         }
     }
 }

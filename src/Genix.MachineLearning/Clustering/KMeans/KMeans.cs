@@ -271,7 +271,7 @@ namespace Genix.MachineLearning.Clustering
 
             if (normalize)
             {
-                float sum = Math32f.Sum(result.Length, result, 0);
+                float sum = Vectors.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
                     Vectors.DivC(result.Length, sum, result, 0);
@@ -333,7 +333,7 @@ namespace Genix.MachineLearning.Clustering
 
             if (normalize)
             {
-                float sum = Math32f.Sum(result.Length, result, 0);
+                float sum = Vectors.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
                     Vectors.DivC(result.Length, sum, result, 0);

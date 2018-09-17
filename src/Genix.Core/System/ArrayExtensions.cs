@@ -177,7 +177,7 @@ namespace System
         /// The sum of all elements in the array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sum(this float[] source) => Math32f.Sum(source.Length, source, 0);
+        public static float Sum(this float[] source) => Vectors.Sum(source.Length, source, 0);
 
         /// <summary>
         /// Computes the variance of all elements in the array of floats.
@@ -205,7 +205,7 @@ namespace System
                 throw new InvalidOperationException(Genix.Core.Properties.Resources.E_SequenceIsEmpty);
             }
 
-            return Mathematics.Variance(source.Length, source, 0);
+            return Vectors.Variance(source.Length, source, 0);
         }
     }
 }

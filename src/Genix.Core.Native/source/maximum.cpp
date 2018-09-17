@@ -309,27 +309,27 @@ template<typename T> void __forceinline __argminmax(int n, const T* x, int offx,
 	winmax += offx;
 }
 
-extern "C" __declspec(dllexport) int WINAPI argmin_s8(int n, const __int8* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_s16(int n, const __int16* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_s32(int n, const __int32* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_s64(int n, const __int64* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_u8(int n, const unsigned __int8* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_u16(int n, const unsigned __int16* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_u32(int n, const unsigned __int32* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_u64(int n, const unsigned __int64* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_f32(int n, const float* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_f64(int n, const double* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_s8(int n, const __int8* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_s16(int n, const __int16* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_s32(int n, const __int32* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_s64(int n, const __int64* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_u8(int n, const unsigned __int8* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_u16(int n, const unsigned __int16* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_u32(int n, const unsigned __int32* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_u64(int n, const unsigned __int64* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_f32(int n, const float* x, int offx) { return __argmin(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmin_ip_f64(int n, const double* x, int offx) { return __argmin(n, x, offx); }
 
-extern "C" __declspec(dllexport) int WINAPI argmax_s8(int n, const __int8* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_s16(int n, const __int16* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_s32(int n, const __int32* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_s64(int n, const __int64* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_u8(int n, const unsigned __int8* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_u16(int n, const unsigned __int16* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_u32(int n, const unsigned __int32* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_u64(int n, const unsigned __int64* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_f32(int n, const float* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_f64(int n, const double* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_s8(int n, const __int8* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_s16(int n, const __int16* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_s32(int n, const __int32* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_s64(int n, const __int64* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_u8(int n, const unsigned __int8* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_u16(int n, const unsigned __int16* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_u32(int n, const unsigned __int32* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_u64(int n, const unsigned __int64* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_f32(int n, const float* x, int offx) { return __argmax(n, x, offx); }
+extern "C" __declspec(dllexport) int WINAPI argmax_ip_f64(int n, const double* x, int offx) { return __argmax(n, x, offx); }
 
 extern "C" __declspec(dllexport) void WINAPI argminmax_s8(int n, const __int8* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
 extern "C" __declspec(dllexport) void WINAPI argminmax_s16(int n, const __int16* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
@@ -341,4 +341,31 @@ extern "C" __declspec(dllexport) void WINAPI argminmax_u32(int n, const unsigned
 extern "C" __declspec(dllexport) void WINAPI argminmax_u64(int n, const unsigned __int64* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
 extern "C" __declspec(dllexport) void WINAPI argminmax_f32(int n, const float* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
 extern "C" __declspec(dllexport) void WINAPI argminmax_f64(int n, const double* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+
+template<typename T> T __forceinline ___min(int n, const T* x, int offx) { return x[__argmin(n, x, offx)]; }
+template<typename T> T __forceinline ___max(int n, const T* x, int offx) { return x[__argmax(n, x, offx)]; }
+
+extern "C" __declspec(dllexport) __int8  WINAPI _min_ip_s8(int n, const __int8* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) __int16 WINAPI _min_ip_s16(int n, const __int16* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) __int32 WINAPI _min_ip_s32(int n, const __int32* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) __int64 WINAPI _min_ip_s64(int n, const __int64* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int8  WINAPI _min_ip_u8(int n, const unsigned __int8* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int16 WINAPI _min_ip_u16(int n, const unsigned __int16* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int32 WINAPI _min_ip_u32(int n, const unsigned __int32* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int64 WINAPI _min_ip_u64(int n, const unsigned __int64* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) float WINAPI _min_ip_f32(int n, const float* x, int offx) { return ___min(n, x, offx); }
+extern "C" __declspec(dllexport) double WINAPI _min_ip_f64(int n, const double* x, int offx) { return ___min(n, x, offx); }
+
+extern "C" __declspec(dllexport) __int8  WINAPI _max_ip_s8(int n, const __int8* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) __int16 WINAPI _max_ip_s16(int n, const __int16* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) __int32 WINAPI _max_ip_s32(int n, const __int32* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) __int64 WINAPI _max_ip_s64(int n, const __int64* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int8  WINAPI _max_ip_u8(int n, const unsigned __int8* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int16 WINAPI _max_ip_u16(int n, const unsigned __int16* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int32 WINAPI _max_ip_u32(int n, const unsigned __int32* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) unsigned __int64 WINAPI _max_ip_u64(int n, const unsigned __int64* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) float WINAPI _max_ip_f32(int n, const float* x, int offx) { return ___max(n, x, offx); }
+extern "C" __declspec(dllexport) double WINAPI _max_ip_f64(int n, const double* x, int offx) { return ___max(n, x, offx); }
+
+
 

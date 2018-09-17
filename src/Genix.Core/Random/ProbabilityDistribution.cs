@@ -41,7 +41,7 @@ namespace Genix.Core
             this.random = new RandomGenerator(random);
 
             this.pdf = weights.ToArray();
-            float sum = Math32f.CumulativeSum(this.pdf.Length, this.pdf, 0);
+            float sum = Vectors.CumulativeSum(this.pdf.Length, this.pdf, 0);
             if (sum != 0.0f)
             {
                 Vectors.DivC(this.pdf.Length, sum, this.pdf, 0);

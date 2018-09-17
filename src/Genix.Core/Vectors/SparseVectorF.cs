@@ -181,7 +181,7 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public float Sum() => Math32f.Sum(this.Idx.Length, this.X, 0);
+        public float Sum() => Vectors.Sum(this.Idx.Length, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
