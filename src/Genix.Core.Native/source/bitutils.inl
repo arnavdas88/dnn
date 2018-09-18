@@ -463,79 +463,70 @@ BITSAPI(void, bits_copy)(
 	}
 }
 
-// Shifts the bits to the left (from LSB to MSB).
+// Shift the bits in the array to the left.
 BITSAPI(void, bits_shl)(
-	int count,				// number of bits to copy
-	int shift,				// number of bits to shift
+	const int count,		// number of bits to copy
+	const int shift,		// number of bits to shift
 	__bits* bits, 			// the source array
-	int pos					// the zero-based index of starting bit in x
+	const int pos 			// the zero-based index of starting bit in bits
 	)
 {
 	if (shift >= count)
 	{
-		// all bits are shifted - just clear
 		BITS_NAME(bits_reset)(count, bits, pos);
 		return;
 	}
 
-	bits += (pos >> BITS_SHIFT);
-	pos &= BITS_MASK;
+	// copy from left to right (from MSB to LSB)
+	// positions points to the MSBs of x and y
+	int remaining = count - shift;
+	int posy = pos + remaining - 1;
+	int posx = pos - shift;
 
-	int copycount = count - shift;
+	const __bits* x = bits + (posx >> BITS_SHIFT);
+	posx &= BITS_MASK;
 
-	// work from left to the right; positions point to leftmost bits to copy inside the pointer (0-31/63)
-	int dstpos = pos + count - 1;
-	__bits* dst = bits + (dstpos >> BITS_SHIFT);
-	dstpos &= BITS_MASK;
+	__bits* y = bits + (posy >> BITS_SHIFT);
+	posy &= BITS_MASK;
 
-	int srcpos = dstpos - shift;
-	const __bits* src = bits + (srcpos >> BITS_SHIFT);
-	srcpos &= BITS_MASK;
+	// first word
+	const int shift0 = posy - posx;
+	const __bits x0 = shift0 >= 0 ?
+		(posx + 1 >= remaining ? x[0] << shift0 : _shiftleft(x[-1], x[0], shift0)) :
+		x[0] >> -shift0;
 
-	// one word only
-	if (dstpos <= copycount)
+	if (posy + 1 >= remaining)
 	{
-		const int shift = dstpos - srcpos;
-		const __bits x0 = shift <= 0 ?
-			src[0] >> -shift :
-			(srcpos <= copycount ? src[0] << shift : _shiftleft(src[-1], src[0], shift));
-		const __bits mask = CLEAR_MASK_RANGE(dstpos - copycount, copycount);
-		dst[0] = (dst[0] & mask) | (x0 & ~mask);
+		const __bits mask0 = CLEAR_MASK_RANGE(posy + 1 - remaining, remaining);
+		y[0] = (y[0] & mask0) | (x0 & ~mask0);
 	}
 	else
 	{
-		// destination does not end on MSB - round up
-		if (dstpos + 1 != BITS_COUNT)
+		const __bits mask0 = CLEAR_MASK_MSB(posy + 1);
+		y[0] = (y[0] & mask0) | (x0 & ~mask0);
+
+		remaining -= posy + 1;
+
+		posx -= posy + 1;
+		if (posx < 0)
 		{
-			const int shift = dstpos - srcpos;
-			const __bits x0 = shift <= 0 ?
-				src[0] >> -shift :
-				_shiftleft(src[-1], src[0], shift);
-			const __bits mask = CLEAR_MASK_LSB(dstpos + 1);
-			dst[0] = (dst[0] & mask) | (x0 & ~mask);
-
-			copycount -= dstpos + 1;
-
-			srcpos -= dstpos + 1;
-			if (srcpos < 0)
-			{
-				src--;
-				srcpos += BITS_COUNT;
-			}
-
-			dst--;
-			dstpos = BITS_COUNT - 1;
+			x--;
+			posx += BITS_COUNT;
 		}
 
-		// copy center
-		int wordcount = copycount >> BITS_SHIFT;
-		copycount &= BITS_MASK;
+		y--;
+		posy = BITS_COUNT - 1;
 
+		// copy center bits
+		int wordcount = remaining >> BITS_SHIFT;
 		if (wordcount > 0)
 		{
-			if (srcpos == 0)
+			if (posx == 0)
 			{
-				::memcpy(y, x, wordcount * sizeof(__bits));
+				for (int i = 0; i < wordcount; i++)
+				{
+					y[i] = x[i];
+				}
 			}
 			else
 			{
@@ -544,64 +535,109 @@ BITSAPI(void, bits_shl)(
 					y[i] = _shiftright(x[i], x[i + 1], posx);
 				}
 			}
+
+			x -= wordcount;
+			y -= wordcount;
+		}
+
+		// copy remaining LSBs
+		remaining &= BITS_MASK;
+		if (remaining > 0)
+		{
+			const __bits x1 = posx + remaining <= BITS_COUNT ? x[0] >> posx : _shiftright(x[0], x[1], posx);
+			const __bits mask1 = CLEAR_MASK_LSB(remaining);
+			y[0] = (y[0] & mask1) | (x1 & ~mask1);
 		}
 	}
 
-	// clear remaining bits
-	BITS_NAME(bits_reset)(count - copycount, bits, pos + copycount);
+	// clear remaining MSBs
+	BITS_NAME(bits_reset)(shift, bits, pos + count - shift);
 }
 
-// Shifts the bits to the right (from MSB to LSB).
+// Shift the bits in the array to the right.
 BITSAPI(void, bits_shr)(
-	int count,				// number of bits to copy
-	int shift,				// number of bits to shift
-	__bits* x, 				// the source array
-	int posx				// the zero-based index of starting bit in x
+	const int count,		// number of bits to copy
+	const int shift,		// number of bits to shift
+	__bits* bits, 			// the source array
+	const int pos 			// the zero-based index of starting bit in bits
 	)
 {
-	x += (posx >> BITS_SHIFT);
-	posx &= BITS_MASK;
-
-	// one word only
-	if (posx + count <= BITS_COUNT)
+	if (shift >= count)
 	{
-		const __bits mask = CLEAR_MASK_RANGE(posx, count);
-		x[0] = ((x[0] & ~mask) >> shift) | (x[0] & mask);
-
+		BITS_NAME(bits_reset)(count, bits, pos);
 		return;
 	}
 
-	// shift first word
-	// if position does not start on word boundary, shift MSBs
-	if (posx != 0)
-	{
-		const __bits mask = CLEAR_MASK_LSB(posx);
-		x[0] = _shiftright(x[0] & mask, x[1], shift) | (x[0] & ~mask);
+	int remaining = count - shift;
+	int posx = pos + shift;
+	int posy = pos;
 
-		// there are not enough bits to fill MSBs - clear
-		int rem = posx + count - shift;
-		if (rem < BITS_COUNT)
+	const __bits* x = bits + (posx >> BITS_SHIFT);
+	posx &= BITS_MASK;
+
+	__bits* y = bits + (posy >> BITS_SHIFT);
+	posy &= BITS_MASK;
+
+	// first word
+	const int shift0 = posy - posx;
+	const __bits x0 = shift0 >= 0 ?
+		x[0] << shift0 :
+		(posx + remaining <= BITS_COUNT ? x[0] >> -shift0 : _shiftright(x[0], x[1], -shift0));
+
+	if (posy + remaining <= BITS_COUNT)
+	{
+		const __bits mask0 = CLEAR_MASK_RANGE(posy, remaining);
+		y[0] = (y[0] & mask0) | (x0 & ~mask0);
+	}
+	else
+	{
+		const __bits mask0 = CLEAR_MASK_MSB(posy);
+		y[0] = (y[0] & mask0) | (x0 & ~mask0);
+
+		remaining -= BITS_COUNT - posy;
+
+		posx += BITS_COUNT - posy;
+		x += (posx >> BITS_SHIFT);
+		posx &= BITS_MASK;
+
+		y++;
+		posy = 0;
+
+		// copy center bits
+		int wordcount = remaining >> BITS_SHIFT;
+		if (wordcount > 0)
 		{
-			x[0] &= CLEAR_MASK_MSB(rem);
+			if (posx == 0)
+			{
+				for (int i = 0; i < wordcount; i++)
+				{
+					y[i] = x[i];
+				}
+			}
+			else
+			{
+				for (int i = 0; i < wordcount; i++)
+				{
+					y[i] = _shiftright(x[i], x[i + 1], posx);
+				}
+			}
+
+			x += wordcount;
+			y += wordcount;
 		}
 
-		x++;
-		count -= BITS_COUNT - posx;
+		// copy remaining LSBs
+		remaining &= BITS_MASK;
+		if (remaining > 0)
+		{
+			const __bits x1 = posx + remaining <= BITS_COUNT ? x[0] >> posx : _shiftright(x[0], x[1], posx);
+			const __bits mask1 = CLEAR_MASK_LSB(remaining);
+			y[0] = (y[0] & mask1) | (x1 & ~mask1);
+		}
 	}
 
-	// shift whole words in center
-	for (int i = 0, ii = count >> BITS_SHIFT; i < ii; i++, x++)
-	{
-		x[0] = _shiftright(x[0], x[1], shift);
-	}
-
-	// shift remaining LSBs
-	count &= BITS_MASK;
-	if (count > 0)
-	{
-		const __bits mask = CLEAR_MASK_MSB(count);
-		x[0] = ((x[0] & mask) >> shift) | (x[0] & ~mask);
-	}
+	// clear remaining MSBs
+	BITS_NAME(bits_reset)(shift, bits, pos + count - shift);
 }
 
 // Counts the number of one bits(population count) in a range of integers.
