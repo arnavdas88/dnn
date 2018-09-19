@@ -12,7 +12,7 @@
             Image image = new Image(118, 133, 1, 200, 200);
             image = Image.SetWhite(image);
 
-            image = Image.ScaleToSize(image, 113, 124, ScalingOptions.None);
+            image = image.ScaleToSize(113, 124, ScalingOptions.None);
         }
     }
 }

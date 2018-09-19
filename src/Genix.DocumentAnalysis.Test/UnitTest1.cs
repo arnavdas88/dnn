@@ -18,7 +18,7 @@
             foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
-                Image workImage = image.BitsPerPixel > 1 ? Image.Binarize(image) : image;
+                Image workImage = image.BitsPerPixel > 1 ? image.Binarize() : image;
 
 #if false
                 stopwatch.Restart();
@@ -43,8 +43,11 @@
                 }
 #endif
 
-                workImage = Image.Deskew(workImage);
+                workImage = workImage.Deskew();
+                stopwatch.Restart();
                 ISet<ConnectedComponent> components = LineDetector.FindLines(workImage, new LineDetectionOptions());
+                stopwatch.Stop();
+                Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
             }
         }
     }

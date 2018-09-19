@@ -83,22 +83,23 @@ namespace Genix.DocumentAnalysis.Classification
 
             Image image = ImagePreprocessing.Process(source.Image, this.ImagePreprocessingOptions, 8);
 
-            image = Image.Scale(image, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None);
-            ////image = image.Binarize();
-            image = Image.Convert8To1(image, 128);
-            image = Image.CleanOverscan(image, 0.5f, 0.5f);
-            image = Image.Deskew(image);
-            image = Image.Despeckle(image);
+            image = image
+                .Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
+                ////.Binarize()
+                .Convert8To1(128)
+                .CleanOverscan(0.5f, 0.5f)
+                .Deskew()
+                .Despeckle();
 
             ISet<ConnectedComponent> components = image.FindConnectedComponents(8);
             image.RemoveConnectedComponents(components.Where(x => x.Power <= 16));
 
-            image = image.CropBlackArea(0, 0);
-            image = Image.Dilate(image, StructuringElement.Square(3), 1);
-            ////image = image.CropBlackArea(0, 0);
-            image = Image.Convert1To8(image);
-
-            image = Image.FilterLowpass(image, 3);
+            image = image
+                .CropBlackArea(0, 0)
+                .Dilate(StructuringElement.Square(3), 1)
+                ////.CropBlackArea(0, 0)
+                .Convert1To8()
+                .FilterLowpass(3);
 
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
 

@@ -86,137 +86,166 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            // result
-            ISet<ConnectedComponent> hlinesResult = null;
-            ISet<ConnectedComponent> vlinesResult = null;
-            HashSet<ConnectedComponent> result = new HashSet<ConnectedComponent>();
-
-            // close up small holes
-            int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-            Image closedImage = Image.MorphClose(image, StructuringElement.Square(maxLineWidth / 3), 1);
-
-            // open up to detect big solid areas
-            Image openedImage = Image.MorphOpen(image, StructuringElement.Square(maxLineWidth), 1);
-            Image hollowImage = Image.Sub(closedImage, openedImage, 0);
-
-            // open up in both directions to find lines
-            int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-            Image hlines = Image.MorphOpen(hollowImage, StructuringElement.Rectangle(minLineLength, 1), 1);
-            Image vlines = Image.MorphOpen(hollowImage, StructuringElement.Rectangle(1, minLineLength), 1);
-
-            // check for line presence
-            if (hlines.IsAllWhite())
-            {
-                hlines = null;
-            }
-
-            if (vlines.IsAllWhite())
-            {
-                vlines = null;
-            }
-
-            // various working images
-            Image nonLines = null;
+            // masks we would like to find
+            Image hlines = null;
+            Image vlines = null;
+            Image nonHLines = null;
+            Image nonVLines = null;
             Image itersections = null;
-            Image nonHLinesExtra = null;
+            FindLines();
 
-            // vertical lines
+            // remove the lines
             if (vlines != null)
             {
-                nonLines = Image.Sub(image, vlines, 0);
-                if (hlines != null)
-                {
-                    nonLines.Sub(hlines, 0);
-                    itersections = Image.And(hlines, vlines);
-                    nonHLinesExtra = Image.Sub(vlines, itersections, 0);
-                }
-
-                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image nonVLines = Image.Erode(nonLines, StructuringElement.Rectangle(maxLineResidue, 1), 1);
-
-                nonVLines.FloodFill(8, nonLines);
-
-                if (hlines != null)
-                {
-                    nonVLines.Add(hlines, 0);
-                    nonVLines.Sub(itersections, 0);
-                }
-
-                vlinesResult = FilterLines(vlines, nonVLines, true);
+                RemoveLines(vlines, nonVLines);
             }
 
-            // horizontal lines
             if (hlines != null)
             {
-                if (nonLines == null)
-                {
-                    nonLines = Image.Sub(image, hlines, 0);
-                }
+                // recompute intersections
+                itersections = vlines != null ? Image.And(hlines, vlines) : null;
 
-                int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                Image nonHLines = Image.Erode(nonLines, StructuringElement.Rectangle(1, maxLineResidue), 1);
+                // re-filter lines
+                FilterLines(hlines, nonHLines, false);
 
-                nonHLines.FloodFill(8, nonLines);
-
-                if (nonHLinesExtra != null)
-                {
-                    nonHLines.Or(nonHLinesExtra);
-                }
-
-                hlinesResult = FilterLines(hlines, nonHLines, false);
+                RemoveLines(hlines, nonHLines);
             }
 
-            /*Image res = Image.Sub(image, hlines, 0);
-            res.Sub(vlines, 0);
+            RemoveIntersections();
 
-            // find horizontal lines
-            if (options.Types.HasFlag(LineTypes.Horizontal))
+            return null; //// result;
+
+            void FindLines()
             {
-                // morphology open leaves only pixels that have required number of horizontal neighbors
-                Image workImage = Image.Open(image, StructuringElement.Rectangle(30, 1), 1);
+                // result
+                ISet<ConnectedComponent> hlinesResult = null;
+                ISet<ConnectedComponent> vlinesResult = null;
+                HashSet<ConnectedComponent> result = new HashSet<ConnectedComponent>();
 
-                // dilate lines to merge small gaps and include neighboring isolated pixels
-                const int DilationSize = 2;
-                workImage.Dilate(StructuringElement.Square(1 + (2 * DilationSize)), 1);
+                // close up small holes
+                int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
+                Image closedImage = image.MorphClose(StructuringElement.Square(maxLineWidth / 3), 1);
 
-                // find line components and filter out non-line components
-                minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
-                List<ConnectedComponent> components = workImage.FindConnectedComponents()
-                                                               .Where(x => x.Bounds.Width >= minLineLength)
-                                                               .ToList();
+                // open up to detect big solid areas
+                Image openedImage = image.MorphOpen(StructuringElement.Square(maxLineWidth), 1);
+                Image hollowImage = Image.Sub(closedImage, openedImage, 0);
 
-                // add components to found lines
-                foreach (ConnectedComponent component in components)
+                // open up in both directions to find lines
+                int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
+                hlines = hollowImage.MorphOpen(StructuringElement.Rectangle(minLineLength, 1), 1);
+                vlines = hollowImage.MorphOpen(StructuringElement.Rectangle(1, minLineLength), 1);
+
+                // check for line presence
+                if (hlines.IsAllWhite())
                 {
-                    int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
-                    lineShapes.Add(new LineShape(
-                        new Point(component.Bounds.Left, y),
-                        new Point(component.Bounds.Right, y),
-                        MinMax.Max(1, component.Bounds.Height - (2 * DilationSize)),
-                        LineTypes.Horizontal));
+                    hlines = null;
                 }
 
-                // create mask image
-                Image mask = new Image(
-                    workImage.Width,
-                    workImage.Height,
-                    1,
-                    workImage.HorizontalResolution,
-                    workImage.VerticalResolution);
-                mask.AddConnectedComponents(components);
-                mask.And(image);
+                if (vlines.IsAllWhite())
+                {
+                    vlines = null;
+                }
 
-                // apply mask
-                cleanedImage = image ^ mask;
+                // various working images
+                Image nonLines = null;
+                Image nonHLinesExtra = null;
 
-                // dilate vertically to close gaps in vertical lines opened by lines removal
-                cleanedImage.Dilate(StructuringElement.Rectangle(1, 7), 1);
-                cleanedImage = cleanedImage & image;
-            }*/
+                // vertical lines
+                if (vlines != null)
+                {
+                    nonLines = Image.Sub(image, vlines, 0);
+                    if (hlines != null)
+                    {
+                        nonLines.Sub(hlines, 0);
+                        itersections = Image.And(hlines, vlines);
+                        nonHLinesExtra = Image.Sub(vlines, itersections, 0);
+                    }
 
-            return result;
+                    int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    nonVLines = nonLines.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1);
 
-            ISet<ConnectedComponent> FilterLines(Image linesImage, Image nonLinesImage, bool vertical)
+                    nonVLines.FloodFillIP(8, nonLines);
+
+                    if (hlines != null)
+                    {
+                        nonVLines.Add(hlines, 0);
+                        nonVLines.Sub(itersections, 0);
+                    }
+
+                    vlinesResult = FilterLines(vlines, nonVLines, true);
+                }
+
+                // horizontal lines
+                if (hlines != null)
+                {
+                    if (nonLines == null)
+                    {
+                        nonLines = Image.Sub(image, hlines, 0);
+                    }
+
+                    int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    nonHLines = nonLines.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1);
+
+                    nonHLines.FloodFillIP(8, nonLines);
+
+                    if (nonHLinesExtra != null)
+                    {
+                        nonHLines.Or(nonHLinesExtra);
+                    }
+
+                    hlinesResult = FilterLines(hlines, nonHLines, false);
+                }
+
+                /*Image res = Image.Sub(image, hlines, 0);
+                res.Sub(vlines, 0);
+
+                // find horizontal lines
+                if (options.Types.HasFlag(LineTypes.Horizontal))
+                {
+                    // morphology open leaves only pixels that have required number of horizontal neighbors
+                    Image workImage = Image.Open(image, StructuringElement.Rectangle(30, 1), 1);
+
+                    // dilate lines to merge small gaps and include neighboring isolated pixels
+                    const int DilationSize = 2;
+                    workImage.Dilate(StructuringElement.Square(1 + (2 * DilationSize)), 1);
+
+                    // find line components and filter out non-line components
+                    minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
+                    List<ConnectedComponent> components = workImage.FindConnectedComponents()
+                                                                   .Where(x => x.Bounds.Width >= minLineLength)
+                                                                   .ToList();
+
+                    // add components to found lines
+                    foreach (ConnectedComponent component in components)
+                    {
+                        int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
+                        lineShapes.Add(new LineShape(
+                            new Point(component.Bounds.Left, y),
+                            new Point(component.Bounds.Right, y),
+                            MinMax.Max(1, component.Bounds.Height - (2 * DilationSize)),
+                            LineTypes.Horizontal));
+                    }
+
+                    // create mask image
+                    Image mask = new Image(
+                        workImage.Width,
+                        workImage.Height,
+                        1,
+                        workImage.HorizontalResolution,
+                        workImage.VerticalResolution);
+                    mask.AddConnectedComponents(components);
+                    mask.And(image);
+
+                    // apply mask
+                    cleanedImage = image ^ mask;
+
+                    // dilate vertically to close gaps in vertical lines opened by lines removal
+                    cleanedImage.Dilate(StructuringElement.Rectangle(1, 7), 1);
+                    cleanedImage = cleanedImage & image;
+                }*/
+            }
+
+            ISet<ConnectedComponent> FilterLines(Image lines, Image nonLines, bool vertical)
             {
                 /*using (Pix pixLines = Pix.FromImage(lines))
                 {
@@ -255,15 +284,13 @@ namespace Genix.DocumentAnalysis
                     vertical ? image.VerticalResolution : image.HorizontalResolution,
                     200);
 
-                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(linesImage.FindConnectedComponents(8));
+                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(lines.FindConnectedComponents(8));
                 components.RemoveWhere(component =>
                 {
                     Rectangle bounds = component.Bounds;
-                    Image comp = component.ToImage();
 
                     // calculate maximum component width as twice the maximum distance between its points and the background
-                    Image compDist = comp.DistanceToBackground(4, 8);
-                    int maxWidth = (int)compDist.Max() * 2;
+                    int maxWidth = (int)component.ToImage().DistanceToBackground(4, 8).Max() * 2;
 
                     /*int maxWidth = 0;
                     using (Pix pixComp = Pix.FromImage(comp))
@@ -298,7 +325,7 @@ namespace Genix.DocumentAnalysis
 
                     if (isBad)
                     {
-                        linesImage.SetWhite(bounds);
+                        lines.SetWhite(bounds);
                     }
                     else
                     {
@@ -337,12 +364,40 @@ namespace Genix.DocumentAnalysis
                     }
 
                     bounds.Intersect(nonLines.Bounds);
-                    return nonLinesImage.Power(bounds);
+                    return nonLines.Power(bounds);
                 }
+            }
 
-                int CountIntersections(Rectangle bounds)
+            int CountIntersections(Rectangle bounds)
+            {
+                return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
+            }
+
+            void RemoveLines(Image lines, Image nonLines)
+            {
+                // remove the lines
+                image.Xand(lines);
+
+                // dilate the lines so they touch the residue
+                // then flood fill then to get all the residue (image less non-lines)
+                Image fatLines = lines.Dilate(StructuringElement.Square(3), 1);
+                fatLines.FloodFillIP(8, Image.Xand(image, nonLines));
+
+                // remove the residue
+                image.Xand(fatLines);
+            }
+
+            void RemoveIntersections()
+            {
+                if (hlines != null && vlines != null)
                 {
-                    return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
+                    // get the intersection residue
+                    Image residue = Image.And(hlines, vlines)
+                        .Dilate(StructuringElement.Square(5), 1);
+                    residue.FloodFillIP(8, image);
+
+                    // remove the residue
+                    image.Xand(residue);
                 }
             }
         }

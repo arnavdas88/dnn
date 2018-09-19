@@ -23,20 +23,16 @@ namespace Genix.Imaging
         /// <summary>
         /// Performs Gaussian filtering of the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to filter.</param>
         /// <param name="kernelSize">The size of the Gaussian kernel (odd, greater or equal to 3).</param>
         /// <param name="sigma">The standard deviation of the Gaussian kernel.</param>
         /// <returns>
         /// A new <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8 or 24.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// <para>The kernel size is not an odd number ot it is less than three.</para>
+        /// <para>The kernel size is not an odd number or it is less than three.</para>
         /// </exception>
         /// <remarks>
         /// <para>
@@ -45,24 +41,19 @@ namespace Genix.Imaging
         /// The anchor cell is the center of the kernel.
         /// </para>
         /// </remarks>
-        public static Image FilterGaussian(Image image, int kernelSize, float sigma)
+        public Image FilterGaussian(int kernelSize, float sigma)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (kernelSize < 3 || (kernelSize % 2) == 0)
             {
                 throw new ArgumentException("The kernel size must be an odd number greater or equal to three.", nameof(kernelSize));
             }
 
-            Image dst = image.Clone(false);
+            Image dst = this.Clone(false);
 
-            switch (image.BitsPerPixel)
+            switch (this.BitsPerPixel)
             {
                 case 8:
-                    if (NativeMethods.filterGaussian_8bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
+                    if (NativeMethods.filterGaussian_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -70,7 +61,7 @@ namespace Genix.Imaging
                     break;
 
                 case 24:
-                    if (NativeMethods.filterGaussian_24bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
+                    if (NativeMethods.filterGaussian_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -79,7 +70,7 @@ namespace Genix.Imaging
 
                 default:
                     throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
+                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
             return dst;
@@ -89,14 +80,10 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies Laplace filter to the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to filter.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
         /// A new <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
@@ -120,25 +107,20 @@ namespace Genix.Imaging
         /// <para>    -3  0  6  0 -3</para>
         /// <para>    -1 -3 -4 -3 -1</para>
         /// </remarks>
-        public static Image FilterLaplace(Image image, int maskSize)
+        public Image FilterLaplace(int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (maskSize != 3 && maskSize != 5)
             {
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = image.Clone(false);
+            Image dst = this.Clone(false);
 
-            switch (image.BitsPerPixel)
+            switch (this.BitsPerPixel)
             {
                 case 8:
-                    if (NativeMethods.filterLaplace_8bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterLaplace_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -146,7 +128,7 @@ namespace Genix.Imaging
                     break;
 
                 case 24:
-                    if (NativeMethods.filterLaplace_24bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterLaplace_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -154,7 +136,7 @@ namespace Genix.Imaging
                     break;
 
                 case 32:
-                    if (NativeMethods.filterLaplace_32bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterLaplace_32bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -163,7 +145,7 @@ namespace Genix.Imaging
 
                 default:
                     throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
+                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
             return dst;
@@ -173,14 +155,10 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies high-pass filter to the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to filter.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
         /// A new <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
         /// </exception>
@@ -204,25 +182,20 @@ namespace Genix.Imaging
         /// <para>    -1 -1 -1 -1 -1</para>
         /// <para>    -1 -1 -1 -1 -1</para>
         /// </remarks>
-        public static Image FilterHipass(Image image, int maskSize)
+        public Image FilterHipass(int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (maskSize != 3 && maskSize != 5)
             {
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = image.Clone(false);
+            Image dst = this.Clone(false);
 
-            switch (image.BitsPerPixel)
+            switch (this.BitsPerPixel)
             {
                 case 8:
-                    if (NativeMethods.filterHipass_8bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterHipass_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -230,7 +203,7 @@ namespace Genix.Imaging
                     break;
 
                 case 24:
-                    if (NativeMethods.filterHipass_24bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterHipass_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -238,7 +211,7 @@ namespace Genix.Imaging
                     break;
 
                 case 32:
-                    if (NativeMethods.filterHipass_32bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterHipass_32bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -247,7 +220,7 @@ namespace Genix.Imaging
 
                 default:
                     throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
+                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
             return dst;
@@ -257,14 +230,10 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies lowpass filter to the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to filter.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
         /// A new <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
         /// </exception>
@@ -288,25 +257,20 @@ namespace Genix.Imaging
         /// <para>    1/25 1/25 1/25 1/25 1/25</para>
         /// <para>    1/25 1/25 1/25 1/25 1/25</para>
         /// </remarks>
-        public static Image FilterLowpass(Image image, int maskSize)
+        public Image FilterLowpass(int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (maskSize != 3 && maskSize != 5)
             {
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = image.Clone(false);
+            Image dst = this.Clone(false);
 
-            switch (image.BitsPerPixel)
+            switch (this.BitsPerPixel)
             {
                 case 8:
-                    if (NativeMethods.filterLowpass_8bpp(image.Width, image.Height, image.Bits, image.Stride, dst.Bits, dst.Stride, maskSize) != 0)
+                    if (NativeMethods.filterLowpass_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
                     {
                         throw new OutOfMemoryException();
                     }
@@ -315,7 +279,7 @@ namespace Genix.Imaging
 
                 default:
                     throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, image.BitsPerPixel));
+                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
             return dst;

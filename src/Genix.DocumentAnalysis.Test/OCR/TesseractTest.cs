@@ -30,7 +30,7 @@ namespace Genix.DocumentAnalysis.OCR.Test
 
                     foreach ((Imaging.Image image, _, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
                     {
-                        tess.SetImage(Imaging.Image.Convert1To8(image));
+                        tess.SetImage(image.Convert1To8());
                     }
                 }
             }

@@ -28,10 +28,10 @@ namespace Genix.Imaging
 <#
     Tuple<string, string>[] sefuncs =
     {
-        Tuple.Create("Dilate", "Dilates the <see cref=\"Image\"/> by using the specified structuring element."),
-        Tuple.Create("Erode", "Erodes the <see cref=\"Image\"/> by using the specified structuring element."),
-        Tuple.Create("MorphOpen", "Perform morphological opening operation on the <see cref=\"Image\"/> by using the specified structuring element."),
-        Tuple.Create("MorphClose", "Perform morphological closing operation on the <see cref=\"Image\"/> by using the specified structuring element."),
+        Tuple.Create("Dilate", "Dilates this <see cref=\"Image\"/> by using the specified structuring element not-in-place."),
+        Tuple.Create("Erode", "Erodes this <see cref=\"Image\"/> by using the specified structuring element not-in-place."),
+        Tuple.Create("MorphOpen", "Perform morphological opening operation on this <see cref=\"Image\"/> by using the specified structuring element not-in-place."),
+        Tuple.Create("MorphClose", "Perform morphological closing operation on this <see cref=\"Image\"/> by using the specified structuring element not-in-place."),
     };
 
     foreach (Tuple<string, string> func in sefuncs)
@@ -43,17 +43,16 @@ namespace Genix.Imaging
         /// <summary>
         /// <#=summary#>
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to process.</param>
         /// <param name="kernel">The structuring element used in this operation.</param>
         /// <param name="iterations">The number of times the operation is applied.</param>
         /// <returns>
         /// The new <see cref="Image"/>.
         /// </returns>
-        /// <seealso cref="<#=funcName#>(StructuringElement, int)"/>
-        public static Image <#=funcName#>(Image image, StructuringElement kernel, int iterations)
+        /// <seealso cref="<#=funcName#>IP(StructuringElement, int)"/>
+        public Image <#=funcName#>(StructuringElement kernel, int iterations)
         {
-            Image dst = image.Copy();
-            dst.<#=funcName#>(kernel, iterations);
+            Image dst = this.Copy();
+            dst.<#=funcName#>IP(kernel, iterations);
             return dst;
         }
 <#
@@ -61,7 +60,7 @@ namespace Genix.Imaging
 
     Tuple<string, string>[] funcs =
     {
-        Tuple.Create("Despeckle", "Removes small isolated pixels from the <see cref=\"Image\"/>."),
+        Tuple.Create("Despeckle", "Removes small isolated pixels from this <see cref=\"Image\"/> not-in-place."),
     };
 
     foreach (Tuple<string, string> func in funcs)
@@ -73,15 +72,14 @@ namespace Genix.Imaging
         /// <summary>
         /// <#=summary#>
         /// </summary>
-        /// <param name="image">The <see cref="Image"/> to process.</param>
         /// <returns>
         /// The new <see cref="Image"/>.
         /// </returns>
-        /// <seealso cref="<#=funcName#>()"/>
-        public static Image <#=funcName#>(Image image)
+        /// <seealso cref="<#=funcName#>IP()"/>
+        public Image <#=funcName#>()
         {
-            Image dst = image.Copy();
-            dst.<#=funcName#>();
+            Image dst = this.Copy();
+            dst.<#=funcName#>IP();
             return dst;
         }
 <#

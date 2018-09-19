@@ -20,32 +20,23 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies affine transformation described by the specified matrix to the <see cref="Image"/>.
         /// </summary>
-        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="matrix">The transformation matrix.</param>
         /// <returns>
         /// A new transformed <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
-        public static Image Affine(Image image, System.Windows.Media.Matrix matrix)
+        public Image Affine(System.Windows.Media.Matrix matrix)
         {
             const float Eps = 1e-8f;
 
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             if (matrix.IsIdentity)
             {
-                return image.Copy();
+                return this.Copy();
             }
 
             // calculate new image size and position
-            System.Windows.Point tr = TransformPoint(image.Width, 0);
-            System.Windows.Point br = TransformPoint(image.Width, image.Height);
-            System.Windows.Point bl = TransformPoint(0, image.Height);
+            System.Windows.Point tr = TransformPoint(this.Width, 0);
+            System.Windows.Point br = TransformPoint(this.Width, this.Height);
+            System.Windows.Point bl = TransformPoint(0, this.Height);
 
             double x1dst = Core.MinMax.Min(bl.X, tr.X, br.X, 0.0);
             double x2dst = Core.MinMax.Max(bl.X, tr.X, br.X, 0.0);
@@ -63,14 +54,14 @@ namespace Genix.Imaging
             // IPP does not support 1bpp images - convert to 8bpp
             Image grayImage;
             bool convert1bpp = false;
-            if (image.BitsPerPixel == 1)
+            if (this.BitsPerPixel == 1)
             {
-                grayImage = Image.Convert1To8(image);
+                grayImage = this.Convert1To8();
                 convert1bpp = true;
             }
             else
             {
-                grayImage = image;
+                grayImage = this;
             }
 
             Image transformedImage = new Image(widthdst, heightdst, grayImage);
@@ -98,7 +89,7 @@ namespace Genix.Imaging
             // convert back to 1bpp
             if (convert1bpp)
             {
-                transformedImage = Image.Convert8To1(transformedImage, 1);
+                transformedImage = transformedImage.Convert8To1(1);
                 /*using (Pix pixs = transformedImage.CreatePix())
                 {
                     using (Pix pixd = pixs.pixOtsu(false))
@@ -111,7 +102,7 @@ namespace Genix.Imaging
                 }*/
             }
 
-            transformedImage.Transform = image.Transform.Append(new MatrixTransform(matrix));
+            transformedImage.Transform = this.Transform.Append(new MatrixTransform(matrix));
             return transformedImage;
 
             System.Windows.Point TransformPoint(int ptx, int pty)
@@ -125,44 +116,31 @@ namespace Genix.Imaging
         /// <summary>
         /// Rotates the <see cref="Image"/> by an arbitrary angle.
         /// </summary>
-        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="angle">The rotation angle, in degrees, counter-clockwise.</param>
         /// <returns>
         /// A new rotated <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
-        public static Image Rotate(Image image, double angle)
+        public Image Rotate(double angle)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
             angle = angle % 360.0;
             float a = (float)(Math.PI * (angle / 180.0));
             if (Math.Abs(a) < 0.001f)
             {
-                return image.Copy();
+                return this.Copy();
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Rotate(angle);
 
-            return Image.Affine(image, matrix);
+            return this.Affine(matrix);
         }
 
         /// <summary>
         /// Rotates, flips, or rotates and flips the <see cref="Image"/>, and returns re-sized image.
         /// </summary>
-        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="rotateFlipType">A <see cref="RotateFlip"/> member that specifies the type of rotation and flip to apply to the image.</param>
         /// <returns>A rotated <see cref="Image"/>.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
-        public static Image RotateFlip(Image image, RotateFlip rotateFlipType)
+        public Image RotateFlip(RotateFlip rotateFlipType)
         {
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
 
@@ -204,45 +182,36 @@ namespace Genix.Imaging
                     break;
             }
 
-            return Image.Affine(image, matrix);
+            return this.Affine(matrix);
         }
 
         /// <summary>
         /// Shears the <see cref="Image"/> by the specified amount.
         /// </summary>
-        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="shearTan">Shearing force.
         /// Each horizontal string with Y coordinate equal to y is shifted horizontally by the <i>skew</i>*y pixels.
         /// </param>
         /// <returns>
         /// A new sheared <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
-        public static Image Shear(Image image, double shearTan)
+        public Image Shear(double shearTan)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
+            int maxoffset = Math.Abs((int)((shearTan * (this.Height - 1)) + 0.5)) * this.BitsPerPixel;
 
-            int maxoffset = Math.Abs((int)((shearTan * (image.Height - 1)) + 0.5)) * image.BitsPerPixel;
-
-            Image dst = new Image(image.Width + maxoffset, image.Height, image);
+            Image dst = new Image(this.Width + maxoffset, this.Height, this);
 
             // allocate new DIB bits
-            int widthsrc1 = image.WidthBits;
+            int widthsrc1 = this.WidthBits;
             int widthdst1 = dst.WidthBits;
-            int stridesrc1 = image.Stride1;
+            int stridesrc1 = this.Stride1;
             int stridedst1 = dst.Stride1;
 
-            ulong[] bitssrc = image.Bits;
+            ulong[] bitssrc = this.Bits;
             ulong[] bitsdst = dst.Bits;
 
-            for (int iy = 0, possrc = 0, posdst = 0; iy < image.Height; iy++, possrc += stridesrc1, posdst += stridedst1)
+            for (int iy = 0, possrc = 0, posdst = 0; iy < this.Height; iy++, possrc += stridesrc1, posdst += stridedst1)
             {
-                int offset = Math.Abs((int)((shearTan * iy) + 0.5)) * image.BitsPerPixel;
+                int offset = Math.Abs((int)((shearTan * iy) + 0.5)) * this.BitsPerPixel;
 
                 if (offset > 0)
                 {
@@ -264,38 +233,29 @@ namespace Genix.Imaging
         /// <summary>
         /// De-skews the <see cref="Image"/> and aligns it horizontally.
         /// </summary>
-        /// <param name="image">The source <see cref="Image"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="image"/> is <b>null</b>.
-        /// </exception>
         /// <exception cref="NotImplementedException">
         /// <see cref="Image{T}.BitsPerPixel"/> is not one.
         /// </exception>
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static Image Deskew(Image image)
+        public Image Deskew()
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            if (image.BitsPerPixel != 1)
+            if (this.BitsPerPixel != 1)
             {
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            int width = image.Width;
-            int height = image.Height;
-            int stride = image.Stride;
-            ulong[] bits = image.Bits;
+            int width = this.Width;
+            int height = this.Height;
+            int stride = this.Stride;
+            ulong[] bits = this.Bits;
 
             // build histogram
-            ulong endMask = image.EndMask;
+            ulong endMask = this.EndMask;
             float[][] histogram = new float[stride][];
             for (int ix = 0; ix < stride; ix++)
             {
@@ -372,7 +332,7 @@ namespace Genix.Imaging
                 }
             }
 
-            return Image.Rotate(image, -angleBest);
+            return this.Rotate(-angleBest);
 
             float EstimateSkewAngle(float angle)
             {

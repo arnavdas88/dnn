@@ -20,11 +20,11 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Dilates this <see cref="Image"/> by using the specified structuring element.
+        /// Dilates this <see cref="Image"/> by using the specified structuring element in-place.
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void Dilate(StructuringElement kernel, int iterations)
+        public void DilateIP(StructuringElement kernel, int iterations)
         {
             if (kernel == null)
             {
@@ -88,11 +88,11 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Erodes this <see cref="Image"/> by using the specified structuring element.
+        /// Erodes this <see cref="Image"/> by using the specified structuring element in-place.
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void Erode(StructuringElement kernel, int iterations)
+        public void ErodeIP(StructuringElement kernel, int iterations)
         {
             if (kernel == null)
             {
@@ -153,37 +153,37 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element in-place.
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void MorphOpen(StructuringElement kernel, int iterations)
+        public void MorphOpenIP(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.Erode(kernel, 1);
-                this.Dilate(kernel, 1);
+                this.ErodeIP(kernel, 1);
+                this.DilateIP(kernel, 1);
             }
         }
 
         /// <summary>
-        /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
+        /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element in-place.
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void MorphClose(StructuringElement kernel, int iterations)
+        public void MorphCloseIP(StructuringElement kernel, int iterations)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.Dilate(kernel, 1);
-                this.Erode(kernel, 1);
+                this.DilateIP(kernel, 1);
+                this.ErodeIP(kernel, 1);
             }
         }
 
         /// <summary>
-        /// Removes small isolated pixels from this <see cref="Image"/>.
+        /// Removes small isolated pixels from this <see cref="Image"/> in-place.
         /// </summary>
-        public void Despeckle()
+        public void DespeckleIP()
         {
             // create masks
             ulong[] mask = new ulong[this.Bits.Length];
@@ -700,7 +700,7 @@ namespace Genix.Imaging
                 throw new ArgumentException("The destination image depth is neither 8 nor 16.");
             }
 
-            Image dst = bitsPerPixel == 8 ? Image.Convert1To8(this, 0, 1) : Image.Convert1To16(this, 0, 1);
+            Image dst = bitsPerPixel == 8 ? this.Convert1To8(0, 1) : this.Convert1To16(0, 1);
             int stride = dst.Stride;
 
             int xx = dst.Width - 1;
@@ -876,7 +876,7 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Performs flood fill (binary reconstruction) of the <see cref="Image"/>.
+        /// Performs flood fill (binary reconstruction) of the <see cref="Image"/> in-place.
         /// </summary>
         /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
         /// <param name="mask">The mask image.</param>
@@ -888,7 +888,7 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
         /// </exception>
-        public void FloodFill(int connectivity, Image mask)
+        public void FloodFillIP(int connectivity, Image mask)
         {
             if (mask == null)
             {
@@ -974,15 +974,26 @@ namespace Genix.Imaging
                         do
                         {
                             int bitoff = bitpos >> 6;
-                            Vectors.Or(stridesrc - bitoff, buffer, bitoff, bits, off + bitoff);
+
+                            int lastbitpos = BitUtils.BitScanOneReverse(bitwidth, buffer, bitwidth - 1);
+                            int lastbitoff = lastbitpos >> 6;
+
+                            int count = lastbitoff - bitoff + 1;
+                            Vectors.Or(count, buffer, bitoff, bits, off + bitoff);
 
                             // shift changed pixels to the left (from LSB to MSB)
                             // on image they are shifted to the right
-                            Vectors.Shl(stridesrc - bitoff, 1, buffer, bitoff);
+                            if (((lastbitpos + 1) & 63) == 0)
+                            {
+                                count = Math.Min(count + 1, buffer.Length - bitoff);
+                            }
+
+                            Vectors.Shl(count, 1, buffer, bitoff);
 
                             // mask pixels
-                            Vectors.And(stride - bitoff, bitsmask, offmask + bitoff, buffer, bitoff);
-                            Vectors.Xand(stridesrc - bitoff, bits, off + bitoff, buffer, bitoff);
+                            // this would leave only new pixels that have to be set
+                            Vectors.And(count, bitsmask, offmask + bitoff, buffer, bitoff);
+                            Vectors.Xand(count, bits, off + bitoff, buffer, bitoff);
 
                             bitpos = BitUtils.BitScanOneForward(bitwidth - (bitpos + 1), buffer, bitpos + 1);
                         }
@@ -1017,8 +1028,8 @@ namespace Genix.Imaging
                     Vectors.Xand(stride, bits, off, buffer, 0);
 
                     // check if any pixel will change
-                    int bitpos = BitUtils.BitScanOneReverse(bitwidth, buffer, bitwidth - 1);
-                    if (bitpos == -1)
+                    int lastbitpos = BitUtils.BitScanOneReverse(bitwidth, buffer, bitwidth - 1);
+                    if (lastbitpos == -1)
                     {
                         // pixel count did not change - shrink lower boundary if we are at the bottom
                         if (i == bottom)
@@ -1038,20 +1049,32 @@ namespace Genix.Imaging
 
                         do
                         {
+                            int bitpos = BitUtils.BitScanOneForward(bitwidth, buffer, 0);
                             int bitoff = bitpos >> 6;
-                            Vectors.Or(bitoff + 1, buffer, 0, bits, off);
+
+                            int lastbitoff = lastbitpos >> 6;
+
+                            int count = lastbitoff - bitoff + 1;
+                            Vectors.Or(count, buffer, bitoff, bits, off + bitoff);
 
                             // shift changed pixels to the right (from MSB to LSB)
                             // on image they are shifted to the left
-                            Vectors.Shr(bitoff + 1, 1, buffer, 0);
+                            if ((bitpos & 63) == 0 && bitoff > 0)
+                            {
+                                bitoff--;
+                                count++;
+                            }
+
+                            Vectors.Shr(count, 1, buffer, bitoff);
 
                             // mask pixels
-                            Vectors.And(bitoff + 1, bitsmask, offmask, buffer, 0);
-                            Vectors.Xand(bitoff + 1, bits, off, buffer, 0);
+                            // this would leave only new pixels that have to be set
+                            Vectors.And(count, bitsmask, offmask + bitoff, buffer, bitoff);
+                            Vectors.Xand(count, bits, off + bitoff, buffer, bitoff);
 
-                            bitpos = BitUtils.BitScanOneReverse(bitpos, buffer, bitpos - 1);
+                            lastbitpos = BitUtils.BitScanOneReverse(lastbitpos, buffer, lastbitpos - 1);
                         }
-                        while (bitpos != -1);
+                        while (lastbitpos != -1);
                     }
                 }
             }
