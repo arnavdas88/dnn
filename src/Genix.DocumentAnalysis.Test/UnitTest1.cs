@@ -15,14 +15,17 @@
         {
             Stopwatch stopwatch = new Stopwatch();
 
-            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
+            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
-                Image workImage = Image.Binarize(image);
+                Image workImage = image.BitsPerPixel > 1 ? Image.Binarize(image) : image;
 
+#if false
                 stopwatch.Restart();
 
-                workImage.DistanceToBackground(4, 8);
+                for (int i = 0; i < 10; i++)
+                workImage.FindConnectedComponents(8);
+                ////workImage.DistanceToBackground(4, 8);
 
                 stopwatch.Stop();
                 Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
@@ -38,6 +41,7 @@
                     stopwatch.Stop();
                     Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
                 }
+#endif
 
                 workImage = Image.Deskew(workImage);
                 ISet<ConnectedComponent> components = LineDetector.FindLines(workImage, new LineDetectionOptions());

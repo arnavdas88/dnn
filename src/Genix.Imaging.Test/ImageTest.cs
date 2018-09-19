@@ -134,7 +134,7 @@
                     workImage = Image.Deskew(workImage);
                     workImage = Image.Despeckle(workImage);
 
-                    ISet<ConnectedComponent> components = workImage.FindConnectedComponents();
+                    ISet<ConnectedComponent> components = workImage.FindConnectedComponents(8);
                     workImage.RemoveConnectedComponents(components);
 
                     /*workImage = workImage.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, Imaging.ScalingOptions.None);

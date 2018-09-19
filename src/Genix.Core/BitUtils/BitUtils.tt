@@ -23,7 +23,7 @@
 namespace Genix.Core
 {
     using System;
-	using System.Diagnostics;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -197,6 +197,24 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Determines whether the range of bits in two arrays of <#=typeDescription#> at the specified positions
+        /// are equal.
+        /// </summary>
+        /// <param name="count">The number of bits to test.</param>
+        /// <param name="x">The first source bits.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
+        /// <param name="y">The second source bits.</param>
+        /// <param name="posy">The starting bit position in <paramref name="y"/>.</param>
+        /// <returns>
+        /// <b>true</b> if the bits are equal; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Equals(int count, <#=typeName#>[] x, int posx, <#=typeName#>[] y, int posy)
+        {
+            return NativeMethods.bits_equals_<#=nativeSuffix#>(count, x, posx, y, posy);
+        }
+
+        /// <summary>
         /// Copies the specified number of bits to the specified position.
         /// </summary>
         /// <param name="bits">The bits to set.</param>
@@ -227,6 +245,32 @@ namespace Genix.Core
         public static void CopyBits(int count, <#=typeName#>[] x, int posx, <#=typeName#>[] y, int posy)
         {
             NativeMethods.bits_copy_<#=nativeSuffix#>(count, x, posx, y, posy);
+        }
+
+        /// <summary>
+        /// Shifts a range of bits from a source array of <#=typeDescription#> to the left (from LSB to MSB).
+        /// </summary>
+        /// <param name="count">The number of bits to shift.</param>
+        /// <param name="shift">The number of bits by which the method shifts each element.</param>
+        /// <param name="x">The bits to shift.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Shl(int count, int shift, <#=typeName#>[] x, int posx)
+        {
+            NativeMethods.bits_shl_<#=nativeSuffix#>(count, shift, x, posx);
+        }
+
+        /// <summary>
+        /// Shifts a range of bits from a source array of <#=typeDescription#> to the right (from MSB to LSB).
+        /// </summary>
+        /// <param name="count">The number of bits to shift.</param>
+        /// <param name="shift">The number of bits by which the method shifts each element.</param>
+        /// <param name="x">The bits to shift.</param>
+        /// <param name="posx">The starting bit position in <paramref name="x"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Shr(int count, int shift, <#=typeName#>[] x, int posx)
+        {
+            NativeMethods.bits_shr_<#=nativeSuffix#>(count, shift, x, posx);
         }
 
         /// <summary>
@@ -508,6 +552,10 @@ namespace Genix.Core
 #>
 
             [DllImport(NativeMethods.DllName)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool bits_equals_<#=nativeSuffix#>(int count, [In] <#=typeName#>[] x, int posx, [In] <#=typeName#>[] y, int posy);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void bits_set_<#=nativeSuffix#>(int count, [In, Out] <#=typeName#>[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
@@ -515,6 +563,12 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_copy_<#=nativeSuffix#>(int count, [In] <#=typeName#>[] x, int posx, [Out] <#=typeName#>[] y, int posy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_shl_<#=nativeSuffix#>(int count, int shift, [In] <#=typeName#>[] x, int posx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_shr_<#=nativeSuffix#>(int count, int shift, [In] <#=typeName#>[] x, int posx);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int bit_scan_forward_<#=nativeSuffix#>(<#=typeName#> bits);

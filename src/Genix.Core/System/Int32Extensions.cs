@@ -54,28 +54,15 @@ namespace System
         /// <param name="value">This instance value.</param>
         /// <param name="lowerBound">The lower inclusive bound of the range.</param>
         /// <param name="upperBound">The upper inclusive bound of the range.</param>
+        /// <param name="includeUpperBound">Determines whether <paramref name="upperBound"/> should be tested for equality.</param>
         /// <returns>
-        /// <b>true</b> if this instance is greater than or equal to <paramref name="lowerBound"/> and less than or equal to <paramref name="upperBound"/>; otherwise, <b>false</b>.
+        /// <b>true</b> if this instance is greater than or equal to <paramref name="lowerBound"/>
+        /// and if <paramref name="includeUpperBound"/> is <b>true</b> less than or otherwise less than or equal to <paramref name="upperBound"/>; otherwise, <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Between(this int value, int lowerBound, int upperBound)
+        public static bool Between(this int value, int lowerBound, int upperBound, bool includeUpperBound)
         {
-            return value >= lowerBound && value <= upperBound;
-        }
-
-        /// <summary>
-        /// Determines whether this instance falls within the range of specified 32-bit signed integers.
-        /// </summary>
-        /// <param name="value">This instance value.</param>
-        /// <param name="lowerBound">The lower inclusive bound of the range.</param>
-        /// <param name="upperBound">The upper exclusive bound of the range.</param>
-        /// <returns>
-        /// <b>true</b> if this instance is greater than or equal to <paramref name="lowerBound"/> and less than <paramref name="upperBound"/>; otherwise, <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool InRange(this int value, int lowerBound, int upperBound)
-        {
-            return value >= lowerBound && value < upperBound;
+            return value >= lowerBound && (includeUpperBound ? value <= upperBound : value < upperBound);
         }
 
         /// <summary>

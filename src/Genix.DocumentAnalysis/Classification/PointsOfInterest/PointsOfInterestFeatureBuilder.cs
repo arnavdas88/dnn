@@ -90,7 +90,7 @@ namespace Genix.DocumentAnalysis.Classification
             image = Image.Deskew(image);
             image = Image.Despeckle(image);
 
-            ISet<ConnectedComponent> components = image.FindConnectedComponents();
+            ISet<ConnectedComponent> components = image.FindConnectedComponents(8);
             image.RemoveConnectedComponents(components.Where(x => x.Power <= 16));
 
             image = image.CropBlackArea(0, 0);

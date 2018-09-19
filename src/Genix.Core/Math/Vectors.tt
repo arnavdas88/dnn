@@ -437,6 +437,34 @@
         },
         new MethodDescriptor()
         {
+            Name = "Shr",
+            NativeName = "shr",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Shifts bits in the array of {0} to the right (from MSB to LSB)",
+            ConstantName = "shift",
+            ConstantType = "int",
+            ConstantDescription = "The number of bits by which the method shifts each element.",
+            HasInPlace = true,
+            Op = "y = x &gt;&gt; shift",
+            OpInPlace = "y &gt;&gt;= shift",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Shl",
+            NativeName = "shl",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Shifts bits in the array of {0} to the left (from LSB to MSB)",
+            ConstantName = "shift",
+            ConstantType = "int",
+            ConstantDescription = "The number of bits by which the method shifts each element.",
+            HasInPlace = true,
+            Op = "y = x &lt;&lt; shift",
+            OpInPlace = "y &lt;&lt;= shift",
+            SupportedTypes = "uint;ulong",
+        },
+        new MethodDescriptor()
+        {
             Name = "Sum",
             NativeName = "sum",
             Argument = ArgumentType.VectorAggregate,
@@ -557,32 +585,32 @@ namespace Genix.Core
         /// <#=string.Format(method.Summary, typeDescription)#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy)
         {
             Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
-            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, y, offy);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, offy);
         }
 
         /// <summary>
         /// <#=string.Format(method.Summary, typeDescription)#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>* y)
+        public static unsafe void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y)
         {
-            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, y, 0);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, 0);
         }
 <#            if (method.HasIncrement) { #>
 
@@ -590,7 +618,7 @@ namespace Genix.Core
         /// <#=string.Format(method.Summary, typeDescription)#> with increment.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
@@ -598,26 +626,26 @@ namespace Genix.Core
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy, int incy)
+        public static void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy, int incy)
         {
             Debug.Assert(y.Length > offy + ((length - 1) * incy), "The destination array should be big enough.");
-            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, a, y, offy, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, offy, incy);
         }
 
         /// <summary>
         /// <#=string.Format(method.Summary, typeDescription)#> with increment.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>* y, int incy)
+        public static unsafe void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y, int incy)
         {
-            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, a, y, 0, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, 0, incy);
         }
 <#            }
               break;
@@ -912,31 +940,31 @@ namespace Genix.Core
         /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " in-place" : ""#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, a, y, offy);
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, offy);
         }
 
         /// <summary>
         /// <#=string.Format(method.Summary, typeDescription)#><#=method.HasInPlace ? " in-place" : ""#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The source and destination array.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>* y)
+        public static unsafe void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y)
         {
-            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, a, y, 0);
+            NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, 0);
         }
 <#                  if (method.HasIncrement) { #>
 
@@ -944,7 +972,7 @@ namespace Genix.Core
         /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " in-place" : ""#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
@@ -952,25 +980,25 @@ namespace Genix.Core
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>[] y, int offy, int incy)
+        public static void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy, int incy)
         {
-            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, a, y, offy, incy);
+            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, offy, incy);
         }
 
         /// <summary>
         /// <#=string.Format(method.Summary, typeDescription)#> with increment<#=method.HasInPlace ? " in-place" : ""#>.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The source and destination array.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#> a, <#=typeName#>* y, int incy)
+        public static unsafe void <#=method.Name#>(int length, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y, int incy)
         {
-            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, a, y, 0, incy);
+            NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, <#=method.ConstantName#>, y, 0, incy);
         }
 <#                  }
                 } #>
@@ -981,16 +1009,16 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.Op#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=typeName#> a, <#=typeName#>[] y, int offy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy)
         {
-            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, a, y, offy);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, offx, <#=method.ConstantName#>, y, offy);
         }
 
         /// <summary>
@@ -998,15 +1026,15 @@ namespace Genix.Core
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.Op#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, <#=typeName#> a, <#=typeName#>* y)
+        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y)
         {
-            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, 0, a, y, 0);
+            NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, x, 0, <#=method.ConstantName#>, y, 0);
         }
 <#              if (method.HasIncrement) { #>
 
@@ -1017,7 +1045,7 @@ namespace Genix.Core
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
@@ -1025,9 +1053,9 @@ namespace Genix.Core
         /// The method performs operation defined as <c><#=method.Op#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, <#=typeName#>[] y, int offy, int incy)
+        public static void <#=method.Name#>(int length, <#=typeName#>[] x, int offx, int incx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, int offy, int incy)
         {
-            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, a, y, offy, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, offx, incx, <#=method.ConstantName#>, y, offy, incy);
         }
 
         /// <summary>
@@ -1036,16 +1064,16 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="x">The source array.</param>
         /// <param name="incx">The increment for the elements of <paramref name="x"/>.</param>
-        /// <param name="a">The constant value.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
         /// <param name="y">The destination array.</param>
         /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
         /// <remarks>
         /// The method performs operation defined as <c><#=method.Op#></c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=typeName#> a, <#=typeName#>* y, int incy)
+        public static unsafe void <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>* y, int incy)
         {
-            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, a, y, 0, incy);
+            NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, <#=method.ConstantName#>, y, 0, incy);
         }
 <#              }
                 break;
@@ -1583,17 +1611,17 @@ namespace Genix.Core
 #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>* y, int offy);
+            public static extern unsafe void <#=method.NativeName#>_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>* y, int offy);
 <#              if (method.HasIncrement) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy, int incy);
+            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, <#=typeName#> a, [Out] <#=typeName#>* y, int offy, int incy);
+            public static extern unsafe void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>* y, int offy, int incy);
 <#              }
                 break;
             case ArgumentType.Vector:
@@ -1669,32 +1697,32 @@ namespace Genix.Core
                 if (method.HasInPlace) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [In, Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>* y, int offy);
+            public static extern unsafe void <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [In, Out] <#=typeName#>* y, int offy);
 <#                  if (method.HasIncrement) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy, int incy);
+            public static extern void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [In, Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, <#=typeName#> a, [In, Out] <#=typeName#>* y, int offy, int incy);
+            public static extern unsafe void <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [In, Out] <#=typeName#>* y, int offy, int incy);
 <#                  }
                 } #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy);
+            public static extern void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>[] y, int offy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, <#=typeName#> a, [Out] <#=typeName#>* y, int offy);
+            public static extern unsafe void <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>* y, int offy);
 <#              if (method.HasIncrement) { #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=typeName#> a, [Out] <#=typeName#>[] y, int offy, int incy);
+            public static extern void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>[] y, int offy, int incy);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern unsafe void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx, <#=typeName#> a, [Out] <#=typeName#>* y, int offy, int incy);
+            public static extern unsafe void <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* x, int offx, int incx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>* y, int offy, int incy);
 <#              }
                 break;
             case ArgumentType.TwoVectors:
@@ -1809,7 +1837,9 @@ namespace Genix.Core
     {
         public MethodDescriptor()
         {
-            this.HasNotInPlace = true; 
+            this.HasNotInPlace = true;
+            this.ConstantName = "a";
+            this.ConstantDescription = "The constant value.";
         }
 
         public string Name { get; set; }
@@ -1820,6 +1850,9 @@ namespace Genix.Core
         public bool HasInPlace { get; set; }
         public bool HasIncrement { get; set; }
         public bool HasGradient { get; set; }
+        public string ConstantType { get; set; }
+        public string ConstantName { get; set; }
+        public string ConstantDescription { get; set; }
         public string ReturnType { get; set; }
         public string Returns { get; set; }
         public string Op { get; set; }

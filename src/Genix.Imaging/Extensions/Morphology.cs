@@ -19,335 +19,6 @@ namespace Genix.Imaging
     /// </content>
     public partial class Image
     {
-        public void FloodFill(Image mask)
-        {
-            if (mask == null)
-            {
-                throw new ArgumentNullException(nameof(mask));
-            }
-
-            if (mask.BitsPerPixel != this.BitsPerPixel)
-            {
-                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
-            }
-
-            int bitsPerPixel = this.BitsPerPixel;
-            int stridesrc = this.Stride;
-            int stridemask = mask.Stride;
-
-            int width = Math.Min(this.Width, mask.Width);
-            int bitwidth = width * bitsPerPixel;
-            int height = Math.Min(this.Height, mask.Height);
-            int stride = Math.Min(stridesrc, stridemask);
-
-            ulong[] bits = this.Bits;
-            ulong[] bitsmask = mask.Bits;
-            ulong[] buffer = new ulong[stride];
-
-            int top = 0;
-            int bottom = height - 1;
-            while (top <= bottom)
-            {
-                // scan from upper-left to bottom-right corner
-                Vectors.Set(stride, 0, buffer, 0);
-                for (int i = top, off = i * stridesrc, offmask = i * stridemask; i < height; i++, off += stridesrc, offmask += stridemask)
-                {
-                    // or from above
-                    if (i > 0)
-                    {
-                        Vectors.Copy(stride, bits, off - stridesrc, buffer, 0);
-                    }
-
-                    // or from left
-                    BitUtils.Or(bitwidth - bitsPerPixel, bits, off * 64, buffer, bitsPerPixel);
-
-                    // mask pixels
-                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
-
-                    // copy back to image
-                    int oldcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
-                    BitUtils.Or(bitwidth, buffer, 0, bits, off * 64);
-                    int newcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
-
-                    if (oldcount == newcount)
-                    {
-                        // pixel count did not change - shrink upper boundary if we are at the top
-                        if (i == top)
-                        {
-                            top++;
-                        }
-
-                        if (i >= bottom)
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // pixel count did change - expand lower boundary
-                        bottom = Core.MinMax.Max(i, bottom);
-                    }
-                }
-
-                // scan from bottom-right to upper-left corner
-                Vectors.Set(stride, 0, buffer, 0);
-                for (int i = bottom, off = i * stridesrc, offmask = i * stridemask; i >= 0; i--, off -= stridesrc, offmask -= stridemask)
-                {
-                    // or from below
-                    if (i < height - 1)
-                    {
-                        Vectors.Copy(stride, bits, off + stridesrc, buffer, 0);
-                    }
-
-                    // or from right
-                    BitUtils.Or(bitwidth - bitsPerPixel, bits, (off * 64) + bitsPerPixel, buffer, 0);
-
-                    // mask pixels
-                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
-
-                    // copy back to image
-                    int oldcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
-                    BitUtils.Or(bitwidth, buffer, 0, bits, off * 64);
-                    int newcount = BitUtils.CountOneBits(bitwidth, bits, off * 64);
-
-                    if (oldcount == newcount)
-                    {
-                        // pixel count did not change - shrink lower boundary if we are at the bottom
-                        if (i == bottom)
-                        {
-                            bottom--;
-                        }
-
-                        if (i <= top)
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // pixel count did change - expand upper boundary
-                        top = Core.MinMax.Min(i, top);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Computes the distance from each pixel to the nearest background pixel.
-        /// </summary>
-        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
-        /// <param name="bitsPerPixel">The destination image color depth, in number of bits per pixel (8 or 16).</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        /// The method computes Manhattan distance from each foreground pixels to its nearest background pixel.
-        /// The cerdit for algorithm design goes to Luc Vincent.
-        /// </para>
-        /// <para>
-        /// Initially, the destination image is initialized by ones for corresponding foreground pixels and zeros for background pixels.
-        /// The algorithm does two scans: the first scan goes from upper-left to bottom-right image corner; the second scan goes in reverse order.
-        /// During first scan each foreground pixels is incremented by the minimum of its left-top pixels ({-1,0} and {0,-1} for 4 connectivity; {-1,0} and {-1,-1},{0,-1},{+1,-1} for 8 connectivity).
-        /// During second scan each foreground pixels is computed as a minimum of its value and one plus the minimum of its bottom-right pixels ({+1,0} and {0,+1} for 4 connectivity; {+1,0} and {-1,+1},{0,+1},{+1,+1} for 8 connectivity).
-        /// </para>
-        /// <para>The Leptonica analog is <c>pixDistanceFunction</c>.</para>
-        /// <para>The method works on binary images only.</para>
-        /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
-        /// <para>-or-</para>
-        /// <para><paramref name="bitsPerPixel"/> is neither 8 nor 16.</para>
-        /// <para>-or-</para>
-        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
-        /// </exception>
-        public Image DistanceToBackground(int connectivity, int bitsPerPixel)
-        {
-            if (this.BitsPerPixel != 1)
-            {
-                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
-            }
-
-            if (bitsPerPixel != 8 && bitsPerPixel != 16)
-            {
-                throw new ArgumentException("The destination image depth is neither 8 nor 16.");
-            }
-
-            Image dst = bitsPerPixel == 8 ? Image.Convert1To8(this, 0, 1) : Image.Convert1To16(this, 0, 1);
-            int stride = dst.Stride;
-
-            int xx = dst.Width - 1;
-            int yy = dst.Height - 1;
-
-            switch (connectivity)
-            {
-                case 4:
-                    Compute4();
-                    break;
-
-                case 8:
-                    Compute8();
-                    break;
-
-                default:
-                    throw new ArgumentException("The connectivity is neither 4 nor 8.");
-            }
-
-            void Compute4()
-            {
-                unsafe
-                {
-                    fixed (ulong* ubits = dst.Bits)
-                    {
-                        if (bitsPerPixel == 8)
-                        {
-                            byte* bits = (byte*)ubits;
-                            stride *= sizeof(ulong) / sizeof(byte);
-
-                            // scan from upper-left to bottom-right corner
-                            // start from pixel with coordinates { 1, 1 }
-                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
-                            {
-                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        bits[offx] += Core.MinMax.Min(bits[offx - stride], bits[offx - 1], (byte)254);
-                                    }
-                                }
-                            }
-
-                            // scan from bottom-right to upper-left corner
-                            // start from pixel with coordinates { width - 2, height - 2 }
-                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
-                            {
-                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        byte val = Core.MinMax.Min(bits[offx + stride], bits[offx + 1], (byte)254);
-                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ushort* bits = (ushort*)ubits;
-                            stride *= sizeof(ulong) / sizeof(ushort);
-
-                            // scan from upper-left to bottom-right corner
-                            // start from pixel with coordinates { 1, 1 }
-                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
-                            {
-                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        bits[offx] += Core.MinMax.Min(bits[offx - stride], bits[offx - 1], (ushort)65534);
-                                    }
-                                }
-                            }
-
-                            // scan from bottom-right to upper-left corner
-                            // start from pixel with coordinates { width - 2, height - 2 }
-                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
-                            {
-                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        ushort val = Core.MinMax.Min(bits[offx + stride], bits[offx + 1], (ushort)65534);
-                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            void Compute8()
-            {
-                unsafe
-                {
-                    fixed (ulong* ubits = dst.Bits)
-                    {
-                        if (bitsPerPixel == 8)
-                        {
-                            byte* bits = (byte*)ubits;
-                            stride *= sizeof(ulong) / sizeof(byte);
-
-                            // scan from upper-left to bottom-right corner
-                            // start from pixel with coordinates { 1, 1 }
-                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
-                            {
-                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        int offxp = offx - stride;
-                                        bits[offx] += Core.MinMax.Min(bits[offxp - 1], bits[offxp], bits[offxp + 1], bits[offx - 1], (byte)254);
-                                    }
-                                }
-                            }
-
-                            // scan from bottom-right to upper-left corner
-                            // start from pixel with coordinates { width - 2, height - 2 }
-                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
-                            {
-                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        int offxn = offx + stride;
-                                        byte val = Core.MinMax.Min(bits[offxn - 1], bits[offxn], bits[offxn + 1], bits[offx + 1], (byte)254);
-                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ushort* bits = (ushort*)ubits;
-                            stride *= sizeof(ulong) / sizeof(ushort);
-
-                            // scan from upper-left to bottom-right corner
-                            // start from pixel with coordinates { 1, 1 }
-                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
-                            {
-                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        int offxp = offx - stride;
-                                        bits[offx] += Core.MinMax.Min(bits[offxp - 1], bits[offxp], bits[offxp + 1], bits[offx - 1], (ushort)65534);
-                                    }
-                                }
-                            }
-
-                            // scan from bottom-right to upper-left corner
-                            // start from pixel with coordinates { width - 2, height - 2 }
-                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
-                            {
-                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
-                                {
-                                    if (bits[offx] != 0)
-                                    {
-                                        int offxn = offx + stride;
-                                        ushort val = Core.MinMax.Min(bits[offxn - 1], bits[offxn], bits[offxn + 1], bits[offx + 1], (ushort)65534);
-                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return dst;
-        }
-
         /// <summary>
         /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
@@ -587,26 +258,66 @@ namespace Genix.Imaging
         /// <summary>
         /// Finds connected components on this <see cref="Image"/>.
         /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
         /// <returns>
         /// A set of <see cref="ConnectedComponent"/> objects found.
         /// </returns>
-        public ISet<ConnectedComponent> FindConnectedComponents()
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        public ISet<ConnectedComponent> FindConnectedComponents(int connectivity)
+            => this.FindConnectedComponents(connectivity, 0, 0, this.Width, this.Height);
+
+        /// <summary>
+        /// Finds connected components on this <see cref="Image"/>
+        /// withing the rectangular area specified by a pair of coordinates, width and height.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <returns>
+        /// A set of <see cref="ConnectedComponent"/> objects found.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        public ISet<ConnectedComponent> FindConnectedComponents(
+            int connectivity,
+            int x,
+            int y,
+            int width,
+            int height)
         {
             if (this.BitsPerPixel != 1)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
+            if (connectivity != 4 && connectivity != 8)
+            {
+                throw new ArgumentException("The connectivity is neither 4 nor 8.");
+            }
+
+            this.ValidateArea(x, y, width, height);
+
             HashSet<ConnectedComponent> all = new HashSet<ConnectedComponent>();
             List<Stroke> last = new List<Stroke>();
             List<Stroke> current = new List<Stroke>();
 
-            int width = this.Width;
-            int height = this.Height;
+            bool connectivity8 = connectivity == 8;
             int stride1 = this.Stride1;
             ulong[] bits = this.Bits;
 
-            for (int y = 0, ypos = 0; y < height; y++, ypos += stride1)
+            for (int iy = y, iiy = iy + height, ypos = (iy * stride1) + x; iy < iiy; iy++, ypos += stride1)
             {
                 // find intervals
                 int lastIndex = 0;
@@ -628,21 +339,21 @@ namespace Genix.Imaging
                     MergeStroke(start - ypos, end - start);
                     xpos = end + 1;
 
-                    void MergeStroke(int x, int length)
+                    void MergeStroke(int x1, int length)
                     {
                         // the component we will attach the stroke to
                         ConnectedComponent component = null;
 
                         // start matching from the position we stopped at last time
-                        for (int i = lastIndex, x2 = x + length, ii = last.Count; i < ii; i++)
+                        for (int i = lastIndex, x2 = x1 + length, ii = last.Count; i < ii; i++)
                         {
                             Stroke lastStroke = last[i];
-                            if (ConnectedComponent.StrokesIntersect(lastStroke.X, lastStroke.Length, x, length))
+                            if (ConnectedComponent.StrokesIntersect(connectivity8, lastStroke.X, lastStroke.Length, x1, length))
                             {
                                 if (component == null)
                                 {
                                     component = lastStroke.Component;
-                                    component.AddStroke(y, x, length);
+                                    component.AddStroke(iy, x1, length);
                                 }
                                 else
                                 {
@@ -705,11 +416,11 @@ namespace Genix.Imaging
 
                         if (component == null)
                         {
-                            component = new ConnectedComponent(y, x, length);
+                            component = new ConnectedComponent(iy, x1, length);
                             all.Add(component);
                         }
 
-                        current.Add(new Stroke(x, length, component));
+                        current.Add(new Stroke(x1, length, component));
                     }
                 }
 
@@ -717,9 +428,29 @@ namespace Genix.Imaging
                 current.Clear();
             }
 
-            Debug.Assert(this.Power() == all.Sum(x => x.Power), "The number of pixels on image and in components must match.");
+            Debug.Assert(this.Power(x, y, width, height) == all.Sum(value => value.Power), "The number of pixels on image and in components must match.");
             return all;
         }
+
+        /// <summary>
+        /// Finds connected components on this <see cref="Image"/>
+        /// withing the rectangular area specified by <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <returns>
+        /// A set of <see cref="ConnectedComponent"/> objects found.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The area is out of image bounds.
+        /// </exception>
+        public ISet<ConnectedComponent> FindConnectedComponents(int connectivity, Rectangle area) =>
+            this.FindConnectedComponents(connectivity, area.X, area.Y, area.Width, area.Height);
 
         /// <summary>
         /// Adds black pixels contained in the <see cref="ConnectedComponent"/> to this <see cref="Image"/>.
@@ -924,6 +655,406 @@ namespace Genix.Imaging
             }
 
             return dst;
+        }
+
+        /// <summary>
+        /// Computes the distance from each pixel to the nearest background pixel.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="bitsPerPixel">The destination image color depth, in number of bits per pixel (8 or 16).</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// The method computes Manhattan distance from each foreground pixels to its nearest background pixel.
+        /// The credit for algorithm design goes to Luc Vincent.
+        /// </para>
+        /// <para>
+        /// Initially, the destination image is initialized by ones for corresponding foreground pixels and zeros for background pixels.
+        /// The algorithm does two sequential pixel scans: the first scan goes from upper-left to bottom-right image corner; the second scan goes in reverse order.
+        /// For 4 connectivity during first scan each foreground pixels is computed as <c>i(x, y) = min(i(x - 1,y), i(x, y - 1)) + 1</c> for 4 connectivity.
+        /// During second scan each foreground pixels is computed as <c>i(x, y) = min(i(x, y), min(i(x + 1, y), i(x, y + 1)) + 1)</c>.
+        /// For 8 connectivity two top corner pixels are added to the formula during first pass;
+        /// two bottom corner pixels are added to the formula during second pass.
+        /// </para>
+        /// <para>The Leptonica analog is <c>pixDistanceFunction</c>.</para>
+        /// <para>The method works on binary images only.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="bitsPerPixel"/> is neither 8 nor 16.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        public Image DistanceToBackground(int connectivity, int bitsPerPixel)
+        {
+            if (this.BitsPerPixel != 1)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            if (bitsPerPixel != 8 && bitsPerPixel != 16)
+            {
+                throw new ArgumentException("The destination image depth is neither 8 nor 16.");
+            }
+
+            Image dst = bitsPerPixel == 8 ? Image.Convert1To8(this, 0, 1) : Image.Convert1To16(this, 0, 1);
+            int stride = dst.Stride;
+
+            int xx = dst.Width - 1;
+            int yy = dst.Height - 1;
+
+            switch (connectivity)
+            {
+                case 4:
+                    Compute4();
+                    break;
+
+                case 8:
+                    Compute8();
+                    break;
+
+                default:
+                    throw new ArgumentException("The connectivity is neither 4 nor 8.");
+            }
+
+            void Compute4()
+            {
+                unsafe
+                {
+                    fixed (ulong* ubits = dst.Bits)
+                    {
+                        if (bitsPerPixel == 8)
+                        {
+                            byte* bits = (byte*)ubits;
+                            stride *= sizeof(ulong) / sizeof(byte);
+
+                            // scan from upper-left to bottom-right corner
+                            // start from pixel with coordinates { 1, 1 }
+                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
+                            {
+                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        bits[offx] += Core.MinMax.Min(bits[offx - stride], bits[offx - 1], (byte)254);
+                                    }
+                                }
+                            }
+
+                            // scan from bottom-right to upper-left corner
+                            // start from pixel with coordinates { width - 2, height - 2 }
+                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
+                            {
+                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        byte val = Core.MinMax.Min(bits[offx + stride], bits[offx + 1], (byte)254);
+                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ushort* bits = (ushort*)ubits;
+                            stride *= sizeof(ulong) / sizeof(ushort);
+
+                            // scan from upper-left to bottom-right corner
+                            // start from pixel with coordinates { 1, 1 }
+                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
+                            {
+                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        bits[offx] += Core.MinMax.Min(bits[offx - stride], bits[offx - 1], (ushort)65534);
+                                    }
+                                }
+                            }
+
+                            // scan from bottom-right to upper-left corner
+                            // start from pixel with coordinates { width - 2, height - 2 }
+                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
+                            {
+                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        ushort val = Core.MinMax.Min(bits[offx + stride], bits[offx + 1], (ushort)65534);
+                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Compute8()
+            {
+                unsafe
+                {
+                    fixed (ulong* ubits = dst.Bits)
+                    {
+                        if (bitsPerPixel == 8)
+                        {
+                            byte* bits = (byte*)ubits;
+                            stride *= sizeof(ulong) / sizeof(byte);
+
+                            // scan from upper-left to bottom-right corner
+                            // start from pixel with coordinates { 1, 1 }
+                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
+                            {
+                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        int offxp = offx - stride;
+                                        bits[offx] += Core.MinMax.Min(bits[offxp - 1], bits[offxp], bits[offxp + 1], bits[offx - 1], (byte)254);
+                                    }
+                                }
+                            }
+
+                            // scan from bottom-right to upper-left corner
+                            // start from pixel with coordinates { width - 2, height - 2 }
+                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
+                            {
+                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        int offxn = offx + stride;
+                                        byte val = Core.MinMax.Min(bits[offxn - 1], bits[offxn], bits[offxn + 1], bits[offx + 1], (byte)254);
+                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ushort* bits = (ushort*)ubits;
+                            stride *= sizeof(ulong) / sizeof(ushort);
+
+                            // scan from upper-left to bottom-right corner
+                            // start from pixel with coordinates { 1, 1 }
+                            for (int iy = 1, offy = stride + 1; iy < yy; iy++, offy += stride)
+                            {
+                                for (int ix = 1, offx = offy; ix < xx; ix++, offx++)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        int offxp = offx - stride;
+                                        bits[offx] += Core.MinMax.Min(bits[offxp - 1], bits[offxp], bits[offxp + 1], bits[offx - 1], (ushort)65534);
+                                    }
+                                }
+                            }
+
+                            // scan from bottom-right to upper-left corner
+                            // start from pixel with coordinates { width - 2, height - 2 }
+                            for (int iy = yy - 1, offy = (iy * stride) + xx - 1; iy > 0; iy--, offy -= stride)
+                            {
+                                for (int ix = xx - 1, offx = offy; ix > 0; ix--, offx--)
+                                {
+                                    if (bits[offx] != 0)
+                                    {
+                                        int offxn = offx + stride;
+                                        ushort val = Core.MinMax.Min(bits[offxn - 1], bits[offxn], bits[offxn + 1], bits[offx + 1], (ushort)65534);
+                                        bits[offx] = Core.MinMax.Min(++val, bits[offx]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Performs flood fill (binary reconstruction) of the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="mask">The mask image.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="mask"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        public void FloodFill(int connectivity, Image mask)
+        {
+            if (mask == null)
+            {
+                throw new ArgumentNullException(nameof(mask));
+            }
+
+            if (connectivity != 4 && connectivity != 8)
+            {
+                throw new ArgumentException("The connectivity is neither 4 nor 8.");
+            }
+
+            if (mask.BitsPerPixel != this.BitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+            int bitsPerPixel = this.BitsPerPixel;
+            int stridesrc = this.Stride;
+            int stridemask = mask.Stride;
+
+            int width = Math.Min(this.Width, mask.Width);
+            int bitwidth = width * bitsPerPixel;
+            int height = Math.Min(this.Height, mask.Height);
+            int stride = Math.Min(stridesrc, stridemask);
+
+            ulong[] bits = this.Bits;
+            ulong[] bitsmask = mask.Bits;
+            ulong[] buffer = new ulong[stridesrc];
+
+            const int MaxIter = 40;
+            int iter = 0;
+            int top = 0;
+            int bottom = height - 1;
+            while (++iter < MaxIter && top <= bottom)
+            {
+                // scan from upper-left to bottom-right corner
+                Vectors.Set(stride, 0, buffer, 0);
+                for (int i = top, off = i * stridesrc, offmask = i * stridemask; i < height; i++, off += stridesrc, offmask += stridemask)
+                {
+                    int off64 = off * 64;
+
+                    // or from above
+                    if (i > 0)
+                    {
+                        int offprev = off - stridesrc;
+                        Vectors.Copy(stride, bits, offprev, buffer, 0);
+
+                        if (connectivity == 8)
+                        {
+                            BitUtils.Or(bitwidth - bitsPerPixel, bits, offprev * 64, buffer, bitsPerPixel);
+                            BitUtils.Or(bitwidth - bitsPerPixel, bits, (offprev * 64) + bitsPerPixel, buffer, 0);
+                        }
+                    }
+
+                    // or from left
+                    BitUtils.Or(bitwidth - bitsPerPixel, bits, off64, buffer, bitsPerPixel);
+
+                    // mask pixels
+                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
+                    Vectors.Xand(stride, bits, off, buffer, 0);
+
+                    // check if any pixel will change
+                    int bitpos = BitUtils.BitScanOneForward(bitwidth, buffer, 0);
+                    if (bitpos == -1)
+                    {
+                        // pixel count did not change - shrink upper boundary if we are at the top
+                        if (i == top)
+                        {
+                            top++;
+                        }
+
+                        if (i >= bottom)
+                        {
+                            // no need to do it any longer
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // pixel count did change - expand lower boundary
+                        bottom = Core.MinMax.Max(i, bottom);
+
+                        do
+                        {
+                            int bitoff = bitpos >> 6;
+                            Vectors.Or(stridesrc - bitoff, buffer, bitoff, bits, off + bitoff);
+
+                            // shift changed pixels to the left (from LSB to MSB)
+                            // on image they are shifted to the right
+                            Vectors.Shl(stridesrc - bitoff, 1, buffer, bitoff);
+
+                            // mask pixels
+                            Vectors.And(stride - bitoff, bitsmask, offmask + bitoff, buffer, bitoff);
+                            Vectors.Xand(stridesrc - bitoff, bits, off + bitoff, buffer, bitoff);
+
+                            bitpos = BitUtils.BitScanOneForward(bitwidth - (bitpos + 1), buffer, bitpos + 1);
+                        }
+                        while (bitpos != -1);
+                    }
+                }
+
+                // scan from bottom-right to upper-left corner
+                Vectors.Set(stride, 0, buffer, 0);
+                for (int i = bottom, off = i * stridesrc, offmask = i * stridemask; i >= 0; i--, off -= stridesrc, offmask -= stridemask)
+                {
+                    int off64 = off * 64;
+
+                    // or from below
+                    if (i < height - 1)
+                    {
+                        int offnext = off + stridesrc;
+                        Vectors.Copy(stride, bits, offnext, buffer, 0);
+
+                        if (connectivity == 8)
+                        {
+                            BitUtils.Or(bitwidth - bitsPerPixel, bits, offnext * 64, buffer, bitsPerPixel);
+                            BitUtils.Or(bitwidth - bitsPerPixel, bits, (offnext * 64) + bitsPerPixel, buffer, 0);
+                        }
+                    }
+
+                    // or from right
+                    BitUtils.Or(bitwidth - bitsPerPixel, bits, off64 + bitsPerPixel, buffer, 0);
+
+                    // mask pixels
+                    Vectors.And(stride, bitsmask, offmask, buffer, 0);
+                    Vectors.Xand(stride, bits, off, buffer, 0);
+
+                    // check if any pixel will change
+                    int bitpos = BitUtils.BitScanOneReverse(bitwidth, buffer, bitwidth - 1);
+                    if (bitpos == -1)
+                    {
+                        // pixel count did not change - shrink lower boundary if we are at the bottom
+                        if (i == bottom)
+                        {
+                            bottom--;
+                        }
+
+                        if (i <= top)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // pixel count did change - expand upper boundary
+                        top = Core.MinMax.Min(i, top);
+
+                        do
+                        {
+                            int bitoff = bitpos >> 6;
+                            Vectors.Or(bitoff + 1, buffer, 0, bits, off);
+
+                            // shift changed pixels to the right (from MSB to LSB)
+                            // on image they are shifted to the left
+                            Vectors.Shr(bitoff + 1, 1, buffer, 0);
+
+                            // mask pixels
+                            Vectors.And(bitoff + 1, bitsmask, offmask, buffer, 0);
+                            Vectors.Xand(bitoff + 1, bits, off, buffer, 0);
+
+                            bitpos = BitUtils.BitScanOneReverse(bitpos, buffer, bitpos - 1);
+                        }
+                        while (bitpos != -1);
+                    }
+                }
+            }
         }
 
         private static void BuildORMask(Image image, StructuringElement kernel, ulong[] bits, ulong[] mask, bool cleanMask)

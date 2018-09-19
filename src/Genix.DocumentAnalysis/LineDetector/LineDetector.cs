@@ -134,7 +134,7 @@ namespace Genix.DocumentAnalysis
                 int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
                 Image nonVLines = Image.Erode(nonLines, StructuringElement.Rectangle(maxLineResidue, 1), 1);
 
-                nonVLines.FloodFill(nonLines);
+                nonVLines.FloodFill(8, nonLines);
 
                 if (hlines != null)
                 {
@@ -156,7 +156,7 @@ namespace Genix.DocumentAnalysis
                 int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
                 Image nonHLines = Image.Erode(nonLines, StructuringElement.Rectangle(1, maxLineResidue), 1);
 
-                nonHLines.FloodFill(nonLines);
+                nonHLines.FloodFill(8, nonLines);
 
                 if (nonHLinesExtra != null)
                 {
@@ -248,10 +248,14 @@ namespace Genix.DocumentAnalysis
                     }
                 }*/
 
-                int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(image.HorizontalResolution, 200);
-                int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(image.HorizontalResolution, 200);
+                int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(
+                    vertical ? image.HorizontalResolution : image.VerticalResolution,
+                    200);
+                int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(
+                    vertical ? image.VerticalResolution : image.HorizontalResolution,
+                    200);
 
-                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(linesImage.FindConnectedComponents());
+                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(linesImage.FindConnectedComponents(8));
                 components.RemoveWhere(component =>
                 {
                     Rectangle bounds = component.Bounds;
@@ -274,16 +278,16 @@ namespace Genix.DocumentAnalysis
 
                     bool isBad = false;
 
-                    if (bounds.Width.InRange(minThickLineWidth, minThickLineLength) &&
-                        bounds.Height.InRange(minThickLineWidth, minThickLineLength) &&
+                    if (bounds.Width.Between(minThickLineWidth, minThickLineLength, false) &&
+                        bounds.Height.Between(minThickLineWidth, minThickLineLength, false) &&
                         maxWidth > minThickLineLength)
                     {
                         // too thick for the length
                         isBad = true;
                     }
 
-                    // Test density near the line
-                    if (!isBad)
+                    // Test density near the line if there are not enough intersections
+                    if (!isBad && CountIntersections(bounds) < 2)
                     {
                         long count = CountAdjacentPixels(maxWidth, bounds);
                         if (count > bounds.Area * LineDetector.MaxNonLineDensity)
@@ -333,10 +337,12 @@ namespace Genix.DocumentAnalysis
                     }
 
                     bounds.Intersect(nonLines.Bounds);
-
-                    Image temp = nonLinesImage.Crop(bounds);
-
                     return nonLinesImage.Power(bounds);
+                }
+
+                int CountIntersections(Rectangle bounds)
+                {
+                    return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
                 }
             }
         }

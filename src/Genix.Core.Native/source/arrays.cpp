@@ -487,7 +487,6 @@ GENIXAPI(void, op##4_u64)(int length, const unsigned __int64* a, int offa, const
 	__logical<unsigned __int64, logical_##op>(length, a, offa, b, offb, c, offc, d, offd, y, offy); \
 }
 
-
 // Logical AND
 LOGICAL(and);
 LOGICAL3(and);
@@ -503,3 +502,143 @@ LOGICAL4(or);
 
 // Logical XOR
 LOGICAL(xor);
+
+// shifts
+unsigned __int64 __forceinline __shr(unsigned __int64 low, unsigned __int64 high, int shift)
+{
+#if defined(_WIN64)
+	return __shiftright128(low, high, shift);
+#else
+	return (low >> shift) | (high << (64 - shift));
+#endif
+}
+unsigned __int64 __forceinline __shl(unsigned __int64 low, unsigned __int64 high, int shift)
+{
+#if defined(_WIN64)
+	return __shiftleft128(low, high, shift);
+#else
+	return (high << shift) | (low >> (64 - shift));
+#endif
+}
+unsigned __int32 __forceinline __shr(unsigned __int32 low, unsigned __int32 high, int shift)
+{
+	return (low >> shift) | (high << (32 - shift));
+}
+unsigned __int32 __forceinline __shl(unsigned __int32 low, unsigned __int32 high, int shift)
+{
+	return (high << shift) | (low >> (32 - shift));
+}
+
+template<typename T> void __forceinline __shr_ip(
+	int length,				// number of elements to shift
+	int shift,				// the number of bits to shift
+	T* x, 					// the source and destination array
+	int offx				// the zero-based index of starting element in x
+)
+{
+	if (length > 0 && shift > 0)
+	{
+		x += offx;
+
+		while (--length)
+		{
+			x[0] = __shr(x[0], x[1], shift);
+			x++;
+		}
+
+		x[0] >>= shift;
+	}
+}
+
+template<typename T> void __forceinline __shl_ip(
+	int length,				// number of elements to shift
+	int shift,				// the number of bits to shift
+	T* x, 					// the source and destination array
+	int offx				// the zero-based index of starting element in x
+)
+{
+	if (length > 0 && shift > 0)
+	{
+		x += ptrdiff_t(offx) + length - 1;
+
+		while (--length)
+		{
+			x[0] = __shl(x[-1], x[0], shift);
+			x--;
+		}
+
+		x[0] <<= shift;
+	}
+}
+
+template<typename T> void __forceinline __shr(
+	int length,				// number of elements to shift
+	int shift,				// the number of bits to shift
+	const T* x,				// the source array
+	int offx,				// the zero-based index of starting element in x
+	T* y, 					// the destination array
+	int offy				// the zero-based index of starting element in y
+)
+{
+	if (length > 0 && shift > 0)
+	{
+		x += offx;
+		y += offy;
+
+		while (--length)
+		{
+			y[0] = __shr(x[0], x[1], shift);
+			x++;
+			y++;
+		}
+
+		y[0] = x[0] >> shift;
+	}
+}
+
+template<typename T> void __forceinline __shl(
+	int length,				// number of elements to shift
+	int shift,				// the number of bits to shift
+	const T* x,				// the source array
+	int offx,				// the zero-based index of starting element in x
+	T* y, 					// the destination array
+	int offy				// the zero-based index of starting element in y
+)
+{
+	if (length > 0 && shift > 0)
+	{
+		x += ptrdiff_t(offx) + length - 1;
+		y += ptrdiff_t(offy) + length - 1;
+
+		while (--length)
+		{
+			y[0] = __shl(x[-1], x[0], shift);
+			x--;
+			y--;
+		}
+
+		y[0] = x[0] << shift;
+	}
+}
+
+#define SHIFT(op) \
+GENIXAPI(void, op##_ip_u32)(int length, int shift, unsigned __int32* x, int offx) \
+{ \
+	__##op##_ip<unsigned __int32>(length, shift, x, offx); \
+} \
+GENIXAPI(void, op##_ip_u64)(int length, int shift, unsigned __int64* x, int offx) \
+{ \
+	__##op##_ip<unsigned __int64>(length, shift, x, offx); \
+} \
+GENIXAPI(void, op##_u32)(int length, const unsigned __int32* x, int offx, int shift, unsigned __int32* y, int offy) \
+{ \
+	__##op##<unsigned __int32>(length, shift, x, offx, y, offy); \
+} \
+GENIXAPI(void, op##_u64)(int length, const unsigned __int64* x, int offx, int shift, unsigned __int64* y, int offy) \
+{ \
+	__##op##<unsigned __int64>(length, shift, x, offx, y, offy); \
+}
+
+SHIFT(shr);
+SHIFT(shl);
+

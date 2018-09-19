@@ -27,7 +27,7 @@
             image.SetPixel(1, 3, 1);
             image.SetPixel(3, 3, 1);
 
-            ISet<ConnectedComponent> components = image.FindConnectedComponents();
+            ISet<ConnectedComponent> components = image.FindConnectedComponents(8);
             Assert.AreEqual(1, components.Count);
 
             ConnectedComponent component = components.First();
@@ -50,7 +50,7 @@
             Imaging.Image image = new Imaging.Image(20, 35, 1, 200, 200);
             image.SetPixel(1, 1, 1);
 
-            ISet<Imaging.ConnectedComponent> components = image.FindConnectedComponents();
+            ISet<Imaging.ConnectedComponent> components = image.FindConnectedComponents(8);
             Assert.AreEqual(1, components.Count);
 
             image.RemoveConnectedComponent(components.First());

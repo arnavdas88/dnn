@@ -292,7 +292,7 @@ namespace Genix.Imaging.Lab
 
             Imaging.Image PrepareImage(Imaging.Image image)
             {
-                IList<ConnectedComponent> components = image.FindConnectedComponents().ToList();
+                IList<ConnectedComponent> components = image.FindConnectedComponents(8).ToList();
                 if (components.Count > 1)
                 {
                     for (int i = 0; i < components.Count; i++)

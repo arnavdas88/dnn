@@ -106,6 +106,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Vectors.tt</DependentUpon>
     </Compile>
+    <Compile Include="Random\UlongRandomGenerator.cs" />
     <Compile Include="Win32\Win32NativeMethods.cs" />
     <Compile Include="System\DisposableObject.cs" />
     <Compile Include="System\FloatExtensions.cs" />

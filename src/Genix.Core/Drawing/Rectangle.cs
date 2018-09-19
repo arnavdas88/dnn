@@ -550,7 +550,7 @@ namespace Genix.Drawing
         /// <param name="x">The x-coordinate to check.</param>
         /// <returns><b>true</b> if <paramref name="x"/> is contained within this <see cref="Rectangle"/> along its x-axis; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsX(int x) => x.InRange(this.x, this.x + this.w);
+        public bool ContainsX(int x) => x.Between(this.x, this.x + this.w, false);
 
         /// <summary>
         /// Determines if the specified y-coordinate is contained within this <see cref="Rectangle"/> structure.
@@ -558,7 +558,7 @@ namespace Genix.Drawing
         /// <param name="y">The y-coordinate to check.</param>
         /// <returns><b>true</b> if <paramref name="y"/> is contained within this <see cref="Rectangle"/> along its y-axis; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsY(int y) => y.InRange(this.y, this.y + this.h);
+        public bool ContainsY(int y) => y.Between(this.y, this.y + this.h, false);
 
         /// <summary>
         /// Computes the Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.

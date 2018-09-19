@@ -132,5 +132,105 @@
                 }
             }
         }
+
+        [TestMethod]
+        public void ShrTest()
+        {
+            const int RepeatCount = 5;
+            UlongRandomGenerator random = new UlongRandomGenerator();
+            ulong[] y = new ulong[3];
+            ulong[] copy = new ulong[3];
+            int size = y.Length * 64;
+
+            for (int count = 0; count <= size; count++)
+            {
+                for (int pos = 0; pos < size - count; pos++)
+                {
+                    for (int shift = 0; shift <= count; shift++)
+                    {
+                        for (int i = 0; i < RepeatCount; i++)
+                        {
+                            random.Generate(y.Length, y);
+                            Vectors.Copy(y.Length, y, 0, copy, 0);
+                            BitUtils.Shr(count, shift, y, pos);
+
+                            // right part that was not copied
+                            if (pos > 0)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(pos, y, 0, copy, 0));
+                            }
+
+                            // shifted part
+                            if (shift < count)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(count - shift, y, pos, copy, pos + shift));
+                            }
+
+                            // zeroed part
+                            if (shift > 0)
+                            {
+                                Assert.AreEqual(0, BitUtils.CountOneBits(shift, y, pos + count - shift));
+                            }
+
+                            // left part that was not copied
+                            if (pos + count < size)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(size - (pos + count), y, pos + count, copy, pos + count));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ShlTest()
+        {
+            const int RepeatCount = 5;
+            UlongRandomGenerator random = new UlongRandomGenerator();
+            ulong[] y = new ulong[3];
+            ulong[] copy = new ulong[3];
+            int size = y.Length * 64;
+
+            for (int count = 0; count <= size; count++)
+            {
+                for (int pos = 0; pos < size - count; pos++)
+                {
+                    for (int shift = 0; shift <= count; shift++)
+                    {
+                        for (int i = 0; i < RepeatCount; i++)
+                        {
+                            random.Generate(y.Length, y);
+                            Vectors.Copy(y.Length, y, 0, copy, 0);
+                            BitUtils.Shl(count, shift, y, pos);
+
+                            // right part that was not copied
+                            if (pos > 0)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(pos, y, 0, copy, 0));
+                            }
+
+                            // shifted part
+                            if (shift < count)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(count - shift, y, pos + shift, copy, pos));
+                            }
+
+                            // zeroed part
+                            if (shift > 0)
+                            {
+                                Assert.AreEqual(0, BitUtils.CountOneBits(shift, y, pos));
+                            }
+
+                            // left part that was not copied
+                            if (pos + count < size)
+                            {
+                                Assert.IsTrue(BitUtils.Equals(size - (pos + count), y, pos + count, copy, pos + count));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

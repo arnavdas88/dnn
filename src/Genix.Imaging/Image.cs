@@ -209,17 +209,7 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Randomize()
         {
-            Random random = new Random(0);
-
-            ulong[] bits = this.Bits;
-            for (int i = 0, ii = bits.Length; i < ii; i++)
-            {
-                bits[i] = (ulong)(uint)random.Next() |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000ul : 0ul) |
-                          (ulong)(uint)random.Next() << 32 |
-                          (random.Next(0, 2) == 0 ? 0x8000_0000_0000_0000ul : 0ul);
-            }
-
+            new UlongRandomGenerator().Generate(this.Bits.Length, this.Bits);
             this.ZeroTail();
         }
 

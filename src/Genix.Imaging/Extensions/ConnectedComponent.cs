@@ -280,9 +280,9 @@ namespace Genix.Imaging
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool StrokesIntersect(int x1, int width1, int x2, int width2)
+        internal static bool StrokesIntersect(bool connectivity8, int x1, int width1, int x2, int width2)
         {
-            return x2.Between(x1, x1 + width1) || x1.Between(x2, x2 + width2);
+            return x2.Between(x1, x1 + width1, connectivity8) || x1.Between(x2, x2 + width2, connectivity8);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
