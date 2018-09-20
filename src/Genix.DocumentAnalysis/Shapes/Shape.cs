@@ -19,7 +19,7 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class.
         /// </summary>
-        /// <param name="bounds">The shape position.</param>
+        /// <param name="bounds">The shape boundaries.</param>
         protected Shape(Rectangle bounds)
         {
             this.Bounds = bounds;

@@ -174,8 +174,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                                 if (!bounds.IsEmpty)
                                 {
                                     shapes.Add(new LineShape(
-                                        new Point(bounds.Left, bounds.Top),
-                                        new Point(bounds.Right, bounds.Bottom),
+                                        bounds,
                                         1,
                                         type == PolyBlockType.HorizontalLine ? LineTypes.Horizontal : LineTypes.Vertical));
                                 }

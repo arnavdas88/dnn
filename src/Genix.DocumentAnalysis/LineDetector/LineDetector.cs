@@ -74,7 +74,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<ConnectedComponent> FindLines(Image image, LineDetectionOptions options)
+        public static ISet<LineShape> FindLines(Image image, LineDetectionOptions options)
         {
             if (image == null)
             {
@@ -85,6 +85,9 @@ namespace Genix.DocumentAnalysis
             {
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
+
+            ISet<Line> hlinesResult = null;
+            ISet<Line> vlinesResult = null;
 
             // masks we would like to find
             Image hlines = null;
@@ -106,23 +109,18 @@ namespace Genix.DocumentAnalysis
                 itersections = vlines != null ? Image.And(hlines, vlines) : null;
 
                 // re-filter lines
-                FilterLines(hlines, nonHLines, false);
+                hlinesResult = FilterLines(hlines, nonHLines, false);
 
                 RemoveLines(hlines, nonHLines);
             }
 
             RemoveIntersections();
 
-            return null; //// result;
+            return CreateAnswer();
 
             void FindLines()
             {
-                // result
-                ISet<ConnectedComponent> hlinesResult = null;
-                ISet<ConnectedComponent> vlinesResult = null;
-                HashSet<ConnectedComponent> result = new HashSet<ConnectedComponent>();
-
-                // close up small holes
+                 // close up small holes
                 int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
                 Image closedImage = image.MorphClose(StructuringElement.Square(maxLineWidth / 3), 1);
 
@@ -195,58 +193,12 @@ namespace Genix.DocumentAnalysis
 
                     hlinesResult = FilterLines(hlines, nonHLines, false);
                 }
-
-                /*Image res = Image.Sub(image, hlines, 0);
-                res.Sub(vlines, 0);
-
-                // find horizontal lines
-                if (options.Types.HasFlag(LineTypes.Horizontal))
-                {
-                    // morphology open leaves only pixels that have required number of horizontal neighbors
-                    Image workImage = Image.Open(image, StructuringElement.Rectangle(30, 1), 1);
-
-                    // dilate lines to merge small gaps and include neighboring isolated pixels
-                    const int DilationSize = 2;
-                    workImage.Dilate(StructuringElement.Square(1 + (2 * DilationSize)), 1);
-
-                    // find line components and filter out non-line components
-                    minLineLength = (int)((options.MinLineLength * image.HorizontalResolution) + 0.5f);
-                    List<ConnectedComponent> components = workImage.FindConnectedComponents()
-                                                                   .Where(x => x.Bounds.Width >= minLineLength)
-                                                                   .ToList();
-
-                    // add components to found lines
-                    foreach (ConnectedComponent component in components)
-                    {
-                        int y = (component.Bounds.Top + component.Bounds.Bottom) / 2;
-                        lineShapes.Add(new LineShape(
-                            new Point(component.Bounds.Left, y),
-                            new Point(component.Bounds.Right, y),
-                            MinMax.Max(1, component.Bounds.Height - (2 * DilationSize)),
-                            LineTypes.Horizontal));
-                    }
-
-                    // create mask image
-                    Image mask = new Image(
-                        workImage.Width,
-                        workImage.Height,
-                        1,
-                        workImage.HorizontalResolution,
-                        workImage.VerticalResolution);
-                    mask.AddConnectedComponents(components);
-                    mask.And(image);
-
-                    // apply mask
-                    cleanedImage = image ^ mask;
-
-                    // dilate vertically to close gaps in vertical lines opened by lines removal
-                    cleanedImage.Dilate(StructuringElement.Rectangle(1, 7), 1);
-                    cleanedImage = cleanedImage & image;
-                }*/
             }
 
-            ISet<ConnectedComponent> FilterLines(Image lines, Image nonLines, bool vertical)
+            ISet<Line> FilterLines(Image lines, Image nonLines, bool vertical)
             {
+                HashSet<Line> answer = new HashSet<Line>();
+
                 /*using (Pix pixLines = Pix.FromImage(lines))
                 {
                     Pixa pixa = null;
@@ -284,8 +236,7 @@ namespace Genix.DocumentAnalysis
                     vertical ? image.VerticalResolution : image.HorizontalResolution,
                     200);
 
-                HashSet<ConnectedComponent> components = new HashSet<ConnectedComponent>(lines.FindConnectedComponents(8));
-                components.RemoveWhere(component =>
+                foreach (ConnectedComponent component in lines.FindConnectedComponents(8))
                 {
                     Rectangle bounds = component.Bounds;
 
@@ -329,28 +280,16 @@ namespace Genix.DocumentAnalysis
                     }
                     else
                     {
-                        /*if (vertical)
+                        answer.Add(new Line()
                         {
-                            yield return new LineShape(
-                                new Point(bounds.X + (bounds.Width / 2), bounds.Y),
-                                new Point(bounds.X + (bounds.Width / 2), bounds.Bottom),
-                                bounds.Width,
-                                LineTypes.Vertical);
-                        }
-                        else
-                        {
-                            yield return new LineShape(
-                                new Point(bounds.X, bounds.Y + (bounds.Height / 2)),
-                                new Point(bounds.Right, bounds.Y + (bounds.Height / 2)),
-                                bounds.Height,
-                                LineTypes.Horizontal);
-                        }*/
+                            Component = component,
+                            Width = maxWidth,
+                            IsVertical = vertical,
+                        });
                     }
+                }
 
-                    return isBad;
-                });
-
-                return components;
+                return answer;
 
                 long CountAdjacentPixels(int lineWidth, Rectangle bounds)
                 {
@@ -400,6 +339,38 @@ namespace Genix.DocumentAnalysis
                     image.Xand(residue);
                 }
             }
+
+            ISet<LineShape> CreateAnswer()
+            {
+                HashSet<LineShape> answer = new HashSet<LineShape>();
+
+                if (hlinesResult != null)
+                {
+                    foreach (Line line in hlinesResult)
+                    {
+                        answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Horizontal));
+                    }
+                }
+
+                if (vlinesResult != null)
+                {
+                    foreach (Line line in vlinesResult)
+                    {
+                        answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Vertical));
+                    }
+                }
+
+                return answer;
+            }
+        }
+
+        private class Line
+        {
+            public ConnectedComponent Component { get; set; }
+
+            public int Width { get; set; }
+
+            public bool IsVertical { get; set; }
         }
     }
 }

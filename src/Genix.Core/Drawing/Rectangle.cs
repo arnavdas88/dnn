@@ -73,6 +73,21 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Rectangle"/> struct
+        /// using two corner points.
+        /// </summary>
+        /// <param name="pt1">The first point.</param>
+        /// <param name="pt2">The second point.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Rectangle(Point pt1, Point pt2)
+        {
+            this.x = MinMax.Min(pt1.X, pt2.X);
+            this.y = MinMax.Min(pt1.Y, pt2.Y);
+            this.w = MinMax.Max(pt1.X, pt2.X) - this.x;
+            this.h = MinMax.Max(pt1.Y, pt2.Y) - this.y;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Rectangle"/> struct from the <see cref="System.Drawing.Rectangle"/>.
         /// </summary>
         /// <param name="rect">The <see cref="System.Drawing.Rectangle"/> that contains the position of the point.</param>
@@ -221,6 +236,14 @@ namespace Genix.Drawing
         public int Area => this.w * this.h;
 
         /// <summary>
+        /// Gets the center <see cref="Point"/> of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <value>
+        /// The center <see cref="Point"/> of this <see cref="Rectangle"/>.
+        /// </value>
+        public Point CenterPoint => new Point(this.x + (this.w / 2), this.y + (this.h / 2));
+
+        /// <summary>
         /// Compares two <see cref="Rectangle"/> objects.
         /// The result specifies whether the values of the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties of the two <see cref="Rectangle"/> objects are equal.
         /// </summary>
@@ -278,6 +301,37 @@ namespace Genix.Drawing
                 rect.Y - dy,
                 MinMax.Max(rect.w + (2 * dx), 0),
                 MinMax.Max(rect.h + (2 * dy), 0));
+        }
+
+        /// <summary>
+        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified amounts, in all directions.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="left">The amount by which to expand or shrink the left side of the rectangle.</param>
+        /// <param name="top">The amount by which to expand or shrink the top side of the rectangle.</param>
+        /// <param name="right">The amount by which to expand or shrink the right side of the rectangle.</param>
+        /// <param name="bottom">The amount by which to expand or shrink the bottom side of the rectangle.</param>
+        /// <returns>The resulting rectangle.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by the sum of <paramref name="left"/> and <paramref name="right"/>,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased or decreased by the sum of <paramref name="top"/> and <paramref name="bottom"/>.
+        /// </para>
+        /// <para>
+        /// If either sum is negative, the <see cref="Rectangle"/> structure is deflated in the corresponding direction.
+        /// </para>
+        /// <para>
+        /// If the specified parameters shrink the rectangle by more than its current <see cref="Width"/> or <see cref="Height"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle.Empty"/> rectangle.</para>
+        /// </remarks>
+        public static Rectangle Inflate(Rectangle rect, int left, int top, int right, int bottom)
+        {
+            return new Rectangle(
+                rect.X - left,
+                rect.Y - top,
+                MinMax.Max(rect.w + left + right, 0),
+                MinMax.Max(rect.h + top + bottom, 0));
         }
 
         /// <summary>
