@@ -258,7 +258,7 @@ namespace Genix.Imaging
             if (this.BitsPerPixel > 1)
             {
                 // set frame to white
-                dst.SetWhiteBorder(dstx, dsty, area.Width, area.Height);
+                dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
             }
 
             dst.Transform = this.Transform.Append(new MatrixTransform(left, top));

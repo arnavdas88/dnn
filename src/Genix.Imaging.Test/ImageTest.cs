@@ -19,7 +19,7 @@
         public void PowerTest1()
         {
             Image image = new Image((64 * 2) + 23, 43, 1, 200, 200);
-            image.SetWhite();
+            image.SetWhiteIP();
 
             image.SetPixel(5, 9, 1);
             image.SetPixel(64 + 37, 19, 1);

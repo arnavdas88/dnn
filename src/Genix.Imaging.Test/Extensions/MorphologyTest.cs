@@ -55,7 +55,7 @@
                 for (int iy = 0; iy < Height; iy++)
                 {
                     Image image = new Image(Width, Height, 1, 200, 200);
-                    image.SetBlack();
+                    image.SetBlackIP();
                     image.SetPixel(ix, iy, 0);
 
                     Image dilatedImage = image.Erode(StructuringElement.Square(3), 1);

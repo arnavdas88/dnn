@@ -55,7 +55,7 @@
             // image is:
             // 1 0 0 0 0 1 0 0   0 1
             Image image = new Image(10, 1, 8, 200, 200);
-            image.SetWhite();
+            image.SetWhiteIP();
             image.SetPixel(0, 0, 0);
             image.SetPixel(5, 0, 0);
             image.SetPixel(9, 0, 0);

@@ -37,7 +37,7 @@ namespace Genix.Imaging
                 // create mask
                 if (iteration > 0)
                 {
-                    mask.SetToMin();
+                    mask.SetToMinIP();
                 }
 
                 // special case for rectangular kernel
@@ -55,7 +55,7 @@ namespace Genix.Imaging
                     this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
 
                     // create horizontal mask
-                    mask.SetToMin();
+                    mask.SetToMinIP();
 
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {
@@ -103,7 +103,7 @@ namespace Genix.Imaging
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 // create mask
-                mask.SetToMax();
+                mask.SetToMaxIP();
 
                 // special case for rectangular kernel
                 // instead of applying m x n mask
@@ -120,7 +120,7 @@ namespace Genix.Imaging
                     this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
 
                     // create horizontal mask
-                    mask.SetToMax();
+                    mask.SetToMaxIP();
 
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {

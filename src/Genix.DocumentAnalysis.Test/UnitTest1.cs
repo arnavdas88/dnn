@@ -45,7 +45,7 @@
 
                 workImage = workImage.Deskew();
                 stopwatch.Restart();
-                ISet<ConnectedComponent> components = LineDetector.FindLines(workImage, new LineDetectionOptions());
+                ISet<LineShape> components = LineDetector.FindLines(workImage, new LineDetectionOptions());
                 stopwatch.Stop();
                 Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
             }

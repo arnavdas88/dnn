@@ -16,7 +16,7 @@
                 uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
 
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
-                image.SetBlack();
+                image.SetBlackIP();
 
                 for (int y = 0; y < image.Height; y++)
                 {
@@ -48,7 +48,7 @@
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
-                Image whiteImage = Image.SetWhite(image);
+                Image whiteImage = image.SetWhite();
 
                 for (int x = 0; x < whiteImage.Width; x++)
                 {
@@ -79,7 +79,7 @@
                     Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                     image.Randomize();
 
-                    Image whiteImage = Image.SetWhite(image, area);
+                    Image whiteImage = image.SetWhite(area);
 
                     for (int x = 0; x < whiteImage.Width; x++)
                     {
@@ -103,7 +103,7 @@
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
-                Image blackImage = Image.SetBlack(image);
+                Image blackImage = image.SetBlack();
 
                 for (int x = 0; x < blackImage.Width; x++)
                 {
@@ -134,7 +134,7 @@
                     Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                     image.Randomize();
 
-                    Image blackImage = Image.SetBlack(image, area);
+                    Image blackImage = image.SetBlack(area);
 
                     for (int x = 0; x < blackImage.Width; x++)
                     {

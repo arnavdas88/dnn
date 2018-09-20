@@ -276,7 +276,7 @@ namespace Genix.DocumentAnalysis
 
                     if (isBad)
                     {
-                        lines.SetWhite(bounds);
+                        lines.SetWhiteIP(bounds);
                     }
                     else
                     {
