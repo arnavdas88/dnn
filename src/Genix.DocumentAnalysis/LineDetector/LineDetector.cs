@@ -122,16 +122,16 @@ namespace Genix.DocumentAnalysis
             {
                  // close up small holes
                 int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-                Image closedImage = image.MorphClose(StructuringElement.Square(maxLineWidth / 3), 1);
+                Image closedImage = image.MorphClose(StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
 
                 // open up to detect big solid areas
-                Image openedImage = closedImage.MorphOpen(StructuringElement.Square(maxLineWidth), 1);
+                Image openedImage = closedImage.MorphOpen(StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
                 Image hollowImage = closedImage.Sub(openedImage, 0);
 
                 // open up in both directions to find lines
                 int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-                hlines = hollowImage.MorphOpen(StructuringElement.Rectangle(minLineLength, 1), 1);
-                vlines = hollowImage.MorphOpen(StructuringElement.Rectangle(1, minLineLength), 1);
+                hlines = hollowImage.MorphOpen(StructuringElement.Rectangle(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                vlines = hollowImage.MorphOpen(StructuringElement.Rectangle(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
 
                 // check for line presence
                 if (hlines.IsAllWhite())
@@ -160,7 +160,7 @@ namespace Genix.DocumentAnalysis
                     }
 
                     int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonVLines = nonLines.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1);
+                    nonVLines = nonLines.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonVLines.FloodFillIP(8, nonLines);
 
@@ -182,7 +182,7 @@ namespace Genix.DocumentAnalysis
                     }
 
                     int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonHLines = nonLines.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1);
+                    nonHLines = nonLines.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonHLines.FloodFillIP(8, nonLines);
 
@@ -319,7 +319,7 @@ namespace Genix.DocumentAnalysis
 
                 // dilate the lines so they touch the residue
                 // then flood fill then to get all the residue (image less non-lines)
-                Image fatLines = lines.Dilate(StructuringElement.Square(3), 1);
+                Image fatLines = lines.Dilate(StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor);
                 fatLines.FloodFillIP(8, image.Xand(nonLines));
 
                 // remove the residue
@@ -333,7 +333,7 @@ namespace Genix.DocumentAnalysis
                     // get the intersection residue
                     Image residue = hlines
                         .And(vlines)
-                        .Dilate(StructuringElement.Square(5), 1);
+                        .Dilate(StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
                     residue.FloodFillIP(8, image);
 
                     // remove the residue

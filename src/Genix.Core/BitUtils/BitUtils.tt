@@ -104,7 +104,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Examines the bit at the specified position in the the array of <#=typeDescription#>.
+        /// Examines the bit at the specified position in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="bits">The bits to examine.</param>
         /// <param name="position">The bit position to test.</param>
@@ -118,7 +118,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Sets the bit at the specified position in the the array of <#=typeDescription#>.
+        /// Sets the bit at the specified position in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The bit position to reset.</param>
@@ -129,7 +129,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Resets the bit at the specified position in the the array of <#=typeDescription#>.
+        /// Resets the bit at the specified position in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="bits">The bits to reset.</param>
         /// <param name="position">The bit position to reset.</param>
@@ -140,7 +140,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Sets the range bits at the specified starting position in the the array of <#=typeDescription#>.
+        /// Sets the range bits at the specified starting position in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="count">The number of bits to set.</param>
         /// <param name="bits">The bits to set.</param>
@@ -152,7 +152,24 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Resets the range bits at the specified starting position in the the array of <#=typeDescription#>.
+        /// Sets the range bits at the specified starting position in the array of <#=typeDescription#> to the specified mask.
+        /// </summary>
+        /// <param name="count">The number of bits to set.</param>
+        /// <param name="mask">The bit mask to set.</param>
+        /// <param name="bits">The bits to set.</param>
+        /// <param name="position">The starting bit position to set.</param>
+        /// <remarks>
+        /// <para>The method sets all elements in <paramref name="bits"/> to <paramref name="mask"/>.</para>
+        /// <para>If range starting or ending position do not match element boundaries, the required bits for partial elements are taken from <paramref name="mask"/>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetBits(int count, <#=typeName#> mask, <#=typeName#>[] bits, int position)
+        {
+            NativeMethods.bits_set_mask_<#=nativeSuffix#>(count, mask, bits, position);
+        }
+
+        /// <summary>
+        /// Resets the range bits at the specified starting position in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="count">The number of bits to reset.</param>
         /// <param name="bits">The bits to reset.</param>
@@ -557,6 +574,9 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_set_<#=nativeSuffix#>(int count, [In, Out] <#=typeName#>[] bits, int pos);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void bits_set_mask_<#=nativeSuffix#>(int count, <#=typeName#> mask, [In, Out] <#=typeName#>[] bits, int pos);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void bits_reset_<#=nativeSuffix#>(int count, [In, Out] <#=typeName#>[] bits, int pos);

@@ -24,12 +24,19 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void DilateIP(StructuringElement kernel, int iterations)
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        [CLSCompliant(false)]
+        public void DilateIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
             if (kernel == null)
             {
                 throw new ArgumentNullException(nameof(kernel));
             }
+
+            /*int stride = this.Stride;
+            ulong[] solidBorder = borderType == BorderType.BorderConst ?
+                Image.ColorScanline(stride, this.BitsPerPixel, borderValue) : null;*/
 
             Image mask = this.Clone(false);
             for (int iteration = 0; iteration < iterations; iteration++)
@@ -40,6 +47,8 @@ namespace Genix.Imaging
                     mask.SetToMinIP();
                 }
 
+                int count = 0;
+
                 // special case for rectangular kernel
                 // instead of applying m x n mask
                 // we sequentially apply n x 1 and 1 x n masks
@@ -49,17 +58,22 @@ namespace Genix.Imaging
                     foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
                     {
                         MakeMask(point);
+                        count++;
                     }
 
                     // apply mask
-                    this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+                    if (count > 0)
+                    {
+                        this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+                        mask.SetToMinIP();
+                    }
 
                     // create horizontal mask
-                    mask.SetToMinIP();
-
+                    count = 0;
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {
                         MakeMask(point);
+                        count++;
                     }
                 }
                 else
@@ -67,23 +81,71 @@ namespace Genix.Imaging
                     foreach (Point point in kernel.GetElements())
                     {
                         MakeMask(point);
+                        count++;
                     }
                 }
 
                 // apply mask
+                if (count == 0)
+                {
+                    break;
+                }
+
                 this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
             }
 
             void MakeMask(Point point)
             {
-                mask.MaximumIP(
-                    Core.MinMax.Max(-point.X, 0),
-                    Core.MinMax.Max(-point.Y, 0),
-                    this.Width - Math.Abs(point.X),
-                    this.Height - Math.Abs(point.Y),
-                    this,
-                    Core.MinMax.Max(point.X, 0),
-                    Core.MinMax.Max(point.Y, 0));
+                int xdst = Core.MinMax.Max(-point.X, 0);
+                int ydst = Core.MinMax.Max(-point.Y, 0);
+                int xsrc = Core.MinMax.Max(point.X, 0);
+                int ysrc = Core.MinMax.Max(point.Y, 0);
+                int width = this.Width - Math.Abs(point.X);
+                int height = this.Height - Math.Abs(point.Y);
+
+                mask.MaximumIP(xdst, ydst, width, height, this, xsrc, ysrc);
+
+                if (borderType == BorderType.BorderConst)
+                {
+                    // max top
+                    /*if (ydst > 0)
+                    {
+                        for (int i = 0, off = 0; i < ydst; i++, off += mask.Stride)
+                        {
+                            Vectors.Max(stride, solidBorder, 0, mask.Bits, off);
+                        }
+                    }*/
+
+                    // set left
+                    /*if (x > 0)
+                    {
+                        SetVerticalBits(x, 0);
+                    }
+
+                    // set right
+                    if (x + width < this.Width)
+                    {
+                        SetVerticalBits(this.Width - (x + width), x + width);
+                    }*/
+
+                    // max bottom
+                    /*if (y + height < this.Height)
+                    {
+                        Vectors.Tile(stride, this.Height - (y + height), colors, 0, bits, (y + height) * stride);
+                    }
+
+                    // set left
+                    if (xdst > 0)
+                    {
+                        SetVerticalBits(x * this.BitsPerPixel, 0);
+                    }
+
+                    // set right
+                    if (xdst + width < mask.Width)
+                    {
+                        SetVerticalBits((this.Width - (x + width)) * this.BitsPerPixel, (x + width) * this.BitsPerPixel);
+                    }*/
+                }
             }
         }
 
@@ -92,7 +154,10 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void ErodeIP(StructuringElement kernel, int iterations)
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        [CLSCompliant(false)]
+        public void ErodeIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
             if (kernel == null)
             {
@@ -105,6 +170,8 @@ namespace Genix.Imaging
                 // create mask
                 mask.SetToMaxIP();
 
+                int count = 0;
+
                 // special case for rectangular kernel
                 // instead of applying m x n mask
                 // we sequentially apply n x 1 and 1 x n masks
@@ -114,17 +181,21 @@ namespace Genix.Imaging
                     foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
                     {
                         MakeMask(point);
+                        count++;
                     }
 
                     // apply mask
-                    this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+                    if (count > 0)
+                    {
+                        this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
+                        mask.SetToMaxIP();
+                    }
 
                     // create horizontal mask
-                    mask.SetToMaxIP();
-
                     foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
                     {
                         MakeMask(point);
+                        count++;
                     }
                 }
                 else
@@ -132,10 +203,16 @@ namespace Genix.Imaging
                     foreach (Point point in kernel.GetElements())
                     {
                         MakeMask(point);
+                        count++;
                     }
                 }
 
                 // apply mask
+                if (count == 0)
+                {
+                    break;
+                }
+
                 this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
             }
 
@@ -157,12 +234,15 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void MorphOpenIP(StructuringElement kernel, int iterations)
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        [CLSCompliant(false)]
+        public void MorphOpenIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.ErodeIP(kernel, 1);
-                this.DilateIP(kernel, 1);
+                this.ErodeIP(kernel, 1, borderType, borderValue);
+                this.DilateIP(kernel, 1, borderType, borderValue);
             }
         }
 
@@ -171,12 +251,15 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
-        public void MorphCloseIP(StructuringElement kernel, int iterations)
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        [CLSCompliant(false)]
+        public void MorphCloseIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                this.DilateIP(kernel, 1);
-                this.ErodeIP(kernel, 1);
+                this.DilateIP(kernel, 1, borderType, borderValue);
+                this.ErodeIP(kernel, 1, borderType, borderValue);
             }
         }
 

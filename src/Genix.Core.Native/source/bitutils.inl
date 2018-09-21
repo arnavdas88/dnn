@@ -385,6 +385,55 @@ BITSAPI(void, bits_set)(
 	}
 }
 
+// Sets the range of bits using the provided mask for little-endian architecture.
+BITSAPI(void, bits_set_mask)(
+	int count,			// number of bits to set
+	const __bits x,		// the mask used to set the bits
+	__bits* bits,		// the bits to set
+	int pos 			// the zero-based index of starting bit in bits
+	)
+{
+	bits += (pos >> BITS_SHIFT);
+	pos &= BITS_MASK;
+
+	// one word only
+	if (pos + count <= BITS_COUNT)
+	{
+		const __bits mask = CLEAR_MASK_RANGE(pos, count);
+		*bits &= mask;
+		*bits |= x & ~mask;
+	}
+	else
+	{
+		// fill left side
+		if (pos > 0)
+		{
+			const __bits mask = CLEAR_MASK_MSB(pos);
+			*bits &= mask;
+			*bits |= x & ~mask;
+
+			count -= BITS_COUNT - pos;
+			bits++;
+		}
+
+		// fill center
+		int wordcount = count >> BITS_SHIFT;
+		if (wordcount > 0)
+		{
+			_set(wordcount, x, bits);
+		}
+
+		// fill right side
+		count &= BITS_MASK;
+		if (count > 0)
+		{
+			const __bits mask = CLEAR_MASK_LSB(count);
+			bits[wordcount] &= mask;
+			bits[wordcount] |= x & ~mask;
+		}
+	}
+}
+
 // Determines whether the bits in two arrays are the same.
 BITSAPI(bool, bits_equals)(
 	int count,				// number of bits to test

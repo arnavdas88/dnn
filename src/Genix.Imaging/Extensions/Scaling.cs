@@ -67,7 +67,7 @@ namespace Genix.Imaging
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Scale((double)width / this.Width, (double)height / this.Height);
 
-            Image dst = this.Affine(matrix, BorderType.BorderConst, 0);
+            Image dst = this.Affine(matrix, BorderType.BorderConst, this.WhiteColor);
             Debug.Assert(width == dst.Width && height == dst.Height, "Image dimensions are wrong.");
             return dst;
 #if false
@@ -180,7 +180,7 @@ namespace Genix.Imaging
             {
                 int dx = width - dst.Width;
                 int dy = height - dst.Height;
-                dst = dst.Inflate(dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2));
+                dst = dst.Inflate(dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2), BorderType.BorderConst, dst.WhiteColor);
             }
 
             return dst != this ? dst : dst.Copy();
@@ -206,7 +206,7 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight);
             }
 
-            return this.Inflate(0, 0, width - this.Width, height - this.Height);
+            return this.Inflate(0, 0, width - this.Width, height - this.Height, BorderType.BorderConst, this.WhiteColor);
         }
 
         /// <summary>
@@ -217,6 +217,8 @@ namespace Genix.Imaging
         /// <param name="top">The amount by which to expand or shrink the top side of the <see cref="Image"/>.</param>
         /// <param name="right">The amount by which to expand or shrink the right side of the <see cref="Image"/>. </param>
         /// <param name="bottom">The amount by which to expand or shrink the bottom side of the <see cref="Image"/>.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// A new inflated <see cref="Image"/>.
         /// </returns>
@@ -225,7 +227,8 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>Result height is less than or equal to zero.</para>
         /// </exception>
-        public Image Inflate(int left, int top, int right, int bottom)
+        [CLSCompliant(false)]
+        public Image Inflate(int left, int top, int right, int bottom, BorderType borderType, uint borderValue)
         {
             // calculate and verify target area in source coordinates
             Rectangle bounds = Rectangle.FromLTRB(
@@ -255,11 +258,8 @@ namespace Genix.Imaging
 
             Image.CopyArea(this, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);
 
-            if (this.BitsPerPixel > 1)
-            {
-                // set frame to white
-                dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
-            }
+            // set border
+            dst.SetBorderIP(dstx, dsty, area.Width, area.Height, borderType, (uint)borderValue);
 
             dst.Transform = this.Transform.Append(new MatrixTransform(left, top));
             return dst;

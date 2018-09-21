@@ -96,7 +96,7 @@ namespace Genix.DocumentAnalysis.Classification
 
             image = image
                 .CropBlackArea(0, 0)
-                .Dilate(StructuringElement.Square(3), 1)
+                .Dilate(StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
                 ////.CropBlackArea(0, 0)
                 .Convert1To8()
                 .FilterLowpass(3);

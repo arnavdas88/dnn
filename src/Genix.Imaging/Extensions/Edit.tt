@@ -21,6 +21,59 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+<#
+    MethodDescriptor[] methods = new MethodDescriptor[]
+    {
+        new MethodDescriptor()
+        {
+            Name = "SetToMax",
+            Summary = "Sets all image pixels to maximum value (2^bpp - 1)",
+            Returns = "A new <see cref=\"Image\"/> that has all its pixels set to maximum value (2^bpp - 1).",
+            SummaryArea = "Sets all image pixels in the specified rectangular area to maximum value (2^bpp - 1)",
+            ReturnsArea = "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to maximum value (2^bpp - 1).",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SetToMin",
+            Summary = "Sets all image pixels to minimum value (zero)",
+            Returns = "A new <see cref=\"Image\"/> that has all its pixels set to minimum value (zero).",
+            SummaryArea = "Sets all image pixels in the specified rectangular area to minimum value (zero)",
+            ReturnsArea =  "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to minimum value (zero).",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SetWhite",
+            Summary = "Sets all image pixels to white color",
+            Returns = "A new <see cref=\"Image\"/> that has all its pixels set to white color.",
+            SummaryArea = "Sets all image pixels in the specified rectangular area to white color",
+            ReturnsArea = "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to white color.",
+            Remarks = "For binary images, the white color is 0; otherwise, the white color is (2^bpp - 1).",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SetBlack",
+            Summary = "Sets all image pixels to black color",
+            Returns = "A new <see cref=\"Image\"/> that has all its pixels set to black color.",
+            SummaryArea = "Sets all image pixels in the specified rectangular area to black color",
+            ReturnsArea = "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to black color.",
+            Remarks = "For binary images, the black color is 1; otherwise, the black color is 0.",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SetWhiteBorder",
+            SummaryArea = "Sets all image pixels outside the specified rectangular area to white color",
+            ReturnsArea = "A new <see cref=\"Image\"/> that has all its pixels outside the specified rectangular area set to white color.",
+            Remarks = "For binary images, the white color is 0; otherwise, the white color is (2^bpp - 1).",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SetBlackBorder",
+            SummaryArea = "Sets all image pixels outside the specified rectangular area to black color",
+            ReturnsArea = "A new <see cref=\"Image\"/> that has all its pixels outside the specified rectangular area set to black color.",
+            Remarks = "For binary images, the black color is 1; otherwise, the black color is 0.",
+        },
+    };
+#>
 namespace Genix.Imaging
 {
     using System;
@@ -31,77 +84,25 @@ namespace Genix.Imaging
     public partial class Image
     {
 <#
-    Tuple<string, string, string, string, string, string>[] funcs =
+    foreach (MethodDescriptor method in methods)
     {
-        Tuple.Create(
-            "SetToMax",
-            "Sets all image pixels to maximum value (2^bpp - 1)",
-            "A new <see cref=\"Image\"/> that has all its pixels set to maximum value (2^bpp - 1).",
-            "Sets all image pixels in the specified rectangular area to maximum value (2^bpp - 1)",
-            "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to maximum value (2^bpp - 1).",
-            string.Empty),
-        Tuple.Create(
-            "SetToMin",
-            "Sets all image pixels to minimum value (zero)",
-            "A new <see cref=\"Image\"/> that has all its pixels set to minimum value (zero).",
-            "Sets all image pixels in the specified rectangular area to minimum value (zero)",
-            "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to minimum value (zero).",
-            string.Empty),
-        Tuple.Create(
-            "SetWhite",
-            "Sets all image pixels to white color",
-            "A new <see cref=\"Image\"/> that has all its pixels set to white color.",
-            "Sets all image pixels in the specified rectangular area to white color",
-            "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to white color.",
-            "For binary images, the white color is 0; otherwise, the white color is (2^bpp - 1)."),
-        Tuple.Create(
-            "SetBlack",
-            "Sets all image pixels to black color",
-            "A new <see cref=\"Image\"/> that has all its pixels set to black color.",
-            "Sets all image pixels in the specified rectangular area to black color",
-            "A new <see cref=\"Image\"/> that has all its pixels in the specified rectangular area set to black color.",
-            "For binary images, the black color is 1; otherwise, the black color is 0."),
-        Tuple.Create(
-            "SetWhiteBorder",
-            string.Empty,
-            string.Empty,
-            "Sets all image pixels outside the specified rectangular area to white color",
-            "A new <see cref=\"Image\"/> that has all its pixels outside the specified rectangular area set to white color.",
-            "For binary images, the white color is 0; otherwise, the white color is (2^bpp - 1)."),
-        Tuple.Create(
-            "SetBlackBorder",
-            string.Empty,
-            string.Empty,
-            "Sets all image pixels outside the specified rectangular area to black color",
-            "A new <see cref=\"Image\"/> that has all its pixels outside the specified rectangular area set to black color.",
-            "For binary images, the black color is 1; otherwise, the black color is 0."),
-    };
-
-    foreach (Tuple<string, string, string, string, string, string> func in funcs)
-    {
-        string funcName = func.Item1;
-        string summary = func.Item2;
-        string retValue = func.Item3;
-        string summaryArea = func.Item4;
-        string retValueArea = func.Item5;
-        string remarks = func.Item6;
 #>
+<#      if (!string.IsNullOrEmpty(method.Summary)) {#>
 
-<#      if (!string.IsNullOrEmpty(summary)) {#>
         /// <summary>
-        /// <#=summary#> not-in-place.
+        /// <#=method.Summary#> not-in-place.
         /// </summary>
         /// <returns>
-        /// <#=retValue#>
+        /// <#=method.Returns#>
         /// </returns>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
-        /// <seealso cref="<#=funcName#>IP()"/>
-        public Image <#=funcName#>()
+        /// <seealso cref="<#=method.Name#>IP()"/>
+        public Image <#=method.Name#>()
         {
             Image dst = this.Clone(false);
-<#    switch (funcName) {
+<#    switch (method.Name) {
           case "SetToMax":
 #>
             Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
@@ -131,25 +132,25 @@ namespace Genix.Imaging
 <#      }#>
 
         /// <summary>
-        /// <#=summaryArea#> not-in-place.
+        /// <#=method.SummaryArea#> not-in-place.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
         /// <param name="width">The width of the area.</param>
         /// <param name="height">The height of the area.</param>
         /// <returns>
-        /// <#=retValueArea#>
+        /// <#=method.ReturnsArea#>
         /// </returns>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of image bounds.
         /// </exception>
-        /// <seealso cref="<#=funcName#>IP(int, int, int, int)"/>
-        public Image <#=funcName#>(int x, int y, int width, int height)
+        /// <seealso cref="<#=method.Name#>IP(int, int, int, int)"/>
+        public Image <#=method.Name#>(int x, int y, int width, int height)
         {
-<#    switch (funcName) {
+<#    switch (method.Name) {
           case "SetWhiteBorder":
 #>
             this.ValidateArea(x, y, width, height);
@@ -184,12 +185,12 @@ namespace Genix.Imaging
 #>
             if (x == 0 && y == 0 && width == this.Width && height == this.Height)
             {
-                return this.<#=funcName#>();
+                return this.<#=method.Name#>();
             }
             else
             {
                 Image dst = this.Copy();
-                dst.<#=funcName#>IP(x, y, width, height);
+                dst.<#=method.Name#>IP(x, y, width, height);
                 return dst;
             }
 <#
@@ -199,32 +200,32 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// <#=summaryArea#> not-in-place.
+        /// <#=method.SummaryArea#> not-in-place.
         /// </summary>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <returns>
-        /// <#=retValueArea#>
+        /// <#=method.ReturnsArea#>
         /// </returns>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="rect"/> is outside of image bounds.
         /// </exception>
-        /// <seealso cref="<#=funcName#>IP(Rectangle)"/>
+        /// <seealso cref="<#=method.Name#>IP(Rectangle)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image <#=funcName#>(Rectangle rect) => this.<#=funcName#>(rect.X, rect.Y, rect.Width, rect.Height);
+        public Image <#=method.Name#>(Rectangle rect) => this.<#=method.Name#>(rect.X, rect.Y, rect.Width, rect.Height);
 
-<#      if (!string.IsNullOrEmpty(summary)) {#>
+<#      if (!string.IsNullOrEmpty(method.Summary)) {#>
         /// <summary>
-        /// <#=summary#> in-place.
+        /// <#=method.Summary#> in-place.
         /// </summary>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void <#=funcName#>IP() =>
-<#    switch (funcName) {
+        public void <#=method.Name#>IP() =>
+<#    switch (method.Name) {
           case "SetToMax":
 #>
             Vectors.Set(this.Bits.Length, ulong.MaxValue, this.Bits, 0);
@@ -250,26 +251,26 @@ namespace Genix.Imaging
 <#      }#>
 
         /// <summary>
-        /// <#=summaryArea#> in-place.
+        /// <#=method.SummaryArea#> in-place.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
         /// <param name="width">The width of the area.</param>
         /// <param name="height">The height of the area.</param>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
-        public void <#=funcName#>IP(int x, int y, int width, int height)
+        public void <#=method.Name#>IP(int x, int y, int width, int height)
         {
-<#        if (funcName == "SetWhiteBorder" || funcName == "SetBlackBorder") {#>
+<#        if (method.Name == "SetWhiteBorder" || method.Name == "SetBlackBorder") {#>
             this.ValidateArea(x, y, width, height);
 
             ulong[] bits = this.Bits;
             int stride1 = this.Stride1;
-<#        if (funcName == "SetWhiteBorder") {#>
+<#        if (method.Name == "SetWhiteBorder") {#>
             ulong color = this.BitsPerPixel == 1 ? 0ul : ulong.MaxValue;
 <#        } else {#>
             ulong color = this.BitsPerPixel == 1 ? ulong.MaxValue : 0ul;
@@ -306,7 +307,7 @@ namespace Genix.Imaging
                 {
                     for (int i = 0; i < height; i++, pos += stride1)
                     {
-<#        if (funcName == "SetWhiteBorder") {#>
+<#        if (method.Name == "SetWhiteBorder") {#>
                         BitUtils.ResetBits(count, bits, pos);
 <#        } else {#>
                         BitUtils.SetBits(count, bits, pos);
@@ -317,7 +318,7 @@ namespace Genix.Imaging
                 {
                     for (int i = 0; i < height; i++, pos += stride1)
                     {
-<#        if (funcName == "SetWhiteBorder") {#>
+<#        if (method.Name == "SetWhiteBorder") {#>
                         BitUtils.SetBits(count, bits, pos);
 <#        } else {#>
                         BitUtils.ResetBits(count, bits, pos);
@@ -328,7 +329,7 @@ namespace Genix.Imaging
 <#        } else {#>
             if (x == 0 && y == 0 && width == this.Width && height == this.Height)
             {
-                this.<#=funcName#>IP();
+                this.<#=method.Name#>IP();
             }
             else
             {
@@ -339,7 +340,7 @@ namespace Genix.Imaging
 
                 for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
                 {
-<#            switch (funcName) {
+<#            switch (method.Name) {
                 case "SetToMax":
 #>
                     BitUtils.SetBits(count, bits, off);
@@ -382,19 +383,36 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// <#=summaryArea#> in-place.
+        /// <#=method.SummaryArea#> in-place.
         /// </summary>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <remarks>
-        /// <#=remarks#>
+        /// <#=method.Remarks#>
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void <#=funcName#>IP(Rectangle rect) => this.<#=funcName#>IP(rect.X, rect.Y, rect.Width, rect.Height);
+        public void <#=method.Name#>IP(Rectangle rect) => this.<#=method.Name#>IP(rect.X, rect.Y, rect.Width, rect.Height);
 <#
     }
 #>
 	}
 }
+
+<#+
+    class MethodDescriptor
+    {
+        public MethodDescriptor()
+        {
+            this.Remarks = string.Empty;
+        }
+
+        public string Name { get; set; }
+        public string Summary { get; set; }
+        public string Returns { get; set; }
+        public string SummaryArea { get; set; }
+        public string ReturnsArea { get; set; }
+        public string Remarks { get; set; }
+    }
+#>

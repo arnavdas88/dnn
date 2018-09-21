@@ -191,7 +191,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            return this.Affine(matrix, BorderType.BorderConst, 0);
+            return this.Affine(matrix, BorderType.BorderConst, this.WhiteColor);
         }
 
         /// <summary>

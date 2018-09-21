@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Globalization;
     using System.Runtime.CompilerServices;
     using Genix.Core;
 
@@ -55,6 +56,24 @@ namespace Genix.Imaging
         /// The integer that specifies the offset, in bytes, between the beginning of one scan line and the next.
         /// </value>
         public int Stride8 => this.Stride << 3;
+
+        /// <summary>
+        /// Gets the pixel value that represents black color for this <see cref="Image"/>.
+        /// </summary>
+        /// <value>
+        /// 1 for binary images; otherwise, 0.
+        /// </value>
+        [CLSCompliant(false)]
+        public uint BlackColor => this.BitsPerPixel == 1 ? 1u : 0u;
+
+        /// <summary>
+        /// Gets the pixel value that represents white color for this <see cref="Image"/>.
+        /// </summary>
+        /// <value>
+        /// 0 for binary images; otherwise, ~(0xffffffff &lt;&lt; bpp).
+        /// </value>
+        [CLSCompliant(false)]
+        public uint WhiteColor => this.BitsPerPixel == 1 ? 0u : ~(uint.MaxValue << this.BitsPerPixel);
 
         /// <summary>
         /// Gets the tranformation performed on the image since it was first created.
@@ -227,6 +246,95 @@ namespace Genix.Imaging
         public uint GetCRC()
         {
             return CRC.Calculate(this.Bits);
+        }
+
+        /// <summary>
+        /// Creates a scan line filled with pixels of the specified color.
+        /// </summary>
+        /// <param name="length">The scan line length.</param>
+        /// <param name="bitsPerPixel">The number of bits per pixel.</param>
+        /// <param name="color">The color to fill the scan line.</param>
+        /// <returns>The array that contains the created scan line.</returns>
+        private static ulong[] ColorScanline(int length, int bitsPerPixel, uint color)
+        {
+            // fill one line with specified color
+            uint maxcolor = ~(uint.MaxValue << bitsPerPixel);
+            color &= maxcolor;
+
+            ulong[] buf = new ulong[length];
+            if (color == maxcolor)
+            {
+                Vectors.Set(length, ulong.MaxValue, buf, 0);
+            }
+            else if (color != 0)
+            {
+                if (bitsPerPixel == 24)
+                {
+                    ulong ucolor = (ulong)color | ((ulong)color << 24);
+                    buf[0] = ucolor | (ucolor << 48);
+                    if (length > 1)
+                    {
+                        buf[1] = (ucolor >> 16) | (ucolor << 32);
+                    }
+
+                    if (length > 2)
+                    {
+                        buf[2] = (ucolor >> 32) | (ucolor << 16);
+                    }
+
+                    if (length > 3)
+                    {
+                        for (int yoff = 3, count = 3; yoff < length; count *= 2)
+                        {
+                            Vectors.Copy(Math.Min(count, length - yoff), buf, 0, buf, yoff);
+                            yoff += count;
+                        }
+                    }
+                }
+                else
+                {
+                    // create 64-bit value with each position filled with given color
+                    Vectors.Set(length, Image.ColorBits(bitsPerPixel, color), buf, 0);
+                }
+            }
+
+            return buf;
+        }
+
+        /// <summary>
+        /// Creates a single 64-bit element filled with pixels of the specified color.
+        /// </summary>
+        /// <param name="bitsPerPixel">The number of bits per pixel.</param>
+        /// <param name="color">The color to fill the scan line.</param>
+        /// <returns>The 64-bit integer filled with pixels of the specified color.</returns>
+        private static ulong ColorBits(int bitsPerPixel, uint color)
+        {
+            if (bitsPerPixel == 24)
+            {
+                throw new NotImplementedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, bitsPerPixel));
+            }
+
+            if (color == 0)
+            {
+                return 0;
+            }
+
+            uint maxcolor = ~(uint.MaxValue << bitsPerPixel);
+            color &= maxcolor;
+            if (color == maxcolor)
+            {
+                return ulong.MaxValue;
+            }
+
+            // create 64-bit value with each position filled with given color
+            ulong value = color;
+            for (int step = bitsPerPixel; step < 64; step *= 2)
+            {
+                value |= value << step;
+            }
+
+            return value;
         }
 
         /// <summary>

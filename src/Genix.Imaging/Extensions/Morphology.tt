@@ -23,6 +23,8 @@
 
 namespace Genix.Imaging
 {
+    using System;
+
     public partial class Image
     {
 <#
@@ -45,14 +47,17 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="kernel">The structuring element used in this operation.</param>
         /// <param name="iterations">The number of times the operation is applied.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// The new <see cref="Image"/>.
         /// </returns>
-        /// <seealso cref="<#=funcName#>IP(StructuringElement, int)"/>
-        public Image <#=funcName#>(StructuringElement kernel, int iterations)
+        /// <seealso cref="<#=funcName#>IP(StructuringElement, int, BorderType, uint)"/>
+        [CLSCompliant(false)]
+        public Image <#=funcName#>(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
             Image dst = this.Copy();
-            dst.<#=funcName#>IP(kernel, iterations);
+            dst.<#=funcName#>IP(kernel, iterations, borderType, borderValue);
             return dst;
         }
 <#

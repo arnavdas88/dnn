@@ -160,7 +160,7 @@ namespace Genix.Imaging
             // generate foreground mask
             Image mask = this
                 .Convert8To1(threshold)
-                .Dilate(StructuringElement.Square(7), 1)
+                .Dilate(StructuringElement.Square(7), 1, BorderType.BorderConst, 0)
                 .Convert1To8();
 
             // use mask to remove foreground pixels from original image

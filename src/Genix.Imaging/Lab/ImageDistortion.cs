@@ -58,7 +58,7 @@ namespace Genix.Imaging.Lab
             if (rotate)
             {
                 double angle = (width > 0 ? 18 : 3) * this.normalDistribution.Generate();
-                image = image.Rotate(angle, BorderType.BorderConst, 0);
+                image = image.Rotate(angle, BorderType.BorderConst, image.WhiteColor);
             }
 
             // reduce image size to black area
@@ -101,7 +101,7 @@ namespace Genix.Imaging.Lab
                     image = image.ScaleToSize(newWidth, newHeight, ScalingOptions.None);
 
                     double angle = 0.5 * this.normalDistribution.Generate();
-                    image = image.Inflate(image.Height, 0, image.Height, 0);
+                    image = image.Inflate(image.Height, 0, image.Height, 0, BorderType.BorderConst, image.WhiteColor);
                     image = image.Shear(angle);
 
                     Rectangle blackArea = image.BlackArea();
@@ -127,7 +127,7 @@ namespace Genix.Imaging.Lab
                         offsety = this.Random(0, dy);
                     }
 
-                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety);
+                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety, BorderType.BorderConst, image.WhiteColor);
                 }
             }
             else
@@ -149,7 +149,7 @@ namespace Genix.Imaging.Lab
                         offsety = this.Random(0, dy);
                     }
 
-                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety);
+                    image = image.Inflate(offsetx, offsety, dx - offsetx, dy - offsety, BorderType.BorderConst, image.WhiteColor);
                 }
             }
 
@@ -161,7 +161,7 @@ namespace Genix.Imaging.Lab
                 int oldHeight = image.Height;
                 int inflatex = image.Width / 8;
                 int inflatey = image.Height / 8;
-                image = image.Inflate(inflatex, inflatey, inflatex, inflatey);
+                image = image.Inflate(inflatex, inflatey, inflatex, inflatey, BorderType.BorderConst, image.WhiteColor);
 
                 yield return image.Crop(0, 0, oldWidth, oldHeight);
                 yield return image.Crop(2 * inflatex, 0, oldWidth, oldHeight);
