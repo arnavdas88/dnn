@@ -67,7 +67,7 @@ namespace Genix.Imaging
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Scale((double)width / this.Width, (double)height / this.Height);
 
-            Image dst = this.Affine(matrix);
+            Image dst = this.Affine(matrix, BorderType.BorderConst, 0);
             Debug.Assert(width == dst.Width && height == dst.Height, "Image dimensions are wrong.");
             return dst;
 #if false

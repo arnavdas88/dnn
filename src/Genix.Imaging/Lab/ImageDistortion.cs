@@ -58,7 +58,7 @@ namespace Genix.Imaging.Lab
             if (rotate)
             {
                 double angle = (width > 0 ? 18 : 3) * this.normalDistribution.Generate();
-                image = image.Rotate(angle);
+                image = image.Rotate(angle, BorderType.BorderConst, 0);
             }
 
             // reduce image size to black area

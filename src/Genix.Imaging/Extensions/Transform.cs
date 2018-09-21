@@ -21,10 +21,13 @@ namespace Genix.Imaging
         /// Applies affine transformation described by the specified matrix to the <see cref="Image"/>.
         /// </summary>
         /// <param name="matrix">The transformation matrix.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// A new transformed <see cref="Image"/>.
         /// </returns>
-        public Image Affine(System.Windows.Media.Matrix matrix)
+        [CLSCompliant(false)]
+        public Image Affine(System.Windows.Media.Matrix matrix, BorderType borderType, uint borderValue)
         {
             const float Eps = 1e-8f;
 
@@ -57,6 +60,7 @@ namespace Genix.Imaging
             if (this.BitsPerPixel == 1)
             {
                 grayImage = this.Convert1To8();
+                borderValue = borderValue != 0 ? 0u : 255u;
                 convert1bpp = true;
             }
             else
@@ -81,7 +85,9 @@ namespace Genix.Imaging
                 matrix.OffsetX,
                 matrix.M21,
                 matrix.M22,
-                matrix.OffsetY) != 0)
+                matrix.OffsetY,
+                (int)borderType,
+                borderValue) != 0)
             {
                 throw new OutOfMemoryException();
             }
@@ -117,10 +123,13 @@ namespace Genix.Imaging
         /// Rotates the <see cref="Image"/> by an arbitrary angle.
         /// </summary>
         /// <param name="angle">The rotation angle, in degrees, counter-clockwise.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// A new rotated <see cref="Image"/>.
         /// </returns>
-        public Image Rotate(double angle)
+        [CLSCompliant(false)]
+        public Image Rotate(double angle, BorderType borderType, uint borderValue)
         {
             angle = angle % 360.0;
             float a = (float)(Math.PI * (angle / 180.0));
@@ -132,7 +141,7 @@ namespace Genix.Imaging
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Rotate(angle);
 
-            return this.Affine(matrix);
+            return this.Affine(matrix, borderType, borderValue);
         }
 
         /// <summary>
@@ -182,7 +191,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            return this.Affine(matrix);
+            return this.Affine(matrix, BorderType.BorderConst, 0);
         }
 
         /// <summary>
@@ -332,7 +341,7 @@ namespace Genix.Imaging
                 }
             }
 
-            return this.Rotate(-angleBest);
+            return this.Rotate(-angleBest, BorderType.BorderRepl, 0);
 
             float EstimateSkewAngle(float angle)
             {
@@ -379,7 +388,9 @@ namespace Genix.Imaging
                double c02,
                double c10,
                double c11,
-               double c12);
+               double c12,
+               int borderType,
+               uint borderValue);
         }
     }
 }

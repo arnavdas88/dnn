@@ -79,7 +79,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
         PSM_SPARSE_TEXT,
 
         /// <summary>
-        /// Sparse text with orientation and script det.
+        /// Sparse text with orientation and script detection.
         /// </summary>
         PSM_SPARSE_TEXT_OSD,
 

@@ -7,13 +7,19 @@
 #define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
+typedef enum _GenixBorderType : int
+{
+	genixBorderConst = 0,
+	genixBorderRepl,
+};
 
 GENIXAPI(int, affine)(
 	const int bitsPerPixel,
 	const int widthsrc, const int heightsrc, const int stridesrc, const unsigned __int64* src,
 	const int widthdst, const int heightdst, const int stridedst, unsigned __int64* dst,
 	const double c00, const double c01, const double c02,
-	const double c10, const double c11, const double c12)
+	const double c10, const double c11, const double c12,
+	const int borderType, const unsigned borderValue)
 {
 	IppStatus status = ippStsNoErr;
 	const IppiSize srcSize = { widthsrc, heightsrc };
@@ -21,7 +27,14 @@ GENIXAPI(int, affine)(
 	int specSize = 0, initSize = 0, bufSize = 0;
 	IppiWarpSpec* pSpec = NULL;
 	Ipp8u* pBuffer = NULL;
-	const Ipp64f borderValue = 255;
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+	const Ipp64f ippBorderValue = borderValue;
 
 	/* Set transform */
 	double coeffs[2][3];
@@ -40,7 +53,7 @@ GENIXAPI(int, affine)(
 		coeffs,
 		ippNearest,
 		ippWarpForward,
-		ippBorderConst,
+		ippBorderType,
 		&specSize,
 		&initSize));
 
@@ -55,8 +68,8 @@ GENIXAPI(int, affine)(
 		coeffs,
 		ippWarpForward,
 		1,
-		ippBorderConst,
-		&borderValue,
+		ippBorderType,
+		&ippBorderValue,
 		0,
 		pSpec));
 
@@ -65,8 +78,9 @@ GENIXAPI(int, affine)(
 	pBuffer = ippsMalloc_8u(bufSize);
 
 	/* Function call */
-	if (bitsPerPixel == 8)
+	switch (bitsPerPixel)
 	{
+	case 8:
 		check_sts(status = ippiWarpAffineNearest_8u_C1R(
 			(const Ipp8u*)src,
 			stridesrc * sizeof(unsigned __int64),
@@ -76,9 +90,21 @@ GENIXAPI(int, affine)(
 			dstSize,
 			pSpec,
 			pBuffer));
-	}
-	else
-	{
+		break;
+
+	case 24:
+		check_sts(status = ippiWarpAffineNearest_8u_C3R(
+			(const Ipp8u*)src,
+			stridesrc * sizeof(unsigned __int64),
+			(Ipp8u*)dst,
+			stridedst * sizeof(unsigned __int64),
+			{ 0, 0 },
+			dstSize,
+			pSpec,
+			pBuffer));
+		break;
+
+	case 32:
 		check_sts(status = ippiWarpAffineNearest_8u_C4R(
 			(const Ipp8u*)src,
 			stridesrc * sizeof(unsigned __int64),
@@ -88,6 +114,11 @@ GENIXAPI(int, affine)(
 			dstSize,
 			pSpec,
 			pBuffer));
+		break;
+
+	default:
+		status = ippStsBadArgErr;
+		goto exitLine;
 	}
 
 	EXIT_MAIN

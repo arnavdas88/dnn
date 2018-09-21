@@ -78,10 +78,14 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
         /// Processes the <see cref="Imaging.Image"/>.
         /// </summary>
         /// <param name="image">The <see cref="Imaging.Image"/> to process.</param>
+        /// <param name="pageSegmentationMode">The page segmentation mode.</param>
+        /// <returns>
+        /// The <see cref="PageShape"/> object this method creates.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>.
         /// </exception>
-        public void SetImage(Imaging.Image image)
+        public PageShape Recognize(Imaging.Image image, PageSegmentationMode pageSegmentationMode)
         {
             using (Pix pix = Pix.FromImage(image))
             {
@@ -95,32 +99,11 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                 ////NativeMethods.TessBaseAPIClearAdaptiveClassifier(this.handle);
 
                 NativeMethods.TessBaseAPISetImage2(this.handle, pix.Handle);
-
-                ////NativeMethods.BaseAPISetPageSegMode(this.handle, actualPageSegmentMode);
+                NativeMethods.TessBaseAPISetPageSegMode(this.handle, pageSegmentationMode);
 
                 NativeMethods.TessBaseAPIRecognize(this.handle, IntPtr.Zero);
 
-                PageShape page = this.ExtractResults(image.Bounds);
-
-#if false
-                using (PageIterator pageIterator = NativeMethods.TessBaseAPIAnalyseLayout(this.handle))
-                {
-                    pageIterator.Begin();
-
-                    /*if (it)
-                    {
-                        it->Orientation(&orientation, &direction, &order, &deskew_angle);
-                        tprintf(
-                            "Orientation: %d\nWritingDirection: %d\nTextlineOrder: %d\n"
-                            "Deskew angle: %.4f\n",
-                            orientation, direction, order, deskew_angle);
-                    }
-                    else
-                    {
-                        ret_val = EXIT_FAILURE;
-                    }*/
-                }
-#endif
+                return this.ExtractResults(image.Bounds);
             }
         }
 

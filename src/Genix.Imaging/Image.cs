@@ -178,6 +178,9 @@ namespace Genix.Imaging
             }
         }
 
+        /// <inheritdoc />
+        public override int GetHashCode() => this.Width ^ this.Height ^ this.BitsPerPixel;
+
         /// <summary>
         /// Creates a new <see cref="Image"/> that is a copy of the current instance.
         /// </summary>

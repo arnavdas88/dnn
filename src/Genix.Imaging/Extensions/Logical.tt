@@ -68,35 +68,32 @@ namespace Genix.Imaging
         /// <summary>
         /// Performs logical <#=functionName.ToUpperInvariant()#> operation on this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
         /// </summary>
-        /// <param name="a">The left-side operand of this operation.</param>
-        /// <param name="b">The right-side operand of this operation.</param>
+        /// <param name="src">The right-side operand of this operation.</param>
         /// <remarks>
         /// <para>
-        /// <paramref name="a"/> and <paramref name="b"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in <paramref name="a"/> upper-left corner.
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
         /// </remarks>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="a"/> is <b>null</b>.</para>
-        /// <para>-or-</para>
-        /// <para><paramref name="b"/> is <b>null</b>.</para>
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="a"/> and <paramref name="b"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
-        public static Image <#=functionName#>(Image a, Image b)
+        public Image <#=functionName#>(Image src)
         {
-            if (a == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(a));
+                throw new ArgumentNullException(nameof(src));
             }
 
-            Image dst = a.Clone(true);
-            dst.<#=functionName#>(b);
+            Image dst = this.Clone(true);
+            dst.<#=functionName#>IP(src);
             return dst;
         }
 
@@ -149,7 +146,7 @@ namespace Genix.Imaging
         /// The images have a different depth.
         /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
-        public void <#=functionName#>(Image src)
+        public void <#=functionName#>IP(Image src)
         {
             this.<#=functionName#>IP(0, 0, Core.MinMax.Min(this.Width, src.Width), Core.MinMax.Min(this.Height, src.Height), src, 0, 0);
         }
