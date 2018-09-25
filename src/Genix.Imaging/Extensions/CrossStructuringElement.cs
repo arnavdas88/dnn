@@ -6,6 +6,7 @@
 
 namespace Genix.Imaging
 {
+    using System;
     using System.Collections.Generic;
     using Genix.Drawing;
 
@@ -22,10 +23,15 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="width"/> is not a positive value.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is not a positive value.</para>
+        /// </exception>
         public CrossStructuringElement(int width, int height)
         {
-            this.width = width;
-            this.height = height;
+            this.width = width > 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Properties.Resources.E_InvalidSEWidth);
+            this.height = height > 0 ? height : throw new ArgumentOutOfRangeException(nameof(height), Properties.Resources.E_InvalidSEHeight);
         }
 
         /// <summary>
@@ -34,28 +40,32 @@ namespace Genix.Imaging
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
         /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="width"/> is not a positive value.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is not a positive value.</para>
+        /// </exception>
         public CrossStructuringElement(int width, int height, Point anchor)
             : base(anchor)
         {
-            this.width = width;
-            this.height = height;
+            this.width = width > 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Properties.Resources.E_InvalidSEWidth);
+            this.height = height > 0 ? height : throw new ArgumentOutOfRangeException(nameof(height), Properties.Resources.E_InvalidSEHeight);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CrossStructuringElement"/> class.
+        /// </summary>
+        private CrossStructuringElement()
+        {
+        }
+
+        /// <inheritdoc />
+        public override Size Size => new Size(this.width, this.height);
 
         /// <inheritdoc />
         public override IEnumerable<Point> GetElements(Point anchor)
         {
-            if (anchor.X == -1 && anchor.Y == -1)
-            {
-                if (this.Anchor.X == -1 && this.Anchor.Y == -1)
-                {
-                    anchor.X = this.width / 2;
-                    anchor.Y = this.height / 2;
-                }
-                else
-                {
-                    anchor = this.Anchor;
-                }
-            }
+            anchor = this.GetAnchor(anchor);
 
             for (int ix = 0; ix < this.width; ix++)
             {

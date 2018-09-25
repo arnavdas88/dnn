@@ -10,6 +10,7 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Runtime.CompilerServices;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
@@ -38,6 +39,12 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Image(int width, int height, Image image)
             : base(width, height, image)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(Size size, Image image)
+            : base(size, image)
         {
         }
 
@@ -73,7 +80,7 @@ namespace Genix.Imaging
         /// 0 for binary images; otherwise, ~(0xffffffff &lt;&lt; bpp).
         /// </value>
         [CLSCompliant(false)]
-        public uint WhiteColor => this.BitsPerPixel == 1 ? 0u : ~(uint.MaxValue << this.BitsPerPixel);
+        public uint WhiteColor => this.BitsPerPixel == 1 ? 0u : ~(uint)(ulong.MaxValue << this.BitsPerPixel);
 
         /// <summary>
         /// Gets the tranformation performed on the image since it was first created.

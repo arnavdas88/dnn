@@ -138,19 +138,18 @@ namespace Genix.Imaging
             // expand target area
             Rectangle bounds = Rectangle.Inflate(blackArea, dx, dy);
 
-            Image dst = new Image(bounds.Width, bounds.Height, this);
+            Image dst = new Image(bounds.Size, this);
 
             if (!blackArea.IsEmpty)
             {
-                Rectangle area = Rectangle.Intersect(bounds, blackArea);
-                int dstx = area.X - bounds.X;
-                int dsty = area.Y - bounds.Y;
-                Image.CopyArea(this, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);
+                Rectangle srcarea = Rectangle.Intersect(bounds, blackArea);
+                Rectangle dstarea = Rectangle.Offset(srcarea, -bounds.X, -bounds.Y);
+                Image.CopyArea(this, srcarea.X, srcarea.Y, srcarea.Width, srcarea.Height, dst, dstarea.X, dstarea.Y);
 
                 if (this.BitsPerPixel > 1)
                 {
                     // set frame to white
-                    dst.SetWhiteBorderIP(dstx, dsty, area.Width, area.Height);
+                    dst.SetWhiteBorderIP(dstarea);
                 }
             }
             else

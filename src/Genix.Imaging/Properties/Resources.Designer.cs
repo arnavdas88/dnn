@@ -160,6 +160,24 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The structuring element height is not positive..
+        /// </summary>
+        internal static string E_InvalidSEHeight {
+            get {
+                return ResourceManager.GetString("E_InvalidSEHeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The structuring element width is not positive..
+        /// </summary>
+        internal static string E_InvalidSEWidth {
+            get {
+                return ResourceManager.GetString("E_InvalidSEWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The image vertical resolution is invalid..
         /// </summary>
         internal static string E_InvalidVerticalResolution {

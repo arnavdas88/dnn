@@ -26,6 +26,12 @@ namespace Genix.Imaging
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
         [CLSCompliant(false)]
         public void DilateIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
@@ -34,17 +40,22 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(kernel));
             }
 
-            /*int stride = this.Stride;
-            ulong[] solidBorder = borderType == BorderType.BorderConst ?
-                Image.ColorScanline(stride, this.BitsPerPixel, borderValue) : null;*/
+            if (iterations <= 0)
+            {
+                throw new ArgumentException("The number of iterations is equal to or less than zero.");
+            }
 
-            Image mask = this.Clone(false);
+            Size size = Size.Scale(Size.Add(kernel.Size, -1, -1), iterations, iterations);
+            Point anchor = Point.Scale(kernel.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
+
+            Image src = this.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+            Image mask = src.Clone(false);
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 // create mask
                 if (iteration > 0)
                 {
-                    mask.SetToMinIP();
+                    mask.SetToZeroIP();
                 }
 
                 int count = 0;
@@ -55,7 +66,7 @@ namespace Genix.Imaging
                 if (kernel is RectangleStructuringElement rectangularKernel)
                 {
                     // create vertical mask
-                    foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
+                    foreach (Point point in rectangularKernel.GetVerticalElements(StructuringElement.DefaultAnchor))
                     {
                         MakeMask(point);
                         count++;
@@ -64,13 +75,13 @@ namespace Genix.Imaging
                     // apply mask
                     if (count > 0)
                     {
-                        this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
-                        mask.SetToMinIP();
+                        src.MaximumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                        mask.SetToZeroIP();
                     }
 
                     // create horizontal mask
                     count = 0;
-                    foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
+                    foreach (Point point in rectangularKernel.GetHorizontalElements(StructuringElement.DefaultAnchor))
                     {
                         MakeMask(point);
                         count++;
@@ -86,13 +97,13 @@ namespace Genix.Imaging
                 }
 
                 // apply mask
-                if (count == 0)
+                if (count > 0)
                 {
-                    break;
+                    src.MaximumIP(0, 0, src.Width, src.Height, mask, 0, 0);
                 }
-
-                this.MaximumIP(0, 0, this.Width, this.Height, mask, 0, 0);
             }
+
+            Image.CopyArea(src, anchor.X, anchor.Y, this.Width, this.Height, this, 0, 0);
 
             void MakeMask(Point point)
             {
@@ -100,52 +111,10 @@ namespace Genix.Imaging
                 int ydst = Core.MinMax.Max(-point.Y, 0);
                 int xsrc = Core.MinMax.Max(point.X, 0);
                 int ysrc = Core.MinMax.Max(point.Y, 0);
-                int width = this.Width - Math.Abs(point.X);
-                int height = this.Height - Math.Abs(point.Y);
+                int width = src.Width - Math.Abs(point.X);
+                int height = src.Height - Math.Abs(point.Y);
 
-                mask.MaximumIP(xdst, ydst, width, height, this, xsrc, ysrc);
-
-                if (borderType == BorderType.BorderConst)
-                {
-                    // max top
-                    /*if (ydst > 0)
-                    {
-                        for (int i = 0, off = 0; i < ydst; i++, off += mask.Stride)
-                        {
-                            Vectors.Max(stride, solidBorder, 0, mask.Bits, off);
-                        }
-                    }*/
-
-                    // set left
-                    /*if (x > 0)
-                    {
-                        SetVerticalBits(x, 0);
-                    }
-
-                    // set right
-                    if (x + width < this.Width)
-                    {
-                        SetVerticalBits(this.Width - (x + width), x + width);
-                    }*/
-
-                    // max bottom
-                    /*if (y + height < this.Height)
-                    {
-                        Vectors.Tile(stride, this.Height - (y + height), colors, 0, bits, (y + height) * stride);
-                    }
-
-                    // set left
-                    if (xdst > 0)
-                    {
-                        SetVerticalBits(x * this.BitsPerPixel, 0);
-                    }
-
-                    // set right
-                    if (xdst + width < mask.Width)
-                    {
-                        SetVerticalBits((this.Width - (x + width)) * this.BitsPerPixel, (x + width) * this.BitsPerPixel);
-                    }*/
-                }
+                mask.MaximumIP(xdst, ydst, width, height, src, xsrc, ysrc);
             }
         }
 
@@ -156,6 +125,12 @@ namespace Genix.Imaging
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
         [CLSCompliant(false)]
         public void ErodeIP(StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
         {
@@ -164,11 +139,20 @@ namespace Genix.Imaging
                 throw new ArgumentNullException(nameof(kernel));
             }
 
-            Image mask = this.Clone(false);
+            if (iterations <= 0)
+            {
+                throw new ArgumentException("The number of iterations is equal to or less than zero.");
+            }
+
+            Size size = Size.Scale(Size.Add(kernel.Size, -1, -1), iterations, iterations);
+            Point anchor = Point.Scale(kernel.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
+
+            Image src = this.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+            Image mask = src.Clone(false);
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 // create mask
-                mask.SetToMaxIP();
+                mask.SetToOneIP();
 
                 int count = 0;
 
@@ -178,7 +162,7 @@ namespace Genix.Imaging
                 if (kernel is RectangleStructuringElement rectangularKernel)
                 {
                     // create vertical mask
-                    foreach (Point point in rectangularKernel.GetVerticalElements(new Point(-1, -1)))
+                    foreach (Point point in rectangularKernel.GetVerticalElements(StructuringElement.DefaultAnchor))
                     {
                         MakeMask(point);
                         count++;
@@ -187,12 +171,12 @@ namespace Genix.Imaging
                     // apply mask
                     if (count > 0)
                     {
-                        this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
-                        mask.SetToMaxIP();
+                        src.MinimumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                        mask.SetToOneIP();
                     }
 
                     // create horizontal mask
-                    foreach (Point point in rectangularKernel.GetHorizontalElements(new Point(-1, -1)))
+                    foreach (Point point in rectangularKernel.GetHorizontalElements(StructuringElement.DefaultAnchor))
                     {
                         MakeMask(point);
                         count++;
@@ -208,24 +192,24 @@ namespace Genix.Imaging
                 }
 
                 // apply mask
-                if (count == 0)
+                if (count > 0)
                 {
-                    break;
+                    src.MinimumIP(0, 0, src.Width, src.Height, mask, 0, 0);
                 }
-
-                this.MinimumIP(0, 0, this.Width, this.Height, mask, 0, 0);
             }
+
+            Image.CopyArea(src, anchor.X, anchor.Y, this.Width, this.Height, this, 0, 0);
 
             void MakeMask(Point point)
             {
-                mask.MinimumIP(
-                    Core.MinMax.Max(-point.X, 0),
-                    Core.MinMax.Max(-point.Y, 0),
-                    this.Width - Math.Abs(point.X),
-                    this.Height - Math.Abs(point.Y),
-                    this,
-                    Core.MinMax.Max(point.X, 0),
-                    Core.MinMax.Max(point.Y, 0));
+                int xdst = Core.MinMax.Max(-point.X, 0);
+                int ydst = Core.MinMax.Max(-point.Y, 0);
+                int xsrc = Core.MinMax.Max(point.X, 0);
+                int ysrc = Core.MinMax.Max(point.Y, 0);
+                int width = src.Width - Math.Abs(point.X);
+                int height = src.Height - Math.Abs(point.Y);
+
+                mask.MinimumIP(xdst, ydst, width, height, src, xsrc, ysrc);
             }
         }
 
@@ -672,7 +656,7 @@ namespace Genix.Imaging
             Rectangle bounds = component.Bounds;
 
             // allocate new image
-            Image dst = new Image(bounds.Width, bounds.Height, this);
+            Image dst = new Image(bounds.Size, this);
 
             ulong[] bitssrc = this.Bits;
             ulong[] bitsdst = dst.Bits;
@@ -721,7 +705,7 @@ namespace Genix.Imaging
             }
 
             // allocate new image
-            Image dst = new Image(bounds.Width, bounds.Height, this);
+            Image dst = new Image(bounds.Size, this);
 
             ulong[] bitssrc = this.Bits;
             ulong[] bitsdst = dst.Bits;
@@ -1159,6 +1143,53 @@ namespace Genix.Imaging
                         }
                         while (lastbitpos != -1);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs flood fill (binary reconstruction) of the <see cref="Image"/> in-place.
+        /// </summary>
+        /// <param name="connectivity">The pixel connectivity (4 or 8).</param>
+        /// <param name="mask">The mask image.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="mask"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="connectivity"/> is neither 4 nor 8.</para>
+        /// <para>-or-</para>
+        /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
+        /// </exception>
+        public void MorphFloodFillIP(int connectivity, Image mask)
+        {
+            if (mask == null)
+            {
+                throw new ArgumentNullException(nameof(mask));
+            }
+
+            if (connectivity != 4 && connectivity != 8)
+            {
+                throw new ArgumentException("The connectivity is neither 4 nor 8.");
+            }
+
+            if (mask.BitsPerPixel != this.BitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+            StructuringElement se = connectivity == 8 ? StructuringElement.Square(3) : StructuringElement.Cross(3);
+
+            long pixelCount = this.Power();
+            while (pixelCount > 0)
+            {
+                this.DilateIP(se, 1, BorderType.BorderConst, 0);
+                this.AndIP(mask);
+
+                long oldPixelCount = pixelCount;
+                pixelCount = this.Power();
+                if (oldPixelCount == pixelCount)
+                {
+                    break;
                 }
             }
         }

@@ -233,6 +233,46 @@ namespace Genix.Imaging
             this.SetColorIP(rect.X, rect.Y, rect.Width, rect.Height, color);
 
         /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the specified color not-in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        public Image SetBorder(int x, int y, int width, int height, BorderType borderType, uint borderValue)
+        {
+            Image dst = this.Copy();
+            dst.SetBorderIP(x, y, width, height, borderType, borderValue);
+            return dst;
+        }
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the specified color not-in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image SetBorder(Rectangle rect, BorderType borderType, uint borderValue) =>
+            this.SetBorder(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
+
+        /// <summary>
         /// Sets all image pixels outside the specified rectangular area to the specified color in-place.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
@@ -318,60 +358,58 @@ namespace Genix.Imaging
                     return;
                 }
 
-                borderValue &= ~(uint.MaxValue << this.BitsPerPixel);
-                if (borderValue == this.WhiteColor)
-                {
-                    this.SetWhiteBorderIP(x, y, width, height);
-                    return;
-                }
-                else if (borderValue == this.BlackColor)
-                {
-                    this.SetBlackBorderIP(x, y, width, height);
-                    return;
-                }
-
                 ulong[] bits = this.Bits;
-                int stride = this.Stride;
                 int stride1 = this.Stride1;
                 int bitsPerPixel = this.BitsPerPixel;
-                ulong[] colors = Image.ColorScanline(stride, bitsPerPixel, borderValue);
+                ulong color = Image.ColorBits(bitsPerPixel, borderValue);
 
-                // set top
-                if (y > 0)
+                int x2 = x + width;
+                int y2 = y + height;
+
+                // fill top area and the left part of first partial stride
+                int count = (y * stride1) + (x * bitsPerPixel);
+                int pos = 0;
+                if (count > 0)
                 {
-                    Vectors.Tile(stride, y, colors, 0, bits, 0);
+                    BitUtils.SetBits(count, color, bits, pos);
                 }
 
-                // set left
-                if (x > 0)
+                // fill partial strides (together right part and left part of the next line)
+                if (height > 1)
                 {
-                    SetVerticalBits(x, 0);
-                }
-
-                // set right
-                if (x + width < this.Width)
-                {
-                    SetVerticalBits(this.Width - (x + width), x + width);
-                }
-
-                // set bottom
-                if (y + height < this.Height)
-                {
-                    Vectors.Tile(stride, this.Height - (y + height), colors, 0, bits, (y + height) * stride);
-                }
-
-                void SetVerticalBits(int count, int pos)
-                {
-                    count *= bitsPerPixel;
-                    int xpos = pos * bitsPerPixel;
-                    int ypos = xpos + (y * stride1);
-
-                    for (int i = 0; i < height; i++, ypos += stride1)
+                    count = stride1 - (width * bitsPerPixel);
+                    if (count > 0)
                     {
-                        BitUtils.CopyBits(count, colors, xpos, bits, ypos);
+                        pos = (y * stride1) + (x2 * bitsPerPixel);
+                        for (int i = 1; i < height; i++, pos += stride1)
+                        {
+                            BitUtils.SetBits(count, color, bits, pos);
+                        }
                     }
+                }
+
+                // fill bottom area and the right part of last partial stride
+                pos = ((y2 - 1) * stride1) + (x2 * bitsPerPixel);
+                count = (this.Height * stride1) - pos;
+                if (count > 0)
+                {
+                    BitUtils.SetBits(count, color, bits, pos);
                 }
             }
         }
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the specified color in-place.
+        /// </summary>
+        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetBorderIP(Rectangle rect, BorderType borderType, uint borderValue) =>
+            this.SetBorderIP(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
     }
 }

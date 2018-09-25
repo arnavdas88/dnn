@@ -15,8 +15,8 @@
         {
             Stopwatch stopwatch = new Stopwatch();
 
-            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
-            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
+            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
                 Image workImage = image.BitsPerPixel > 1 ? image.Binarize() : image;
@@ -44,7 +44,7 @@
                 }
 #endif
 
-                ////workImage = workImage.Deskew();
+                workImage = workImage.CleanOverscan(0.5f, 0.5f).Deskew().Despeckle();
                 workImage.SetResolution(300, 300);
                 stopwatch.Restart();
                 ISet<LineShape> components = LineDetector.FindLines(workImage, new LineDetectionOptions());

@@ -26,7 +26,7 @@
     {
         new MethodDescriptor()
         {
-            Name = "SetToMax",
+            Name = "SetToOne",
             Summary = "Sets all image pixels to maximum value (2^bpp - 1)",
             Returns = "A new <see cref=\"Image\"/> that has all its pixels set to maximum value (2^bpp - 1).",
             SummaryArea = "Sets all image pixels in the specified rectangular area to maximum value (2^bpp - 1)",
@@ -34,7 +34,7 @@
         },
         new MethodDescriptor()
         {
-            Name = "SetToMin",
+            Name = "SetToZero",
             Summary = "Sets all image pixels to minimum value (zero)",
             Returns = "A new <see cref=\"Image\"/> that has all its pixels set to minimum value (zero).",
             SummaryArea = "Sets all image pixels in the specified rectangular area to minimum value (zero)",
@@ -103,29 +103,22 @@ namespace Genix.Imaging
         {
             Image dst = this.Clone(false);
 <#    switch (method.Name) {
-          case "SetToMax":
-#>
+          case "SetToOne":#>
             Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
-<#
-            break;
-          case "SetWhite":
-#>
+<#            break;
+          case "SetWhite":#>
             if (dst.BitsPerPixel != 1)
             {
                 Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
-<#
-            break;
-          case "SetBlack":
-#>
+<#            break;
+          case "SetBlack":#>
             if (dst.BitsPerPixel == 1)
             {
                 Vectors.Set(dst.Bits.Length, ulong.MaxValue, dst.Bits, 0);
             }
-<#
-            break;
-    }
-#>
+<#            break;
+      }#>
 
             return dst;
         }
@@ -151,38 +144,13 @@ namespace Genix.Imaging
         public Image <#=method.Name#>(int x, int y, int width, int height)
         {
 <#    switch (method.Name) {
-          case "SetWhiteBorder":
-#>
-            this.ValidateArea(x, y, width, height);
-
-            Image dst = this.Clone(false);
-            Image.CopyArea(this, x, y, width, height, dst, x, y);
-
-            if (this.BitsPerPixel > 1)
-            {
-                dst.SetWhiteBorderIP(x, y, width, height);
-            }
-
-            return dst;
-<#
-            break;
-          case "SetBlackBorder":
-#>
-            this.ValidateArea(x, y, width, height);
-
-            Image dst = this.Clone(false);
-            Image.CopyArea(this, x, y, width, height, dst, x, y);
-
-            if (this.BitsPerPixel == 1)
-            {
-                dst.SetBlackBorderIP(x, y, width, height);
-            }
-
-            return dst;
-<#
-            break;
-          default:
-#>
+          case "SetWhiteBorder":#>
+            return this.SetBorder(x, y, width, height, BorderType.BorderConst, this.BitsPerPixel == 1 ? 0 : uint.MaxValue);
+<#            break;
+          case "SetBlackBorder":#>
+            return this.SetBorder(x, y, width, height, BorderType.BorderConst, this.BitsPerPixel == 1 ? uint.MaxValue : 0);
+<#            break;
+          default:#>
             if (x == 0 && y == 0 && width == this.Width && height == this.Height)
             {
                 return this.<#=method.Name#>();
@@ -193,10 +161,8 @@ namespace Genix.Imaging
                 dst.<#=method.Name#>IP(x, y, width, height);
                 return dst;
             }
-<#
-            break;
-    }
-#>
+<#            break;
+    }#>
         }
 
         /// <summary>
@@ -226,28 +192,19 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void <#=method.Name#>IP() =>
 <#    switch (method.Name) {
-          case "SetToMax":
-#>
+          case "SetToOne":#>
             Vectors.Set(this.Bits.Length, ulong.MaxValue, this.Bits, 0);
-<#
-            break;
-          case "SetToMin":
-#>
+<#            break;
+          case "SetToZero":#>
             Vectors.Set(this.Bits.Length, 0ul, this.Bits, 0);
-<#
-            break;
-          case "SetWhite":
-#>
+<#            break;
+          case "SetWhite":#>
            Vectors.Set(this.Bits.Length, this.BitsPerPixel == 1 ? 0ul : ulong.MaxValue, this.Bits, 0);
-<#
-            break;
-          case "SetBlack":
-#>
+<#            break;
+          case "SetBlack":#>
            Vectors.Set(this.Bits.Length, this.BitsPerPixel == 1 ? ulong.MaxValue : 0ul, this.Bits, 0);
-<#
-            break;
-    }
-#>
+<#            break;
+      }#>
 <#      }#>
 
         /// <summary>
@@ -263,123 +220,29 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void <#=method.Name#>IP(int x, int y, int width, int height)
         {
-<#        if (method.Name == "SetWhiteBorder" || method.Name == "SetBlackBorder") {#>
-            this.ValidateArea(x, y, width, height);
-
-            ulong[] bits = this.Bits;
-            int stride1 = this.Stride1;
-<#        if (method.Name == "SetWhiteBorder") {#>
-            ulong color = this.BitsPerPixel == 1 ? 0ul : ulong.MaxValue;
-<#        } else {#>
-            ulong color = this.BitsPerPixel == 1 ? ulong.MaxValue : 0ul;
-<#        }#>
-
-            // set top
-            if (y > 0)
-            {
-                Vectors.Set(y * this.Stride, color, bits, 0);
-            }
-
-            // set left
-            if (x > 0)
-            {
-                SetVerticalBits(x * this.BitsPerPixel, 0);
-            }
-
-            // set right
-            if (x + width < this.Width)
-            {
-                SetVerticalBits((this.Width - (x + width)) * this.BitsPerPixel, (x + width) * this.BitsPerPixel);
-            }
-
-            // set bottom
-            if (y + height < this.Height)
-            {
-                Vectors.Set((this.Height - (y + height)) * this.Stride, color, bits, (y + height) * this.Stride);
-            }
-
-            void SetVerticalBits(int count, int pos)
-            {
-                pos += y * stride1;
-                if (this.BitsPerPixel == 1)
-                {
-                    for (int i = 0; i < height; i++, pos += stride1)
-                    {
-<#        if (method.Name == "SetWhiteBorder") {#>
-                        BitUtils.ResetBits(count, bits, pos);
-<#        } else {#>
-                        BitUtils.SetBits(count, bits, pos);
-<#        }#>
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < height; i++, pos += stride1)
-                    {
-<#        if (method.Name == "SetWhiteBorder") {#>
-                        BitUtils.SetBits(count, bits, pos);
-<#        } else {#>
-                        BitUtils.ResetBits(count, bits, pos);
-<#        }#>
-                    }
-                }
-            }
-<#        } else {#>
-            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
-            {
-                this.<#=method.Name#>IP();
-            }
-            else
-            {
-                this.ValidateArea(x, y, width, height);
-                int stride1 = this.Stride1;
-                int count = width * this.BitsPerPixel;
-                ulong[] bits = this.Bits;
-
-                for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
-                {
-<#            switch (method.Name) {
-                case "SetToMax":
-#>
-                    BitUtils.SetBits(count, bits, off);
-<#
-                    break;
-                case "SetToMin":
-#>
-                    BitUtils.ResetBits(count, bits, off);
-<#
-                    break;
-                case "SetWhite":
-#>
-                    if (this.BitsPerPixel == 1)
-                    {
-                        BitUtils.ResetBits(count, bits, off);
-                    }
-                    else
-                    {
-                        BitUtils.SetBits(count, bits, off);
-                    }
-<#
-                    break;
-                case "SetBlack":
-#>
-                    if (this.BitsPerPixel == 1)
-                    {
-                        BitUtils.SetBits(count, bits, off);
-                    }
-                    else
-                    {
-                        BitUtils.ResetBits(count, bits, off);
-                    }
-<#
-                    break;
-            }
-#>
-                }
-            }
-<#        }#>
+<#          switch (method.Name) {
+            case "SetWhiteBorder":#>
+            this.SetBorderIP(x, y, width, height, BorderType.BorderConst, this.BitsPerPixel == 1 ? 0 : uint.MaxValue);
+<#              break;
+            case "SetBlackBorder":#>
+            this.SetBorderIP(x, y, width, height, BorderType.BorderConst, this.BitsPerPixel == 1 ? uint.MaxValue : 0);
+<#              break;
+            case "SetToOne":#>
+            this.SetColorIP(x, y, width, height, uint.MaxValue);
+<#              break;
+            case "SetToZero":#>
+            this.SetColorIP(x, y, width, height, 0);
+<#              break;
+            case "SetWhite":#>
+            this.SetColorIP(x, y, width, height, this.BitsPerPixel == 1 ? 0 : uint.MaxValue);
+<#              break;
+            case "SetBlack":#>
+            this.SetColorIP(x, y, width, height, this.BitsPerPixel == 1 ? uint.MaxValue : 0);
+<#              break;
+            }#>
         }
 
         /// <summary>

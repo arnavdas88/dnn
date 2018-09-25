@@ -132,6 +132,15 @@
   <data name="E_InvalidRectangleWidth" xml:space="preserve">
     <value>The rectangle width is negative.</value>
   </data>
+  <data name="E_InvalidSizeFormat" xml:space="preserve">
+    <value>The string representation of a Size structure is invalid.</value>
+  </data>
+  <data name="E_InvalidSizeHeight" xml:space="preserve">
+    <value>The size height is negative.</value>
+  </data>
+  <data name="E_InvalidSizeWidth" xml:space="preserve">
+    <value>The size width is negative.</value>
+  </data>
   <data name="E_SequenceIsEmpty" xml:space="preserve">
     <value>The sequence contains no elements.</value>
   </data>

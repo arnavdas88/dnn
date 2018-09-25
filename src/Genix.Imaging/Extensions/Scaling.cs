@@ -247,19 +247,18 @@ namespace Genix.Imaging
                 throw new ArgumentException("The new image height is invalid.");
             }
 
-            Image dst = new Image(bounds.Width, bounds.Height, this);
+            Image dst = new Image(bounds.Size, this);
 
             // calculate source area to copy from
-            Rectangle area = Rectangle.Intersect(bounds, this.Bounds);
+            Rectangle srcarea = Rectangle.Intersect(bounds, this.Bounds);
 
             // calculate destination area to copy to
-            int dstx = area.X - bounds.X;
-            int dsty = area.Y - bounds.Y;
+            Rectangle dstarea = Rectangle.Offset(srcarea, -bounds.X, -bounds.Y);
 
-            Image.CopyArea(this, area.X, area.Y, area.Width, area.Height, dst, dstx, dsty);
+            Image.CopyArea(this, srcarea.X, srcarea.Y, srcarea.Width, srcarea.Height, dst, dstarea.X, dstarea.Y);
 
             // set border
-            dst.SetBorderIP(dstx, dsty, area.Width, area.Height, borderType, (uint)borderValue);
+            dst.SetBorderIP(dstarea, borderType, borderValue);
 
             dst.Transform = this.Transform.Append(new MatrixTransform(left, top));
             return dst;

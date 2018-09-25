@@ -72,7 +72,7 @@
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
                 {
                     uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
 
@@ -127,7 +127,7 @@
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
                 {
                     uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
 
@@ -145,6 +145,63 @@
                         }
                     }
                 }
+            }
+        }
+
+        [TestMethod]
+        public void SetBlackBorderTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
+            {
+                Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
+                image.SetWhiteIP();
+
+                Rectangle area = Rectangle.Inflate(image.Bounds, -2, -3, -4, -5);
+                Image borderImage = image.SetBlackBorder(area);
+
+                // count black pixels
+                int count = 0;
+                for (int x = 0; x < image.Width; x++)
+                {
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        if (borderImage.GetPixel(x, y) == image.BlackColor)
+                        {
+                            count++;
+                        }
+                    }
+                }
+
+                Assert.AreEqual(image.Bounds.Area - area.Area, count);
+            }
+        }
+
+
+        [TestMethod]
+        public void SetWhiteBorderTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
+            {
+                Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
+                image.SetBlackIP();
+
+                Rectangle area = Rectangle.Inflate(image.Bounds, -2, -3, -4, -5);
+                Image borderImage = image.SetWhiteBorder(area);
+
+                // count black pixels
+                int count = 0;
+                for (int x = 0; x < image.Width; x++)
+                {
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        if (borderImage.GetPixel(x, y) == image.WhiteColor)
+                        {
+                            count++;
+                        }
+                    }
+                }
+
+                Assert.AreEqual(image.Bounds.Area - area.Area, count);
             }
         }
 

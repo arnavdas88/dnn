@@ -83,6 +83,17 @@ namespace Genix.Imaging
         {
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(Size size, Image<T> image)
+            : this(
+                size.Width,
+                size.Height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Image{T}"/> class.
         /// </summary>

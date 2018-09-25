@@ -106,6 +106,33 @@ namespace Genix.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The string representation of a Size structure is invalid..
+        /// </summary>
+        public static string E_InvalidSizeFormat {
+            get {
+                return ResourceManager.GetString("E_InvalidSizeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size height is negative..
+        /// </summary>
+        public static string E_InvalidSizeHeight {
+            get {
+                return ResourceManager.GetString("E_InvalidSizeHeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size width is negative..
+        /// </summary>
+        public static string E_InvalidSizeWidth {
+            get {
+                return ResourceManager.GetString("E_InvalidSizeWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sequence contains no elements..
         /// </summary>
         public static string E_SequenceIsEmpty {

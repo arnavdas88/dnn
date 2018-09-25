@@ -68,6 +68,9 @@
     <Compile Include="Drawing\Rectangle.cs" />
     <Compile Include="Drawing\RectangleConverter.cs" />
     <Compile Include="Drawing\RectangleJsonConverter.cs" />
+    <Compile Include="Drawing\Size.cs" />
+    <Compile Include="Drawing\SizeConverter.cs" />
+    <Compile Include="Drawing\SizeJsonConverter.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />

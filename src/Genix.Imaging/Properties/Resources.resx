@@ -150,6 +150,12 @@
   <data name="E_InvalidPropertyItem" xml:space="preserve">
     <value>The image does not contain the requested property item.</value>
   </data>
+  <data name="E_InvalidSEHeight" xml:space="preserve">
+    <value>The structuring element height is not positive.</value>
+  </data>
+  <data name="E_InvalidSEWidth" xml:space="preserve">
+    <value>The structuring element width is not positive.</value>
+  </data>
   <data name="E_InvalidVerticalResolution" xml:space="preserve">
     <value>The image vertical resolution is invalid.</value>
   </data>

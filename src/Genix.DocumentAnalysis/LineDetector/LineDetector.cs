@@ -159,7 +159,7 @@ namespace Genix.DocumentAnalysis
                         nonHLinesExtra = vlines.Sub(itersections, 0);
                     }
 
-                    int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
                     nonVLines = nonLines.Erode(StructuringElement.Rectangle(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonVLines.FloodFillIP(8, nonLines);
@@ -181,7 +181,7 @@ namespace Genix.DocumentAnalysis
                         nonLines = image.Sub(hlines, 0);
                     }
 
-                    int maxLineResidue = LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
                     nonHLines = nonLines.Erode(StructuringElement.Rectangle(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonHLines.FloodFillIP(8, nonLines);

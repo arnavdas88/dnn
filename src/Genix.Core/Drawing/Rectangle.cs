@@ -74,6 +74,21 @@ namespace Genix.Drawing
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Rectangle"/> struct
+        /// with the specified location and size.
+        /// </summary>
+        /// <param name="location">The x- and y-coordinates of the top-left corner of the rectangle.</param>
+        /// <param name="size">The dimensions of the rectangle.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Rectangle(Point location, Size size)
+        {
+            this.x = location.X;
+            this.y = location.Y;
+            this.w = size.Width;
+            this.h = size.Height;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Rectangle"/> struct
         /// using two corner points.
         /// </summary>
         /// <param name="pt1">The first point.</param>
@@ -228,6 +243,22 @@ namespace Genix.Drawing
         public bool IsEmpty => this.x == 0 && this.y == 0 && this.w == 0 && this.h == 0;
 
         /// <summary>
+        /// Gets the location of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Point"/> struct that contains the x- and y-coordinates of the top-left corner of the rectangle.
+        /// </value>
+        public Point Location => new Point(this.x, this.y);
+
+        /// <summary>
+        /// Gets the size of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Size"/> struct that contains rectangle dimensions.
+        /// </value>
+        public Size Size => new Size(this.w, this.h);
+
+        /// <summary>
         /// Gets the area of this <see cref="Rectangle"/>.
         /// </summary>
         /// <value>
@@ -302,6 +333,22 @@ namespace Genix.Drawing
                 MinMax.Max(rect.w + (2 * dx), 0),
                 MinMax.Max(rect.h + (2 * dy), 0));
         }
+
+        /// <summary>
+        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified dimensions, in all directions.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="size">The amount by which to expand or shrink the left, right and top, bottom sides of the rectangle.</param>
+        /// <returns>The resulting rectangle.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the resulting rectangle is increased by twice the specified horizontal dimension,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased by twice the vertical dimension.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rectangle Inflate(Rectangle rect, Size size) => Rectangle.Inflate(rect, size.Width, size.Height);
 
         /// <summary>
         /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified amounts, in all directions.
@@ -709,6 +756,20 @@ namespace Genix.Drawing
             this.y -= dy;
             this.h = MinMax.Max(this.h + (2 * dy), 0);
         }
+
+        /// <summary>
+        /// Expands or shrinks the rectangle by the specified dimensions, in all directions.
+        /// </summary>
+        /// <param name="size">The amount by which to expand or shrink the left, right and top, bottom sides of the rectangle.</param>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the rectangle is increased by twice the specified horizontal dimension,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// Likewise, the <see cref="Height"/> of the resulting rectangle is increased by twice the vertical dimension.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Inflate(Size size) => this.Inflate(size.Width, size.Height);
 
         /// <summary>
         /// Replaces this <see cref="Rectangle"/> with the intersection of itself and the specified <see cref="Rectangle"/>.
