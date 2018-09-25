@@ -173,7 +173,7 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetColorIP(uint color) =>
-            Vectors.Set(this.Bits.Length, Image.ColorBits(this.BitsPerPixel, color), this.Bits, 0);
+            Vectors.Set(this.Bits.Length, this.ColorBits(color), this.Bits, 0);
 
         /// <summary>
         /// Sets all image pixels in the specified rectangular area to the specified color in-place.
@@ -198,7 +198,7 @@ namespace Genix.Imaging
                 this.ValidateArea(x, y, width, height);
 
                 ulong[] bits = this.Bits;
-                ulong ucolor = Image.ColorBits(this.BitsPerPixel, color);
+                ulong ucolor = this.ColorBits(color);
 
                 if (x == 0 && width == this.Width)
                 {
@@ -316,7 +316,7 @@ namespace Genix.Imaging
                     int count = x * bitsPerPixel;
                     for (int i = y, ii = y + height, pos = y * stride1; i < ii; i++, pos += stride1)
                     {
-                        ulong ucolor = Image.ColorBits(bitsPerPixel, this.GetPixel(x, i));
+                        ulong ucolor = this.ColorBits(this.GetPixel(x, i));
                         BitUtils.SetBits(count, ucolor, bits, pos);
                     }
                 }
@@ -329,7 +329,7 @@ namespace Genix.Imaging
                     int count = (this.Width - x2) * bitsPerPixel;
                     for (int i = y, ii = y + height, pos = (y * stride1) + (x2 * bitsPerPixel); i < ii; i++, pos += stride1)
                     {
-                        ulong ucolor = Image.ColorBits(bitsPerPixel, this.GetPixel(x2 - 1, i));
+                        ulong ucolor = this.ColorBits(this.GetPixel(x2 - 1, i));
                         BitUtils.SetBits(count, ucolor, bits, pos);
                     }
                 }
@@ -361,7 +361,7 @@ namespace Genix.Imaging
                 ulong[] bits = this.Bits;
                 int stride1 = this.Stride1;
                 int bitsPerPixel = this.BitsPerPixel;
-                ulong color = Image.ColorBits(bitsPerPixel, borderValue);
+                ulong color = this.ColorBits(borderValue);
 
                 int x2 = x + width;
                 int y2 = y + height;

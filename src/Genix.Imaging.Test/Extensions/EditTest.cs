@@ -215,7 +215,7 @@
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
-                Image invertedImage = image.NOT();
+                Image invertedImage = image.Not();
 
                 for (int x = 0; x < invertedImage.Width; x++)
                 {

@@ -51,8 +51,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BitUtils.tt</DependentUpon>
     </Compile>
-    <Compile Include="BitUtils\BitUtils32.cs" />
-    <Compile Include="BitUtils\BitUtils64.cs" />
     <Compile Include="Collections\Histogram.cs" />
     <Compile Include="Collections\LinkedCollection.cs" />
     <Compile Include="Collections\LinkedCollectionItem.cs" />

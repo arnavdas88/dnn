@@ -87,7 +87,7 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel < 8)
             {
-                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                Vectors.SwapBits(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             bitmap.UnlockBits(srcData);
@@ -170,10 +170,10 @@ namespace Genix.Imaging
                                 dst = IntPtr.Add(dst, (image.Height - 1) * dstData.Stride);
                             }
 
-                            BitUtils32.BitSwap(
+                            Vectors.SwapBits(
                                 image.Height * Math.Abs(dstData.Stride) / sizeof(uint),
                                 image.BitsPerPixel,
-                                dstData.Scan0);
+                                (uint*)dst.ToPointer());
                         }
                     }
                 }
@@ -255,7 +255,7 @@ namespace Genix.Imaging
             {
                 // swap bits to make storage big-endian
                 ulong[] bits = new ulong[image.Bits.Length];
-                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0, bits, 0);
+                Vectors.SwapBits(image.Bits.Length, image.Bits, 0, image.BitsPerPixel, bits, 0);
                 bitmapSource.WritePixels(sourceRect, bits, image.Stride8, 0);
             }
             else
@@ -345,13 +345,13 @@ namespace Genix.Imaging
 
             if (image.BitsPerPixel < 8)
             {
-                BitUtils.BitSwap(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
+                Vectors.SwapBits(image.Bits.Length, image.BitsPerPixel, image.Bits, 0);
             }
 
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
             {
-                image.NOTIP();
+                image.NotIP();
                 metadata.RemovePropertyItem((int)TIFFField.PhotometricInterpretation);
             }
 

@@ -113,7 +113,7 @@ namespace Genix.Imaging.Encoders
                             if (image.BitsPerPixel < 8)
                             {
                                 // make bits big-endian
-                                BitUtils32.BitSwap(image.Height * stride32, image.BitsPerPixel, new IntPtr(dst));
+                                Vectors.SwapBits(image.Height * stride32, image.BitsPerPixel, (uint*)dst);
                             }
                         }
                     }

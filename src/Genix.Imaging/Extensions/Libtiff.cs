@@ -114,7 +114,16 @@ namespace Genix.Imaging
             {
                 if (image.BitsPerPixel < 8)
                 {
-                    BitUtils64.BitSwap(image.Stride, image.BitsPerPixel, image.Bits, offset, buffer, 0);
+                    unsafe
+                    {
+                        fixed (ulong* src = &image.Bits[offset])
+                        {
+                            fixed (byte* dst = buffer)
+                            {
+                                Vectors.SwapBits(image.Stride, src, image.BitsPerPixel, (ulong*)dst);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -269,55 +278,55 @@ namespace Genix.Imaging
                     try
                     {
 #endif
-                        switch (item.Id)
-                        {
-                            case (int)TIFFField.PageNumber:
-                            case (int)TIFFField.HalftoneHints:
-                            case (int)TIFFField.YCbCrSubSampling:
+                    switch (item.Id)
+                    {
+                        case (int)TIFFField.PageNumber:
+                        case (int)TIFFField.HalftoneHints:
+                        case (int)TIFFField.YCbCrSubSampling:
+                            {
+                                if (item.Value is Array array && array.Length == 2)
                                 {
-                                    if (item.Value is Array array && array.Length == 2)
-                                    {
-                                        tiff.SetField((TiffTag)item.Id, array.GetValue(0), array.GetValue(1));
-                                    }
+                                    tiff.SetField((TiffTag)item.Id, array.GetValue(0), array.GetValue(1));
                                 }
+                            }
 
-                                break;
+                            break;
 
-                            // known Photoshop tag issue
-                            case (int)TIFFField.Photoshop:
-                                {
-                                    byte[] bytes = item.Value as byte[];
-                                    if (bytes == null)
-                                    {
-                                        if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
-                                        {
-                                            bytes = blob.GetBlobValue();
-                                        }
-                                    }
-
-                                    if (bytes != null)
-                                    {
-                                        tiff.SetField((TiffTag)item.Id, bytes.Length, bytes);
-                                    }
-                                }
-
-                                break;
-
-                            default:
+                        // known Photoshop tag issue
+                        case (int)TIFFField.Photoshop:
+                            {
+                                byte[] bytes = item.Value as byte[];
+                                if (bytes == null)
                                 {
                                     if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
                                     {
-                                        byte[] blobValue = blob.GetBlobValue();
-                                        SaveTiffTag((TiffTag)item.Id, blobValue);
-                                    }
-                                    else
-                                    {
-                                        SaveTiffTag((TiffTag)item.Id, item.Value);
+                                        bytes = blob.GetBlobValue();
                                     }
                                 }
 
-                                break;
-                        }
+                                if (bytes != null)
+                                {
+                                    tiff.SetField((TiffTag)item.Id, bytes.Length, bytes);
+                                }
+                            }
+
+                            break;
+
+                        default:
+                            {
+                                if (item.Value is System.Windows.Media.Imaging.BitmapMetadataBlob blob)
+                                {
+                                    byte[] blobValue = blob.GetBlobValue();
+                                    SaveTiffTag((TiffTag)item.Id, blobValue);
+                                }
+                                else
+                                {
+                                    SaveTiffTag((TiffTag)item.Id, item.Value);
+                                }
+                            }
+
+                            break;
+                    }
 #if !DEBUG
                     }
                     catch

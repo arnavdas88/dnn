@@ -20,7 +20,7 @@ namespace Genix.Imaging
         /// <returns>
         /// The inverted <see cref="Image"/>.
         /// </returns>
-        public static Image operator ~(Image right) => right.NOT();
+        public static Image operator ~(Image right) => right.Not();
 
         /// <summary>
         /// Performs a bitwise logical AND operation on two images with equal depth and returns a combined image.

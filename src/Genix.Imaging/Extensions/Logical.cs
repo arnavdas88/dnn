@@ -51,10 +51,10 @@ namespace Genix.Imaging
         /// <returns>
         /// A new inverted <see cref="Image"/>.
         /// </returns>
-        public Image NOT()
+        public Image Not()
         {
             Image dst = this.Clone(false);
-            BitUtils64.WordsNOT(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+            Vectors.Not(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
             return dst;
         }
 
@@ -62,7 +62,7 @@ namespace Genix.Imaging
         /// Inverts all pixels in this <see cref="Image"/> in-place.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void NOTIP() => BitUtils64.WordsNOT(this.Bits.Length, this.Bits, 0);
+        public void NotIP() => Vectors.Not(this.Bits.Length, this.Bits, 0);
 
         /// <summary>
         /// Computes maximum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
@@ -142,7 +142,7 @@ namespace Genix.Imaging
         /// </exception>
         public void MaximumIP(Image src)
         {
-            this.MaximumIP(0, 0, Core.MinMax.Min(this.Width, src.Width), Core.MinMax.Min(this.Height, src.Height), src, 0, 0);
+            this.MaximumIP(0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace Genix.Imaging
         /// </exception>
         public void MinimumIP(Image src)
         {
-            this.MinimumIP(0, 0, Core.MinMax.Min(this.Width, src.Width), Core.MinMax.Min(this.Height, src.Height), src, 0, 0);
+            this.MinimumIP(0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>

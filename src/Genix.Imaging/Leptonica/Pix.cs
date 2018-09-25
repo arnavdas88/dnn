@@ -34,21 +34,22 @@ namespace Genix.Imaging.Leptonica
             try
             {
                 NativeMethods.pixSetResolution(handle, image.HorizontalResolution, image.VerticalResolution);
-                IntPtr dst = NativeMethods.pixGetData(handle);
-                int wpl = NativeMethods.pixGetWpl(handle);
 
                 unsafe
                 {
+                    uint* dst = (uint*)NativeMethods.pixGetData(handle).ToPointer();
+                    int wpl = NativeMethods.pixGetWpl(handle);
+
                     fixed (ulong* src = image.Bits)
                     {
-                        Arrays.CopyStrides(image.Height, new IntPtr(src), image.Stride8, dst, wpl * sizeof(uint));
+                        Arrays.CopyStrides(image.Height, new IntPtr(src), image.Stride8, new IntPtr(dst), wpl * sizeof(uint));
 
                         int count = image.Height * wpl;
-                        BitUtils32.BiteSwap(count, dst);
+                        BitUtils.BiteSwap(count, dst);
 
                         if (image.BitsPerPixel < 8)
                         {
-                            BitUtils32.BitSwap(count, image.BitsPerPixel, dst);
+                            Vectors.SwapBits(count, image.BitsPerPixel, dst);
                         }
                     }
                 }
@@ -124,15 +125,15 @@ namespace Genix.Imaging.Leptonica
             {
                 fixed (ulong* bits = image.Bits)
                 {
-                    IntPtr dst = new IntPtr(bits);
-                    Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), dst, image.Stride8);
+                    uint* dst = (uint*)bits;
+                    Arrays.CopyStrides(image.Height, src, wpl * sizeof(uint), new IntPtr(dst), image.Stride8);
 
                     int count = image.Bits.Length * 2; // work with 32-bit words
-                    BitUtils32.BiteSwap(count, dst);
+                    BitUtils.BiteSwap(count, dst);
 
                     if (image.BitsPerPixel < 8)
                     {
-                        BitUtils32.BitSwap(count, image.BitsPerPixel, dst);
+                        Vectors.SwapBits(count, image.BitsPerPixel, dst);
                     }
                 }
             }

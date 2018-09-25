@@ -517,6 +517,17 @@ namespace Genix.Core
         /// Reverses the order of bytes in an array of <#=typeDescription#>.
         /// </summary>
         /// <param name="length">The number of elements to swap.</param>
+        /// <param name="xy">The source and destination array.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void BiteSwap(int length, <#=typeName#>* xy)
+        {
+            NativeMethods.bytesswap_ip_<#=nativeSuffix#>(length, xy, 0);
+        }
+
+        /// <summary>
+        /// Reverses the order of bytes in an array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements to swap.</param>
         /// <param name="x">The source array.</param>
         /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
         /// <param name="y">The destination array.</param>
@@ -526,37 +537,10 @@ namespace Genix.Core
         {
             NativeMethods.bytesswap_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
-
-        /// <summary>
-        /// Reverses the order of groups of bits in each byte an array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="bitCount">The number of bits in a group (1, 2, or 4).</param>
-        /// <param name="xy">The source and destination array.</param>
-        /// <param name="offxy">The starting element position in <paramref name="xy"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BitSwap(int length, int bitCount, <#=typeName#>[] xy, int offxy)
-        {
-            NativeMethods.bits_reverse_ip_<#=nativeSuffix#>(length, bitCount, xy, offxy);
-        }
-
-        /// <summary>
-        /// Reverses the order of groups of bits in each byte an array of <#=typeDescription#>.
-        /// </summary>
-        /// <param name="length">The number of elements to swap.</param>
-        /// <param name="bitCount">The number of bits in a group (1, 2, or 4).</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting element position in <paramref name="x"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void BitSwap(int length, int bitCount, <#=typeName#>[] x, int offx, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.bits_reverse_<#=nativeSuffix#>(length, bitCount, x, offx, y, offy);
-        }
 <#
     }
 #>
+
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
@@ -633,13 +617,10 @@ namespace Genix.Core
             public static extern void bytesswap_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>[] xy, int offxy);
 
             [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void bytesswap_ip_<#=nativeSuffix#>(int n, [In, Out] <#=typeName#>* xy, int offxy);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern void bytesswap_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void bits_reverse_<#=nativeSuffix#>(int length, int bitCount, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void bits_reverse_ip_<#=nativeSuffix#>(int length, int bitCount, [In, Out] <#=typeName#>[] xy, int offxy);
 <#
     }
 #>

@@ -255,7 +255,7 @@ namespace Genix.Imaging
             // create masks
             ulong[] mask = new ulong[this.Bits.Length];
             ulong[] notbits = new ulong[this.Bits.Length];
-            BitUtils64.WordsNOT(this.Bits.Length, this.Bits, 0, notbits, 0);
+            Vectors.Not(this.Bits.Length, this.Bits, 0, notbits, 0);
 
             // remove isolated pixels
             Image.BuildORMask(this, StructuringElement.Square(3), null, mask, false);

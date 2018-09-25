@@ -854,127 +854,6 @@ BITSAPI(__bits, bits_count)(
 	return sum;
 }
 
-// reshuffle n-bits at a time
-__forceinline __bits _bitswap1(const __bits bits)
-{
-#if BITS_COUNT == 64
-	return
-		((bits >> 7) & 0x0101010101010101ul) |
-		((bits >> 5) & 0x0202020202020202ul) |
-		((bits >> 3) & 0x0404040404040404ul) |
-		((bits >> 1) & 0x0808080808080808ul) |
-		((bits << 1) & 0x1010101010101010ul) |
-		((bits << 3) & 0x2020202020202020ul) |
-		((bits << 5) & 0x4040404040404040ul) |
-		((bits << 7) & 0x8080808080808080ul);
-#else
-	return
-		((bits >> 7) & 0x01010101ul) |
-		((bits >> 5) & 0x02020202ul) |
-		((bits >> 3) & 0x04040404ul) |
-		((bits >> 1) & 0x08080808ul) |
-		((bits << 1) & 0x10101010ul) |
-		((bits << 3) & 0x20202020ul) |
-		((bits << 5) & 0x40404040ul) |
-		((bits << 7) & 0x80808080ul);
-#endif
-}
-
-__forceinline __bits _bitswap2(const __bits bits)
-{
-#if BITS_COUNT == 64
-	return
-		((bits >> 6) & 0x0303030303030303ul) |
-		((bits >> 2) & 0x0c0c0c0c0c0c0c0cul) |
-		((bits << 2) & 0x3030303030303030ul) |
-		((bits << 6) & 0xc0c0c0c0c0c0c0c0ul);
-#else
-	return
-		((bits >> 6) & 0x03030303ul) |
-		((bits >> 2) & 0x0c0c0c0cul) |
-		((bits << 2) & 0x30303030ul) |
-		((bits << 6) & 0xc0c0c0c0ul);
-#endif
-}
-
-__forceinline __bits _bitswap4(const __bits bits)
-{
-#if BITS_COUNT == 64
-	return
-		((bits >> 4) & 0x0f0f0f0f0f0f0f0ful) |
-		((bits << 4) & 0xf0f0f0f0f0f0f0f0ul);
-#else
-	return
-		((bits >> 4) & 0x0f0f0f0ful) |
-		((bits << 4) & 0xf0f0f0f0ul);
-#endif
-}
-
-BITSAPI(void, bits_reverse)(
-	const int n, const int bitCount, /* 1, 2, or 4 */
-	const __bits* x, const int offx,
-	__bits* y, const int offy)
-{
-	x += offx;
-	y += offy;
-
-	switch (bitCount)
-	{
-	case 1:
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = _bitswap1(x[i]);
-		}
-		break;
-
-	case 2:
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = _bitswap2(x[i]);
-		}
-		break;
-
-	case 4:
-		for (int i = 0; i < n; i++)
-		{
-			y[i] = _bitswap4(x[i]);
-		}
-		break;
-	}
-}
-
-BITSAPI(void, bits_reverse_ip)(
-	const int n, const int bitCount, /* 1, 2, or 4 */
-	__bits* xy,
-	const int offxy)
-{
-	xy += offxy;
-
-	switch (bitCount)
-	{
-	case 1:
-		for (int i = 0; i < n; i++)
-		{
-			xy[i] = _bitswap1(xy[i]);
-		}
-		break;
-
-	case 2:
-		for (int i = 0; i < n; i++)
-		{
-			xy[i] = _bitswap2(xy[i]);
-		}
-		break;
-
-	case 4:
-		for (int i = 0; i < n; i++)
-		{
-			xy[i] = _bitswap4(xy[i]);
-		}
-		break;
-	}
-}
-
 // Logical operations
 template<void T2(__bits&, __bits), void T3(__bits&, __bits, __bits)> void __forceinline __bits_logical(
 	int count,				// number of bits to process
@@ -1096,39 +975,6 @@ void __forceinline logical_xor3(__bits &result, __bits value, __bits mask)
 	result ^= value & ~mask;
 }
 
-// Logical NOT
-BITSAPI(void, bits_not1)(
-	int length,				// number of elements to process
-	__bits* xy, 			// the array
-	int offxy 				// the zero-based index of starting element in xy
-	)
-{
-	xy += offxy;
-
-	for (int i = 0; i < length; i++)
-	{
-		xy[i] = ~xy[i];
-	}
-}
-
-// Logical NOT
-BITSAPI(void, bits_not2)(
-	int length,				// number of elements to process
-	const __bits* x, 		// the source array
-	int offx, 				// the zero-based index of starting element in x
-	__bits* y, 				// the destination array
-	int offy 				// the zero-based index of starting element in y
-	)
-{
-	x += offx;
-	y += offy;
-
-	for (int i = 0; i < length; i++)
-	{
-		y[i] = ~x[i];
-	}
-}
-
 // Logical OR
 BITSAPI(void, bits_or)(
 	int count,				// number of bits to process
@@ -1139,34 +985,6 @@ BITSAPI(void, bits_or)(
 	)
 {
 	__bits_logical<logical_or2, logical_or3>(count, x, posx, y, posy);
-}
-
-// Logical AND
-BITSAPI(void, bits_and_mask_inc)(
-	int length,				// number of elements to process
-	__bits mask,			// the mask to apply
-	__bits* y, 				// the destination array
-	int offy, 				// the zero-based index of starting element in y
-	int incy				// the increment for the elements of y
-	)
-{
-	y += offy;
-
-	if (incy == 1)
-	{
-		for (int i = 0; i < length; i++)
-		{
-			y[i] &= mask;
-		}
-
-	}
-	else
-	{
-		for (int i = 0, yi = 0; i < length; i++, yi += incy)
-		{
-			y[yi] &= mask;
-		}
-	}
 }
 
 // Logical AND

@@ -245,7 +245,7 @@ namespace Genix.Imaging
 
             if (invert)
             {
-                image.NOTIP();
+                image.NotIP();
             }
 
             return image;
