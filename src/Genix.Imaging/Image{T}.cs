@@ -61,15 +61,8 @@ namespace Genix.Imaging
             this.HorizontalResolution = horizontalResolution;
             this.VerticalResolution = verticalResolution;
 
-            this.Stride = CalculateStride();
+            this.Stride = Image<T>.CalculateStride(width, bitsPerPixel);
             this.Bits = new T[this.Stride * height];
-
-            int CalculateStride()
-            {
-                int sizeInBytes = Marshal.SizeOf(default(T));
-                int sizeInBits = sizeInBytes * 8;
-                return ((width * bitsPerPixel) + sizeInBits - 1) / sizeInBits;
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -231,5 +224,12 @@ namespace Genix.Imaging
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ValidateArea(Rectangle area) => this.ValidateArea(area.X, area.Y, area.Width, area.Height);
+
+        private protected static int CalculateStride(int width, int bitsPerPixel)
+        {
+            int sizeInBytes = Marshal.SizeOf(default(T));
+            int sizeInBits = sizeInBytes * 8;
+            return ((width * bitsPerPixel) + sizeInBits - 1) / sizeInBits;
+        }
     }
 }

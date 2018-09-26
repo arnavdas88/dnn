@@ -65,6 +65,293 @@ namespace Genix.Imaging
         public void NotIP() => Vectors.Not(this.Bits.Length, this.Bits, 0);
 
         /// <summary>
+        /// Computes a larger of each pixel value and a constant value of this <see cref="Image"/> not-in-place.
+        /// </summary>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        [CLSCompliant(false)]
+        public Image MaxC(uint color)
+        {
+            Image dst = this.Clone(true);
+            dst.MaxCIP(color);
+            return dst;
+        }
+
+        /// <summary>
+        /// Computes a larger of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> not-in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="width">The width of the source and destination rectangles.</param>
+        /// <param name="height">The height of the source and destination rectangles.</param>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        [CLSCompliant(false)]
+        public Image MaxC(int x, int y, int width, int height, uint color)
+        {
+            Image dst = this.Clone(true);
+            dst.MaxCIP(x, y, width, height, color);
+            return dst;
+        }
+
+        /// <summary>
+        /// Computes a larger of each pixel value and a constant value of this <see cref="Image"/> in-place.
+        /// </summary>
+        /// <param name="color">The constant value.</param>
+        [CLSCompliant(false)]
+        public void MaxCIP(uint color)
+        {
+            this.MaxCIP(0, 0, this.Width, this.Height, color);
+        }
+
+        /// <summary>
+        /// Computes a larger of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="width">The width of the source and destination rectangles.</param>
+        /// <param name="height">The height of the source and destination rectangles.</param>
+        /// <param name="color">The constant value.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        [CLSCompliant(false)]
+        public void MaxCIP(int x, int y, int width, int height, uint color)
+        {
+            this.ValidateArea(x, y, width, height);
+
+            color &= this.MaxColor;
+            if (color != 0)
+            {
+                if (this.BitsPerPixel == this.MaxColor)
+                {
+                    this.SetToOneIP(x, y, width, height);
+                }
+                else
+                {
+                    unsafe
+                    {
+                        fixed (ulong* bits = &this.Bits[y * this.Stride])
+                        {
+                            switch (this.BitsPerPixel)
+                            {
+                                case 8:
+                                    {
+                                        int stride8 = this.Stride8;
+                                        if (x == 0 && width == this.Width)
+                                        {
+                                            Vectors.MaxC(height * stride8, (byte)color, (byte*)bits);
+                                        }
+                                        else
+                                        {
+                                            for (int i = 0, off = x; i < height; i++, off += stride8)
+                                            {
+                                                Vectors.MaxC(width, (byte)color, (byte*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                case 16:
+                                    {
+                                        int stride16 = this.Stride8 / sizeof(ushort);
+                                        if (x == 0 && width == this.Width)
+                                        {
+                                            Vectors.MaxC(height * stride16, (ushort)color, (ushort*)bits);
+                                        }
+                                        else
+                                        {
+                                            for (int i = 0, off = x; i < height; i++, off += stride16)
+                                            {
+                                                Vectors.MaxC(width, (ushort)color, (ushort*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                case 24:
+                                case 32:
+                                    {
+                                        int stride8 = this.Stride8;
+
+                                        ulong[] colors = this.ColorScanline(Image.CalculateStride(width, this.BitsPerPixel), color);
+                                        fixed (ulong* mask = colors)
+                                        {
+                                            int bytesPerPixel = this.BitsPerPixel / 8;
+                                            for (int i = 0, off = x * bytesPerPixel, count = width * bytesPerPixel; i < height; i++, off += stride8)
+                                            {
+                                                Vectors.Max(count, (byte*)mask, (byte*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                default:
+                                    throw new NotSupportedException(string.Format(
+                                        CultureInfo.InvariantCulture,
+                                        Properties.Resources.E_UnsupportedDepth,
+                                        this.BitsPerPixel));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pixel value and a constant value of this <see cref="Image"/> not-in-place.
+        /// </summary>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        [CLSCompliant(false)]
+        public Image MinC(uint color)
+        {
+            Image dst = this.Clone(true);
+            dst.MinCIP(color);
+            return dst;
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> not-in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="width">The width of the source and destination rectangles.</param>
+        /// <param name="height">The height of the source and destination rectangles.</param>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        [CLSCompliant(false)]
+        public Image MinC(int x, int y, int width, int height, uint color)
+        {
+            Image dst = this.Clone(true);
+            dst.MinCIP(x, y, width, height, color);
+            return dst;
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pixel value and a constant value of this <see cref="Image"/> in-place.
+        /// </summary>
+        /// <param name="color">The constant value.</param>
+        [CLSCompliant(false)]
+        public void MinCIP(uint color)
+        {
+            this.MinCIP(0, 0, this.Width, this.Height, color);
+        }
+
+        /// <summary>
+        /// Computes a smaller of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> in-place.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="width">The width of the source and destination rectangles.</param>
+        /// <param name="height">The height of the source and destination rectangles.</param>
+        /// <param name="color">The constant value.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        [CLSCompliant(false)]
+        public void MinCIP(int x, int y, int width, int height, uint color)
+        {
+            this.ValidateArea(x, y, width, height);
+
+            color &= this.MaxColor;
+            if (color != this.MaxColor)
+            {
+                if (this.BitsPerPixel == 0)
+                {
+                    this.SetToZeroIP(x, y, width, height);
+                }
+                else
+                {
+                    unsafe
+                    {
+                        fixed (ulong* bits = &this.Bits[y * this.Stride])
+                        {
+                            switch (this.BitsPerPixel)
+                            {
+                                case 8:
+                                    {
+                                        int stride8 = this.Stride8;
+                                        if (x == 0 && width == this.Width)
+                                        {
+                                            Vectors.MinC(height * stride8, (byte)color, (byte*)bits);
+                                        }
+                                        else
+                                        {
+                                            for (int i = 0, off = x; i < height; i++, off += stride8)
+                                            {
+                                                Vectors.MinC(width, (byte)color, (byte*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                case 16:
+                                    {
+                                        int stride16 = this.Stride8 / sizeof(ushort);
+                                        if (x == 0 && width == this.Width)
+                                        {
+                                            Vectors.MinC(height * stride16, (ushort)color, (ushort*)bits);
+                                        }
+                                        else
+                                        {
+                                            for (int i = 0, off = x; i < height; i++, off += stride16)
+                                            {
+                                                Vectors.MinC(width, (ushort)color, (ushort*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                case 24:
+                                case 32:
+                                    {
+                                        ulong[] colors = this.ColorScanline(Image.CalculateStride(width, this.BitsPerPixel), color);
+                                        fixed (ulong* mask = colors)
+                                        {
+                                            int stride8 = this.Stride8;
+                                            int bytesPerPixel = this.BitsPerPixel / 8;
+                                            for (int i = 0, off = x * bytesPerPixel, count = width * bytesPerPixel; i < height; i++, off += stride8)
+                                            {
+                                                Vectors.Min(count, (byte*)mask, (byte*)bits + off);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+
+                                default:
+                                    throw new NotSupportedException(string.Format(
+                                        CultureInfo.InvariantCulture,
+                                        Properties.Resources.E_UnsupportedDepth,
+                                        this.BitsPerPixel));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Computes maximum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
         /// </summary>
         /// <param name="src">The right-side operand of this operation.</param>
