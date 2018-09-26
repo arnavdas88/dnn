@@ -88,7 +88,7 @@ namespace Genix.DocumentAnalysis.Classification
 
                 // find best class
                 int[] indices = Arrays.Indexes(w.Length);
-                Arrays.Sort(w.Length, w, 0, indices, 0, false);
+                Vectors.Sort(w.Length, w, 0, indices, 0, false);
 
                 /*float confidence = w[0];
                 float diff = w[0] - w[1];

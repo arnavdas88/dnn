@@ -123,30 +123,6 @@ namespace Genix.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Replace(int length, float[] x, int offx, float oldValue, float newValue, float[] y, int offy) => NativeMethods.sreplace(length, x, offx, oldValue, newValue, y, offy);
 
-        /// <summary>
-        /// Sorts the elements in a range of elements in an array.
-        /// </summary>
-        /// <param name="length">The number of elements in the range to sort.</param>
-        /// <param name="x">The array to sort.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which sorting begins.</param>
-        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sort(int length, float[] x, int offx, bool ascending) => NativeMethods.fqsort(length, x, offx, ascending);
-
-        /// <summary>
-        /// Sorts the elements in a range of elements in a pair of arrays
-        /// (one contains the keys and the other contains the corresponding items)
-        /// based on the keys in the first array.
-        /// </summary>
-        /// <param name="length">The number of elements in the range to sort.</param>
-        /// <param name="x">The array that contains the keys to sort.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which sorting begins.</param>
-        /// <param name="y">The array that contains the items that correspond to each of the keys in the <paramref name="x"/>.</param>
-        /// <param name="offy">The index in the <paramref name="y"/> at which sorting begins.</param>
-        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sort(int length, float[] x, int offx, int[] y, int offy, bool ascending) => NativeMethods.fqsortv(length, x, offx, y, offy, ascending);
-
         [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
@@ -169,22 +145,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void unpack(int n, [In] float[] a, int offa, [Out] float[] y, int offy, int incy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void fqsort(
-                int n,
-                [In, Out] float[] x,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool ascending);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void fqsortv(
-                int n,
-                [In, Out] float[] x,
-                int offx,
-                [In, Out] int[] y,
-                int offy,
-                [MarshalAs(UnmanagedType.Bool)] bool ascending);
         }
     }
 }

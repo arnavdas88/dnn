@@ -180,7 +180,7 @@ namespace Genix.DNN
                     cls[off + i] = i;
                 }
 
-                Arrays.Sort(A, ylog, off, cls, off, false);
+                Vectors.Sort(A, ylog, off, cls, off, false);
             }
 
             // initialize first buffer

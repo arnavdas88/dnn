@@ -1608,10 +1608,38 @@ namespace Genix.Core
         {
             return NativeMethods.euclidean_distance_<#=nativeSuffix#>(length, x, offx, y, offy);
         }
-<#
+<#      }#>
+
+        /// <summary>
+        /// Sorts the elements in a range of elements in an array of <#=typeDescription#>.
+        /// </summary>
+        /// <param name="length">The number of elements in the range to sort.</param>
+        /// <param name="x">The array to sort.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which sorting begins.</param>
+        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sort(int length, <#=typeName#>[] x, int offx, bool ascending)
+        {
+            NativeMethods.qsort_<#=nativeSuffix#>(length, x, offx, ascending);
         }
-    }
-#>
+
+        /// <summary>
+        /// Sorts the elements in a range of elements in a pair of arrays
+        /// (one contains the keys and the other contains the corresponding items)
+        /// based on the keys in the first array.
+        /// </summary>
+        /// <param name="length">The number of elements in the range to sort.</param>
+        /// <param name="x">The array that contains the keys to sort.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which sorting begins.</param>
+        /// <param name="y">The array that contains the items that correspond to each of the keys in the <paramref name="x"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which sorting begins.</param>
+        /// <param name="ascending"><b>true</b> to use ascending sorting order; <b>false</b> to use descending sorting order.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Sort(int length, <#=typeName#>[] x, int offx, int[] y, int offy, bool ascending)
+        {
+            NativeMethods.qsortv_<#=nativeSuffix#>(length, x, offx, y, offy, ascending);
+        }
+<#  }#>
 
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
@@ -1820,10 +1848,8 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_ltgt_ip_<#=nativeSuffix#>(int n, <#=typeName#> thresholdLT, <#=typeName#> valueLT, <#=typeName#> thresholdGT, <#=typeName#> valueGT, [In, Out] <#=typeName#>[] y, int offy);
-<#
-        if (isFloating)
-        {
-#>
+<#      if (isFloating)
+        {#>
 
             [DllImport(NativeMethods.DllName)]
             public static extern <#=typeName#> nrm1_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx);
@@ -1839,10 +1865,24 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern <#=typeName#> euclidean_distance_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=typeName#>[] y, int offy);
-<#
-        }
-    }
-#>
+<#      }#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void qsort_<#=nativeSuffix#>(
+                int n,
+                [In, Out] <#=typeName#>[] x,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool ascending);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void qsortv_<#=nativeSuffix#>(
+                int n,
+                [In, Out] <#=typeName#>[] x,
+                int offx,
+                [In, Out] int[] y,
+                int offy,
+                [MarshalAs(UnmanagedType.Bool)] bool ascending);
+<#  }#>
         }
     }
 }

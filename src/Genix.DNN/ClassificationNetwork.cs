@@ -243,7 +243,7 @@ namespace Genix.DNN
                     ywidx[j] = j;
                 }
 
-                Arrays.Sort(numAnswers, ywmb, 0, ywidx, 0, false);
+                Vectors.Sort(numAnswers, ywmb, 0, ywidx, 0, false);
 
                 // create answer for a mini-batch item
                 List<(string, float)> mbanswers = new List<(string, float)>(numAnswers);

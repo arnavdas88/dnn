@@ -1,28 +1,18 @@
 #include "stdafx.h"
 
-void __forceinline swap(float* data, int i, int j)
+template<typename T> void __forceinline swap(T* data, int i, int j)
 {
 	if (i != j)
 	{
-		const float temp = data[i];
+		const T temp = data[i];
 		data[i] = data[j];
 		data[j] = temp;
 	}
 }
 
-void __forceinline swap(int* data, int i, int j)
+template<typename T> static void qsort_asc(T* keys, const int lo, const int hi)
 {
-	if (i != j)
-	{
-		const int temp = data[i];
-		data[i] = data[j];
-		data[j] = temp;
-	}
-}
-
-static void fqsort_asc(float* keys, const int lo, const int hi)
-{
-	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
+	const T pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
 	int j = hi;
 
@@ -41,18 +31,18 @@ static void fqsort_asc(float* keys, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		fqsort_asc(keys, lo, j);
+		qsort_asc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		fqsort_asc(keys, i, hi);
+		qsort_asc(keys, i, hi);
 	}
 }
 
-static void fqsort_asc(float* keys, int* values, const int lo, const int hi)
+template<typename T> static void qsort_asc(T* keys, int* values, const int lo, const int hi)
 {
-	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
+	const T pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
 	int j = hi;
 
@@ -72,18 +62,18 @@ static void fqsort_asc(float* keys, int* values, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		fqsort_asc(keys, lo, j);
+		qsort_asc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		fqsort_asc(keys, i, hi);
+		qsort_asc(keys, i, hi);
 	}
 }
 
-static void fqsort_desc(float* keys, const int lo, const int hi)
+template<typename T> static void qsort_desc(T* keys, const int lo, const int hi)
 {
-	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
+	const T pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
 	int j = hi;
 
@@ -102,18 +92,18 @@ static void fqsort_desc(float* keys, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		fqsort_desc(keys, lo, j);
+		qsort_desc(keys, lo, j);
 	}
 
 	if (i < hi)
 	{
-		fqsort_desc(keys, i, hi);
+		qsort_desc(keys, i, hi);
 	}
 }
 
-static void fqsort_desc(float* keys, int* values, const int lo, const int hi)
+template<typename T> static void qsort_desc(T* keys, int* values, const int lo, const int hi)
 {
-	const float pivot = keys[(lo + hi) >> 1]; // find pivot item
+	const T pivot = keys[(lo + hi) >> 1]; // find pivot item
 	int i = lo;
 	int j = hi;
 
@@ -133,47 +123,57 @@ static void fqsort_desc(float* keys, int* values, const int lo, const int hi)
 
 	if (lo < j)
 	{
-		fqsort_desc(keys, values, lo, j);
+		qsort_desc(keys, values, lo, j);
 	}
 
 	if (i < hi)
 	{
-		fqsort_desc(keys, values, i, hi);
+		qsort_desc(keys, values, i, hi);
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI fqsort(
-	const int n,
-	float* x, const int offx,
-	BOOL ascending)
+template<typename T> void __forceinline qsort(const int n, T* keys, BOOL ascending)
 {
-	x += offx;
-
 	if (ascending)
 	{
-		::fqsort_asc(x, 0, n - 1);
+		::qsort_asc(keys, 0, n - 1);
 	}
 	else
 	{
-		::fqsort_desc(x, 0, n - 1);
+		::qsort_desc(keys, 0, n - 1);
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI fqsortv(
-	const int n,
-	float* x, const int offx,
-	int* y, const int offy,
-	BOOL ascending)
+template<typename T> void __forceinline qsort(const int n, T* keys, int* values, BOOL ascending)
 {
-	x += offx;
-	y += offy;
-
 	if (ascending)
 	{
-		::fqsort_asc(x, y, 0, n - 1);
+		::qsort_asc(keys, values, 0, n - 1);
 	}
 	else
 	{
-		::fqsort_desc(x, y, 0, n - 1);
+		::qsort_desc(keys, values, 0, n - 1);
 	}
 }
+
+GENIXAPI(void, qsort_s8)(const int n, __int8*  x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_s16)(const int n, __int16* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_s32)(const int n, __int32* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_s64)(const int n, __int64* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_u8)(const int n, unsigned __int8* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_u16)(const int n, unsigned __int16* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_u32)(const int n, unsigned __int32* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_u64)(const int n, unsigned __int64* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_f32)(const int n, float* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+GENIXAPI(void, qsort_f64)(const int n, double* x, const int offx, BOOL ascending) { qsort(n, x + offx, ascending); }
+
+GENIXAPI(void, qsortv_s8)(const int n, __int8*  x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_s16)(const int n, __int16* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_s32)(const int n, __int32* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_s64)(const int n, __int64* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_u8)(const int n, unsigned __int8*  x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_u16)(const int n, unsigned __int16* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_u32)(const int n, unsigned __int32* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_u64)(const int n, unsigned __int64* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_f32)(const int n, float* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
+GENIXAPI(void, qsortv_f64)(const int n, double* x, const int offx, int* y, const int offy, BOOL ascending) { qsort(n, x + offx, y + offy, ascending); }
