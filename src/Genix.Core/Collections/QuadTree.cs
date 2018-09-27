@@ -9,6 +9,7 @@ namespace Genix.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using Genix.Drawing;
 
     /// <summary>
@@ -60,7 +61,7 @@ namespace Genix.Core
         public QuadTree(Rectangle bounds, IEnumerable<T> nodes)
             : this(bounds)
         {
-            this.Insert(nodes);
+            this.AddRange(nodes);
         }
 
         /// <summary>
@@ -107,14 +108,22 @@ namespace Genix.Core
         public int Count { get; private set; }
 
         /// <summary>
-        /// Inserts a node into this <see cref="QuadTree{T}"/>.
+        /// Adds a node into this <see cref="QuadTree{T}"/>.
         /// </summary>
-        /// <param name="node">The node to insert.</param>
+        /// <param name="node">The node to add.</param>
         /// <returns>
         /// <b>true</b> if the element is added to the <see cref="QuadTree{T}"/> object;
         /// <b>false</b> if the element is already present.
         /// </returns>
-        public bool Insert(T node)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="node"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The width or height of the object you are trying to add to <see cref="QuadTree{T}"/> is zero.</para>
+        /// <para>-or-</para>
+        /// <para>The object you are trying to add to <see cref="QuadTree{T}"/> is outside of its bounds.</para>
+        /// </exception>
+        public bool Add(T node)
         {
             if (node == null)
             {
@@ -124,7 +133,12 @@ namespace Genix.Core
             Rectangle bounds = node.Bounds;
             if (bounds.Width == 0 || bounds.Height == 0)
             {
-                ////throw new ArgumentException(Properties.Resources.BoundsMustBeNonZero);
+                throw new ArgumentException(Properties.Resources.E_QuadTree_ObjectWidthOrHeightIsZero);
+            }
+
+            if (!this.Bounds.Contains(bounds))
+            {
+                throw new ArgumentException(Properties.Resources.E_QuadTree_ObjectNotWithinBounds);
             }
 
             bool inserted = false;
@@ -194,7 +208,7 @@ namespace Genix.Core
                                 this.minHeight);
                         }
 
-                        return this.nw.Insert(nodeToInsert);
+                        return this.nw.Add(nodeToInsert);
                     }
                     else
                     {
@@ -208,7 +222,7 @@ namespace Genix.Core
                                 this.minHeight);
                         }
 
-                        return this.sw.Insert(nodeToInsert);
+                        return this.sw.Add(nodeToInsert);
                     }
                 }
                 else
@@ -225,7 +239,7 @@ namespace Genix.Core
                                 this.minHeight);
                         }
 
-                        return this.ne.Insert(nodeToInsert);
+                        return this.ne.Add(nodeToInsert);
                     }
                     else
                     {
@@ -239,20 +253,20 @@ namespace Genix.Core
                                 this.minHeight);
                         }
 
-                        return this.se.Insert(nodeToInsert);
+                        return this.se.Add(nodeToInsert);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Inserts a range of nodes into this <see cref="QuadTree{T}"/>.
+        /// Adds a range of nodes into this <see cref="QuadTree{T}"/>.
         /// </summary>
-        /// <param name="nodes">The nodes to insert.</param>
+        /// <param name="nodes">The nodes to add.</param>
         /// <returns>
-        /// The number of inserted nodes.
+        /// The number of added nodes.
         /// </returns>
-        public int Insert(IEnumerable<T> nodes)
+        public int AddRange(IEnumerable<T> nodes)
         {
             if (nodes == null)
             {
@@ -262,7 +276,7 @@ namespace Genix.Core
             int count = 0;
             foreach (T node in nodes)
             {
-                if (this.Insert(node))
+                if (this.Add(node))
                 {
                     count++;
                 }
@@ -338,7 +352,7 @@ namespace Genix.Core
         /// <returns>
         /// The number of removed nodes.
         /// </returns>
-        public int Remove(IEnumerable<T> nodes)
+        public int RemoveRange(IEnumerable<T> nodes)
         {
             if (nodes == null)
             {
@@ -553,6 +567,32 @@ namespace Genix.Core
                 }
 
                 return found;
+            }
+        }
+
+        public IEnumerable<T> GetNearestNeighbors(Rectangle bounds, int numberOfNeighbors)
+        {
+            if (bounds.IsEmpty)
+            {
+                yield break;
+            }
+
+            // Priority is distance to rect.
+            PriorityQueue<int, T> neighbors = new PriorityQueue<int, T>(this.Count, numberOfNeighbors);
+
+            // look into own nodes first
+            if (this.ownNodes != null)
+            {
+                foreach (T node in this.ownNodes)
+                {
+                    neighbors.Enqueue(node.Bounds.DistanceToSquared(bounds), node);
+                }
+            }
+
+            // pop top n elements from the queue
+            for (int i = 0; i < numberOfNeighbors && neighbors.Count > 0; i++)
+            {
+                yield return neighbors.Dequeue().value;
             }
         }
     }

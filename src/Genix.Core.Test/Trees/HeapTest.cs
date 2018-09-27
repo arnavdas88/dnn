@@ -15,7 +15,7 @@
             const int Count = 1000000;
             Random random = new Random(0);
 
-            BinaryHeap<int> heap = new BinaryHeap<int>(100);
+            BinaryHeap<int, int> heap = new BinaryHeap<int, int>(100);
 
             int count = 0;
             while (count < Count)
@@ -23,7 +23,7 @@
                 // add more elements to the heap
                 for (int i = 0, ii = random.Next(10, 100); i < ii; i++, count++)
                 {
-                    heap.Push(random.Next(0, 100));
+                    heap.Push(random.Next(0, 100), 1000);
                 }
 
                 // pop some elements
@@ -37,11 +37,11 @@
             {
                 if (popcount > 0)
                 {
-                    int previous = heap.Pop();
+                    int previous = heap.Pop().key;
 
                     for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
                     {
-                        int value = heap.Pop();
+                        int value = heap.Pop().key;
                         Assert.IsTrue(previous <= value);
                         previous = value;
                     }
@@ -55,7 +55,7 @@
             const int Count = 1000000;
             Random random = new Random(0);
 
-            FibonacciHeap<int> heap = new FibonacciHeap<int>(100);
+            FibonacciHeap<int, int> heap = new FibonacciHeap<int, int>(100);
 
             int count = 0;
             while (count < Count)
@@ -63,7 +63,7 @@
                 // add more elements to the heap
                 for (int i = 0, ii = random.Next(10, 100); i < ii; i++, count++)
                 {
-                    heap.Push(random.Next(0, 100));
+                    heap.Push(random.Next(0, 100), 1000);
                 }
 
                 // pop some elements
@@ -77,11 +77,11 @@
             {
                 if (popcount > 0)
                 {
-                    int previous = heap.Pop();
+                    int previous = heap.Pop().key;
 
                     for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
                     {
-                        int value = heap.Pop();
+                        int value = heap.Pop().key;
                         Assert.IsTrue(previous <= value);
                         previous = value;
                     }
@@ -98,7 +98,7 @@
             Stopwatch stopwatch = new Stopwatch();
             int[] values = Enumerable.Range(0, Size).Select(x => random.Next(0, 1000000)).ToArray();
 
-            BinaryHeap<int> binaryHeap = new BinaryHeap<int>(Size);
+            BinaryHeap<int, int> binaryHeap = new BinaryHeap<int, int>(Size);
 
             stopwatch.Restart();
 
@@ -106,7 +106,7 @@
             {
                 for (int j = 0, jj = random.Next(10, 100); j < jj; j++)
                 {
-                    binaryHeap.Push(random.Next(0, 100));
+                    binaryHeap.Push(random.Next(0, 100), 1000);
                 }
 
                 Pop(binaryHeap, random.Next(binaryHeap.Count / 2, 3 * binaryHeap.Count / 4));
@@ -118,7 +118,7 @@
 
             Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
 
-            FibonacciHeap<int> fibonacciHeap = new FibonacciHeap<int>(Size);
+            FibonacciHeap<int, int> fibonacciHeap = new FibonacciHeap<int, int>(Size);
 
             stopwatch.Restart();
 
@@ -126,7 +126,7 @@
             {
                 for (int j = 0, jj = random.Next(10, 100); j < jj; j++)
                 {
-                    fibonacciHeap.Push(random.Next(0, 100));
+                    fibonacciHeap.Push(random.Next(0, 100), 1000);
                 }
 
                 Pop(fibonacciHeap, random.Next(fibonacciHeap.Count / 2, 3 * fibonacciHeap.Count / 4));
@@ -159,15 +159,15 @@
 
             Console.WriteLine("{0:F4} ms", stopwatch.ElapsedMilliseconds/* / Count*/);
 
-            void Pop(IHeap<int> heap, int popcount)
+            void Pop(IHeap<int, int> heap, int popcount)
             {
                 if (popcount > 0)
                 {
-                    int previous = heap.Pop();
+                    int previous = heap.Pop().key;
 
                     for (int i = 0, ii = Math.Max(0, popcount - 1); i < ii; i++)
                     {
-                        int value = heap.Pop();
+                        int value = heap.Pop().key;
                         Assert.IsTrue(previous <= value);
                         previous = value;
                     }

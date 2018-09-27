@@ -38,7 +38,7 @@ namespace Genix.Core
                     throw new DirectoryNotFoundException(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Properties.Resources.E_DataDirectoryNotFound,
+                            Properties.Resources.E_DirectoryNotFound,
                             Path.Combine("Data", directoryName)));
                 }
 

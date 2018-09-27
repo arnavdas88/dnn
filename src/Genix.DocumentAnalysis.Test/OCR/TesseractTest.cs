@@ -8,6 +8,8 @@ namespace Genix.DocumentAnalysis.OCR.Test
     using Genix.DocumentAnalysis.OCR.Tesseract;
     using Genix.Imaging;
     using Genix.Imaging.Leptonica;
+    using Genix.Drawing;
+    using System.Collections.Generic;
 
     [TestClass]
     public class TesseractTest
@@ -19,7 +21,7 @@ namespace Genix.DocumentAnalysis.OCR.Test
             {
                 using (Tesseract tess = Tesseract.Create(null))
                 {
-                    canvas.DrawText("TEST", new Rectangle(0, 0, 100, 50), HorizontalAlignment.Left);
+                    canvas.DrawText("TEST", new System.Drawing.Rectangle(0, 0, 100, 50), HorizontalAlignment.Left);
 
                     ////Imaging.Image image = canvas.ToImage(Rectangle.Empty);
                     ////Pix pix = Pix.FromImage(image/*.Convert1To8()*/);

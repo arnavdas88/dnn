@@ -53,7 +53,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                 throw new DirectoryNotFoundException(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        Genix.Core.Properties.Resources.E_DataDirectoryNotFound,
+                        Genix.Core.Properties.Resources.E_DirectoryNotFound,
                         dataDirectory));
             }
 

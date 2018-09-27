@@ -26,6 +26,11 @@ namespace Genix.Drawing
         public static readonly Point Empty;
 
         /// <summary>
+        /// Epsilon used in rounding operations.
+        /// </summary>
+        private const float Eps = 1e-8f;
+
+        /// <summary>
         /// The x-coordinate of this <see cref="Point"/>.
         /// </summary>
         private int x;
@@ -161,9 +166,10 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point Scale(Point point, float dx, float dy)
         {
+            // note: add epsilon to avoid rounding problems
             return new Point(
-                (int)Math.Round(dx * point.x, MidpointRounding.AwayFromZero),
-                (int)Math.Round(dy * point.y, MidpointRounding.AwayFromZero));
+                (int)Math.Round((dx * point.x) + Point.Eps, MidpointRounding.AwayFromZero),
+                (int)Math.Round((dy * point.y) + Point.Eps, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>
@@ -264,8 +270,9 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Scale(float dx, float dy)
         {
-            this.x = (int)Math.Round(dx * this.x, MidpointRounding.AwayFromZero);
-            this.y = (int)Math.Round(dy * this.y, MidpointRounding.AwayFromZero);
+            // note: add epsilon to avoid rounding problems
+            this.x = (int)Math.Round((dx * this.x) + Point.Eps, MidpointRounding.AwayFromZero);
+            this.y = (int)Math.Round((dy * this.y) + Point.Eps, MidpointRounding.AwayFromZero);
         }
 
         /// <summary>

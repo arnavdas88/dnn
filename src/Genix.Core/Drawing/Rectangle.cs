@@ -31,6 +31,11 @@ namespace Genix.Drawing
         public static readonly Rectangle Empty;
 
         /// <summary>
+        /// Epsilon used in rounding operations.
+        /// </summary>
+        private const float Eps = 1e-8f;
+
+        /// <summary>
         /// The x-coordinate of the top-left corner of the rectangle.
         /// </summary>
         private int x;
@@ -453,17 +458,18 @@ namespace Genix.Drawing
             }
         }
 
-#if false
         /// <summary>
-        /// Scales the specified <see cref="Rectangle"/> location.
+        /// Creates a <see cref="Rectangle"/> that results from scaling the location and dimensions of specified <see cref="Rectangle"/>.
         /// </summary>
-        /// <param name="point">The <see cref="Rectangle"/> to scale.</param>
-        /// <param name="dx">The horizontal scaling factor.</param>
-        /// <param name="dy">The vertical scaling factor.</param>
-        /// <returns>The scaled <see cref="Rectangle"/>.</returns>
+        /// <param name="rect">The <see cref="Rectangle"/> to scale.</param>
+        /// <param name="dx">The amount by which to scale the left position and the width of the rectangle.</param>
+        /// <param name="dy">The amount by which to scale the top position and the height of the rectangle.</param>
+        /// <returns>The resulting <see cref="Rectangle"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rectangle Scale(Rectangle point, int dx, int dy) => new Rectangle(point.x * dx, point.y * dy);
+        public static Rectangle Scale(Rectangle rect, int dx, int dy) =>
+            new Rectangle(rect.x * dx, rect.y * dy, rect.w * dx, rect.h * dy);
 
+#if false
         /// <summary>
         /// Scales the specified <see cref="Rectangle"/> location.
         /// </summary>
@@ -662,6 +668,16 @@ namespace Genix.Drawing
         public bool ContainsY(int y) => y.Between(this.y, this.y + this.h, false);
 
         /// <summary>
+        /// Computes the Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Point"/>.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the Euclidean distance between this <see cref="Rectangle"/> and <paramref name="point"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public float DistanceTo(Point point) => (float)Math.Sqrt(this.DistanceToSquared(point));
+
+        /// <summary>
         /// Computes the Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
         /// </summary>
         /// <param name="rect">The <see cref="Rectangle"/> to compute the distance to.</param>
@@ -670,6 +686,20 @@ namespace Genix.Drawing
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float DistanceTo(Rectangle rect) => (float)Math.Sqrt(this.DistanceToSquared(rect));
+
+        /// <summary>
+        /// Computes the squared Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Point"/>.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the squared Euclidean distance between this <see cref="Rectangle"/> and <paramref name="point"/>.
+        /// </returns>
+        public int DistanceToSquared(Point point)
+        {
+            int dx = this.DistanceToX(point);
+            int dy = this.DistanceToY(point);
+            return (dx * dx) + (dy * dy);
+        }
 
         /// <summary>
         /// Computes the squared Euclidean distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/>.
@@ -684,6 +714,70 @@ namespace Genix.Drawing
             int dy = this.DistanceToY(rect);
             return (dx * dx) + (dy * dy);
         }
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified point along x-axis.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="x"/> along x-axis.
+        /// </returns>
+        public int DistanceToX(int x)
+        {
+            int distance = this.x - x;
+            if (distance < 0)
+            {
+                distance = x - (this.x + this.w);
+                if (distance < 0)
+                {
+                    distance = 0;
+                }
+            }
+
+            return distance;
+        }
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified point along y-axis.
+        /// </summary>
+        /// <param name="y">The y-coordinate of the point to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="y"/> along y-axis.
+        /// </returns>
+        public int DistanceToY(int y)
+        {
+            int distance = this.y - y;
+            if (distance < 0)
+            {
+                distance = y - (this.y + this.h);
+                if (distance < 0)
+                {
+                    distance = 0;
+                }
+            }
+
+            return distance;
+        }
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Point"/> along x-axis.
+        /// </summary>
+        /// <param name="point">The x-coordinate of the <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="point"/> along x-axis.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int DistanceToX(Point point) => this.DistanceToX(point.X);
+
+        /// <summary>
+        /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Point"/> along y-axis.
+        /// </summary>
+        /// <param name="point">The y-coordinate of the <see cref="Point"/> to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the distance between this <see cref="Rectangle"/> and <paramref name="point"/> along y-axis.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int DistanceToY(Point point) => this.DistanceToX(point.Y);
 
         /// <summary>
         /// Computes the distance between this <see cref="Rectangle"/> and the specified <see cref="Rectangle"/> along x-axis.
@@ -900,12 +994,11 @@ namespace Genix.Drawing
             this.h = result.h;
         }
 
-#if false
         /// <summary>
-        /// Scales this <see cref="Rectangle"/> location.
+        /// Scales the location and the dimensions of this <see cref="Rectangle"/>.
         /// </summary>
-        /// <param name="dx">The horizontal scaling factor.</param>
-        /// <param name="dy">The vertical scaling factor.</param>
+        /// <param name="dx">The amount by which to scale the left position and the width of the rectangle.</param>
+        /// <param name="dy">The amount by which to scale the top position and the height of the rectangle.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Scale(int dx, int dy)
         {
@@ -916,16 +1009,51 @@ namespace Genix.Drawing
         }
 
         /// <summary>
-        /// Scales this <see cref="Rectangle"/> location.
+        /// Scales the location and the dimensions of this <see cref="Rectangle"/>.
         /// </summary>
-        /// <param name="dx">The horizontal scaling factor.</param>
-        /// <param name="dy">The vertical scaling factor.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <param name="dx">The amount by which to scale the left position and the width of the rectangle.</param>
+        /// <param name="dy">The amount by which to scale the top position and the height of the rectangle.</param>
         public void Scale(float dx, float dy)
         {
-            this.x = (int)Math.Round(dx * this.x, MidpointRounding.AwayFromZero);
-            this.y = (int)Math.Round(dy * this.y, MidpointRounding.AwayFromZero);
+            float x1 = dx * this.x;
+            float y1 = dy * this.y;
+            float x2 = dx * (this.x + this.w);
+            float y2 = dy * (this.y + this.h);
+
+            // note: add epsilon to avoid rounding problems
+            this.x = (int)Math.Round(x1 + Rectangle.Eps, MidpointRounding.AwayFromZero);
+            this.y = (int)Math.Round(y1 + Rectangle.Eps, MidpointRounding.AwayFromZero);
+            this.w = (int)Math.Floor(x2 - x1 + Rectangle.Eps);
+            this.h = (int)Math.Floor(y2 - y1 + Rectangle.Eps);
         }
-#endif
+
+        /// <summary>
+        /// Applies affine transformation described by the specified matrix to the <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="matrix">The transformation matrix.</param>
+        public void Transform(System.Windows.Media.Matrix matrix)
+        {
+            // convert three corner points out of four
+            (double x, double y) tr = TransformPoint(this.x + this.w, this.y);
+            (double x, double y) br = TransformPoint(this.x + this.w, this.y + this.h);
+            (double x, double y) bl = TransformPoint(this.x, this.y + this.h);
+
+            // find boundaries of new rectangle
+            double x1 = MinMax.Min(bl.x, tr.x, br.x);
+            double x2 = MinMax.Max(bl.x, tr.x, br.x);
+            double y1 = MinMax.Min(bl.y, tr.y, br.y);
+            double y2 = MinMax.Max(bl.y, tr.y, br.y);
+
+            // note: add epsilon to avoid rounding problems
+            this.x = (int)Math.Round(x1 + Rectangle.Eps, MidpointRounding.AwayFromZero);
+            this.y = (int)Math.Round(y1 + Rectangle.Eps, MidpointRounding.AwayFromZero);
+            this.w = (int)Math.Floor(x2 - x1 + Rectangle.Eps);
+            this.h = (int)Math.Floor(y2 - y1 + Rectangle.Eps);
+
+            (double x, double y) TransformPoint(int x, int y)
+            {
+                return ((matrix.M11 * x) + (matrix.M12 * y) + matrix.OffsetX, (matrix.M21 * x) + (matrix.M22 * y) + matrix.OffsetY);
+            }
+        }
     }
 }

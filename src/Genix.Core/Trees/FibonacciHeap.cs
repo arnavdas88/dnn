@@ -15,21 +15,22 @@ namespace Genix.Core
     /// <summary>
     /// Represents the Fibonacci heap.
     /// </summary>
-    /// <typeparam name="T">Specifies the type of elements in the heap.</typeparam>
+    /// <typeparam name="TKey">Specifies the type of the "heap" property.</typeparam>
+    /// <typeparam name="TValue">Specifies the type of elements in the heap.</typeparam>
     /// <remarks>
     /// <each>
     /// Each element in the heap satisfies the "heap" property condition that it smaller or equal to all its children.
     /// </each>
     /// </remarks>
-    public class FibonacciHeap<T>
-        : IHeap<T>
-        where T : IComparable<T>
+    public class FibonacciHeap<TKey, TValue>
+        : IHeap<TKey, TValue>
+        where TKey : IComparable<TKey>
     {
         private readonly List<FibonacciTree> heaps = new List<FibonacciTree>(100);
         private int minimumHeapIndex = -1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FibonacciHeap{T}"/> class.
+        /// Initializes a new instance of the <see cref="FibonacciHeap{TKey, TValue}"/> class.
         /// </summary>
         /// <param name="capacity">The initial heap capacity.</param>
         public FibonacciHeap(int capacity)
@@ -48,26 +49,28 @@ namespace Genix.Core
         }
 
         /// <inheritdoc />
-        public void Push(T value)
+        public bool Push(TKey key, TValue value)
         {
             // to push an element into the heap
             // we create a new heap containing value
-            FibonacciTree newheap = new FibonacciTree(value);
+            FibonacciTree newheap = new FibonacciTree((key, value));
             this.heaps.Add(newheap);
             this.Count++;
 
             // now we update position of current min element
-            if (this.minimumHeapIndex == -1 || value.CompareTo(this.heaps[this.minimumHeapIndex].RootValue) < 0)
+            if (this.minimumHeapIndex == -1 || key.CompareTo(this.heaps[this.minimumHeapIndex].RootItem.key) < 0)
             {
                 this.minimumHeapIndex = this.heaps.Count - 1;
             }
+
+            return true;
         }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
-        /// The <see cref="FibonacciHeap{T}"/> is empty.
+        /// The <see cref="FibonacciHeap{TKey, TValue}"/> is empty.
         /// </exception>
-        public T Pop()
+        public (TKey key, TValue value) Pop()
         {
             if (this.Count == 0)
             {
@@ -76,7 +79,7 @@ namespace Genix.Core
 
             // the minimum element is always the root of the first heap
             FibonacciTreeNode node = this.heaps[this.minimumHeapIndex].Root;
-            T value = node.Value;
+            (TKey key, TValue value) value = node.Value;
 
             // 1. remove min element from the heap
             // push all its children into the list of heaps
@@ -105,7 +108,7 @@ namespace Genix.Core
 
                 for (int i = 1, ii = this.heaps.Count; i < ii; i++)
                 {
-                    if (this.heaps[i].RootValue.CompareTo(this.heaps[this.minimumHeapIndex].RootValue) < 0)
+                    if (this.heaps[i].RootItem.key.CompareTo(this.heaps[this.minimumHeapIndex].RootItem.key) < 0)
                     {
                         this.minimumHeapIndex = i;
                     }
@@ -117,9 +120,9 @@ namespace Genix.Core
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
-        /// The <see cref="FibonacciHeap{T}"/> is empty.
+        /// The <see cref="FibonacciHeap{TKey, TValue}"/> is empty.
         /// </exception>
-        public T Peek()
+        public (TKey key, TValue value) Peek()
         {
             if (this.Count == 0)
             {
@@ -127,11 +130,11 @@ namespace Genix.Core
             }
 
             // the minimum element is at the position found previously
-            return this.heaps[this.minimumHeapIndex].RootValue;
+            return this.heaps[this.minimumHeapIndex].RootItem;
         }
 
         private class FibonacciTree
-            : Tree<T, FibonacciTreeNode>
+            : Tree<(TKey key, TValue value), FibonacciTreeNode>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="FibonacciTree"/> class.
@@ -143,9 +146,9 @@ namespace Genix.Core
             /// <summary>
             /// Initializes a new instance of the <see cref="FibonacciTree"/> class.
             /// </summary>
-            /// <param name="rootValue">The root value of the tree.</param>
-            public FibonacciTree(T rootValue)
-                : base(rootValue)
+            /// <param name="rootItem">The root value of the tree.</param>
+            public FibonacciTree((TKey key, TValue value) rootItem)
+                : base(rootItem)
             {
             }
 
@@ -172,7 +175,7 @@ namespace Genix.Core
             /// </remarks>
             public static FibonacciTree Merge(FibonacciTree tree1, FibonacciTree tree2)
             {
-                if (tree1.RootValue.CompareTo(tree2.RootValue) < 0)
+                if (tree1.RootItem.key.CompareTo(tree2.RootItem.key) < 0)
                 {
                     tree1.Root.Add(tree2.Root);
                     return tree1;
@@ -204,7 +207,7 @@ namespace Genix.Core
 
                         if (irank == jnode.Rank)
                         {
-                            if (inode.Value.CompareTo(jnode.Value) < 0)
+                            if (inode.Value.key.CompareTo(jnode.Value.key) < 0)
                             {
                                 inode.Add(jnode);
                                 trees.RemoveAt(j);
@@ -228,7 +231,7 @@ namespace Genix.Core
         }
 
         private class FibonacciTreeNode
-            : TreeNode<T>
+            : TreeNode<(TKey key, TValue value)>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="FibonacciTreeNode"/> class.

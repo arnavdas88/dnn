@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="E_DataDirectoryNotFound" xml:space="preserve">
+  <data name="E_DirectoryNotFound" xml:space="preserve">
     <value>The directory '{0}' does not exist.</value>
   </data>
   <data name="E_InvalidPointFormat" xml:space="preserve">
@@ -140,6 +140,12 @@
   </data>
   <data name="E_InvalidSizeWidth" xml:space="preserve">
     <value>The size width is negative.</value>
+  </data>
+  <data name="E_QuadTree_ObjectNotWithinBounds" xml:space="preserve">
+    <value>The object you are trying to add to QuadTree is outside of its bounds.</value>
+  </data>
+  <data name="E_QuadTree_ObjectWidthOrHeightIsZero" xml:space="preserve">
+    <value>The width or height of the object you are trying to add to QuadTree is zero.</value>
   </data>
   <data name="E_SequenceIsEmpty" xml:space="preserve">
     <value>The sequence contains no elements.</value>

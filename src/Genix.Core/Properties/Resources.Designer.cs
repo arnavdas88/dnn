@@ -63,9 +63,9 @@ namespace Genix.Core.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The directory &apos;{0}&apos; does not exist..
         /// </summary>
-        public static string E_DataDirectoryNotFound {
+        public static string E_DirectoryNotFound {
             get {
-                return ResourceManager.GetString("E_DataDirectoryNotFound", resourceCulture);
+                return ResourceManager.GetString("E_DirectoryNotFound", resourceCulture);
             }
         }
         
@@ -129,6 +129,24 @@ namespace Genix.Core.Properties {
         public static string E_InvalidSizeWidth {
             get {
                 return ResourceManager.GetString("E_InvalidSizeWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The object you are trying to add to QuadTree is outside of its bounds..
+        /// </summary>
+        public static string E_QuadTree_ObjectNotWithinBounds {
+            get {
+                return ResourceManager.GetString("E_QuadTree_ObjectNotWithinBounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The width or height of the object you are trying to add to QuadTree is zero..
+        /// </summary>
+        public static string E_QuadTree_ObjectWidthOrHeightIsZero {
+            get {
+                return ResourceManager.GetString("E_QuadTree_ObjectWidthOrHeightIsZero", resourceCulture);
             }
         }
         

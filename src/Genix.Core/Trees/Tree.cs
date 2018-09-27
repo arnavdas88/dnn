@@ -24,12 +24,12 @@ namespace Genix.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="Tree{T, TNode}"/> class.
         /// </summary>
-        /// <param name="rootValue">The root value of the tree.</param>
-        public Tree(T rootValue)
+        /// <param name="rootItem">The root item of the tree.</param>
+        public Tree(T rootItem)
         {
             this.Root = new TNode
             {
-                Value = rootValue,
+                Value = rootItem,
             };
         }
 
@@ -52,12 +52,12 @@ namespace Genix.Core
         public TNode Root { get; private set; }
 
         /// <summary>
-        /// Gets the value in the root node of the tree.
+        /// Gets the item in the root node of the tree.
         /// </summary>
         /// <value>
-        /// The root node value.
+        /// The root node item.
         /// </value>
-        public T RootValue => this.Root.Value;
+        public T RootItem => this.Root.Value;
 
         /// <summary>
         /// Gets the number of elements contained in the <see cref="Tree{T, TNode}"/>.
