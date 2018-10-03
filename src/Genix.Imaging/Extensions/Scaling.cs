@@ -22,52 +22,55 @@ namespace Genix.Imaging
         /// <summary>
         /// Scales the <see cref="Image"/> proportionally in both dimensions without changing its resolution.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
-        /// A new scaled <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Scale(double scaleFactor, ScalingOptions options) =>
-            this.Scale(scaleFactor, scaleFactor, options);
+        public Image Scale(Image dst, double scaleFactor, ScalingOptions options) =>
+            this.Scale(dst, scaleFactor, scaleFactor, options);
 
         /// <summary>
         /// Scales the <see cref="Image"/> in both dimensions without changing its resolution.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="scaleFactorX">The horizontal scaling factor.</param>
         /// <param name="scaleFactorY">The vertical scaling factor.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
-        /// A new scaled <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
-        public Image Scale(double scaleFactorX, double scaleFactorY, ScalingOptions options)
+        public Image Scale(Image dst, double scaleFactorX, double scaleFactorY, ScalingOptions options)
         {
             int newWidth = (int)((this.Width * scaleFactorX) + 0.5);
             int newHeight = (int)((this.Height * scaleFactorY) + 0.5);
 
-            return this.ScaleToSize(newWidth, newHeight, options);
+            return this.ScaleToSize(dst, newWidth, newHeight, options);
         }
 
         /// <summary>
         /// Scales the <see cref="Image"/> vertically and horizontally without changing its resolution.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="width">The desired width of the image, in pixels.</param>
         /// <param name="height">The desired height of the image, in pixels.</param>
         /// <param name="options">The scaling options.</param>
         /// <returns>
-        /// A new scaled <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
-        public Image ScaleToSize(int width, int height, ScalingOptions options)
+        public Image ScaleToSize(Image dst, int width, int height, ScalingOptions options)
         {
             if (width == this.Width && height == this.Height)
             {
-                return this.Copy(null);
+                return this.Copy(dst);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Scale((double)width / this.Width, (double)height / this.Height);
 
-            Image dst = this.Affine(matrix, BorderType.BorderConst, this.WhiteColor);
+            dst = this.Affine(dst, matrix, BorderType.BorderConst, this.WhiteColor);
             Debug.Assert(width == dst.Width && height == dst.Height, "Image dimensions are wrong.");
             return dst;
 #if false
@@ -172,7 +175,7 @@ namespace Genix.Imaging
 
                 if (dst.Width != newWidth || dst.Height != newHeight)
                 {
-                    dst = dst.ScaleToSize(newWidth, newHeight, options);
+                    dst.ScaleToSize(dst, newWidth, newHeight, options);
                 }
             }
 

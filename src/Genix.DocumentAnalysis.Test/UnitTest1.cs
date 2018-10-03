@@ -44,7 +44,7 @@
                 }
 #endif
 
-                workImage = workImage.CleanOverscan(0.5f, 0.5f).Deskew().Despeckle(null);
+                workImage = workImage.CleanOverscan(0.5f, 0.5f).Deskew(null).Despeckle(null);
                 workImage.SetResolution(300, 300);
                 stopwatch.Restart();
                 ISet<LineShape> components = LineDetector.FindLines(workImage, new LineDetectionOptions());

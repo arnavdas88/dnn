@@ -7,7 +7,7 @@
 #define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
-typedef enum _GenixBorderType : int
+enum _GenixBorderType : int
 {
 	genixBorderConst = 0,
 	genixBorderRepl,

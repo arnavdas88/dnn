@@ -277,7 +277,7 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
             }
 
-            if (this.Bits != null && this.Width == width && this.Height == height && this.BitsPerPixel == bitsPerPixel)
+            if (this.Width == width && this.Height == height && this.BitsPerPixel == bitsPerPixel)
             {
                 // nothing to do
                 // already allocated
@@ -287,9 +287,13 @@ namespace Genix.Imaging
             this.Width = width;
             this.Height = height;
             this.BitsPerPixel = bitsPerPixel;
-
             this.Stride = Image<T>.CalculateStride(width, bitsPerPixel);
-            this.Bits = new T[this.Stride * height];
+
+            int length = this.Stride * height;
+            if (this.Bits?.Length != length)
+            {
+                this.Bits = new T[length];
+            }
         }
 
         private protected void Attach(Image<T> source)

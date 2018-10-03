@@ -328,35 +328,42 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Computes maximum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Computes maximum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="src">The right-side operand of this operation.</param>
         /// <returns>
-        /// The <see cref="Image"/> that receives the data.
+        /// The destination <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="src"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
         /// <remarks>
         /// <para>
         /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        public Image Maximum(Image src)
+        public Image Maximum(Image dst, Image src)
         {
-            Image dst = this.Clone(true);
-            dst.MaximumIP(src);
-            return dst;
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            return this.Maximum(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>
-        /// Computes maximum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Computes maximum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width of the source and destination rectangles.</param>
@@ -365,78 +372,31 @@ namespace Genix.Imaging
         /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
         /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
         /// <returns>
-        /// The <see cref="Image"/> that receives the data.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="src"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
         /// <para>-or-</para>
         /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
         /// </exception>
-        public Image Maximum(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
-        {
-            Image dst = this.Clone(true);
-            dst.MaximumIP(x, y, width, height, src, xsrc, ysrc);
-            return dst;
-        }
-
-        /// <summary>
-        /// Computes maximum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="src">The right-side operand of this operation.</param>
         /// <remarks>
-        /// <para>
-        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
-        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        public void MaximumIP(Image src)
+        public Image Maximum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
-            this.MaximumIP(0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
-        }
-
-        /// <summary>
-        /// Computes maximum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="width">The width of the source and destination rectangles.</param>
-        /// <param name="height">The height of the source and destination rectangles.</param>
-        /// <param name="src">The right-side operand of this operation.</param>
-        /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// <para>-or-</para>
-        /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
-        /// </exception>
-        public void MaximumIP(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
-        {
-            switch (this.BitsPerPixel)
+            int bitsPerPixel = this.BitsPerPixel;
+            switch (bitsPerPixel)
             {
                 case 1:
-                    this.Or(this, x, y, width, height, src, xsrc, ysrc);
-                    break;
+                    return this.Or(dst, x, y, width, height, src, xsrc, ysrc);
 
                 case 8:
                 case 24:
@@ -449,21 +409,23 @@ namespace Genix.Imaging
                     this.ValidateArea(x, y, width, height);
                     src.ValidateArea(xsrc, ysrc, width, height);
 
-                    if (this.BitsPerPixel != src.BitsPerPixel)
+                    if (src.BitsPerPixel != bitsPerPixel)
                     {
                         throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
                     }
 
+                    dst = this.Copy(dst);
+
                     int stridesrc8 = src.Stride8;
-                    int stridedst8 = this.Stride8;
+                    int stridedst8 = dst.Stride8;
                     unsafe
                     {
-                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = this.Bits)
+                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
                         {
-                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * this.BitsPerPixel / 8);
-                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * this.BitsPerPixel / 8);
+                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
+                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
 
-                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == this.Width)
+                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
                             {
                                 // operation is performed on entire pixel line
                                 // do all lines at once
@@ -471,7 +433,7 @@ namespace Genix.Imaging
                             }
                             else
                             {
-                                int count = width * this.BitsPerPixel / 8;
+                                int count = width * bitsPerPixel / 8;
                                 for (int iy = 0; iy < height; iy++)
                                 {
                                     Vectors.Max(count, bitssrc, bitsdst);
@@ -483,46 +445,53 @@ namespace Genix.Imaging
                         }
                     }
 
-                    break;
+                    return dst;
 
                 default:
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
+                        bitsPerPixel));
             }
         }
 
         /// <summary>
-        /// Computes minimum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Computes minimum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="src">The right-side operand of this operation.</param>
         /// <returns>
-        /// The <see cref="Image"/> that receives the data.
+        /// The destination <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="src"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
         /// <remarks>
         /// <para>
         /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
         /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
         /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        public Image Minimum(Image src)
+        public Image Minimum(Image dst, Image src)
         {
-            Image dst = this.Clone(true);
-            dst.MinimumIP(src);
-            return dst;
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            return this.Minimum(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>
-        /// Computes minimum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Computes minimum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width of the source and destination rectangles.</param>
@@ -531,78 +500,31 @@ namespace Genix.Imaging
         /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
         /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
         /// <returns>
-        /// The <see cref="Image"/> that receives the data.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="src"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
         /// <para>-or-</para>
         /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
         /// </exception>
-        public Image Minimum(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
-        {
-            Image dst = this.Clone(true);
-            dst.MinimumIP(x, y, width, height, src, xsrc, ysrc);
-            return dst;
-        }
-
-        /// <summary>
-        /// Computes minimum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="src">The right-side operand of this operation.</param>
         /// <remarks>
-        /// <para>
-        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
-        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        public void MinimumIP(Image src)
+        public Image Minimum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
-            this.MinimumIP(0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
-        }
-
-        /// <summary>
-        /// Computes minimum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="width">The width of the source and destination rectangles.</param>
-        /// <param name="height">The height of the source and destination rectangles.</param>
-        /// <param name="src">The right-side operand of this operation.</param>
-        /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// <para>-or-</para>
-        /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
-        /// </exception>
-        public void MinimumIP(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
-        {
-            switch (this.BitsPerPixel)
+            int bitsPerPixel = this.BitsPerPixel;
+            switch (bitsPerPixel)
             {
                 case 1:
-                    this.And(this, x, y, width, height, src, xsrc, ysrc);
-                    break;
+                    return this.And(dst, x, y, width, height, src, xsrc, ysrc);
 
                 case 8:
                 case 24:
@@ -615,21 +537,23 @@ namespace Genix.Imaging
                     this.ValidateArea(x, y, width, height);
                     src.ValidateArea(xsrc, ysrc, width, height);
 
-                    if (this.BitsPerPixel != src.BitsPerPixel)
+                    if (src.BitsPerPixel != bitsPerPixel)
                     {
                         throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
                     }
 
+                    dst = this.Copy(dst);
+
                     int stridesrc8 = src.Stride8;
-                    int stridedst8 = this.Stride8;
+                    int stridedst8 = dst.Stride8;
                     unsafe
                     {
-                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = this.Bits)
+                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
                         {
-                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * this.BitsPerPixel / 8);
-                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * this.BitsPerPixel / 8);
+                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
+                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
 
-                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == this.Width)
+                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
                             {
                                 // operation is performed on entire pixel line
                                 // do all lines at once
@@ -637,7 +561,7 @@ namespace Genix.Imaging
                             }
                             else
                             {
-                                int count = width * this.BitsPerPixel / 8;
+                                int count = width * bitsPerPixel / 8;
                                 for (int iy = 0; iy < height; iy++)
                                 {
                                     Vectors.Min(count, bitssrc, bitsdst);
@@ -649,13 +573,13 @@ namespace Genix.Imaging
                         }
                     }
 
-                    break;
+                    return dst;
 
                 default:
                     throw new NotSupportedException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
+                        bitsPerPixel));
             }
         }
     }

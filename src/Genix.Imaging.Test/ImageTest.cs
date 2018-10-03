@@ -125,14 +125,14 @@
                 {
                     ////long power = image.Power();
                     ////Histogram hyst = image.GrayHistogram();
-                    Image workImage = image.ConvertTo(null, 8);
-
-                    workImage = workImage.Scale(100.0 / workImage.HorizontalResolution, 100.0 / workImage.VerticalResolution, ScalingOptions.None);
-                    ////image = image.Binarize();
-                    workImage = workImage.Convert8To1(null, 128);
-                    workImage = workImage.CleanOverscan(0.5f, 0.5f);
-                    workImage = workImage.Deskew();
-                    workImage = workImage.Despeckle(null);
+                    Image workImage = image
+                        .ConvertTo(null, 8)
+                        .Scale(null, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
+                        ////.Binarize(null)
+                        .Convert8To1(null, 128)
+                        .CleanOverscan(0.5f, 0.5f)
+                        .Deskew(null)
+                        .Despeckle(null);
 
                     ISet<ConnectedComponent> components = workImage.FindConnectedComponents(8);
                     workImage.RemoveConnectedComponents(components);

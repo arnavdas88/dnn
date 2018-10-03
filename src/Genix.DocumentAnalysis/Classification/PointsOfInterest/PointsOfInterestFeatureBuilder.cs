@@ -84,11 +84,11 @@ namespace Genix.DocumentAnalysis.Classification
             Image image = ImagePreprocessing.Process(source.Image, this.ImagePreprocessingOptions, 8);
 
             image = image
-                .Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
+                .Scale(null, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
                 ////.Binarize()
                 .Convert8To1(null, 128)
                 .CleanOverscan(0.5f, 0.5f)
-                .Deskew()
+                .Deskew(null)
                 .Despeckle(null);
 
             ISet<ConnectedComponent> components = image.FindConnectedComponents(8);

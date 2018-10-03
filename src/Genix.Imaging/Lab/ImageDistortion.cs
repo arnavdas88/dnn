@@ -58,7 +58,7 @@ namespace Genix.Imaging.Lab
             if (rotate)
             {
                 double angle = (width > 0 ? 18 : 3) * this.normalDistribution.Generate();
-                image = image.Rotate(angle, BorderType.BorderConst, image.WhiteColor);
+                image.Rotate(image, angle, BorderType.BorderConst, image.WhiteColor);
             }
 
             // reduce image size to black area
@@ -73,7 +73,7 @@ namespace Genix.Imaging.Lab
                     double verticalFactor = (double)height / image.Height;
                     double scaleFactor = Math.Min(horizontalFactor, verticalFactor);
 
-                    image = image.Scale(scaleFactor, ScalingOptions.None);
+                    image.Scale(image, scaleFactor, ScalingOptions.None);
                 }
             }
             else
@@ -81,7 +81,7 @@ namespace Genix.Imaging.Lab
                 if (image.Height > height)
                 {
                     double scaleFactor = (double)height / image.Height;
-                    image = image.Scale(scaleFactor, ScalingOptions.None);
+                    image.Scale(image, scaleFactor, ScalingOptions.None);
                 }
             }
 
@@ -92,13 +92,13 @@ namespace Genix.Imaging.Lab
                 {
                     int newWidth = image.Width - Math.Abs(this.Random(-width / 4, width / 4));
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
-                    image = image.ScaleToSize(newWidth, newHeight, ScalingOptions.None);
+                    image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
                 }
                 else
                 {
                     int newWidth = image.Width + this.Random(-image.Width / 10, image.Width / 10);
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
-                    image = image.ScaleToSize(newWidth, newHeight, ScalingOptions.None);
+                    image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
 
                     double angle = 0.5 * this.normalDistribution.Generate();
                     image = image.Inflate(image.Height, 0, image.Height, 0, BorderType.BorderConst, image.WhiteColor);

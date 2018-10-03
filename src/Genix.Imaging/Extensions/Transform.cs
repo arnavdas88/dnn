@@ -20,26 +20,46 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies affine transformation described by the specified matrix to the <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="matrix">The transformation matrix.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
-        /// A new transformed <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
         [CLSCompliant(false)]
-        public Image Affine(System.Windows.Media.Matrix matrix, BorderType borderType, uint borderValue)
+        public Image Affine(Image dst, System.Windows.Media.Matrix matrix, BorderType borderType, uint borderValue)
         {
             const float Eps = 1e-8f;
 
             if (matrix.IsIdentity)
             {
-                return this.Copy(null);
+                return this.Copy(dst);
+            }
+
+            // IPP does not support 1bpp images - convert to 8bpp
+            Image src;
+            bool convert1bpp = false;
+            if (this.BitsPerPixel == 1)
+            {
+                src = this.Convert1To8(null);
+                borderValue = borderValue != 0 ? 0u : 255u;
+                convert1bpp = true;
+            }
+            else
+            {
+                src = this;
             }
 
             // calculate new image size and position
-            System.Windows.Point tr = TransformPoint(this.Width, 0);
-            System.Windows.Point br = TransformPoint(this.Width, this.Height);
-            System.Windows.Point bl = TransformPoint(0, this.Height);
+            System.Windows.Point tr = TransformPoint(src.Width, 0);
+            System.Windows.Point br = TransformPoint(src.Width, src.Height);
+            System.Windows.Point bl = TransformPoint(0, src.Height);
 
             double x1dst = Core.MinMax.Min(bl.X, tr.X, br.X, 0.0);
             double x2dst = Core.MinMax.Max(bl.X, tr.X, br.X, 0.0);
@@ -54,32 +74,19 @@ namespace Genix.Imaging
             int widthdst = (int)Math.Floor(x2dst - x1dst + Eps);
             int heightdst = (int)Math.Floor(y2dst - y1dst + Eps);
 
-            // IPP does not support 1bpp images - convert to 8bpp
-            Image grayImage;
-            bool convert1bpp = false;
-            if (this.BitsPerPixel == 1)
-            {
-                grayImage = this.Convert1To8(null);
-                borderValue = borderValue != 0 ? 0u : 255u;
-                convert1bpp = true;
-            }
-            else
-            {
-                grayImage = this;
-            }
-
-            Image transformedImage = new Image(widthdst, heightdst, grayImage);
+            bool inplace = dst == this;
+            dst = src.CreateTemplate(dst, widthdst, heightdst, src.BitsPerPixel);
 
             if (NativeMethods.affine(
-                grayImage.BitsPerPixel,
-                grayImage.Width,
-                grayImage.Height,
-                grayImage.Stride,
-                grayImage.Bits,
-                transformedImage.Width,
-                transformedImage.Height,
-                transformedImage.Stride,
-                transformedImage.Bits,
+                src.BitsPerPixel,
+                src.Width,
+                src.Height,
+                src.Stride,
+                src.Bits,
+                dst.Width,
+                dst.Height,
+                dst.Stride,
+                dst.Bits,
                 matrix.M11,
                 matrix.M12,
                 matrix.OffsetX,
@@ -92,10 +99,12 @@ namespace Genix.Imaging
                 throw new OutOfMemoryException();
             }
 
+            dst.AppendTransform(new MatrixTransform(matrix));
+
             // convert back to 1bpp
             if (convert1bpp)
             {
-                transformedImage.Convert8To1(transformedImage, 1);
+                dst.Convert8To1(dst, 1);
                 /*using (Pix pixs = transformedImage.CreatePix())
                 {
                     using (Pix pixd = pixs.pixOtsu(false))
@@ -108,8 +117,13 @@ namespace Genix.Imaging
                 }*/
             }
 
-            transformedImage.AppendTransform(new MatrixTransform(matrix));
-            return transformedImage;
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
 
             System.Windows.Point TransformPoint(int ptx, int pty)
             {
@@ -122,34 +136,38 @@ namespace Genix.Imaging
         /// <summary>
         /// Rotates the <see cref="Image"/> by an arbitrary angle.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="angle">The rotation angle, in degrees, counter-clockwise.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
-        /// A new rotated <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         [CLSCompliant(false)]
-        public Image Rotate(double angle, BorderType borderType, uint borderValue)
+        public Image Rotate(Image dst, double angle, BorderType borderType, uint borderValue)
         {
             angle = angle % 360.0;
             float a = (float)(Math.PI * (angle / 180.0));
             if (Math.Abs(a) < 0.001f)
             {
-                return this.Copy(null);
+                return this.Copy(dst);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Rotate(angle);
 
-            return this.Affine(matrix, borderType, borderValue);
+            return this.Affine(dst, matrix, borderType, borderValue);
         }
 
         /// <summary>
         /// Rotates, flips, or rotates and flips the <see cref="Image"/>, and returns re-sized image.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="rotateFlipType">A <see cref="RotateFlip"/> member that specifies the type of rotation and flip to apply to the image.</param>
-        /// <returns>A rotated <see cref="Image"/>.</returns>
-        public Image RotateFlip(RotateFlip rotateFlipType)
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        public Image RotateFlip(Image dst, RotateFlip rotateFlipType)
         {
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
 
@@ -191,7 +209,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            return this.Affine(matrix, BorderType.BorderConst, this.WhiteColor);
+            return this.Affine(dst, matrix, BorderType.BorderConst, this.WhiteColor);
         }
 
         /// <summary>
@@ -242,6 +260,7 @@ namespace Genix.Imaging
         /// <summary>
         /// De-skews the <see cref="Image"/> and aligns it horizontally.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -251,7 +270,7 @@ namespace Genix.Imaging
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public Image Deskew()
+        public Image Deskew(Image dst)
         {
             if (this.BitsPerPixel != 1)
             {
@@ -341,7 +360,7 @@ namespace Genix.Imaging
                 }
             }
 
-            return this.Rotate(-angleBest, BorderType.BorderRepl, 0);
+            return this.Rotate(dst, -angleBest, BorderType.BorderRepl, 0);
 
             float EstimateSkewAngle(float angle)
             {

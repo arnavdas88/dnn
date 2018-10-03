@@ -42,7 +42,6 @@ namespace Genix.Imaging
         /// <exception cref="OutOfMemoryException">
         /// Not enough memory to complete this operation.
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image ConvertTo(Image dst, int bitsPerPixel)
         {
             if (bitsPerPixel == this.BitsPerPixel)
@@ -202,14 +201,14 @@ namespace Genix.Imaging
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
+        /// </exception>
         /// <remarks>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
-        /// </exception>
         public Image Binarize(Image dst)
         {
             if (this.BitsPerPixel != 8)

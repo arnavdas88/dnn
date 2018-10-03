@@ -20,6 +20,36 @@ namespace Genix.Imaging
         /// Creates of blank template with the dimensions of the this <see cref="Image"/> and specified bit depth.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="width">The destination <see cref="Image"/> width, in pixels.</param>
+        /// <param name="height">The destination <see cref="Image"/> height, in pixels.</param>
+        /// <param name="bitsPerPixel">The destination <see cref="Image"/> color depth, in number of bits per pixel.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with specified dimensions.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the specified dimensions.</para>
+        /// </remarks>
+        public Image CreateTemplate(Image dst, int width, int height, int bitsPerPixel)
+        {
+            if (dst == null)
+            {
+                return new Image(width, height, bitsPerPixel, this);
+            }
+            else
+            {
+                // reallocate destination
+                dst.AllocateBits(width, height, bitsPerPixel);
+                dst.SetResolution(this.HorizontalResolution, this.VerticalResolution);
+                dst.Transform = this.Transform;
+                return dst;
+            }
+        }
+
+        /// <summary>
+        /// Creates of blank template with the dimensions of the this <see cref="Image"/> and specified bit depth.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="bitsPerPixel">The destination <see cref="Image"/> color depth, in number of bits per pixel.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
@@ -28,21 +58,8 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image CreateTemplate(Image dst, int bitsPerPixel)
-        {
-            if (dst == null)
-            {
-                return new Image(this.Width, this.Height, bitsPerPixel, this);
-            }
-            else
-            {
-                // reallocate destination
-                dst.AllocateBits(this.Width, this.Height, bitsPerPixel);
-                dst.SetResolution(this.HorizontalResolution, this.VerticalResolution);
-                dst.Transform = this.Transform;
-                return dst;
-            }
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image CreateTemplate(Image dst, int bitsPerPixel) => this.CreateTemplate(dst, this.Width, this.Height, bitsPerPixel);
 
         /// <summary>
         /// Copies the data from this <see cref="Image"/> to destination <see cref="Image"/>.

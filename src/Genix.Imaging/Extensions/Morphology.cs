@@ -86,7 +86,7 @@ namespace Genix.Imaging
                     // apply mask
                     if (count > 0)
                     {
-                        src.MaximumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                        src.Maximum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
                         mask.SetToZero();
                     }
 
@@ -110,7 +110,7 @@ namespace Genix.Imaging
                 // apply mask
                 if (count > 0)
                 {
-                    src.MaximumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                    src.Maximum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
                 }
             }
 
@@ -127,7 +127,7 @@ namespace Genix.Imaging
                 int width = src.Width - Math.Abs(point.X);
                 int height = src.Height - Math.Abs(point.Y);
 
-                mask.MaximumIP(xdst, ydst, width, height, src, xsrc, ysrc);
+                mask.Maximum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
             }
         }
 
@@ -195,7 +195,7 @@ namespace Genix.Imaging
                     // apply mask
                     if (count > 0)
                     {
-                        src.MinimumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                        src.Minimum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
                         mask.SetToOne();
                     }
 
@@ -218,7 +218,7 @@ namespace Genix.Imaging
                 // apply mask
                 if (count > 0)
                 {
-                    src.MinimumIP(0, 0, src.Width, src.Height, mask, 0, 0);
+                    src.Minimum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
                 }
             }
 
@@ -235,7 +235,7 @@ namespace Genix.Imaging
                 int width = src.Width - Math.Abs(point.X);
                 int height = src.Height - Math.Abs(point.Y);
 
-                mask.MinimumIP(xdst, ydst, width, height, src, xsrc, ysrc);
+                mask.Minimum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
             }
         }
 
@@ -593,6 +593,7 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ISet<ConnectedComponent> FindConnectedComponents(int connectivity, Rectangle area) =>
             this.FindConnectedComponents(connectivity, area.X, area.Y, area.Width, area.Height);
 
