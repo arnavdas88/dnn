@@ -23,7 +23,7 @@ namespace Genix.Imaging
         /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="kernel">The structuring element used for dilation.</param>
+        /// <param name="se">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
@@ -31,7 +31,7 @@ namespace Genix.Imaging
         /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The number of iterations is equal to or less than zero.</para>
@@ -42,11 +42,11 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [CLSCompliant(false)]
-        public Image Dilate(Image dst, StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
+        public Image Dilate(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
-            if (kernel == null)
+            if (se == null)
             {
-                throw new ArgumentNullException(nameof(kernel));
+                throw new ArgumentNullException(nameof(se));
             }
 
             if (iterations <= 0)
@@ -56,28 +56,34 @@ namespace Genix.Imaging
 
             dst = this.Copy(dst);
 
-            Size size = Size.Scale(Size.Add(kernel.Size, -1, -1), iterations, iterations);
-            Point anchor = Point.Scale(kernel.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
-
-            Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
-            Image mask = src.Clone(false);
-            for (int iteration = 0; iteration < iterations; iteration++)
+            // special case for rectangular kernel
+            // instead of applying m x n mask
+            // we sequentially apply m x 1 and 1 x n masks
+            if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
             {
-                // create mask
-                if (iteration > 0)
+                for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    mask.SetToZero();
+                    dst.Dilate(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
+                    dst.Dilate(dst, StructuringElement.Brick(1, brickSE.Height), 1, borderType, borderValue);
                 }
+            }
+            else
+            {
+                Size size = Size.Scale(Size.Add(se.Size, -1, -1), iterations, iterations);
+                Point anchor = Point.Scale(se.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
 
-                int count = 0;
-
-                // special case for rectangular kernel
-                // instead of applying m x n mask
-                // we sequentially apply n x 1 and 1 x n masks
-                if (kernel is RectangleStructuringElement rectangularKernel)
+                Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+                Image mask = src.Clone(false);
+                for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    // create vertical mask
-                    foreach (Point point in rectangularKernel.GetVerticalElements(StructuringElement.DefaultAnchor))
+                    // create mask
+                    if (iteration > 0)
+                    {
+                        mask.SetToZero();
+                    }
+
+                    int count = 0;
+                    foreach (Point point in se.GetElements())
                     {
                         MakeMask(point);
                         count++;
@@ -87,55 +93,32 @@ namespace Genix.Imaging
                     if (count > 0)
                     {
                         src.Maximum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
-                        mask.SetToZero();
-                    }
-
-                    // create horizontal mask
-                    count = 0;
-                    foreach (Point point in rectangularKernel.GetHorizontalElements(StructuringElement.DefaultAnchor))
-                    {
-                        MakeMask(point);
-                        count++;
-                    }
-                }
-                else
-                {
-                    foreach (Point point in kernel.GetElements())
-                    {
-                        MakeMask(point);
-                        count++;
                     }
                 }
 
-                // apply mask
-                if (count > 0)
+                Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
+
+                void MakeMask(Point point)
                 {
-                    src.Maximum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
+                    int xdst = Core.MinMax.Max(-point.X, 0);
+                    int ydst = Core.MinMax.Max(-point.Y, 0);
+                    int xsrc = Core.MinMax.Max(point.X, 0);
+                    int ysrc = Core.MinMax.Max(point.Y, 0);
+                    int width = src.Width - Math.Abs(point.X);
+                    int height = src.Height - Math.Abs(point.Y);
+
+                    mask.Maximum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
-
-            Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
 
             return dst;
-
-            void MakeMask(Point point)
-            {
-                int xdst = Core.MinMax.Max(-point.X, 0);
-                int ydst = Core.MinMax.Max(-point.Y, 0);
-                int xsrc = Core.MinMax.Max(point.X, 0);
-                int ysrc = Core.MinMax.Max(point.Y, 0);
-                int width = src.Width - Math.Abs(point.X);
-                int height = src.Height - Math.Abs(point.Y);
-
-                mask.Maximum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
-            }
         }
 
         /// <summary>
         /// Erodes this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="kernel">The structuring element used for dilation.</param>
+        /// <param name="se">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
@@ -143,7 +126,7 @@ namespace Genix.Imaging
         /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The number of iterations is equal to or less than zero.</para>
@@ -154,11 +137,11 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [CLSCompliant(false)]
-        public Image Erode(Image dst, StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
+        public Image Erode(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
-            if (kernel == null)
+            if (se == null)
             {
-                throw new ArgumentNullException(nameof(kernel));
+                throw new ArgumentNullException(nameof(se));
             }
 
             if (iterations <= 0)
@@ -168,25 +151,31 @@ namespace Genix.Imaging
 
             dst = this.Copy(dst);
 
-            Size size = Size.Scale(Size.Add(kernel.Size, -1, -1), iterations, iterations);
-            Point anchor = Point.Scale(kernel.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
-
-            Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
-            Image mask = src.Clone(false);
-            for (int iteration = 0; iteration < iterations; iteration++)
+            // special case for rectangular kernel
+            // instead of applying m x n mask
+            // we sequentially apply m x 1 and 1 x n masks
+            if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
             {
-                // create mask
-                mask.SetToOne();
-
-                int count = 0;
-
-                // special case for rectangular kernel
-                // instead of applying m x n mask
-                // we sequentially apply n x 1 and 1 x n masks
-                if (kernel is RectangleStructuringElement rectangularKernel)
+                for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    // create vertical mask
-                    foreach (Point point in rectangularKernel.GetVerticalElements(StructuringElement.DefaultAnchor))
+                    dst.Erode(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
+                    dst.Erode(dst, StructuringElement.Brick(1, brickSE.Height), 1, borderType, borderValue);
+                }
+            }
+            else
+            {
+                Size size = Size.Scale(Size.Add(se.Size, -1, -1), iterations, iterations);
+                Point anchor = Point.Scale(se.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
+
+                Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+                Image mask = src.Clone(false);
+                for (int iteration = 0; iteration < iterations; iteration++)
+                {
+                    // create mask
+                    mask.SetToOne();
+
+                    int count = 0;
+                    foreach (Point point in se.GetElements())
                     {
                         MakeMask(point);
                         count++;
@@ -196,54 +185,32 @@ namespace Genix.Imaging
                     if (count > 0)
                     {
                         src.Minimum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
-                        mask.SetToOne();
-                    }
-
-                    // create horizontal mask
-                    foreach (Point point in rectangularKernel.GetHorizontalElements(StructuringElement.DefaultAnchor))
-                    {
-                        MakeMask(point);
-                        count++;
-                    }
-                }
-                else
-                {
-                    foreach (Point point in kernel.GetElements())
-                    {
-                        MakeMask(point);
-                        count++;
                     }
                 }
 
-                // apply mask
-                if (count > 0)
+                Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
+
+                void MakeMask(Point point)
                 {
-                    src.Minimum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
+                    int xdst = Core.MinMax.Max(-point.X, 0);
+                    int ydst = Core.MinMax.Max(-point.Y, 0);
+                    int xsrc = Core.MinMax.Max(point.X, 0);
+                    int ysrc = Core.MinMax.Max(point.Y, 0);
+                    int width = src.Width - Math.Abs(point.X);
+                    int height = src.Height - Math.Abs(point.Y);
+
+                    mask.Minimum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
-
-            Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
 
             return dst;
-
-            void MakeMask(Point point)
-            {
-                int xdst = Core.MinMax.Max(-point.X, 0);
-                int ydst = Core.MinMax.Max(-point.Y, 0);
-                int xsrc = Core.MinMax.Max(point.X, 0);
-                int ysrc = Core.MinMax.Max(point.Y, 0);
-                int width = src.Width - Math.Abs(point.X);
-                int height = src.Height - Math.Abs(point.Y);
-
-                mask.Minimum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
-            }
         }
 
         /// <summary>
         /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="kernel">The structuring element used for dilation.</param>
+        /// <param name="se">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
@@ -251,7 +218,7 @@ namespace Genix.Imaging
         /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The number of iterations is equal to or less than zero.</para>
@@ -262,14 +229,14 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [CLSCompliant(false)]
-        public Image MorphOpen(Image dst, StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
+        public Image MorphOpen(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
             dst = this.Copy(dst);
 
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                dst = this.Erode(dst, kernel, 1, borderType, borderValue);
-                dst = this.Dilate(dst, kernel, 1, borderType, borderValue);
+                dst.Erode(dst, se, 1, borderType, borderValue);
+                dst.Dilate(dst, se, 1, borderType, borderValue);
             }
 
             return dst;
@@ -279,7 +246,7 @@ namespace Genix.Imaging
         /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="kernel">The structuring element used for dilation.</param>
+        /// <param name="se">The structuring element used for dilation.</param>
         /// <param name="iterations">The number of times dilation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
@@ -287,7 +254,7 @@ namespace Genix.Imaging
         /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="kernel"/> is <b>null</b>.</para>
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The number of iterations is equal to or less than zero.</para>
@@ -298,14 +265,14 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [CLSCompliant(false)]
-        public Image MorphClose(Image dst, StructuringElement kernel, int iterations, BorderType borderType, uint borderValue)
+        public Image MorphClose(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
             dst = this.Copy(dst);
 
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                dst = this.Dilate(dst, kernel, 1, borderType, borderValue);
-                dst = this.Erode(dst, kernel, 1, borderType, borderValue);
+                dst.Dilate(dst, se, 1, borderType, borderValue);
+                dst.Erode(dst, se, 1, borderType, borderValue);
             }
 
             return dst;
@@ -339,29 +306,29 @@ namespace Genix.Imaging
             // 0 0 0
             // 0 x 0
             // x x x
-            Image.BuildORMask(dst, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
-            Image.BuildORMask(dst, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
+            Image.BuildORMask(dst, StructuringElement.Brick(3, 2, new Point(1, 1)), null, mask, true);
+            Image.BuildORMask(dst, StructuringElement.Brick(3, 1, new Point(1, -1)), notbits, mask, false);
             Vectors.And(mask.Length, mask, 0, dst.Bits, 0);
 
             // x x x
             // 0 x 0
             // 0 0 0
-            Image.BuildORMask(dst, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
-            Image.BuildORMask(dst, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
+            Image.BuildORMask(dst, StructuringElement.Brick(3, 2, new Point(1, 0)), null, mask, true);
+            Image.BuildORMask(dst, StructuringElement.Brick(3, 1, new Point(1, 1)), notbits, mask, false);
             Vectors.And(mask.Length, mask, 0, dst.Bits, 0);
 
             // x 0 0
             // x x 0
             // x 0 0
-            Image.BuildORMask(dst, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
-            Image.BuildORMask(dst, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
+            Image.BuildORMask(dst, StructuringElement.Brick(2, 3, new Point(0, 1)), null, mask, true);
+            Image.BuildORMask(dst, StructuringElement.Brick(1, 3, new Point(1, 1)), notbits, mask, false);
             Vectors.And(mask.Length, mask, 0, dst.Bits, 0);
 
             // 0 0 x
             // 0 x x
             // 0 0 x
-            Image.BuildORMask(dst, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
-            Image.BuildORMask(dst, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
+            Image.BuildORMask(dst, StructuringElement.Brick(2, 3, new Point(1, 1)), null, mask, true);
+            Image.BuildORMask(dst, StructuringElement.Brick(1, 3, new Point(-1, 1)), notbits, mask, false);
             Vectors.And(mask.Length, mask, 0, dst.Bits, 0);
 
             // fill isolated gaps
@@ -371,29 +338,29 @@ namespace Genix.Imaging
             // x x x
             // x 0 x
             // 0 0 0
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(3, 2, new Point(1, 1)), null, mask, true);
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(3, 1, new Point(1, -1)), notbits, mask, false);
+            Image.BuildANDMask(dst, StructuringElement.Brick(3, 2, new Point(1, 1)), null, mask, true);
+            Image.BuildANDMask(dst, StructuringElement.Brick(3, 1, new Point(1, -1)), notbits, mask, false);
             Vectors.Or(mask.Length, mask, 0, dst.Bits, 0);
 
             // 0 0 0
             // x 0 x
             // x x x
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(3, 2, new Point(1, 0)), null, mask, true);
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(3, 1, new Point(1, 1)), notbits, mask, false);
+            Image.BuildANDMask(dst, StructuringElement.Brick(3, 2, new Point(1, 0)), null, mask, true);
+            Image.BuildANDMask(dst, StructuringElement.Brick(3, 1, new Point(1, 1)), notbits, mask, false);
             Vectors.Or(mask.Length, mask, 0, dst.Bits, 0);
 
             // 0 x x
             // 0 0 x
             // 0 x x
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(2, 3, new Point(0, 1)), null, mask, true);
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(1, 3, new Point(1, 1)), notbits, mask, false);
+            Image.BuildANDMask(dst, StructuringElement.Brick(2, 3, new Point(0, 1)), null, mask, true);
+            Image.BuildANDMask(dst, StructuringElement.Brick(1, 3, new Point(1, 1)), notbits, mask, false);
             Vectors.Or(mask.Length, mask, 0, dst.Bits, 0);
 
             // x x 0
             // x 0 0
             // x x 0
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(2, 3, new Point(1, 1)), null, mask, true);
-            Image.BuildANDMask(dst, StructuringElement.Rectangle(1, 3, new Point(-1, 1)), notbits, mask, false);
+            Image.BuildANDMask(dst, StructuringElement.Brick(2, 3, new Point(1, 1)), null, mask, true);
+            Image.BuildANDMask(dst, StructuringElement.Brick(1, 3, new Point(-1, 1)), notbits, mask, false);
             Vectors.Or(mask.Length, mask, 0, dst.Bits, 0);
 
             return dst;

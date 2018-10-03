@@ -81,7 +81,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Logical.tt</DependentUpon>
     </Compile>
-    <Compile Include="Extensions\RectangleStructuringElement.cs" />
+    <Compile Include="Extensions\BrickStructuringElement.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />

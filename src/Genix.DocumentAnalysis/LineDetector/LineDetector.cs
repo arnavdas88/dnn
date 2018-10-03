@@ -130,8 +130,8 @@ namespace Genix.DocumentAnalysis
 
                 // open up in both directions to find lines
                 int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-                hlines = hollowImage.MorphOpen(null, StructuringElement.Rectangle(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
-                vlines = hollowImage.MorphOpen(null, StructuringElement.Rectangle(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
+                hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
 
                 // check for line presence
                 if (hlines.IsAllWhite())
@@ -160,7 +160,7 @@ namespace Genix.DocumentAnalysis
                     }
 
                     int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonVLines = nonLines.Erode(null, StructuringElement.Rectangle(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                    nonVLines = nonLines.Erode(null, StructuringElement.Brick(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonVLines.FloodFill(nonVLines, 8, nonLines);
 
@@ -182,7 +182,7 @@ namespace Genix.DocumentAnalysis
                     }
 
                     int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonHLines = nonLines.Erode(null, StructuringElement.Rectangle(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
+                    nonHLines = nonLines.Erode(null, StructuringElement.Brick(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
 
                     nonHLines.FloodFill(nonHLines, 8, nonLines);
 

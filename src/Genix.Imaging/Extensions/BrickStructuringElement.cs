@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="RectangleStructuringElement.cs" company="Noname, Inc.">
+// <copyright file="BrickStructuringElement.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -13,13 +13,13 @@ namespace Genix.Imaging
     /// <summary>
     /// Represents a rectangular structuring element.
     /// </summary>
-    internal class RectangleStructuringElement : StructuringElement
+    internal class BrickStructuringElement : StructuringElement
     {
         private readonly int width;
         private readonly int height;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RectangleStructuringElement"/> class.
+        /// Initializes a new instance of the <see cref="BrickStructuringElement"/> class.
         /// </summary>
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
@@ -28,14 +28,14 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para><paramref name="height"/> is not a positive value.</para>
         /// </exception>
-        public RectangleStructuringElement(int width, int height)
+        public BrickStructuringElement(int width, int height)
         {
             this.width = width > 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Properties.Resources.E_InvalidSEWidth);
             this.height = height > 0 ? height : throw new ArgumentOutOfRangeException(nameof(height), Properties.Resources.E_InvalidSEHeight);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RectangleStructuringElement"/> class.
+        /// Initializes a new instance of the <see cref="BrickStructuringElement"/> class.
         /// </summary>
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
@@ -45,7 +45,7 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para><paramref name="height"/> is not a positive value.</para>
         /// </exception>
-        public RectangleStructuringElement(int width, int height, Point anchor)
+        public BrickStructuringElement(int width, int height, Point anchor)
             : base(anchor)
         {
             this.width = width > 0 ? width : throw new ArgumentOutOfRangeException(nameof(width), Properties.Resources.E_InvalidSEWidth);
@@ -53,11 +53,27 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RectangleStructuringElement"/> class.
+        /// Initializes a new instance of the <see cref="BrickStructuringElement"/> class.
         /// </summary>
-        private RectangleStructuringElement()
+        private BrickStructuringElement()
         {
         }
+
+        /// <summary>
+        /// Gets the structuring element width.
+        /// </summary>
+        /// <value>
+        /// The structuring element width, in pixels.
+        /// </value>
+        public int Width => this.width;
+
+        /// <summary>
+        /// Gets the structuring element height.
+        /// </summary>
+        /// <value>
+        /// The structuring element height, in pixels.
+        /// </value>
+        public int Height => this.height;
 
         /// <inheritdoc />
         public override Size Size => new Size(this.width, this.height);

@@ -65,7 +65,7 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StructuringElement Square(int size)
         {
-            return new RectangleStructuringElement(size, size);
+            return new BrickStructuringElement(size, size);
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StructuringElement Square(int size, Point anchor)
         {
-            return new RectangleStructuringElement(size, size, anchor);
+            return new BrickStructuringElement(size, size, anchor);
         }
 
         /// <summary>
-        /// Creates a rectangular structuring element.
+        /// Creates a brick structuring element.
         /// </summary>
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
@@ -91,13 +91,13 @@ namespace Genix.Imaging
         /// The <see cref="StructuringElement"/> object this method creates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static StructuringElement Rectangle(int width, int height)
+        public static StructuringElement Brick(int width, int height)
         {
-            return new RectangleStructuringElement(width, height);
+            return new BrickStructuringElement(width, height);
         }
 
         /// <summary>
-        /// Creates a rectangular structuring element.
+        /// Creates a brick structuring element.
         /// </summary>
         /// <param name="width">The width of the structuring element.</param>
         /// <param name="height">The height of the structuring element.</param>
@@ -106,9 +106,9 @@ namespace Genix.Imaging
         /// The <see cref="StructuringElement"/> object this method creates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static StructuringElement Rectangle(int width, int height, Point anchor)
+        public static StructuringElement Brick(int width, int height, Point anchor)
         {
-            return new RectangleStructuringElement(width, height, anchor);
+            return new BrickStructuringElement(width, height, anchor);
         }
 
         /// <summary>
