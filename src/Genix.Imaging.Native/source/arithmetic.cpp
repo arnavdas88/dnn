@@ -69,13 +69,13 @@ GENIXAPI(int, _sub)(
 	Ipp8u* dst, int dststep,
 	int scaleFactor)
 {
-	if (src2 == NULL)
+	if (src1 == NULL)
 	{
 		switch (bitsPerPixel)
 		{
-		case 8: return ippiSub_8u_C1IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
-		case 24: return ippiSub_8u_C3IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
-		case 32: return ippiSub_8u_AC4IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 8: return ippiSub_8u_C1IRSfs(src2, src2step, dst, dststep, { width, height }, scaleFactor);
+		case 24: return ippiSub_8u_C3IRSfs(src2, src2step, dst, dststep, { width, height }, scaleFactor);
+		case 32: return ippiSub_8u_AC4IRSfs(src2, src2step, dst, dststep, { width, height }, scaleFactor);
 		default: return ippStsBadArgErr;
 		}
 	}

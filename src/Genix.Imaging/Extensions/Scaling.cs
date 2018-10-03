@@ -61,7 +61,7 @@ namespace Genix.Imaging
         {
             if (width == this.Width && height == this.Height)
             {
-                return this.Copy();
+                return this.Copy(null);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
@@ -183,7 +183,7 @@ namespace Genix.Imaging
                 dst = dst.Inflate(dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2), BorderType.BorderConst, dst.WhiteColor);
             }
 
-            return dst != this ? dst : dst.Copy();
+            return dst != this ? dst : dst.Copy(null);
         }
 
         /// <summary>
@@ -255,12 +255,12 @@ namespace Genix.Imaging
             // calculate destination area to copy to
             Rectangle dstarea = Rectangle.Offset(srcarea, -bounds.X, -bounds.Y);
 
-            Image.CopyArea(this, srcarea.X, srcarea.Y, srcarea.Width, srcarea.Height, dst, dstarea.X, dstarea.Y);
+            Image.CopyArea(dst, dstarea.X, dstarea.Y, srcarea.Width, srcarea.Height, this, srcarea.X, srcarea.Y);
 
             // set border
-            dst.SetBorderIP(dstarea, borderType, borderValue);
+            dst.SetBorder(dstarea, borderType, borderValue);
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(left, top));
+            dst.AppendTransform(new MatrixTransform(left, top));
             return dst;
         }
 
@@ -298,7 +298,7 @@ namespace Genix.Imaging
                 Vectors.Copy(stride, bitssrc, offsrc, bitsdst, offdst);
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.5));
+            dst.AppendTransform(new MatrixTransform(1.0, 0.5));
             return dst;
         }
 
@@ -342,7 +342,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 1.0 / 3));
+            dst.AppendTransform(new MatrixTransform(1.0, 1.0 / 3));
             return dst;
         }
 
@@ -390,7 +390,7 @@ namespace Genix.Imaging
                     break;
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(1.0, 0.25));
+            dst.AppendTransform(new MatrixTransform(1.0, 0.25));
             return dst;
         }
 

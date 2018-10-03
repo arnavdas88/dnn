@@ -19,7 +19,7 @@
         public void PowerTest1()
         {
             Image image = new Image((64 * 2) + 23, 43, 1, 200, 200);
-            image.SetWhiteIP();
+            image.SetWhite();
 
             image.SetPixel(5, 9, 1);
             image.SetPixel(64 + 37, 19, 1);
@@ -125,14 +125,14 @@
                 {
                     ////long power = image.Power();
                     ////Histogram hyst = image.GrayHistogram();
-                    Image workImage = image.ConvertTo(8);
+                    Image workImage = image.ConvertTo(null, 8);
 
                     workImage = workImage.Scale(100.0 / workImage.HorizontalResolution, 100.0 / workImage.VerticalResolution, ScalingOptions.None);
                     ////image = image.Binarize();
-                    workImage = workImage.Convert8To1(128);
+                    workImage = workImage.Convert8To1(null, 128);
                     workImage = workImage.CleanOverscan(0.5f, 0.5f);
                     workImage = workImage.Deskew();
-                    workImage = workImage.Despeckle();
+                    workImage = workImage.Despeckle(null);
 
                     ISet<ConnectedComponent> components = workImage.FindConnectedComponents(8);
                     workImage.RemoveConnectedComponents(components);

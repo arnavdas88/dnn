@@ -18,13 +18,13 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Adds a constant to pixel values of an image not-in-place.
+        /// Adds a constant to pixel values of this <see cref="Image"/>.
         /// </summary>
-        /// <param name="src">The source <see cref="Image"/>.</param>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="value">The constant value to add to image pixel values.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
-        /// A new destination <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// <para>
@@ -41,106 +41,47 @@ namespace Genix.Imaging
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="src"/> is <b>null</b>.</para>
-        /// </exception>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
-        public Image AddC(Image src, int value, int scaleFactor)
+        public Image AddC(Image dst, int value, int scaleFactor)
         {
-            if (src == null)
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
             {
-                throw new ArgumentNullException(nameof(src));
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
             }
 
-            switch (src.BitsPerPixel)
-            {
-                case 8:
-                case 24:
-                case 32:
-                    Image dst = src.Clone(false);
-                    NativeMethods._addc(
-                        src.BitsPerPixel,
-                        src.Width,
-                        src.Height,
-                        src.Bits,
-                        src.Stride8,
-                        value,
-                        dst.Bits,
-                        dst.Stride8,
-                        scaleFactor);
-                    return dst;
+            dst = this.Copy(dst);
 
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        src.BitsPerPixel));
-            }
+            NativeMethods._addc(
+                dst.BitsPerPixel,
+                dst.Width,
+                dst.Height,
+                dst == this ? null : this.Bits,
+                this.Stride8,
+                value,
+                dst.Bits,
+                dst.Stride8,
+                scaleFactor);
+
+            return dst;
         }
 
         /// <summary>
-        /// Adds a constant to pixel values of an image in-place.
+        /// Subtracts a constant from pixel values of an image.
         /// </summary>
-        /// <param name="value">The constant value to add to image pixel values.</param>
-        /// <param name="scaleFactor">The scaling factor.</param>
-        /// <remarks>
-        /// <para>
-        /// This method changes the image intensity by adding value to image pixel values.
-        /// </para>
-        /// <para>
-        /// For gray (8bpp) images, a positive value brightens the image (increases the intensity); a negative value darkens the image (decreases the intensity).
-        /// </para>
-        /// <para>
-        /// For color (24bpp and 32bpp) images, the color components are added to pixel channel values.
-        /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
-        /// The alpha channel is not affected by this method.
-        /// </para>
-        /// <para>
-        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
-        /// </para>
-        /// </remarks>
-        /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
-        /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddCIP(int value, int scaleFactor)
-        {
-            switch (this.BitsPerPixel)
-            {
-                case 8:
-                case 24:
-                case 32:
-                    NativeMethods._addc(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        null,
-                        0,
-                        value,
-                        this.Bits,
-                        this.Stride8,
-                        scaleFactor);
-                    break;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
-            }
-        }
-
-        /// <summary>
-        /// Subtracts a constant from pixel values of an image not-in-place.
-        /// </summary>
-        /// <param name="src">The source <see cref="Image"/>.</param>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="value">The constant value to subtract from image pixel values.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
-        /// A new destination <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// <para>
@@ -157,96 +98,37 @@ namespace Genix.Imaging
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
-        /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="src"/> is <b>null</b>.</para>
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
-        /// </exception>
-        public Image SubC(Image src, int value, int scaleFactor)
-        {
-            if (src == null)
-            {
-                throw new ArgumentNullException(nameof(src));
-            }
-
-            switch (src.BitsPerPixel)
-            {
-                case 8:
-                case 24:
-                case 32:
-                    Image dst = src.Clone(false);
-                    NativeMethods._subc(
-                        src.BitsPerPixel,
-                        src.Width,
-                        src.Height,
-                        src.Bits,
-                        src.Stride8,
-                        value,
-                        dst.Bits,
-                        dst.Stride8,
-                        scaleFactor);
-                    return dst;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        src.BitsPerPixel));
-            }
-        }
-
-        /// <summary>
-        /// Subtracts a constant from pixel values of an image in-place.
-        /// </summary>
-        /// <param name="value">The constant value to subtract from image pixel values.</param>
-        /// <param name="scaleFactor">The scaling factor.</param>
-        /// <remarks>
-        /// <para>
-        /// This method changes the image intensity by subtracting value from image pixel values.
-        /// </para>
-        /// <para>
-        /// For gray (8bpp) images, a positive value darkens the image (decreases the intensity); a negative value brightens the image (increases the intensity).
-        /// </para>
-        /// <para>
-        /// For color (24bpp and 32bpp) images, the color components are subtracted from pixel channel values.
-        /// In this case, the <paramref name="value"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte.
-        /// The alpha channel is not affected by this method.
-        /// </para>
-        /// <para>
-        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
-        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubCIP(int value, int scaleFactor)
+        public Image SubC(Image dst, int value, int scaleFactor)
         {
-            switch (this.BitsPerPixel)
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
             {
-                case 8:
-                case 24:
-                case 32:
-                    NativeMethods._subc(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        null,
-                        0,
-                        value,
-                        this.Bits,
-                        this.Stride8,
-                        scaleFactor);
-                    break;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
             }
+
+            dst = this.Copy(dst);
+
+            NativeMethods._subc(
+                dst.BitsPerPixel,
+                dst.Width,
+                dst.Height,
+                dst == this ? null : this.Bits,
+                this.Stride8,
+                value,
+                dst.Bits,
+                dst.Stride8,
+                scaleFactor);
+
+            return dst;
         }
 
         [SuppressUnmanagedCodeSecurity]

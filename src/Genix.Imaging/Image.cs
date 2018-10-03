@@ -32,7 +32,13 @@ namespace Genix.Imaging
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Image(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution)
-            : base(width, height, bitsPerPixel, horizontalResolution, verticalResolution)
+            : base(width, height, bitsPerPixel, horizontalResolution, verticalResolution, null)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(int width, int height, int bitsPerPixel, Image image)
+            : base(width, height, bitsPerPixel, image)
         {
         }
 
@@ -45,6 +51,12 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Image(Size size, Image image)
             : base(size, image)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(Image image)
+            : base(image)
         {
         }
 
@@ -90,14 +102,6 @@ namespace Genix.Imaging
         /// </value>
         [CLSCompliant(false)]
         public uint MaxColor => ~(uint)(ulong.MaxValue << this.BitsPerPixel);
-
-        /// <summary>
-        /// Gets the tranformation performed on the image since it was first created.
-        /// </summary>
-        /// <value>
-        /// The <see cref="Imaging.Transform"/> object that contains the image transormations.
-        /// </value>
-        public Transform Transform { get; private set; } = new IdentityTransform();
 
         /// <summary>
         /// Gets the mask that clears ending unused bits in the stride.
@@ -225,19 +229,13 @@ namespace Genix.Imaging
         /// </returns>
         public Image Clone(bool copyBits)
         {
-            Image dst = new Image(
-                 this.Width,
-                 this.Height,
-                 this.BitsPerPixel,
-                 this.HorizontalResolution,
-                 this.VerticalResolution);
+            Image dst = new Image(this.Width, this.Height, this);
 
             if (copyBits)
             {
                 Vectors.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
             }
 
-            dst.Transform = this.Transform;
             return dst;
         }
 

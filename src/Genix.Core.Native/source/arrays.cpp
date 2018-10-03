@@ -909,3 +909,14 @@ template<typename T> void __forceinline __swap_bits_ip(
 
 GENIXAPI(void, swap_bits_ip_u32)(const int n, const int bitCount, unsigned __int32* xy, const int offxy) { __swap_bits_ip(n, bitCount, xy, offxy); }
 GENIXAPI(void, swap_bits_ip_u64)(const int n, const int bitCount, unsigned __int64* xy, const int offxy) { __swap_bits_ip(n, bitCount, xy, offxy); }
+
+__forceinline unsigned __int32 __or_bits2(const unsigned __int64 bits)
+{
+	unsigned __int64 x = bits & 0x5555555555555555ul;
+	x = (x | (x >> 1)) & 0x3333333333333333ul;
+	x = (x | (x >> 2)) & 0x0f0f0f0f0f0f0f0ful;
+	x = (x | (x >> 4)) & 0x00ff00ff00ff00fful;
+	x = (x | (x >> 8)) & 0x0000ffff0000fffful;
+	x = (x | (x >> 16)) & 0x00000000fffffffful;
+	return (unsigned __int32)bits;
+}

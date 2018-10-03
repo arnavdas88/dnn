@@ -34,23 +34,23 @@ namespace Genix.DocumentAnalysis
             // remove noise
             if (options.HasFlag(ImagePreprocessingOptions.Despeckle))
             {
-                image = image.ConvertTo(1).Despeckle();
+                image = image.ConvertTo(null, 1).Despeckle(null);
             }
 
             // removes border noise
             if (options.HasFlag(ImagePreprocessingOptions.CleanOverscan))
             {
                 // clean 1/2 inches on all sides
-                image = image.ConvertTo(1).CleanOverscan(0.5f, 0.5f);
+                image = image.ConvertTo(null, 1).CleanOverscan(0.5f, 0.5f);
             }
 
             // align
             if (options.HasFlag(ImagePreprocessingOptions.Despeckle))
             {
-                image = image.ConvertTo(1).Deskew();
+                image = image.ConvertTo(null, 1).Deskew();
             }
 
-            return image.ConvertTo(bitsPerPixel);
+            return image.ConvertTo(null, bitsPerPixel);
         }
     }
 }

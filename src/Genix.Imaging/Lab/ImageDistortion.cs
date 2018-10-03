@@ -51,7 +51,7 @@ namespace Genix.Imaging.Lab
 
             if (image.BitsPerPixel == 8)
             {
-                image = image.Binarize();
+                image.Binarize(image);
             }
 
             // rotate image randomly

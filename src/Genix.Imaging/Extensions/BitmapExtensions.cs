@@ -351,7 +351,7 @@ namespace Genix.Imaging
             // special case for BitmapFrame BlackWhite pixel format
             if (bitmapFrame.Format == PixelFormats.BlackWhite)
             {
-                image.NotIP();
+                image.Not(image);
                 metadata.RemovePropertyItem((int)TIFFField.PhotometricInterpretation);
             }
 
@@ -400,12 +400,7 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Image ApplyPalette(this Image image, IList<Color> palette)
         {
-            Image dst = new Image(
-                image.Width,
-                image.Height,
-                32,
-                image.HorizontalResolution,
-                image.VerticalResolution);
+            Image dst = new Image(image.Width, image.Height, 32, image);
 
             int height = image.Height;
             int bitsPerPixel = image.BitsPerPixel;

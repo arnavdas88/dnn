@@ -14,7 +14,7 @@
                 Image image = new Image(87, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
-                Image copyImage = image.Copy();
+                Image copyImage = image.Copy(null);
 
                 Assert.AreEqual(image.Width, copyImage.Width);
                 Assert.AreEqual(image.Height, copyImage.Height);

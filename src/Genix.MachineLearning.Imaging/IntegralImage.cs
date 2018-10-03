@@ -41,7 +41,7 @@ namespace Genix.MachineLearning.Imaging
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal IntegralImage(int width, int height, int horizontalResolution, int verticalResolution)
-            : base(width, height, 32, horizontalResolution, verticalResolution)
+            : base(width, height, 32, horizontalResolution, verticalResolution, null)
         {
         }
 

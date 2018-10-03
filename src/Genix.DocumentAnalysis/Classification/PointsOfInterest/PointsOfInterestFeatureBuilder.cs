@@ -86,20 +86,20 @@ namespace Genix.DocumentAnalysis.Classification
             image = image
                 .Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
                 ////.Binarize()
-                .Convert8To1(128)
+                .Convert8To1(null, 128)
                 .CleanOverscan(0.5f, 0.5f)
                 .Deskew()
-                .Despeckle();
+                .Despeckle(null);
 
             ISet<ConnectedComponent> components = image.FindConnectedComponents(8);
             image.RemoveConnectedComponents(components.Where(x => x.Power <= 16));
 
             image = image
                 .CropBlackArea(0, 0)
-                .Dilate(StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
+                .Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
                 ////.CropBlackArea(0, 0)
-                .Convert1To8()
-                .FilterLowpass(3);
+                .Convert1To8(null)
+                .FilterLowpass(null, 3);
 
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
 

@@ -104,79 +104,18 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Sets all image pixels to the specified color not-in-place.
+        /// Sets all image pixels to the specified color.
         /// </summary>
         /// <param name="color">The color to set.</param>
-        /// <returns>
-        /// A new <see cref="Image"/> that has all its pixels set to the specified color.
-        /// </returns>
-        /// <seealso cref="SetColorIP(uint)"/>
-        [CLSCompliant(false)]
-        public Image SetColor(uint color)
-        {
-            Image dst = this.Clone(false);
-            dst.SetColorIP(color);
-            return dst;
-        }
-
-        /// <summary>
-        /// Sets all image pixels in the specified rectangular area to the specified color not-in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
-        /// <param name="width">The width of the area.</param>
-        /// <param name="height">The height of the area.</param>
-        /// <param name="color">The color to set.</param>
-        /// <returns>
-        /// A new <see cref="Image"/> that has all its pixels in the specified rectangular area set to the specified color.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of image bounds.
-        /// </exception>
-        /// <seealso cref="SetColorIP(int, int, int, int, uint)"/>
-        [CLSCompliant(false)]
-        public Image SetColor(int x, int y, int width, int height, uint color)
-        {
-            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
-            {
-                return this.SetColor(color);
-            }
-            else
-            {
-                Image dst = this.Copy();
-                dst.SetColorIP(x, y, width, height, color);
-                return dst;
-            }
-        }
-
-        /// <summary>
-        /// Sets all image pixels in the specified rectangular area to the specified color not-in-place.
-        /// </summary>
-        /// <param name="rect">The width, height, and location of the area.</param>
-        /// <returns>
-        /// A new <see cref="Image"/> that has all its pixels in the specified rectangular area set to the specified color.
-        /// </returns>
-        /// <param name="color">The color to set.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="rect"/> is outside of image bounds.
-        /// </exception>
-        /// <seealso cref="SetColorIP(Rectangle, uint)"/>
-        [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image SetColor(Rectangle rect, uint color) =>
-            this.SetColor(rect.X, rect.Y, rect.Width, rect.Height, color);
-
-        /// <summary>
-        /// Sets all image pixels to the specified color in-place.
-        /// </summary>
-        /// <param name="color">The color to set.</param>
         [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetColorIP(uint color) =>
+        public void SetColor(uint color)
+        {
             Vectors.Set(this.Bits.Length, this.ColorBits(color), this.Bits, 0);
+        }
 
         /// <summary>
-        /// Sets all image pixels in the specified rectangular area to the specified color in-place.
+        /// Sets all image pixels in the specified rectangular area to the specified color.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
@@ -187,40 +126,51 @@ namespace Genix.Imaging
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
         [CLSCompliant(false)]
-        public void SetColorIP(int x, int y, int width, int height, uint color)
+        public void SetColor(int x, int y, int width, int height, uint color)
         {
-            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            this.ValidateArea(x, y, width, height);
+
+            ulong[] bits = this.Bits;
+            ulong colorbits = this.ColorBits(color);
+
+            if (x == 0 && width == this.Width)
             {
-                this.SetColorIP(color);
+                // set multiple scan lines at once
+                // if entire image width has to be set
+                Vectors.Set(height * this.Stride, colorbits, bits, y * this.Stride);
             }
             else
             {
-                this.ValidateArea(x, y, width, height);
+                int stride1 = this.Stride1;
+                int count = width * this.BitsPerPixel;
+                int off = (y * stride1) + (x * this.BitsPerPixel);
 
-                ulong[] bits = this.Bits;
-                ulong ucolor = this.ColorBits(color);
-
-                if (x == 0 && width == this.Width)
+                if (colorbits == 0)
                 {
-                    // set multiple scan lines at once
-                    // if entire image width has to be set
-                    Vectors.Set(height * this.Stride, ucolor, bits, y * this.Stride);
+                    for (int i = 0; i < height; i++, off += stride1)
+                    {
+                        BitUtils.ResetBits(count, bits, off);
+                    }
+                }
+                else if (colorbits == ulong.MaxValue)
+                {
+                    for (int i = 0; i < height; i++, off += stride1)
+                    {
+                        BitUtils.SetBits(count, bits, off);
+                    }
                 }
                 else
                 {
-                    int stride1 = this.Stride1;
-                    int count = width * this.BitsPerPixel;
-
-                    for (int i = 0, off = (y * stride1) + (x * this.BitsPerPixel); i < height; i++, off += stride1)
+                    for (int i = 0; i < height; i++, off += stride1)
                     {
-                        BitUtils.SetBits(count, ucolor, bits, off);
+                        BitUtils.SetBits(count, colorbits, bits, off);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Sets all image pixels in the specified rectangular area to the specified color in-place.
+        /// Sets all image pixels in the specified rectangular area to the specified color.
         /// </summary>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <param name="color">The color to set.</param>
@@ -229,51 +179,11 @@ namespace Genix.Imaging
         /// </exception>
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetColorIP(Rectangle rect, uint color) =>
-            this.SetColorIP(rect.X, rect.Y, rect.Width, rect.Height, color);
+        public void SetColor(Rectangle rect, uint color) =>
+            this.SetColor(rect.X, rect.Y, rect.Width, rect.Height, color);
 
         /// <summary>
-        /// Sets all image pixels outside the specified rectangular area to the specified color not-in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
-        /// <param name="width">The width of the area.</param>
-        /// <param name="height">The height of the area.</param>
-        /// <param name="borderType">The type of border.</param>
-        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
-        /// </exception>
-        [CLSCompliant(false)]
-        public Image SetBorder(int x, int y, int width, int height, BorderType borderType, uint borderValue)
-        {
-            Image dst = this.Copy();
-            dst.SetBorderIP(x, y, width, height, borderType, borderValue);
-            return dst;
-        }
-
-        /// <summary>
-        /// Sets all image pixels outside the specified rectangular area to the specified color not-in-place.
-        /// </summary>
-        /// <param name="rect">The width, height, and location of the area.</param>
-        /// <param name="borderType">The type of border.</param>
-        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
-        /// </exception>
-        [CLSCompliant(false)]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image SetBorder(Rectangle rect, BorderType borderType, uint borderValue) =>
-            this.SetBorder(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
-
-        /// <summary>
-        /// Sets all image pixels outside the specified rectangular area to the specified color in-place.
+        /// Sets all image pixels outside the specified rectangular area to the specified color.
         /// </summary>
         /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
@@ -285,7 +195,7 @@ namespace Genix.Imaging
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
         [CLSCompliant(false)]
-        public void SetBorderIP(int x, int y, int width, int height, BorderType borderType, uint borderValue)
+        public void SetBorder(int x, int y, int width, int height, BorderType borderType, uint borderValue)
         {
             this.ValidateArea(x, y, width, height);
 
@@ -399,7 +309,7 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Sets all image pixels outside the specified rectangular area to the specified color in-place.
+        /// Sets all image pixels outside the specified rectangular area to the specified color.
         /// </summary>
         /// <param name="rect">The width, height, and location of the area.</param>
         /// <param name="borderType">The type of border.</param>
@@ -409,7 +319,7 @@ namespace Genix.Imaging
         /// </exception>
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetBorderIP(Rectangle rect, BorderType borderType, uint borderValue) =>
-            this.SetBorderIP(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
+        public void SetBorder(Rectangle rect, BorderType borderType, uint borderValue) =>
+            this.SetBorder(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
     }
 }

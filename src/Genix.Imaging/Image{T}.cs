@@ -27,42 +27,38 @@ namespace Genix.Imaging
         /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
         /// <param name="horizontalResolution">The image horizontal resolution, in pixels per inch.</param>
         /// <param name="verticalResolution">The image vertical resolution, in pixels per inch.</param>
+        /// <param name="transform">The image transformation.</param>
         /// <exception cref="ArgumentException">
         /// <para><paramref name="width"/> is less than or equal to zero.</para>
         /// <para>-or-</para>
         /// <para><paramref name="height"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="horizontalResolution"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="verticalResolution"/> is less than or equal to zero.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution)
+        public Image(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution, Transform transform)
         {
-            if (width <= 0)
+            this.AllocateBits(width, height, bitsPerPixel);
+            this.SetResolution(horizontalResolution, verticalResolution);
+
+            if (transform != null)
             {
-                throw new ArgumentException(Properties.Resources.E_InvalidWidth, nameof(width));
+                this.Transform = transform;
             }
+        }
 
-            if (height <= 0)
-            {
-                throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
-            }
-
-            if (horizontalResolution <= 0)
-            {
-                throw new ArgumentException(Properties.Resources.E_InvalidHorizontalResolution, nameof(horizontalResolution));
-            }
-
-            if (verticalResolution <= 0)
-            {
-                throw new ArgumentException(Properties.Resources.E_InvalidVerticalResolution, nameof(verticalResolution));
-            }
-
-            this.Width = width;
-            this.Height = height;
-            this.BitsPerPixel = bitsPerPixel;
-            this.HorizontalResolution = horizontalResolution;
-            this.VerticalResolution = verticalResolution;
-
-            this.Stride = Image<T>.CalculateStride(width, bitsPerPixel);
-            this.Bits = new T[this.Stride * height];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(int width, int height, int bitsPerPixel, Image<T> image)
+            : this(
+                width,
+                height,
+                bitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution,
+                image.Transform)
+        {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -72,7 +68,8 @@ namespace Genix.Imaging
                 height,
                 image.BitsPerPixel,
                 image.HorizontalResolution,
-                image.VerticalResolution)
+                image.VerticalResolution,
+                image.Transform)
         {
         }
 
@@ -83,7 +80,20 @@ namespace Genix.Imaging
                 size.Height,
                 image.BitsPerPixel,
                 image.HorizontalResolution,
-                image.VerticalResolution)
+                image.VerticalResolution,
+                image.Transform)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Image(Image<T> image)
+            : this(
+                image.Width,
+                image.Height,
+                image.BitsPerPixel,
+                image.HorizontalResolution,
+                image.VerticalResolution,
+                image.Transform)
         {
         }
 
@@ -101,7 +111,7 @@ namespace Genix.Imaging
         /// <value>
         /// The width, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
-        public int Width { get; }
+        public int Width { get; private set; }
 
         /// <summary>
         /// Gets the width, in bits, of this <see cref="Image{T}"/>.
@@ -117,7 +127,7 @@ namespace Genix.Imaging
         /// <value>
         /// The height, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
-        public int Height { get; }
+        public int Height { get; private set; }
 
         /// <summary>
         /// Gets the color depth, in number of bits per pixel, of this <see cref="Image{T}"/>.
@@ -125,7 +135,7 @@ namespace Genix.Imaging
         /// <value>
         /// The color depth, in number of bits per pixel, of this <see cref="Image{T}"/>.
         /// </value>
-        public int BitsPerPixel { get; }
+        public int BitsPerPixel { get; private set; }
 
         /// <summary>
         /// Gets the offset, in sizes of <typeparamref name="T"/>, between the beginning of one scan line and the next.
@@ -133,7 +143,7 @@ namespace Genix.Imaging
         /// <value>
         /// The integer that specifies the offset between the beginning of one scan line and the next.
         /// </value>
-        public int Stride { get; }
+        public int Stride { get; private set; }
 
         /// <summary>
         /// Gets the number of bytes occupied in memory by this <see cref="Image{T}"/> bits.
@@ -173,15 +183,38 @@ namespace Genix.Imaging
         /// <value>
         /// The array that contains the image bits.
         /// </value>
-        public T[] Bits { get; }
+        public T[] Bits { get; private set; }
 
         /// <summary>
-        /// Changes image resolution whithout changing its size.
+        /// Gets the transformation performed on the image since it was first created.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Imaging.Transform"/> object that contains the image transformations.
+        /// </value>
+        public Transform Transform { get; private protected set; } = new IdentityTransform();
+
+        /// <summary>
+        /// Changes image resolution without changing its size.
         /// </summary>
         /// <param name="horizontalResolution">The horizontal resolution, in pixels per inch.</param>
         /// <param name="verticalResolution">The vertical resolution, in pixels per inch.</param>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="horizontalResolution"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="verticalResolution"/> is less than or equal to zero.</para>
+        /// </exception>
         public void SetResolution(int horizontalResolution, int verticalResolution)
         {
+            if (horizontalResolution <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidHorizontalResolution, nameof(horizontalResolution));
+            }
+
+            if (verticalResolution <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidVerticalResolution, nameof(verticalResolution));
+            }
+
             this.HorizontalResolution = horizontalResolution;
             this.VerticalResolution = verticalResolution;
         }
@@ -230,6 +263,50 @@ namespace Genix.Imaging
             int sizeInBytes = Marshal.SizeOf(default(T));
             int sizeInBits = sizeInBytes * 8;
             return ((width * bitsPerPixel) + sizeInBits - 1) / sizeInBits;
+        }
+
+        private protected void AllocateBits(int width, int height, int bitsPerPixel)
+        {
+            if (width <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidWidth, nameof(width));
+            }
+
+            if (height <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
+            }
+
+            if (this.Bits != null && this.Width == width && this.Height == height && this.BitsPerPixel == bitsPerPixel)
+            {
+                // nothing to do
+                // already allocated
+                return;
+            }
+
+            this.Width = width;
+            this.Height = height;
+            this.BitsPerPixel = bitsPerPixel;
+
+            this.Stride = Image<T>.CalculateStride(width, bitsPerPixel);
+            this.Bits = new T[this.Stride * height];
+        }
+
+        private protected void Attach(Image<T> source)
+        {
+            this.Width = source.Width;
+            this.Height = source.Height;
+            this.BitsPerPixel = source.BitsPerPixel;
+            this.Stride = source.Stride;
+            this.HorizontalResolution = source.HorizontalResolution;
+            this.VerticalResolution = source.VerticalResolution;
+            this.Bits = source.Bits;
+            this.Transform = source.Transform;
+        }
+
+        private protected void AppendTransform(Transform transform)
+        {
+            this.Transform = this.Transform.Append(transform);
         }
     }
 }

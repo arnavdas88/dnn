@@ -28,17 +28,19 @@ namespace Genix.Imaging
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ImageF(int width, int height, int horizontalResolution, int verticalResolution)
-            : base(width, height, 32, horizontalResolution, verticalResolution)
+            : base(width, height, 32, horizontalResolution, verticalResolution, null)
         {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ImageF(ImageF image)
-            : this(
+            : base(
             image.Width,
             image.Height,
+            image.BitsPerPixel,
             image.HorizontalResolution,
-            image.VerticalResolution)
+            image.VerticalResolution,
+            image.Transform)
         {
         }
 

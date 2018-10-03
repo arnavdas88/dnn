@@ -32,7 +32,7 @@ namespace Genix.DocumentAnalysis.OCR.Test
 
                     foreach ((Imaging.Image image, _, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
                     {
-                        PageShape answer = tess.Recognize(image.Convert1To8(), PageSegmentationMode.PSM_AUTO_OSD);
+                        PageShape answer = tess.Recognize(image.Convert1To8(null), PageSegmentationMode.PSM_AUTO_OSD);
                     }
                 }
             }

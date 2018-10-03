@@ -10,7 +10,7 @@
         public void ScaleToSizeTest()
         {
             Image image = new Image(118, 133, 1, 200, 200);
-            image = image.SetWhite();
+            image.SetWhite();
 
             image = image.ScaleToSize(113, 124, ScalingOptions.None);
         }

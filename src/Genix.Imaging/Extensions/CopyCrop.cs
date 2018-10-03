@@ -17,13 +17,62 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Copies the <see cref="Image"/>.
+        /// Creates of blank template with the dimensions of the this <see cref="Image"/> and specified bit depth.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="bitsPerPixel">The destination <see cref="Image"/> color depth, in number of bits per pixel.</param>
         /// <returns>
-        /// A new <see cref="Image"/> that is a copy of this instance.
+        /// The destination <see cref="Image"/>.
         /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Copy() => this.Clone(true);
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image CreateTemplate(Image dst, int bitsPerPixel)
+        {
+            if (dst == null)
+            {
+                return new Image(this.Width, this.Height, bitsPerPixel, this);
+            }
+            else
+            {
+                // reallocate destination
+                dst.AllocateBits(this.Width, this.Height, bitsPerPixel);
+                dst.SetResolution(this.HorizontalResolution, this.VerticalResolution);
+                dst.Transform = this.Transform;
+                return dst;
+            }
+        }
+
+        /// <summary>
+        /// Copies the data from this <see cref="Image"/> to destination <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the method returns this <see cref="Image"/>.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image Copy(Image dst)
+        {
+            if (dst == this)
+            {
+                return this;
+            }
+            else
+            {
+                // reallocate destination image
+                dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+                // copy bits
+                Vectors.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+
+                return dst;
+            }
+        }
 
         /// <summary>
         /// Copies a rectangular area specified by
@@ -34,32 +83,32 @@ namespace Genix.Imaging
         /// <param name="y">The y-coordinate, in pixels, of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width, in pixels, of the destination rectangle.</param>
         /// <param name="height">The height, in pixels, of the destination rectangle.</param>
-        /// <param name="source">The <see cref="Image"/> to copy from.</param>
-        /// <param name="srcx">The x-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
-        /// <param name="srcy">The y-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
+        /// <param name="src">The <see cref="Image"/> to copy from.</param>
+        /// <param name="xsrc">The x-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
+        /// <param name="ysrc">The y-coordinate, in pixels, of the upper-left corner of the source rectangle.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="source"/> is <b>null</b>.
+        /// <paramref name="src"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="source"/> and this <see cref="Image"/> are not the same.
+        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
-        public void CopyIP(int x, int y, int width, int height, Image source, int srcx, int srcy)
+        public void CopyFrom(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
-            if (source == null)
+            if (src == null)
             {
-                throw new ArgumentNullException(nameof(source));
+                throw new ArgumentNullException(nameof(src));
             }
 
             this.ValidateArea(x, y, width, height);
-            source.ValidateArea(srcx, srcy, width, height);
+            src.ValidateArea(xsrc, ysrc, width, height);
 
-            if (this.BitsPerPixel != source.BitsPerPixel)
+            if (this.BitsPerPixel != src.BitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            Image.CopyArea(source, srcx, srcy, width, height, this, x, y);
+            Image.CopyArea(this, x, y, width, height, src, xsrc, ysrc);
         }
 
         /// <summary>
@@ -68,11 +117,11 @@ namespace Genix.Imaging
         /// to the current <see cref="Image"/> in-place.
         /// </summary>
         /// <param name="area">The coordinates, in pixels, of the destination rectangle.</param>
-        /// <param name="source">The <see cref="Image"/> to copy from.</param>
+        /// <param name="src">The <see cref="Image"/> to copy from.</param>
         /// <param name="origin">The coordinates, in pixels, of the upper-left corner of the source rectangle.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void CopyIP(Rectangle area, Image source, Point origin) =>
-            this.CopyIP(area.X, area.Y, area.Width, area.Height, source, origin.X, origin.Y);
+        public void CopyFrom(Rectangle area, Image src, Point origin) =>
+            this.CopyFrom(area.X, area.Y, area.Width, area.Height, src, origin.X, origin.Y);
 
         /// <summary>
         /// Crops the <see cref="Image"/> using rectangle specified by a pair of coordinates, a width, and a height.
@@ -92,9 +141,9 @@ namespace Genix.Imaging
             this.ValidateArea(x, y, width, height);
 
             Image dst = new Image(width, height, this);
-            Image.CopyArea(this, x, y, width, height, dst, 0, 0);
+            Image.CopyArea(dst, 0, 0, width, height, this, x, y);
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(-x, -y));
+            dst.AppendTransform(new MatrixTransform(-x, -y));
             return dst;
         }
 
@@ -144,12 +193,12 @@ namespace Genix.Imaging
             {
                 Rectangle srcarea = Rectangle.Intersect(bounds, blackArea);
                 Rectangle dstarea = Rectangle.Offset(srcarea, -bounds.X, -bounds.Y);
-                Image.CopyArea(this, srcarea.X, srcarea.Y, srcarea.Width, srcarea.Height, dst, dstarea.X, dstarea.Y);
+                Image.CopyArea(dst, dstarea.X, dstarea.Y, srcarea.Width, srcarea.Height, this, srcarea.X, srcarea.Y);
 
                 if (this.BitsPerPixel > 1)
                 {
                     // set frame to white
-                    dst.SetWhiteBorderIP(dstarea);
+                    dst.SetWhiteBorder(dstarea);
                 }
             }
             else
@@ -161,11 +210,11 @@ namespace Genix.Imaging
                 }
             }
 
-            dst.Transform = this.Transform.Append(new MatrixTransform(-bounds.X, -bounds.Y));
+            dst.AppendTransform(new MatrixTransform(-bounds.X, -bounds.Y));
             return dst;
         }
 
-        private static void CopyArea(Image src, int x, int y, int width, int height, Image dst, int dstx, int dsty)
+        private static void CopyArea(Image dst, int xdst, int ydst, int width, int height, Image src, int xsrc, int ysrc)
         {
             ulong[] bitssrc = src.Bits;
             ulong[] bitsdst = dst.Bits;
@@ -173,14 +222,14 @@ namespace Genix.Imaging
             int stride1src = src.Stride1;
             int stride1dst = dst.Stride1;
 
-            int offsrc = (y * stride1src) + (x * src.BitsPerPixel);
-            int offdst = (dsty * stride1dst) + (dstx * src.BitsPerPixel);
+            int offsrc = (ysrc * stride1src) + (xsrc * src.BitsPerPixel);
+            int offdst = (ydst * stride1dst) + (xdst * src.BitsPerPixel);
 
             int count = width * src.BitsPerPixel;
 
-            if (stride1src == stride1dst && x == 0 && dstx == 0 && width == src.Width)
+            if (stride1src == stride1dst && xsrc == 0 && xdst == 0 && width == src.Width)
             {
-                Vectors.Copy(height * src.Stride, bitssrc, y * src.Stride, bitsdst, dsty * src.Stride);
+                Vectors.Copy(height * src.Stride, bitssrc, ysrc * src.Stride, bitsdst, ydst * dst.Stride);
             }
             else
             {

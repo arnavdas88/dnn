@@ -81,11 +81,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Logical.tt</DependentUpon>
     </Compile>
-    <Compile Include="Extensions\Morphology.Generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Morphology.tt</DependentUpon>
-    </Compile>
     <Compile Include="Extensions\RectangleStructuringElement.cs" />
     <Compile Include="Extensions\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
@@ -185,10 +180,6 @@
     <Content Include="Extensions\Logical.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Logical.Generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Extensions\Morphology.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Morphology.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Leptonica\SafeHandles.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

@@ -23,13 +23,14 @@ namespace Genix.Imaging
         /// <summary>
         /// Performs Gaussian filtering of the <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="kernelSize">The size of the Gaussian kernel (odd, greater or equal to 3).</param>
         /// <param name="sigma">The standard deviation of the Gaussian kernel.</param>
         /// <returns>
-        /// A new <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8 or 24.
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 bits per pixel.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The kernel size is not an odd number or it is less than three.</para>
@@ -40,15 +41,19 @@ namespace Genix.Imaging
         /// The kernel of the Gaussian filter is the matrix of size <paramref name="kernelSize"/>x<paramref name="kernelSize"/> with the standard deviation <paramref name="sigma"/>.
         /// The anchor cell is the center of the kernel.
         /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterGaussian(int kernelSize, float sigma)
+        public Image FilterGaussian(Image dst, int kernelSize, float sigma)
         {
             if (kernelSize < 3 || (kernelSize % 2) == 0)
             {
                 throw new ArgumentException("The kernel size must be an odd number greater or equal to three.", nameof(kernelSize));
             }
 
-            Image dst = this.Clone(false);
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
             switch (this.BitsPerPixel)
             {
@@ -73,6 +78,12 @@ namespace Genix.Imaging
                         string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
             return dst;
         }
 
@@ -80,12 +91,13 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies Laplace filter to the <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
-        /// A new <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The kernel size is not 3 or 5.</para>
@@ -106,8 +118,11 @@ namespace Genix.Imaging
         /// <para>    -4  6 20  6 -4</para>
         /// <para>    -3  0  6  0 -3</para>
         /// <para>    -1 -3 -4 -3 -1</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterLaplace(int maskSize)
+        public Image FilterLaplace(Image dst, int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -115,7 +130,8 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = this.Clone(false);
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
             switch (this.BitsPerPixel)
             {
@@ -148,6 +164,12 @@ namespace Genix.Imaging
                         string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
             return dst;
         }
 
@@ -155,12 +177,13 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies high-pass filter to the <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
-        /// A new <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The kernel size is not 3 or 5.</para>
@@ -181,8 +204,11 @@ namespace Genix.Imaging
         /// <para>    -1 -1 24 -1 -1</para>
         /// <para>    -1 -1 -1 -1 -1</para>
         /// <para>    -1 -1 -1 -1 -1</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterHipass(int maskSize)
+        public Image FilterHipass(Image dst, int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -190,7 +216,8 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = this.Clone(false);
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
             switch (this.BitsPerPixel)
             {
@@ -223,6 +250,12 @@ namespace Genix.Imaging
                         string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
             }
 
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
             return dst;
         }
 
@@ -230,12 +263,13 @@ namespace Genix.Imaging
         /// <summary>
         /// Applies lowpass filter to the <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
         /// <returns>
-        /// A new <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8.
+        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
         /// <para>The kernel size is not 3 or 5.</para>
@@ -256,8 +290,11 @@ namespace Genix.Imaging
         /// <para>    1/25 1/25 1/25 1/25 1/25</para>
         /// <para>    1/25 1/25 1/25 1/25 1/25</para>
         /// <para>    1/25 1/25 1/25 1/25 1/25</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterLowpass(int maskSize)
+        public Image FilterLowpass(Image dst, int maskSize)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -265,7 +302,8 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
-            Image dst = this.Clone(false);
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
             switch (this.BitsPerPixel)
             {
@@ -280,6 +318,12 @@ namespace Genix.Imaging
                 default:
                     throw new NotSupportedException(
                         string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
             }
 
             return dst;

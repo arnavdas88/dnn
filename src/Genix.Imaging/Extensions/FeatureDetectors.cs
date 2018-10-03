@@ -42,7 +42,7 @@ namespace Genix.Imaging
             bool convert1bpp = false;
             if (this.BitsPerPixel == 1)
             {
-                src = this.Convert1To8();
+                src = this.Convert1To8(null);
                 convert1bpp = true;
             }
             else
@@ -65,7 +65,7 @@ namespace Genix.Imaging
             // convert back to 1bpp
             if (convert1bpp)
             {
-                dst = dst.Convert8To1(1);
+                dst.Convert8To1(dst, 1);
             }
 
             return dst;
@@ -191,7 +191,7 @@ namespace Genix.Imaging
             {
                 // convert image to 8bpp, then float
                 return this
-                    .ConvertTo(8)
+                    .ConvertTo(null, 8)
                     .Convert8To32f(
                         ComputeImageSize(this.Width),
                         ComputeImageSize(this.Height),

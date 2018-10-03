@@ -27,15 +27,15 @@
         {
             Name = "Add",
             NativeName = "_add",
-            Summary = "Adds pixel values of two images",
-            Remarks = "<para>This method adds corresponding pixel values of two images and places the results in a destination image.</para>",
+            Summary = "Adds pixel values of two images.",
+            Remarks = "<para>This method adds corresponding pixel values of <paramref name=\"src\"/> to this <see cref=\"Image\"/> and places the results in a destination image.</para>",
         },
         new MethodDescriptor()
         {
             Name = "Sub",
             NativeName = "_sub",
-            Summary = "Subtracts pixel values of two images",
-            Remarks = "<para>This method subtracts corresponding pixel values of two images and places the results in a destination image.</para>",
+            Summary = "Subtracts pixel values of two images.",
+            Remarks = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/> and places the results in a destination image.</para>",
         },
     };
 #>
@@ -52,12 +52,13 @@ namespace Genix.Imaging
 <#  foreach (MethodDescriptor method in methods) { #>
 
         /// <summary>
-        /// <#=method.Summary#> not-in-place.
+        /// <#=method.Summary#>
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="src">The <see cref="Image"/> to add.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
         /// <returns>
-        /// A new destination <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <remarks>
         /// <#=method.Remarks#>
@@ -68,18 +69,20 @@ namespace Genix.Imaging
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="src"/> is <b>null</b>.</para>
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of this <see cref="Image"/> and <paramref name="src"/> are not the same.
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
-        public Image <#=method.Name#>(Image src, int scaleFactor)
+        public Image <#=method.Name#>(Image dst, Image src, int scaleFactor)
         {
             if (src == null)
             {
@@ -95,21 +98,24 @@ namespace Genix.Imaging
             {
 <#      if (method.Name == "Add") { #>
                 case 1:
-                    return this.Or(src);
+                    dst = this.Or(dst, src);
+                    break;
 <#      } else if (method.Name == "Sub") { #>
                 case 1:
-                    return this.Xand(src);
+                    dst = this.Xand(dst, src);
+                    break;
 <#      } #>
 
                 case 8:
                 case 24:
                 case 32:
-                    Image dst = this.Clone(false);
+                    dst = this.Copy(dst);
+
                     NativeMethods.<#=method.NativeName#>(
                         this.BitsPerPixel,
                         Core.MinMax.Min(this.Width, src.Width),
                         Core.MinMax.Min(this.Height, src.Height),
-                        this.Bits,
+                        dst == this ? null : this.Bits,
                         this.Stride8,
                         src.Bits,
                         src.Stride8,
@@ -124,79 +130,8 @@ namespace Genix.Imaging
                         Properties.Resources.E_UnsupportedDepth,
                         this.BitsPerPixel));
             }
-        }
 
-        /// <summary>
-        /// <#=method.Summary#> in-place.
-        /// </summary>
-        /// <param name="src">The <see cref="Image"/> to add.</param>
-        /// <param name="scaleFactor">The scaling factor.</param>
-        /// <remarks>
-        /// <#=method.Remarks#>
-        /// <para>
-        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
-        /// </para>
-        /// <para>
-        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
-        /// </para>
-        /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="src"/> is <b>null</b>.</para>
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is not 8, 24, or 32.
-        /// </exception>
-        public void <#=method.Name#>IP(Image src, int scaleFactor)
-        {
-            if (src == null)
-            {
-                throw new ArgumentNullException(nameof(src));
-            }
-
-            if (src.BitsPerPixel != this.BitsPerPixel)
-            {
-                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
-            }
-
-            switch (this.BitsPerPixel)
-            {
-<#      if (method.Name == "Add") { #>
-                case 1:
-                    this.OrIP(src);
-                    break;
-<#      } else if (method.Name == "Sub") { #>
-                case 1:
-                    this.XandIP(src);
-                    break;
-<#      } #>
-
-                case 8:
-                case 24:
-                case 32:
-                    NativeMethods.<#=method.NativeName#>(
-                        this.BitsPerPixel,
-                        Core.MinMax.Min(src.Width, this.Width),
-                        Core.MinMax.Min(src.Height, this.Height),
-                        src.Bits,
-                        src.Stride8,
-                        null,
-                        0,
-                        this.Bits,
-                        this.Stride8,
-                        scaleFactor);
-                    break;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
-            }
+            return dst;
         }
 <#  } #>
 

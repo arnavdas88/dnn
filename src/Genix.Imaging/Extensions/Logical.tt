@@ -66,15 +66,10 @@ namespace Genix.Imaging
 #>
 
         /// <summary>
-        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="src">The right-side operand of this operation.</param>
-        /// <remarks>
-        /// <para>
-        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
-        /// </para>
-        /// </remarks>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -85,21 +80,34 @@ namespace Genix.Imaging
         /// The images have a different depth.
         /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
         /// </exception>
-        public Image <#=functionName#>(Image src)
+        /// <remarks>
+        /// <para>
+        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
+        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
+        /// </para>
+        /// </remarks>
+        public Image <#=functionName#>(Image dst, Image src)
         {
             if (src == null)
             {
                 throw new ArgumentNullException(nameof(src));
             }
 
-            Image dst = this.Clone(true);
-            dst.<#=functionName#>IP(src);
-            return dst;
+            return this.<#=functionName#>(
+                dst,
+                0,
+                0,
+                Math.Min(this.Width, src.Width),
+                Math.Min(this.Height, src.Height),
+                src,
+                0,
+                0);
         }
 
         /// <summary>
-        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> not-in-place.
+        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width of the source and destination rectangles.</param>
@@ -108,7 +116,7 @@ namespace Genix.Imaging
         /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
         /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
         /// <returns>
-        /// The <see cref="Image"/> that receives the data.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="src"/> is <b>null</b>.
@@ -122,58 +130,7 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
         /// </exception>
-        public Image <#=functionName#>(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
-        {
-            Image dst = this.Clone(true);
-            dst.<#=functionName#>IP(x, y, width, height, src, xsrc, ysrc);
-            return dst;
-        }
-
-        /// <summary>
-        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="src">The right-side operand of this operation.</param>
-        /// <remarks>
-        /// <para>
-        /// <paramref name="src"/> and this <see cref="Image"/> do not have to have the same width and height.
-        /// If image sizes are different, the operation is performed in this <see cref="Image"/> upper-left corner.
-        /// </para>
-        /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        public void <#=functionName#>IP(Image src)
-        {
-            this.<#=functionName#>IP(0, 0, Core.MinMax.Min(this.Width, src.Width), Core.MinMax.Min(this.Height, src.Height), src, 0, 0);
-        }
-
-        /// <summary>
-        /// Performs logical <#=functionName.ToUpperInvariant()#> operation on a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="width">The width of the source and destination rectangles.</param>
-        /// <param name="height">The height of the source and destination rectangles.</param>
-        /// <param name="src">The right-side operand of this operation.</param>
-        /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="src"/> is <b>null</b>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// The images have a different depth.
-        /// The <see cref="Image{T}.BitsPerPixel"/> properties of <paramref name="src"/> and this <see cref="Image"/> are not the same.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// <para>-or-</para>
-        /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
-        /// </exception>
-        public void <#=functionName#>IP(int x, int y, int width, int height, Image src, int xsrc, int ysrc)
+        public Image <#=functionName#>(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
             if (src == null)
             {
@@ -183,20 +140,24 @@ namespace Genix.Imaging
             this.ValidateArea(x, y, width, height);
             src.ValidateArea(xsrc, ysrc, width, height);
 
-            if (this.BitsPerPixel != src.BitsPerPixel)
+            int bitsPerPixel = this.BitsPerPixel;
+            if (src.BitsPerPixel != bitsPerPixel)
             {
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
+            // copy to destination image
+            dst = this.Copy(dst);
+
             int stridesrc = src.Stride1;
-            int stridedst = this.Stride1;
+            int stridedst = dst.Stride1;
             ulong[] bitssrc = src.Bits;
-            ulong[] bitsdst = this.Bits;
+            ulong[] bitsdst = dst.Bits;
 
-            int possrc = (ysrc * stridesrc) + (xsrc * this.BitsPerPixel);
-            int posdst = (y * stridedst) + (x * this.BitsPerPixel);
+            int possrc = (ysrc * stridesrc) + (xsrc * bitsPerPixel);
+            int posdst = (y * stridedst) + (x * bitsPerPixel);
 
-            if (x == 0 && xsrc == 0 && stridesrc == stridedst && width == this.Width)
+            if (x == 0 && xsrc == 0 && stridesrc == stridedst && width == dst.Width)
             {
                 // operation is performed on entire pixel line
                 // do all lines at once
@@ -204,12 +165,14 @@ namespace Genix.Imaging
             }
             else
             {
-                int count = width * this.BitsPerPixel;
+                int count = width * bitsPerPixel;
                 for (int iy = 0; iy < height; iy++, possrc += stridesrc, posdst += stridedst)
                 {
                     BitUtils.<#=functionName#>(count, bitssrc, possrc, bitsdst, posdst);
                 }
             }
+
+            return dst;
         }
 <#
     }

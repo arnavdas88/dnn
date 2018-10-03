@@ -33,7 +33,7 @@ namespace Genix.Imaging
 
             if (matrix.IsIdentity)
             {
-                return this.Copy();
+                return this.Copy(null);
             }
 
             // calculate new image size and position
@@ -59,7 +59,7 @@ namespace Genix.Imaging
             bool convert1bpp = false;
             if (this.BitsPerPixel == 1)
             {
-                grayImage = this.Convert1To8();
+                grayImage = this.Convert1To8(null);
                 borderValue = borderValue != 0 ? 0u : 255u;
                 convert1bpp = true;
             }
@@ -95,7 +95,7 @@ namespace Genix.Imaging
             // convert back to 1bpp
             if (convert1bpp)
             {
-                transformedImage = transformedImage.Convert8To1(1);
+                transformedImage.Convert8To1(transformedImage, 1);
                 /*using (Pix pixs = transformedImage.CreatePix())
                 {
                     using (Pix pixd = pixs.pixOtsu(false))
@@ -108,7 +108,7 @@ namespace Genix.Imaging
                 }*/
             }
 
-            transformedImage.Transform = this.Transform.Append(new MatrixTransform(matrix));
+            transformedImage.AppendTransform(new MatrixTransform(matrix));
             return transformedImage;
 
             System.Windows.Point TransformPoint(int ptx, int pty)
@@ -135,7 +135,7 @@ namespace Genix.Imaging
             float a = (float)(Math.PI * (angle / 180.0));
             if (Math.Abs(a) < 0.001f)
             {
-                return this.Copy();
+                return this.Copy(null);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;

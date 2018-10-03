@@ -46,106 +46,96 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
-        /// Inverts all pixels in this <see cref="Image"/> not-in-place.
+        /// Inverts all pixels in this <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <returns>
-        /// A new inverted <see cref="Image"/>.
+        /// The destination <see cref="Image"/>.
         /// </returns>
-        public Image Not()
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image Not(Image dst)
         {
-            Image dst = this.Clone(false);
-            Vectors.Not(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+            if (dst == this)
+            {
+                Vectors.Not(this.Bits.Length, this.Bits, 0);
+            }
+            else
+            {
+                dst = this.CreateTemplate(dst, this.BitsPerPixel);
+                Vectors.Not(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+            }
+
             return dst;
         }
 
         /// <summary>
-        /// Inverts all pixels in this <see cref="Image"/> in-place.
+        /// Computes a larger of each pixel value and a constant value of this <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void NotIP() => Vectors.Not(this.Bits.Length, this.Bits, 0);
-
-        /// <summary>
-        /// Computes a larger of each pixel value and a constant value of this <see cref="Image"/> not-in-place.
-        /// </summary>
-        /// <param name="color">The constant value.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
-        /// </returns>
         [CLSCompliant(false)]
-        public Image MaxC(uint color)
-        {
-            Image dst = this.Clone(true);
-            dst.MaxCIP(color);
-            return dst;
-        }
+        public Image MaxC(Image dst, uint color) => this.MaxC(dst, 0, 0, this.Width, this.Height, color);
 
         /// <summary>
-        /// Computes a larger of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> not-in-place.
+        /// Computes a larger of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width of the source and destination rectangles.</param>
         /// <param name="height">The height of the source and destination rectangles.</param>
         /// <param name="color">The constant value.</param>
         /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
         /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
         [CLSCompliant(false)]
-        public Image MaxC(int x, int y, int width, int height, uint color)
-        {
-            Image dst = this.Clone(true);
-            dst.MaxCIP(x, y, width, height, color);
-            return dst;
-        }
-
-        /// <summary>
-        /// Computes a larger of each pixel value and a constant value of this <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="color">The constant value.</param>
-        [CLSCompliant(false)]
-        public void MaxCIP(uint color)
-        {
-            this.MaxCIP(0, 0, this.Width, this.Height, color);
-        }
-
-        /// <summary>
-        /// Computes a larger of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="width">The width of the source and destination rectangles.</param>
-        /// <param name="height">The height of the source and destination rectangles.</param>
-        /// <param name="color">The constant value.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// </exception>
-        [CLSCompliant(false)]
-        public void MaxCIP(int x, int y, int width, int height, uint color)
+        public Image MaxC(Image dst, int x, int y, int width, int height, uint color)
         {
             this.ValidateArea(x, y, width, height);
 
-            color &= this.MaxColor;
+            // create a copy of this image
+            dst = this.Copy(dst);
+
+            color &= dst.MaxColor;
             if (color != 0)
             {
-                if (this.BitsPerPixel == this.MaxColor)
+                if (dst.BitsPerPixel == dst.MaxColor)
                 {
-                    this.SetToOneIP(x, y, width, height);
+                    dst.SetToOne(x, y, width, height);
                 }
                 else
                 {
                     unsafe
                     {
-                        fixed (ulong* bits = &this.Bits[y * this.Stride])
+                        fixed (ulong* bits = &dst.Bits[y * dst.Stride])
                         {
-                            switch (this.BitsPerPixel)
+                            switch (dst.BitsPerPixel)
                             {
                                 case 8:
                                     {
-                                        int stride8 = this.Stride8;
-                                        if (x == 0 && width == this.Width)
+                                        int stride8 = dst.Stride8;
+                                        if (x == 0 && width == dst.Width)
                                         {
                                             Vectors.MaxC(height * stride8, (byte)color, (byte*)bits);
                                         }
@@ -162,8 +152,8 @@ namespace Genix.Imaging
 
                                 case 16:
                                     {
-                                        int stride16 = this.Stride8 / sizeof(ushort);
-                                        if (x == 0 && width == this.Width)
+                                        int stride16 = dst.Stride8 / sizeof(ushort);
+                                        if (x == 0 && width == dst.Width)
                                         {
                                             Vectors.MaxC(height * stride16, (ushort)color, (ushort*)bits);
                                         }
@@ -181,12 +171,12 @@ namespace Genix.Imaging
                                 case 24:
                                 case 32:
                                     {
-                                        int stride8 = this.Stride8;
+                                        int stride8 = dst.Stride8;
 
-                                        ulong[] colors = this.ColorScanline(Image.CalculateStride(width, this.BitsPerPixel), color);
+                                        ulong[] colors = dst.ColorScanline(Image.CalculateStride(width, dst.BitsPerPixel), color);
                                         fixed (ulong* mask = colors)
                                         {
-                                            int bytesPerPixel = this.BitsPerPixel / 8;
+                                            int bytesPerPixel = dst.BitsPerPixel / 8;
                                             for (int i = 0, off = x * bytesPerPixel, count = width * bytesPerPixel; i < height; i++, off += stride8)
                                             {
                                                 Vectors.Max(count, (byte*)mask, (byte*)bits + off);
@@ -200,96 +190,80 @@ namespace Genix.Imaging
                                     throw new NotSupportedException(string.Format(
                                         CultureInfo.InvariantCulture,
                                         Properties.Resources.E_UnsupportedDepth,
-                                        this.BitsPerPixel));
+                                        dst.BitsPerPixel));
                             }
                         }
                     }
                 }
             }
-        }
 
-        /// <summary>
-        /// Computes a smaller of each pixel value and a constant value of this <see cref="Image"/> not-in-place.
-        /// </summary>
-        /// <param name="color">The constant value.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
-        /// </returns>
-        [CLSCompliant(false)]
-        public Image MinC(uint color)
-        {
-            Image dst = this.Clone(true);
-            dst.MinCIP(color);
             return dst;
         }
 
         /// <summary>
-        /// Computes a smaller of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> not-in-place.
+        /// Computes a smaller of each pixel value and a constant value of this <see cref="Image"/>.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="color">The constant value.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public Image MinC(Image dst, uint color) => this.MinC(dst, 0, 0, this.Width, this.Height, color);
+
+        /// <summary>
+        /// Computes a smaller of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
         /// <param name="width">The width of the source and destination rectangles.</param>
         /// <param name="height">The height of the source and destination rectangles.</param>
         /// <param name="color">The constant value.</param>
         /// <returns>
-        /// The destination <see cref="Image"/> this method creates.
+        /// The destination <see cref="Image"/>.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
         /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
         [CLSCompliant(false)]
-        public Image MinC(int x, int y, int width, int height, uint color)
-        {
-            Image dst = this.Clone(true);
-            dst.MinCIP(x, y, width, height, color);
-            return dst;
-        }
-
-        /// <summary>
-        /// Computes a smaller of each pixel value and a constant value of this <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="color">The constant value.</param>
-        [CLSCompliant(false)]
-        public void MinCIP(uint color)
-        {
-            this.MinCIP(0, 0, this.Width, this.Height, color);
-        }
-
-        /// <summary>
-        /// Computes a smaller of each pixel value and a constant value in a rectangular block of pixels of this <see cref="Image"/> in-place.
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
-        /// <param name="width">The width of the source and destination rectangles.</param>
-        /// <param name="height">The height of the source and destination rectangles.</param>
-        /// <param name="color">The constant value.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// </exception>
-        [CLSCompliant(false)]
-        public void MinCIP(int x, int y, int width, int height, uint color)
+        public Image MinC(Image dst, int x, int y, int width, int height, uint color)
         {
             this.ValidateArea(x, y, width, height);
 
-            color &= this.MaxColor;
-            if (color != this.MaxColor)
+            // create a copy of this image
+            dst = this.Copy(dst);
+
+            color &= dst.MaxColor;
+            if (color != dst.MaxColor)
             {
-                if (this.BitsPerPixel == 0)
+                if (dst.BitsPerPixel == 0)
                 {
-                    this.SetToZeroIP(x, y, width, height);
+                    dst.SetToZero(x, y, width, height);
                 }
                 else
                 {
                     unsafe
                     {
-                        fixed (ulong* bits = &this.Bits[y * this.Stride])
+                        fixed (ulong* bits = &dst.Bits[y * dst.Stride])
                         {
-                            switch (this.BitsPerPixel)
+                            switch (dst.BitsPerPixel)
                             {
                                 case 8:
                                     {
-                                        int stride8 = this.Stride8;
-                                        if (x == 0 && width == this.Width)
+                                        int stride8 = dst.Stride8;
+                                        if (x == 0 && width == dst.Width)
                                         {
                                             Vectors.MinC(height * stride8, (byte)color, (byte*)bits);
                                         }
@@ -306,8 +280,8 @@ namespace Genix.Imaging
 
                                 case 16:
                                     {
-                                        int stride16 = this.Stride8 / sizeof(ushort);
-                                        if (x == 0 && width == this.Width)
+                                        int stride16 = dst.Stride8 / sizeof(ushort);
+                                        if (x == 0 && width == dst.Width)
                                         {
                                             Vectors.MinC(height * stride16, (ushort)color, (ushort*)bits);
                                         }
@@ -325,11 +299,11 @@ namespace Genix.Imaging
                                 case 24:
                                 case 32:
                                     {
-                                        ulong[] colors = this.ColorScanline(Image.CalculateStride(width, this.BitsPerPixel), color);
+                                        ulong[] colors = dst.ColorScanline(Image.CalculateStride(width, dst.BitsPerPixel), color);
                                         fixed (ulong* mask = colors)
                                         {
-                                            int stride8 = this.Stride8;
-                                            int bytesPerPixel = this.BitsPerPixel / 8;
+                                            int stride8 = dst.Stride8;
+                                            int bytesPerPixel = dst.BitsPerPixel / 8;
                                             for (int i = 0, off = x * bytesPerPixel, count = width * bytesPerPixel; i < height; i++, off += stride8)
                                             {
                                                 Vectors.Min(count, (byte*)mask, (byte*)bits + off);
@@ -343,12 +317,14 @@ namespace Genix.Imaging
                                     throw new NotSupportedException(string.Format(
                                         CultureInfo.InvariantCulture,
                                         Properties.Resources.E_UnsupportedDepth,
-                                        this.BitsPerPixel));
+                                        dst.BitsPerPixel));
                             }
                         }
                     }
                 }
             }
+
+            return dst;
         }
 
         /// <summary>
@@ -459,7 +435,7 @@ namespace Genix.Imaging
             switch (this.BitsPerPixel)
             {
                 case 1:
-                    this.OrIP(x, y, width, height, src, xsrc, ysrc);
+                    this.Or(this, x, y, width, height, src, xsrc, ysrc);
                     break;
 
                 case 8:
@@ -625,7 +601,7 @@ namespace Genix.Imaging
             switch (this.BitsPerPixel)
             {
                 case 1:
-                    this.AndIP(x, y, width, height, src, xsrc, ysrc);
+                    this.And(this, x, y, width, height, src, xsrc, ysrc);
                     break;
 
                 case 8:
