@@ -111,7 +111,31 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public void SetColor(uint color)
         {
-            Vectors.Set(this.Bits.Length, this.ColorBits(color), this.Bits, 0);
+            if (this.BitsPerPixel == 24)
+            {
+                byte bcolor = (byte)(color & 0xff);
+                if (bcolor == (byte)((color >> 8) & 0xff) && bcolor == (byte)((color >> 16) & 0xff))
+                {
+                    // all components are the same - set bytes
+                    unsafe
+                    {
+                        fixed (ulong* bits = this.Bits)
+                        {
+                            Vectors.Set(this.Height * this.Stride8, bcolor, (byte*)bits);
+                        }
+                    }
+                }
+                else
+                {
+                    ulong[] colors = this.ColorScanline(Image.CalculateStride(this.Width, 24), color);
+                    Vectors.Tile(this.Stride, this.Height, colors, 0, this.Bits, 0);
+
+                }
+            }
+            else
+            {
+                Vectors.Set(this.Bits.Length, this.ColorBits(color), this.Bits, 0);
+            }
         }
 
         /// <summary>
@@ -130,40 +154,99 @@ namespace Genix.Imaging
         {
             this.ValidateArea(x, y, width, height);
 
-            ulong[] bits = this.Bits;
-            ulong colorbits = this.ColorBits(color);
-
-            if (x == 0 && width == this.Width)
+            if (this.BitsPerPixel == 24)
             {
-                // set multiple scan lines at once
-                // if entire image width has to be set
-                Vectors.Set(height * this.Stride, colorbits, bits, y * this.Stride);
-            }
-            else
-            {
-                int stride1 = this.Stride1;
-                int count = width * this.BitsPerPixel;
-                int off = (y * stride1) + (x * this.BitsPerPixel);
-
-                if (colorbits == 0)
+                byte bcolor = (byte)(color & 0xff);
+                if (bcolor == (byte)((color >> 8) & 0xff) && bcolor == (byte)((color >> 16) & 0xff))
                 {
-                    for (int i = 0; i < height; i++, off += stride1)
+                    // all components are the same - set bytes
+                    unsafe
                     {
-                        BitUtils.ResetBits(count, bits, off);
-                    }
-                }
-                else if (colorbits == ulong.MaxValue)
-                {
-                    for (int i = 0; i < height; i++, off += stride1)
-                    {
-                        BitUtils.SetBits(count, bits, off);
+                        fixed (ulong* bits = &this.Bits[y * this.Stride])
+                        {
+                            byte* bbits = (byte*)bits;
+                            if (x == 0 && width == this.Width)
+                            {
+                                // set multiple scan lines at once
+                                // if entire image width has to be set
+                                Vectors.Set(height * this.Stride8, bcolor, bbits);
+                            }
+                            else
+                            {
+                                bbits += x * 3;
+                                for (int i = 0, count = width * 3, stride8 = this.Stride8; i < height; i++, bbits += stride8)
+                                {
+                                    Vectors.Set(count, bcolor, bbits);
+                                }
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < height; i++, off += stride1)
+                    ulong[] colors = this.ColorScanline(Image.CalculateStride(width, 24), color);
+
+                    if (x == 0 && width == this.Width)
                     {
-                        BitUtils.SetBits(count, colorbits, bits, off);
+                        // set multiple scan lines at once
+                        // if entire image width has to be set
+                        Vectors.Tile(this.Stride, height, colors, 0, this.Bits, y * this.Stride);
+                    }
+                    else
+                    {
+                        unsafe
+                        {
+                            fixed (ulong* bits = &this.Bits[y * this.Stride], ucolors = colors)
+                            {
+                                byte* bbits = (byte*)bits + (x * 3);
+                                byte* bcolors = (byte*)ucolors;
+
+                                for (int i = 0, count = width * 3, stride8 = this.Stride8; i < height; i++, bbits += stride8)
+                                {
+                                    Vectors.Copy(count, bcolors, bbits);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                ulong colorbits = this.ColorBits(color);
+                ulong[] bits = this.Bits;
+
+                if (x == 0 && width == this.Width)
+                {
+                    // set multiple scan lines at once
+                    // if entire image width has to be set
+                    Vectors.Set(height * this.Stride, colorbits, bits, y * this.Stride);
+                }
+                else
+                {
+                    int stride1 = this.Stride1;
+                    int count = width * this.BitsPerPixel;
+                    int off = (y * stride1) + (x * this.BitsPerPixel);
+
+                    if (colorbits == 0)
+                    {
+                        for (int i = 0; i < height; i++, off += stride1)
+                        {
+                            BitUtils.ResetBits(count, bits, off);
+                        }
+                    }
+                    else if (colorbits == ulong.MaxValue)
+                    {
+                        for (int i = 0; i < height; i++, off += stride1)
+                        {
+                            BitUtils.SetBits(count, bits, off);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < height; i++, off += stride1)
+                        {
+                            BitUtils.SetBits(count, colorbits, bits, off);
+                        }
                     }
                 }
             }

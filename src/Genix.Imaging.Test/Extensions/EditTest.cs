@@ -1,12 +1,24 @@
 ﻿namespace Genix.Imaging.Test
 {
     using System;
+    using System.Collections.Generic;
     using Genix.Drawing;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class EditTest
     {
+        private readonly Dictionary<int, uint[]> colors = new Dictionary<int, uint[]>()
+        {
+            { 1, new uint[] { 0, uint.MaxValue } },
+            { 2, new uint[] { 0, 1, 2, uint.MaxValue } },
+            { 4, new uint[] { 0, 5, 12, uint.MaxValue } },
+            { 8, new uint[] { 0, 43, 157, uint.MaxValue } },
+            { 16, new uint[] { 0, 1234, 6789, uint.MaxValue } },
+            { 24, new uint[] { 0, 0x124578, 0x454545, 0x875421, uint.MaxValue } },
+            { 32, new uint[] { 0, 0x124578ab, 0x45454545, 0xba875421, uint.MaxValue } },
+        };
+
         [TestMethod]
         public void GetPixelSetPixelTest1()
         {
@@ -43,8 +55,6 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
-
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
@@ -55,7 +65,7 @@
                 {
                     for (int y = 0; y < whiteImage.Height; y++)
                     {
-                        Assert.AreEqual(whiteColor, whiteImage.GetPixel(x, y));
+                        Assert.AreEqual(image.WhiteColor, whiteImage.GetPixel(x, y));
                     }
                 }
             }
@@ -69,14 +79,13 @@
                 new Rectangle(5, 12, (32 * 0) + 17, 20),
                 new Rectangle(5, 12, (32 * 1) + 17, 20),
                 new Rectangle(5, 12, (32 * 2) + 17, 20),
+                new Rectangle(0, 12, (32 * 2) + 23, 20),
             };
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
                 {
-                    uint whiteColor = bitsPerPixel == 1 ? 0u : (uint)(ulong.MaxValue >> (64 - bitsPerPixel));
-
                     Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                     image.Randomize();
 
@@ -87,7 +96,7 @@
                     {
                         for (int y = 0; y < whiteImage.Height; y++)
                         {
-                            uint color = area.Contains(x, y) ? whiteColor : image.GetPixel(x, y);
+                            uint color = area.Contains(x, y) ? image.WhiteColor : image.GetPixel(x, y);
                             Assert.AreEqual(color, whiteImage.GetPixel(x, y));
                         }
                     }
@@ -100,8 +109,6 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
-
                 Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                 image.Randomize();
 
@@ -112,7 +119,7 @@
                 {
                     for (int y = 0; y < blackImage.Height; y++)
                     {
-                        Assert.AreEqual(blackColor, blackImage.GetPixel(x, y));
+                        Assert.AreEqual(image.BlackColor, blackImage.GetPixel(x, y));
                     }
                 }
             }
@@ -126,14 +133,13 @@
                 new Rectangle(5, 12, (32 * 0) + 17, 20),
                 new Rectangle(5, 12, (32 * 1) + 17, 20),
                 new Rectangle(5, 12, (32 * 2) + 17, 20),
-            };
+                new Rectangle(0, 12, (32 * 2) + 23, 20),
+           };
 
             foreach (Rectangle area in areas)
             {
-                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, /*24,*/ 32 })
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
                 {
-                    uint blackColor = bitsPerPixel == 1 ? 1u : 0u;
-
                     Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
                     image.Randomize();
 
@@ -144,8 +150,68 @@
                     {
                         for (int y = 0; y < blackImage.Height; y++)
                         {
-                            uint color = area.Contains(x, y) ? blackColor : image.GetPixel(x, y);
+                            uint color = area.Contains(x, y) ? image.BlackColor : image.GetPixel(x, y);
                             Assert.AreEqual(color, blackImage.GetPixel(x, y));
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void SetColorTest1()
+        {
+            foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
+            {
+                foreach (uint color in this.colors[bitsPerPixel])
+                {
+                    Image image = new Image((64 * 4) + 23, 43, bitsPerPixel, 200, 200);
+                    image.Randomize();
+
+                    Image coloredImage = image.Clone(true);
+                    coloredImage.SetColor(color);
+
+                    for (int x = 0; x < coloredImage.Width; x++)
+                    {
+                        for (int y = 0; y < coloredImage.Height; y++)
+                        {
+                            Assert.AreEqual(color & image.MaxColor, coloredImage.GetPixel(x, y), $"bpp={bitsPerPixel}");
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void SetColorTest2()
+        {
+            Rectangle[] areas = new Rectangle[]
+            {
+                new Rectangle(5, 12, (32 * 0) + 17, 20),
+                new Rectangle(5, 12, (32 * 1) + 17, 20),
+                new Rectangle(5, 12, (32 * 2) + 17, 20),
+                new Rectangle(0, 12, (32 * 2) + 23, 20),
+            };
+
+            foreach (Rectangle area in areas)
+            {
+                foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
+                {
+                    foreach (uint color in this.colors[bitsPerPixel])
+                    {
+                        Image image = new Image((32 * 2) + 23, 43, bitsPerPixel, 200, 200);
+                        image.Randomize();
+
+                        Image coloredImage = image.Clone(true);
+                        coloredImage.SetColor(area, color);
+
+                        for (int x = 0; x < coloredImage.Width; x++)
+                        {
+                            for (int y = 0; y < coloredImage.Height; y++)
+                            {
+                                uint c = area.Contains(x, y) ? color & image.MaxColor : image.GetPixel(x, y);
+                                Assert.AreEqual(c, coloredImage.GetPixel(x, y), $"bpp={bitsPerPixel}");
+                            }
                         }
                     }
                 }
@@ -180,7 +246,6 @@
                 Assert.AreEqual(image.Bounds.Area - area.Area, count);
             }
         }
-
 
         [TestMethod]
         public void SetWhiteBorderTest()

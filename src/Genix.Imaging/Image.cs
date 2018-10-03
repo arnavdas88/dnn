@@ -287,12 +287,12 @@ namespace Genix.Imaging
                     buf[0] = ucolor | (ucolor << 48);
                     if (length > 1)
                     {
-                        buf[1] = (ucolor >> 16) | (ucolor << 32);
+                        buf[1] = ((ucolor >> 16) & 0x0000_0000_ffff_fffful) | (ucolor << 32);
                     }
 
                     if (length > 2)
                     {
-                        buf[2] = (ucolor >> 32) | (ucolor << 16);
+                        buf[2] = ((ucolor >> 32) & 0x0000_0000_0000_fffful) | (ucolor << 16);
                     }
 
                     if (length > 3)
