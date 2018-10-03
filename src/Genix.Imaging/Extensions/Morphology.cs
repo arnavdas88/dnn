@@ -54,13 +54,13 @@ namespace Genix.Imaging
                 throw new ArgumentException("The number of iterations is equal to or less than zero.");
             }
 
-            dst = this.Copy(dst);
-
             // special case for rectangular kernel
             // instead of applying m x n mask
             // we sequentially apply m x 1 and 1 x n masks
             if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
             {
+                dst = this.Copy(dst);
+
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
                     dst.Dilate(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
@@ -69,34 +69,41 @@ namespace Genix.Imaging
             }
             else
             {
-                Size size = Size.Scale(Size.Add(se.Size, -1, -1), iterations, iterations);
-                Point anchor = Point.Scale(se.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
+                bool inplace = dst == this;
+                dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-                Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+                Image src = this;
                 Image mask = src.Clone(false);
+
+                Size size = Size.Add(se.Size, -1, -1);
+                Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
+                Rectangle border = new Rectangle(anchor.X, anchor.Y, src.Width - size.Width, src.Height - size.Height);
+
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
                     // create mask
                     if (iteration > 0)
                     {
+                        src = dst.Clone(true);
                         mask.SetToZero();
                     }
 
-                    int count = 0;
                     foreach (Point point in se.GetElements())
                     {
                         MakeMask(point);
-                        count++;
                     }
 
                     // apply mask
-                    if (count > 0)
-                    {
-                        src.Maximum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
-                    }
+                    dst.Maximum(dst, mask);
+
+                    // apply border
                 }
 
-                Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
+                if (inplace)
+                {
+                    this.Attach(dst);
+                    return this;
+                }
 
                 void MakeMask(Point point)
                 {

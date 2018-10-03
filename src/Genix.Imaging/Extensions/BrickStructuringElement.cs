@@ -94,45 +94,5 @@ namespace Genix.Imaging
                 }
             }
         }
-
-        /// <summary>
-        /// Enumerates vertical elements of the structuring element.
-        /// </summary>
-        /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
-        /// <returns>
-        /// The collection of vertical elements.
-        /// </returns>
-        public IEnumerable<Point> GetVerticalElements(Point anchor)
-        {
-            anchor = this.GetAnchor(anchor);
-
-            for (int iy = 0; iy < this.height; iy++)
-            {
-                if (iy != anchor.Y)
-                {
-                    yield return new Point(0, iy - anchor.Y);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Enumerates horizontal elements of the structuring element.
-        /// </summary>
-        /// <param name="anchor">The anchor position within the element. The default value  (-1, -1) means that the anchor is at the center.</param>
-        /// <returns>
-        /// The collection of horizontal elements.
-        /// </returns>
-        public IEnumerable<Point> GetHorizontalElements(Point anchor)
-        {
-            anchor = this.GetAnchor(anchor);
-
-            for (int ix = 0; ix < this.width; ix++)
-            {
-                if (ix != anchor.X)
-                {
-                    yield return new Point(ix - anchor.X, 0);
-                }
-            }
-        }
     }
 }

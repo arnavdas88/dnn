@@ -393,66 +393,64 @@ namespace Genix.Imaging
         public Image Maximum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
             int bitsPerPixel = this.BitsPerPixel;
-            switch (bitsPerPixel)
+            if (bitsPerPixel == 1)
             {
-                case 1:
-                    return this.Or(dst, x, y, width, height, src, xsrc, ysrc);
+                return this.Or(dst, x, y, width, height, src, xsrc, ysrc);
+            }
 
-                case 8:
-                case 24:
-                case 32:
-                    if (src == null)
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            this.ValidateArea(x, y, width, height);
+            src.ValidateArea(xsrc, ysrc, width, height);
+
+            if (bitsPerPixel != 8 && bitsPerPixel != 24 && bitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    bitsPerPixel));
+            }
+
+            if (src.BitsPerPixel != bitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+            dst = this.Copy(dst);
+
+            int stridesrc8 = src.Stride8;
+            int stridedst8 = dst.Stride8;
+            unsafe
+            {
+                fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
+                {
+                    byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
+                    byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
+
+                    if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
                     {
-                        throw new ArgumentNullException(nameof(src));
+                        // operation is performed on entire pixel line
+                        // do all lines at once
+                        Vectors.Max(stridesrc8 * height, bitssrc, bitsdst);
                     }
-
-                    this.ValidateArea(x, y, width, height);
-                    src.ValidateArea(xsrc, ysrc, width, height);
-
-                    if (src.BitsPerPixel != bitsPerPixel)
+                    else
                     {
-                        throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
-                    }
-
-                    dst = this.Copy(dst);
-
-                    int stridesrc8 = src.Stride8;
-                    int stridedst8 = dst.Stride8;
-                    unsafe
-                    {
-                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
+                        int count = width * bitsPerPixel / 8;
+                        for (int iy = 0; iy < height; iy++)
                         {
-                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
-                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
+                            Vectors.Max(count, bitssrc, bitsdst);
 
-                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
-                            {
-                                // operation is performed on entire pixel line
-                                // do all lines at once
-                                Vectors.Max(stridesrc8 * height, bitssrc, bitsdst);
-                            }
-                            else
-                            {
-                                int count = width * bitsPerPixel / 8;
-                                for (int iy = 0; iy < height; iy++)
-                                {
-                                    Vectors.Max(count, bitssrc, bitsdst);
-
-                                    bitssrc += stridesrc8;
-                                    bitsdst += stridedst8;
-                                }
-                            }
+                            bitssrc += stridesrc8;
+                            bitsdst += stridedst8;
                         }
                     }
-
-                    return dst;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        bitsPerPixel));
+                }
             }
+
+            return dst;
         }
 
         /// <summary>
@@ -521,66 +519,64 @@ namespace Genix.Imaging
         public Image Minimum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
             int bitsPerPixel = this.BitsPerPixel;
-            switch (bitsPerPixel)
+            if (bitsPerPixel == 1)
             {
-                case 1:
-                    return this.And(dst, x, y, width, height, src, xsrc, ysrc);
+                return this.And(dst, x, y, width, height, src, xsrc, ysrc);
+            }
 
-                case 8:
-                case 24:
-                case 32:
-                    if (src == null)
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            this.ValidateArea(x, y, width, height);
+            src.ValidateArea(xsrc, ysrc, width, height);
+
+            if (bitsPerPixel != 8 && bitsPerPixel != 24 && bitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    bitsPerPixel));
+            }
+
+            if (src.BitsPerPixel != bitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+            dst = this.Copy(dst);
+
+            int stridesrc8 = src.Stride8;
+            int stridedst8 = dst.Stride8;
+            unsafe
+            {
+                fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
+                {
+                    byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
+                    byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
+
+                    if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
                     {
-                        throw new ArgumentNullException(nameof(src));
+                        // operation is performed on entire pixel line
+                        // do all lines at once
+                        Vectors.Min(stridesrc8 * height, bitssrc, bitsdst);
                     }
-
-                    this.ValidateArea(x, y, width, height);
-                    src.ValidateArea(xsrc, ysrc, width, height);
-
-                    if (src.BitsPerPixel != bitsPerPixel)
+                    else
                     {
-                        throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
-                    }
-
-                    dst = this.Copy(dst);
-
-                    int stridesrc8 = src.Stride8;
-                    int stridedst8 = dst.Stride8;
-                    unsafe
-                    {
-                        fixed (ulong* pbitssrc = src.Bits, pbitsdst = dst.Bits)
+                        int count = width * bitsPerPixel / 8;
+                        for (int iy = 0; iy < height; iy++)
                         {
-                            byte* bitssrc = (byte*)pbitssrc + (ysrc * stridesrc8) + (xsrc * bitsPerPixel / 8);
-                            byte* bitsdst = (byte*)pbitsdst + (y * stridedst8) + (x * bitsPerPixel / 8);
+                            Vectors.Min(count, bitssrc, bitsdst);
 
-                            if (x == 0 && xsrc == 0 && stridesrc8 == stridedst8 && width == dst.Width)
-                            {
-                                // operation is performed on entire pixel line
-                                // do all lines at once
-                                Vectors.Min(stridesrc8 * height, bitssrc, bitsdst);
-                            }
-                            else
-                            {
-                                int count = width * bitsPerPixel / 8;
-                                for (int iy = 0; iy < height; iy++)
-                                {
-                                    Vectors.Min(count, bitssrc, bitsdst);
-
-                                    bitssrc += stridesrc8;
-                                    bitsdst += stridedst8;
-                                }
-                            }
+                            bitssrc += stridesrc8;
+                            bitsdst += stridedst8;
                         }
                     }
-
-                    return dst;
-
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        bitsPerPixel));
+                }
             }
+
+            return dst;
         }
     }
 }
