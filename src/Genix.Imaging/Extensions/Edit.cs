@@ -129,7 +129,6 @@ namespace Genix.Imaging
                 {
                     ulong[] colors = this.ColorScanline(Image.CalculateStride(this.Width, 24), color);
                     Vectors.Tile(this.Stride, this.Height, colors, 0, this.Bits, 0);
-
                 }
             }
             else
@@ -302,28 +301,58 @@ namespace Genix.Imaging
                 int stride1 = this.Stride1;
                 int bitsPerPixel = this.BitsPerPixel;
 
-                // fill left side
-                if (x > 0)
+                if (bitsPerPixel == 24)
                 {
-                    // sets all pixels on the left to first row pixel within the area
-                    int count = x * bitsPerPixel;
-                    for (int i = y, ii = y + height, pos = y * stride1; i < ii; i++, pos += stride1)
+                    // fill left and right sides
+                    int x2 = x + width;
+                    if (x > 0 || x2 < this.Width)
                     {
-                        ulong ucolor = this.ColorBits(this.GetPixel(x, i));
-                        BitUtils.SetBits(count, ucolor, bits, pos);
+                        unsafe
+                        {
+                            fixed (ulong* ubits = &this.Bits[y * this.Stride])
+                            {
+                                byte* bbits = (byte*)ubits;
+                                for (int i = 0, count2 = this.Width - x2, stride8 = this.Stride8; i < height; i++, bbits += stride8)
+                                {
+                                    if (x > 0)
+                                    {
+                                        Vectors.Tile(3, x, bbits + (x * 3), bbits);
+                                    }
+
+                                    if (count2 > 0)
+                                    {
+                                        Vectors.Tile(3, count2, bbits + (x2 * 3) - 3, bbits + (x2 * 3));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-
-                // fill right side
-                if (x + width < this.Width)
+                else
                 {
-                    // sets all pixels on the left to last row pixel within the area
-                    int x2 = x + width;
-                    int count = (this.Width - x2) * bitsPerPixel;
-                    for (int i = y, ii = y + height, pos = (y * stride1) + (x2 * bitsPerPixel); i < ii; i++, pos += stride1)
+                    // fill left side
+                    if (x > 0)
                     {
-                        ulong ucolor = this.ColorBits(this.GetPixel(x2 - 1, i));
-                        BitUtils.SetBits(count, ucolor, bits, pos);
+                        // sets all pixels on the left to first row pixel within the area
+                        int count = x * bitsPerPixel;
+                        for (int i = y, ii = y + height, pos = y * stride1; i < ii; i++, pos += stride1)
+                        {
+                            ulong ucolor = this.ColorBits(this.GetPixel(x, i));
+                            BitUtils.SetBits(count, ucolor, bits, pos);
+                        }
+                    }
+
+                    // fill right side
+                    int x2 = x + width;
+                    if (x2 < this.Width)
+                    {
+                        // sets all pixels on the left to last row pixel within the area
+                        int count = (this.Width - x2) * bitsPerPixel;
+                        for (int i = y, ii = y + height, pos = (y * stride1) + (x2 * bitsPerPixel); i < ii; i++, pos += stride1)
+                        {
+                            ulong ucolor = this.ColorBits(this.GetPixel(x2 - 1, i));
+                            BitUtils.SetBits(count, ucolor, bits, pos);
+                        }
                     }
                 }
 
@@ -335,10 +364,10 @@ namespace Genix.Imaging
                 }
 
                 // fill bottom
-                if (y + height < this.Height)
+                int y2 = y + height;
+                if (y2 < this.Height)
                 {
                     // copy last area row to all rows below
-                    int y2 = y + height;
                     Vectors.Tile(stride, this.Height - y2, bits, (y2 - 1) * stride, bits, y2 * stride);
                 }
             }
@@ -351,42 +380,89 @@ namespace Genix.Imaging
                     return;
                 }
 
-                ulong[] bits = this.Bits;
-                int stride1 = this.Stride1;
                 int bitsPerPixel = this.BitsPerPixel;
-                ulong color = this.ColorBits(borderValue);
-
-                int x2 = x + width;
-                int y2 = y + height;
-
-                // fill top area and the left part of first partial stride
-                int count = (y * stride1) + (x * bitsPerPixel);
-                int pos = 0;
-                if (count > 0)
+                if (bitsPerPixel == 24)
                 {
-                    BitUtils.SetBits(count, color, bits, pos);
-                }
+                    ulong[] colors = this.ColorScanline(Image.CalculateStride(this.Width, 24), borderValue);
 
-                // fill partial strides (together right part and left part of the next line)
-                if (height > 1)
-                {
-                    count = stride1 - (width * bitsPerPixel);
-                    if (count > 0)
+                    // fill top
+                    if (y > 0)
                     {
-                        pos = (y * stride1) + (x2 * bitsPerPixel);
-                        for (int i = 1; i < height; i++, pos += stride1)
+                        Vectors.Tile(this.Stride, y, colors, 0, this.Bits, 0);
+                    }
+
+                    // fill left and right
+                    int x2 = x + width;
+                    if (x > 0 || x2 < this.Width)
+                    {
+                        unsafe
                         {
-                            BitUtils.SetBits(count, color, bits, pos);
+                            fixed (ulong* bits = &this.Bits[y * this.Stride], ucolors = colors)
+                            {
+                                byte* bbits = (byte*)bits;
+                                byte* bcolors = (byte*)ucolors;
+
+                                for (int i = 0, count1 = x * 3, count2 = (this.Width - x2) * 3, stride8 = this.Stride8; i < height; i++, bbits += stride8)
+                                {
+                                    if (count1 > 0)
+                                    {
+                                        Vectors.Copy(count1, bcolors, bbits);
+                                    }
+
+                                    if (count2 > 0)
+                                    {
+                                        Vectors.Copy(count2, bcolors + (x2 * 3), bbits + (x2 * 3));
+                                    }
+                                }
+                            }
                         }
                     }
-                }
 
-                // fill bottom area and the right part of last partial stride
-                pos = ((y2 - 1) * stride1) + (x2 * bitsPerPixel);
-                count = (this.Height * stride1) - pos;
-                if (count > 0)
+                    // fill bottom
+                    int y2 = y + height;
+                    if (y2 < this.Height)
+                    {
+                        Vectors.Tile(this.Stride, this.Height - y2, colors, 0, this.Bits, y2 * this.Stride);
+                    }
+                }
+                else
                 {
-                    BitUtils.SetBits(count, color, bits, pos);
+                    ulong[] bits = this.Bits;
+                    int stride1 = this.Stride1;
+                    ulong color = this.ColorBits(borderValue);
+
+                    int x2 = x + width;
+                    int y2 = y + height;
+
+                    // fill top area and the left part of first partial stride
+                    int count = (y * stride1) + (x * bitsPerPixel);
+                    int pos = 0;
+                    if (count > 0)
+                    {
+                        BitUtils.SetBits(count, color, bits, pos);
+                    }
+
+                    // fill partial strides (together right part and left part of the next line)
+                    if (height > 1)
+                    {
+                        count = stride1 - (width * bitsPerPixel);
+                        if (count > 0)
+                        {
+                            pos = (y * stride1) + (x2 * bitsPerPixel);
+                            for (int i = 1; i < height; i++, pos += stride1)
+                            {
+                                BitUtils.SetBits(count, color, bits, pos);
+                            }
+                        }
+                    }
+
+                    // fill bottom area and the right part of last partial stride
+                    pos = ((y2 - 1) * stride1) + (x2 * bitsPerPixel);
+                    count = (this.Height * stride1) - pos;
+                    if (count > 0)
+                    {
+                        BitUtils.SetBits(count, color, bits, pos);
+                    }
                 }
             }
         }

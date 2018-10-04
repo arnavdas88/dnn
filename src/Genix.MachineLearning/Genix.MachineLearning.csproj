@@ -50,6 +50,7 @@
     <Compile Include="Clustering\KMeans\KMeansCluster.cs" />
     <Compile Include="Clustering\KMeans\KMeansSeeding.cs" />
     <Compile Include="Distances\EuclideanDistance.cs" />
+    <Compile Include="Distances\HammingDistance.cs" />
     <Compile Include="Distances\IDistance.cs" />
     <Compile Include="Distances\IVectorDistance.cs" />
     <Compile Include="Distances\ManhattanDistance.cs" />

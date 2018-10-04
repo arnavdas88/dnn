@@ -523,6 +523,18 @@
             OpInPlace = "variance(x)",
             SupportedTypes = "float;double",
             },
+        new MethodDescriptor()
+        {
+            Name = "HammingDistance",
+            NativeName = "hamming_distance",
+            Argument = ArgumentType.TwoVectorsAggregate,
+            Summary = "Computes the Hamming distance between the two arrays of {0}",
+            HasInPlace = true,
+            HasNotInPlace = false,
+            Returns = "The computed Hamming distance between the two arrays of {0}.",
+            OpInPlace = "popcnt(a ^ b)",
+            SupportedTypes = "uint;ulong",
+            },
         };
 #>
 
@@ -955,6 +967,180 @@ namespace Genix.Core
         public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* x, int incx, <#=typeName#>* y, int incy)
         {
             return NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, x, 0, incx, y, 0, incy);
+        }
+<#                  }
+                }
+                break;
+            case ArgumentType.TwoVectorsAggregate:
+               if (method.HasInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb)
+        {
+            Debug.Assert(a.Length > offa + length - 1, "The source array should be big enough.");
+            Debug.Assert(b.Length > offb + length - 1, "The source array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, a, offa, b, offb);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="b">The second source array.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpInPlace#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* a, <#=typeName#>* b)
+        {
+            return NativeMethods.<#=method.NativeName#>_ip_<#=nativeSuffix#>(length, a, 0, b, 0);
+        }
+
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.OpInPlace#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] a, int offa, int inca, <#=typeName#>[] b, int offb, int incb)
+        {
+            Debug.Assert(a.Length > offa + ((length - 1) * inca), "The source array should be big enough.");
+            Debug.Assert(b.Length > offb + ((length - 1) * incb), "The source array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, a, offa, inca, b, offb, incb);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.OpInPlace#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* a, int inca, <#=typeName#>* b, int incb)
+        {
+            return NativeMethods.<#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(length, a, 0, inca, b, 0, incb);
+        }
+<#              }
+            }
+            if (method.HasNotInPlace) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
+        {
+            Debug.Assert(a.Length > offa + length - 1, "The source array should be big enough.");
+            Debug.Assert(b.Length > offb + length - 1, "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + length - 1, "The destination array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, offa, b, offb, y, offy);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#>.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="y">The destination array.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.Op#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* a, <#=typeName#>* b, <#=typeName#>* y)
+        {
+            return NativeMethods.<#=method.NativeName#>_<#=nativeSuffix#>(length, a, 0, b, 0, y, 0);
+        }
+
+<#              if (method.HasIncrement) { #>
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="offa">The starting element position in <paramref name="a"/>.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The second source array.</param>
+        /// <param name="offb">The starting element position in <paramref name="b"/>.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="offy">The starting element position in <paramref name="y"/>.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>[] a, int offa, int inca, <#=typeName#>[] b, int offb, int incb, <#=typeName#>[] y, int offy, int incy)
+        {
+            Debug.Assert(a.Length > offa + ((length - 1) * inca), "The source array should be big enough.");
+            Debug.Assert(b.Length > offb + ((length - 1) * incb), "The source array should be big enough.");
+            Debug.Assert(y.Length > offy + ((length - 1) * incy), "The destination array should be big enough.");
+            return NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, a, offa, inca, b, offb, incb, y, offy, incy);
+        }
+
+        /// <summary>
+        /// <#=string.Format(method.Summary, typeDescription)#> with increment.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="a">The first source array.</param>
+        /// <param name="inca">The increment for the elements of <paramref name="a"/>.</param>
+        /// <param name="b">The first source array.</param>
+        /// <param name="incb">The increment for the elements of <paramref name="b"/>.</param>
+        /// <param name="y">The destination array.</param>
+        /// <param name="incy">The increment for the elements of <paramref name="y"/>.</param>
+        /// <returns><#=method.Returns#></returns>
+        /// <remarks>
+        /// <para>The method performs operation defined as <c><#=method.Op#></c>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe <#=method.GetReturnType(typeName)#> <#=method.Name#>(int length, <#=typeName#>* a, int inca, <#=typeName#>* b, int incb, <#=typeName#>* y, int incy)
+        {
+            return NativeMethods.<#=method.NativeName#>_inc_<#=nativeSuffix#>(length, a, 0, inca, b, 0, incb, y, 0, incy);
         }
 <#                  }
                 }
@@ -1402,6 +1588,22 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Copies a range of values from a array of <#=typeDescription#> to another array specified number of times.
+        /// </summary>
+        /// <param name="length">The number of elements to copy.</param>
+        /// <param name="count">The number of times to copy <paramref name="x"/>.</param>
+        /// <param name="x">The source array.</param>
+        /// <param name="y">The destination.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Tile(int length, int count, <#=typeName#>* x, <#=typeName#>* y)
+        {
+            for (int i = 0; i < count; i++, y += length)
+            {
+                Vectors.Copy(length, x, y);
+            }
+        }
+
+        /// <summary>
         /// Adds product of element of an array of <#=typeDescription#> and a constant to the elements of destination array.
         /// </summary>
         /// <param name="length">The number of elements to add.</param>
@@ -1747,6 +1949,38 @@ namespace Genix.Core
 <#                  }
                 }
                 break;
+            case ArgumentType.TwoVectorsAggregate:
+                if (method.HasInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_ip_<#=nativeSuffix#>(int n, [In] <#=typeName#>* a, int offa, int inca, [In] <#=typeName#>* b, int offb, int incb);
+<#                  }
+                }
+                if (method.HasNotInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_<#=nativeSuffix#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb, [In] <#=typeName#>* y, int offy);
+<#                  if (method.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [In] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=method.GetReturnType(typeName)#> <#=method.NativeName#>_inc_<#=nativeSuffix#>(int n, [In] <#=typeName#>* a, int offa, int inca, [In] <#=typeName#>* b, int offb, int incb, [In] <#=typeName#>* y, int offy, int incy);
+<#                  }
+                }
+                break;
             case ArgumentType.ConstantAndVector:
                 if (method.HasInPlace) { #>
 
@@ -1893,10 +2127,11 @@ namespace Genix.Core
         Constant = 0,
         Vector = 1,
         VectorAggregate = 2,
-        ConstantAndVector = 3,
-        TwoVectors = 4,
-        ThreeVectors = 5,
-        FourVectors = 6,
+        TwoVectorsAggregate = 3,
+        ConstantAndVector = 4,
+        TwoVectors = 5,
+        ThreeVectors = 6,
+        FourVectors = 7,
     }
 
     class MethodDescriptor
