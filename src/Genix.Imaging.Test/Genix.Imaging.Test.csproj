@@ -68,6 +68,7 @@
     <Compile Include="Extensions\BitmapExtensionsTest.cs" />
     <Compile Include="Extensions\MorphologyTest.cs" />
     <Compile Include="Extensions\ConvertTest.cs" />
+    <Compile Include="Extensions\ArithmeticTest.cs" />
     <Compile Include="ImageTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\EditTest.cs" />

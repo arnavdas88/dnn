@@ -99,7 +99,7 @@ namespace Genix.DocumentAnalysis.Classification
                 .Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
                 ////.CropBlackArea(0, 0)
                 .Convert1To8(null)
-                .FilterLowpass(null, 3);
+                .FilterLowpass(null, 3, BorderType.BorderRepl, 0);
 
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);
 

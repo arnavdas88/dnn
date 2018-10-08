@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
     using Genix.Core;
     using Genix.Drawing;
@@ -32,7 +33,7 @@ namespace Genix.Imaging
         /// </remarks>
         public Image CreateTemplate(Image dst, int width, int height, int bitsPerPixel)
         {
-            if (dst == null)
+            if (dst == null || dst == this)
             {
                 return new Image(width, height, bitsPerPixel, this);
             }
@@ -256,5 +257,9 @@ namespace Genix.Imaging
                 }
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyArea(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
+            Image.CopyArea(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
     }
 }

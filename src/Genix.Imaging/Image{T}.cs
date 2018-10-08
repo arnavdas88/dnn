@@ -9,6 +9,7 @@ namespace Genix.Imaging
     using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
+    using Genix.Core;
     using Genix.Drawing;
 
     /// <summary>
@@ -170,10 +171,18 @@ namespace Genix.Imaging
         public int VerticalResolution { get; private set; }
 
         /// <summary>
-        /// Gets the bounds, in pixels, of this <see cref="Image{T}"/>.
+        /// Gets the size, in pixels, of this <see cref="Image{T}"/>.
         /// </summary>
         /// <value>
-        /// A <see cref="Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="Image{T}"/>.
+        /// A <see cref="Size"/> structure that contains the size, in pixels, of this <see cref="Image{T}"/>.
+        /// </value>
+        public Size Size => new Size(this.Width, this.Height);
+
+        /// <summary>
+        /// Gets the bounding box, in pixels, of this <see cref="Image{T}"/>.
+        /// </summary>
+        /// <value>
+        /// A <see cref="Rectangle"/> structure that contains the bounding box, in pixels, of this <see cref="Image{T}"/>.
         /// </value>
         public Rectangle Bounds => new Rectangle(0, 0, this.Width, this.Height);
 

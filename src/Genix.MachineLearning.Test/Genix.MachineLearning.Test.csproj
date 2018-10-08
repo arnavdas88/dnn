@@ -46,13 +46,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord.MachineLearning">
-      <HintPath>E:\Accord\framework\Debug\Accord.MachineLearning.dll</HintPath>
+      <HintPath>..\..\..\framework\Debug\Accord.MachineLearning.dll</HintPath>
     </Reference>
     <Reference Include="Accord.Math">
-      <HintPath>E:\Accord\framework\Debug\Accord.Math.dll</HintPath>
+      <HintPath>..\..\..\framework\Debug\Accord.Math.dll</HintPath>
     </Reference>
     <Reference Include="Accord.Statistics">
-      <HintPath>E:\Accord\framework\Debug\Accord.Statistics.dll</HintPath>
+      <HintPath>..\..\..\framework\Debug\Accord.Statistics.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>

@@ -243,9 +243,16 @@ namespace Genix.Imaging
         /// Randomizes all colors in the <see cref="Image"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Randomize()
+        public void Randomize() => this.Randomize(new UlongRandomGenerator());
+
+        /// <summary>
+        /// Randomizes all colors in the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="random">The random numbers generator.</param>
+        [CLSCompliant(false)]
+        public void Randomize(UlongRandomGenerator random)
         {
-            new UlongRandomGenerator().Generate(this.Bits.Length, this.Bits);
+            random.Generate(this.Bits.Length, this.Bits);
             this.ZeroTail();
         }
 

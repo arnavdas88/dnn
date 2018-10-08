@@ -60,7 +60,7 @@ namespace Genix.Imaging.Test
                         {
                             for (int i = 0, ii = palette.Length; i < ii; i++)
                             {
-                                dst.Entries[i] = Color.FromArgb(palette[i].Argb);
+                                dst.Entries[i] = Color.FromArgb((int)palette[i].Argb);
                             }
                         }
 

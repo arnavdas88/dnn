@@ -23,8 +23,8 @@ namespace Genix.Imaging
         /// Dilates this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="se">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
@@ -37,6 +37,9 @@ namespace Genix.Imaging
         /// <para>The number of iterations is equal to or less than zero.</para>
         /// </exception>
         /// <remarks>
+        /// <para>
+        /// Dilation assigns to each pixel a maximum value of all pixels covered by its structuring element.
+        /// </para>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
@@ -59,50 +62,46 @@ namespace Genix.Imaging
             // we sequentially apply m x 1 and 1 x n masks
             if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
             {
-                dst = this.Copy(dst);
-
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    dst.Dilate(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
+                    dst = (iteration == 0 ? this : dst).Dilate(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
                     dst.Dilate(dst, StructuringElement.Brick(1, brickSE.Height), 1, borderType, borderValue);
                 }
             }
             else
             {
-                bool inplace = dst == this;
-                dst = this.CreateTemplate(dst, this.BitsPerPixel);
+                dst = this.Copy(dst);
 
-                Image src = this;
-                Image mask = src.Clone(false);
-
-                Size size = Size.Add(se.Size, -1, -1);
+                Size sesize = Size.Add(se.Size, -1, -1);
                 Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
-                Rectangle border = new Rectangle(anchor.X, anchor.Y, src.Width - size.Width, src.Height - size.Height);
+
+                Image src = this.Inflate(anchor.X, anchor.Y, sesize.Width - anchor.X, sesize.Height - anchor.Y, borderType, borderValue);
+                Image mask = src.Clone(false);
 
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    // create mask
                     if (iteration > 0)
                     {
-                        src = dst.Clone(true);
+                        // copy destination image back into source
+                        // update border if it is a replica of boundary pixels
+                        Rectangle border = new Rectangle(anchor, src.Size);
+                        Image.CopyArea(src, border, dst, anchor);
+                        if (borderType == BorderType.BorderRepl)
+                        {
+                            src.SetBorder(border, BorderType.BorderRepl, 0);
+                        }
+
                         mask.SetToZero();
                     }
 
+                    // create mask
                     foreach (Point point in se.GetElements())
                     {
                         MakeMask(point);
                     }
 
                     // apply mask
-                    dst.Maximum(dst, mask);
-
-                    // apply border
-                }
-
-                if (inplace)
-                {
-                    this.Attach(dst);
-                    return this;
+                    dst.Maximum(dst, dst.Bounds, mask, anchor);
                 }
 
                 void MakeMask(Point point)
@@ -125,8 +124,8 @@ namespace Genix.Imaging
         /// Erodes this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="se">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
@@ -139,6 +138,9 @@ namespace Genix.Imaging
         /// <para>The number of iterations is equal to or less than zero.</para>
         /// </exception>
         /// <remarks>
+        /// <para>
+        /// Erosion assigns to each pixel a minimum value of all pixels covered by its structuring element.
+        /// </para>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
@@ -156,8 +158,6 @@ namespace Genix.Imaging
                 throw new ArgumentException("The number of iterations is equal to or less than zero.");
             }
 
-            dst = this.Copy(dst);
-
             // special case for rectangular kernel
             // instead of applying m x n mask
             // we sequentially apply m x 1 and 1 x n masks
@@ -165,37 +165,44 @@ namespace Genix.Imaging
             {
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
-                    dst.Erode(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
+                    dst = (iteration == 0 ? this : dst).Erode(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
                     dst.Erode(dst, StructuringElement.Brick(1, brickSE.Height), 1, borderType, borderValue);
                 }
             }
             else
             {
-                Size size = Size.Scale(Size.Add(se.Size, -1, -1), iterations, iterations);
-                Point anchor = Point.Scale(se.GetAnchor(StructuringElement.DefaultAnchor), iterations, iterations);
+                dst = this.Copy(dst);
 
-                Image src = dst.Inflate(anchor.X, anchor.Y, size.Width - anchor.X, size.Height - anchor.Y, borderType, borderValue);
+                Size sesize = Size.Add(se.Size, -1, -1);
+                Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
+
+                Image src = this.Inflate(anchor.X, anchor.Y, sesize.Width - anchor.X, sesize.Height - anchor.Y, borderType, borderValue);
                 Image mask = src.Clone(false);
+
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
+                    if (iteration > 0)
+                    {
+                        // copy destination image back into source
+                        // update border if it is a replica of boundary pixels
+                        Rectangle border = new Rectangle(anchor, src.Size);
+                        Image.CopyArea(src, border, dst, anchor);
+                        if (borderType == BorderType.BorderRepl)
+                        {
+                            src.SetBorder(border, BorderType.BorderRepl, 0);
+                        }
+                    }
+
                     // create mask
                     mask.SetToOne();
-
-                    int count = 0;
                     foreach (Point point in se.GetElements())
                     {
                         MakeMask(point);
-                        count++;
                     }
 
                     // apply mask
-                    if (count > 0)
-                    {
-                        src.Minimum(src, 0, 0, src.Width, src.Height, mask, 0, 0);
-                    }
+                    dst.Minimum(dst, dst.Bounds, mask, anchor);
                 }
-
-                Image.CopyArea(dst, 0, 0, dst.Width, dst.Height, src, anchor.X, anchor.Y);
 
                 void MakeMask(Point point)
                 {
@@ -217,8 +224,8 @@ namespace Genix.Imaging
         /// Perform morphological opening operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="se">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
@@ -231,6 +238,10 @@ namespace Genix.Imaging
         /// <para>The number of iterations is equal to or less than zero.</para>
         /// </exception>
         /// <remarks>
+        /// <para>
+        /// Opening is Erosion followed by Dilation.
+        /// It is useful in removing noise.
+        /// </para>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
@@ -238,11 +249,9 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image MorphOpen(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
-            dst = this.Copy(dst);
-
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                dst.Erode(dst, se, 1, borderType, borderValue);
+                dst = (iteration == 0 ? this : dst).Erode(dst, se, 1, borderType, borderValue);
                 dst.Dilate(dst, se, 1, borderType, borderValue);
             }
 
@@ -253,8 +262,8 @@ namespace Genix.Imaging
         /// Perform morphological closing operation this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="se">The structuring element used for dilation.</param>
-        /// <param name="iterations">The number of times dilation is applied.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
@@ -267,6 +276,10 @@ namespace Genix.Imaging
         /// <para>The number of iterations is equal to or less than zero.</para>
         /// </exception>
         /// <remarks>
+        /// <para>
+        /// Closing is reverse of Opening, Dilation followed by Erosion.
+        /// It is useful in closing small holes inside the foreground objects, or small black points on the object.
+        /// </para>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
@@ -274,12 +287,119 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image MorphClose(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
-            dst = this.Copy(dst);
-
             for (int iteration = 0; iteration < iterations; iteration++)
             {
-                dst.Dilate(dst, se, 1, borderType, borderValue);
+                dst = (iteration == 0 ? this : dst).Dilate(dst, se, 1, borderType, borderValue);
                 dst.Erode(dst, se, 1, borderType, borderValue);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Perform morphological gradient operation this <see cref="Image"/> by using the specified structuring element.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>Morphological Gradient is the difference between Dilation and Erosion of an image.</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image MorphGradient(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
+        {
+            for (int iteration = 0; iteration < iterations; iteration++)
+            {
+                Image src = iteration == 0 ? this : dst;
+                Image dilation = src.Dilate(null, se, 1, borderType, borderValue);
+                Image erosion = src.Erode(null, se, 1, borderType, borderValue);
+                dst = dilation.Sub(dst, erosion, 0);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Perform morphological top hat operation this <see cref="Image"/> by using the specified structuring element.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>Top Hat is the difference between input image and Opening of the image.</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image MorphTopHat(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
+        {
+            for (int iteration = 0; iteration < iterations; iteration++)
+            {
+                Image src = iteration == 0 ? this : dst;
+                Image opening = src.MorphOpen(null, se, 1, borderType, borderValue);
+                dst = src.Sub(dst, opening, 0);
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Perform morphological black hat operation this <see cref="Image"/> by using the specified structuring element.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="se">The structuring element used for operation.</param>
+        /// <param name="iterations">The number of times the operation is applied.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="se"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>Black Hat is the difference between the Closing of the input image and input image.</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image MorphBlackHat(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
+        {
+            for (int iteration = 0; iteration < iterations; iteration++)
+            {
+                Image src = iteration == 0 ? this : dst;
+                Image closing = src.MorphClose(null, se, 1, borderType, borderValue);
+                dst = closing.Sub(dst, src, 0);
             }
 
             return dst;

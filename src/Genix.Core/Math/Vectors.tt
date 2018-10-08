@@ -1568,6 +1568,18 @@ namespace Genix.Core
         }
 
         /// <summary>
+        /// Creates an array of <#=typeDescription#> initialized to one values.
+        /// </summary>
+        /// <param name="length">The number of elements in the array.</param>
+        /// <param name="a">The allocated array.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Ones(int length, out <#=typeName#>[] a)
+        {
+            a = new <#=typeName#>[length];
+            Vectors.Set(length, 1, a, 0);
+        }
+
+        /// <summary>
         /// Copies a range of values from a array of <#=typeDescription#> starting at the specified source index
         /// to another array starting at the specified destination index
         /// specified number of times.

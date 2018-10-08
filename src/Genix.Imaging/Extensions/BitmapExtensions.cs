@@ -190,7 +190,7 @@ namespace Genix.Imaging
                     {
                         for (int i = 0, ii = palette.Length; i < ii; i++)
                         {
-                            dst.Entries[i] = System.Drawing.Color.FromArgb(palette[i].Argb);
+                            dst.Entries[i] = System.Drawing.Color.FromArgb((int)palette[i].Argb);
                         }
                     }
 
@@ -630,7 +630,7 @@ namespace Genix.Imaging
             /// <returns><b>true</b> if the specified colors are equal; otherwise, <b>false</b>.</returns>
             public bool Equals(Color x, Color y)
             {
-                return x.Argb == y.Argb;
+                return x == y;
             }
 
             /// <summary>
@@ -640,7 +640,7 @@ namespace Genix.Imaging
             /// <returns>A hash code for the specified color.</returns>
             public int GetHashCode(Color color)
             {
-                return color.Argb;
+                return color.GetHashCode();
             }
         }
     }

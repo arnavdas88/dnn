@@ -12,6 +12,7 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <content>
     /// <para>
@@ -454,6 +455,36 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Computes maximum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="dstBounds">The location and dimensions of the destination rectangle.</param>
+        /// <param name="src">The right-side operand of this operation.</param>
+        /// <param name="srcOrigin">The x- and y-coordinates of the upper-left corner of the source rectangle.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="src"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="dstBounds"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="srcOrigin"/> and <paramref name="dstBounds"/> is outside of <paramref name="src"/> bounds.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Maximum(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
+            this.Maximum(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
+
+        /// <summary>
         /// Computes minimum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -578,5 +609,35 @@ namespace Genix.Imaging
 
             return dst;
         }
+
+        /// <summary>
+        /// Computes minimum values for each pixel in a rectangular block of pixels from this <see cref="Image"/> and the specified <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="dstBounds">The location and dimensions of the destination rectangle.</param>
+        /// <param name="src">The right-side operand of this operation.</param>
+        /// <param name="srcOrigin">The x- and y-coordinates of the upper-left corner of the source rectangle.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="src"/> is <b>null</b>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="dstBounds"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="srcOrigin"/> and <paramref name="dstBounds"/> is outside of <paramref name="src"/> bounds.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Minimum(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
+            this.Minimum(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
     }
 }

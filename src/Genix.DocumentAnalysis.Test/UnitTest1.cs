@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using Genix.Imaging.Leptonica;
+    using Genix.Core;
 
     [TestClass]
     public class UnitTest1
@@ -16,9 +17,31 @@
             Stopwatch stopwatch = new Stopwatch();
 
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
-            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
+            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
+                ////Image xxx = image.FilterBox(null, 30, 30, BorderType.BorderRepl, 0);
+                Image xxx = image.MorphClose(null, StructuringElement.Square(25), 1, BorderType.BorderRepl, 0);
+                xxx.FilterBox(xxx, 30, 30, BorderType.BorderRepl, 0);
+                xxx.Not(xxx);
+                xxx.AddC(xxx, 1, 0);
+
+                Image yyy = image.Mul(null, xxx, 1);
+
+                ////Image yyy = image.Div(null, xxx, 8);
+
+                ////xxx.FilterBox(xxx, 30, 30, BorderType.BorderRepl, 0);
+
+                ////xxx.Not(xxx);
+                ////Image yyy = image.Add(null, xxx, 0);
+                ////yyy = yyy.Binarize(null).Deskew(null).Despeckle(null);
+                ///
+
+                ////Image yyy = image.MorphBlackHat(null, StructuringElement.Square(30), 1, BorderType.BorderRepl, 0).Not(null);
+
+                LineDetector.FindLines(yyy, new LineDetectionOptions());
+
+
                 Image workImage = image.BitsPerPixel > 1 ? image.Binarize(null) : image;
 
 #if false

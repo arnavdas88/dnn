@@ -37,6 +37,20 @@
             Summary = "Subtracts pixel values of two images.",
             Remarks = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/> and places the results in a destination image.</para>",
         },
+        new MethodDescriptor()
+        {
+            Name = "Mul",
+            NativeName = "_mul",
+            Summary = "Multiplies pixel values of two images.",
+            Remarks = "<para>This method multiplies corresponding pixel values of <paramref name=\"src\"/> by this <see cref=\"Image\"/> and places the results in a destination image.</para>",
+        },
+        new MethodDescriptor()
+        {
+            Name = "Div",
+            NativeName = "_div",
+            Summary = "Divides pixel values of two images.",
+            Remarks = "<para>This method divides corresponding pixel values of this <see cref=\"Image\"/> by <paramref name=\"src\"/> and places the results in a destination image.</para>",
+        },
     };
 #>
 
@@ -68,6 +82,7 @@ namespace Genix.Imaging
         /// </para>
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// The result is rounded off to the nearest even integer number.
         /// </para>
         /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
@@ -109,20 +124,39 @@ namespace Genix.Imaging
                 case 8:
                 case 24:
                 case 32:
-                    dst = this.Copy(dst);
+                    if (dst == this)
+                    {
+                        // in-place operation
+                        NativeMethods.<#=method.NativeName#>(
+                            this.BitsPerPixel,
+                            Core.MinMax.Min(this.Width, src.Width),
+                            Core.MinMax.Min(this.Height, src.Height),
+                            src.Bits,
+                            src.Stride8,
+                            null,
+                            0,
+                            dst.Bits,
+                            dst.Stride8,
+                            scaleFactor);
+                    }
+                    else
+                    {
+                        dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-                    NativeMethods.<#=method.NativeName#>(
-                        this.BitsPerPixel,
-                        Core.MinMax.Min(this.Width, src.Width),
-                        Core.MinMax.Min(this.Height, src.Height),
-                        dst == this ? null : this.Bits,
-                        this.Stride8,
-                        src.Bits,
-                        src.Stride8,
-                        dst.Bits,
-                        dst.Stride8,
-                        scaleFactor);
-                    return dst;
+                        NativeMethods.<#=method.NativeName#>(
+                            this.BitsPerPixel,
+                            Core.MinMax.Min(this.Width, src.Width),
+                            Core.MinMax.Min(this.Height, src.Height),
+                            this.Bits,
+                            this.Stride8,
+                            src.Bits,
+                            src.Stride8,
+                            dst.Bits,
+                            dst.Stride8,
+                            scaleFactor);
+                    }
+
+                    break;
 
                 default:
                     throw new NotSupportedException(string.Format(

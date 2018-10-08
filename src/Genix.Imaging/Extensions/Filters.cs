@@ -21,11 +21,168 @@ namespace Genix.Imaging
     public partial class Image
     {
         /// <summary>
+        /// Filters this <see cref="Image"/> using a rectangular filter.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="kernelWidth">The kernel width.</param>
+        /// <param name="kernelHeight">The kernel height.</param>
+        /// <param name="kernel">The kernel. The array of size <paramref name="kernelWidth"/> * <paramref name="kernelHeight"/>.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="kernelWidth"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="kernelHeight"/> is less than or equal to zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// The method uses a general rectangular kernel to filter an image.
+        /// The kernel is a matrix of single-precision real values.
+        /// For each input pixel, the kernel is placed on the image in such a way that the fixed anchor cell within the kernel coincides with the input pixel.
+        /// The anchor cell is a geometric center of the kernel.
+        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image Filter(Image dst, int kernelWidth, int kernelHeight, float[] kernel, BorderType borderType, uint borderValue)
+        {
+            if (kernelWidth <= 0)
+            {
+                throw new ArgumentException("The kernel width must be positive.", nameof(kernelWidth));
+            }
+
+            if (kernelHeight <= 0)
+            {
+                throw new ArgumentException("The kernel height must be positive.", nameof(kernelHeight));
+            }
+
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+            if (NativeMethods.filterRectangular(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                kernelWidth,
+                kernelHeight,
+                kernel,
+                (int)borderType,
+                borderValue) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Blurs this <see cref="Image"/> using a simple box filter.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="maskWidth">The kernel width.</param>
+        /// <param name="maskHeight">The kernel height.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="maskWidth"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="maskHeight"/> is less than or equal to zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// The method sets each pixel in <paramref name="dst"/> as the average of all pixels in this <see cref="Image"/>
+        /// in the rectangular neighborhood of size <paramref name="maskWidth"/>*<paramref name="maskHeight"/> with the anchor cell at that pixel.
+        /// This has the effect of smoothing or blurring the input image.
+        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image FilterBox(Image dst, int maskWidth, int maskHeight, BorderType borderType, uint borderValue)
+        {
+            if (maskWidth <= 0)
+            {
+                throw new ArgumentException("The kernel width must be positive.", nameof(maskWidth));
+            }
+
+            if (maskHeight <= 0)
+            {
+                throw new ArgumentException("The kernel height must be positive.", nameof(maskHeight));
+            }
+
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+            if (NativeMethods.filterBox(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                maskWidth,
+                maskHeight,
+                (int)borderType,
+                borderValue) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Performs Gaussian filtering of the <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="kernelSize">The size of the Gaussian kernel (odd, greater or equal to 3).</param>
         /// <param name="sigma">The standard deviation of the Gaussian kernel.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -45,37 +202,37 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterGaussian(Image dst, int kernelSize, float sigma)
+        [CLSCompliant(false)]
+        public Image FilterGaussian(Image dst, int kernelSize, float sigma, BorderType borderType, uint borderValue)
         {
             if (kernelSize < 3 || (kernelSize % 2) == 0)
             {
                 throw new ArgumentException("The kernel size must be an odd number greater or equal to three.", nameof(kernelSize));
             }
 
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            switch (this.BitsPerPixel)
+            if (NativeMethods.filterGaussian(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                kernelSize,
+                sigma,
+                (int)borderType,
+                borderValue) != 0)
             {
-                case 8:
-                    if (NativeMethods.filterGaussian_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                case 24:
-                    if (NativeMethods.filterGaussian_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, kernelSize, sigma) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                default:
-                    throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                throw new OutOfMemoryException();
             }
 
             if (inplace)
@@ -87,12 +244,14 @@ namespace Genix.Imaging
             return dst;
         }
 
-#pragma warning disable SA1629 // Documentation text should end with a period
+ #pragma warning disable SA1629 // Documentation text should end with a period
         /// <summary>
         /// Applies Laplace filter to the <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -122,7 +281,8 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterLaplace(Image dst, int maskSize)
+        [CLSCompliant(false)]
+        public Image FilterLaplace(Image dst, int maskSize, BorderType borderType, uint borderValue)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -130,38 +290,28 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            switch (this.BitsPerPixel)
+            if (NativeMethods.filterLaplace(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                maskSize,
+                (int)borderType,
+                borderValue) != 0)
             {
-                case 8:
-                    if (NativeMethods.filterLaplace_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                case 24:
-                    if (NativeMethods.filterLaplace_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                case 32:
-                    if (NativeMethods.filterLaplace_32bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                default:
-                    throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                throw new OutOfMemoryException();
             }
 
             if (inplace)
@@ -179,6 +329,8 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -208,7 +360,8 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterHipass(Image dst, int maskSize)
+        [CLSCompliant(false)]
+        public Image FilterHipass(Image dst, int maskSize, BorderType borderType, uint borderValue)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -216,38 +369,28 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            switch (this.BitsPerPixel)
+            if (NativeMethods.filterHipass(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                maskSize,
+                (int)borderType,
+                borderValue) != 0)
             {
-                case 8:
-                    if (NativeMethods.filterHipass_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                case 24:
-                    if (NativeMethods.filterHipass_24bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                case 32:
-                    if (NativeMethods.filterHipass_32bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                default:
-                    throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                throw new OutOfMemoryException();
             }
 
             if (inplace)
@@ -265,6 +408,8 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
         /// <param name="maskSize">The size of the kernel (3 or 5).</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -294,7 +439,8 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FilterLowpass(Image dst, int maskSize)
+        [CLSCompliant(false)]
+        public Image FilterLowpass(Image dst, int maskSize, BorderType borderType, uint borderValue)
 #pragma warning restore SA1629 // Documentation text should end with a period
         {
             if (maskSize != 3 && maskSize != 5)
@@ -302,22 +448,28 @@ namespace Genix.Imaging
                 throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
             }
 
+            if (this.BitsPerPixel != 8)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            switch (this.BitsPerPixel)
+            if (NativeMethods.filterLowpass(
+                this.BitsPerPixel,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                maskSize,
+                (int)borderType,
+                borderValue) != 0)
             {
-                case 8:
-                    if (NativeMethods.filterLowpass_8bpp(this.Width, this.Height, this.Bits, this.Stride, dst.Bits, dst.Stride, maskSize) != 0)
-                    {
-                        throw new OutOfMemoryException();
-                    }
-
-                    break;
-
-                default:
-                    throw new NotSupportedException(
-                        string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+                throw new OutOfMemoryException();
             }
 
             if (inplace)
@@ -333,7 +485,37 @@ namespace Genix.Imaging
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterGaussian_8bpp(
+            public static extern int filterRectangular(
+                int bitsPerPixel,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                int kernelWidth,
+                int kernelHeight,
+                [In] float[] kernel,
+                int borderType,
+                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int filterBox(
+                int bitsPerPixel,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                int maskWidth,
+                int maskeight,
+                int borderType,
+                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int filterGaussian(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -341,88 +523,48 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 int kernelSize,
-                float sigma);
+                float sigmaconst,
+                int borderType,
+                uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterGaussian_24bpp(
+            public static extern int filterLaplace(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
                 int stridesrc,
                 [Out] ulong[] dst,
                 int stridedst,
-                int kernelSize,
-                float sigma);
+                int maskSize,
+                int borderType,
+                uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterLaplace_8bpp(
+            public static extern int filterHipass(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
                 int stridesrc,
                 [Out] ulong[] dst,
                 int stridedst,
-                int maskSize);
+                int maskSize,
+                int borderType,
+                uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterLaplace_24bpp(
+            public static extern int filterLowpass(
+                int bitsPerPixel,
                 int width,
                 int height,
                 [In] ulong[] src,
                 int stridesrc,
                 [Out] ulong[] dst,
                 int stridedst,
-                int maskSize);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int filterLaplace_32bpp(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int maskSize);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int filterHipass_8bpp(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int maskSize);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int filterHipass_24bpp(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int maskSize);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int filterHipass_32bpp(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int maskSize);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int filterLowpass_8bpp(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int maskSize);
+                int maskSize,
+                int borderType,
+                uint borderValue);
         }
     }
 }
