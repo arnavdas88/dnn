@@ -50,6 +50,31 @@
         }
 
         [TestMethod]
+        public void Convert4to1Test()
+        {
+            // image is:
+            // 1 0 0 0 0 1 0 0   0 1
+            Image image = new Image(10, 1, 4, 200, 200);
+            image.SetWhite();
+            image.SetPixel(0, 0, 0);
+            image.SetPixel(5, 0, 0);
+            image.SetPixel(9, 0, 0);
+
+            Image result = image.Convert4To1(null, 7);
+            result.ToBitmap();
+            Assert.AreEqual(1u, result.GetPixel(0, 0));
+            Assert.AreEqual(0u, result.GetPixel(1, 0));
+            Assert.AreEqual(0u, result.GetPixel(2, 0));
+            Assert.AreEqual(0u, result.GetPixel(3, 0));
+            Assert.AreEqual(0u, result.GetPixel(4, 0));
+            Assert.AreEqual(1u, result.GetPixel(5, 0));
+            Assert.AreEqual(0u, result.GetPixel(6, 0));
+            Assert.AreEqual(0u, result.GetPixel(7, 0));
+            Assert.AreEqual(0u, result.GetPixel(8, 0));
+            Assert.AreEqual(1u, result.GetPixel(9, 0));
+        }
+
+        [TestMethod]
         public void Convert8to1Test()
         {
             // image is:

@@ -14,38 +14,48 @@ extern "C" __declspec(dllimport) unsigned __int32 WINAPI sum_ip_u8(const int n, 
 extern "C" __declspec(dllimport) int WINAPI bits_scan_one_forward_64(int count, const unsigned __int64* bits, int pos);
 extern "C" __declspec(dllimport) int WINAPI bits_scan_zero_forward_64(int count, const unsigned __int64* bits, int pos);
 
-GENIXAPI(__int64, power_1bpp)(
+GENIXAPI(unsigned __int64, power)(
+	const int bitsPerPixel,
 	const int x, const int y, const int width, const int height,
 	const unsigned __int64* bits, const int stride)
 {
-	const int stridebits = stride * 64;	// 64 bits per word
-
-	unsigned __int64 sum = 0;
-	for (int iy = 0, pos = (y * stridebits) + x; iy < height; iy++, pos += stridebits)
+	switch (bitsPerPixel)
 	{
-		sum += ::bits_count_64(width, bits, pos);
+	case 1:
+	{
+		unsigned __int64 sum = 0;
+		const int stridebits = stride * 64;	// 64 bits per word
+		for (int iy = 0, pos = (y * stridebits) + x; iy < height; iy++, pos += stridebits)
+		{
+			sum += ::bits_count_64(width, bits, pos);
+		}
+
+		return sum;
 	}
 
-	return (__int64)sum;
-}
-
-GENIXAPI(__int64, power_8bpp)(
-	const int x, const int y, const int width, const int height,
-	const unsigned __int64* bits, const int stride)
-{
-	const int stridebytes = stride * 8;	// 8 bytes per word
-	const unsigned __int8* bits_u8 = ((const unsigned __int8*)bits) + (ptrdiff_t(y) * stridebytes) + x;
-
-	Ipp64f sum = 0;
-	ippiSum_8u_C1R(bits_u8, stridebytes, { width, height }, &sum);
-
-	/*unsigned __int64 sum = 0;
-	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
+	case 8:
 	{
-		sum += (unsigned __int64)::sum_ip_u8(width, bits_u8, 0);
-	}*/
+#if true
+		// IPP version is approximately 3 times faster ???
+		Ipp64f sum = 0;
+		const int stridebytes = stride * 8;	// 8 bytes per word
+		const unsigned __int8* bits_u8 = ((const unsigned __int8*)bits) + (ptrdiff_t(y) * stridebytes) + x;
+		ippiSum_8u_C1R(bits_u8, stridebytes, { width, height }, &sum);
+		return (unsigned __int64)sum;
+#else
+		unsigned __int64 sum = 0;
+		const int stridebytes = stride * 8;	// 8 bytes per word
+		for (int iy = 0, off = (y * stridebytes) + x; iy < height; iy++, off += stridebytes)
+		{
+			sum += (unsigned __int64)::sum_ip_u8(width, (const unsigned __int8*)bits, off);
+		}
 
-	return (__int64)sum;
+		return sum;
+#endif
+	}
+	}
+
+	return (unsigned __int64)-1;
 }
 
 GENIXAPI(BOOL, is_all_white)(

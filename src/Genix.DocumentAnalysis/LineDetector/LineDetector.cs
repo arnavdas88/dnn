@@ -267,7 +267,7 @@ namespace Genix.DocumentAnalysis
                     // Test density near the line if there are not enough intersections
                     if (!isBad && CountIntersections(bounds) < 2)
                     {
-                        long count = CountAdjacentPixels(maxWidth, bounds);
+                        ulong count = CountAdjacentPixels(maxWidth, bounds);
                         if (count > bounds.Area * LineDetector.MaxNonLineDensity)
                         {
                             isBad = true;
@@ -291,7 +291,7 @@ namespace Genix.DocumentAnalysis
 
                 return answer;
 
-                long CountAdjacentPixels(int lineWidth, Rectangle bounds)
+                ulong CountAdjacentPixels(int lineWidth, Rectangle bounds)
                 {
                     if (vertical)
                     {

@@ -232,6 +232,74 @@ GENIXAPI(int, _convert2to8)(
 	return 0;
 }
 
+unsigned __int64 __forceinline bits4to1(const unsigned __int64 bits, int threshold)
+{
+	unsigned __int32 result = 0;
+
+	result |= ((int((bits >> 60) & 0x0f) - threshold) >> 16) & 0x8000;
+	result |= ((int((bits >> 56) & 0x0f) - threshold) >> 17) & 0x4000;
+	result |= ((int((bits >> 52) & 0x0f) - threshold) >> 18) & 0x2000;
+	result |= ((int((bits >> 48) & 0x0f) - threshold) >> 19) & 0x1000;
+
+	result |= ((int((bits >> 44) & 0x0f) - threshold) >> 20) & 0x0800;
+	result |= ((int((bits >> 40) & 0x0f) - threshold) >> 21) & 0x0400;
+	result |= ((int((bits >> 36) & 0x0f) - threshold) >> 22) & 0x0200;
+	result |= ((int((bits >> 32) & 0x0f) - threshold) >> 23) & 0x0100;
+
+	result |= ((int((bits >> 28) & 0x0f) - threshold) >> 24) & 0x0080;
+	result |= ((int((bits >> 24) & 0x0f) - threshold) >> 25) & 0x0040;
+	result |= ((int((bits >> 20) & 0x0f) - threshold) >> 26) & 0x0020;
+	result |= ((int((bits >> 16) & 0x0f) - threshold) >> 27) & 0x0010;
+
+	result |= ((int((bits >> 12) & 0x0f) - threshold) >> 28) & 0x0008;
+	result |= ((int((bits >> 8) & 0x0f) - threshold) >> 29) & 0x0004;
+	result |= ((int((bits >> 4) & 0x0f) - threshold) >> 30) & 0x0002;
+	result |= ((int((bits >> 0) & 0x0f) - threshold) >> 31) & 0x0001;
+
+	return result;
+}
+
+GENIXAPI(int, _convert4to1)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const __int32 threshold)
+{
+	src += (ptrdiff_t(y) * stridesrc) + (x / 16);
+	dst += (ptrdiff_t(y) * stridedst) + (x / 64);
+
+	const int width64 = width & ~63;
+	for (int iy = 0, offysrc = 0, offydst = 0; iy < height; iy++, offysrc += stridesrc, offydst += stridedst)
+	{
+		int offxsrc = offysrc;
+		int offxdst = offydst;
+
+		// convert 64 bits at a time
+		int ix = 0;
+		for (; ix < width64; ix += 64, offxdst++, offxsrc += 4)
+		{
+			dst[offxdst] =
+				(bits4to1(src[offxsrc + 0], threshold) << 0) |
+				(bits4to1(src[offxsrc + 1], threshold) << 16) |
+				(bits4to1(src[offxsrc + 2], threshold) << 32) |
+				(bits4to1(src[offxsrc + 3], threshold) << 48);
+		}
+
+		// convert remaining bits
+		if (ix < width)
+		{
+			dst[offxdst] = 0;
+			for (; ix < width; ix += 16, offxsrc++)
+			{
+				dst[offxdst] |= bits4to1(src[offxsrc], threshold) << (ix & 63);
+			}
+		}
+	}
+
+	return 0;
+}
+
 GENIXAPI(int, _convert4to8)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
@@ -248,7 +316,7 @@ GENIXAPI(int, _convert4to8)(
 	{
 		map[i] =
 			(((i & 0xf0) >> 4) | (i & 0xf0)) << 8 |
-			(((i & 0x0f) << 4) | (i & 0x0f)) ;
+			(((i & 0x0f) << 4) | (i & 0x0f));
 	}
 
 	const unsigned __int16* src_u16 = (const unsigned __int16*)src;
@@ -287,7 +355,7 @@ GENIXAPI(int, _convert4to8)(
 
 unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, int threshold)
 {
-	unsigned __int8 result = 0;
+	unsigned __int32 result = 0;
 
 	result |= ((int((bits >> 56) & 0xff) - threshold) >> 24) & 0x80;
 	result |= ((int((bits >> 48) & 0xff) - threshold) >> 25) & 0x40;
@@ -307,7 +375,7 @@ GENIXAPI(int, _convert8to1)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
 	unsigned __int64* dst, const int stridedst,
-	const unsigned __int8 threshold)
+	const __int32 threshold)
 {
 	/*return ippiGrayToBin_8u1u_C1R(
 		(const Ipp8u*)src,
@@ -409,6 +477,71 @@ GENIXAPI(int, _convert8to32f)(
 		dst_f32,
 		stridedst * sizeof(float),
 		{ width, height });
+}
+
+unsigned __int64 __forceinline bits16to1(const unsigned __int64 bits, int threshold)
+{
+	unsigned __int32 result = 0;
+
+	result |= ((int((bits >> 48) & 0xffff) - threshold) >> 28) & 0x08;
+	result |= ((int((bits >> 32) & 0xffff) - threshold) >> 29) & 0x04;
+	result |= ((int((bits >> 16) & 0xffff) - threshold) >> 30) & 0x02;
+	result |= ((int((bits >> 0) & 0xffff) - threshold) >> 31) & 0x01;
+
+	return result;
+}
+
+GENIXAPI(int, _convert16to1)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int64* src, const int stridesrc,
+	unsigned __int64* dst, const int stridedst,
+	const __int32 threshold)
+{
+	src += (ptrdiff_t(y) * stridesrc) + (x / 4);
+	dst += (ptrdiff_t(y) * stridedst) + (x / 64);
+
+	const int width64 = width & ~63;
+	for (int iy = 0, offysrc = 0, offydst = 0; iy < height; iy++, offysrc += stridesrc, offydst += stridedst)
+	{
+		int offxsrc = offysrc;
+		int offxdst = offydst;
+
+		// convert 64 bits at a time
+		int ix = 0;
+		for (; ix < width64; ix += 64, offxdst++, offxsrc += 16)
+		{
+			dst[offxdst] =
+				(bits16to1(src[offxsrc + 0], threshold) << 0) |
+				(bits16to1(src[offxsrc + 1], threshold) << 4) |
+				(bits16to1(src[offxsrc + 2], threshold) << 8) |
+				(bits16to1(src[offxsrc + 3], threshold) << 12) |
+				(bits16to1(src[offxsrc + 4], threshold) << 16) |
+				(bits16to1(src[offxsrc + 5], threshold) << 20) |
+				(bits16to1(src[offxsrc + 6], threshold) << 24) |
+				(bits16to1(src[offxsrc + 7], threshold) << 28) |
+			    (bits16to1(src[offxsrc + 8], threshold) << 32) |
+				(bits16to1(src[offxsrc + 9], threshold) << 36) |
+				(bits16to1(src[offxsrc + 10], threshold) << 40) |
+				(bits16to1(src[offxsrc + 11], threshold) << 44) |
+				(bits16to1(src[offxsrc + 12], threshold) << 48) |
+				(bits16to1(src[offxsrc + 13], threshold) << 52) |
+				(bits16to1(src[offxsrc + 14], threshold) << 56) |
+				(bits16to1(src[offxsrc + 15], threshold) << 60);
+		}
+
+		// convert remaining bits
+		if (ix < width)
+		{
+			dst[offxdst] = 0;
+			for (; ix < width; ix += 4, offxsrc++)
+			{
+				dst[offxdst] |= bits16to1(src[offxsrc], threshold) << (ix & 63);
+			}
+		}
+	}
+
+	return 0;
 }
 
 GENIXAPI(int, _convert24to8)(

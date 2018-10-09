@@ -666,7 +666,7 @@ namespace Genix.Imaging
                 current.Clear();
             }
 
-            Debug.Assert(this.Power(x, y, width, height) == all.Sum(value => value.Power), "The number of pixels on image and in components must match.");
+            Debug.Assert(this.Power(x, y, width, height) == (ulong)all.Sum(value => value.Power), "The number of pixels on image and in components must match.");
             return all;
         }
 
@@ -1365,13 +1365,13 @@ namespace Genix.Imaging
 
             StructuringElement se = connectivity == 8 ? StructuringElement.Square(3) : StructuringElement.Cross(3);
 
-            long pixelCount = this.Power();
+            ulong pixelCount = this.Power();
             while (pixelCount > 0)
             {
                 this.Dilate(this, se, 1, BorderType.BorderConst, 0);
                 this.And(this, mask);
 
-                long oldPixelCount = pixelCount;
+                ulong oldPixelCount = pixelCount;
                 pixelCount = this.Power();
                 if (oldPixelCount == pixelCount)
                 {

@@ -401,15 +401,23 @@ namespace Genix.Imaging
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            public static extern int scale8(
-               int widthsrc,
-               int heightsrc,
-               int stridesrc,
-               [In] ulong[] src,
-               int widthdst,
-               int heightdst,
-               int stridedst,
-               [Out] ulong[] dst);
+            public static extern int resize(
+                int bitsPerPixel,
+                int widthsrc,
+                int heightsrc,
+                [In] ulong[] src,
+                int stridesrc,
+                int widthdst,
+                int heightdst,
+                [Out] ulong[] dst,
+                int stridedst,
+                InterpolationType interpolationType,
+                [MarshalAs(UnmanagedType.Bool)] bool antializing,
+                float valueB,
+                float valueC,
+                uint numLobes,
+                BorderType borderType,
+                uint borderValue);
         }
     }
 }

@@ -34,7 +34,8 @@ namespace Genix.Imaging
         /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public long Power() => this.Power(0, 0, this.Width, this.Height);
+        [CLSCompliant(false)]
+        public ulong Power() => this.Power(0, 0, this.Width, this.Height);
 
         /// <summary>
         /// Calculates the <see cref="Image"/> intensity withing a rectangular area
@@ -58,17 +59,16 @@ namespace Genix.Imaging
         /// <remarks>
         /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
-        public long Power(int x, int y, int width, int height)
+        [CLSCompliant(false)]
+        public ulong Power(int x, int y, int width, int height)
         {
             this.ValidateArea(x, y, width, height);
 
             switch (this.BitsPerPixel)
             {
                 case 1:
-                    return NativeMethods.power_1bpp(x, y, width, height, this.Bits, this.Stride);
-
                 case 8:
-                    return NativeMethods.power_8bpp(x, y, width, height, this.Bits, this.Stride);
+                    return NativeMethods.power(this.BitsPerPixel, x, y, width, height, this.Bits, this.Stride);
 
                 default:
                     throw new NotSupportedException(string.Format(
@@ -98,7 +98,8 @@ namespace Genix.Imaging
         /// This method supports binary and gray images only and will throw an exception otherwise.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public long Power(Rectangle area) => this.Power(area.X, area.Y, area.Width, area.Height);
+        [CLSCompliant(false)]
+        public ulong Power(Rectangle area) => this.Power(area.X, area.Y, area.Width, area.Height);
 
         /// <summary>
         /// Determines whether the <see cref="Image"/> contains only white pixels.
@@ -860,16 +861,8 @@ namespace Genix.Imaging
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            public static extern long power_1bpp(
-               int x,
-               int y,
-               int width,
-               int height,
-               [In] ulong[] bits,
-               int stride);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern long power_8bpp(
+            public static extern ulong power(
+                int bitsPerPixel,
                 int x,
                 int y,
                 int width,

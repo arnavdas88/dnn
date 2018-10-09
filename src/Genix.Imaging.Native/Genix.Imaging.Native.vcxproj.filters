@@ -25,9 +25,6 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="source\scale.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,6 +50,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\arithmetic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\resize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

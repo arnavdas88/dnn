@@ -52,6 +52,12 @@ namespace Genix.Imaging.Leptonica
         public static extern SafePixHandle pixOtsuThreshOnBackgroundNorm(SafePixHandle pix, SafePixHandle pixim, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy, float scorefract, out int pthresh);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern SafePixHandle pixBackgroundNorm(SafePixHandle pixs, SafePixHandle pixim, SafePixHandle pixg, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy);
+
+        [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern SafePixHandle pixBackgroundNormMorph(SafePixHandle pixs, SafePixHandle pixim, int reduction, int size, int bgval);
+
+        [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int pixWriteMemBmp(out IntPtr fdata, out IntPtr fsize, SafePixHandle pix);
 
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]

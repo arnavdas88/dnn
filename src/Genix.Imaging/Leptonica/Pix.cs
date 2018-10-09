@@ -192,6 +192,50 @@ namespace Genix.Imaging.Leptonica
         }
 
         /// <summary>
+        /// Normalizes the image intensity by mapping the image so that the background is near 200.
+        /// </summary>
+        /// <param name="pixim">The optional 1bpp mask image.</param>
+        /// <param name="pixg">The optional 8bpp gray scale version.</param>
+        /// <returns>The destination <see cref="Pix"/>.</returns>
+        public Pix BackgroundNorm(Pix pixim, Pix pixg)
+        {
+            return this.BackgroundNorm(pixim, pixg, 10, 15, 60, 40, 200, 2, 1);
+        }
+
+        /// <summary>
+        /// Normalizes the image intensity by mapping the image so that the background is near the input value <paramref name="bgval"/>.
+        /// </summary>
+        /// <param name="pixim">The optional 1bpp mask image.</param>
+        /// <param name="pixg">The optional 8bpp gray scale version.</param>
+        /// <param name="sx">The tile width, in pixels.</param>
+        /// <param name="sy">The tile height, in pixels.</param>
+        /// <param name="thresh">The threshold for determining foreground.</param>
+        /// <param name="mincount">The minimum number of background pixels in tile.</param>
+        /// <param name="bgval">The target background value.</param>
+        /// <param name="smoothx">The half-width of block convolution kernel width.</param>
+        /// <param name="smoothy">The half-width of block convolution kernel height.</param>
+        /// <returns>The destination <see cref="Pix"/>.</returns>
+        public Pix BackgroundNorm(Pix pixim, Pix pixg, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy)
+        {
+            SafePixHandle pixd = NativeMethods.pixBackgroundNorm(this.handle, pixim?.handle, pixg?.handle, sx, sy, thresh, mincount, bgval, smoothx, smoothy);
+            return new Pix(pixd);
+        }
+
+        /// <summary>
+        /// Normalizes the image intensity by mapping the image so that the background is near the input value <paramref name="bgval"/>.
+        /// </summary>
+        /// <param name="pixim">The optional 1bpp mask image.</param>
+        /// <param name="reduction">The sub sampling image reduction at which morph closings are done; between 2 and 16.</param>
+        /// <param name="size">The size of s.e. for the closing; use odd number.</param>
+        /// <param name="bgval">The target background value.</param>
+        /// <returns>The destination <see cref="Pix"/>.</returns>
+        public Pix BackgroundNormMorph(Pix pixim, int reduction, int size, int bgval)
+        {
+            SafePixHandle pixd = NativeMethods.pixBackgroundNormMorph(this.handle, pixim?.handle, reduction, size, bgval);
+            return new Pix(pixd);
+        }
+
+        /// <summary>
         /// Finds connected components on this <see cref="Pix"/>.
         /// </summary>
         /// <param name="connectivity">The pixel connectivity (4 or 8).</param>

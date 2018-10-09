@@ -158,18 +158,20 @@ namespace Genix.Imaging
             int sx = 64;
             int sy = 128;
             byte threshold = 128;
+            int mincount = (sx * sy) / 3;
 
-            Histogram ghist = this.GrayHistogram();
-            Histogram vhist = this.HistogramY();
+            ////Histogram ghist = this.GrayHistogram();
+            ////Histogram vhist = this.HistogramY();
 
             // generate foreground mask
-            Image mask = this
+            Image maskb = this
                 .Convert8To1(null, threshold)
-                .Dilate(null, StructuringElement.Square(7), 1, BorderType.BorderConst, 0)
-                .Convert1To8(null);
+                .Dilate(null, StructuringElement.Square(7), 1, BorderType.BorderConst, 0);
+
+            Image maskg = maskb.Convert1To8(null);
 
             // use mask to remove foreground pixels from original image
-            Image values = this & mask;
+            Image values = this & maskg;
 
             // generate map
             ////int wd = (this.Width + sx - 1) / sx;
@@ -177,7 +179,7 @@ namespace Genix.Imaging
 
             int nx = this.Width / sx;
             int ny = this.Height / sy;
-            long[] map = new long[ny * nx];
+            byte[] map = new byte[ny * nx];
 
             for (int iy = 0, ty = 0, imap = 0; iy < ny; iy++, ty += sy)
             {
@@ -187,7 +189,14 @@ namespace Genix.Imaging
                 {
                     int tw = ix + 1 == nx ? this.Width - tx : sx;
 
-                    map[imap++] = values.Power(tx, ty, tw, th);
+                    int count = (tw * th) - (int)maskb.Power(tx, ty, tw, th);
+                    if (count >= mincount)
+                    {
+                        int sum = (int)values.Power(tx, ty, tw, th);
+                        map[imap] = (byte)(sum / count);
+                    }
+
+                    imap++;
                 }
             }
 
@@ -556,6 +565,64 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Converts a 4-bit gray scale <see cref="Image"/> to binary.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="threshold">The threshold level.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// <para>
+        /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0 (white).
+        /// </para>
+        /// <para>
+        /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1 (black).
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 4 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image Convert4To1(Image dst, byte threshold)
+        {
+            if (this.BitsPerPixel != 4)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, 1);
+
+            if (NativeMethods._convert4to1(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                threshold) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Converts a 4-bit gray scale <see cref="Image"/> to 8-bit gray scale <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -874,6 +941,65 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Converts a 16-bit gray scale <see cref="Image"/> to binary.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="threshold">The threshold level.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// <para>
+        /// If the input pixel is more than, or equal to the <paramref name="threshold"/> value, the corresponding output bit is set to 0 (white).
+        /// </para>
+        /// <para>
+        /// If the input pixel is less than the <paramref name="threshold"/> value, the corresponding output bit is set to 1 (black).
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 16 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [CLSCompliant(false)]
+        public Image Convert16To1(Image dst, ushort threshold)
+        {
+            if (this.BitsPerPixel != 16)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, 1);
+
+            if (NativeMethods._convert16to1(
+                0,
+                0,
+                this.Width,
+                this.Height,
+                this.Bits,
+                this.Stride,
+                dst.Bits,
+                dst.Stride,
+                threshold) != 0)
+            {
+                throw new OutOfMemoryException();
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Converts a color 24-bit <see cref="Image"/> to gray scale using fixed transform coefficients.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -1133,6 +1259,18 @@ namespace Genix.Imaging
               byte value3);
 
             [DllImport(NativeMethods.DllName)]
+            public static extern int _convert4to1(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                int threshold);
+
+            [DllImport(NativeMethods.DllName)]
             public static extern int _convert4to8(
               int width,
               int height,
@@ -1151,7 +1289,7 @@ namespace Genix.Imaging
                 int stridesrc,
                 [Out] ulong[] dst,
                 int stridedst,
-                byte threshold);
+                int threshold);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _convert8to24(
@@ -1186,6 +1324,18 @@ namespace Genix.Imaging
                 int stridesrc,
                 [Out] float[] dst,
                 int stridedst);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int _convert16to1(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int stridesrc,
+                [Out] ulong[] dst,
+                int stridedst,
+                int threshold);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _convert24to8(
