@@ -23,21 +23,21 @@
                     if ((ix == 0 || ix == Width - 1) && (iy == 0 || iy == Height - 1))
                     {
                         Assert.AreEqual(
-                            4,
+                            4ul,
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }
                     else if ((ix == 0 || ix == Width - 1) || (iy == 0 || iy == Height - 1))
                     {
                         Assert.AreEqual(
-                            6,
+                            6ul,
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }
                     else
                     {
                         Assert.AreEqual(
-                            9,
+                            9ul,
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }
@@ -63,21 +63,21 @@
                     if ((ix == 0 || ix == Width - 1) && (iy == 0 || iy == Height - 1))
                     {
                         Assert.AreEqual(
-                            (Width * Height) - 4,
+                            (ulong)((Width * Height) - 4),
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }
                     else if ((ix == 0 || ix == Width - 1) || (iy == 0 || iy == Height - 1))
                     {
                         Assert.AreEqual(
-                            (Width * Height) - 6,
+                            (ulong)((Width * Height) - 6),
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }
                     else
                     {
                         Assert.AreEqual(
-                            (Width * Height) - 9,
+                            (ulong)((Width * Height) - 9),
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
                     }

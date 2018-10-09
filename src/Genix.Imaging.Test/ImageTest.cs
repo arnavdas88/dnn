@@ -25,9 +25,9 @@
             image.SetPixel(64 + 37, 19, 1);
             image.SetPixel((2 * 64) + 11, 29, 1);
 
-            Assert.AreEqual(3, image.Power());
-            Assert.AreEqual(2, image.Power(5, 9, 134, 20));
-            Assert.AreEqual(3, image.Power(5, 9, 135, 21));
+            Assert.AreEqual(3ul, image.Power());
+            Assert.AreEqual(2ul, image.Power(5, 9, 134, 20));
+            Assert.AreEqual(3ul, image.Power(5, 9, 135, 21));
         }
 
         /// <summary>
@@ -42,9 +42,9 @@
             image.SetPixel(64 + 37, 19, 128);
             image.SetPixel((2 * 64) + 11, 29, 64);
 
-            Assert.AreEqual(255 + 128 + 64, image.Power());
-            Assert.AreEqual(255 + 128, image.Power(5, 9, 134, 20));
-            Assert.AreEqual(255 + 128 + 64, image.Power(5, 9, 135, 21));
+            Assert.AreEqual(255ul + 128ul + 64ul, image.Power());
+            Assert.AreEqual(255ul + 128ul, image.Power(5, 9, 134, 20));
+            Assert.AreEqual(255ul + 128ul + 64ul, image.Power(5, 9, 135, 21));
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@
             Assert.AreEqual(new Rectangle(0, 0, 18, 33), image.Bounds);
             Assert.AreEqual(1u, image.GetPixel(0, 0));
             Assert.AreEqual(1u, image.GetPixel(17, 32));
-            Assert.AreEqual(2, image.Power());
+            Assert.AreEqual(2ul, image.Power());
         }
 
         [TestMethod]

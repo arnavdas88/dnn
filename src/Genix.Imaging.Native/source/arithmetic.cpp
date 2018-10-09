@@ -33,12 +33,15 @@ GENIXAPI(int, _add)(
 
 // Adds a constant to pixel values of an image.
 GENIXAPI(int, _addc)(
-	int bitsPerPixel, int width, int height,
-	const Ipp8u* src, int srcstep,
-	unsigned value,
-	Ipp8u* dst, int dststep,
-	int scaleFactor)
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const Ipp8u* src, const int srcstep,
+	const unsigned value,
+	Ipp8u* dst, const int dststep,
+	const int scaleFactor)
 {
+	dst += (ptrdiff_t(y) * dststep) + (x * bitsPerPixel / 8);
+
 	if (src == NULL)
 	{
 		switch (bitsPerPixel)
@@ -51,6 +54,8 @@ GENIXAPI(int, _addc)(
 	}
 	else
 	{
+		src += (ptrdiff_t(y) * srcstep) + (x * bitsPerPixel / 8);
+
 		switch (bitsPerPixel)
 		{
 		case 8: return ippiAddC_8u_C1RSfs(src, srcstep, value, dst, dststep, { width, height }, scaleFactor);
@@ -93,12 +98,15 @@ GENIXAPI(int, _sub)(
 
 // Subtracts a constant from pixel values of an image.
 GENIXAPI(int, _subc)(
-	int bitsPerPixel, int width, int height,
-	const Ipp8u* src, int srcstep,
-	unsigned value,
-	Ipp8u* dst, int dststep,
-	int scaleFactor)
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const Ipp8u* src, const int srcstep,
+	const unsigned value,
+	Ipp8u* dst, const int dststep,
+	const int scaleFactor)
 {
+	dst += (ptrdiff_t(y) * dststep) + (x * bitsPerPixel / 8);
+
 	if (src == NULL)
 	{
 		switch (bitsPerPixel)
@@ -111,6 +119,8 @@ GENIXAPI(int, _subc)(
 	}
 	else
 	{
+		src += (ptrdiff_t(y) * srcstep) + (x * bitsPerPixel / 8);
+
 		switch (bitsPerPixel)
 		{
 		case 8: return ippiSubC_8u_C1RSfs(src, srcstep, value, dst, dststep, { width, height }, scaleFactor);
@@ -153,12 +163,15 @@ GENIXAPI(int, _mul)(
 
 // Multiplies pixel values of an image by a constant.
 GENIXAPI(int, _mulc)(
-	int bitsPerPixel, int width, int height,
-	const Ipp8u* src, int srcstep,
-	unsigned value,
-	Ipp8u* dst, int dststep,
-	int scaleFactor)
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const Ipp8u* src, const int srcstep,
+	const unsigned value,
+	Ipp8u* dst, const int dststep,
+	const int scaleFactor)
 {
+	dst += (ptrdiff_t(y) * dststep) + (x * bitsPerPixel / 8);
+
 	if (src == NULL)
 	{
 		switch (bitsPerPixel)
@@ -171,6 +184,8 @@ GENIXAPI(int, _mulc)(
 	}
 	else
 	{
+		src += (ptrdiff_t(y) * srcstep) + (x * bitsPerPixel / 8);
+
 		switch (bitsPerPixel)
 		{
 		case 8: return ippiMulC_8u_C1RSfs(src, srcstep, value, dst, dststep, { width, height }, scaleFactor);
@@ -213,12 +228,15 @@ GENIXAPI(int, _div)(
 
 // Divides pixel values of an image by pixel values of another image.
 GENIXAPI(int, _divc)(
-	int bitsPerPixel, int width, int height,
-	const Ipp8u* src, int srcstep,
-	unsigned value,
-	Ipp8u* dst, int dststep,
-	int scaleFactor)
+	const int bitsPerPixel,
+	const int x, const int y, const int width, const int height,
+	const Ipp8u* src, const int srcstep,
+	const unsigned value,
+	Ipp8u* dst, const int dststep,
+	const int scaleFactor)
 {
+	dst += (ptrdiff_t(y) * dststep) + (x * bitsPerPixel / 8);
+
 	if (src == NULL)
 	{
 		switch (bitsPerPixel)
@@ -231,6 +249,8 @@ GENIXAPI(int, _divc)(
 	}
 	else
 	{
+		src += (ptrdiff_t(y) * srcstep) + (x * bitsPerPixel / 8);
+
 		switch (bitsPerPixel)
 		{
 		case 8: return ippiDivC_8u_C1RSfs(src, srcstep, value, dst, dststep, { width, height }, scaleFactor);

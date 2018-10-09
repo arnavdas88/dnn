@@ -171,36 +171,108 @@ namespace Genix.Imaging
             Image maskg = maskb.Convert1To8(null);
 
             // use mask to remove foreground pixels from original image
-            Image values = this & maskg;
+            maskg = this & maskg;
 
-            // generate map
-            ////int wd = (this.Width + sx - 1) / sx;
-            ////int hd = (this.Height + sy - 1) / sy;
-
+            // calculate adaptive map
             int nx = this.Width / sx;
             int ny = this.Height / sy;
-            byte[] map = new byte[ny * nx];
+            byte[][] map = JaggedArray.Create<byte>(ny, nx);
+            CalculateMap();
 
-            for (int iy = 0, ty = 0, imap = 0; iy < ny; iy++, ty += sy)
+            // fill holes in map
+            FillHoles();
+
+            // apply map to source image
+            for (int iy = 0, ty = 0; iy < ny; iy++, ty += sy)
             {
                 int th = iy + 1 == ny ? this.Height - ty : sy;
+                byte[] row = map[iy];
 
                 for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                 {
                     int tw = ix + 1 == nx ? this.Width - tx : sx;
 
-                    int count = (tw * th) - (int)maskb.Power(tx, ty, tw, th);
-                    if (count >= mincount)
-                    {
-                        int sum = (int)values.Power(tx, ty, tw, th);
-                        map[imap] = (byte)(sum / count);
-                    }
-
-                    imap++;
+                    this.DivC(this, tx, ty, tw, th, row[ix], -8);
                 }
             }
 
             return this;
+
+            void CalculateMap()
+            {
+                for (int iy = 0, ty = 0; iy < ny; iy++, ty += sy)
+                {
+                    int th = iy + 1 == ny ? this.Height - ty : sy;
+                    byte[] row = map[iy];
+
+                    for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
+                    {
+                        int tw = ix + 1 == nx ? this.Width - tx : sx;
+
+                        int count = (tw * th) - (int)maskb.Power(tx, ty, tw, th);
+                        if (count >= mincount)
+                        {
+                            int sum = (int)maskg.Power(tx, ty, tw, th);
+                            row[ix] = (byte)(sum / count);
+                        }
+                    }
+                }
+            }
+
+            void FillHoles()
+            {
+                bool needBackwardPass = false;
+                byte[] prev = null;
+                for (int iy = 0; iy < ny; iy++)
+                {
+                    byte[] row = map[iy];
+                    for (int ix = 0; ix < nx; ix++)
+                    {
+                        if (row[ix] == 0)
+                        {
+                            if (iy > 0 && prev[ix] != 0)
+                            {
+                                row[ix] = prev[ix];
+                            }
+                            else if (ix > 0 && row[ix - 1] != 0)
+                            {
+                                row[ix] = row[ix - 1];
+                            }
+                            else
+                            {
+                                needBackwardPass = true;
+                            }
+                        }
+                    }
+
+                    prev = row;
+                }
+
+                if (needBackwardPass)
+                {
+                    prev = null;
+                    for (int iy = ny - 1; iy >= 0; iy--)
+                    {
+                        byte[] row = map[iy];
+                        for (int ix = nx - 1; ix >= 0; ix--)
+                        {
+                            if (row[ix] == 0)
+                            {
+                                if (iy < ny - 1 && prev[ix] != 0)
+                                {
+                                    row[ix] = prev[ix];
+                                }
+                                else if (ix < nx - 1 && row[ix + 1] != 0)
+                                {
+                                    row[ix] = row[ix + 1];
+                                }
+                            }
+
+                            prev = row;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -3,7 +3,7 @@
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
-
+#if false
 namespace Genix.Imaging
 {
     using System;
@@ -253,6 +253,8 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             public static extern int _addc(
                 int bitsPerPixel,
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -265,6 +267,8 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             public static extern int _subc(
                 int bitsPerPixel,
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -277,6 +281,8 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             public static extern int _mulc(
                 int bitsPerPixel,
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -289,6 +295,8 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             public static extern int _divc(
                 int bitsPerPixel,
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src,
@@ -300,3 +308,4 @@ namespace Genix.Imaging
         }
     }
 }
+#endif

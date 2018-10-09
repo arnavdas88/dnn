@@ -121,7 +121,7 @@
     <Compile Include="Vectors\DenseVectorPackF.cs" />
     <Compile Include="Vectors\IDenseVector.cs" />
     <Compile Include="Vectors\IVector.cs" />
-    <Compile Include="Math\JaggedArray.cs" />
+    <Compile Include="Collections\JaggedArray.cs" />
     <Compile Include="Math\Mathematics.cs" />
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\MatrixLayout.cs" />

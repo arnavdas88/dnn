@@ -217,7 +217,7 @@ namespace Genix.Imaging.Leptonica
         /// <returns>The destination <see cref="Pix"/>.</returns>
         public Pix BackgroundNorm(Pix pixim, Pix pixg, int sx, int sy, int thresh, int mincount, int bgval, int smoothx, int smoothy)
         {
-            SafePixHandle pixd = NativeMethods.pixBackgroundNorm(this.handle, pixim?.handle, pixg?.handle, sx, sy, thresh, mincount, bgval, smoothx, smoothy);
+            SafePixHandle pixd = NativeMethods.pixBackgroundNorm(this.handle, pixim?.handle ?? new SafePixHandle(), pixg?.handle ?? new SafePixHandle(), sx, sy, thresh, mincount, bgval, smoothx, smoothy);
             return new Pix(pixd);
         }
 
@@ -231,7 +231,7 @@ namespace Genix.Imaging.Leptonica
         /// <returns>The destination <see cref="Pix"/>.</returns>
         public Pix BackgroundNormMorph(Pix pixim, int reduction, int size, int bgval)
         {
-            SafePixHandle pixd = NativeMethods.pixBackgroundNormMorph(this.handle, pixim?.handle, reduction, size, bgval);
+            SafePixHandle pixd = NativeMethods.pixBackgroundNormMorph(this.handle, pixim?.handle ?? new SafePixHandle(), reduction, size, bgval);
             return new Pix(pixd);
         }
 
