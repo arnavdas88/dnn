@@ -46,18 +46,12 @@ GENIXAPI(int, _convert1to8)(
 		int xdst = 0;
 		int xsrc = 0;
 
-		int x = 0;
-		for (; x < width64; x += 64)
+		// convert 64 pixels at a time
+		for (; xdst < width64; xdst += 64, xsrc += 8)
 		{
-			const unsigned __int64 b = src[offxsrc++];
-			dst[offxdst++] = map[(b >> 0) & 0xff];
-			dst[offxdst++] = map[(b >> 8) & 0xff];
-			dst[offxdst++] = map[(b >> 16) & 0xff];
-			dst[offxdst++] = map[(b >> 24) & 0xff];
-			dst[offxdst++] = map[(b >> 32) & 0xff];
-			dst[offxdst++] = map[(b >> 40) & 0xff];
-			dst[offxdst++] = map[(b >> 48) & 0xff];
-			dst[offxdst++] = map[(b >> 56) & 0xff];
+			const unsigned __int64 b = *(const unsigned __int64*)(src + xsrc);
+			unsigned __int64* dst64 = (unsigned __int64*)(dst + xdst);
+			dst64[0] = map[(b >> 0) & 0xff];
 			dst64[1] = map[(b >> 8) & 0xff];
 			dst64[2] = map[(b >> 16) & 0xff];
 			dst64[3] = map[(b >> 24) & 0xff];
