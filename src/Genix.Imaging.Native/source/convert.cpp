@@ -10,21 +10,15 @@
 
 GENIXAPI(int, _convert1to8)(
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const unsigned __int8 value0,
 	const unsigned __int8 value1)
 {
-	/*return ippiBinToGray_1u8u_C1R(
-		(const Ipp8u*)src,
-		stridesrc * sizeof(unsigned __int64),
-		0,
-		(Ipp8u*)dst,
-		stridedst * sizeof(unsigned __int64),
-		{ width, height },
-		255,
-		0);*/
-
+#if false
+	// IPP version is aproximately ~10 times slower ???
+	return ippiBinToGray_1u8u_C1R(src, stridesrc, 0, dst, stridedst, { width, height }, value0, value1);
+#else
 	unsigned __int64* map = (unsigned __int64*)::malloc(256 * sizeof(unsigned __int64));
 	if (map == NULL)
 	{
@@ -47,12 +41,11 @@ GENIXAPI(int, _convert1to8)(
 	}
 
 	const int width64 = width & ~63;
-	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	for (int y = 0; y < height; y++, src += stridesrc, dst += stridedst)
 	{
-		int offxsrc = offysrc;
-		int offxdst = offydst;
+		int xdst = 0;
+		int xsrc = 0;
 
-		// convert 8 words at a time
 		int x = 0;
 		for (; x < width64; x += 64)
 		{
@@ -65,22 +58,26 @@ GENIXAPI(int, _convert1to8)(
 			dst[offxdst++] = map[(b >> 40) & 0xff];
 			dst[offxdst++] = map[(b >> 48) & 0xff];
 			dst[offxdst++] = map[(b >> 56) & 0xff];
+			dst64[1] = map[(b >> 8) & 0xff];
+			dst64[2] = map[(b >> 16) & 0xff];
+			dst64[3] = map[(b >> 24) & 0xff];
+			dst64[4] = map[(b >> 32) & 0xff];
+			dst64[5] = map[(b >> 40) & 0xff];
+			dst64[6] = map[(b >> 48) & 0xff];
+			dst64[7] = map[(b >> 56) & 0xff];
 		}
 
-		// convert remaining bits
-		if (x < width)
+		for (; xdst < width; xdst += 8, xsrc++)
 		{
-			const unsigned __int64 b = src[offxsrc];
-			for (; x < width; x += 8)
-			{
-				dst[offxdst++] = map[(b >> (x & 63)) & 0xff];
-			}
+			unsigned __int64* dst64 = (unsigned __int64*)(dst + xdst);
+			dst64[0] = map[src[xsrc]];
 		}
 	}
 
 	::free(map);
 
 	return 0;
+#endif
 }
 
 GENIXAPI(int, _convert1to16)(
@@ -101,31 +98,37 @@ GENIXAPI(int, _convert1to16)(
 			(values[(i >> 0) & 1] << (0 * 16));
 	}
 
-	const int width64 = width & ~63;
-	for (int y = 0, offysrc = 0, offydst = 0; y < height; y++, offysrc += stridesrc, offydst += stridedst)
+	const int stridedst16 = stridedst & ~15;
+	for (int y = 0; y < height; y++, src += stridesrc, dst += stridedst)
 	{
-		int offxsrc = offysrc;
-		int offxdst = offydst;
+		int offdst = 0;
+		int offsrc = 0;
 
-		// convert 64 bits at a time (16 pixels)
-		int x = 0;
-		for (; x < width64; x += 64)
+		// convert 64 pixels at a time
+		for (; offdst < stridedst16; offdst += 16, offsrc++)
 		{
-			unsigned __int64 b = src[offxsrc++];
-			for (int i = 0; i < 64; i += 4, b >>= 4)
-			{
-				dst[offxdst++] = map[b & 15];
-			}
+			const unsigned __int64 b = src[offsrc];
+			dst[offdst + 0] = map[(b >> 0) & 0x0f];
+			dst[offdst + 1] = map[(b >> 4) & 0x0f];
+			dst[offdst + 2] = map[(b >> 8) & 0x0f];
+			dst[offdst + 3] = map[(b >> 12) & 0x0f];
+			dst[offdst + 4] = map[(b >> 16) & 0x0f];
+			dst[offdst + 5] = map[(b >> 20) & 0x0f];
+			dst[offdst + 6] = map[(b >> 24) & 0x0f];
+			dst[offdst + 7] = map[(b >> 28) & 0x0f];
+			dst[offdst + 8] = map[(b >> 32) & 0x0f];
+			dst[offdst + 9] = map[(b >> 36) & 0x0f];
+			dst[offdst + 10] = map[(b >> 40) & 0x0f];
+			dst[offdst + 11] = map[(b >> 44) & 0x0f];
+			dst[offdst + 12] = map[(b >> 48) & 0x0f];
+			dst[offdst + 13] = map[(b >> 52) & 0x0f];
+			dst[offdst + 14] = map[(b >> 56) & 0x0f];
+			dst[offdst + 15] = map[(b >> 60) & 0x0f];
 		}
 
-		// convert remaining bits
-		if (x < width)
+		for (int x = 0; offdst < stridedst; x += 4, offdst++)
 		{
-			unsigned __int64 b = src[offxsrc];
-			for (; x < width; x += 4, b >>= 4)
-			{
-				dst[offxdst++] = map[b & 15];
-			}
+			dst[offdst] = map[(src[offsrc] >> x) & 0x0f];
 		}
 	}
 
@@ -520,7 +523,7 @@ GENIXAPI(int, _convert16to1)(
 				(bits16to1(src[offxsrc + 5], threshold) << 20) |
 				(bits16to1(src[offxsrc + 6], threshold) << 24) |
 				(bits16to1(src[offxsrc + 7], threshold) << 28) |
-			    (bits16to1(src[offxsrc + 8], threshold) << 32) |
+				(bits16to1(src[offxsrc + 8], threshold) << 32) |
 				(bits16to1(src[offxsrc + 9], threshold) << 36) |
 				(bits16to1(src[offxsrc + 10], threshold) << 40) |
 				(bits16to1(src[offxsrc + 11], threshold) << 44) |
@@ -612,6 +615,21 @@ GENIXAPI(int, _convert32to24)(
 		{ width, height });
 }
 
+GENIXAPI(int, otsu_threshold)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* threshold)
+{
+	*threshold = 0;
+
+	return ippiComputeThreshold_Otsu_8u_C1R(
+		src + (ptrdiff_t(y) * stridesrc) + x,
+		stridesrc,
+		{ width, height },
+		threshold);
+}
+
 GENIXAPI(int, otsu)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
@@ -673,7 +691,7 @@ GENIXAPI(int, otsu)(
 				const int tw = ix + 1 == nx ? width - tx : sx;
 
 				check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
-					(const Ipp8u*)(src + (ptrdiff_t(ty) * stridesrc)) + (tx >> 3),
+					(const Ipp8u*)(src + (ptrdiff_t(ty) * stridesrc)) + tx,
 					stridesrc * sizeof(unsigned __int64),
 					{ tw, th },
 					&pThresholds[ithresh++]));

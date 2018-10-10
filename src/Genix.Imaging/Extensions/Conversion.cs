@@ -426,9 +426,9 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 value0,
                 value1) != 0)
             {

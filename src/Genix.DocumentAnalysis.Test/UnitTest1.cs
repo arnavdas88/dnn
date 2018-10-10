@@ -20,12 +20,20 @@
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
-                Pix pix = Pix.FromImage(image);
+                Image xxx = image.Convert8To1(null, 100);
+                Image yyy = xxx.CreateTemplate(null, 8);
+
+                ////Pix pix = Pix.FromImage(image);
                 stopwatch.Restart();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    xxx.Convert1To8(yyy);
+                }
 
                 ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);
 
-                image.NormalizeBackground(image, 0, 0, 0, 0, 255);
+                ////image.NormalizeBackground(image, 0, 0, 0, 0, 255);
 
                 ////Image xxx = image.FilterBox(null, 30, 30, BorderType.BorderRepl, 0);
                 ////Image xxx = image.MorphClose(null, StructuringElement.Square(25), 1, BorderType.BorderRepl, 0);
