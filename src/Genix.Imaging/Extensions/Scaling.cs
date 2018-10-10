@@ -64,7 +64,7 @@ namespace Genix.Imaging
         {
             if (width == this.Width && height == this.Height)
             {
-                return this.Copy(dst);
+                return this.Copy(dst, true);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
@@ -186,7 +186,7 @@ namespace Genix.Imaging
                 dst = dst.Inflate(dx / 2, dy / 2, dx - (dx / 2), dy - (dy / 2), BorderType.BorderConst, dst.WhiteColor);
             }
 
-            return dst != this ? dst : dst.Copy(null);
+            return dst != this ? dst : dst.Copy(null, true);
         }
 
         /// <summary>

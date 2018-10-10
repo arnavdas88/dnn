@@ -204,6 +204,12 @@ namespace Genix.Core
         public int ArgMax() => Vectors.ArgMax(this.bins.Length, this.bins, 0);
 
         /// <summary>
+        /// Applies a 1*2*1 moving average filter over the histogram bins.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Smooth() => Statistic.Smooth(this.bins.Length, this.bins, 0);
+
+        /// <summary>
         /// Converts this <see cref="Histogram"/> to a cumulative <see cref="Histogram"/>.
         /// </summary>
         /// <returns>

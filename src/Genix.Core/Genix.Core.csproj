@@ -107,6 +107,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MinMax.tt</DependentUpon>
     </Compile>
+    <Compile Include="Math\Statistic.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Statistic.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\Vectors.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -179,6 +184,10 @@
     <Content Include="Math\MinMax.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MinMax.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Math\Statistic.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Statistic.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Math\Vectors.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

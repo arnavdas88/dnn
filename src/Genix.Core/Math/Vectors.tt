@@ -1769,7 +1769,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="x">The first array <paramref name="x"/>.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The first array <paramref name="y"/>.</param>
+        /// <param name="y">The second array <paramref name="y"/>.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <returns>
         /// The Manhattan distance between elements of two arrays.
@@ -1789,7 +1789,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="x">The first array <paramref name="x"/>.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The first array <paramref name="y"/>.</param>
+        /// <param name="y">The second array <paramref name="y"/>.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <returns>
         /// The Euclidean distance between elements of two arrays.
@@ -1809,7 +1809,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to calculate.</param>
         /// <param name="x">The first array <paramref name="x"/>.</param>
         /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="y">The first array <paramref name="y"/>.</param>
+        /// <param name="y">The second array <paramref name="y"/>.</param>
         /// <param name="offy">The starting position in <paramref name="y"/>.</param>
         /// <returns>
         /// The Euclidean distance between elements of two arrays.

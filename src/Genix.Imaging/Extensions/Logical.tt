@@ -147,7 +147,7 @@ namespace Genix.Imaging
             }
 
             // copy to destination image
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             int stridesrc = src.Stride1;
             int stridedst = dst.Stride1;

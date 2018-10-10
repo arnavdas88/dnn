@@ -9,7 +9,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Defines how values of border pixels are calculated.
     /// </summary>
-    public enum BorderType
+    public enum BorderType : int
     {
         /// <summary>
         /// All border pixels are set to the constant value.

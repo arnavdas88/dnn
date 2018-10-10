@@ -15,8 +15,8 @@ enum _GenixBorderType : int
 GENIXAPI(int, filterRectangular)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int kernelWidth, const int kernelHeight, const float* kernel,
 	const int borderType, const unsigned borderValue)
 {
@@ -60,10 +60,10 @@ GENIXAPI(int, filterRectangular)(
 	{
 	case 8:
 		check_sts(status = ippiFilterBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
@@ -73,10 +73,10 @@ GENIXAPI(int, filterRectangular)(
 
 	case 24:
 		check_sts(status = ippiFilterBorder_8u_C3R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
@@ -86,10 +86,10 @@ GENIXAPI(int, filterRectangular)(
 
 	case 32:
 		check_sts(status = ippiFilterBorder_8u_C4R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
@@ -107,8 +107,8 @@ GENIXAPI(int, filterRectangular)(
 GENIXAPI(int, filterBox)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int maskWidth, const int maskHeight,
 	const int borderType, const unsigned borderValue)
 {
@@ -139,10 +139,10 @@ GENIXAPI(int, filterBox)(
 	{
 	case 8:
 		check_sts(status = ippiFilterBoxBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			maskSize,
 			ippBorderType,
@@ -152,10 +152,10 @@ GENIXAPI(int, filterBox)(
 
 	case 24:
 		check_sts(status = ippiFilterBoxBorder_8u_C3R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			maskSize,
 			ippBorderType,
@@ -165,10 +165,10 @@ GENIXAPI(int, filterBox)(
 
 	case 32:
 		check_sts(status = ippiFilterBoxBorder_8u_AC4R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			maskSize,
 			ippBorderType,
@@ -185,8 +185,8 @@ GENIXAPI(int, filterBox)(
 GENIXAPI(int, filterGaussian)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int kernelSize,
 	const float sigma,
 	const int borderType, const unsigned borderValue)
@@ -231,10 +231,10 @@ GENIXAPI(int, filterGaussian)(
 	{
 	case 8:
 		check_sts(status = ippiFilterGaussianBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			(Ipp8u)borderValue,
 			pSpec,
@@ -243,10 +243,10 @@ GENIXAPI(int, filterGaussian)(
 
 	case 24:
 		check_sts(status = ippiFilterGaussianBorder_8u_C3R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
 			(Ipp8u*)&borderValue,
 			pSpec,
@@ -263,8 +263,8 @@ GENIXAPI(int, filterGaussian)(
 GENIXAPI(int, filterLaplace)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int maskSize /* 3 or 5 */,
 	const int borderType, const unsigned borderValue)
 {
@@ -280,10 +280,12 @@ GENIXAPI(int, filterLaplace)(
 	default:				ippBorderType = ippBorderConst; break;
 	}
 
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
 	/* Allocate buffer */
 	check_sts(status = ippiFilterLaplaceBorderGetBufferSize(
 		roiSize,
-		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		mask,
 		ipp8u,
 		ipp8u,
 		bitsPerPixel / 8,
@@ -295,12 +297,12 @@ GENIXAPI(int, filterLaplace)(
 	{
 	case 8:
 		check_sts(status = ippiFilterLaplaceBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u)borderValue,
 			pBuffer));
@@ -308,12 +310,12 @@ GENIXAPI(int, filterLaplace)(
 
 	case 24:
 		check_sts(status = ippiFilterLaplaceBorder_8u_C3R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
 			pBuffer));
@@ -321,12 +323,12 @@ GENIXAPI(int, filterLaplace)(
 
 	case 32:
 		check_sts(status = ippiFilterLaplaceBorder_8u_AC4R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
 			pBuffer));
@@ -341,8 +343,8 @@ GENIXAPI(int, filterLaplace)(
 GENIXAPI(int, filterHipass)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int maskSize /* 3 or 5 */,
 	const int borderType, const unsigned borderValue)
 {
@@ -358,10 +360,12 @@ GENIXAPI(int, filterHipass)(
 	default:				ippBorderType = ippBorderConst; break;
 	}
 
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
 	/* Allocate buffer */
 	check_sts(status = ippiFilterHipassBorderGetBufferSize(
 		roiSize,
-		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		mask,
 		ipp8u,
 		ipp8u,
 		bitsPerPixel / 8,
@@ -373,12 +377,12 @@ GENIXAPI(int, filterHipass)(
 	{
 	case 8:
 		check_sts(status = ippiFilterHipassBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u)borderValue,
 			pBuffer));
@@ -386,12 +390,12 @@ GENIXAPI(int, filterHipass)(
 
 	case 24:
 		check_sts(status = ippiFilterHipassBorder_8u_C3R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
 			pBuffer));
@@ -399,12 +403,12 @@ GENIXAPI(int, filterHipass)(
 
 	case 32:
 		check_sts(status = ippiFilterHipassBorder_8u_AC4R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u*)&borderValue,
 			pBuffer));
@@ -419,8 +423,8 @@ GENIXAPI(int, filterHipass)(
 GENIXAPI(int, filterLowpass)(
 	const int bitsPerPixel,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const int maskSize /* 3 or 5 */,
 	const int borderType, const unsigned borderValue)
 {
@@ -436,10 +440,12 @@ GENIXAPI(int, filterLowpass)(
 	default:				ippBorderType = ippBorderConst; break;
 	}
 
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
 	/* Allocate buffer */
 	check_sts(status = ippiFilterLowpassGetBufferSize_8u_C1R(
 		roiSize,
-		maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+		mask,
 		&bufferSize));
 	pBuffer = ippsMalloc_8u(bufferSize);
 
@@ -448,12 +454,12 @@ GENIXAPI(int, filterLowpass)(
 	{
 	case 8:
 		check_sts(status = ippiFilterLowpassBorder_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src,
+			stridesrc,
+			dst,
+			stridedst,
 			roiSize,
-			maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5,
+			mask,
 			ippBorderType,
 			(Ipp8u)borderValue,
 			pBuffer));
@@ -461,6 +467,6 @@ GENIXAPI(int, filterLowpass)(
 	}
 
 	EXIT_MAIN
-		ippsFree(pBuffer);
+	ippsFree(pBuffer);
 	return (int)status;
 }

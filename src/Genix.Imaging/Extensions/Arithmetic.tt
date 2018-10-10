@@ -219,14 +219,7 @@ namespace Genix.Imaging
             else
             {
                 // not in-place operation
-                if (x == 0 && y == 0 && width == this.Width && height == this.Height)
-                {
-                    dst = this.CreateTemplate(dst, this.BitsPerPixel);
-                }
-                else
-                {
-                    dst = this.Copy(dst);
-                }
+                dst = this.Copy(dst, !(x == 0 && y == 0 && width == this.Width && height == this.Height));
 
                 NativeMethods.<#=method.NativeName#>(
                     dst.BitsPerPixel,

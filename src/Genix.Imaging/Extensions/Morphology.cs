@@ -70,7 +70,7 @@ namespace Genix.Imaging
             }
             else
             {
-                dst = this.Copy(dst);
+                dst = this.Copy(dst, true);
 
                 Size sesize = Size.Add(se.Size, -1, -1);
                 Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
@@ -101,7 +101,7 @@ namespace Genix.Imaging
                     }
 
                     // apply mask
-                    dst.Maximum(dst, dst.Bounds, mask, anchor);
+                    dst.MaxEvery(dst, dst.Bounds, mask, anchor);
                 }
 
                 void MakeMask(Point point)
@@ -113,7 +113,7 @@ namespace Genix.Imaging
                     int width = src.Width - Math.Abs(point.X);
                     int height = src.Height - Math.Abs(point.Y);
 
-                    mask.Maximum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
+                    mask.MaxEvery(mask, xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
 
@@ -171,7 +171,7 @@ namespace Genix.Imaging
             }
             else
             {
-                dst = this.Copy(dst);
+                dst = this.Copy(dst, true);
 
                 Size sesize = Size.Add(se.Size, -1, -1);
                 Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
@@ -201,7 +201,7 @@ namespace Genix.Imaging
                     }
 
                     // apply mask
-                    dst.Minimum(dst, dst.Bounds, mask, anchor);
+                    dst.MinEvery(dst, dst.Bounds, mask, anchor);
                 }
 
                 void MakeMask(Point point)
@@ -213,7 +213,7 @@ namespace Genix.Imaging
                     int width = src.Width - Math.Abs(point.X);
                     int height = src.Height - Math.Abs(point.Y);
 
-                    mask.Minimum(mask, xdst, ydst, width, height, src, xsrc, ysrc);
+                    mask.MinEvery(mask, xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
 
@@ -419,7 +419,7 @@ namespace Genix.Imaging
         /// </remarks>
         public Image Despeckle(Image dst)
         {
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             // create masks
             ulong[] mask = new ulong[dst.Bits.Length];
@@ -1156,7 +1156,7 @@ namespace Genix.Imaging
             }
 
             // copy to destination image
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             int stridesrc = dst.Stride;
             int stridemask = mask.Stride;

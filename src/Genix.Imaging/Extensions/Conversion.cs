@@ -46,7 +46,7 @@ namespace Genix.Imaging
         {
             if (bitsPerPixel == this.BitsPerPixel)
             {
-                return this.Copy(dst);
+                return this.Copy(dst, true);
             }
 
             switch (bitsPerPixel)
@@ -64,16 +64,9 @@ namespace Genix.Imaging
 
             Image ConvertTo1bpp()
             {
-                switch (this.BitsPerPixel)
-                {
-                    case 8: return this.Binarize(dst);
-                    case 24: return this.Convert24To8(null).Binarize(dst);
-                    case 32: return this.Convert32To8(null).Binarize(dst);
-
-                    default:
-                        throw new NotImplementedException(
-                            string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
-                }
+                dst = ConvertTo8bpp();
+                dst.NormalizeBackground(dst, 0, 0, 0, 0, 255);
+                return dst.Binarize(dst);
             }
 
             Image ConvertTo8bpp()
@@ -137,36 +130,72 @@ namespace Genix.Imaging
             }
         }
 
-        //// <param name="threshold">The threshold to determine foreground.</param>
-        //// <param name="sx">The tile width.</param>
-        //// <param name="sy">The tile height.</param>
-
         /// <summary>
         /// Normalizes this <see cref="Image"/> intensity be mapping the image
         /// so that the background is near the specified value.
         /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="sx">The tile width, in pixels. If 0, the method uses default value 16.</param>
+        /// <param name="sy">The tile height, in pixels. If 0, the method uses default value 32.</param>
+        /// <param name="threshold">The threshold for determining foreground. If 0, the method uses default value 100.</param>
+        /// <param name="mincount">The minimum number of background pixels in tile. If 0, the method uses default value (<paramref name="sx"/> * <paramref name="sy"/>) / 4.</param>
+        /// <param name="bgval">The target background value.</param>
         /// <returns>
         /// A new normalized <see cref="Image"/>.
         /// </returns>
-        public Image NormalizeBackground(/*, byte threshold, int sx, int sy*/)
+        /// <remarks>
+        /// <para>
+        /// This method brings <see cref="Image"/> background to the specified <paramref name="bgval"/> value.
+        /// </para>
+        /// <para>
+        /// For each tile of size <paramref name="sx"/> x <paramref name="sy"/> the background is estimated as the
+        /// average value of all pixels which values are more than, or equal to the <paramref name="threshold"/> value.
+        /// The number of such pixels in the tile should be at least <paramref name="mincount"/>; otherwise, tile's background value is approximated from neighboring tiles.
+        /// The resulting map is then smoothed using 3x3 kernel.
+        /// </para>
+        /// <para>
+        /// Finally, pixel values in each tile are scaled using the following formula: <c>new_value = old_value * 255 / background_value.</c>.
+        /// </para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image NormalizeBackground(Image dst, int sx, int sy, byte threshold, int mincount, uint bgval)
         {
             if (this.BitsPerPixel != 8)
             {
                 throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
             }
 
-            int sx = 64;
-            int sy = 128;
-            byte threshold = 128;
-            int mincount = (sx * sy) / 3;
+            if (sx == 0)
+            {
+                sx = 16;
+            }
 
-            ////Histogram ghist = this.GrayHistogram();
-            ////Histogram vhist = this.HistogramY();
+            if (sy == 0)
+            {
+                sy = 32;
+            }
+
+            if (threshold == 0)
+            {
+                threshold = 100;
+            }
+
+            if (mincount == 0)
+            {
+                mincount = (sx * sy) / 4;
+            }
+
+            Histogram ghist = this.GrayHistogram();
+            ghist.Smooth();
+            ghist = ghist.ToCumulative();
+
+            int[] bins = ghist.Bins;
+            int[] binsg = bins.SecondDerivative();
 
             // generate foreground mask
             Image maskb = this
                 .Convert8To1(null, threshold)
-                .Dilate(null, StructuringElement.Square(7), 1, BorderType.BorderConst, 0);
+                .Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, 0);
 
             Image maskg = maskb.Convert1To8(null);
 
@@ -176,23 +205,33 @@ namespace Genix.Imaging
             // calculate adaptive map
             int nx = this.Width / sx;
             int ny = this.Height / sy;
-            byte[][] map = JaggedArray.Create<byte>(ny, nx);
+            byte[] map = new byte[nx * ny];
             CalculateMap();
 
             // fill holes in map
             FillHoles();
 
+            // normalize map
+            unsafe
+            {
+                fixed (byte* bmap = map)
+                {
+                    NativeMethods.filterBox(8, nx, ny, bmap, nx, bmap, nx, 3, 3, BorderType.BorderRepl, 0);
+                }
+            }
+
             // apply map to source image
-            for (int iy = 0, ty = 0; iy < ny; iy++, ty += sy)
+            dst = this.CreateTemplate(this, this.BitsPerPixel);
+
+            for (int iy = 0, ty = 0, mapoff = 0; iy < ny; iy++, ty += sy, mapoff += nx)
             {
                 int th = iy + 1 == ny ? this.Height - ty : sy;
-                byte[] row = map[iy];
 
                 for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                 {
                     int tw = ix + 1 == nx ? this.Width - tx : sx;
 
-                    this.DivC(this, tx, ty, tw, th, row[ix], -8);
+                    this.DivC(this, tx, ty, tw, th, map[mapoff + ix], -8);
                 }
             }
 
@@ -200,10 +239,9 @@ namespace Genix.Imaging
 
             void CalculateMap()
             {
-                for (int iy = 0, ty = 0; iy < ny; iy++, ty += sy)
+                for (int iy = 0, ty = 0, mapoff = 0; iy < ny; iy++, ty += sy, mapoff += nx)
                 {
                     int th = iy + 1 == ny ? this.Height - ty : sy;
-                    byte[] row = map[iy];
 
                     for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                     {
@@ -213,7 +251,7 @@ namespace Genix.Imaging
                         if (count >= mincount)
                         {
                             int sum = (int)maskg.Power(tx, ty, tw, th);
-                            row[ix] = (byte)(sum / count);
+                            map[mapoff + ix] = (byte)(sum / count);
                         }
                     }
                 }
@@ -222,21 +260,19 @@ namespace Genix.Imaging
             void FillHoles()
             {
                 bool needBackwardPass = false;
-                byte[] prev = null;
-                for (int iy = 0; iy < ny; iy++)
+                for (int iy = 0, prevoff = 0, mapoff = 0; iy < ny; iy++, prevoff = mapoff, mapoff += nx)
                 {
-                    byte[] row = map[iy];
                     for (int ix = 0; ix < nx; ix++)
                     {
-                        if (row[ix] == 0)
+                        if (map[mapoff + ix] == 0)
                         {
-                            if (iy > 0 && prev[ix] != 0)
+                            if (iy > 0 && map[prevoff + ix] != 0)
                             {
-                                row[ix] = prev[ix];
+                                map[mapoff + ix] = map[prevoff + ix];
                             }
-                            else if (ix > 0 && row[ix - 1] != 0)
+                            else if (ix > 0 && map[mapoff + ix - 1] != 0)
                             {
-                                row[ix] = row[ix - 1];
+                                map[mapoff + ix] = map[mapoff + ix - 1];
                             }
                             else
                             {
@@ -244,31 +280,25 @@ namespace Genix.Imaging
                             }
                         }
                     }
-
-                    prev = row;
                 }
 
                 if (needBackwardPass)
                 {
-                    prev = null;
-                    for (int iy = ny - 1; iy >= 0; iy--)
+                    for (int iy = ny - 1, prevoff = 0, mapoff = iy * nx; iy >= 0; iy--, prevoff = mapoff, mapoff -= nx)
                     {
-                        byte[] row = map[iy];
                         for (int ix = nx - 1; ix >= 0; ix--)
                         {
-                            if (row[ix] == 0)
+                            if (map[mapoff + ix] == 0)
                             {
-                                if (iy < ny - 1 && prev[ix] != 0)
+                                if (iy < ny - 1 && map[prevoff + ix] != 0)
                                 {
-                                    row[ix] = prev[ix];
+                                    map[mapoff + ix] = map[prevoff + ix];
                                 }
-                                else if (ix < nx - 1 && row[ix + 1] != 0)
+                                else if (ix < nx - 1 && map[mapoff + ix + 1] != 0)
                                 {
-                                    row[ix] = row[ix + 1];
+                                    map[mapoff + ix] = map[mapoff + ix + 1];
                                 }
                             }
-
-                            prev = row;
                         }
                     }
                 }
@@ -307,8 +337,8 @@ namespace Genix.Imaging
                 this.Stride,
                 dst.Bits,
                 dst.Stride,
-                64,
-                128,
+                this.Width, ////16, ////64,
+                this.Height, ////32, ////128,
                 2,
                 2);
 
@@ -1465,6 +1495,20 @@ namespace Genix.Imaging
                 int sy,
                 int smoothx,
                 int smoothy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static unsafe extern int filterBox(
+                int bitsPerPixel,
+                int width,
+                int height,
+                [In] byte* src,
+                int stridesrc,
+                [Out] byte* dst,
+                int stridedst,
+                int maskWidth,
+                int maskeight,
+                BorderType borderType,
+                uint borderValue);
         }
     }
 }

@@ -25,7 +25,7 @@
 
                 ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);
 
-                image.NormalizeBackground();
+                image.NormalizeBackground(image, 0, 0, 0, 0, 255);
 
                 ////Image xxx = image.FilterBox(null, 30, 30, BorderType.BorderRepl, 0);
                 ////Image xxx = image.MorphClose(null, StructuringElement.Square(25), 1, BorderType.BorderRepl, 0);

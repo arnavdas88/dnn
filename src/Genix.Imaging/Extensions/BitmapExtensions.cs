@@ -410,29 +410,44 @@ namespace Genix.Imaging
             int srcstride = image.Stride;
             int dststride = dst.Stride;
 
-            int srcwidth32 = image.WidthBits / srcstride;
-            int srctail = image.WidthBits - (srcwidth32 * 32);
+            int srcwidthbits = image.WidthBits;
+            int srcwidthbits2 = image.WidthBits & ~1;
+            int srcwidthbits64 = image.WidthBits & ~63;
 
-            uint[] colormap = palette
-                .Select(x => ((uint)x.R << 24) | ((uint)x.G << 16) | ((uint)x.B << 8) | ((uint)x.A << 0))
-                .ToArray();
+            uint[] colormap = palette.Select(x => x.Argb).ToArray();
 
-            for (int row = 0, offsrc = 0, offdst = 0; row < height; row++, offsrc = srcstride, offdst = dststride)
+            for (int iy = 0, yoffsrc = 0, yoffdst = 0; iy < height; iy++, yoffsrc += srcstride, yoffdst += dststride)
             {
-                int offs = offsrc;
-                int offd = offdst;
+                int xoffsrc = yoffsrc;
+                int xoffdst = yoffdst;
+                int ix = 0;
 
-                for (int col = 0; col < srcwidth32; col++, offs++)
+                for (; ix < srcwidthbits64; ix += 64, xoffsrc++)
                 {
-                    for (int i = 0; i < 32; i += bitsPerPixel, offd++)
+                    ulong bits = srcbits[xoffsrc];
+                    for (int i = 0; i < 64; i += 2 * bitsPerPixel, xoffdst++)
                     {
-                        dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
+                        dstbits[xoffdst] =
+                            (ulong)colormap[BitUtils.GetBits(bits, i, bitsPerPixel)] |
+                            ((ulong)colormap[BitUtils.GetBits(bits, i + bitsPerPixel, bitsPerPixel)] << 32);
                     }
                 }
 
-                for (int i = 0; i < srctail; i += bitsPerPixel, offd++)
+                if (ix < srcwidthbits)
                 {
-                    dstbits[offd] = colormap[BitUtils.GetBits(srcbits[offs], i, bitsPerPixel)];
+                    ulong bits = srcbits[xoffsrc];
+
+                    for (; ix < srcwidthbits2; ix += 2 * bitsPerPixel, xoffdst++)
+                    {
+                        dstbits[xoffdst] =
+                            (ulong)colormap[BitUtils.GetBits(bits, ix & 63, bitsPerPixel)] |
+                            ((ulong)colormap[BitUtils.GetBits(bits, (ix + bitsPerPixel) & 63, bitsPerPixel)] << 32);
+                    }
+
+                    if (ix < srcwidthbits)
+                    {
+                        dstbits[xoffdst] = (ulong)colormap[BitUtils.GetBits(bits, ix & 63, bitsPerPixel)];
+                    }
                 }
             }
 

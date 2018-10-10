@@ -7,13 +7,9 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Core;
 
     /// <content>
     /// Provides filtering methods for the <see cref="Image"/> class.
@@ -78,13 +74,13 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 kernelWidth,
                 kernelHeight,
                 kernel,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -155,12 +151,12 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 maskWidth,
                 maskHeight,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -224,12 +220,12 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 kernelSize,
                 sigma,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -304,11 +300,11 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 maskSize,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -383,11 +379,11 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 maskSize,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -462,11 +458,11 @@ namespace Genix.Imaging
                 this.Width,
                 this.Height,
                 this.Bits,
-                this.Stride,
+                this.Stride8,
                 dst.Bits,
-                dst.Stride,
+                dst.Stride8,
                 maskSize,
-                (int)borderType,
+                borderType,
                 borderValue) != 0)
             {
                 throw new OutOfMemoryException();
@@ -496,7 +492,7 @@ namespace Genix.Imaging
                 int kernelWidth,
                 int kernelHeight,
                 [In] float[] kernel,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
@@ -510,7 +506,7 @@ namespace Genix.Imaging
                 int stridedst,
                 int maskWidth,
                 int maskeight,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
@@ -524,7 +520,7 @@ namespace Genix.Imaging
                 int stridedst,
                 int kernelSize,
                 float sigmaconst,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
@@ -537,7 +533,7 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 int maskSize,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
@@ -550,7 +546,7 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 int maskSize,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
@@ -563,7 +559,7 @@ namespace Genix.Imaging
                 [Out] ulong[] dst,
                 int stridedst,
                 int maskSize,
-                int borderType,
+                BorderType borderType,
                 uint borderValue);
         }
     }

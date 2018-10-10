@@ -30,7 +30,7 @@ namespace Genix.Imaging
             int stride1 = this.Stride1;
             int stride = this.Stride;
 
-            Image dst = this.Copy(null);
+            Image dst = this.Copy(null, true);
             ulong[] bits = dst.Bits;
 
             int maxwidth = (int)((maxNoiseWidth * this.HorizontalResolution) + 0.5f);

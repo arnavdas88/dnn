@@ -116,7 +116,7 @@ namespace Genix.Imaging
             this.ValidateArea(x, y, width, height);
 
             // create a copy of this image
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             color &= dst.MaxColor;
             if (color != 0)
@@ -244,7 +244,7 @@ namespace Genix.Imaging
             this.ValidateArea(x, y, width, height);
 
             // create a copy of this image
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             color &= dst.MaxColor;
             if (color != dst.MaxColor)
@@ -351,14 +351,14 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Maximum(Image dst, Image src)
+        public Image MaxEvery(Image dst, Image src)
         {
             if (src == null)
             {
                 throw new ArgumentNullException(nameof(src));
             }
 
-            return this.Maximum(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
+            return this.MaxEvery(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>
@@ -391,7 +391,7 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Maximum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
+        public Image MaxEvery(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
             int bitsPerPixel = this.BitsPerPixel;
             if (bitsPerPixel == 1)
@@ -420,7 +420,7 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             int stridesrc8 = src.Stride8;
             int stridedst8 = dst.Stride8;
@@ -481,8 +481,8 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Maximum(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
-            this.Maximum(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
+        public Image MaxEvery(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
+            this.MaxEvery(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
 
         /// <summary>
         /// Computes minimum values for each pixel from this <see cref="Image"/> and the specified <see cref="Image"/>.
@@ -507,14 +507,14 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Minimum(Image dst, Image src)
+        public Image MinEvery(Image dst, Image src)
         {
             if (src == null)
             {
                 throw new ArgumentNullException(nameof(src));
             }
 
-            return this.Minimum(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
+            return this.MinEvery(dst, 0, 0, Math.Min(this.Width, src.Width), Math.Min(this.Height, src.Height), src, 0, 0);
         }
 
         /// <summary>
@@ -547,7 +547,7 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Minimum(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
+        public Image MinEvery(Image dst, int x, int y, int width, int height, Image src, int xsrc, int ysrc)
         {
             int bitsPerPixel = this.BitsPerPixel;
             if (bitsPerPixel == 1)
@@ -576,7 +576,7 @@ namespace Genix.Imaging
                 throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
             }
 
-            dst = this.Copy(dst);
+            dst = this.Copy(dst, true);
 
             int stridesrc8 = src.Stride8;
             int stridedst8 = dst.Stride8;
@@ -637,7 +637,7 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Image Minimum(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
-            this.Minimum(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
+        public Image MinEvery(Image dst, Rectangle dstBounds, Image src, Point srcOrigin) =>
+            this.MinEvery(dst, dstBounds.X, dstBounds.Y, dstBounds.Width, dstBounds.Height, src, srcOrigin.X, srcOrigin.Y);
     }
 }

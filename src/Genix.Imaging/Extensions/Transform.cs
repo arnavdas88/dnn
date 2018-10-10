@@ -39,7 +39,7 @@ namespace Genix.Imaging
 
             if (matrix.IsIdentity)
             {
-                return this.Copy(dst);
+                return this.Copy(dst, true);
             }
 
             // IPP does not support 1bpp images - convert to 8bpp
@@ -150,7 +150,7 @@ namespace Genix.Imaging
             float a = (float)(Math.PI * (angle / 180.0));
             if (Math.Abs(a) < 0.001f)
             {
-                return this.Copy(dst);
+                return this.Copy(dst, true);
             }
 
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;

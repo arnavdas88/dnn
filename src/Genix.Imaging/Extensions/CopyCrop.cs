@@ -66,6 +66,7 @@ namespace Genix.Imaging
         /// Copies the data from this <see cref="Image"/> to destination <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="copyBits">The value indicating whether the <see cref="Image{T}.Bits"/> should be copied to the new <see cref="Image"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -74,7 +75,7 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the method returns this <see cref="Image"/>.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Copy(Image dst)
+        public Image Copy(Image dst, bool copyBits)
         {
             if (dst == this)
             {
@@ -86,7 +87,10 @@ namespace Genix.Imaging
                 dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
                 // copy bits
-                Vectors.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+                if (copyBits)
+                {
+                    Vectors.Copy(this.Bits.Length, this.Bits, 0, dst.Bits, 0);
+                }
 
                 return dst;
             }
