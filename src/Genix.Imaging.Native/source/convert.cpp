@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <stdlib.h>
+#include <assert.h>
 #include "ipp.h"
 
 /* Next two defines are created to simplify code reading and understanding */
@@ -16,7 +17,7 @@ GENIXAPI(int, _convert1to8)(
 	const unsigned __int8 value1)
 {
 #if false
-	// IPP version is aproximately ~10 times slower ???
+	// IPP version is approximately ~10 times slower ???
 	return ippiBinToGray_1u8u_C1R(src, stridesrc, 0, dst, stridedst, { width, height }, value0, value1);
 #else
 	unsigned __int64* map = (unsigned __int64*)::malloc(256 * sizeof(unsigned __int64));
@@ -350,19 +351,19 @@ GENIXAPI(int, _convert4to8)(
 	return 0;
 }
 
-unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, int threshold)
+unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, __int64 threshold)
 {
-	unsigned __int32 result = 0;
+	unsigned __int64 result = 0;
 
-	result |= ((int((bits >> 56) & 0xff) - threshold) >> 24) & 0x80;
-	result |= ((int((bits >> 48) & 0xff) - threshold) >> 25) & 0x40;
-	result |= ((int((bits >> 40) & 0xff) - threshold) >> 26) & 0x20;
-	result |= ((int((bits >> 32) & 0xff) - threshold) >> 27) & 0x10;
+	result |= ((__int64((bits >> 56) & 0xff) - threshold) >> 56) & 0x80;
+	result |= ((__int64((bits >> 48) & 0xff) - threshold) >> 57) & 0x40;
+	result |= ((__int64((bits >> 40) & 0xff) - threshold) >> 58) & 0x20;
+	result |= ((__int64((bits >> 32) & 0xff) - threshold) >> 59) & 0x10;
 
-	result |= ((int((bits >> 24) & 0xff) - threshold) >> 28) & 0x08;
-	result |= ((int((bits >> 16) & 0xff) - threshold) >> 29) & 0x04;
-	result |= ((int((bits >> 8) & 0xff) - threshold) >> 30) & 0x02;
-	result |= ((int((bits >> 0) & 0xff) - threshold) >> 31) & 0x01;
+	result |= ((__int64((bits >> 24) & 0xff) - threshold) >> 60) & 0x08;
+	result |= ((__int64((bits >> 16) & 0xff) - threshold) >> 61) & 0x04;
+	result |= ((__int64((bits >> 8) & 0xff) - threshold) >> 62) & 0x02;
+	result |= ((__int64((bits >> 0) & 0xff) - threshold) >> 63) & 0x01;
 
 	return result;
 }
@@ -370,91 +371,77 @@ unsigned __int64 __forceinline bits8to1(const unsigned __int64 bits, int thresho
 GENIXAPI(int, _convert8to1)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const __int32 threshold)
 {
-	/*return ippiGrayToBin_8u1u_C1R(
-		(const Ipp8u*)src,
-		stridesrc * sizeof(unsigned __int64),
-		(Ipp8u*)dst,
-		stridedst * sizeof(unsigned __int64),
-		0,
-		{ width, height },
-		threshold);
+	assert((x & 7) == 0);	// x position must be a multiple of 8
+	src += (ptrdiff_t(y) * stridesrc) + x;
+	dst += (ptrdiff_t(y) * stridedst) + (x / 8);
 
-	return 0;*/
-
-	src += (ptrdiff_t(y) * stridesrc) + (x / 8);
-	dst += (ptrdiff_t(y) * stridedst) + (x / 64);
-
+#if false
+	// IPP version is approximately ~2.5 times slower ???
+	return ippiGrayToBin_8u1u_C1R(src, stridesrc, dst, stridedst, 0, { width, height }, threshold);
+#else
+	const __int64 threshold64 = threshold;
 	const int width64 = width & ~63;
-	for (int iy = 0, offysrc = 0, offydst = 0; iy < height; iy++, offysrc += stridesrc, offydst += stridedst)
+	for (int y = 0; y < height; y++, src += stridesrc, dst += stridedst)
 	{
-		int offxsrc = offysrc;
-		int offxdst = offydst;
+		int xdst = 0;
+		int xsrc = 0;
 
-		// convert 64 bits at a time
-		int ix = 0;
-		for (; ix < width64; ix += 64, offxdst++, offxsrc += 8)
+		// convert 64 pixels at a time
+		for (; xsrc < width64; xdst += 8, xsrc += 64)
 		{
-			dst[offxdst] =
-				(bits8to1(src[offxsrc + 0], threshold) << 0) |
-				(bits8to1(src[offxsrc + 1], threshold) << 8) |
-				(bits8to1(src[offxsrc + 2], threshold) << 16) |
-				(bits8to1(src[offxsrc + 3], threshold) << 24) |
-				(bits8to1(src[offxsrc + 4], threshold) << 32) |
-				(bits8to1(src[offxsrc + 5], threshold) << 40) |
-				(bits8to1(src[offxsrc + 6], threshold) << 48) |
-				(bits8to1(src[offxsrc + 7], threshold) << 56);
+			unsigned __int64* src64 = (unsigned __int64*)(src + xsrc);
+			*(unsigned __int64*)(dst + xdst) = 
+				(bits8to1(src64[0], threshold64) << 0) |
+				(bits8to1(src64[1], threshold64) << 8) |
+				(bits8to1(src64[2], threshold64) << 16) |
+				(bits8to1(src64[3], threshold64) << 24) |
+				(bits8to1(src64[4], threshold64) << 32) |
+				(bits8to1(src64[5], threshold64) << 40) |
+				(bits8to1(src64[6], threshold64) << 48) |
+				(bits8to1(src64[7], threshold64) << 56);
 		}
 
-		// convert remaining bits
-		if (ix < width)
+		for (; xsrc < width; xdst++, xsrc += 8)
 		{
-			dst[offxdst] = 0;
-			for (; ix < width; ix += 8, offxsrc++)
-			{
-				dst[offxdst] |= bits8to1(src[offxsrc], threshold) << (ix & 63);
-			}
+			unsigned __int64* src64 = (unsigned __int64*)(src + xsrc);
+			dst[xdst] = (unsigned __int8)bits8to1(src64[0], threshold64);
 		}
 	}
 
 	return 0;
+#endif
 }
 
 GENIXAPI(int, _convert8to24)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst)
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst)
 {
-	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
-	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 3);
-
 	return ippiGrayToRGB_8u_C1C3R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + x,
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 3),
+		stridedst,
 		{ width, height });
 }
 
 GENIXAPI(int, _convert8to32)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
 	const unsigned __int8 alpha)
 {
-	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
-	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 4);
-
 	return ippiGrayToRGB_8u_C1C4R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + x,
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+		stridedst,
 		{ width, height },
 		alpha);
 }
@@ -462,16 +449,13 @@ GENIXAPI(int, _convert8to32)(
 GENIXAPI(int, _convert8to32f)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
+	const unsigned __int8* src, const int stridesrc,
 	float* dst, const int stridedst)
 {
-	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + x;
-	Ipp32f* dst_f32 = (Ipp32f*)(dst + (ptrdiff_t(y) * stridedst)) + x;
-
 	return ippiConvert_8u32f_C1R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_f32,
+		src + (ptrdiff_t(y) * stridesrc) + x,
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + x,
 		stridedst * sizeof(float),
 		{ width, height });
 }
@@ -544,68 +528,56 @@ GENIXAPI(int, _convert16to1)(
 GENIXAPI(int, _convert24to8)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst)
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst)
 {
-	const Ipp8u* src_u8 = (const Ipp8u*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
-	Ipp8u* dst_u8 = (Ipp8u*)(dst + (ptrdiff_t(y) * stridedst)) + x;
-
 	return ippiRGBToGray_8u_C3C1R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 3),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + x,
+		stridedst,
 		{ width, height });
 }
 
 GENIXAPI(int, _convert24to32)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst)
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst)
 {
-	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 3);
-	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 4);
-
 	return ippiCopy_8u_C3AC4R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 3),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+		stridedst,
 		{ width, height });
 }
 
 GENIXAPI(int, _convert32to8)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst)
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst)
 {
-	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 4);
-	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + x;
-
 	return ippiRGBToGray_8u_AC4C1R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + x,
+		stridedst,
 		{ width, height });
 }
 
 GENIXAPI(int, _convert32to24)(
 	const int x, const int y,
 	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst)
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst)
 {
-	const unsigned __int8* src_u8 = (const unsigned __int8*)(src + (ptrdiff_t(y) * stridesrc)) + (ptrdiff_t(x) * 4);
-	unsigned __int8* dst_u8 = (unsigned __int8*)(dst + (ptrdiff_t(y) * stridedst)) + (ptrdiff_t(x) * 3);
-
 	return ippiCopy_8u_AC4C3R(
-		src_u8,
-		stridesrc * sizeof(unsigned __int64),
-		dst_u8,
-		stridedst * sizeof(unsigned __int64),
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 3),
+		stridedst,
 		{ width, height });
 }
 
@@ -624,6 +596,7 @@ GENIXAPI(int, otsu_threshold)(
 		threshold);
 }
 
+#if false
 GENIXAPI(int, otsu)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,
@@ -758,6 +731,7 @@ GENIXAPI(int, otsu)(
 	ippsFree(pThresholds);
 	return (int)status;
 }
+#endif
 
 GENIXAPI(int, cart2polar)(
 	const int n,

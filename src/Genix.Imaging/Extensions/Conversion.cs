@@ -11,8 +11,6 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Core;
-    ////using Leptonica;
 
     /// <content>
     /// Provides conversion methods for the <see cref="Image"/> class.
@@ -65,8 +63,7 @@ namespace Genix.Imaging
             Image ConvertTo1bpp()
             {
                 dst = ConvertTo8bpp();
-                dst.NormalizeBackground(dst, 0, 0, 0, 0, 255);
-                return dst.Binarize(dst);
+                return dst.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
             }
 
             Image ConvertTo8bpp()
@@ -131,242 +128,6 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Normalizes this <see cref="Image"/> intensity be mapping the image
-        /// so that the background is near the specified value.
-        /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="sx">The tile width, in pixels. If 0, the method uses default value 16.</param>
-        /// <param name="sy">The tile height, in pixels. If 0, the method uses default value 32.</param>
-        /// <param name="threshold">The threshold for determining foreground. If 0, the method uses default value 100.</param>
-        /// <param name="mincount">The minimum number of background pixels in tile. If 0, the method uses default value (<paramref name="sx"/> * <paramref name="sy"/>) / 4.</param>
-        /// <param name="bgval">The target background value.</param>
-        /// <returns>
-        /// A new normalized <see cref="Image"/>.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        /// This method brings <see cref="Image"/> background to the specified <paramref name="bgval"/> value.
-        /// </para>
-        /// <para>
-        /// For each tile of size <paramref name="sx"/> x <paramref name="sy"/> the background is estimated as the
-        /// average value of all pixels which values are more than, or equal to the <paramref name="threshold"/> value.
-        /// The number of such pixels in the tile should be at least <paramref name="mincount"/>; otherwise, tile's background value is approximated from neighboring tiles.
-        /// The resulting map is then smoothed using 3x3 kernel.
-        /// </para>
-        /// <para>
-        /// Finally, pixel values in each tile are scaled using the following formula: <c>new_value = old_value * 255 / background_value.</c>.
-        /// </para>
-        /// </remarks>
-        [CLSCompliant(false)]
-        public Image NormalizeBackground(Image dst, int sx, int sy, byte threshold, int mincount, uint bgval)
-        {
-            if (this.BitsPerPixel != 8)
-            {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_8bpp);
-            }
-
-            if (sx == 0)
-            {
-                sx = 16;
-            }
-
-            if (sy == 0)
-            {
-                sy = 32;
-            }
-
-            if (threshold == 0)
-            {
-                threshold = 100;
-            }
-
-            if (mincount == 0)
-            {
-                mincount = (sx * sy) / 4;
-            }
-
-            Histogram ghist = this.GrayHistogram();
-            ghist.Smooth();
-            ghist = ghist.ToCumulative();
-
-            int[] bins = ghist.Bins;
-            int[] binsg = bins.SecondDerivative();
-
-            // generate foreground mask
-            Image maskb = this
-                .Convert8To1(null, threshold)
-                .Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, 0);
-
-            Image maskg = maskb.Convert1To8(null);
-
-            // use mask to remove foreground pixels from original image
-            maskg = this & maskg;
-
-            // calculate adaptive map
-            int nx = this.Width / sx;
-            int ny = this.Height / sy;
-            byte[] map = new byte[nx * ny];
-            CalculateMap();
-
-            // fill holes in map
-            FillHoles();
-
-            // normalize map
-            unsafe
-            {
-                fixed (byte* bmap = map)
-                {
-                    NativeMethods.filterBox(8, nx, ny, bmap, nx, bmap, nx, 3, 3, BorderType.BorderRepl, 0);
-                }
-            }
-
-            // apply map to source image
-            dst = this.CreateTemplate(this, this.BitsPerPixel);
-
-            for (int iy = 0, ty = 0, mapoff = 0; iy < ny; iy++, ty += sy, mapoff += nx)
-            {
-                int th = iy + 1 == ny ? this.Height - ty : sy;
-
-                for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
-                {
-                    int tw = ix + 1 == nx ? this.Width - tx : sx;
-
-                    this.DivC(this, tx, ty, tw, th, map[mapoff + ix], -8);
-                }
-            }
-
-            return this;
-
-            void CalculateMap()
-            {
-                for (int iy = 0, ty = 0, mapoff = 0; iy < ny; iy++, ty += sy, mapoff += nx)
-                {
-                    int th = iy + 1 == ny ? this.Height - ty : sy;
-
-                    for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
-                    {
-                        int tw = ix + 1 == nx ? this.Width - tx : sx;
-
-                        int count = (tw * th) - (int)maskb.Power(tx, ty, tw, th);
-                        if (count >= mincount)
-                        {
-                            int sum = (int)maskg.Power(tx, ty, tw, th);
-                            map[mapoff + ix] = (byte)(sum / count);
-                        }
-                    }
-                }
-            }
-
-            void FillHoles()
-            {
-                bool needBackwardPass = false;
-                for (int iy = 0, prevoff = 0, mapoff = 0; iy < ny; iy++, prevoff = mapoff, mapoff += nx)
-                {
-                    for (int ix = 0; ix < nx; ix++)
-                    {
-                        if (map[mapoff + ix] == 0)
-                        {
-                            if (iy > 0 && map[prevoff + ix] != 0)
-                            {
-                                map[mapoff + ix] = map[prevoff + ix];
-                            }
-                            else if (ix > 0 && map[mapoff + ix - 1] != 0)
-                            {
-                                map[mapoff + ix] = map[mapoff + ix - 1];
-                            }
-                            else
-                            {
-                                needBackwardPass = true;
-                            }
-                        }
-                    }
-                }
-
-                if (needBackwardPass)
-                {
-                    for (int iy = ny - 1, prevoff = 0, mapoff = iy * nx; iy >= 0; iy--, prevoff = mapoff, mapoff -= nx)
-                    {
-                        for (int ix = nx - 1; ix >= 0; ix--)
-                        {
-                            if (map[mapoff + ix] == 0)
-                            {
-                                if (iy < ny - 1 && map[prevoff + ix] != 0)
-                                {
-                                    map[mapoff + ix] = map[prevoff + ix];
-                                }
-                                else if (ix < nx - 1 && map[mapoff + ix + 1] != 0)
-                                {
-                                    map[mapoff + ix] = map[mapoff + ix + 1];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Converts this <see cref="Image"/> from gray scale to black-and-white.
-        /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
-        /// </exception>
-        /// <remarks>
-        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
-        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
-        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
-        /// </remarks>
-        public Image Binarize(Image dst)
-        {
-            if (this.BitsPerPixel != 8)
-            {
-                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
-            }
-
-            bool inplace = dst == this;
-            dst = this.CreateTemplate(dst, 1);
-
-            NativeMethods.otsu(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                this.Width, ////16, ////64,
-                this.Height, ////32, ////128,
-                2,
-                2);
-
-            if (inplace)
-            {
-                this.Attach(dst);
-                return this;
-            }
-
-            return dst;
-
-            /*try
-            {
-                using (Pix pixs = this.CreatePix())
-                {
-                    using (Pix pixd = pixs.pixOtsu(false))
-                    {
-                        return pixd.CreateImage(this.HorizontalResolution, this.VerticalResolution);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("Cannot binarize the this.", e);
-            }*/
-        }
-
-        /// <summary>
         /// Converts a binary <see cref="Image"/> to 8-bit gray scale image.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -422,17 +183,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            if (NativeMethods._convert1to8(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                value0,
-                value1) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert1to8(
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            value0,
+                            value1) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -808,18 +575,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 1);
 
-            if (NativeMethods._convert8to1(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                threshold) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert8to1(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        threshold) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -860,17 +633,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 24);
 
-            if (NativeMethods._convert8to24(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert8to24(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -913,18 +692,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 32);
 
-            if (NativeMethods._convert8to32(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                alpha) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert8to32(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        alpha) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -966,17 +751,23 @@ namespace Genix.Imaging
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            if (NativeMethods._convert8to32f(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits)
+                {
+                    if (NativeMethods._convert8to32f(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        dst.Bits,
+                        dst.Stride) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             return dst;
@@ -1023,17 +814,23 @@ namespace Genix.Imaging
             // convert pixels
             int areaWidth = Core.MinMax.Min(width, this.Width);
             int areaHeight = Core.MinMax.Min(height, this.Height);
-            if (NativeMethods._convert8to32f(
-                0,
-                0,
-                areaWidth,
-                areaHeight,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits)
+                {
+                    if (NativeMethods._convert8to32f(
+                        0,
+                        0,
+                        areaWidth,
+                        areaHeight,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        dst.Bits,
+                        dst.Stride) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             // set border
@@ -1134,17 +931,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            if (NativeMethods._convert24to8(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert24to8(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -1184,17 +987,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 32);
 
-            if (NativeMethods._convert24to32(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert24to32(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -1239,17 +1048,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            if (NativeMethods._convert32to8(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert32to8(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -1289,17 +1104,23 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 24);
 
-            if (NativeMethods._convert32to24(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods._convert32to24(
+                        0,
+                        0,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -1315,12 +1136,12 @@ namespace Genix.Imaging
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert1to8(
+            public static extern unsafe int _convert1to8(
                int width,
                int height,
-               [In] ulong[] src,
+               byte* src,
                int stridesrc,
-               [Out] ulong[] dst,
+               byte* dst,
                int stridedst,
                byte value0,
                byte value1);
@@ -1382,49 +1203,49 @@ namespace Genix.Imaging
               int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert8to1(
+            public static extern unsafe int _convert8to1(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int threshold);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert8to24(
+            public static extern unsafe int _convert8to24(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert8to32(
+            public static extern unsafe int _convert8to32(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 byte alpha);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert8to32f(
+            public static extern unsafe int _convert8to32f(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] float[] dst,
+                float[] dst,
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
@@ -1440,75 +1261,48 @@ namespace Genix.Imaging
                 int threshold);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert24to8(
+            public static extern unsafe int _convert24to8(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert24to32(
+            public static extern unsafe int _convert24to32(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert32to8(
+            public static extern unsafe int _convert32to8(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int _convert32to24(
+            public static extern unsafe int _convert32to24(
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int otsu(
-                int width,
-                int height,
-                [In] ulong[] src,
-                int stridesrc,
-                [Out] ulong[] dst,
-                int stridedst,
-                int sx,
-                int sy,
-                int smoothx,
-                int smoothy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static unsafe extern int filterBox(
-                int bitsPerPixel,
-                int width,
-                int height,
-                [In] byte* src,
-                int stridesrc,
-                [Out] byte* dst,
-                int stridedst,
-                int maskWidth,
-                int maskeight,
-                BorderType borderType,
-                uint borderValue);
         }
     }
 }

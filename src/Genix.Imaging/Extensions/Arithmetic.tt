@@ -28,7 +28,7 @@
             Name = "AddC",
             NativeName = "_addc",
             Summary = "Adds a constant to pixel values of this <see cref=\"Image\"/>.",
-            SummaryArea = "Adds a constant to a rectangular block of pixels values of this <see cref=\"Image\"/>.",
+            SummaryArea = "Adds a constant to a rectangular block of pixels values of source image and puts results into this <see cref=\"Image\"/>.",
             Remarks = 
                 "<para>This method changes the image intensity by adding value to image pixel values.</para>" +
                 "<para>For gray (8bpp) images, a positive value brightens the image (increases the intensity); a negative value darkens the image (decreases the intensity).</para>" +
@@ -43,7 +43,7 @@
             Name = "SubC",
             NativeName = "_subc",
             Summary = "Subtracts a constant from pixel values of this <see cref=\"Image\"/>.",
-            SummaryArea = "Subtracts a constant from a rectangular block of pixels values of this <see cref=\"Image\"/>.",
+            SummaryArea = "Subtracts a constant from a rectangular block of pixels values of source image and puts results into this <see cref=\"Image\"/>.",
             Remarks = 
                 "<para>This method changes the image intensity by subtracting value from image pixel values.</para>" +
                 "<para>For gray (8bpp) images, a positive value darkens the image (decreases the intensity); a negative value brightens the image (increases the intensity).</para>" +
@@ -58,7 +58,7 @@
             Name = "MulC",
             NativeName = "_mulc",
             Summary = "Multiplies pixel values of this <see cref=\"Image\"/> by a constant.",
-            SummaryArea = "Multiplies a rectangular block of pixels values of this <see cref=\"Image\"/> by a constant.",
+            SummaryArea = "Multiplies a rectangular block of pixels values of source image by a constant and puts results into  this <see cref=\"Image\"/>.",
             Remarks = 
                 "<para>This method changes the image intensity by multiplying image pixel values by a value.</para>" +
                 "<para>" +
@@ -72,7 +72,7 @@
             Name = "DivC",
             NativeName = "_divc",
             Summary = "Divides pixel values of this <see cref=\"Image\"/> by a constant.",
-            SummaryArea = "Divides a rectangular block of pixels values of this <see cref=\"Image\"/> by a constant.",
+            SummaryArea = "Divides a rectangular block of pixels values of source image by a constant and puts results into this <see cref=\"Image\"/>.",
             Remarks = 
                 "<para>This method changes the image intensity by dividing image pixel values by a value.</para>" +
                 "<para>" +
@@ -155,41 +155,6 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image <#=method.Name#>(Image dst, uint value, int scaleFactor)
         {
-            return this.AddC(dst, 0, 0, this.Width, this.Height, value, scaleFactor);
-        }
-
-        /// <summary>
-        /// <#=method.SummaryArea#>
-        /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
-        /// <param name="width">The width of the area.</param>
-        /// <param name="height">The height of the area.</param>
-        /// <param name="value">The constant value.</param>
-        /// <param name="scaleFactor">The scaling factor.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
-        /// <remarks>
-        /// <#=method.Remarks#>
-        /// <para>
-        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
-        /// The result is rounded off to the nearest even integer number.
-        /// </para>
-        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
-        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
-        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
-        /// </exception>
-        [CLSCompliant(false)]
-        public Image <#=method.Name#>(Image dst, int x, int y, int width, int height, uint value, int scaleFactor)
-        {
             if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
             {
                 throw new NotSupportedException(string.Format(
@@ -198,17 +163,15 @@ namespace Genix.Imaging
                     this.BitsPerPixel));
             }
 
-            this.ValidateArea(x, y, width, height);
-
             if (dst == this)
             {
                 // in-place operation
                 NativeMethods.<#=method.NativeName#>(
-                    dst.BitsPerPixel,
-                    x,
-                    y,
-                    width,
-                    height,
+                    this.BitsPerPixel,
+                    0,
+                    0,
+                    this.Width,
+                    this.Height,
                     null,
                     0,
                     value,
@@ -219,14 +182,14 @@ namespace Genix.Imaging
             else
             {
                 // not in-place operation
-                dst = this.Copy(dst, !(x == 0 && y == 0 && width == this.Width && height == this.Height));
+                dst = this.Copy(dst, false);
 
                 NativeMethods.<#=method.NativeName#>(
-                    dst.BitsPerPixel,
-                    x,
-                    y,
-                    width,
-                    height,
+                    this.BitsPerPixel,
+                    0,
+                    0,
+                    this.Width,
+                    this.Height,
                     this.Bits,
                     this.Stride8,
                     value,
@@ -241,34 +204,94 @@ namespace Genix.Imaging
         /// <summary>
         /// <#=method.SummaryArea#>
         /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="src">The source <see cref="Image"/>.</param>
         /// <param name="value">The constant value.</param>
         /// <param name="scaleFactor">The scaling factor.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
         /// <remarks>
         /// <#=method.Remarks#>
         /// <para>
         /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
         /// The result is rounded off to the nearest even integer number.
         /// </para>
-        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
-        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
-        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        [CLSCompliant(false)]
+        public void <#=method.Name#>(int x, int y, int width, int height, Image src, uint value, int scaleFactor)
+        {
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
+            }
+
+            this.ValidateArea(x, y, width, height);
+            src.ValidateArea(x, y, width, height);
+
+            NativeMethods.<#=method.NativeName#>(
+                this.BitsPerPixel,
+                x,
+                y,
+                width,
+                height,
+                src.Bits,
+                src.Stride8,
+                value,
+                this.Bits,
+                this.Stride8,
+                scaleFactor);
+        }
+
+        /// <summary>
+        /// <#=method.SummaryArea#>
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="src">The source <see cref="Image"/>.</param>
+        /// <param name="value">The constant value.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
+        /// <remarks>
+        /// <#=method.Remarks#>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// The result is rounded off to the nearest even integer number.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
+        /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para>The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="area"/> is outside of <paramref name="src"/> bounds.</para>
         /// </exception>
         /// <exception cref="NotSupportedException">
         /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
-        public Image <#=method.Name#>(Image dst, Rectangle area, uint value, int scaleFactor)
+        public void <#=method.Name#>(Rectangle area, Image src, uint value, int scaleFactor)
         {
-            return this.<#=method.Name#>(dst, area.X, area.Y, area.Width, area.Height, value, scaleFactor);
+            this.<#=method.Name#>(area.X, area.Y, area.Width, area.Height, src, value, scaleFactor);
         }
 <#  }#>
 <#  foreach (MethodDescriptor method in methods) { #>

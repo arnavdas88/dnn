@@ -69,21 +69,27 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterRectangular(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                kernelWidth,
-                kernelHeight,
-                kernel,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterRectangular(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        kernelWidth,
+                        kernelHeight,
+                        kernel,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -146,20 +152,26 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterBox(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                maskWidth,
-                maskHeight,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterBox(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        maskWidth,
+                        maskHeight,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -215,20 +227,26 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterGaussian(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                kernelSize,
-                sigma,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterGaussian(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        kernelSize,
+                        sigma,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -295,19 +313,25 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterLaplace(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                maskSize,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterLaplace(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        maskSize,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -374,19 +398,25 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterHipass(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                maskSize,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterHipass(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        maskSize,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -453,19 +483,25 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            if (NativeMethods.filterLowpass(
-                this.BitsPerPixel,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride8,
-                dst.Bits,
-                dst.Stride8,
-                maskSize,
-                borderType,
-                borderValue) != 0)
+            unsafe
             {
-                throw new OutOfMemoryException();
+                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                {
+                    if (NativeMethods.filterLowpass(
+                        this.BitsPerPixel,
+                        this.Width,
+                        this.Height,
+                        (byte*)bitssrc,
+                        this.Stride8,
+                        (byte*)bitsdst,
+                        dst.Stride8,
+                        maskSize,
+                        borderType,
+                        borderValue) != 0)
+                    {
+                        throw new OutOfMemoryException();
+                    }
+                }
             }
 
             if (inplace)
@@ -481,28 +517,28 @@ namespace Genix.Imaging
         private static partial class NativeMethods
         {
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterRectangular(
+            public static unsafe extern int filterRectangular(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int kernelWidth,
                 int kernelHeight,
-                [In] float[] kernel,
+                float[] kernel,
                 BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterBox(
+            public static unsafe extern int filterBox(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int maskWidth,
                 int maskeight,
@@ -510,13 +546,13 @@ namespace Genix.Imaging
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterGaussian(
+            public static unsafe extern int filterGaussian(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int kernelSize,
                 float sigmaconst,
@@ -524,39 +560,39 @@ namespace Genix.Imaging
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterLaplace(
+            public static unsafe extern int filterLaplace(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int maskSize,
                 BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterHipass(
+            public static unsafe extern int filterHipass(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int maskSize,
                 BorderType borderType,
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int filterLowpass(
+            public static unsafe extern int filterLowpass(
                 int bitsPerPixel,
                 int width,
                 int height,
-                [In] ulong[] src,
+                byte* src,
                 int stridesrc,
-                [Out] ulong[] dst,
+                byte* dst,
                 int stridedst,
                 int maskSize,
                 BorderType borderType,

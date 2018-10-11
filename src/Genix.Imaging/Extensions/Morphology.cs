@@ -101,7 +101,7 @@ namespace Genix.Imaging
                     }
 
                     // apply mask
-                    dst.MaxEvery(dst, dst.Bounds, mask, anchor);
+                    dst.MaxEvery(dst.Bounds, mask, anchor);
                 }
 
                 void MakeMask(Point point)
@@ -113,7 +113,7 @@ namespace Genix.Imaging
                     int width = src.Width - Math.Abs(point.X);
                     int height = src.Height - Math.Abs(point.Y);
 
-                    mask.MaxEvery(mask, xdst, ydst, width, height, src, xsrc, ysrc);
+                    mask.MaxEvery(xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
 
@@ -201,7 +201,7 @@ namespace Genix.Imaging
                     }
 
                     // apply mask
-                    dst.MinEvery(dst, dst.Bounds, mask, anchor);
+                    dst.MinEvery(dst.Bounds, mask, anchor);
                 }
 
                 void MakeMask(Point point)
@@ -213,7 +213,7 @@ namespace Genix.Imaging
                     int width = src.Width - Math.Abs(point.X);
                     int height = src.Height - Math.Abs(point.Y);
 
-                    mask.MinEvery(mask, xdst, ydst, width, height, src, xsrc, ysrc);
+                    mask.MinEvery(xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
 

@@ -65,6 +65,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arithmetic.tt</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\Binarize.cs" />
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\CrossStructuringElement.cs" />
