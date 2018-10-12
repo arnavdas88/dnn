@@ -35,7 +35,7 @@
                 "<para>" +
                 "For color (24bpp and 32bpp) images, the color components are added to pixel channel values. " +
                 "In this case, the <paramref name=\"value\"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte. " +
-                "The alpha channel is not affected by this method." +
+                "The alpha channel is affected by this method." +
                 "</para>",
         },
         new MethodDescriptor()
@@ -50,7 +50,7 @@
                 "<para>" +
                 "For color (24bpp and 32bpp) images, the color components are subtracted from pixel channel values. " +
                 "In this case, the <paramref name=\"value\"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte. " +
-                "The alpha channel is not affected by this method." +
+                "The alpha channel is affected by this method." +
                 "</para>",
         },
         new MethodDescriptor()
@@ -64,7 +64,7 @@
                 "<para>" +
                 "For color (24bpp and 32bpp) images, the pixel channel values are multiplied by color components. " +
                 "In this case, the <paramref name=\"value\"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte. " +
-                "The alpha channel is not affected by this method." +
+                "The alpha channel is affected by this method." +
                 "</para>",
         },
         new MethodDescriptor()
@@ -78,7 +78,7 @@
                 "<para>" +
                 "For color (24bpp and 32bpp) images, the pixel channel values are multiplied by color components. " +
                 "In this case, the <paramref name=\"value\"/> should contain three color components (blue, green, and red) ordered from least- to- most-significant byte. " +
-                "The alpha channel is not affected by this method." +
+                "The alpha channel is affected by this method." +
                 "</para>",
         },
     };
@@ -90,28 +90,36 @@
             Name = "Add",
             NativeName = "_add",
             Summary = "Adds pixel values of two images.",
+            SummaryArea = "Adds a rectangular block of pixels values of two images.",
             Remarks = "<para>This method adds corresponding pixel values of <paramref name=\"src\"/> to this <see cref=\"Image\"/> and places the results in a destination image.</para>",
+            RemarksArea = "<para>This method adds corresponding pixel values of <paramref name=\"src\"/> to this <see cref=\"Image\"/>.</para>",
         },
         new MethodDescriptor()
         {
             Name = "Sub",
             NativeName = "_sub",
             Summary = "Subtracts pixel values of two images.",
+            SummaryArea = "Subtracts a rectangular block of pixels values of two images.",
             Remarks = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/> and places the results in a destination image.</para>",
+            RemarksArea = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/>.</para>",
         },
         new MethodDescriptor()
         {
             Name = "Mul",
             NativeName = "_mul",
             Summary = "Multiplies pixel values of two images.",
+            SummaryArea = "Multiplies a rectangular block of pixels values of two images.",
             Remarks = "<para>This method multiplies corresponding pixel values of <paramref name=\"src\"/> by this <see cref=\"Image\"/> and places the results in a destination image.</para>",
+            RemarksArea = "<para>This method multiplies corresponding pixel values of <paramref name=\"src\"/> by this <see cref=\"Image\"/>.</para>",
         },
         new MethodDescriptor()
         {
             Name = "Div",
             NativeName = "_div",
             Summary = "Divides pixel values of two images.",
+            SummaryArea = "Divides a rectangular block of pixels values of two images.",
             Remarks = "<para>This method divides corresponding pixel values of this <see cref=\"Image\"/> by <paramref name=\"src\"/> and places the results in a destination image.</para>",
+            RemarksArea = "<para>This method divides corresponding pixel values of this <see cref=\"Image\"/> by <paramref name=\"src\"/>.</para>",
         },
     };
 #>
@@ -360,11 +368,17 @@ namespace Genix.Imaging
                         // in-place operation
                         NativeMethods.<#=method.NativeName#>(
                             this.BitsPerPixel,
+                            0,
+                            0,
                             Core.MinMax.Min(this.Width, src.Width),
                             Core.MinMax.Min(this.Height, src.Height),
                             src.Bits,
                             src.Stride8,
+                            0,
+                            0,
                             null,
+                            0,
+                            0,
                             0,
                             dst.Bits,
                             dst.Stride8,
@@ -376,12 +390,18 @@ namespace Genix.Imaging
 
                         NativeMethods.<#=method.NativeName#>(
                             this.BitsPerPixel,
+                            0,
+                            0,
                             Core.MinMax.Min(this.Width, src.Width),
                             Core.MinMax.Min(this.Height, src.Height),
                             this.Bits,
                             this.Stride8,
+                            0,
+                            0,
                             src.Bits,
                             src.Stride8,
+                            0,
+                            0,
                             dst.Bits,
                             dst.Stride8,
                             scaleFactor);
@@ -397,6 +417,131 @@ namespace Genix.Imaging
             }
 
             return dst;
+        }
+
+        /// <summary>
+        /// <#=method.SummaryArea#>
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the destination rectangle.</param>
+        /// <param name="width">The width of the source and destination rectangles.</param>
+        /// <param name="height">The height of the source and destination rectangles.</param>
+        /// <param name="src">The <see cref="Image"/> to add.</param>
+        /// <param name="xsrc">The x-coordinate of the upper-left corner of the source rectangle.</param>
+        /// <param name="ysrc">The y-coordinate of the upper-left corner of the source rectangle.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
+        /// <remarks>
+        /// <#=method.RemarksArea#>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// The result is rounded off to the nearest even integer number.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="xsrc"/>, <paramref name="ysrc"/>, <paramref name="width"/> and <paramref name="height"/> is outside of <paramref name="src"/> bounds.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        public void <#=method.Name#>(int x, int y, int width, int height, Image src, int xsrc, int ysrc, int scaleFactor)
+        {
+            if (src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
+
+            if (this.BitsPerPixel != src.BitsPerPixel)
+            {
+                throw new ArgumentException(Properties.Resources.E_DepthNotTheSame);
+            }
+
+<#        if (method.Name == "Add" || method.Name == "Sub") { #>
+            if (this.BitsPerPixel == 1)
+            {
+<#        if (method.Name == "Add") { #>
+                this.Or(x, y, width, height, src, xsrc, ysrc);
+<#        } else if (method.Name == "Sub") { #>
+                this.Xand(x, y, width, height, src, xsrc, ysrc);
+<#        } #>
+                return;
+            }
+<#        } #>
+
+            this.ValidateArea(x, y, width, height);
+            src.ValidateArea(xsrc, ysrc, width, height);
+
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                case 24:
+                case 32:
+                    NativeMethods.<#=method.NativeName#>(
+                        this.BitsPerPixel,
+                        x,
+                        y,
+                        width,
+                        height,
+                        src.Bits,
+                        src.Stride8,
+                        xsrc,
+                        ysrc,
+                        null,
+                        0,
+                        0,
+                        0,
+                        this.Bits,
+                        this.Stride8,
+                        scaleFactor);
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        this.BitsPerPixel));
+            }
+        }
+
+        /// <summary>
+        /// <#=method.SummaryArea#>
+        /// </summary>
+        /// <param name="area">The width, height, and location of the destination rectangle.</param>
+        /// <param name="src">The <see cref="Image"/> to add.</param>
+        /// <param name="origin">The coordinates, in pixels, of the upper-left corner of the source rectangle.</param>
+        /// <param name="scaleFactor">The scaling factor.</param>
+        /// <remarks>
+        /// <#=method.RemarksArea#>
+        /// <para>
+        /// The scaling of a result is done by multiplying the output pixel values by 2^-<paramref name="scaleFactor"/> before the method returns.
+        /// The result is rounded off to the nearest even integer number.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="src"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of <paramref name="src"/> is not the same as the depth of this <see cref="Image"/>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.</para>
+        /// <para>-or-</para>
+        /// <para>The rectangular area described by <paramref name="origin"/> and <paramref name="area"/> is outside of <paramref name="src"/> bounds.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void <#=method.Name#>(Rectangle area, Image src, Point origin, int scaleFactor)
+        {
+            this.<#=method.Name#>(area.X, area.Y, area.Width, area.Height, src, origin.X, origin.Y, scaleFactor);
         }
 <#  } #>
 
@@ -424,12 +569,18 @@ namespace Genix.Imaging
             [DllImport(NativeMethods.DllName)]
             public static extern int <#=method.NativeName#>(
                 int bitsPerPixel,
+                int x,
+                int y,
                 int width,
                 int height,
                 [In] ulong[] src1,
                 int src1step,
+                int src1x,
+                int src1y,
                 [In] ulong[] src2,
                 int src2step,
+                int src2x,
+                int src2y,
                 [Out] ulong[] dst,
                 int dststep,
                 int scaleFactor);
@@ -446,5 +597,6 @@ namespace Genix.Imaging
 		public string Summary { get; set; }
 		public string SummaryArea { get; set; }
 		public string Remarks { get; set; }
+		public string RemarksArea { get; set; }
 	}
 #>

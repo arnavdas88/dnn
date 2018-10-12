@@ -52,10 +52,24 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Gets the color of the specified pixel in this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="point">The x- and y-coordinate of the pixel to retrieve.</param>
+        /// <returns>
+        /// The color of the specified pixel.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The pixel coordinates specified by <paramref name="point"/> is outside this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public uint GetPixel(Point point) => this.GetPixel(point.X, point.Y);
+
+        /// <summary>
         /// Sets the color of the specified pixel in this <see cref="Image"/>.
         /// </summary>
-        /// <param name="x">The x-coordinate of the pixel to retrieve.</param>
-        /// <param name="y">The y-coordinate of the pixel to retrieve.</param>
+        /// <param name="x">The x-coordinate of the pixel to set.</param>
+        /// <param name="y">The y-coordinate of the pixel to set.</param>
         /// <param name="color">The color to assign to the specified pixel.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <para><paramref name="x"/> is less than 0, or greater than or equal to <see cref="Image{T}.Width"/>.</para>
@@ -103,6 +117,27 @@ namespace Genix.Imaging
                 this.Bits[pos] = BitUtils.CopyBits(this.Bits[pos], xpos, this.BitsPerPixel, color);
             }
         }
+
+        /// <summary>
+        /// Sets the color of the specified pixel in this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="point">The x- and y-coordinate of the pixel to set.</param>
+        /// <param name="color">The color to assign to the specified pixel.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The pixel coordinates specified by <paramref name="point"/> is outside this <see cref="Image"/> bounds.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 1,
+        /// <paramref name="color"/> > 0 sets the bit on.
+        /// </para>
+        /// <para>
+        /// For <see cref="Image{T}.BitsPerPixel"/> == 2, 4, 8, and 16,
+        /// <paramref name="color"/> > 0 is masked to the maximum allowable pixel value, and any(invalid) higher order bits are discarded.
+        /// </para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public void SetPixel(Point point, uint color) => this.SetPixel(point.X, point.Y, color);
 
         /// <summary>
         /// Sets all image pixels to the specified color.

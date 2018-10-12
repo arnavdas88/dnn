@@ -42,7 +42,7 @@
 
                         case 24:
                             {
-                                Color addcolor = Color.FromArgb(12, 34, 56);
+                                Color addcolor = Color.FromArgb(0, 12, 34, 56);
                                 Image dst1 = src.AddC(null, addcolor.Argb, scaleFactor);
                                 Image dst2 = src.AddC(src, addcolor.Argb, scaleFactor);
                                 Assert.IsTrue(src == dst2);
@@ -51,17 +51,11 @@
                                 {
                                     for (int x = 0; x < src.Width; x++)
                                     {
-                                        Color expected = Color.Add(Color.FromArgb(copy.GetPixel(x, y)), addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Add(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -82,17 +76,8 @@
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Add(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -150,7 +135,7 @@
 
                         case 24:
                             {
-                                Color addcolor = Color.FromArgb(12, 34, 56);
+                                Color addcolor = Color.FromArgb(0, 12, 34, 56);
                                 Image dst1 = src.SubC(null, addcolor.Argb, scaleFactor);
                                 Image dst2 = src.SubC(src, addcolor.Argb, scaleFactor);
                                 Assert.IsTrue(src == dst2);
@@ -159,17 +144,11 @@
                                 {
                                     for (int x = 0; x < src.Width; x++)
                                     {
-                                        Color expected = Color.Subtract(Color.FromArgb(copy.GetPixel(x, y)), addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Subtract(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -190,17 +169,8 @@
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Subtract(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -258,7 +228,7 @@
 
                         case 24:
                             {
-                                Color addcolor = Color.FromArgb(2, 3, 4);
+                                Color addcolor = Color.FromArgb(0, 2, 3, 4);
                                 Image dst1 = src.MulC(null, addcolor.Argb, scaleFactor);
                                 Image dst2 = src.MulC(src, addcolor.Argb, scaleFactor);
                                 Assert.IsTrue(src == dst2);
@@ -267,17 +237,11 @@
                                 {
                                     for (int x = 0; x < src.Width; x++)
                                     {
-                                        Color expected = Color.Multiply(Color.FromArgb(copy.GetPixel(x, y)), addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Multiply(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -298,17 +262,8 @@
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Multiply(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -366,7 +321,7 @@
 
                         case 24:
                             {
-                                Color addcolor = Color.FromArgb(2, 3, 4);
+                                Color addcolor = Color.FromArgb(0, 2, 3, 4);
                                 Image dst1 = src.DivC(null, addcolor.Argb, scaleFactor);
                                 Image dst2 = src.DivC(src, addcolor.Argb, scaleFactor);
                                 Assert.IsTrue(src == dst2);
@@ -375,17 +330,11 @@
                                 {
                                     for (int x = 0; x < src.Width; x++)
                                     {
-                                        Color expected = Color.Divide(Color.FromArgb(copy.GetPixel(x, y)), addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Divide(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -406,17 +355,8 @@
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Divide(source, addcolor, Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -490,17 +430,11 @@
                                 {
                                     for (int x = 0; x < src1.Width; x++)
                                     {
-                                        Color expected = Color.Add(Color.FromArgb(copy.GetPixel(x, y)), Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Add(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -519,18 +453,10 @@
                                     {
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Add(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        expected.A = source.A; // alpha channel should not be affected
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -604,17 +530,11 @@
                                 {
                                     for (int x = 0; x < src1.Width; x++)
                                     {
-                                        Color expected = Color.Subtract(Color.FromArgb(copy.GetPixel(x, y)), Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Subtract(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -633,18 +553,10 @@
                                     {
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Subtract(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        expected.A = source.A; // alpha channel should not be affected
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -715,17 +627,11 @@
                                 {
                                     for (int x = 0; x < src1.Width; x++)
                                     {
-                                        Color expected = Color.Multiply(Color.FromArgb(copy.GetPixel(x, y)), Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Multiply(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -744,18 +650,10 @@
                                     {
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Multiply(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        expected.A = source.A; // alpha channel should not be affected
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -828,17 +726,11 @@
                                 {
                                     for (int x = 0; x < src1.Width; x++)
                                     {
-                                        Color expected = Color.Divide(Color.FromArgb(copy.GetPixel(x, y)), Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        Color source = Color.FromArgb(copy.GetPixel(x, y));
+                                        Color expected = Color.Divide(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }
@@ -857,18 +749,10 @@
                                     {
                                         Color source = Color.FromArgb(copy.GetPixel(x, y));
                                         Color expected = Color.Divide(source, Color.FromArgb(src2.GetPixel(x, y)), Math.Pow(2, -scaleFactor), MidpointRounding.ToEven);
+                                        expected.A = source.A; // alpha channel should not be affected
 
-                                        Color actual1 = Color.FromArgb(dst1.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual1.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual1.R);
-                                        Assert.AreEqual(expected.G, actual1.G);
-                                        Assert.AreEqual(expected.B, actual1.B);
-
-                                        Color actual2 = Color.FromArgb(dst2.GetPixel(x, y));
-                                        ////Assert.AreEqual(source.A, actual2.A);  // alpha channel should not be affected
-                                        Assert.AreEqual(expected.R, actual2.R);
-                                        Assert.AreEqual(expected.G, actual2.G);
-                                        Assert.AreEqual(expected.B, actual2.B);
+                                        Assert.AreEqual(expected.Argb, dst1.GetPixel(x, y));
+                                        Assert.AreEqual(expected.Argb, dst2.GetPixel(x, y));
                                     }
                                 }
                             }

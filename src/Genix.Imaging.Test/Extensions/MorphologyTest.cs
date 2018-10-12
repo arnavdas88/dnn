@@ -1,11 +1,15 @@
 ﻿namespace Genix.Imaging.Test
 {
     using System.Globalization;
+    using Genix.Core;
+    using Genix.Drawing;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class MorphologyTest
     {
+        private readonly UlongRandomGenerator random = new UlongRandomGenerator();
+
         [TestMethod, TestCategory("Image")]
         public void DilateTest1()
         {
@@ -46,6 +50,88 @@
         }
 
         [TestMethod, TestCategory("Image")]
+        public void DilateTest2()
+        {
+            StructuringElement[] ses = new[]
+            {
+                StructuringElement.Square(7),
+                StructuringElement.Brick(8, 6),
+                StructuringElement.Brick(8, 6, new Point(6, 5)),
+                StructuringElement.Brick(8, 6, new Point(10, 8)),
+                StructuringElement.Cross(10, 5),
+                StructuringElement.Cross(10, 5, new Point(-3, -2)),
+            };
+
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 2, 131 })
+                {
+                    Image src = new Image(width, 50, bitsPerPixel, 200, 200);
+
+                    foreach (StructuringElement se in ses)
+                    {
+                        // constant border
+                        foreach (uint borderValue in new[] { src.BlackColor, src.WhiteColor, (uint)(((ulong)src.BlackColor + (ulong)src.WhiteColor) / 2) })
+                        {
+                            src.Randomize();
+                            Image dst = src.Dilate(null, se, 1, BorderType.BorderConst, borderValue);
+
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                for (int y = 0; y < src.Height; y++)
+                                {
+                                    Assert.AreEqual(ComputePixelBorder(x, y, borderValue), dst.GetPixel(x, y));
+                                }
+                            }
+                        }
+
+                        // replica border
+                        {
+                            src.Randomize();
+                            Image dst = src.Dilate(null, se, 1, BorderType.BorderRepl, 0);
+
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                for (int y = 0; y < src.Height; y++)
+                                {
+                                    Assert.AreEqual(ComputePixel(x, y), dst.GetPixel(x, y));
+                                }
+                            }
+                        }
+
+                        uint ComputePixel(int x, int y)
+                        {
+                            uint maxcolor = uint.MinValue;
+                            foreach (Point point in se.GetElements())
+                            {
+                                Point pt = new Point(x + point.X, y + point.Y);
+                                if (src.Bounds.Contains(pt))
+                                {
+                                    maxcolor = ColorHelpers.MaxColor(maxcolor, src.GetPixel(pt), bitsPerPixel);
+                                }
+                            }
+
+                            return maxcolor;
+                        }
+
+                        uint ComputePixelBorder(int x, int y, uint borderValue)
+                        {
+                            uint maxcolor = uint.MinValue;
+                            foreach (Point point in se.GetElements())
+                            {
+                                Point pt = new Point(x + point.X, y + point.Y);
+                                uint color = src.Bounds.Contains(pt) ? src.GetPixel(pt) : borderValue;
+                                maxcolor = ColorHelpers.MaxColor(maxcolor, color, bitsPerPixel);
+                            }
+
+                            return maxcolor;
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod, TestCategory("Image")]
         public void ErodeTest1()
         {
             const int Width = 150;
@@ -80,6 +166,88 @@
                             (ulong)((Width * Height) - 9),
                             dilatedImage.Power(),
                             string.Format(CultureInfo.InvariantCulture, "{0} {1}", ix, iy));
+                    }
+                }
+            }
+        }
+
+        [TestMethod, TestCategory("Image")]
+        public void ErodeTest2()
+        {
+            StructuringElement[] ses = new[]
+            {
+                StructuringElement.Square(7),
+                StructuringElement.Brick(8, 6),
+                StructuringElement.Brick(8, 6, new Point(6, 5)),
+                StructuringElement.Brick(8, 6, new Point(10, 8)),
+                StructuringElement.Cross(10, 5),
+                StructuringElement.Cross(10, 5, new Point(-3, -2)),
+            };
+
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 2, 131 })
+                {
+                    Image src = new Image(width, 50, bitsPerPixel, 200, 200);
+
+                    foreach (StructuringElement se in ses)
+                    {
+                        // constant border
+                        foreach (uint borderValue in new[] { src.BlackColor, src.WhiteColor, (uint)(((ulong)src.BlackColor + (ulong)src.WhiteColor) / 2) })
+                        {
+                            src.Randomize();
+                            Image dst = src.Erode(null, se, 1, BorderType.BorderConst, borderValue);
+
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                for (int y = 0; y < src.Height; y++)
+                                {
+                                    Assert.AreEqual(ComputePixelBorder(x, y, borderValue), dst.GetPixel(x, y));
+                                }
+                            }
+                        }
+
+                        // replica border
+                        {
+                            src.Randomize();
+                            Image dst = src.Erode(null, se, 1, BorderType.BorderRepl, 0);
+
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                for (int y = 0; y < src.Height; y++)
+                                {
+                                    Assert.AreEqual(ComputePixel(x, y), dst.GetPixel(x, y));
+                                }
+                            }
+                        }
+
+                        uint ComputePixel(int x, int y)
+                        {
+                            uint maxcolor = uint.MaxValue;
+                            foreach (Point point in se.GetElements())
+                            {
+                                Point pt = new Point(x + point.X, y + point.Y);
+                                if (src.Bounds.Contains(pt))
+                                {
+                                    maxcolor = ColorHelpers.MinColor(maxcolor, src.GetPixel(pt), bitsPerPixel);
+                                }
+                            }
+
+                            return maxcolor;
+                        }
+
+                        uint ComputePixelBorder(int x, int y, uint borderValue)
+                        {
+                            uint maxcolor = uint.MaxValue;
+                            foreach (Point point in se.GetElements())
+                            {
+                                Point pt = new Point(x + point.X, y + point.Y);
+                                uint color = src.Bounds.Contains(pt) ? src.GetPixel(pt) : borderValue;
+                                maxcolor = ColorHelpers.MinColor(maxcolor, color, bitsPerPixel);
+                            }
+
+                            return maxcolor;
+                        }
                     }
                 }
             }
