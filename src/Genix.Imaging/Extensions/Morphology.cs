@@ -62,49 +62,110 @@ namespace Genix.Imaging
             // we sequentially apply m x 1 and 1 x n masks
             if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
             {
-                for (int iteration = 0; iteration < iterations; iteration++)
-                {
-                    dst = (iteration == 0 ? this : dst).Dilate(dst, StructuringElement.Brick(brickSE.Width, 1), 1, borderType, borderValue);
-                    dst.Dilate(dst, StructuringElement.Brick(1, brickSE.Height), 1, borderType, borderValue);
-                }
+                dst = this.Dilate(
+                    dst,
+                    StructuringElement.Brick(
+                        brickSE.Width,
+                        1,
+                        brickSE.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(brickSE.Anchor.X, 0)),
+                    iterations,
+                    borderType,
+                    borderValue);
+
+                dst.Dilate(
+                    dst,
+                    StructuringElement.Brick(
+                        1,
+                        brickSE.Height,
+                        brickSE.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(0, brickSE.Anchor.Y)),
+                    iterations,
+                    borderType,
+                    borderValue);
             }
             else
             {
-                dst = this.Copy(dst, true);
+                Image src = this;
+                bool inplace = dst == this;
 
-                Size sesize = Size.Add(se.Size, -1, -1);
+                // estimate border size
+                Size sesize = se.Size;
                 Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
+                int bx1 = Math.Max(anchor.X, 0) * iterations;
+                int by1 = Math.Max(anchor.Y, 0) * iterations;
+                int bx2 = this.Width - (Math.Max(sesize.Width - 1 - anchor.X, 0) * iterations);
+                int by2 = this.Height - (Math.Max(sesize.Height - 1 - anchor.Y, 0) * iterations);
 
-                Image src = this.Inflate(anchor.X, anchor.Y, sesize.Width - anchor.X, sesize.Height - anchor.Y, borderType, borderValue);
-                Image mask = src.Clone(false);
+                // extreme case - border is larger than image
+                // simply set entire image to the max color
+                if (bx2 <= bx1 || by2 <= by1)
+                {
+                    uint maxcolor = src.Max();
+                    if (borderType == BorderType.BorderConst)
+                    {
+                        maxcolor = this.BitsPerPixel < 24 ?
+                            Math.Max(maxcolor, borderValue & this.MaxColor) :
+                            Color.Max(Color.FromArgb(maxcolor), Color.FromArgb(borderValue & this.MaxColor)).Argb;
+                    }
+
+                    if (!inplace)
+                    {
+                        dst = this.CreateTemplate(dst, this.BitsPerPixel);
+                    }
+
+                    dst.SetColor(maxcolor);
+                    return dst;
+                }
+
+                dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+                // initialize dst with src if s.e. contains anchor point
+                // this is a direct copy
+                // anchor point will later be excluded from comparison
+                if (se.GetElements().Contains(Point.Empty))
+                {
+                    Vectors.Copy(src.Bits.Length, src.Bits, 0, dst.Bits, 0);
+                }
+                else
+                {
+                    dst.SetToZero();
+                }
 
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
+                    // for next iteration, copy destination image back into source
                     if (iteration > 0)
                     {
-                        // copy destination image back into source
-                        // update border if it is a replica of boundary pixels
-                        Rectangle border = new Rectangle(anchor, src.Size);
-                        Image.CopyArea(src, border, dst, anchor);
-                        if (borderType == BorderType.BorderRepl)
+                        if (src == this)
                         {
-                            src.SetBorder(border, BorderType.BorderRepl, 0);
+                            src = dst.Clone(false);
                         }
 
-                        mask.SetToZero();
+                        Vectors.Copy(dst.Bits.Length, dst.Bits, 0, src.Bits, 0);
                     }
 
-                    // create mask
+                    // apply s.e.
                     foreach (Point point in se.GetElements())
                     {
-                        MakeMask(point);
+                        if (point != Point.Empty)
+                        {
+                            ApplySEPoint(point);
+                        }
                     }
-
-                    // apply mask
-                    dst.MaxEvery(dst.Bounds, mask, anchor);
                 }
 
-                void MakeMask(Point point)
+                // maximize border
+                if (borderType == BorderType.BorderConst)
+                {
+                    dst.MaxCBorder(bx1, by1, bx2 - bx1, by2 - by1, borderValue);
+                }
+
+                if (inplace)
+                {
+                    this.Attach(dst);
+                    return this;
+                }
+
+                void ApplySEPoint(Point point)
                 {
                     int xdst = Core.MinMax.Max(-point.X, 0);
                     int ydst = Core.MinMax.Max(-point.Y, 0);
@@ -113,7 +174,7 @@ namespace Genix.Imaging
                     int width = src.Width - Math.Abs(point.X);
                     int height = src.Height - Math.Abs(point.Y);
 
-                    mask.MaxEvery(xdst, ydst, width, height, src, xsrc, ysrc);
+                    dst.MaxEvery(xdst, ydst, width, height, src, xsrc, ysrc);
                 }
             }
 

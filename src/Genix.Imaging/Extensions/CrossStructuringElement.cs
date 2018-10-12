@@ -67,19 +67,19 @@ namespace Genix.Imaging
         {
             anchor = this.GetAnchor(anchor);
 
+            int centerx = this.width / 2;
+            int centery = this.height / 2;
+
             for (int ix = 0; ix < this.width; ix++)
             {
-                if (ix != anchor.X)
-                {
-                    yield return new Point(ix - anchor.X, 0);
-                }
+                yield return new Point(ix - anchor.X, centery - anchor.Y);
             }
 
             for (int iy = 0; iy < this.height; iy++)
             {
-                if (iy != anchor.Y)
+                if (iy != centery)
                 {
-                    yield return new Point(0, iy - anchor.Y);
+                    yield return new Point(centerx - anchor.X, iy - anchor.Y);
                 }
             }
         }

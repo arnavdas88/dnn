@@ -256,6 +256,36 @@ namespace Genix.Imaging
             return Color.FromArgb(a, r, g, b);
         }
 
+        /// <summary>
+        /// Computes the of each channel maximum of two colors.
+        /// </summary>
+        /// <param name="color1">The first color.</param>
+        /// <param name="color2">The second color.</param>
+        /// <returns>The maximum of two colors.</returns>
+        public static Color Max(Color color1, Color color2)
+        {
+            byte r = Core.MinMax.Max(color1.R, color2.R);
+            byte g = Core.MinMax.Max(color1.G, color2.G);
+            byte b = Core.MinMax.Max(color1.B, color2.B);
+            byte a = Core.MinMax.Max(color1.A, color2.A);
+            return Color.FromArgb(a, r, g, b);
+        }
+
+        /// <summary>
+        /// Computes the minimum of each channel of two colors.
+        /// </summary>
+        /// <param name="color1">The first color.</param>
+        /// <param name="color2">The second color.</param>
+        /// <returns>The minimum of two colors.</returns>
+        public static Color Min(Color color1, Color color2)
+        {
+            byte r = Core.MinMax.Min(color1.R, color2.R);
+            byte g = Core.MinMax.Min(color1.G, color2.G);
+            byte b = Core.MinMax.Min(color1.B, color2.B);
+            byte a = Core.MinMax.Min(color1.A, color2.A);
+            return Color.FromArgb(a, r, g, b);
+        }
+
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Color other) => other.Argb == this.Argb;

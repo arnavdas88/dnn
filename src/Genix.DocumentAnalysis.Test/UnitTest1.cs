@@ -28,7 +28,8 @@
 
                 for (int i = 0; i < 100; i++)
                 {
-                    xxx.Convert8To1(yyy, 128);
+                    ////xxx.Convert8To1(yyy, 128);
+                    xxx.Dilate(yyy, StructuringElement.Square(7), 1, BorderType.BorderConst, 0);
                 }
 
                 ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);

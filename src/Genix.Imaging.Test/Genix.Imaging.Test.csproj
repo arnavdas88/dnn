@@ -65,6 +65,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BitmapHelpers.cs" />
+    <Compile Include="ColorHelpers.cs" />
     <Compile Include="Extensions\BitmapExtensionsTest.cs" />
     <Compile Include="Extensions\MorphologyTest.cs" />
     <Compile Include="Extensions\ConvertTest.cs" />

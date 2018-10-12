@@ -355,9 +355,6 @@ namespace Genix.Imaging
 
                             dst.FloodFill(dst, 8, temp2);
 
-
-
-
                             /*                            Image temp1 = this.CreateTemplate(null, 1);
                                                         fixed (ulong* bitstemp1 = temp1.Bits)
                                                         {

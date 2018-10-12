@@ -555,64 +555,99 @@ namespace Genix.Imaging
         {
             this.ValidateArea(x, y, width, height);
 
-            switch (this.BitsPerPixel)
+            uint result = uint.MaxValue;
+            unsafe
             {
-                case 8:
-                    unsafe
-                    {
-                        fixed (ulong* ubits = this.Bits)
-                        {
-                            int stride = this.Stride8;
-                            byte* bits = (byte*)ubits + (y * stride) + x;
+                fixed (ulong* bits = &this.Bits[y * this.Stride])
+                {
+                    int stride8 = this.Stride8;
+                    byte* ptr = (byte*)bits + (x * this.BitsPerPixel / 8);
 
-                            if (width == stride)
+                    switch (this.BitsPerPixel)
+                    {
+                        case 8:
+                            if (width == stride8)
                             {
-                                return Vectors.Min(width * height, bits);
+                                result = (uint)Vectors.Min(width * height, ptr);
                             }
                             else
                             {
-                                byte result = byte.MaxValue;
-                                for (int i = 0; i < height; i++, bits += stride)
+                                for (int i = 0; i < height; i++, ptr += stride8)
                                 {
-                                    result = Core.MinMax.Min(result, Vectors.Min(width, bits));
+                                    result = Math.Min(result, (uint)Vectors.Min(width, ptr));
                                 }
-
-                                return result;
                             }
-                        }
-                    }
 
-                case 16:
-                    unsafe
-                    {
-                        fixed (ulong* ubits = this.Bits)
-                        {
-                            int stride = this.Stride8 / 2;
-                            ushort* bits = (ushort*)ubits + (y * stride) + x;
+                            break;
 
-                            if (width == stride)
+                        case 16:
+                            if (width == stride8 / sizeof(ushort))
                             {
-                                return Vectors.Min(width * height, bits);
+                                result = (uint)Vectors.Min(width * height, (ushort*)bits);
                             }
                             else
                             {
-                                ushort result = ushort.MaxValue;
-                                for (int i = 0; i < height; i++, bits += stride)
+                                for (int i = 0; i < height; i++, ptr += stride8)
                                 {
-                                    result = Core.MinMax.Min(result, Vectors.Min(width, bits));
+                                    result = Math.Min(result, (uint)Vectors.Min(width, (ushort*)bits));
+                                }
+                            }
+
+                            break;
+
+                        case 24:
+                            {
+                                Color mincolor = Color.FromArgb(0, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+
+                                for (int i = 0; i < height; i++, ptr += stride8)
+                                {
+                                    mincolor.B = Math.Min(mincolor.B, Vectors.Min(width, ptr + 0, 3));
+                                    mincolor.G = Math.Min(mincolor.G, Vectors.Min(width, ptr + 1, 3));
+                                    mincolor.R = Math.Min(mincolor.R, Vectors.Min(width, ptr + 2, 3));
                                 }
 
-                                return result;
+                                result = mincolor.Argb;
                             }
-                        }
-                    }
 
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
+                            break;
+
+                        case 32:
+                            {
+                                Color mincolor = Color.FromArgb(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+
+                                if (width == stride8)
+                                {
+                                    mincolor.B = Vectors.Min(width * height, ptr + 0, 4);
+                                    mincolor.G = Vectors.Min(width * height, ptr + 1, 4);
+                                    mincolor.R = Vectors.Min(width * height, ptr + 2, 4);
+                                    mincolor.A = Vectors.Min(width * height, ptr + 3, 4);
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < height; i++, ptr += stride8)
+                                    {
+                                        mincolor.B = Math.Min(mincolor.B, Vectors.Min(width, ptr + 0, 4));
+                                        mincolor.G = Math.Min(mincolor.G, Vectors.Min(width, ptr + 1, 4));
+                                        mincolor.R = Math.Min(mincolor.R, Vectors.Min(width, ptr + 2, 4));
+                                        mincolor.A = Math.Min(mincolor.A, Vectors.Min(width, ptr + 3, 4));
+                                    }
+                                }
+
+                                result = mincolor.Argb;
+                            }
+
+                            break;
+
+                        default:
+                            throw new NotSupportedException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                Properties.Resources.E_UnsupportedDepth,
+                                this.BitsPerPixel));
+                    }
+                }
             }
+
+            return result;
         }
 
         /// <summary>
@@ -677,64 +712,99 @@ namespace Genix.Imaging
         {
             this.ValidateArea(x, y, width, height);
 
-            switch (this.BitsPerPixel)
+            uint result = uint.MinValue;
+            unsafe
             {
-                case 8:
-                    unsafe
-                    {
-                        fixed (ulong* ubits = this.Bits)
-                        {
-                            int stride = this.Stride8;
-                            byte* bits = (byte*)ubits + (y * stride) + x;
+                fixed (ulong* bits = &this.Bits[y * this.Stride])
+                {
+                    int stride8 = this.Stride8;
+                    byte* ptr = (byte*)bits + (x * this.BitsPerPixel / 8);
 
-                            if (width == stride)
+                    switch (this.BitsPerPixel)
+                    {
+                        case 8:
+                            if (width == stride8)
                             {
-                                return Vectors.Max(width * height, bits);
+                                result = (uint)Vectors.Max(width * height, ptr);
                             }
                             else
                             {
-                                byte result = 0;
-                                for (int i = 0; i < height; i++, bits += stride)
+                                for (int i = 0; i < height; i++, ptr += stride8)
                                 {
-                                    result = Core.MinMax.Max(result, Vectors.Max(width, bits));
+                                    result = Math.Max(result, (uint)Vectors.Max(width, ptr));
                                 }
-
-                                return result;
                             }
-                        }
-                    }
 
-                case 16:
-                    unsafe
-                    {
-                        fixed (ulong* ubits = this.Bits)
-                        {
-                            int stride = this.Stride8 / 2;
-                            ushort* bits = (ushort*)ubits + (y * stride) + x;
+                            break;
 
-                            if (width == stride)
+                        case 16:
+                            if (width == stride8 / sizeof(ushort))
                             {
-                                return Vectors.Max(width * height, bits);
+                                result = (uint)Vectors.Max(width * height, (ushort*)bits);
                             }
                             else
                             {
-                                ushort result = 0;
-                                for (int i = 0; i < height; i++, bits += stride)
+                                for (int i = 0; i < height; i++, ptr += stride8)
                                 {
-                                    result = Core.MinMax.Max(result, Vectors.Max(width, bits));
+                                    result = Math.Max(result, (uint)Vectors.Max(width, (ushort*)bits));
+                                }
+                            }
+
+                            break;
+
+                        case 24:
+                            {
+                                Color maxcolor = Color.FromArgb(0, byte.MinValue, byte.MinValue, byte.MinValue);
+
+                                for (int i = 0; i < height; i++, ptr += stride8)
+                                {
+                                    maxcolor.B = Math.Max(maxcolor.B, Vectors.Max(width, ptr + 0, 3));
+                                    maxcolor.G = Math.Max(maxcolor.G, Vectors.Max(width, ptr + 1, 3));
+                                    maxcolor.R = Math.Max(maxcolor.R, Vectors.Max(width, ptr + 2, 3));
                                 }
 
-                                return result;
+                                result = maxcolor.Argb;
                             }
-                        }
-                    }
 
-                default:
-                    throw new NotSupportedException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        Properties.Resources.E_UnsupportedDepth,
-                        this.BitsPerPixel));
+                            break;
+
+                        case 32:
+                            {
+                                Color maxcolor = Color.FromArgb(byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue);
+
+                                if (width == stride8)
+                                {
+                                    maxcolor.B = Vectors.Max(width * height, ptr + 0, 4);
+                                    maxcolor.G = Vectors.Max(width * height, ptr + 1, 4);
+                                    maxcolor.R = Vectors.Max(width * height, ptr + 2, 4);
+                                    maxcolor.A = Vectors.Max(width * height, ptr + 3, 4);
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < height; i++, ptr += stride8)
+                                    {
+                                        maxcolor.B = Math.Max(maxcolor.B, Vectors.Max(width, ptr + 0, 4));
+                                        maxcolor.G = Math.Max(maxcolor.G, Vectors.Max(width, ptr + 1, 4));
+                                        maxcolor.R = Math.Max(maxcolor.R, Vectors.Max(width, ptr + 2, 4));
+                                        maxcolor.A = Math.Max(maxcolor.A, Vectors.Max(width, ptr + 3, 4));
+                                    }
+                                }
+
+                                result = maxcolor.Argb;
+                            }
+
+                            break;
+
+                        default:
+                            throw new NotSupportedException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                Properties.Resources.E_UnsupportedDepth,
+                                this.BitsPerPixel));
+                    }
+                }
             }
+
+            return result;
         }
 
         /// <summary>

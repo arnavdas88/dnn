@@ -87,10 +87,7 @@ namespace Genix.Imaging
             {
                 for (int iy = 0; iy < this.height; iy++)
                 {
-                    if (ix != anchor.X || iy != anchor.Y)
-                    {
-                        yield return new Point(ix - anchor.X, iy - anchor.Y);
-                    }
+                    yield return new Point(ix - anchor.X, iy - anchor.Y);
                 }
             }
         }

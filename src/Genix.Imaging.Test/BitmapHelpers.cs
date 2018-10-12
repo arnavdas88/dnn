@@ -1,5 +1,4 @@
-﻿
-namespace Genix.Imaging.Test
+﻿namespace Genix.Imaging.Test
 {
     using System;
     using System.Drawing;

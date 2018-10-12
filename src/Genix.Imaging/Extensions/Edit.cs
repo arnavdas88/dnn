@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Globalization;
     using System.Runtime.CompilerServices;
     using Genix.Core;
     using Genix.Drawing;
@@ -254,15 +255,14 @@ namespace Genix.Imaging
         /// <summary>
         /// Sets all image pixels in the specified rectangular area to the specified color.
         /// </summary>
-        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <param name="area">The width, height, and location of the area.</param>
         /// <param name="color">The color to set.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
+        /// The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetColor(Rectangle rect, uint color) =>
-            this.SetColor(rect.X, rect.Y, rect.Width, rect.Height, color);
+        public void SetColor(Rectangle area, uint color) => this.SetColor(area.X, area.Y, area.Width, area.Height, color);
 
         /// <summary>
         /// Sets all image pixels outside the specified rectangular area to the specified color.
@@ -470,15 +470,370 @@ namespace Genix.Imaging
         /// <summary>
         /// Sets all image pixels outside the specified rectangular area to the specified color.
         /// </summary>
-        /// <param name="rect">The width, height, and location of the area.</param>
+        /// <param name="area">The width, height, and location of the area.</param>
         /// <param name="borderType">The type of border.</param>
         /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// The rectangular area described by <paramref name="rect"/> is outside of this <see cref="Image"/> bounds.
+        /// The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetBorder(Rectangle rect, BorderType borderType, uint borderValue) =>
-            this.SetBorder(rect.X, rect.Y, rect.Width, rect.Height, borderType, borderValue);
+        public void SetBorder(Rectangle area, BorderType borderType, uint borderValue) => this.SetBorder(area.X, area.Y, area.Width, area.Height, borderType, borderValue);
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the larger of specified color and their current values.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="borderValue">The value of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        public void MaxCBorder(int x, int y, int width, int height, uint borderValue)
+        {
+            borderValue &= this.MaxColor;
+            if (borderValue == 0)
+            {
+                // nothing to set
+                return;
+            }
+
+            if (borderValue == this.MaxColor)
+            {
+                // set to maximum value
+                this.SetBorder(x, y, width, height, BorderType.BorderConst, borderValue);
+                return;
+            }
+
+            this.ValidateArea(x, y, width, height);
+
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                // nothing to set
+                return;
+            }
+
+            if (width == 0 || height == 0)
+            {
+                // if border occupies entire image - max entire image with the specified color
+                this.MaxC(this, borderValue);
+                return;
+            }
+
+            unsafe
+            {
+                fixed (ulong* bits = this.Bits)
+                {
+                    byte* ptr = (byte*)bits;
+                    int stride8 = this.Stride8;
+
+                    int x2 = x + width;
+                    int y2 = y + height;
+
+                    int bitsPerPixel = this.BitsPerPixel;
+                    switch (bitsPerPixel)
+                    {
+                        case 8:
+                            // fill top area and the left part of first partial stride
+                            if (y > 0 || x > 0)
+                            {
+                                Vectors.MaxC((y * stride8) + x, (byte)borderValue, ptr);
+                            }
+
+                            // fill partial strides (together right part and left part of the next line)
+                            if (height > 1 && width < this.Width)
+                            {
+                                byte* ptr2 = ptr + (y * stride8) + x2;
+                                for (int i = 1, count = stride8 - width; i < height; i++, ptr2 += stride8)
+                                {
+                                    Vectors.MaxC(count, (byte)borderValue, ptr2);
+                                }
+                            }
+
+                            // fill bottom area and the right part of last partial stride
+                            if (y2 < this.Height || x2 < this.Width)
+                            {
+                                int off = ((y2 - 1) * stride8) + x2;
+                                int count = (this.Height * stride8) - off;
+                                Vectors.MaxC(count, (byte)borderValue, ptr + off);
+                            }
+
+                            break;
+
+                        case 16:
+                            int stride16 = stride8 / sizeof(ushort);
+                            ushort* usptr = (ushort*)bits;
+
+                            // fill top area and the left part of first partial stride
+                            if (y > 0 || x > 0)
+                            {
+                                Vectors.MaxC((y * stride16) + x, (ushort)borderValue, usptr);
+                            }
+
+                            // fill partial strides (together right part and left part of the next line)
+                            if (height > 1 && width < this.Width)
+                            {
+                                ushort* usptr2 = usptr + (y * stride16) + x2;
+                                for (int i = 1, count = stride16 - width; i < height; i++, usptr2 += stride16)
+                                {
+                                    Vectors.MaxC(count, (ushort)borderValue, usptr2);
+                                }
+                            }
+
+                            // fill bottom area and the right part of last partial stride
+                            if (y2 < this.Height || x2 < this.Width)
+                            {
+                                int off = ((y2 - 1) * stride16) + x2;
+                                int count = (this.Height * stride16) - off;
+                                Vectors.MaxC(count, (ushort)borderValue, usptr + off);
+                            }
+
+                            break;
+
+                        case 24:
+                        case 32:
+                            fixed (ulong* mask = this.ColorScanline(this.Stride, borderValue))
+                            {
+                                int i = 0;
+
+                                // fill top area
+                                for (; i < y; i++, ptr += stride8)
+                                {
+                                    Vectors.Max(stride8, (byte*)mask, ptr);
+                                }
+
+                                // fill left and right
+                                if (width == this.Width)
+                                {
+                                    i += height;
+                                    ptr += height * stride8;
+                                }
+                                else
+                                {
+                                    for (int lcount = x * bitsPerPixel / 8, rcount = (this.Width - x2) * bitsPerPixel / 8, roff = x2 * bitsPerPixel / 8; i < y2; i++, ptr += stride8)
+                                    {
+                                        if (lcount > 0)
+                                        {
+                                            Vectors.Max(lcount, (byte*)mask, ptr);
+                                        }
+
+                                        if (rcount > 0)
+                                        {
+                                            Vectors.Max(rcount, (byte*)mask + roff, ptr + roff);
+                                        }
+                                    }
+                                }
+
+                                // fill bottom area
+                                for (int ii = this.Height; i < ii; i++, ptr += stride8)
+                                {
+                                    Vectors.Max(stride8, (byte*)mask, ptr);
+                                }
+                            }
+
+                            break;
+
+                        default:
+                            throw new NotSupportedException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                Properties.Resources.E_UnsupportedDepth,
+                                this.BitsPerPixel));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the larger of specified color and their current values.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="borderValue">The value of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MaxCBorder(Rectangle area, uint borderValue) => this.MaxCBorder(area.X, area.Y, area.Width, area.Height, borderValue);
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the smaller of specified color and their current values.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="borderValue">The value of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        public void MinCBorder(int x, int y, int width, int height, uint borderValue)
+        {
+            borderValue &= this.MaxColor;
+            if (borderValue == this.MaxColor)
+            {
+                // nothing to set
+                return;
+            }
+
+            if (borderValue == 0)
+            {
+                // set to maximum value
+                this.SetBorder(x, y, width, height, BorderType.BorderConst, borderValue);
+                return;
+            }
+
+            this.ValidateArea(x, y, width, height);
+
+            if (x == 0 && y == 0 && width == this.Width && height == this.Height)
+            {
+                // nothing to set
+                return;
+            }
+
+            if (width == 0 || height == 0)
+            {
+                // if border occupies entire image - max entire image with the specified color
+                this.MinC(this, borderValue);
+                return;
+            }
+
+            unsafe
+            {
+                fixed (ulong* bits = this.Bits)
+                {
+                    byte* ptr = (byte*)bits;
+                    int stride8 = this.Stride8;
+
+                    int x2 = x + width;
+                    int y2 = y + height;
+
+                    int bitsPerPixel = this.BitsPerPixel;
+                    switch (bitsPerPixel)
+                    {
+                        case 8:
+                            // fill top area and the left part of first partial stride
+                            if (y > 0 || x > 0)
+                            {
+                                Vectors.MinC((y * stride8) + x, (byte)borderValue, ptr);
+                            }
+
+                            // fill partial strides (together right part and left part of the next line)
+                            if (height > 1 && width < this.Width)
+                            {
+                                byte* ptr2 = ptr + (y * stride8) + x2;
+                                for (int i = 1, count = stride8 - width; i < height; i++, ptr2 += stride8)
+                                {
+                                    Vectors.MinC(count, (byte)borderValue, ptr2);
+                                }
+                            }
+
+                            // fill bottom area and the right part of last partial stride
+                            if (y2 < this.Height || x2 < this.Width)
+                            {
+                                int off = ((y2 - 1) * stride8) + x2;
+                                int count = (this.Height * stride8) - off;
+                                Vectors.MinC(count, (byte)borderValue, ptr + off);
+                            }
+
+                            break;
+
+                        case 16:
+                            int stride16 = stride8 / sizeof(ushort);
+                            ushort* usptr = (ushort*)bits;
+
+                            // fill top area and the left part of first partial stride
+                            if (y > 0 || x > 0)
+                            {
+                                Vectors.MinC((y * stride16) + x, (ushort)borderValue, usptr);
+                            }
+
+                            // fill partial strides (together right part and left part of the next line)
+                            if (height > 1 && width < this.Width)
+                            {
+                                ushort* usptr2 = usptr + (y * stride16) + x2;
+                                for (int i = 1, count = stride16 - width; i < height; i++, usptr2 += stride16)
+                                {
+                                    Vectors.MinC(count, (ushort)borderValue, usptr2);
+                                }
+                            }
+
+                            // fill bottom area and the right part of last partial stride
+                            if (y2 < this.Height || x2 < this.Width)
+                            {
+                                int off = ((y2 - 1) * stride16) + x2;
+                                int count = (this.Height * stride16) - off;
+                                Vectors.MinC(count, (ushort)borderValue, usptr + off);
+                            }
+
+                            break;
+
+                        case 24:
+                        case 32:
+                            fixed (ulong* mask = this.ColorScanline(this.Stride, borderValue))
+                            {
+                                int i = 0;
+
+                                // fill top area
+                                for (; i < y; i++, ptr += stride8)
+                                {
+                                    Vectors.Min(stride8, (byte*)mask, ptr);
+                                }
+
+                                // fill left and right
+                                if (width == this.Width)
+                                {
+                                    i += height;
+                                    ptr += height * stride8;
+                                }
+                                else
+                                {
+                                    for (int lcount = x * bitsPerPixel / 8, rcount = (this.Width - x2) * bitsPerPixel / 8, roff = x2 * bitsPerPixel / 8; i < y2; i++, ptr += stride8)
+                                    {
+                                        if (lcount > 0)
+                                        {
+                                            Vectors.Min(lcount, (byte*)mask, ptr);
+                                        }
+
+                                        if (rcount > 0)
+                                        {
+                                            Vectors.Min(rcount, (byte*)mask + roff, ptr + roff);
+                                        }
+                                    }
+                                }
+
+                                // fill bottom area
+                                for (int ii = this.Height; i < ii; i++, ptr += stride8)
+                                {
+                                    Vectors.Min(stride8, (byte*)mask, ptr);
+                                }
+                            }
+
+                            break;
+
+                        default:
+                            throw new NotSupportedException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                Properties.Resources.E_UnsupportedDepth,
+                                this.BitsPerPixel));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets all image pixels outside the specified rectangular area to the smaller of specified color and their current values.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="borderValue">The value of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void MinCBorder(Rectangle area, uint borderValue) => this.MinCBorder(area.X, area.Y, area.Width, area.Height, borderValue);
     }
 }

@@ -2,12 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
+    using Genix.Core;
     using Genix.Drawing;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class EditTest
     {
+        private readonly UlongRandomGenerator random = new UlongRandomGenerator();
+
         private readonly Dictionary<int, uint[]> colors = new Dictionary<int, uint[]>()
         {
             { 1, new uint[] { 0, uint.MaxValue } },
@@ -469,6 +472,294 @@
                     for (int y = 0; y < invertedImage.Height; y++)
                     {
                         Assert.AreEqual(maxColor - image.GetPixel(x, y), invertedImage.GetPixel(x, y));
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MaxCTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+
+                        Image dst = src.MaxC(null, color);
+                        Assert.AreEqual(dst.Width, src.Width);
+                        Assert.AreEqual(dst.Height, src.Height);
+                        Assert.AreEqual(dst.BitsPerPixel, src.BitsPerPixel);
+                        Assert.AreEqual(dst.HorizontalResolution, src.HorizontalResolution);
+                        Assert.AreEqual(dst.VerticalResolution, src.VerticalResolution);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MaxColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+
+                        // in-place operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        dst = src.MaxC(src, color);
+                        Assert.IsTrue(src == dst);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+
+                        // operation with existing destination
+                        src.Randomize(this.random);
+
+                        dst = new Image(src.Width + 10, src.Height - 10, bitsPerPixel, 200, 200);
+                        dst.Randomize(this.random);
+
+                        dst = src.MaxC(dst, color);
+                        Assert.IsFalse(src == dst);
+                        Assert.AreEqual(dst.Width, src.Width);
+                        Assert.AreEqual(dst.Height, src.Height);
+                        Assert.AreEqual(dst.BitsPerPixel, src.BitsPerPixel);
+                        Assert.AreEqual(dst.HorizontalResolution, src.HorizontalResolution);
+                        Assert.AreEqual(dst.VerticalResolution, src.VerticalResolution);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MaxColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MaxCTest_WithWindow()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        Rectangle area = Rectangle.Inflate(src.Bounds, -1, -2, -3, -4);
+                        src.MaxC(area, color);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                if (area.Contains(x, y))
+                                {
+                                    Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(copy.GetPixel(x, y), src.GetPixel(x, y));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MaxCBorderTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        Rectangle area = Rectangle.Inflate(src.Bounds, -1, -2, -3, -4);
+                        src.MaxCBorder(area, color);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                if (area.Contains(x, y))
+                                {
+                                    Assert.AreEqual(copy.GetPixel(x, y), src.GetPixel(x, y));
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MinCTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+
+                        Image dst = src.MinC(null, color);
+                        Assert.AreEqual(dst.Width, src.Width);
+                        Assert.AreEqual(dst.Height, src.Height);
+                        Assert.AreEqual(dst.BitsPerPixel, src.BitsPerPixel);
+                        Assert.AreEqual(dst.HorizontalResolution, src.HorizontalResolution);
+                        Assert.AreEqual(dst.VerticalResolution, src.VerticalResolution);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MinColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+
+                        // in-place operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        dst = src.MinC(src, color);
+                        Assert.IsTrue(src == dst);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+
+                        // operation with existing destination
+                        src.Randomize(this.random);
+
+                        dst = new Image(src.Width + 10, src.Height - 10, bitsPerPixel, 200, 200);
+                        dst.Randomize(this.random);
+
+                        dst = src.MinC(dst, color);
+                        Assert.IsFalse(src == dst);
+                        Assert.AreEqual(dst.Width, src.Width);
+                        Assert.AreEqual(dst.Height, src.Height);
+                        Assert.AreEqual(dst.BitsPerPixel, src.BitsPerPixel);
+                        Assert.AreEqual(dst.HorizontalResolution, src.HorizontalResolution);
+                        Assert.AreEqual(dst.VerticalResolution, src.VerticalResolution);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                Assert.AreEqual(ColorHelpers.MinColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MinCTest_WithWindow()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        Rectangle area = Rectangle.Inflate(src.Bounds, -1, -2, -3, -4);
+                        src.MinC(area, color);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                if (area.Contains(x, y))
+                                {
+                                    Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(copy.GetPixel(x, y), src.GetPixel(x, y));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void MinCBorderTest()
+        {
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                foreach (int width in new[] { 64 * 4, 231 })
+                {
+                    Image src = new Image(width, 100, bitsPerPixel, 200, 200);
+
+                    foreach (uint color in new uint[] { 0, src.MaxColor, src.MaxColor / 2 })
+                    {
+                        // simple operation
+                        src.Randomize(this.random);
+                        Image copy = src.Clone(true);
+
+                        Rectangle area = Rectangle.Inflate(src.Bounds, -1, -2, -3, -4);
+                        src.MinCBorder(area, color);
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                if (area.Contains(x, y))
+                                {
+                                    Assert.AreEqual(copy.GetPixel(x, y), src.GetPixel(x, y));
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                }
+                            }
+                        }
                     }
                 }
             }
