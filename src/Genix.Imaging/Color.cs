@@ -286,6 +286,32 @@ namespace Genix.Imaging
             return Color.FromArgb(a, r, g, b);
         }
 
+        /// <summary>
+        /// Computes the maximum of two ARGB colors of the specified depth.
+        /// </summary>
+        /// <param name="color1">The first color.</param>
+        /// <param name="color2">The second color.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <returns>The maximum of two colors.</returns>
+        [CLSCompliant(false)]
+        public static uint Max(uint color1, uint color2, int bitsPerPixel)
+        {
+            return bitsPerPixel < 24 ? Math.Max(color1, color2) : Color.Max(Color.FromArgb(color1), Color.FromArgb(color2)).Argb;
+        }
+
+        /// <summary>
+        /// Computes the minimum of two ARGB colors of the specified depth.
+        /// </summary>
+        /// <param name="color1">The first color.</param>
+        /// <param name="color2">The second color.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <returns>The maximum of two colors.</returns>
+        [CLSCompliant(false)]
+        public static uint Min(uint color1, uint color2, int bitsPerPixel)
+        {
+            return bitsPerPixel < 24 ? Math.Min(color1, color2) : Color.Min(Color.FromArgb(color1), Color.FromArgb(color2)).Argb;
+        }
+
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Color other) => other.Argb == this.Argb;

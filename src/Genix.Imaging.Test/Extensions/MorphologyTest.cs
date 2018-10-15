@@ -107,7 +107,7 @@
                                 Point pt = new Point(x + point.X, y + point.Y);
                                 if (src.Bounds.Contains(pt))
                                 {
-                                    maxcolor = ColorHelpers.MaxColor(maxcolor, src.GetPixel(pt), bitsPerPixel);
+                                    maxcolor = Color.Max(maxcolor, src.GetPixel(pt), bitsPerPixel);
                                 }
                             }
 
@@ -121,7 +121,7 @@
                             {
                                 Point pt = new Point(x + point.X, y + point.Y);
                                 uint color = src.Bounds.Contains(pt) ? src.GetPixel(pt) : borderValue;
-                                maxcolor = ColorHelpers.MaxColor(maxcolor, color, bitsPerPixel);
+                                maxcolor = Color.Max(maxcolor, color, bitsPerPixel);
                             }
 
                             return maxcolor;
@@ -229,7 +229,7 @@
                                 Point pt = new Point(x + point.X, y + point.Y);
                                 if (src.Bounds.Contains(pt))
                                 {
-                                    maxcolor = ColorHelpers.MinColor(maxcolor, src.GetPixel(pt), bitsPerPixel);
+                                    maxcolor = Color.Min(maxcolor, src.GetPixel(pt), bitsPerPixel);
                                 }
                             }
 
@@ -243,7 +243,7 @@
                             {
                                 Point pt = new Point(x + point.X, y + point.Y);
                                 uint color = src.Bounds.Contains(pt) ? src.GetPixel(pt) : borderValue;
-                                maxcolor = ColorHelpers.MinColor(maxcolor, color, bitsPerPixel);
+                                maxcolor = Color.Min(maxcolor, color, bitsPerPixel);
                             }
 
                             return maxcolor;

@@ -502,7 +502,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MaxColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Max(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
 
@@ -517,7 +517,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Max(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
 
@@ -539,7 +539,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MaxColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Max(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
                     }
@@ -571,7 +571,7 @@
                             {
                                 if (area.Contains(x, y))
                                 {
-                                    Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                    Assert.AreEqual(Color.Max(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
                                 }
                                 else
                                 {
@@ -612,7 +612,7 @@
                                 }
                                 else
                                 {
-                                    Assert.AreEqual(ColorHelpers.MaxColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                    Assert.AreEqual(Color.Max(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
                                 }
                             }
                         }
@@ -646,7 +646,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MinColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Min(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
 
@@ -661,7 +661,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Min(copy.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
 
@@ -683,7 +683,7 @@
                         {
                             for (int x = 0; x < src.Width; x++)
                             {
-                                Assert.AreEqual(ColorHelpers.MinColor(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
+                                Assert.AreEqual(Color.Min(src.GetPixel(x, y), color, bitsPerPixel), dst.GetPixel(x, y));
                             }
                         }
                     }
@@ -715,7 +715,7 @@
                             {
                                 if (area.Contains(x, y))
                                 {
-                                    Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                    Assert.AreEqual(Color.Min(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
                                 }
                                 else
                                 {
@@ -756,7 +756,7 @@
                                 }
                                 else
                                 {
-                                    Assert.AreEqual(ColorHelpers.MinColor(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
+                                    Assert.AreEqual(Color.Min(copy.GetPixel(x, y), color, bitsPerPixel), src.GetPixel(x, y));
                                 }
                             }
                         }

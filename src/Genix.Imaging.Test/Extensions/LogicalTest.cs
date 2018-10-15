@@ -14,9 +14,9 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                foreach (int width in new[] { 64 * 30, 2031 })
+                foreach (int width in new[] { 64 * 4, 231 })
                 {
-                    Image src1 = new Image(width, 1000, bitsPerPixel, 200, 200);
+                    Image src1 = new Image(width, 100, bitsPerPixel, 200, 200);
                     src1.Randomize(this.random);
 
                     // simple operation
@@ -140,7 +140,7 @@
                     src2 = src1.Clone(false);
                     src2.Randomize(this.random);
 
-                    dst = new Image(src1.Width + 100, src1.Height - 100, bitsPerPixel, 200, 200);
+                    dst = new Image(src1.Width + 10, src1.Height - 10, bitsPerPixel, 200, 200);
                     dst.Randomize(this.random);
 
                     dst = src1.Or(dst, src2);
@@ -166,9 +166,9 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                foreach (int width in new[] { 64 * 30, 2031 })
+                foreach (int width in new[] { 64 * 4, 231 })
                 {
-                    Image src1 = new Image(width, 1000, bitsPerPixel, 200, 200);
+                    Image src1 = new Image(width, 100, bitsPerPixel, 200, 200);
                     src1.Randomize(this.random);
 
                     // simple operation
@@ -292,7 +292,7 @@
                     src2 = src1.Clone(false);
                     src2.Randomize(this.random);
 
-                    dst = new Image(src1.Width + 100, src1.Height - 100, bitsPerPixel, 200, 200);
+                    dst = new Image(src1.Width + 10, src1.Height - 10, bitsPerPixel, 200, 200);
                     dst.Randomize(this.random);
 
                     dst = src1.And(dst, src2);
@@ -318,9 +318,9 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                foreach (int width in new[] { 64 * 30, 2031 })
+                foreach (int width in new[] { 64 * 4, 231 })
                 {
-                    Image src1 = new Image(width, 1000, bitsPerPixel, 200, 200);
+                    Image src1 = new Image(width, 100, bitsPerPixel, 200, 200);
                     src1.Randomize(this.random);
 
                     // simple operation
@@ -444,7 +444,7 @@
                     src2 = src1.Clone(false);
                     src2.Randomize(this.random);
 
-                    dst = new Image(src1.Width + 100, src1.Height - 100, bitsPerPixel, 200, 200);
+                    dst = new Image(src1.Width + 10, src1.Height - 10, bitsPerPixel, 200, 200);
                     dst.Randomize(this.random);
 
                     dst = src1.Xor(dst, src2);
@@ -470,9 +470,9 @@
         {
             foreach (int bitsPerPixel in new[] { 1, 2, 4, 8, 16, 24, 32 })
             {
-                foreach (int width in new[] { 64 * 30, 2031 })
+                foreach (int width in new[] { 64 * 4, 231 })
                 {
-                    Image src1 = new Image(width, 1000, bitsPerPixel, 200, 200);
+                    Image src1 = new Image(width, 100, bitsPerPixel, 200, 200);
                     src1.Randomize(this.random);
 
                     // simple operation
@@ -596,7 +596,7 @@
                     src2 = src1.Clone(false);
                     src2.Randomize(this.random);
 
-                    dst = new Image(src1.Width + 100, src1.Height - 100, bitsPerPixel, 200, 200);
+                    dst = new Image(src1.Width + 10, src1.Height - 10, bitsPerPixel, 200, 200);
                     dst.Randomize(this.random);
 
                     dst = src1.Xand(dst, src2);

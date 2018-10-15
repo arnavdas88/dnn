@@ -57,103 +57,76 @@ namespace Genix.Imaging
                 throw new ArgumentException("The number of iterations is equal to or less than zero.");
             }
 
-            // special case for rectangular kernel
-            // instead of applying m x n mask
-            // we sequentially apply m x 1 and 1 x n masks
-            if (se is BrickStructuringElement brickSE && brickSE.Width > 1 && brickSE.Height > 1)
-            {
-                dst = this.Dilate(
-                    dst,
-                    StructuringElement.Brick(
-                        brickSE.Width,
-                        1,
-                        brickSE.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(brickSE.Anchor.X, 0)),
-                    iterations,
-                    borderType,
-                    borderValue);
+            Image src = this;
+            bool inplace = dst == this;
 
-                dst.Dilate(
-                    dst,
-                    StructuringElement.Brick(
-                        1,
-                        brickSE.Height,
-                        brickSE.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(0, brickSE.Anchor.Y)),
-                    iterations,
-                    borderType,
-                    borderValue);
+            Size sesize = se.Size;
+            Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
+
+            // estimate border size
+            int bx1 = Math.Max(anchor.X, 0) * iterations;
+            int by1 = Math.Max(anchor.Y, 0) * iterations;
+            int bx2 = src.Width - (Math.Max(sesize.Width - 1 - anchor.X, 0) * iterations);
+            int by2 = src.Height - (Math.Max(sesize.Height - 1 - anchor.Y, 0) * iterations);
+
+            // extreme case - border is larger than image
+            // simply set entire image to the max color
+            if (bx2 <= bx1 || by2 <= by1)
+            {
+                uint maxcolor = src.Max();
+                if (borderType == BorderType.BorderConst)
+                {
+                    maxcolor = Color.Max(maxcolor, borderValue & this.MaxColor, this.BitsPerPixel);
+                }
+
+                if (!inplace)
+                {
+                    dst = this.CreateTemplate(dst, this.BitsPerPixel);
+                }
+
+                dst.SetColor(maxcolor);
             }
             else
             {
-                Image src = this;
-                bool inplace = dst == this;
-
-                // estimate border size
-                Size sesize = se.Size;
-                Point anchor = se.GetAnchor(StructuringElement.DefaultAnchor);
-                int bx1 = Math.Max(anchor.X, 0) * iterations;
-                int by1 = Math.Max(anchor.Y, 0) * iterations;
-                int bx2 = this.Width - (Math.Max(sesize.Width - 1 - anchor.X, 0) * iterations);
-                int by2 = this.Height - (Math.Max(sesize.Height - 1 - anchor.Y, 0) * iterations);
-
-                // extreme case - border is larger than image
-                // simply set entire image to the max color
-                if (bx2 <= bx1 || by2 <= by1)
-                {
-                    uint maxcolor = src.Max();
-                    if (borderType == BorderType.BorderConst)
-                    {
-                        maxcolor = this.BitsPerPixel < 24 ?
-                            Math.Max(maxcolor, borderValue & this.MaxColor) :
-                            Color.Max(Color.FromArgb(maxcolor), Color.FromArgb(borderValue & this.MaxColor)).Argb;
-                    }
-
-                    if (!inplace)
-                    {
-                        dst = this.CreateTemplate(dst, this.BitsPerPixel);
-                    }
-
-                    dst.SetColor(maxcolor);
-                    return dst;
-                }
-
                 dst = this.CreateTemplate(dst, this.BitsPerPixel);
-
-                // initialize dst with src if s.e. contains anchor point
-                // this is a direct copy
-                // anchor point will later be excluded from comparison
-                if (se.GetElements().Contains(Point.Empty))
-                {
-                    Vectors.Copy(src.Bits.Length, src.Bits, 0, dst.Bits, 0);
-                }
-                else
-                {
-                    dst.SetToZero();
-                }
 
                 for (int iteration = 0; iteration < iterations; iteration++)
                 {
                     // for next iteration, copy destination image back into source
                     if (iteration > 0)
                     {
-                        if (src == this)
-                        {
-                            src = dst.Clone(false);
-                        }
-
-                        Vectors.Copy(dst.Bits.Length, dst.Bits, 0, src.Bits, 0);
+                        UpdateSource();
                     }
 
-                    // apply s.e.
-                    foreach (Point point in se.GetElements())
+                    // special case for rectangular kernel
+                    // instead of applying m x n mask
+                    // we sequentially apply m x 1 and 1 x n masks
+                    if (se is BrickStructuringElement && sesize.Width > 1 && sesize.Height > 1)
                     {
-                        if (point != Point.Empty)
-                        {
-                            ApplySEPoint(point);
-                        }
+                        ApplySE(
+                            StructuringElement.Brick(
+                                sesize.Width,
+                                1,
+                                se.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(se.Anchor.X, 0)),
+                            iteration == 0);
+
+                        // for next iteration, copy destination image back into source
+                        UpdateSource();
+
+                        ApplySE(
+                            StructuringElement.Brick(
+                                1,
+                                sesize.Height,
+                                se.Anchor == StructuringElement.DefaultAnchor ? StructuringElement.DefaultAnchor : new Point(0, se.Anchor.Y)),
+                            false);
+                    }
+                    else
+                    {
+                        ApplySE(se, iteration == 0);
                     }
                 }
 
-                // maximize border
+                // maximize border pixels
                 if (borderType == BorderType.BorderConst)
                 {
                     dst.MaxCBorder(bx1, by1, bx2 - bx1, by2 - by1, borderValue);
@@ -163,6 +136,53 @@ namespace Genix.Imaging
                 {
                     this.Attach(dst);
                     return this;
+                }
+            }
+
+            return dst;
+
+            void UpdateSource()
+            {
+                if (src == this)
+                {
+                    src = dst.Clone(false);
+                }
+
+                Vectors.Copy(dst.Bits.Length, dst.Bits, 0, src.Bits, 0);
+            }
+
+            void ApplySE(StructuringElement currentSE, bool copySrcToDst)
+            {
+                // initialize dst with src if s.e. contains anchor point
+                // anchor point will later be excluded from comparison
+                if (currentSE.GetElements().Contains(Point.Empty))
+                {
+                    if (copySrcToDst)
+                    {
+                        Vectors.Copy(src.Bits.Length, src.Bits, 0, dst.Bits, 0);
+                    }
+                }
+                else
+                {
+                    dst.SetToZero();
+                }
+
+                // use van-Herk/Gil-Werman (vHGW) algorithm for 1 x n and m x 1 kernels with anchor point inside s.e. with at least one pixel boundary
+                if (se is BrickStructuringElement)
+                {
+                    if (sesize.Width == 1 && anchor.Y.Between(1, sesize.Height - 2, true))
+                    {
+                        ComputeRows_vHGW();
+                    }
+                }
+
+                // apply s.e.
+                foreach (Point point in currentSE.GetElements())
+                {
+                    if (point != Point.Empty)
+                    {
+                        ApplySEPoint(point);
+                    }
                 }
 
                 void ApplySEPoint(Point point)
@@ -176,9 +196,93 @@ namespace Genix.Imaging
 
                     dst.MaxEvery(xdst, ydst, width, height, src, xsrc, ysrc);
                 }
-            }
 
-            return dst;
+                void ComputeRows_vHGW()
+                {
+                    int stride8 = src.Stride8;
+
+                    // calculate left and right buffer sizes
+                    int lsize = anchor.Y.Clip(0, sesize.Height - 1);
+                    int rsize = (sesize.Height - 1 - anchor.Y).Clip(0, sesize.Height - 1);
+                    int lsize2 = lsize * 2;
+                    int rsize2 = rsize * 2;
+
+                    // calculate distances between buffers and anchor element (0 if anchor is inside s.e)
+                    int loff = Math.Max(0, anchor.Y - (sesize.Height - 1));
+                    int roff = Math.Max(0, -anchor.Y);
+
+                    // allocate buffers
+                    byte[] lbuf = lsize2 > 0 ? new byte[lsize2 * stride8] : null;
+                    byte[] rbuf = rsize2 > 0 ? new byte[rsize2 * stride8] : null;
+
+                    unsafe
+                    {
+                        fixed (ulong* bits = src.Bits)
+                        {
+                            byte* bitsptr = (byte*)bits;
+
+                            fixed (byte* lbufptr = lbuf, rbufptr = rbuf)
+                            {
+                                for (int i = anchor.Y, step = sesize.Height, ii = src.Height; i < ii; i += step)
+                                {
+                                    // compute left buffer
+                                    if (lbuf != null)
+                                    {
+                                        int isrc = i - loff;
+
+                                        byte* bitsptr2 = bitsptr + ((isrc - 1) * stride8);
+                                        byte* lbufptr2 = lbufptr;
+                                        for (int j = 0; j < lsize2; j++, bitsptr2 -= stride8, lbufptr2 += stride8)
+                                        {
+                                            Vectors.Max(
+                                                stride8,
+                                                bitsptr2,
+                                                j == 0 ? bitsptr2 + stride8 : lbufptr2 - stride8,
+                                                lbufptr2);
+                                        }
+                                    }
+
+                                    // compute right buffer
+                                    if (rbuf != null)
+                                    {
+                                        int isrc = i + roff;
+
+                                        byte* bitsptr2 = bitsptr + ((isrc + 1) * stride8);
+                                        byte* rbufptr2 = rbufptr;
+                                        for (int j = 0; j < rsize2; j++, bitsptr2 += stride8, rbufptr2 += stride8)
+                                        {
+                                            Vectors.Max(
+                                                stride8,
+                                                bitsptr2,
+                                                j == 0 ? bitsptr2 - stride8 : rbufptr2 - stride8,
+                                                rbufptr2);
+                                        }
+                                    }
+
+                                    // compute buffers
+                                    /*byte* bitsptr2 = bitsptr + (i * stride8);
+                                    Vectors.Max(stride8, bitsptr, bitsptr - stride8, lbufptr);
+                                    Vectors.Max(stride8, bitsptr, bitsptr + stride8, rbufptr);
+
+                                    bitsptr2 = bitsptr + ((i - 2) * stride8);
+                                    byte* lbufptr2 = lbufptr;
+                                    for (int j = 1; j < lsize2; j++, bitsptr2 -= stride8, lbufptr2 += stride8)
+                                    {
+                                        Vectors.Max(stride8, bitsptr2, lbufptr2, lbufptr2 + stride8);
+                                    }
+
+                                    bitsptr2 = bitsptr + ((i + 2) * stride8);
+                                    byte* rbufptr2 = rbufptr;
+                                    for (int j = 1; j < rsize2; j++, bitsptr2 += stride8, rbufptr2 += stride8)
+                                    {
+                                        Vectors.Max(stride8, bitsptr2, rbufptr2, rbufptr2 + stride8);
+                                    }*/
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
