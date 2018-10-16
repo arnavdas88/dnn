@@ -134,6 +134,29 @@ GENIXAPI(void, min_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned 
 GENIXAPI(void, min_ip_f32)(int n, const float* x, int offx, float* y, int offy) { __min_ip(n, x, offx, y, offy); }
 GENIXAPI(void, min_ip_f64)(int n, const double* x, int offx, double* y, int offy) { __min_ip(n, x, offx, y, offy); }
 
+// Returns the smaller of each pair of elements of the two vector arguments in-place with increment
+template<typename T> void __forceinline __min_inc_ip(
+	int n,
+	const T* x, int offx, int incx,
+	T* y, int offy, int incy)
+{
+	for (int i = 0; i < n; i++, offx += incx, offy += incy)
+	{
+		y[offy] = __min(x[offx], y[offy]);
+	}
+}
+
+GENIXAPI(void, min_inc_ip_s8)(int n, const __int8* x, int offx, int incx, __int8* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_s16)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_u16)(int n, const unsigned __int16* x, int offx, int incx, unsigned __int16* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx, unsigned __int32* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, min_inc_ip_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __min_inc_ip(n, x, offx, incx, y, offy, incy); }
+
 // Returns the smaller of each pair of elements of the two vector arguments not-in-place
 template<typename T> void __forceinline ___min(
 	int n,
@@ -162,6 +185,30 @@ GENIXAPI(void, min_u64)(int n, const unsigned __int64* a, int offa, const unsign
 GENIXAPI(void, min_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, min_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { ___min(n, a, offa, b, offb, y, offy); }
 
+// Returns the smaller of each pair of elements of the two vector arguments not-in-place with increment
+template<typename T> void __forceinline __min_inc(
+	int n,
+	const T* a, int offa, int inca,
+	const T* b, int offb, int incb,
+	T* y, int offy, int incy)
+{
+	for (int i = 0; i < n; i++, offa += inca, offb += incb, offy += incy)
+	{
+		y[offy] = __min(a[offa], b[offb]);
+	}
+}
+
+GENIXAPI(void, min_inc_s8)(int n, const __int8* a, int offa, int inca, const __int8* b, int offb, int incb, __int8* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_s16)(int n, const __int16* a, int offa, int inca, const __int16* b, int offb, int incb, __int16* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_s32)(int n, const __int32* a, int offa, int inca, const __int32* b, int offb, int incb, __int32* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_s64)(int n, const __int64* a, int offa, int inca, const __int64* b, int offb, int incb, __int64* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_u8)(int n, const unsigned __int8* a, int offa, int inca, const unsigned __int8* b, int offb, int incb, unsigned __int8* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_u16)(int n, const unsigned __int16* a, int offa, int inca, const unsigned __int16* b, int offb, int incb, unsigned __int16* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_u32)(int n, const unsigned __int32* a, int offa, int inca, const unsigned __int32* b, int offb, int incb, unsigned __int32* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_u64)(int n, const unsigned __int64* a, int offa, int inca, const unsigned __int64* b, int offb, int incb, unsigned __int64* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, min_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __min_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+
 // Returns the larger of each pair of elements of the two vector arguments in-place
 template<typename T> void __forceinline __max_ip(
 	int n,
@@ -187,6 +234,29 @@ GENIXAPI(void, max_ip_u32)(int n, const unsigned __int32* x, int offx, unsigned 
 GENIXAPI(void, max_ip_u64)(int n, const unsigned __int64* x, int offx, unsigned __int64* y, int offy) { __max_ip(n, x, offx, y, offy); }
 GENIXAPI(void, max_ip_f32)(int n, const float* x, int offx, float* y, int offy) { __max_ip(n, x, offx, y, offy); }
 GENIXAPI(void, max_ip_f64)(int n, const double* x, int offx, double* y, int offy) { __max_ip(n, x, offx, y, offy); }
+
+// Returns the larger of each pair of elements of the two vector arguments in-place with increment
+template<typename T> void __forceinline __max_inc_ip(
+	int n,
+	const T* x, int offx, int incx,
+	T* y, int offy, int incy)
+{
+	for (int i = 0; i < n; i++, offx += incx, offy += incy)
+	{
+		y[offy] = __max(x[offx], y[offy]);
+	}
+}
+
+GENIXAPI(void, max_inc_ip_s8)(int n, const __int8* x, int offx, int incx, __int8* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_s16)(int n, const __int16* x, int offx, int incx, __int16* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_s32)(int n, const __int32* x, int offx, int incx, __int32* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_s64)(int n, const __int64* x, int offx, int incx, __int64* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx, unsigned __int8* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_u16)(int n, const unsigned __int16* x, int offx, int incx, unsigned __int16* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx, unsigned __int32* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx, unsigned __int64* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_f32)(int n, const float* x, int offx, int incx, float* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
+GENIXAPI(void, max_inc_ip_f64)(int n, const double* x, int offx, int incx, double* y, int offy, int incy) { __max_inc_ip(n, x, offx, incx, y, offy, incy); }
 
 // Returns the larger of each pair of elements of the two vector arguments not-in-place
 template<typename T> void __forceinline ___max(
@@ -215,6 +285,30 @@ GENIXAPI(void, max_u32)(int n, const unsigned __int32* a, int offa, const unsign
 GENIXAPI(void, max_u64)(int n, const unsigned __int64* a, int offa, const unsigned __int64* b, int offb, unsigned __int64* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, max_f32)(int n, const float* a, int offa, const float* b, int offb, float* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
 GENIXAPI(void, max_f64)(int n, const double* a, int offa, const double* b, int offb, double* y, int offy) { ___max(n, a, offa, b, offb, y, offy); }
+
+// Returns the larger of each pair of elements of the two vector arguments not-in-place with increment
+template<typename T> void __forceinline __max_inc(
+	int n,
+	const T* a, int offa, int inca,
+	const T* b, int offb, int incb,
+	T* y, int offy, int incy)
+{
+	for (int i = 0; i < n; i++, offa += inca, offb += incb, offy += incy)
+	{
+		y[offy] = __max(a[offa], b[offb]);
+	}
+}
+
+GENIXAPI(void, max_inc_s8)(int n, const __int8* a, int offa, int inca, const __int8* b, int offb, int incb, __int8* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_s16)(int n, const __int16* a, int offa, int inca, const __int16* b, int offb, int incb, __int16* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_s32)(int n, const __int32* a, int offa, int inca, const __int32* b, int offb, int incb, __int32* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_s64)(int n, const __int64* a, int offa, int inca, const __int64* b, int offb, int incb, __int64* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_u8)(int n, const unsigned __int8* a, int offa, int inca, const unsigned __int8* b, int offb, int incb, unsigned __int8* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_u16)(int n, const unsigned __int16* a, int offa, int inca, const unsigned __int16* b, int offb, int incb, unsigned __int16* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_u32)(int n, const unsigned __int32* a, int offa, int inca, const unsigned __int32* b, int offb, int incb, unsigned __int32* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_u64)(int n, const unsigned __int64* a, int offa, int inca, const unsigned __int64* b, int offb, int incb, unsigned __int64* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
+GENIXAPI(void, max_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
 
 extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
 	int n,
