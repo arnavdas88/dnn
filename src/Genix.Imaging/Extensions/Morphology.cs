@@ -167,12 +167,13 @@ namespace Genix.Imaging
                     dst.SetToZero();
                 }
 
-                // use van-Herk/Gil-Werman (vHGW) algorithm for 1 x n and m x 1 kernels with anchor point inside s.e. with at least one pixel boundary
-                if (se is BrickStructuringElement)
+                // use van-Herk/Gil-Werman (vHGW) algorithm for 1 x n and m x 1 kernels
+                if (src.BitsPerPixel == 8 && currentSE is BrickStructuringElement brick)
                 {
-                    if (sesize.Width == 1 && anchor.Y.Between(1, sesize.Height - 2, true))
+                    if (brick.Width == 1 && anchor.Y.Between(1, brick.Height - 2, true))
                     {
                         ComputeRows_vHGW();
+                        return;
                     }
                 }
 
@@ -202,81 +203,131 @@ namespace Genix.Imaging
                     int stride8 = src.Stride8;
 
                     // calculate left and right buffer sizes
-                    int lsize = anchor.Y.Clip(0, sesize.Height - 1);
-                    int rsize = (sesize.Height - 1 - anchor.Y).Clip(0, sesize.Height - 1);
+                    int lsize = anchor.Y;
+                    int rsize = sesize.Height - 1 - lsize;
                     int lsize2 = lsize * 2;
                     int rsize2 = rsize * 2;
 
-                    // calculate distances between buffers and anchor element (0 if anchor is inside s.e)
-                    int loff = Math.Max(0, anchor.Y - (sesize.Height - 1));
-                    int roff = Math.Max(0, -anchor.Y);
-
                     // allocate buffers
-                    byte[] lbuf = lsize2 > 0 ? new byte[lsize2 * stride8] : null;
-                    byte[] rbuf = rsize2 > 0 ? new byte[rsize2 * stride8] : null;
+                    byte[] lbuf = new byte[lsize2 * stride8];
+                    byte[] rbuf = new byte[rsize2 * stride8];
 
                     unsafe
                     {
-                        fixed (ulong* bits = src.Bits)
+                        fixed (ulong* ubitssrc = src.Bits, ubitsdst = dst.Bits)
                         {
-                            byte* bitsptr = (byte*)bits;
-
                             fixed (byte* lbufptr = lbuf, rbufptr = rbuf)
                             {
-                                for (int i = anchor.Y, step = sesize.Height, ii = src.Height; i < ii; i += step)
+                                for (int i = lsize, ii = src.Height + lsize, step = sesize.Height; i < ii; i += step)
                                 {
                                     // compute left buffer
-                                    if (lbuf != null)
                                     {
-                                        int isrc = i - loff;
-
-                                        byte* bitsptr2 = bitsptr + ((isrc - 1) * stride8);
+                                        byte* bitssrc = (byte*)ubitssrc + (i * stride8);
                                         byte* lbufptr2 = lbufptr;
-                                        for (int j = 0; j < lsize2; j++, bitsptr2 -= stride8, lbufptr2 += stride8)
+
+                                        int ibuf = 0;
+                                        for (int j = i; j >= 0 && ibuf < lsize2; j--, ibuf++, bitssrc -= stride8, lbufptr2 += stride8)
                                         {
-                                            Vectors.Max(
-                                                stride8,
-                                                bitsptr2,
-                                                j == 0 ? bitsptr2 + stride8 : lbufptr2 - stride8,
-                                                lbufptr2);
+                                            if (ibuf == 0)
+                                            {
+                                                if (j < src.Height)
+                                                {
+                                                    Vectors.Max(stride8, bitssrc, bitssrc - stride8, lbufptr2);
+                                                }
+                                                else if (j == src.Height)
+                                                {
+                                                    Vectors.Copy(stride8, bitssrc - stride8, lbufptr2);
+                                                }
+                                                else
+                                                {
+                                                    Vectors.Set(stride8, 0, lbufptr2);
+                                                }
+
+                                                j--;
+                                                bitssrc -= stride8;
+                                            }
+                                            else
+                                            {
+                                                if (j < src.Height)
+                                                {
+                                                    Vectors.Max(stride8, bitssrc, lbufptr2 - stride8, lbufptr2);
+                                                }
+                                                else
+                                                {
+                                                    Vectors.Copy(stride8, lbufptr2 - stride8, lbufptr2);
+                                                }
+                                            }
+                                        }
+
+                                        int tilecount = lsize2 - ibuf;
+                                        if (tilecount > 0)
+                                        {
+                                            Vectors.Tile(stride8, tilecount, lbufptr2 - stride8, lbufptr2);
                                         }
                                     }
 
                                     // compute right buffer
-                                    if (rbuf != null)
                                     {
-                                        int isrc = i + roff;
-
-                                        byte* bitsptr2 = bitsptr + ((isrc + 1) * stride8);
+                                        byte* bitssrc = (byte*)ubitssrc + (i * stride8);
                                         byte* rbufptr2 = rbufptr;
-                                        for (int j = 0; j < rsize2; j++, bitsptr2 += stride8, rbufptr2 += stride8)
+
+                                        if (i >= src.Height)
                                         {
-                                            Vectors.Max(
-                                                stride8,
-                                                bitsptr2,
-                                                j == 0 ? bitsptr2 - stride8 : rbufptr2 - stride8,
-                                                rbufptr2);
+                                            Vectors.Set(rsize2 * stride8, 0, rbufptr2);
+                                        }
+                                        else if (i == src.Height - 1)
+                                        {
+                                            Vectors.Tile(stride8, rsize2, bitssrc, rbufptr2);
+                                        }
+                                        else
+                                        {
+                                            int ibuf = 0;
+                                            for (int j = i; j < src.Height && ibuf < rsize2; j++, ibuf++, bitssrc += stride8, rbufptr2 += stride8)
+                                            {
+                                                if (ibuf == 0)
+                                                {
+                                                    Vectors.Max(stride8, bitssrc, bitssrc + stride8, rbufptr2);
+                                                    j++;
+                                                    bitssrc += stride8;
+                                                }
+                                                else
+                                                {
+                                                    Vectors.Max(stride8, bitssrc, rbufptr2 - stride8, rbufptr2);
+                                                }
+                                            }
+
+                                            int tilecount = rsize2 - ibuf;
+                                            if (tilecount > 0)
+                                            {
+                                                Vectors.Tile(stride8, tilecount, rbufptr2 - stride8, rbufptr2);
+                                            }
                                         }
                                     }
 
-                                    // compute buffers
-                                    /*byte* bitsptr2 = bitsptr + (i * stride8);
-                                    Vectors.Max(stride8, bitsptr, bitsptr - stride8, lbufptr);
-                                    Vectors.Max(stride8, bitsptr, bitsptr + stride8, rbufptr);
-
-                                    bitsptr2 = bitsptr + ((i - 2) * stride8);
-                                    byte* lbufptr2 = lbufptr;
-                                    for (int j = 1; j < lsize2; j++, bitsptr2 -= stride8, lbufptr2 += stride8)
+                                    // compute maximums
                                     {
-                                        Vectors.Max(stride8, bitsptr2, lbufptr2, lbufptr2 + stride8);
+                                        byte* bitsdst = (byte*)ubitsdst + ((i - lsize) * stride8);
+                                        for (int j = -lsize; j <= rsize; j++, bitsdst += stride8)
+                                        {
+                                            if ((i + j).Between(0, dst.Height - 1, true))
+                                            {
+                                                int rindex = rsize - 1 + j;
+                                                int lindex = lsize - 1 - j;
+                                                if (rindex < 0)
+                                                {
+                                                    Vectors.Copy(stride8, lbufptr + (lindex * stride8), bitsdst);
+                                                }
+                                                else if (lindex < 0)
+                                                {
+                                                    Vectors.Copy(stride8, rbufptr + (rindex * stride8), bitsdst);
+                                                }
+                                                else
+                                                {
+                                                    Vectors.Max(stride8, lbufptr + (lindex * stride8), rbufptr + (rindex * stride8), bitsdst);
+                                                }
+                                            }
+                                        }
                                     }
-
-                                    bitsptr2 = bitsptr + ((i + 2) * stride8);
-                                    byte* rbufptr2 = rbufptr;
-                                    for (int j = 1; j < rsize2; j++, bitsptr2 += stride8, rbufptr2 += stride8)
-                                    {
-                                        Vectors.Max(stride8, bitsptr2, rbufptr2, rbufptr2 + stride8);
-                                    }*/
                                 }
                             }
                         }
