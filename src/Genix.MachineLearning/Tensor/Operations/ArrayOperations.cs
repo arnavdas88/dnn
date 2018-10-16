@@ -297,7 +297,7 @@ namespace Genix.MachineLearning
                     int b = begin[i];
                     int s = size[i];
 
-                    if (!b.Between(0, axis, false))
+                    if (!b.Between(0, axis - 1))
                     {
                         throw new ArgumentOutOfRangeException(nameof(begin));
                     }
@@ -310,7 +310,7 @@ namespace Genix.MachineLearning
                     {
                         ysize[i] = s;
 
-                        if (!(b + ysize[i]).Between(1, axis, true))
+                        if (!(b + ysize[i]).Between(1, axis))
                         {
                             throw new ArgumentOutOfRangeException(nameof(size));
                         }

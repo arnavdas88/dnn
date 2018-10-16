@@ -54,7 +54,9 @@
         {
             StructuringElement[] ses = new[]
             {
+                StructuringElement.Brick(1, 3),
                 StructuringElement.Brick(1, 4),
+                StructuringElement.Brick(1, 4, new Point(0, 1)),
                 StructuringElement.Square(7),
                 StructuringElement.Brick(8, 6),
                 StructuringElement.Brick(8, 6, new Point(6, 5)),

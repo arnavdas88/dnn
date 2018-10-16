@@ -256,8 +256,8 @@ namespace Genix.DocumentAnalysis
 
                     bool isBad = false;
 
-                    if (bounds.Width.Between(minThickLineWidth, minThickLineLength, false) &&
-                        bounds.Height.Between(minThickLineWidth, minThickLineLength, false) &&
+                    if (bounds.Width.Between(minThickLineWidth, minThickLineLength - 1) &&
+                        bounds.Height.Between(minThickLineWidth, minThickLineLength - 1) &&
                         maxWidth > minThickLineLength)
                     {
                         // too thick for the length

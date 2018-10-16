@@ -17,11 +17,11 @@
             Stopwatch stopwatch = new Stopwatch();
 
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
-            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
+            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
-                Image xxx = image.Convert1To8(null);
-                Image yyy = xxx.CreateTemplate(null, 8);
+                Image xxx = image.Convert8To1(null, 128);
+                Image yyy = xxx.CreateTemplate(null, 1);
 
                 ////Pix pix = Pix.FromImage(image);
                 stopwatch.Restart();
@@ -29,7 +29,7 @@
                 for (int i = 0; i < 100; i++)
                 {
                     ////xxx.Convert8To1(yyy, 128);
-                    xxx.Dilate(yyy, StructuringElement.Square(7), 1, BorderType.BorderConst, 0);
+                    xxx.Dilate(yyy, StructuringElement.Brick(1, 7), 1, BorderType.BorderConst, 0);
                 }
 
                 ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);

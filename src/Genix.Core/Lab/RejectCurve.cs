@@ -170,7 +170,7 @@ namespace Genix.Lab
         /// <returns>The area under the curve.</returns>
         public float GetArea(float errorRateStart, float errorRateEnd, int intervalCount)
         {
-            if (!intervalCount.Between(1, 100, true))
+            if (!intervalCount.Between(1, 100))
             {
                 throw new ArgumentOutOfRangeException(nameof(intervalCount));
             }
