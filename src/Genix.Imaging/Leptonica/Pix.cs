@@ -277,5 +277,16 @@ namespace Genix.Imaging.Leptonica
         {
             return new Pix(NativeMethods.pixDistanceFunction(this.handle, connectivity, outdepth, boundcond));
         }
+
+        /// <summary>
+        /// Gray scale morphological dilation.
+        /// </summary>
+        /// <param name="hsize">The height of the s.e. Must be odd number.</param>
+        /// <param name="vsize">The width of the s.e. Must be odd number.</param>
+        /// <returns>The destination <see cref="Pix"/> this method creates.</returns>
+        public Pix DilateGray(int hsize, int vsize)
+        {
+            return new Pix(NativeMethods.pixDilateGray(this.handle, hsize, vsize));
+        }
     }
 }

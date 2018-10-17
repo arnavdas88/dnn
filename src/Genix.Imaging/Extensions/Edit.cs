@@ -344,7 +344,7 @@ namespace Genix.Imaging
                     {
                         unsafe
                         {
-                            fixed (ulong* ubits = &this.Bits[y * this.Stride])
+                            fixed (ulong* ubits = &bits[y * stride])
                             {
                                 byte* bbits = (byte*)ubits;
                                 for (int i = 0, count2 = this.Width - x2, stride8 = this.Stride8; i < height; i++, bbits += stride8)
@@ -415,7 +415,10 @@ namespace Genix.Imaging
                     return;
                 }
 
+                ulong[] bits = this.Bits;
+                int stride = this.Stride;
                 int bitsPerPixel = this.BitsPerPixel;
+
                 if (bitsPerPixel == 24)
                 {
                     ulong[] colors = this.ColorScanline(Image.CalculateStride(this.Width, 24), borderValue);
@@ -423,7 +426,7 @@ namespace Genix.Imaging
                     // fill top
                     if (y > 0)
                     {
-                        Vectors.Tile(this.Stride, y, colors, 0, this.Bits, 0);
+                        Vectors.Tile(stride, y, colors, 0, bits, 0);
                     }
 
                     // fill left and right
@@ -432,9 +435,9 @@ namespace Genix.Imaging
                     {
                         unsafe
                         {
-                            fixed (ulong* bits = &this.Bits[y * this.Stride], ucolors = colors)
+                            fixed (ulong* ubits = &bits[y * stride], ucolors = colors)
                             {
-                                byte* bbits = (byte*)bits;
+                                byte* bbits = (byte*)ubits;
                                 byte* bcolors = (byte*)ucolors;
 
                                 for (int i = 0, count1 = x * 3, count2 = (this.Width - x2) * 3, stride8 = this.Stride8; i < height; i++, bbits += stride8)
@@ -457,12 +460,11 @@ namespace Genix.Imaging
                     int y2 = y + height;
                     if (y2 < this.Height)
                     {
-                        Vectors.Tile(this.Stride, this.Height - y2, colors, 0, this.Bits, y2 * this.Stride);
+                        Vectors.Tile(stride, this.Height - y2, colors, 0, bits, y2 * stride);
                     }
                 }
                 else
                 {
-                    ulong[] bits = this.Bits;
                     int stride1 = this.Stride1;
                     ulong color = this.ColorBits(borderValue);
 

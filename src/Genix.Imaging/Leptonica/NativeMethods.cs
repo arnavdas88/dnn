@@ -66,6 +66,10 @@ namespace Genix.Imaging.Leptonica
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern SafePixHandle pixDistanceFunction(SafePixHandle pix, int connectivity, int outdepth, int boundcond);
 
+        // morphology
+        [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern SafePixHandle pixDilateGray(SafePixHandle pix, int hsize, int vsize);
+
         // PIXA methods
         [DllImport(NativeMethods.DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern SafePixaHandle pixaCreate(int n);
