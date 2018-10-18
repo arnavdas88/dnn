@@ -2636,23 +2636,26 @@ namespace Genix.Imaging
 
             foreach (Point point in kernel.GetElements())
             {
-                if (point.X == 0)
+                if (point != Point.Empty)
                 {
-                    Vectors.Or(
-                        (height - Math.Abs(point.Y)) * stride,
-                        bits,
-                        Core.MinMax.Max(point.Y, 0) * stride,
-                        mask,
-                        Core.MinMax.Max(-point.Y, 0) * stride);
-                }
-                else
-                {
-                    int count = width - Math.Abs(point.X);
-                    int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
-                    int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
-                    for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
+                    if (point.X == 0)
                     {
-                        BitUtils.Or(count, bits, offx, mask, offy);
+                        Vectors.Or(
+                            (height - Math.Abs(point.Y)) * stride,
+                            bits,
+                            Core.MinMax.Max(point.Y, 0) * stride,
+                            mask,
+                            Core.MinMax.Max(-point.Y, 0) * stride);
+                    }
+                    else
+                    {
+                        int count = width - Math.Abs(point.X);
+                        int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
+                        int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
+                        for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
+                        {
+                            BitUtils.Or(count, bits, offx, mask, offy);
+                        }
                     }
                 }
             }
@@ -2677,23 +2680,26 @@ namespace Genix.Imaging
 
             foreach (Point point in kernel.GetElements())
             {
-                if (point.X == 0)
+                if (point != Point.Empty)
                 {
-                    Vectors.And(
-                        (height - Math.Abs(point.Y)) * stride,
-                        bits,
-                        Core.MinMax.Max(point.Y, 0) * stride,
-                        mask,
-                        Core.MinMax.Max(-point.Y, 0) * stride);
-                }
-                else
-                {
-                    int count = width - Math.Abs(point.X);
-                    int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
-                    int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
-                    for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
+                    if (point.X == 0)
                     {
-                        BitUtils.And(count, bits, offx, mask, offy);
+                        Vectors.And(
+                            (height - Math.Abs(point.Y)) * stride,
+                            bits,
+                            Core.MinMax.Max(point.Y, 0) * stride,
+                            mask,
+                            Core.MinMax.Max(-point.Y, 0) * stride);
+                    }
+                    else
+                    {
+                        int count = width - Math.Abs(point.X);
+                        int offx = (Core.MinMax.Max(point.Y, 0) * stride1) + Core.MinMax.Max(point.X, 0);
+                        int offy = (Core.MinMax.Max(-point.Y, 0) * stride1) + Core.MinMax.Max(-point.X, 0);
+                        for (int i = 0, ii = height - Math.Abs(point.Y); i < ii; i++, offx += stride1, offy += stride1)
+                        {
+                            BitUtils.And(count, bits, offx, mask, offy);
+                        }
                     }
                 }
             }

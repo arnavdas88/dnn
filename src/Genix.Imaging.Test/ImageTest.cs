@@ -117,15 +117,18 @@
             const int Count = 5;
             Stopwatch stopwatch = new Stopwatch();
 
-            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\363978.tif"))
+            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
+            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\363978.tif"))
             {
                 stopwatch.Restart();
 
                 for (int i = 0; i < Count; i++)
                 {
+                    image.Binarize(null, 0, 0, 0, 0, true, 0, 0);
+
                     ////long power = image.Power();
                     ////Histogram hyst = image.GrayHistogram();
-                    Image workImage = image
+                    /*Image workImage = image
                         .ConvertTo(null, 8)
                         .Scale(null, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
                         ////.Binarize(null)
@@ -135,7 +138,7 @@
                         .Despeckle(null);
 
                     ISet<ConnectedComponent> components = workImage.FindConnectedComponents(8);
-                    workImage.RemoveConnectedComponents(components);
+                    workImage.RemoveConnectedComponents(components);*/
 
                     /*workImage = workImage.Scale(100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, Imaging.ScalingOptions.None);
                     workImage = workImage.Binarize();
