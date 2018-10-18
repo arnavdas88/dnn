@@ -20,12 +20,12 @@
             foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             {
-                /*Image xxx = image.Convert1To8(null);
+                Image xxx = image.Convert1To8(null);
                 Image yyy = xxx.CreateTemplate(null, xxx.BitsPerPixel);
 
-                Pix pix = Pix.FromImage(xxx);*/
+                /*Pix pix = Pix.FromImage(xxx);*/
 
-                int[] a = new int[10000];
+                ////int[] a = new int[10000];
 
                 ////for (int kw = 49; kw <= 49; kw++)
                 {
@@ -35,12 +35,14 @@
                     ////Pix pix = Pix.FromImage(image);
                     stopwatch.Restart();
 
-                    for (int i = 0; i < 10000; i++)
+                    for (int i = 0; i < 100; i++)
                     {
-                        Statistic.Smooth(a.Length, a, 0);
+                        ////Statistic.Smooth(a.Length, a, 0);
                         ////pix.DilateGray(1, kw);
                         ////xxx.Convert8To1(yyy, 128);
                         ////xxx.Dilate(yyy, StructuringElement.Brick(1, kw), 1, BorderType.BorderConst, 0);
+                        xxx.Dilate3x3(yyy, BorderType.BorderConst, 0);
+                        ////xxx.Dilate(yyy, StructuringElement.Brick(3, 3), 1, BorderType.BorderConst, 0);
                     }
 
                     ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);

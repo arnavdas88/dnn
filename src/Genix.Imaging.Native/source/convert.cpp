@@ -385,16 +385,19 @@ GENIXAPI(int, _convert8to1)(
 #else
 	const __int64 threshold64 = threshold;
 	const int width64 = width & ~63;
+	const int width8 = width & ~7;
+	unsigned __int8 mask = 0xff << (width - width8);
 	for (int y = 0; y < height; y++, src += stridesrc, dst += stridedst)
 	{
-		int xdst = 0;
-		int xsrc = 0;
+		const unsigned __int64* src64 = (const unsigned __int64*)src;
+		unsigned __int64* dst64 = (unsigned __int64*)dst;
+
+		int x = 0;
 
 		// convert 64 pixels at a time
-		for (; xsrc < width64; xdst += 8, xsrc += 64)
+		for (; x < width64; x += 64, src64 += 8, dst64++)
 		{
-			unsigned __int64* src64 = (unsigned __int64*)(src + xsrc);
-			*(unsigned __int64*)(dst + xdst) = 
+			dst64[0] =
 				(bits8to1(src64[0], threshold64) << 0) |
 				(bits8to1(src64[1], threshold64) << 8) |
 				(bits8to1(src64[2], threshold64) << 16) |
@@ -405,10 +408,17 @@ GENIXAPI(int, _convert8to1)(
 				(bits8to1(src64[7], threshold64) << 56);
 		}
 
-		for (; xsrc < width; xdst++, xsrc += 8)
+		// convert 8 pixels at a time
+		for (; x < width8; x += 8, src64++)
 		{
-			unsigned __int64* src64 = (unsigned __int64*)(src + xsrc);
-			dst[xdst] = (unsigned __int8)bits8to1(src64[0], threshold64);
+			dst[x / 8] = (unsigned __int8)bits8to1(src64[0], threshold64);
+		}
+
+		// convert last bits
+		if (x < width)
+		{
+			dst[x / 8] &= mask;
+			dst[x / 8] |= (unsigned __int8)bits8to1(src64[0], threshold64) & ~mask;
 		}
 	}
 

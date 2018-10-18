@@ -124,7 +124,7 @@
             Image image1 = new Image(2031, 1000, 8, 200, 200);
             image1.Randomize();
 
-            Image image2 = image1.Convert8To1(null, 128);
+            Image image2 = image1.Convert8To1(null, 137);
             for (int iy = 0; iy < image1.Height; iy++)
             {
                 for (int ix = 0; ix < image1.Width; ix++)
@@ -132,7 +132,7 @@
                     uint color1 = image1.GetPixel(ix, iy);
                     uint color2 = image2.GetPixel(ix, iy);
 
-                    Assert.IsTrue((color1 >= 128 && color2 == 0) || (color1 < 128 && color2 == 1));
+                    Assert.IsTrue((color1 >= 137 && color2 == 0) || (color1 < 137 && color2 == 1));
                 }
             }
         }

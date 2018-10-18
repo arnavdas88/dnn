@@ -74,10 +74,17 @@ namespace Genix.Imaging
             // simply set entire image to the max color
             if (bx2 <= bx1 || by2 <= by1)
             {
-                uint maxcolor = src.Max();
-                if (borderType == BorderType.BorderConst)
+                if (borderType == BorderType.BorderRepl)
                 {
-                    maxcolor = Color.Max(maxcolor, borderValue & this.MaxColor, this.BitsPerPixel);
+                    borderValue = this.Max();
+                }
+                else
+                {
+                    borderValue &= this.MaxColor;
+                    if (borderValue != this.MaxColor)
+                    {
+                        borderValue = Color.Max(this.Max(), borderValue, this.BitsPerPixel);
+                    }
                 }
 
                 if (!inplace)
@@ -85,7 +92,7 @@ namespace Genix.Imaging
                     dst = this.CreateTemplate(dst, this.BitsPerPixel);
                 }
 
-                dst.SetColor(maxcolor);
+                dst.SetColor(borderValue);
             }
             else
             {
@@ -781,6 +788,73 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Dilates this <see cref="Image"/> by using the 3x3 structuring element.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The number of iterations is equal to or less than zero.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// Dilation assigns to each pixel a maximum value of all pixels covered by its structuring element.
+        /// </para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image Dilate3x3(Image dst, BorderType borderType, uint borderValue)
+        {
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+            if (dst.Width <= 2 || dst.Height <= 2)
+            {
+                if (borderType == BorderType.BorderRepl)
+                {
+                    borderValue = this.Max();
+                }
+                else
+                {
+                    borderValue &= this.MaxColor;
+                    if (borderValue != this.MaxColor)
+                    {
+                        borderValue = Color.Max(this.Max(), borderValue, this.BitsPerPixel);
+                    }
+                }
+
+                dst.SetColor(borderValue);
+            }
+            else
+            {
+                Vectors.Copy(dst.Bits.Length, this.Bits, 0, dst.Bits, 0);
+
+                dst.MaxEvery(0, 0, this.Width, this.Height - 1, this, 0, 1);
+                dst.MaxEvery(0, 1, this.Width, this.Height - 1, this, 0, 0);
+                dst.MaxEvery(0, 0, this.Width - 1, this.Height, this, 1, 0);
+                dst.MaxEvery(1, 0, this.Width - 1, this.Height, this, 0, 0);
+
+                if (borderType == BorderType.BorderConst)
+                {
+                    dst.MaxCBorder(1, 1, this.Width - 1, this.Height - 1, borderValue);
+                }
+            }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Erodes this <see cref="Image"/> by using the specified structuring element.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -834,6 +908,19 @@ namespace Genix.Imaging
             // simply set entire image to the min color
             if (bx2 <= bx1 || by2 <= by1)
             {
+                if (borderType == BorderType.BorderRepl)
+                {
+                    borderValue = this.Min();
+                }
+                else
+                {
+                    borderValue &= this.MaxColor;
+                    if (borderValue != 0)
+                    {
+                        borderValue = Color.Min(this.Min(), borderValue, this.BitsPerPixel);
+                    }
+                }
+
                 uint mincolor = src.Min();
                 if (borderType == BorderType.BorderConst)
                 {
@@ -925,7 +1012,7 @@ namespace Genix.Imaging
                 }
                 else
                 {
-                    dst.SetToZero();
+                    dst.SetToOne();
                 }
 
                 // use van-Herk/Gil-Werman (vHGW) algorithm for 1 x n and m x 1 kernels

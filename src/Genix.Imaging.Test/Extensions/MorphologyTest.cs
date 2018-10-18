@@ -227,7 +227,7 @@
 
                         uint ComputePixel(int x, int y)
                         {
-                            uint maxcolor = uint.MaxValue;
+                            uint maxcolor = src.MaxColor;
                             foreach (Point point in se.GetElements())
                             {
                                 Point pt = new Point(x + point.X, y + point.Y);
@@ -242,7 +242,7 @@
 
                         uint ComputePixelBorder(int x, int y, uint borderValue)
                         {
-                            uint maxcolor = uint.MaxValue;
+                            uint maxcolor = src.MaxColor;
                             foreach (Point point in se.GetElements())
                             {
                                 Point pt = new Point(x + point.X, y + point.Y);
