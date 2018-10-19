@@ -109,7 +109,6 @@ namespace Genix.Imaging
         /// Converts this <see cref="ImageF"/> to a gray 8-bit <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel. Could be 8, 24, or 32.</param>
         /// <param name="rounding">The rounding mode.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
@@ -119,87 +118,135 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// The <paramref name="bitsPerPixel"/> is neither 8 not 24 nor 32.
-        /// </exception>
-        /// <exception cref="OutOfMemoryException">
-        /// Not enough memory to complete this operation.
-        /// </exception>
-        public Image ConvertTo(Image dst, int bitsPerPixel, MidpointRounding rounding)
+        public Image ConvertTo8(Image dst, MidpointRounding rounding)
         {
             // create destination
             if (dst == null)
             {
-                dst = new Image(this.Width, this.Height, bitsPerPixel, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+                dst = new Image(this.Width, this.Height, 8, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
             else
             {
-                dst.Reallocate(this.Width, this.Height, bitsPerPixel, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+                dst.Reallocate(this.Width, this.Height, 8, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
 
-            // do the conversion
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitsdst = dst.Bits)
+                unsafe
                 {
-                    switch (bitsPerPixel)
+                    fixed (ulong* bitsdst = dst.Bits)
                     {
-                        case 8:
-                            if (NativeMethods._convert32fto8(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                this.Bits,
-                                this.Stride,
-                                (byte*)bitsdst,
-                                dst.Stride8,
-                                (int)rounding) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        case 24:
-                            if (NativeMethods._convert32fto24(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                this.Bits,
-                                this.Stride,
-                                (byte*)bitsdst,
-                                dst.Stride8,
-                                (int)rounding) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        case 32:
-                            if (NativeMethods._convert32fto32(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                this.Bits,
-                                this.Stride,
-                                (byte*)bitsdst,
-                                dst.Stride8,
-                                (int)rounding) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        default:
-                            throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+                        return NativeMethods._convert32fto8(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            this.Bits,
+                            this.Stride,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            (int)rounding);
                     }
                 }
+            });
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts this <see cref="ImageF"/> to a color 24-bit <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image ConvertTo24(Image dst, MidpointRounding rounding)
+        {
+            // create destination
+            if (dst == null)
+            {
+                dst = new Image(this.Width, this.Height, 24, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
+            else
+            {
+                dst.Reallocate(this.Width, this.Height, 24, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+            }
+
+            Image.ExecuteIPPMethod(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitsdst = dst.Bits)
+                    {
+                        return NativeMethods._convert32fto24(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            this.Bits,
+                            this.Stride,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            (int)rounding);
+                    }
+                }
+            });
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts this <see cref="ImageF"/> to a color 32-bit <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="convertAlphaChannel">Determines whether this <see cref="ImageF"/> contains alpha channel.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image ConvertTo32(Image dst, bool convertAlphaChannel, MidpointRounding rounding)
+        {
+            // create destination
+            if (dst == null)
+            {
+                dst = new Image(this.Width, this.Height, 32, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+            }
+            else
+            {
+                dst.Reallocate(this.Width, this.Height, 32, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+            }
+
+            Image.ExecuteIPPMethod(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitsdst = dst.Bits)
+                    {
+                        return NativeMethods._convert32fto32(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            this.Bits,
+                            this.Stride,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            convertAlphaChannel,
+                            (int)rounding);
+                    }
+                }
+            });
 
             return dst;
         }
@@ -343,6 +390,7 @@ namespace Genix.Imaging
                 int stridesrc,
                 byte* dst,
                 int stridedst,
+                [MarshalAs(UnmanagedType.Bool)] bool convertAlphaChannel,
                 int roundMode);
         }
     }

@@ -873,7 +873,7 @@ namespace Genix.Imaging
         {
             if (this.BitsPerPixel != 24)
             {
-                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_24bpp);
             }
 
             bool inplace = dst == this;
@@ -929,7 +929,7 @@ namespace Genix.Imaging
         {
             if (this.BitsPerPixel != 24)
             {
-                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_24bpp);
             }
 
             bool inplace = dst == this;
@@ -1081,13 +1081,13 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts this <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// Converts a gray scale <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
         /// </summary>
         /// <returns>
         /// A new <see cref="float"/> <see cref="ImageF"/>.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// The <see cref="Image{T}.BitsPerPixel"/> is neither 8 not 24 nor 32.
+        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
         /// </exception>
         /// <exception cref="OutOfMemoryException">
         /// Not enough memory to complete this operation.
@@ -1097,73 +1097,143 @@ namespace Genix.Imaging
         /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
         /// </para>
         /// </remarks>
-        public ImageF ConvertTo32f()
+        public ImageF Convert8To32f()
         {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
             ImageF dst = new ImageF(
                 this.Width,
                 this.Height,
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits)
+                unsafe
                 {
-                    switch (this.BitsPerPixel)
+                    fixed (ulong* bitssrc = this.Bits)
                     {
-                        case 8:
-                            if (NativeMethods._convert8to32f(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                (byte*)bitssrc,
-                                this.Stride8,
-                                dst.Bits,
-                                dst.Stride) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        case 24:
-                            if (NativeMethods._convert24to32f(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                (byte*)bitssrc,
-                                this.Stride8,
-                                dst.Bits,
-                                dst.Stride) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        case 32:
-                            if (NativeMethods._convert32to32f(
-                                0,
-                                0,
-                                this.Width,
-                                this.Height,
-                                (byte*)bitssrc,
-                                this.Stride8,
-                                dst.Bits,
-                                dst.Stride) != 0)
-                            {
-                                throw new OutOfMemoryException();
-                            }
-
-                            break;
-
-                        default:
-                            throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+                        return NativeMethods._convert8to32f(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            dst.Bits,
+                            dst.Stride);
                     }
                 }
+            });
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a color 24-bit <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="float"/> <see cref="ImageF"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 24 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
+        /// </para>
+        /// </remarks>
+        public ImageF Convert24To32f()
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_24bpp);
             }
+
+            ImageF dst = new ImageF(
+                this.Width,
+                this.Height,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            Image.ExecuteIPPMethod(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitssrc = this.Bits)
+                    {
+                        return NativeMethods._convert24to32f(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            dst.Bits,
+                            dst.Stride);
+                    }
+                }
+            });
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a color 32-bit <see cref="Image"/> to a <see cref="float"/> <see cref="ImageF"/>.
+        /// </summary>
+        /// <param name="convertAlphaChannel">Determines whether the alpha channel should be converted.</param>
+        /// <returns>
+        /// A new <see cref="float"/> <see cref="ImageF"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 32 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This function converts pixel values in this <see cref="Image"/> to a <see cref="float"/> data type and writes them to the destination <see cref="ImageF"/>.
+        /// </para>
+        /// </remarks>
+        public ImageF Convert32To32f(bool convertAlphaChannel)
+        {
+            if (this.BitsPerPixel != 32)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_32bpp);
+            }
+
+            ImageF dst = new ImageF(
+                this.Width,
+                this.Height,
+                this.HorizontalResolution,
+                this.VerticalResolution);
+
+            Image.ExecuteIPPMethod(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitssrc = this.Bits)
+                    {
+                        return NativeMethods._convert32to32f(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            dst.Bits,
+                            dst.Stride,
+                            convertAlphaChannel);
+                    }
+                }
+            });
 
             return dst;
         }
@@ -1360,7 +1430,8 @@ namespace Genix.Imaging
                 byte* src,
                 int stridesrc,
                 float[] dst,
-                int stridedst);
+                int stridedst,
+                [MarshalAs(UnmanagedType.Bool)] bool convertAlphaChannel);
         }
     }
 }

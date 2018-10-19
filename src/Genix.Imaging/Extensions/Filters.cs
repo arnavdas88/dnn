@@ -514,12 +514,22 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Performs deconvolution of this <see cref="Image"/>.
+        /// Performs deconvolution of this <see cref="Image"/> using FFT (Fast Fourie Transform).
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="kernelSize">The width and height of the convolution kernel.</param>
+        /// <param name="kernel">The convolution kernel. The length must be <paramref name="kernelSize"/> * <paramref name="kernelSize"/>.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="kernelSize"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="kernelSize"/> is less than 3.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="kernel"/> length is not <paramref name="kernelSize"/> * <paramref name="kernelSize"/>.</para>
+        /// </exception>
         /// <exception cref="NotSupportedException">
         /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
         /// </exception>
@@ -529,35 +539,185 @@ namespace Genix.Imaging
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
         [CLSCompliant(false)]
-        public Image Deconvolution(Image dst)
+        public Image DeconvolutionFFT(Image dst, int kernelSize, float[] kernel)
         {
-            // convert to float image
-            ImageF srcf = this.ConvertTo32f();
+            if (kernelSize < 3)
+            {
+                throw new ArgumentException("The convolution kernel size must be at least 3.");
+            }
 
-            int kernelSize = 3;
+            if (kernel == null)
+            {
+                throw new ArgumentNullException(nameof(kernel));
+            }
+
+            if (kernel.Length != kernelSize * kernelSize)
+            {
+                throw new ArgumentException("The kernel length must be kernelSize * kernelSize.");
+            }
+
+            // convert to float image
+            ImageF srcf = null;
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                    srcf = this.Convert8To32f();
+                    break;
+
+                case 24:
+                    srcf = this.Convert24To32f();
+                    break;
+
+                case 32:
+                    srcf = this.Convert32To32f(false);
+                    break;
+
+                default:
+                    throw new ArgumentException(Properties.Resources.E_UnsupportedDepth);
+            }
 
             // explanation of IPP deconvolution parameters is here:
             // https://software.intel.com/en-us/forums/intel-integrated-performance-primitives/topic/304247
 
             // perform deconvolution
             ImageF dstf = new ImageF(srcf);
-            Image.ExecuteIPPMethod(() => NativeMethods.deconvolution(
-                this.BitsPerPixel / 8,
-                kernelSize,
-                new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                (int)Math.Ceiling(Math.Log(srcf.Width + kernelSize - 1, 2)), // 2^FFT order >= (roi.width + kernelSize - 1)
-                32,
-                0,
-                0,
-                srcf.Width,
-                srcf.Height,
-                srcf.Bits,
-                srcf.Stride,
-                dstf.Bits,
-                dstf.Stride));
+            Image.ExecuteIPPMethod(() =>
+            {
+                return NativeMethods.deconv_FFT(
+                    0,
+                    0,
+                    srcf.Width,
+                    srcf.Height,
+                    srcf.Bits,
+                    srcf.Stride,
+                    dstf.Bits,
+                    dstf.Stride,
+                    this.BitsPerPixel / 8,
+                    kernelSize,
+                    kernel,
+                    (int)Math.Ceiling(Math.Log(srcf.Width + kernelSize - 1, 2)), // 2^FFT order >= (roi.width + kernelSize - 1)
+                    32);
+            });
 
             // convert back to original format
-            return dstf.ConvertTo(dst, this.BitsPerPixel, MidpointRounding.AwayFromZero);
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                    return dstf.ConvertTo8(dst, MidpointRounding.AwayFromZero);
+
+                case 24:
+                    return dstf.ConvertTo24(dst, MidpointRounding.AwayFromZero);
+
+                case 32:
+                    return dstf.ConvertTo32(dst, false, MidpointRounding.AwayFromZero);
+
+                default:
+                    throw new ArgumentException(Properties.Resources.E_UnsupportedDepth);
+            }
+        }
+
+        /// <summary>
+        /// Performs deconvolution of this <see cref="Image"/> using Lucy-Richardson algorithm.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="kernelSize">The width and height of the convolution kernel.</param>
+        /// <param name="kernel">The convolution kernel. The length must be <paramref name="kernelSize"/> * <paramref name="kernelSize"/>.</param>
+        /// <param name="numberOfIterations">The number of iterations.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para><paramref name="kernelSize"/> is <b>null</b>.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="kernelSize"/> is less than 3.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="kernel"/> length is not <paramref name="kernelSize"/> * <paramref name="kernelSize"/>.</para>
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image DeconvolutionLR(Image dst, int kernelSize, float[] kernel, int numberOfIterations)
+        {
+            if (kernelSize < 3)
+            {
+                throw new ArgumentException("The convolution kernel size must be at least 3.");
+            }
+
+            if (kernel == null)
+            {
+                throw new ArgumentNullException(nameof(kernel));
+            }
+
+            if (kernel.Length != kernelSize * kernelSize)
+            {
+                throw new ArgumentException("The kernel length must be kernelSize * kernelSize.");
+            }
+
+            // convert to float image
+            ImageF srcf = null;
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                    srcf = this.Convert8To32f();
+                    break;
+
+                case 24:
+                    srcf = this.Convert24To32f();
+                    break;
+
+                case 32:
+                    srcf = this.Convert32To32f(false);
+                    break;
+
+                default:
+                    throw new ArgumentException(Properties.Resources.E_UnsupportedDepth);
+            }
+
+            // explanation of IPP deconvolution parameters is here:
+            // https://software.intel.com/en-us/forums/intel-integrated-performance-primitives/topic/304247
+
+            // perform deconvolution
+            ImageF dstf = new ImageF(srcf);
+            Image.ExecuteIPPMethod(() =>
+            {
+                return NativeMethods.deconv_LR(
+                    0,
+                    0,
+                    srcf.Width,
+                    srcf.Height,
+                    srcf.Bits,
+                    srcf.Stride,
+                    dstf.Bits,
+                    dstf.Stride,
+                    this.BitsPerPixel / 8,
+                    kernelSize,
+                    kernel,
+                    numberOfIterations,
+                    32);
+            });
+
+            // convert back to original format
+            switch (this.BitsPerPixel)
+            {
+                case 8:
+                    return dstf.ConvertTo8(dst, MidpointRounding.AwayFromZero);
+
+                case 24:
+                    return dstf.ConvertTo24(dst, MidpointRounding.AwayFromZero);
+
+                case 32:
+                    return dstf.ConvertTo32(dst, false, MidpointRounding.AwayFromZero);
+
+                default:
+                    throw new ArgumentException(Properties.Resources.E_UnsupportedDepth);
+            }
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -646,12 +806,7 @@ namespace Genix.Imaging
                 uint borderValue);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int deconvolution(
-                int channels,
-                int kernelSize,
-                [In] float[] kernel,
-                int FFTorder,
-                float threshold,
+            public static extern int deconv_FFT(
                 int x,
                 int y,
                 int width,
@@ -659,7 +814,28 @@ namespace Genix.Imaging
                 [In] float[] src,
                 int stridesrc,
                 [Out] float[] dst,
-                int stridedst);
+                int stridedst,
+                int channels,
+                int kernelSize,
+                [In] float[] kernel,
+                int FFTorder,
+                float threshold);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int deconv_LR(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] float[] src,
+                int stridesrc,
+                [Out] float[] dst,
+                int stridedst,
+                int channels,
+                int kernelSize,
+                [In] float[] kernel,
+                int numIter,
+                float threshold);
         }
     }
 }

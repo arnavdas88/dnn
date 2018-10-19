@@ -17,7 +17,7 @@ namespace Genix.Imaging
     /// This is an abstract class.
     /// </summary>
     /// <typeparam name="T">The type of elements that store image bits.</typeparam>
-    public abstract class Image<T>
+    public abstract partial class Image<T>
         where T : struct
     {
         /// <summary>

@@ -83,7 +83,7 @@ namespace Genix.Imaging
 
             if (normalizeBackground)
             {
-                Image deconv = this.Deconvolution(null);
+                this.DeconvolutionLR(this, 3, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 2);
 
                 // calculate adaptive threshold
                 if (adaptiveThreshold == 0)
@@ -110,14 +110,15 @@ namespace Genix.Imaging
                 // use gray mask as a temporary buffer for normalized image
                 ApplyAdaptiveThresholds(this, maskg);
 
+#if false
                 //// !!!! TEMP
                 maskg.Sub(maskg, maskg.MorphBlackHat(null, StructuringElement.Square(7), 1, BorderType.BorderRepl, 0), 0);
                 //// !!!! TEMP
-
+#endif
                 // apply single otsu threshold to entire normalized image
                 byte otsuThreshold = maskg.Otsu(0, 0, width, height);
                 maskg.Convert8To1(dst, otsuThreshold);
-
+#if false
                 //// !!!! TEMP
                 sx *= 2;
                 sy *= 2;
@@ -164,19 +165,8 @@ namespace Genix.Imaging
 
                 dst.FloodFill(dst, 8, temp2);
 
-                /*                            Image temp1 = this.CreateTemplate(null, 1);
-                                            fixed (ulong* bitstemp1 = temp1.Bits)
-                                            {
-                                                NativeMethods._convert8to1(0, 0, width, height, (byte*)bitsnorm, this.Stride8, (byte*)bitstemp1, temp1.Stride8, otsuThreshold + 50);
-                                            }
-
-                                            Image temp2 = dst.Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, 0);
-                                            temp2.And(temp2, temp1);
-
-                                            dst.Or(dst, temp2);*/
-
                 //// !!!! TEMP
-
+#endif
                 void CalculateAdaptiveThresholds(Image bgmask, Image fgmask)
                 {
                     for (int iy = 0, ty = 0, mapoff = 0; iy < ny; iy++, ty += sy, mapoff += nx)

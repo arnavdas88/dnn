@@ -615,14 +615,27 @@ GENIXAPI(int, _convert32to32f)(
 	const int x, const int y,
 	const int width, const int height,
 	const unsigned __int8* src, const int stridesrc,
-	float* dst, const int stridedst)
+	float* dst, const int stridedst,
+	BOOL convertAlphaChannel)
 {
-	return ippiConvert_8u32f_C4R(
-		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
-		stridesrc,
-		dst + (ptrdiff_t(y) * stridedst) + x,
-		stridedst * sizeof(float),
-		{ width, height });
+	if (convertAlphaChannel)
+	{
+		return ippiConvert_8u32f_AC4R(
+			src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+			stridesrc,
+			dst + (ptrdiff_t(y) * stridedst) + x,
+			stridedst * sizeof(float),
+			{ width, height });
+	}
+	else
+	{
+		return ippiConvert_8u32f_C4R(
+			src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+			stridesrc,
+			dst + (ptrdiff_t(y) * stridedst) + x,
+			stridedst * sizeof(float),
+			{ width, height });
+	}
 }
 
 GENIXAPI(int, _convert32fto8)(
@@ -678,6 +691,7 @@ GENIXAPI(int, _convert32fto32)(
 	const int width, const int height,
 	const float* src, const int stridesrc,
 	unsigned __int8* dst, const int stridedst,
+	BOOL convertAlphaChannel,
 	const int roundMode)
 {
 	IppRoundMode ippRoundMode;
@@ -688,13 +702,26 @@ GENIXAPI(int, _convert32fto32)(
 	default:				ippRoundMode = ippRndNear; break;
 	}
 
-	return ippiConvert_32f8u_C4R(
-		src + ((ptrdiff_t(y) * stridesrc) + x),
-		stridesrc * sizeof(float),
-		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
-		stridedst,
-		{ width, height },
-		ippRoundMode);
+	if (convertAlphaChannel)
+	{
+		return ippiConvert_32f8u_AC4R(
+			src + ((ptrdiff_t(y) * stridesrc) + x),
+			stridesrc * sizeof(float),
+			dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+			stridedst,
+			{ width, height },
+			ippRoundMode);
+	}
+	else
+	{
+		return ippiConvert_32f8u_C4R(
+			src + ((ptrdiff_t(y) * stridesrc) + x),
+			stridesrc * sizeof(float),
+			dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+			stridedst,
+			{ width, height },
+			ippRoundMode);
+	}
 }
 
 GENIXAPI(int, otsu_threshold)(

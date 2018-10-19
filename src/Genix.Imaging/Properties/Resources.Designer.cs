@@ -214,6 +214,15 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This operation supports color (24bpp) images only..
+        /// </summary>
+        internal static string E_UnsupportedDepth_24bpp {
+            get {
+                return ResourceManager.GetString("E_UnsupportedDepth_24bpp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation supports color (32bpp) images only..
         /// </summary>
         internal static string E_UnsupportedDepth_32bpp {

@@ -17,10 +17,10 @@
             Stopwatch stopwatch = new Stopwatch();
 
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
-            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
+            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test4.jpg"))
             {
-                Image xxx = image.Convert1To8(null);
+                Image xxx = image.ConvertTo(null, 8);
                 Image yyy = xxx.CreateTemplate(null, xxx.BitsPerPixel);
 
                 /*Pix pix = Pix.FromImage(xxx);*/
@@ -37,41 +37,15 @@
 
                     for (int i = 0; i < 100; i++)
                     {
+                        xxx.Binarize(yyy, 0, 0, 0, 0, true, 0, 0);
                         ////Statistic.Smooth(a.Length, a, 0);
                         ////pix.DilateGray(1, kw);
                         ////xxx.Convert8To1(yyy, 128);
                         ////xxx.Dilate(yyy, StructuringElement.Brick(1, kw), 1, BorderType.BorderConst, 0);
-                        xxx.Dilate3x3(yyy, BorderType.BorderConst, 0);
+                        ////xxx.Dilate3x3(yyy, BorderType.BorderConst, 0);
                         ////xxx.Dilate(yyy, StructuringElement.Brick(3, 3), 1, BorderType.BorderConst, 0);
                     }
 
-                    ////pix = pix.BackgroundNorm(null, null, 64, 128, 128, (64 * 128) / 3, 255, 2, 1);
-
-                    ////image.NormalizeBackground(image, 0, 0, 0, 0, 255);
-
-                    ////Image xxx = image.FilterBox(null, 30, 30, BorderType.BorderRepl, 0);
-                    ////Image xxx = image.MorphClose(null, StructuringElement.Square(25), 1, BorderType.BorderRepl, 0);
-                    ////xxx.FilterBox(xxx, 30, 30, BorderType.BorderRepl, 0);
-                    ////xxx.Not(xxx);
-                    ////xxx.AddC(xxx, 1, 0);
-
-                    ////Image yyy = image.Mul(null, xxx, 1);
-
-                    ////Image yyy = image.Div(null, xxx, 8);
-
-                    ////xxx.FilterBox(xxx, 30, 30, BorderType.BorderRepl, 0);
-
-                    ////xxx.Not(xxx);
-                    ////Image yyy = image.Add(null, xxx, 0);
-                    ////yyy = yyy.Binarize(null).Deskew(null).Despeckle(null);
-                    ///
-
-                    ////Image yyy = image.MorphBlackHat(null, StructuringElement.Square(30), 1, BorderType.BorderRepl, 0).Not(null);
-
-                    ////LineDetector.FindLines(yyy, new LineDetectionOptions());
-
-
-                    ////Image workImage = image.BitsPerPixel > 1 ? image.Binarize(null) : image;
 
 #if false
                 stopwatch.Restart();
