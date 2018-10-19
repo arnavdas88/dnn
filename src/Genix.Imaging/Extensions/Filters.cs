@@ -258,7 +258,7 @@ namespace Genix.Imaging
             return dst;
         }
 
- #pragma warning disable SA1629 // Documentation text should end with a period
+#pragma warning disable SA1629 // Documentation text should end with a period
         /// <summary>
         /// Applies Laplace filter to the <see cref="Image"/>.
         /// </summary>
@@ -513,6 +513,53 @@ namespace Genix.Imaging
             return dst;
         }
 
+        /// <summary>
+        /// Performs deconvolution of this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image Deconvolution(Image dst)
+        {
+            // convert to float image
+            ImageF srcf = this.ConvertTo32f();
+
+            int kernelSize = 3;
+
+            // explanation of IPP deconvolution parameters is here:
+            // https://software.intel.com/en-us/forums/intel-integrated-performance-primitives/topic/304247
+
+            // perform deconvolution
+            ImageF dstf = new ImageF(srcf);
+            Image.ExecuteIPPMethod(() => NativeMethods.deconvolution(
+                this.BitsPerPixel / 8,
+                kernelSize,
+                new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                (int)Math.Ceiling(Math.Log(srcf.Width + kernelSize - 1, 2)), // 2^FFT order >= (roi.width + kernelSize - 1)
+                32,
+                0,
+                0,
+                srcf.Width,
+                srcf.Height,
+                srcf.Bits,
+                srcf.Stride,
+                dstf.Bits,
+                dstf.Stride));
+
+            // convert back to original format
+            return dstf.ConvertTo(dst, this.BitsPerPixel, MidpointRounding.AwayFromZero);
+        }
+
         [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
@@ -597,6 +644,22 @@ namespace Genix.Imaging
                 int maskSize,
                 BorderType borderType,
                 uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int deconvolution(
+                int channels,
+                int kernelSize,
+                [In] float[] kernel,
+                int FFTorder,
+                float threshold,
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] float[] src,
+                int stridesrc,
+                [Out] float[] dst,
+                int stridedst);
         }
     }
 }

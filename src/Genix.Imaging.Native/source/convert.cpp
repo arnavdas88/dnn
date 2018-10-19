@@ -9,6 +9,12 @@
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
 
+enum _MidpointRounding : int
+{
+	ToEven = 0,
+	AwayFromZero = 1,
+}; 
+
 GENIXAPI(int, _convert1to8)(
 	const int width, const int height,
 	const unsigned __int8* src, const int stridesrc,
@@ -563,6 +569,20 @@ GENIXAPI(int, _convert24to32)(
 		{ width, height });
 }
 
+GENIXAPI(int, _convert24to32f)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	float* dst, const int stridedst)
+{
+	return ippiConvert_8u32f_C3R(
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 3),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + x,
+		stridedst * sizeof(float),
+		{ width, height });
+}
+
 GENIXAPI(int, _convert32to8)(
 	const int x, const int y,
 	const int width, const int height,
@@ -591,6 +611,92 @@ GENIXAPI(int, _convert32to24)(
 		{ width, height });
 }
 
+GENIXAPI(int, _convert32to32f)(
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	float* dst, const int stridedst)
+{
+	return ippiConvert_8u32f_C4R(
+		src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+		stridesrc,
+		dst + (ptrdiff_t(y) * stridedst) + x,
+		stridedst * sizeof(float),
+		{ width, height });
+}
+
+GENIXAPI(int, _convert32fto8)(
+	const int x, const int y,
+	const int width, const int height,
+	const float* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
+	const int roundMode)
+{
+	IppRoundMode ippRoundMode;
+	switch (roundMode)
+	{
+	case AwayFromZero:		ippRoundMode = ippRndFinancial; break;
+	case ToEven:
+	default:				ippRoundMode = ippRndNear; break;
+	}
+
+	return ippiConvert_32f8u_C1R(
+		src + ((ptrdiff_t(y) * stridesrc) + x),
+		stridesrc * sizeof(float),
+		dst + (ptrdiff_t(y) * stridedst) + x,
+		stridedst,
+		{ width, height },
+		ippRoundMode);
+}
+
+GENIXAPI(int, _convert32fto24)(
+	const int x, const int y,
+	const int width, const int height,
+	const float* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
+	const int roundMode)
+{
+	IppRoundMode ippRoundMode;
+	switch (roundMode)
+	{
+	case AwayFromZero:		ippRoundMode = ippRndFinancial; break;
+	case ToEven:
+	default:				ippRoundMode = ippRndNear; break;
+	}
+
+	return ippiConvert_32f8u_C3R(
+		src + ((ptrdiff_t(y) * stridesrc) + x),
+		stridesrc * sizeof(float),
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 3),
+		stridedst,
+		{ width, height },
+		ippRoundMode);
+}
+
+GENIXAPI(int, _convert32fto32)(
+	const int x, const int y,
+	const int width, const int height,
+	const float* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
+	const int roundMode)
+{
+	IppRoundMode ippRoundMode;
+	switch (roundMode)
+	{
+	case AwayFromZero:		ippRoundMode = ippRndFinancial; break;
+	case ToEven:
+	default:				ippRoundMode = ippRndNear; break;
+	}
+
+	return ippiConvert_32f8u_C4R(
+		src + ((ptrdiff_t(y) * stridesrc) + x),
+		stridesrc * sizeof(float),
+		dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+		stridedst,
+		{ width, height },
+		ippRoundMode);
+}
+
 GENIXAPI(int, otsu_threshold)(
 	const int x, const int y,
 	const int width, const int height,
@@ -605,143 +711,6 @@ GENIXAPI(int, otsu_threshold)(
 		{ width, height },
 		threshold);
 }
-
-#if false
-GENIXAPI(int, otsu)(
-	const int width, const int height,
-	const unsigned __int64* src, const int stridesrc,
-	unsigned __int64* dst, const int stridedst,
-	int sx, int sy,
-	int smoothx, int smoothy)
-{
-	IppStatus status = ippStsNoErr;
-	Ipp8u* pThresholds = NULL;
-	Ipp8u* pFilterBoxBorderBuffer = NULL;
-
-	// Calculate tile size
-	sx = __max(((sx + 7) / 8) * 8, 16);	// horizontal tile size must be rounded to 8 pixels
-	sy = __max(sy, 16);
-	int nx = __max(1, width / sx);
-	int ny = __max(1, height / sy);
-
-	if (nx == 1 && ny == 1)
-	{
-		Ipp8u threshold = 0;
-
-		// Compute the threshold
-		check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			{ width, height },
-			&threshold));
-
-		// Apply the threshold
-		check_sts(status = _convert8to1(
-			0,
-			0,
-			width,
-			height,
-			src,
-			stridesrc,
-			dst,
-			stridedst,
-			threshold));
-	}
-	else
-	{
-		// Allocate thresholds
-		pThresholds = (Ipp8u*)ippsMalloc_8u(nx * ny);
-		if (pThresholds == NULL)
-		{
-			// insufficient memory available
-			status = ippStsNoMemErr;
-			goto exitLine;
-		}
-
-		// Compute the threshold array for the tiles
-		for (int iy = 0, ty = 0, ithresh = 0; iy < ny; iy++, ty += sy)
-		{
-			const int th = iy + 1 == ny ? height - ty : sy;
-
-			for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
-			{
-				const int tw = ix + 1 == nx ? width - tx : sx;
-
-				check_sts(status = ippiComputeThreshold_Otsu_8u_C1R(
-					(const Ipp8u*)(src + (ptrdiff_t(ty) * stridesrc)) + tx,
-					stridesrc * sizeof(unsigned __int64),
-					{ tw, th },
-					&pThresholds[ithresh++]));
-			}
-		}
-
-		// Optionally smooth the threshold array
-		if (smoothx > 0 || smoothy > 0)
-		{
-			// kernel too large; reducing!
-			if (nx < (2 * smoothx) + 1 || ny < (2 * smoothy) + 1)
-			{
-				smoothx = __min(smoothx, (nx - 1) / 2);
-				smoothy = __min(smoothy, (ny - 1) / 2);
-			}
-
-			if (smoothx > 0 || smoothy > 0)
-			{
-				IppiSize roiSize = { nx, ny };
-				IppiSize maskSize = { (2 * smoothx) + 1, (2 * smoothy) + 1 };
-				int iBufSize = 0;
-
-				check_sts(status = ippiFilterBoxBorderGetBufferSize(
-					roiSize,
-					maskSize,
-					ipp8u,
-					1,
-					&iBufSize));
-
-				pFilterBoxBorderBuffer = ippsMalloc_8u(iBufSize);
-
-				check_sts(status = ippiFilterBoxBorder_8u_C1R(
-					pThresholds,
-					nx,
-					pThresholds,
-					nx,
-					roiSize,
-					maskSize,
-					ippBorderRepl,
-					NULL,
-					pFilterBoxBorderBuffer));
-			}
-		}
-
-		// Apply the threshold
-		for (int iy = 0, ty = 0, ithresh = 0; iy < ny; iy++, ty += sy)
-		{
-			const int th = iy + 1 == ny ? height - ty : sy;
-
-			for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
-			{
-				const int tw = ix + 1 == nx ? width - tx : sx;
-
-				check_sts(status = _convert8to1(
-					tx,
-					ty,
-					tw,
-					th,
-					src,
-					stridesrc,
-					dst,
-					stridedst,
-					pThresholds[ithresh++]));
-			}
-		}
-	}
-
-	EXIT_MAIN
-		ippsFree(pFilterBoxBorderBuffer);
-	ippsFree(pThresholds);
-	return (int)status;
-}
-#endif
 
 GENIXAPI(int, cart2polar)(
 	const int n,

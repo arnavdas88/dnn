@@ -39,10 +39,7 @@ namespace Genix.Imaging
             }
             else
             {
-                // reallocate destination
-                dst.AllocateBits(width, height, bitsPerPixel);
-                dst.SetResolution(this.HorizontalResolution, this.VerticalResolution);
-                dst.Transform = this.Transform;
+                dst.Reallocate(width, height, bitsPerPixel, this.HorizontalResolution, this.VerticalResolution, this.Transform);
                 return dst;
             }
         }

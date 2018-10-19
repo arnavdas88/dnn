@@ -83,6 +83,8 @@ namespace Genix.Imaging
 
             if (normalizeBackground)
             {
+                Image deconv = this.Deconvolution(null);
+
                 // calculate adaptive threshold
                 if (adaptiveThreshold == 0)
                 {

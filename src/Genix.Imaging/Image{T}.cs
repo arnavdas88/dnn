@@ -228,6 +228,31 @@ namespace Genix.Imaging
             this.VerticalResolution = verticalResolution;
         }
 
+        /// <summary>
+        /// Reallocates this instance of the <see cref="Image{T}"/> class for an image of different dimensions.
+        /// </summary>
+        /// <param name="width">The image width, in pixels.</param>
+        /// <param name="height">The image height, in pixels.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <param name="horizontalResolution">The image horizontal resolution, in pixels per inch.</param>
+        /// <param name="verticalResolution">The image vertical resolution, in pixels per inch.</param>
+        /// <param name="transform">The image transformation.</param>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="width"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="horizontalResolution"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="verticalResolution"/> is less than or equal to zero.</para>
+        /// </exception>
+        internal void Reallocate(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution, Transform transform)
+        {
+            this.AllocateBits(width, height, bitsPerPixel);
+            this.SetResolution(horizontalResolution, verticalResolution);
+            this.Transform = transform;
+        }
+
         internal void ValidatePosition(int x, int y)
         {
             if (x < 0 || x >= this.Width)
@@ -267,6 +292,13 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ValidateArea(Rectangle area) => this.ValidateArea(area.X, area.Y, area.Width, area.Height);
 
+        /// <summary>
+        /// Calculates the stride for the image.
+        /// The stride is a distance in <typeparamref name="T"/> between starts of consecutive lines in the image.
+        /// </summary>
+        /// <param name="width">The image width, in pixels.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <returns>The calculated stride.</returns>
         private protected static int CalculateStride(int width, int bitsPerPixel)
         {
             int sizeInBytes = Marshal.SizeOf(default(T));

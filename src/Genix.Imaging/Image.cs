@@ -36,6 +36,26 @@ namespace Genix.Imaging
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Image"/> class.
+        /// </summary>
+        /// <param name="width">The image width, in pixels.</param>
+        /// <param name="height">The image height, in pixels.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel.</param>
+        /// <param name="horizontalResolution">The image horizontal resolution, in pixels per inch.</param>
+        /// <param name="verticalResolution">The image vertical resolution, in pixels per inch.</param>
+        /// <param name="transform">The image transformation.</param>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="width"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is less than or equal to zero.</para>
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image(int width, int height, int bitsPerPixel, int horizontalResolution, int verticalResolution, Transform transform)
+            : base(width, height, bitsPerPixel, horizontalResolution, verticalResolution, transform)
+        {
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Image(int width, int height, int bitsPerPixel, Image image)
             : base(width, height, bitsPerPixel, image)

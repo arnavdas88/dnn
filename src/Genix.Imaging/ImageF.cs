@@ -6,7 +6,10 @@
 
 namespace Genix.Imaging
 {
+    using System;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using Genix.Core;
 
     /// <summary>
@@ -100,6 +103,105 @@ namespace Genix.Imaging
 
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Converts this <see cref="ImageF"/> to a gray 8-bit <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="bitsPerPixel">The image color depth, in number of bits per pixel. Could be 8, 24, or 32.</param>
+        /// <param name="rounding">The rounding mode.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// The <paramref name="bitsPerPixel"/> is neither 8 not 24 nor 32.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        public Image ConvertTo(Image dst, int bitsPerPixel, MidpointRounding rounding)
+        {
+            // create destination
+            if (dst == null)
+            {
+                dst = new Image(this.Width, this.Height, bitsPerPixel, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+            }
+            else
+            {
+                dst.Reallocate(this.Width, this.Height, bitsPerPixel, this.HorizontalResolution, this.VerticalResolution, this.Transform);
+            }
+
+            // do the conversion
+            unsafe
+            {
+                fixed (ulong* bitsdst = dst.Bits)
+                {
+                    switch (bitsPerPixel)
+                    {
+                        case 8:
+                            if (NativeMethods._convert32fto8(
+                                0,
+                                0,
+                                this.Width,
+                                this.Height,
+                                this.Bits,
+                                this.Stride,
+                                (byte*)bitsdst,
+                                dst.Stride8,
+                                (int)rounding) != 0)
+                            {
+                                throw new OutOfMemoryException();
+                            }
+
+                            break;
+
+                        case 24:
+                            if (NativeMethods._convert32fto24(
+                                0,
+                                0,
+                                this.Width,
+                                this.Height,
+                                this.Bits,
+                                this.Stride,
+                                (byte*)bitsdst,
+                                dst.Stride8,
+                                (int)rounding) != 0)
+                            {
+                                throw new OutOfMemoryException();
+                            }
+
+                            break;
+
+                        case 32:
+                            if (NativeMethods._convert32fto32(
+                                0,
+                                0,
+                                this.Width,
+                                this.Height,
+                                this.Bits,
+                                this.Stride,
+                                (byte*)bitsdst,
+                                dst.Stride8,
+                                (int)rounding) != 0)
+                            {
+                                throw new OutOfMemoryException();
+                            }
+
+                            break;
+
+                        default:
+                            throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+                    }
+                }
+            }
+
+            return dst;
         }
 
         /// <summary>
@@ -200,6 +302,48 @@ namespace Genix.Imaging
                     Vectors.Set(len * stride, borderValue, bits, bottom * stride);
                 }
             }
+        }
+
+        [SuppressUnmanagedCodeSecurity]
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.Imaging.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int _convert32fto8(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] float[] src,
+                int stridesrc,
+                byte* dst,
+                int stridedst,
+                int roundMode);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int _convert32fto24(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] float[] src,
+                int stridesrc,
+                byte* dst,
+                int stridedst,
+                int roundMode);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int _convert32fto32(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] float[] src,
+                int stridesrc,
+                byte* dst,
+                int stridedst,
+                int roundMode);
         }
     }
 }

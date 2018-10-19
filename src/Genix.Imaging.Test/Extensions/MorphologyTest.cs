@@ -75,7 +75,7 @@
                     foreach (StructuringElement se in ses)
                     {
                         // constant border
-                        /*foreach (uint borderValue in new[] { src.BlackColor, src.WhiteColor, (uint)(((ulong)src.BlackColor + (ulong)src.WhiteColor) / 2) })
+                        foreach (uint borderValue in new[] { src.BlackColor, src.WhiteColor, (uint)(((ulong)src.BlackColor + (ulong)src.WhiteColor) / 2) })
                         {
                             src.Randomize();
                             Image dst = src.Dilate(null, se, 1, BorderType.BorderConst, borderValue);
@@ -87,7 +87,7 @@
                                     Assert.AreEqual(ComputePixelBorder(x, y, borderValue), dst.GetPixel(x, y));
                                 }
                             }
-                        }*/
+                        }
 
                         // replica border
                         {

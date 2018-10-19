@@ -55,5 +55,8 @@
     <ClCompile Include="source\resize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\deconvolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

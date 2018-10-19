@@ -133,6 +133,7 @@
     <ClCompile Include="source\arithmetic.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\affine.cpp" />
+    <ClCompile Include="source\deconvolution.cpp" />
     <ClCompile Include="source\filters.cpp" />
     <ClCompile Include="source\gradients.cpp" />
     <ClCompile Include="source\hog.cpp" />
