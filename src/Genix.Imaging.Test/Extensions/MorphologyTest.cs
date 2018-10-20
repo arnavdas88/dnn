@@ -55,7 +55,7 @@
             StructuringElement[] ses = new[]
             {
                 StructuringElement.Brick(3, 1),
-                /*StructuringElement.Brick(1, 3),
+                StructuringElement.Brick(1, 3),
                 StructuringElement.Brick(1, 4),
                 StructuringElement.Brick(1, 4, new Point(0, 1)),
                 StructuringElement.Square(7),
@@ -63,7 +63,7 @@
                 StructuringElement.Brick(8, 6, new Point(6, 5)),
                 StructuringElement.Brick(8, 6, new Point(10, 8)),
                 StructuringElement.Cross(10, 5),
-                StructuringElement.Cross(10, 5, new Point(-3, -2)),*/
+                StructuringElement.Cross(10, 5, new Point(-3, -2)),
             };
 
             foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })

@@ -61,5 +61,8 @@
     <ClCompile Include="source\edgedetection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\colorkey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
