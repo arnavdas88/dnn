@@ -83,20 +83,26 @@ namespace Genix.Imaging
 
             if (normalizeBackground)
             {
-                this.DeconvolutionLR(this, 3, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 2);
+                ////this.DeconvolutionFFT(this, 3, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+                ///
+                ////this.FilterWiener(this, new Drawing.Size(5, 5), new Drawing.Point(2, 2));
+
+                Image edges = this.Canny(null, 50.0f, 150.0f, BorderType.BorderRepl, 0);
+                Image maskedges = this & edges;
+
 
                 // calculate adaptive threshold
                 if (adaptiveThreshold == 0)
                 {
                     // calculate the threshold
                     adaptiveThreshold = this.Otsu(0, 0, width, height);
-                    adaptiveThreshold = (byte)(3 * adaptiveThreshold / 4);
+                    adaptiveThreshold = (byte)Math.Max(3 * adaptiveThreshold / 4, 45);
                 }
 
                 // generate foreground mask
                 // use destination as a temporary buffer
                 this.Convert8To1(dst, adaptiveThreshold);
-                dst.Dilate(dst, StructuringElement.Square(3), 1, BorderType.BorderConst, 0);
+                dst.Dilate3x3(dst, BorderType.BorderConst, 0);
 
                 // create mask that has all foreground pixels set to zero
                 Image maskg = dst.Convert1To8(null);
@@ -118,6 +124,12 @@ namespace Genix.Imaging
                 // apply single otsu threshold to entire normalized image
                 byte otsuThreshold = maskg.Otsu(0, 0, width, height);
                 maskg.Convert8To1(dst, otsuThreshold);
+
+                edges.Convert8To1(edges, 128);
+                edges.Not(edges);
+                ////edges.MorphClose(edges, StructuringElement.Brick(3, 3), 1, BorderType.BorderConst, 0);
+                dst.FloodFill(dst, 8, edges);
+
 #if false
                 //// !!!! TEMP
                 sx *= 2;
@@ -375,7 +387,18 @@ namespace Genix.Imaging
                         {
                             fixed (byte* ptr = map)
                             {
-                                NativeMethods.filterBox(8, nx, ny, ptr, nx, ptr, nx, (2 * smoothx) + 1, (2 * smoothy) + 1, BorderType.BorderRepl, 0);
+                                NativeMethods.filterBox(
+                                    8,
+                                    nx,
+                                    ny,
+                                    ptr,
+                                    nx,
+                                    ptr,
+                                    nx,
+                                    (2 * smoothx) + 1,
+                                    (2 * smoothy) + 1,
+                                    BorderType.BorderRepl,
+                                    0);
                             }
                         }
                     }

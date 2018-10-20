@@ -340,6 +340,79 @@ GENIXAPI(int, filterLaplace)(
 	return (int)status;
 }
 
+GENIXAPI(int, filterWiener)(
+	const int bitsPerPixel,
+	const int x, const int y,
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
+	const int maskWidth, const int maskHeight,
+	const int anchorx, const int anchory,
+	float* noise)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	const IppiSize maskSize = { maskWidth, maskHeight };
+	const IppiPoint anchor = { anchorx, anchory };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterWienerGetBufferSize(
+		roiSize,
+		maskSize,
+		bitsPerPixel / 8,
+		&bufferSize));
+	pBuffer = ippsMalloc_8u(bufferSize);
+
+	/* Do filtering */
+	switch (bitsPerPixel)
+	{
+	case 8:
+		check_sts(status = ippiFilterWiener_8u_C1R(
+			src + (ptrdiff_t(y) * stridesrc) + x,
+			stridesrc,
+			dst + (ptrdiff_t(y) * stridedst) + x,
+			stridedst,
+			roiSize,
+			maskSize,
+			anchor,
+			noise,
+			pBuffer));
+		break;
+
+	case 24:
+		check_sts(status = ippiFilterWiener_8u_C3R(
+			src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 3),
+			stridesrc,
+			dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 3),
+			stridedst,
+			roiSize,
+			maskSize,
+			anchor,
+			noise,
+			pBuffer));
+		break;
+
+	case 32:
+		check_sts(status = ippiFilterWiener_8u_AC4R(
+			src + (ptrdiff_t(y) * stridesrc) + (ptrdiff_t(x) * 4),
+			stridesrc,
+			dst + (ptrdiff_t(y) * stridedst) + (ptrdiff_t(x) * 4),
+			stridedst,
+			roiSize,
+			maskSize,
+			anchor,
+			noise,
+			pBuffer));
+		break;
+	}
+
+	EXIT_MAIN
+	ippsFree(pBuffer);
+	return (int)status;
+}
+
 GENIXAPI(int, filterHipass)(
 	const int bitsPerPixel,
 	const int width, const int height,

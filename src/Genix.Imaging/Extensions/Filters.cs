@@ -10,6 +10,7 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Runtime.InteropServices;
     using System.Security;
+    using Genix.Drawing;
 
     /// <content>
     /// Provides filtering methods for the <see cref="Image"/> class.
@@ -69,28 +70,28 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterRectangular(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        kernelWidth,
-                        kernelHeight,
-                        kernel,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterRectangular(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            kernelWidth,
+                            kernelHeight,
+                            kernel,
+                            borderType,
+                            borderValue);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -152,27 +153,27 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterBox(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        maskWidth,
-                        maskHeight,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterBox(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            maskWidth,
+                            maskHeight,
+                            borderType,
+                            borderValue);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -227,27 +228,27 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterGaussian(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        kernelSize,
-                        sigma,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterGaussian(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            kernelSize,
+                            sigma,
+                            borderType,
+                            borderValue);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -313,26 +314,89 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterLaplace(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        maskSize,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterLaplace(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            maskSize,
+                            borderType,
+                            borderValue);
                     }
                 }
+            });
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
             }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Filters an image using the Wiener algorithm.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="maskSize">The size of the mask, in pixels.</param>
+        /// <param name="anchor">The anchor cell specifying the mask alignment with respect to the position of the input pixel.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image FilterWiener(Image dst, Size maskSize, Point anchor)
+        {
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(
+                    string.Format(CultureInfo.InvariantCulture, Properties.Resources.E_UnsupportedDepth, this.BitsPerPixel));
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.BitsPerPixel);
+
+            Image.ExecuteIPPMethod(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                    {
+                        return NativeMethods.filterWiener(
+                            this.BitsPerPixel,
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            maskSize.Width,
+                            maskSize.Height,
+                            anchor.X,
+                            anchor.Y,
+                            new float[3] { 0.5f, 0.5f, 0.5f });
+                    }
+                }
+            });
 
             if (inplace)
             {
@@ -398,26 +462,26 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterHipass(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        maskSize,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterHipass(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            maskSize,
+                            borderType,
+                            borderValue);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -483,26 +547,26 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            unsafe
+            Image.ExecuteIPPMethod(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods.filterLowpass(
-                        this.BitsPerPixel,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        maskSize,
-                        borderType,
-                        borderValue) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods.filterLowpass(
+                            this.BitsPerPixel,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            maskSize,
+                            borderType,
+                            borderValue);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -595,8 +659,7 @@ namespace Genix.Imaging
                     this.BitsPerPixel / 8,
                     kernelSize,
                     kernel,
-                    (int)Math.Ceiling(Math.Log(srcf.Width + kernelSize - 1, 2)), // 2^FFT order >= (roi.width + kernelSize - 1)
-                    32);
+                    (int)Math.Ceiling(Math.Log(srcf.Width + kernelSize - 1, 2))); // 2^FFT order >= (roi.width + kernelSize - 1)
             });
 
             // convert back to original format
@@ -699,8 +762,7 @@ namespace Genix.Imaging
                     this.BitsPerPixel / 8,
                     kernelSize,
                     kernel,
-                    numberOfIterations,
-                    32);
+                    numberOfIterations);
             });
 
             // convert back to original format
@@ -748,7 +810,7 @@ namespace Genix.Imaging
                 byte* dst,
                 int stridedst,
                 int maskWidth,
-                int maskeight,
+                int maskHeight,
                 BorderType borderType,
                 uint borderValue);
 
@@ -778,6 +840,23 @@ namespace Genix.Imaging
                 int maskSize,
                 BorderType borderType,
                 uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static unsafe extern int filterWiener(
+                int bitsPerPixel,
+                int x,
+                int y,
+                int width,
+                int height,
+                byte* src,
+                int stridesrc,
+                byte* dst,
+                int stridedst,
+                int maskWidth,
+                int maskHeight,
+                int anchorx,
+                int anchory,
+                [In] float[] noise);
 
             [DllImport(NativeMethods.DllName)]
             public static unsafe extern int filterHipass(
@@ -818,8 +897,7 @@ namespace Genix.Imaging
                 int channels,
                 int kernelSize,
                 [In] float[] kernel,
-                int FFTorder,
-                float threshold);
+                int FFTorder);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int deconv_LR(
@@ -834,8 +912,7 @@ namespace Genix.Imaging
                 int channels,
                 int kernelSize,
                 [In] float[] kernel,
-                int numIter,
-                float threshold);
+                int numIter);
         }
     }
 }

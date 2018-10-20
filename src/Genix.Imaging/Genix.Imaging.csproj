@@ -69,6 +69,7 @@
     <Compile Include="Extensions\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\CrossStructuringElement.cs" />
+    <Compile Include="Extensions\EdgeDetectors.cs" />
     <Compile Include="Extensions\Edit.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

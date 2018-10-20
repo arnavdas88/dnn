@@ -15,8 +15,7 @@ GENIXAPI(int, deconv_FFT)(
 	const int channels,
 	const int kernelSize,
 	const float* pKernel,
-	const int FFTorder,
-	const float threshold)
+	const int FFTorder)
 {
 	IppStatus status = ippStsNoErr;
 
@@ -43,7 +42,7 @@ GENIXAPI(int, deconv_FFT)(
 			pKernel,
 			kernelSize,
 			FFTorder,
-			threshold));
+			0.0001f));
 
 		check_sts(status = ippiDeconvFFT_32f_C1R(
 			src,
@@ -61,7 +60,7 @@ GENIXAPI(int, deconv_FFT)(
 			pKernel,
 			kernelSize,
 			FFTorder,
-			threshold));
+			0.0001f));
 
 		check_sts(status = ippiDeconvFFT_32f_C3R(
 			src,
@@ -87,8 +86,7 @@ GENIXAPI(int, deconv_LR)(
 	const int channels,
 	const int kernelSize,
 	const float* pKernel,
-	const int numIter,
-	const float threshold)
+	const int numIter)
 {
 	IppStatus status = ippStsNoErr;
 
@@ -116,7 +114,7 @@ GENIXAPI(int, deconv_LR)(
 			pKernel,
 			kernelSize,
 			maxRoi,
-			threshold));
+			0.0001f));
 
 		check_sts(status = ippiDeconvLR_32f_C1R(
 			src,
@@ -135,7 +133,7 @@ GENIXAPI(int, deconv_LR)(
 			pKernel,
 			kernelSize,
 			maxRoi,
-			threshold));
+			0.0001f));
 
 		check_sts(status = ippiDeconvLR_32f_C3R(
 			src,
