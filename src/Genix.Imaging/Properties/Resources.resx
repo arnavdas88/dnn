@@ -132,6 +132,12 @@
   <data name="E_DepthNotTheSame" xml:space="preserve">
     <value>The images must have the same depth.</value>
   </data>
+  <data name="E_IntegralImage_InvalidHeight" xml:space="preserve">
+    <value>The height of integral image is invalid.</value>
+  </data>
+  <data name="E_IntegralImage_InvalidWidth" xml:space="preserve">
+    <value>The width of integral image is invalid.</value>
+  </data>
   <data name="E_InvalidCanvasOperation" xml:space="preserve">
     <value>Cannot draw on the canvas.</value>
   </data>

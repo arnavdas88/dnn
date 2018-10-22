@@ -9,7 +9,7 @@
 
 // from Genix.Core.Native.dll
 extern "C" __declspec(dllimport) unsigned __int64 WINAPI bits_count_64(int count, const unsigned __int64* bits, int pos);
-extern "C" __declspec(dllimport) unsigned __int32 WINAPI sum_ip_u8(const int n, const unsigned __int8* x, const int offx);
+extern "C" __declspec(dllimport) unsigned __int32 WINAPI sum_ip_u8u32(const int n, const unsigned __int8* x, const int offx);
 
 extern "C" __declspec(dllimport) int WINAPI bits_scan_one_forward_64(int count, const unsigned __int64* bits, int pos);
 extern "C" __declspec(dllimport) int WINAPI bits_scan_zero_forward_64(int count, const unsigned __int64* bits, int pos);
@@ -47,7 +47,7 @@ GENIXAPI(unsigned __int64, power)(
 		const int stridebytes = stride * 8;	// 8 bytes per word
 		for (int iy = 0, off = (y * stridebytes) + x; iy < height; iy++, off += stridebytes)
 		{
-			sum += (unsigned __int64)::sum_ip_u8(width, (const unsigned __int8*)bits, off);
+			sum += (unsigned __int64)::sum_ip_u8u32(width, (const unsigned __int8*)bits, off);
 		}
 
 		return sum;
@@ -158,7 +158,7 @@ GENIXAPI(void, vhist_8bpp)(
 
 	for (int iy = 0; iy < height; iy++, bits_u8 += stridebytes)
 	{
-		hist[iy] = ::sum_ip_u8(width, bits_u8, 0);
+		hist[iy] = ::sum_ip_u8u32(width, bits_u8, 0);
 	}
 }
 

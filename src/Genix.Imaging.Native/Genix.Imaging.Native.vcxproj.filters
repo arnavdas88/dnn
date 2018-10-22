@@ -64,5 +64,8 @@
     <ClCompile Include="source\colorkey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\integral.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

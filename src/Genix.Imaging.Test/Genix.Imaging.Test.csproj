@@ -79,6 +79,7 @@
     <Compile Include="Extensions\ScaleTest.cs" />
     <Compile Include="Extensions\ConnectedComponentsTest.cs" />
     <Compile Include="EncoderTest.cs" />
+    <Compile Include="IntegralImageTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.Imaging.Test.snk" />

@@ -106,6 +106,24 @@ namespace Genix.Imaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The height of integral image is invalid..
+        /// </summary>
+        internal static string E_IntegralImage_InvalidHeight {
+            get {
+                return ResourceManager.GetString("E_IntegralImage_InvalidHeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The width of integral image is invalid..
+        /// </summary>
+        internal static string E_IntegralImage_InvalidWidth {
+            get {
+                return ResourceManager.GetString("E_IntegralImage_InvalidWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot draw on the canvas..
         /// </summary>
         internal static string E_InvalidCanvasOperation {

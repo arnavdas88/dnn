@@ -94,6 +94,7 @@
     <Compile Include="Extensions\Thresholding.cs" />
     <Compile Include="ImageF.cs" />
     <Compile Include="Extensions\ConnectedComponent.cs" />
+    <Compile Include="IntegralImage.cs" />
     <Compile Include="Lab\CanvasDataProvider.cs" />
     <Compile Include="Lab\ImageDistortion.cs" />
     <Compile Include="Lab\TestImage.cs" />
