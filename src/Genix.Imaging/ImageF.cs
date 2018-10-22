@@ -130,7 +130,7 @@ namespace Genix.Imaging
                 dst.Reallocate(this.Width, this.Height, 8, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -178,7 +178,7 @@ namespace Genix.Imaging
                 dst.Reallocate(this.Width, this.Height, 24, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -227,7 +227,7 @@ namespace Genix.Imaging
                 dst.Reallocate(this.Width, this.Height, 32, this.HorizontalResolution, this.VerticalResolution, this.Transform);
             }
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {

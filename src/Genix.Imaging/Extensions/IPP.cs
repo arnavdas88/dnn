@@ -11,13 +11,17 @@ namespace Genix.Imaging
     /// <content>
     /// Provides support methods for calling Intel IPP library functions.
     /// </content>
-    public abstract partial class Image<T>
-        where T : struct
+    internal class IPP
     {
-        private protected static void ExecuteIPPMethod(Func<int> action)
+        public static void Execute(Func<int> action)
         {
             int retCode = action();
-            switch (retCode)
+            IPP.ProcessErrorCode(retCode);
+        }
+
+        private static void ProcessErrorCode(int code)
+        {
+            switch (code)
             {
                 case 0:
                     break;

@@ -45,7 +45,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {

@@ -70,7 +70,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -153,7 +153,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -228,7 +228,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -314,7 +314,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -373,7 +373,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -462,7 +462,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -547,7 +547,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -645,7 +645,7 @@ namespace Genix.Imaging
 
             // perform deconvolution
             ImageF dstf = new ImageF(srcf);
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 return NativeMethods.deconv_FFT(
                     0,
@@ -748,7 +748,7 @@ namespace Genix.Imaging
 
             // perform deconvolution
             ImageF dstf = new ImageF(srcf);
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 return NativeMethods.deconv_LR(
                     0,

@@ -1110,7 +1110,7 @@ namespace Genix.Imaging
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -1162,7 +1162,7 @@ namespace Genix.Imaging
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {
@@ -1215,7 +1215,7 @@ namespace Genix.Imaging
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 unsafe
                 {

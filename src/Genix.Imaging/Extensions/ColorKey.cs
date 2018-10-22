@@ -60,7 +60,7 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, this.BitsPerPixel);
 
-            Image.ExecuteIPPMethod(() =>
+            IPP.Execute(() =>
             {
                 return NativeMethods.colorkey(
                     this.BitsPerPixel,

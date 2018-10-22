@@ -7,11 +7,6 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Globalization;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Security;
-    using Genix.Core;
     ////using Leptonica;
 
     /// <content>
@@ -84,12 +79,10 @@ namespace Genix.Imaging
             if (normalizeBackground)
             {
                 ////this.DeconvolutionFFT(this, 3, new float[9] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-                ///
                 ////this.FilterWiener(this, new Drawing.Size(5, 5), new Drawing.Point(2, 2));
 
                 Image edges = this.Canny(null, 50.0f, 150.0f, BorderType.BorderRepl, 0);
                 Image maskedges = this & edges;
-
 
                 // calculate adaptive threshold
                 if (adaptiveThreshold == 0)
@@ -427,35 +420,6 @@ namespace Genix.Imaging
             {
                 throw new InvalidOperationException("Cannot binarize the this.", e);
             }*/
-        }
-
-        private byte Otsu(int x, int y, int width, int height)
-        {
-            byte threshold;
-            unsafe
-            {
-                // calculate the threshold
-                fixed (ulong* bits = this.Bits)
-                {
-                    NativeMethods.otsu_threshold(x, y, width, height, (byte*)bits, this.Stride8, out threshold);
-                }
-            }
-
-            return threshold;
-        }
-
-        [SuppressUnmanagedCodeSecurity]
-        private static partial class NativeMethods
-        {
-            [DllImport(NativeMethods.DllName)]
-            public static unsafe extern int otsu_threshold(
-                int x,
-                int y,
-                int width,
-                int height,
-                byte* src,
-                int stridesrc,
-                out byte threshold);
         }
     }
 }

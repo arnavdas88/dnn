@@ -724,21 +724,6 @@ GENIXAPI(int, _convert32fto32)(
 	}
 }
 
-GENIXAPI(int, otsu_threshold)(
-	const int x, const int y,
-	const int width, const int height,
-	const unsigned __int8* src, const int stridesrc,
-	unsigned __int8* threshold)
-{
-	*threshold = 0;
-
-	return ippiComputeThreshold_Otsu_8u_C1R(
-		src + (ptrdiff_t(y) * stridesrc) + x,
-		stridesrc,
-		{ width, height },
-		threshold);
-}
-
 GENIXAPI(int, cart2polar)(
 	const int n,
 	const float* re,
