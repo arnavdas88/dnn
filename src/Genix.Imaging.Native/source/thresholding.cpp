@@ -19,7 +19,7 @@ GENIXAPI(int, threshold_lt_8bpp)(
 {
 	if (src == dst)
 	{
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
@@ -50,8 +50,8 @@ GENIXAPI(int, threshold_lt_8bpp)(
 	}
 	else
 	{
-		src += (ptrdiff_t(y) * stridesrc) + x;
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		src += (ptrdiff_t(y) * stridesrc) + (x * bitsPerPixel / 8);
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
@@ -102,7 +102,7 @@ GENIXAPI(int, threshold_gt_8bpp)(
 {
 	if (src == dst)
 	{
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
@@ -133,8 +133,8 @@ GENIXAPI(int, threshold_gt_8bpp)(
 	}
 	else
 	{
-		src += (ptrdiff_t(y) * stridesrc) + x;
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		src += (ptrdiff_t(y) * stridesrc) + (x * bitsPerPixel / 8);
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
@@ -149,7 +149,7 @@ GENIXAPI(int, threshold_gt_8bpp)(
 				value);
 
 		case 24:
-			return ippiThreshold_GTVal_8u_C4R(
+			return ippiThreshold_GTVal_8u_C3R(
 				src,
 				stridesrc,
 				dst,
@@ -186,7 +186,7 @@ GENIXAPI(int, threshold_ltgt_8bpp)(
 {
 	if (src == dst)
 	{
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
@@ -223,8 +223,8 @@ GENIXAPI(int, threshold_ltgt_8bpp)(
 	}
 	else
 	{
-		src += (ptrdiff_t(y) * stridesrc) + x;
-		dst += (ptrdiff_t(y) * stridedst) + x;
+		src += (ptrdiff_t(y) * stridesrc) + (x * bitsPerPixel / 8);
+		dst += (ptrdiff_t(y) * stridedst) + (x * bitsPerPixel / 8);
 
 		switch (bitsPerPixel)
 		{
