@@ -16,13 +16,13 @@ namespace Genix.DocumentAnalysis
     /// Represents a horizontal text line.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class TextLineShape : Container<WordShape>
+    public class TextLineShape : Container<TextShape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLineShape"/> class.
         /// </summary>
-        /// <param name="words">The collection of <see cref="WordShape"/> objects to include in this container.</param>
-        public TextLineShape(IList<WordShape> words)
+        /// <param name="words">The collection of <see cref="TextShape"/> objects to include in this container.</param>
+        public TextLineShape(IList<TextShape> words)
             : base(words)
         {
         }
@@ -30,9 +30,9 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLineShape"/> class.
         /// </summary>
-        /// <param name="words">The collection of <see cref="WordShape"/> objects to include in this container.</param>
+        /// <param name="words">The collection of <see cref="TextShape"/> objects to include in this container.</param>
         /// <param name="bounds">The shape boundaries.</param>
-        public TextLineShape(IList<WordShape> words, Rectangle bounds)
+        public TextLineShape(IList<TextShape> words, Rectangle bounds)
             : base(words, bounds)
         {
         }

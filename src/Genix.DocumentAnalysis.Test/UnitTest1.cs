@@ -7,6 +7,7 @@
     using System.Diagnostics;
     using Genix.Imaging.Leptonica;
     using Genix.Core;
+    using System.Threading;
 
     [TestClass]
     public class UnitTest1
@@ -17,11 +18,13 @@
             Stopwatch stopwatch = new Stopwatch();
 
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
-            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test4.jpg"))
+            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test4.jpg"))
             {
-                Image xxx = image.ConvertTo(null, 8);
+                Image xxx = image.ConvertTo(null, 1);
                 Image yyy = xxx.CreateTemplate(null, xxx.BitsPerPixel);
+
+                ////LineDetector.FindLines(xxx, new LineDetectionOptions());
 
                 /*Pix pix = Pix.FromImage(xxx);*/
 
@@ -37,7 +40,8 @@
 
                     for (int i = 0; i < 100; i++)
                     {
-                        xxx.Binarize(yyy, 0, 0, 0, 0, true, 0, 0);
+                        new ImageSegmentation().Segment(xxx, null, CancellationToken.None);
+                        ////xxx.Binarize(yyy, 0, 0, 0, 0, true, 0, 0);
                         ////Statistic.Smooth(a.Length, a, 0);
                         ////pix.DilateGray(1, kw);
                         ////xxx.Convert8To1(yyy, 128);

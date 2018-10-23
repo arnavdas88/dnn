@@ -16,26 +16,38 @@ namespace Genix.DocumentAnalysis
     /// Represents a page.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class PageShape : Container<TextBlockShape>
+    public class PageShape : Container<Shape>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PageShape"/> class.
         /// </summary>
-        /// <param name="textBlocks">The collection of <see cref="TextBlockShape"/> objects to include in this container.</param>
-        public PageShape(IList<TextBlockShape> textBlocks)
-            : base(textBlocks)
+        /// <param name="bounds">The shape boundaries.</param>
+        /// <param name="horizontalResolution">The page horizontal resolution, in pixels per inch.</param>
+        /// <param name="verticalResolution">The page vertical resolution, in pixels per inch.</param>
+        public PageShape(Rectangle bounds, int horizontalResolution, int verticalResolution)
+            : base(bounds)
         {
+            this.HorizontalResolution = horizontalResolution;
+            this.VerticalResolution = verticalResolution;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PageShape"/> class.
+        /// Gets the horizontal resolution, in pixels per inch, of this <see cref="PageShape"/>.
         /// </summary>
-        /// <param name="textBlocks">The collection of <see cref="TextBlockShape"/> objects to include in this container.</param>
-        /// <param name="bounds">The shape boundaries.</param>
-        public PageShape(IList<TextBlockShape> textBlocks, Rectangle bounds)
-            : base(textBlocks, bounds)
-        {
-        }
+        /// <value>
+        /// The horizontal resolution, in pixels per inch, of this <see cref="PageShape"/>.
+        /// </value>
+        [JsonProperty("hres")]
+        public int HorizontalResolution { get; private set; }
+
+        /// <summary>
+        /// Gets the vertical resolution, in pixels per inch, of this <see cref="PageShape"/>.
+        /// </summary>
+        /// <value>
+        /// The vertical resolution, in pixels per inch, of this <see cref="PageShape"/>.
+        /// </value>
+        [JsonProperty("vres")]
+        public int VerticalResolution { get; private set; }
 
         /// <inheritdoc />
         public override string Text =>

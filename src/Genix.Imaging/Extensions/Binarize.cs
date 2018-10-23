@@ -114,6 +114,7 @@ namespace Genix.Imaging
                 maskg.Sub(maskg, maskg.MorphBlackHat(null, StructuringElement.Square(7), 1, BorderType.BorderRepl, 0), 0);
                 //// !!!! TEMP
 #endif
+
                 // apply single otsu threshold to entire normalized image
                 byte otsuThreshold = maskg.Otsu(0, 0, width, height);
                 maskg.Convert8To1(dst, otsuThreshold);

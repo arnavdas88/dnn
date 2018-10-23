@@ -10,6 +10,7 @@ namespace Genix.DocumentAnalysis
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using Genix.Core;
     using Genix.Drawing;
     using Genix.Imaging;
@@ -58,15 +59,16 @@ namespace Genix.DocumentAnalysis
 
         /// <summary>
         /// Finds the horizontal and vertical lines on the <see cref="Image"/>.
-        /// The type of lines to find is determined by the <c>options</c> parameter.
+        /// The type of lines to find is determined by the <paramref name="options"/> parameter.
         /// </summary>
         /// <param name="image">The source <see cref="Image"/>.</param>
         /// <param name="options">The parameters of this method.</param>
+        /// <param name="cancellationToken">The cancellationToken token used to notify the <see cref="LineDetector"/> that operation should be canceled.</param>
         /// <returns>
         /// The detected lines.
         /// </returns>
         /// <exception cref="ArgumentNullException">
-        /// <c>image</c> is <b>null</b>.
+        /// <paramref name="image"/> is <b>null</b>.
         /// </exception>
         /// <exception cref="NotImplementedException">
         /// <see cref="Image{T}.BitsPerPixel"/> is not one.
@@ -74,7 +76,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<LineShape> FindLines(Image image, LineDetectionOptions options)
+        public static ISet<LineShape> FindLines(Image image, LineDetectionOptions options, CancellationToken cancellationToken)
         {
             if (image == null)
             {
@@ -133,6 +135,8 @@ namespace Genix.DocumentAnalysis
                 hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
                 vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // check for line presence
                 if (hlines.IsAllWhite())
                 {
@@ -171,6 +175,8 @@ namespace Genix.DocumentAnalysis
                     }
 
                     vlinesResult = FilterLines(vlines, nonVLines, true);
+
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
 
                 // horizontal lines
@@ -192,6 +198,8 @@ namespace Genix.DocumentAnalysis
                     }
 
                     hlinesResult = FilterLines(hlines, nonHLines, false);
+
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
             }
 
@@ -289,6 +297,8 @@ namespace Genix.DocumentAnalysis
                     }
                 }
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 return answer;
 
                 ulong CountAdjacentPixels(int lineWidth, Rectangle bounds)
@@ -319,12 +329,14 @@ namespace Genix.DocumentAnalysis
 
                 // dilate the lines so they touch the residue
                 // then flood fill then to get all the residue (image less non-lines)
-                Image fatLines = lines.Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor);
+                Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
 
                 fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
 
                 // remove the residue
                 image.Xand(image, fatLines);
+
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             void RemoveIntersections()
@@ -340,6 +352,8 @@ namespace Genix.DocumentAnalysis
 
                     // remove the residue
                     image.Xand(image, residue);
+
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
             }
 

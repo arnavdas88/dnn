@@ -570,15 +570,31 @@ namespace Genix.Core
             }
         }
 
-        public IEnumerable<T> GetNearestNeighbors(Rectangle bounds, int numberOfNeighbors)
+        /// <summary>
+        /// Returns a specified number of nodes closest to the given area.
+        /// </summary>
+        /// <param name="bounds">The area to test.</param>
+        /// <param name="numberOfNodes">The number of nodes to return.</param>
+        /// <returns>
+        /// The sequence of <typeparamref name="T"/> object of maximum length of <paramref name="numberOfNodes"/> ordered by their proximity to <paramref name="bounds"/>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="numberOfNodes"/> is zero or less.
+        /// </exception>
+        public IEnumerable<T> GetNearestNeighbors(Rectangle bounds, int numberOfNodes)
         {
+            if (numberOfNodes < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(numberOfNodes), numberOfNodes, "The number of nodes must be greater than zero.");
+            }
+
             if (bounds.IsEmpty)
             {
                 yield break;
             }
 
             // Priority is distance to rect.
-            PriorityQueue<int, T> neighbors = new PriorityQueue<int, T>(this.Count, numberOfNeighbors);
+            PriorityQueue<int, T> neighbors = new PriorityQueue<int, T>(this.Count, numberOfNodes);
 
             // look into own nodes first
             if (this.ownNodes != null)
@@ -590,7 +606,7 @@ namespace Genix.Core
             }
 
             // pop top n elements from the queue
-            for (int i = 0; i < numberOfNeighbors && neighbors.Count > 0; i++)
+            for (int i = 0; i < numberOfNodes && neighbors.Count > 0; i++)
             {
                 yield return neighbors.Dequeue().value;
             }

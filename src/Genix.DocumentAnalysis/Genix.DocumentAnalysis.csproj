@@ -60,6 +60,11 @@
     <Compile Include="FeatureDetectors\IFeatureDetector.cs" />
     <Compile Include="ImagePreprocessing\ImagePreprocessing.cs" />
     <Compile Include="ImagePreprocessing\ImagePreprocessingOptions.cs" />
+    <Compile Include="ImageSegmentation\ImageSegmentation.cs" />
+    <Compile Include="ImageSegmentation\Locators\LineLocator.cs" />
+    <Compile Include="ImageSegmentation\Locators\LocatorBase.cs" />
+    <Compile Include="ImageSegmentation\Locators\LocatorTypes.cs" />
+    <Compile Include="ImageSegmentation\Locators\TextLocator.cs" />
     <Compile Include="ImageSource.cs" />
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
     <Compile Include="LineDetector\LineDetector.cs" />
@@ -86,15 +91,18 @@
     </Compile>
     <Compile Include="Shapes\Container.cs" />
     <Compile Include="Shapes\IContainer.cs" />
+    <Compile Include="Shapes\IContainer{T}.cs" />
     <Compile Include="Shapes\LineShape.cs" />
     <Compile Include="Shapes\LineTypes.cs" />
     <Compile Include="Shapes\PageShape.cs" />
     <Compile Include="Shapes\ParagraphShape.cs" />
     <Compile Include="Shapes\PictureShape.cs" />
     <Compile Include="Shapes\Shape.cs" />
-    <Compile Include="Shapes\WordShape.cs" />
+    <Compile Include="Shapes\TextShape.cs" />
     <Compile Include="Shapes\TextBlockShape.cs" />
     <Compile Include="Shapes\TextLineShape.cs" />
+    <Compile Include="TextDetector\TextDetectionOptions.cs" />
+    <Compile Include="TextDetector\TextDetector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DocumentAnalysis.snk" />

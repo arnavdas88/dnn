@@ -103,7 +103,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
 
                 NativeMethods.TessBaseAPIRecognize(this.handle, IntPtr.Zero);
 
-                return this.ExtractResults(image.Bounds);
+                return this.ExtractResults(image.Bounds, image.HorizontalResolution, image.VerticalResolution);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
             }
         }
 
-        private PageShape ExtractResults(Rectangle pageBounds)
+        private PageShape ExtractResults(Rectangle pageBounds, int horizontalResolution, int verticalResolution)
         {
             List<TextBlockShape> textBlocks = new List<TextBlockShape>();
 
@@ -214,10 +214,10 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                         return null;
                     }
 
-                    List<WordShape> shapes = new List<WordShape>();
+                    List<TextShape> shapes = new List<TextShape>();
                     do
                     {
-                        WordShape shape = ExtractWord();
+                        TextShape shape = ExtractWord();
                         if (shape != null)
                         {
                             shapes.Add(shape);
@@ -229,7 +229,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                     return shapes.Count > 0 ? new TextLineShape(shapes, bounds) : null;
                 }
 
-                WordShape ExtractWord()
+                TextShape ExtractWord()
                 {
                     Rectangle bounds = iterator.GetBoundingBox(PageIteratorLevel.Word);
                     if (bounds.IsEmpty)
@@ -268,11 +268,13 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
 
                     float confidence = iterator.GetConfidence(PageIteratorLevel.Word) / 100.0f;
 
-                    return new WordShape(bounds, text, confidence);
+                    return new TextShape(bounds, text, confidence);
                 }
             }
 
-            return new PageShape(textBlocks, pageBounds);
+            PageShape page = new PageShape(pageBounds, horizontalResolution, verticalResolution);
+            page.AddShapes(textBlocks);
+            return page;
         }
     }
 }

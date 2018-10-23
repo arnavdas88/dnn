@@ -35,8 +35,16 @@ namespace Genix.Core
         /// </summary>
         /// <param name="initialCapacity">The initial queue capacity.</param>
         /// <param name="maximumSize">The maximum recommended number of elements in the queue. The actual number of elements might be larger.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="maximumSize"/> is zero or less.
+        /// </exception>
         public PriorityQueue(int initialCapacity, int maximumSize)
         {
+            if (maximumSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maximumSize), maximumSize, "The maximum size of priority queue must be greater than zero.");
+            }
+
             this.heap = new BinaryHeap<TKey, TValue>(initialCapacity, maximumSize);
         }
 

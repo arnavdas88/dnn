@@ -55,7 +55,7 @@ namespace Genix.DocumentAnalysis.Classification
             {
                 return source
                     .Page
-                    .EnumAllShapes<WordShape>()
+                    .EnumAllShapes<TextShape>()
                     .Select(x => PrepareString(x.Text))
                     .Where(x => !string.IsNullOrEmpty(x) && !this.ignoreWords.Contains(x))
                     .ToList();

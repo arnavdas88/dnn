@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="WordShape.cs" company="Noname, Inc.">
+// <copyright file="TextShape.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -14,7 +14,7 @@ namespace Genix.DocumentAnalysis
     /// Represents a shape that contains text.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class WordShape : Shape
+    public class TextShape : Shape
     {
         [JsonProperty("text")]
         private readonly string text;
@@ -23,12 +23,12 @@ namespace Genix.DocumentAnalysis
         private readonly float confidence;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WordShape"/> class.
+        /// Initializes a new instance of the <see cref="TextShape"/> class.
         /// </summary>
         /// <param name="bounds">The shape position.</param>
         /// <param name="text">The word text.</param>
         /// <param name="confidence">The word confidence.</param>
-        public WordShape(Rectangle bounds, string text, float confidence)
+        public TextShape(Rectangle bounds, string text, float confidence)
             : base(bounds)
         {
             this.text = text;

@@ -4,11 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.Drawing
+namespace Genix.Core
 {
     using System;
     using System.Collections.Generic;
-    using Genix.Core;
+    using System.Linq;
+    using Genix.Drawing;
 
     /// <summary>
     /// Represents a grid that holds a collection of <see cref="IBoundedObject"/> objects and provides a fast access to those objects.
@@ -23,29 +24,23 @@ namespace Genix.Drawing
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundedObjectGrid{T}"/> class.
         /// </summary>
-        /// <param name="cellSize">The size of each cell, in pixels.</param>
         /// <param name="bounds">The grid bounding box.</param>
+        /// <param name="cellWidth">The width of each cell, in pixels.</param>
+        /// <param name="cellHeight">The height of each cell, in pixels.</param>
         /// <param name="comparer">The comparer used to sort object withing their cells.</param>
-        public BoundedObjectGrid(int cellSize, Rectangle bounds, IComparer<Rectangle> comparer)
+        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
         {
-            this.CellSize = cellSize;
             this.Bounds = bounds;
+            this.CellWidth = cellWidth;
+            this.CellHeight = cellHeight;
 
-            this.Width = (bounds.Width + cellSize - 1) / cellSize;
-            this.Height = (bounds.Height + cellSize - 1) / cellSize;
+            this.Width = (bounds.Width + cellWidth - 1) / cellWidth;
+            this.Height = (bounds.Height + cellHeight - 1) / cellHeight;
             this.NumberOfCells = this.Width * this.Height;
 
             this.cells = JaggedArray.Create<SortedList<Rectangle, T>>(this.Height, this.Width);
             this.comparer = comparer;
         }
-
-        /// <summary>
-        /// Gets the size of each cell, in pixels.
-        /// </summary>
-        /// <value>
-        /// The size of each cell, in pixels.
-        /// </value>
-        public int CellSize { get; }
 
         /// <summary>
         /// Gets the grid bounding box.
@@ -54,6 +49,22 @@ namespace Genix.Drawing
         /// The grid bounding box.
         /// </value>
         public Rectangle Bounds { get; }
+
+        /// <summary>
+        /// Gets the width of each cell, in pixels.
+        /// </summary>
+        /// <value>
+        /// The width of each cell, in pixels.
+        /// </value>
+        public int CellWidth { get; }
+
+        /// <summary>
+        /// Gets the height of each cell, in pixels.
+        /// </summary>
+        /// <value>
+        /// The height of each cell, in pixels.
+        /// </value>
+        public int CellHeight { get; }
 
         /// <summary>
         /// Gets the width of the grid, in cells.
@@ -88,8 +99,8 @@ namespace Genix.Drawing
         /// <param name="ygrid">The y-coordinate of the found cell.</param>
         public void FindCell(int x, int y, out int xgrid, out int ygrid)
         {
-            xgrid = ((x - this.Bounds.X) / this.CellSize).Clip(0, this.Width - 1);
-            ygrid = ((y - this.Bounds.Y) / this.CellSize).Clip(0, this.Height - 1);
+            xgrid = ((x - this.Bounds.X) / this.CellWidth).Clip(0, this.Width - 1);
+            ygrid = ((y - this.Bounds.Y) / this.CellHeight).Clip(0, this.Height - 1);
         }
 
         /// <summary>
@@ -131,6 +142,28 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Adds the collection of bounded object to the grid.
+        /// </summary>
+        /// <param name="obj">The objects to add.</param>
+        /// <param name="spreadHorizontally">If <b>true</b> all the cells covered horizontally by the object are used; otherwise, the object is added to the top-left cell.</param>
+        /// <param name="spreadVertically">If <b>true</b> all the cells covered vertically by the object are used; otherwise, the object is added to the top-left cell.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="obj"/> is <b>null</b>.
+        /// </exception>
+        public void Add(IEnumerable<T> obj, bool spreadHorizontally, bool spreadVertically)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            foreach (T o in obj)
+            {
+                this.Add(o, spreadHorizontally, spreadVertically);
+            }
+        }
+
+        /// <summary>
         /// Returns all object in this <see cref="BoundedObjectGrid{T}"/>.
         /// </summary>
         /// <returns>
@@ -138,10 +171,35 @@ namespace Genix.Drawing
         /// </returns>
         public IEnumerable<T> GetObjects()
         {
-            for (int y = 0, h = this.Height, w = this.Width; y < h; y++)
+            return this.GetObjects(0, 0, this.Width - 1, this.Height - 1);
+        }
+
+        /// <summary>
+        /// Returns all object in this <see cref="BoundedObjectGrid{T}"/> that intersect the specified bounds.
+        /// </summary>
+        /// <param name="bounds">The bounds to test.</param>
+        /// <returns>
+        /// The sequence of objects found inside the specified bounds.
+        /// </returns>
+        public IEnumerable<T> GetObjects(Rectangle bounds)
+        {
+            if (bounds.Width == 0 || bounds.Height == 0)
+            {
+                return Enumerable.Empty<T>();
+            }
+
+            this.FindCell(bounds.X, bounds.Y, out int startx, out int starty);
+            this.FindCell(bounds.Right - 1, bounds.Bottom - 1, out int endx, out int endy);
+
+            return this.GetObjects(startx, starty, endx, endy);
+        }
+
+        private IEnumerable<T> GetObjects(int startx, int starty, int endx, int endy)
+        {
+            for (int y = starty; y <= endy; y++)
             {
                 SortedList<Rectangle, T>[] lists = this.cells[y];
-                for (int x = 0; x < w; x++)
+                for (int x = startx; x <= endx; x++)
                 {
                     SortedList<Rectangle, T> list = lists[x];
                     if (list != null)
@@ -150,8 +208,8 @@ namespace Genix.Drawing
                         {
                             // validate that we are in object's starting cell
                             // otherwise the object that spread across multiple cells has already been returned from other cell
-                            this.FindCell(kvp.Key.X, kvp.Key.Y, out int startx, out int starty);
-                            if (x == startx && y == starty)
+                            this.FindCell(kvp.Key.X, kvp.Key.Y, out int firstx, out int firsty);
+                            if (x == MinMax.Max(firstx, startx) && y == MinMax.Max(firsty, starty))
                             {
                                 yield return kvp.Value;
                             }
