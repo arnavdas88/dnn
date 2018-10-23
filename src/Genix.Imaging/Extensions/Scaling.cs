@@ -8,6 +8,7 @@ namespace Genix.Imaging
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -394,6 +395,127 @@ namespace Genix.Imaging
             }
 
             dst.AppendTransform(new MatrixTransform(1.0, 0.25));
+            return dst;
+        }
+
+        public Image ScaleByDownsampling2(Image dst)
+        {
+            int width = this.Width;
+            int height = this.Height;
+            int bitsPerPixel = this.BitsPerPixel;
+            int dstwidth = width / 2;
+            int dstheight = height / 2;
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, dstwidth, dstheight, bitsPerPixel);
+
+            switch (bitsPerPixel)
+            {
+                case 8:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            byte* ptrsrc = (byte*)bitssrc;
+                            byte* ptrdst = (byte*)bitsdst;
+                            int stride8src = this.Stride8;
+                            int stride8dst = dst.Stride8;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stride8src, ptrdst += stride8dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 2)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 16:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ushort* ptrsrc = (ushort*)bitssrc;
+                            ushort* ptrdst = (ushort*)bitsdst;
+                            int stride16src = this.Stride * 4;
+                            int stride16dst = dst.Stride * 4;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stride16src, ptrdst += stride16dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 2)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 24:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            byte* ptrsrc = (byte*)bitssrc;
+                            byte* ptrdst = (byte*)bitsdst;
+                            int stride8src = this.Stride8;
+                            int stride8dst = dst.Stride8;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stride8src, ptrdst += stride8dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < 3 * dstwidth; xdst += 3, xsrc += 2 * 3)
+                                {
+                                    ptrdst[xdst + 0] = ptrsrc[xsrc + 0];
+                                    ptrdst[xdst + 1] = ptrsrc[xsrc + 1];
+                                    ptrdst[xdst + 2] = ptrsrc[xsrc + 2];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 32:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            uint* ptrsrc = (uint*)bitssrc;
+                            uint* ptrdst = (uint*)bitsdst;
+                            int stride32src = this.Stride * 2;
+                            int stride32dst = dst.Stride * 2;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stride32src, ptrdst += stride32dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 2)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        bitsPerPixel));
+            }
+
+            dst.AppendTransform(new MatrixTransform(0.5, 0.5));
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
             return dst;
         }
 

@@ -84,7 +84,7 @@ namespace Genix.DocumentAnalysis.Classification
             Image image = ImagePreprocessing.Process(source.Image, this.ImagePreprocessingOptions, 8);
 
             image = image
-                .Scale(null, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
+                ////.Scale(null, 100.0 / image.HorizontalResolution, 100.0 / image.VerticalResolution, ScalingOptions.None)
                 ////.Binarize()
                 .Convert8To1(null, 128)
                 .CleanOverscan(0.5f, 0.5f)
@@ -96,9 +96,11 @@ namespace Genix.DocumentAnalysis.Classification
 
             image = image
                 .CropBlackArea(0, 0)
-                .Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
+                ////.Dilate(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)
                 ////.CropBlackArea(0, 0)
                 .Convert1To8(null)
+                .Erode(null, StructuringElement.Square(2), 1, BorderType.BorderRepl, 0)
+                .ScaleByDownsampling2(null)
                 .FilterLowpass(null, 3, BorderType.BorderRepl, 0);
 
             FeatureDetectors.Features features = this.detector.Detect(image, cancellationToken);

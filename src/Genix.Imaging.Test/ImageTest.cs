@@ -117,18 +117,23 @@
             const int Count = 5;
             Stopwatch stopwatch = new Stopwatch();
 
-            Image image = new Image(2000, 3000, 8, 200, 200);
-            image.Randomize();
+            ////Image image = new Image(2000, 3000, 8, 200, 200);
+            ////image.Randomize();
 
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test.jpg"))
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\363978.tif"))
+            foreach ((Image image, _, _) in Imaging.Image.FromFile(@"L:\FormXtra\Receipts\Concur\Full\jpg\Work\08240EB488FE324E83C7C54042D9813C.jpg"))
             {
                 stopwatch.Restart();
 
+                Image xxx = image.ConvertTo(null, 8);
+
                 for (int i = 0; i < Count; i++)
                 {
+                    xxx.Erode(xxx, StructuringElement.Square(2), 1, BorderType.BorderRepl, 0);
+                    xxx.ScaleByDownsampling2(xxx);
                     ////image.Binarize(null, 0, 0, 0, 0, true, 0, 0);
-                    IntegralImage.FromImage(image);
+                    ////IntegralImage.FromImage(image);
 
                     ////long power = image.Power();
                     ////Histogram hyst = image.GrayHistogram();
