@@ -398,6 +398,18 @@ namespace Genix.Imaging
             return dst;
         }
 
+        /// <summary>
+        /// Reduces the size and resolution of this <see cref="Image"/> by a factor of 2 by downsampling.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
         public Image ScaleByDownsampling2(Image dst)
         {
             int width = this.Width;
@@ -411,6 +423,131 @@ namespace Genix.Imaging
 
             switch (bitsPerPixel)
             {
+                case 1:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            uint* ptrdst = (uint*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride32dst = dst.Stride * 2;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stridesrc, ptrdst += stride32dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 32, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (uint)(
+                                        (bits & 0x0000_0001) |
+                                        ((bits >> 1) & 0x0000_0002) |
+                                        ((bits >> 2) & 0x0000_0004) |
+                                        ((bits >> 3) & 0x0000_0008) |
+                                        ((bits >> 4) & 0x0000_0010) |
+                                        ((bits >> 5) & 0x0000_0020) |
+                                        ((bits >> 6) & 0x0000_0040) |
+                                        ((bits >> 7) & 0x0000_0080) |
+                                        ((bits >> 8) & 0x0000_0100) |
+                                        ((bits >> 9) & 0x0000_0200) |
+                                        ((bits >> 10) & 0x0000_0400) |
+                                        ((bits >> 11) & 0x0000_0800) |
+                                        ((bits >> 12) & 0x0000_1000) |
+                                        ((bits >> 13) & 0x0000_2000) |
+                                        ((bits >> 14) & 0x0000_4000) |
+                                        ((bits >> 15) & 0x0000_8000) |
+                                        ((bits >> 16) & 0x0001_0000) |
+                                        ((bits >> 17) & 0x0002_0000) |
+                                        ((bits >> 18) & 0x0004_0000) |
+                                        ((bits >> 19) & 0x0008_0000) |
+                                        ((bits >> 20) & 0x0010_0000) |
+                                        ((bits >> 21) & 0x0020_0000) |
+                                        ((bits >> 22) & 0x0040_0000) |
+                                        ((bits >> 23) & 0x0080_0000) |
+                                        ((bits >> 24) & 0x0100_0000) |
+                                        ((bits >> 25) & 0x0200_0000) |
+                                        ((bits >> 26) & 0x0400_0000) |
+                                        ((bits >> 27) & 0x0800_0000) |
+                                        ((bits >> 28) & 0x1000_0000) |
+                                        ((bits >> 29) & 0x2000_0000) |
+                                        ((bits >> 30) & 0x4000_0000) |
+                                        ((bits >> 31) & 0x8000_0000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 2:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            uint* ptrdst = (uint*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride32dst = dst.Stride * 2;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stridesrc, ptrdst += stride32dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 16, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (uint)(
+                                        (bits & 0x0000_0003) |
+                                        ((bits >> 2) & 0x0000_000c) |
+                                        ((bits >> 4) & 0x0000_0030) |
+                                        ((bits >> 6) & 0x0000_00c0) |
+                                        ((bits >> 8) & 0x0000_0300) |
+                                        ((bits >> 10) & 0x0000_0c00) |
+                                        ((bits >> 12) & 0x0000_3000) |
+                                        ((bits >> 14) & 0x0000_c000) |
+                                        ((bits >> 16) & 0x0003_0000) |
+                                        ((bits >> 18) & 0x000c_0000) |
+                                        ((bits >> 20) & 0x0030_0000) |
+                                        ((bits >> 22) & 0x00c0_0000) |
+                                        ((bits >> 24) & 0x0300_0000) |
+                                        ((bits >> 26) & 0x0c00_0000) |
+                                        ((bits >> 28) & 0x3000_0000) |
+                                        ((bits >> 30) & 0xc000_0000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 4:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            uint* ptrdst = (uint*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride32dst = dst.Stride * 2;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 2 * stridesrc, ptrdst += stride32dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 8, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (uint)(
+                                        (bits & 0x0000_000f) |
+                                        ((bits >> 4) & 0x0000_00f0) |
+                                        ((bits >> 8) & 0x0000_0f00) |
+                                        ((bits >> 12) & 0x0000_f000) |
+                                        ((bits >> 16) & 0x000f_0000) |
+                                        ((bits >> 20) & 0x00f0_0000) |
+                                        ((bits >> 24) & 0x0f00_0000) |
+                                        ((bits >> 28) & 0xf000_0000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
                 case 8:
                     unsafe
                     {
@@ -508,7 +645,239 @@ namespace Genix.Imaging
                         bitsPerPixel));
             }
 
+            dst.SetResolution(this.HorizontalResolution / 2, this.VerticalResolution / 2);
             dst.AppendTransform(new MatrixTransform(0.5, 0.5));
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Reduces the size and resolution of this <see cref="Image"/> by a factor of 4 by downsampling.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image ScaleByDownsampling4(Image dst)
+        {
+            int width = this.Width;
+            int height = this.Height;
+            int bitsPerPixel = this.BitsPerPixel;
+            int dstwidth = width / 4;
+            int dstheight = height / 4;
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, dstwidth, dstheight, bitsPerPixel);
+
+            switch (bitsPerPixel)
+            {
+                case 1:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            ushort* ptrdst = (ushort*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride16dst = dst.Stride * 4;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stridesrc, ptrdst += stride16dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 16, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (ushort)(
+                                        (bits & 0x0001) |
+                                        ((bits >> 3) & 0x0002) |
+                                        ((bits >> 6) & 0x0004) |
+                                        ((bits >> 9) & 0x0008) |
+                                        ((bits >> 12) & 0x0010) |
+                                        ((bits >> 15) & 0x0020) |
+                                        ((bits >> 18) & 0x0040) |
+                                        ((bits >> 21) & 0x0080) |
+                                        ((bits >> 24) & 0x0100) |
+                                        ((bits >> 27) & 0x0200) |
+                                        ((bits >> 30) & 0x0400) |
+                                        ((bits >> 33) & 0x0800) |
+                                        ((bits >> 36) & 0x1000) |
+                                        ((bits >> 39) & 0x2000) |
+                                        ((bits >> 42) & 0x4000) |
+                                        ((bits >> 45) & 0x8000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 2:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            ushort* ptrdst = (ushort*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride16dst = dst.Stride * 4;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stridesrc, ptrdst += stride16dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 8, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (ushort)(
+                                        (bits & 0x0003) |
+                                        ((bits >> 6) & 0x000c) |
+                                        ((bits >> 12) & 0x0030) |
+                                        ((bits >> 18) & 0x00c0) |
+                                        ((bits >> 24) & 0x0300) |
+                                        ((bits >> 30) & 0x0c00) |
+                                        ((bits >> 36) & 0x3000) |
+                                        ((bits >> 42) & 0xc000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 4:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ulong* ptrsrc = (ulong*)bitssrc;
+                            ushort* ptrdst = (ushort*)bitsdst;
+                            int stridesrc = this.Stride;
+                            int stride16dst = dst.Stride * 4;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stridesrc, ptrdst += stride16dst)
+                            {
+                                for (int x = 0, xdst = 0, xsrc = 0; x < dstwidth; x += 4, xdst++, xsrc++)
+                                {
+                                    ulong bits = ptrsrc[xsrc];
+                                    ptrdst[xdst] = (ushort)(
+                                        (bits & 0x000f) |
+                                        ((bits >> 12) & 0x00f0) |
+                                        ((bits >> 24) & 0x0f00) |
+                                        ((bits >> 36) & 0xf000));
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 8:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            byte* ptrsrc = (byte*)bitssrc;
+                            byte* ptrdst = (byte*)bitsdst;
+                            int stride8src = this.Stride8;
+                            int stride8dst = dst.Stride8;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stride8src, ptrdst += stride8dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 4)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 16:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            ushort* ptrsrc = (ushort*)bitssrc;
+                            ushort* ptrdst = (ushort*)bitsdst;
+                            int stride16src = this.Stride * 4;
+                            int stride16dst = dst.Stride * 4;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stride16src, ptrdst += stride16dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 4)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 24:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            byte* ptrsrc = (byte*)bitssrc;
+                            byte* ptrdst = (byte*)bitsdst;
+                            int stride8src = this.Stride8;
+                            int stride8dst = dst.Stride8;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stride8src, ptrdst += stride8dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < 3 * dstwidth; xdst += 3, xsrc += 4 * 3)
+                                {
+                                    ptrdst[xdst + 0] = ptrsrc[xsrc + 0];
+                                    ptrdst[xdst + 1] = ptrsrc[xsrc + 1];
+                                    ptrdst[xdst + 2] = ptrsrc[xsrc + 2];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 32:
+                    unsafe
+                    {
+                        fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                        {
+                            uint* ptrsrc = (uint*)bitssrc;
+                            uint* ptrdst = (uint*)bitsdst;
+                            int stride32src = this.Stride * 2;
+                            int stride32dst = dst.Stride * 2;
+
+                            for (int ydst = 0; ydst < dstheight; ydst++, ptrsrc += 4 * stride32src, ptrdst += stride32dst)
+                            {
+                                for (int xdst = 0, xsrc = 0; xdst < dstwidth; xdst++, xsrc += 4)
+                                {
+                                    ptrdst[xdst] = ptrsrc[xsrc];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        CultureInfo.InvariantCulture,
+                        Properties.Resources.E_UnsupportedDepth,
+                        bitsPerPixel));
+            }
+
+            dst.SetResolution(this.HorizontalResolution / 4, this.VerticalResolution / 4);
+            dst.AppendTransform(new MatrixTransform(0.25, 0.25));
 
             if (inplace)
             {
