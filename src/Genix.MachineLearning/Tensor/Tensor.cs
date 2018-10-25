@@ -419,6 +419,16 @@ namespace Genix.MachineLearning
         public void Abs() => Vectors.Abs(this.Length, this.Weights, 0);
 
         /// <summary>
+        /// Adds a constant value to each element of a tensor.
+        /// </summary>
+        /// <param name="alpha">The constant value.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>this(i) := this(i) + alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddC(float alpha) => Vectors.AddC(this.Length, alpha, this.Weights, 0);
+
+        /// <summary>
         /// Adds all values from a tensor.
         /// </summary>
         /// <param name="x">The tensor that contains the data to add.</param>
@@ -427,6 +437,26 @@ namespace Genix.MachineLearning
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Tensor x) => Vectors.Add(this.Length, x.Weights, 0, this.Weights, 0);
+
+        /// <summary>
+        /// Subtracts a constant value from each element of a tensor.
+        /// </summary>
+        /// <param name="alpha">The constant value.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>this(i) := this(i) - alpha</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SubC(float alpha) => Vectors.SubC(this.Length, alpha, this.Weights, 0);
+
+        /// <summary>
+        /// Subtracts each element of a tensor from a constant value.
+        /// </summary>
+        /// <param name="alpha">The constant value.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>this(i) := alpha - this(i)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SubCRev(float alpha) => Vectors.SubCRev(this.Length, alpha, this.Weights, 0);
 
         /// <summary>
         /// Subtracts all values of a tensor.
@@ -446,7 +476,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) * alpha</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(float alpha) => Vectors.MulC(this.Length, alpha, this.Weights, 0);
+        public void MulC(float alpha) => Vectors.MulC(this.Length, alpha, this.Weights, 0);
 
         /// <summary>
         /// Multiplies elements of this tensor to elements of another tensor.
@@ -456,7 +486,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) * x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Multiply(Tensor x) => Vectors.Mul(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Mul(Tensor x) => Vectors.Mul(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Divides elements of this tensor to elements of another tensor.
@@ -466,7 +496,7 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>this(i) := this(i) / x(i)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Divide(Tensor x) => Vectors.Div(this.Length, x.Weights, 0, this.Weights, 0);
+        public void Div(Tensor x) => Vectors.Div(this.Length, x.Weights, 0, this.Weights, 0);
 
         /// <summary>
         /// Adds all values multiplied by a specified factor from a tensor.

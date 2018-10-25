@@ -682,8 +682,8 @@ namespace Genix.MachineLearning
 
                     // 2. calculate forward tensor
                     // y(i) = x(i) * scale(i) ^ -beta
-                    Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, y.Weights, 0);
-                    y.Multiply(x);
+                    Vectors.Pow(scale.Length, scale.Weights, 0, -beta, y.Weights, 0);
+                    y.Mul(x);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -700,10 +700,10 @@ namespace Genix.MachineLearning
                                 Vectors.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
-                                work.Multiply(x);
+                                work.Mul(x);
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
-                                Mathematics.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
+                                Vectors.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
                                 Vectors.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
@@ -713,6 +713,269 @@ namespace Genix.MachineLearning
 #endif
 
                     return y;
+                });
+        }
+
+        /// <summary>
+        /// Computes fully connected cell.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor that contains the data.</param>
+        /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="b">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix <paramref name="w"/>. Can be null.</param>
+        /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/> and <paramref name="b"/> are row-major or column-major.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> that contains computed data.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor FullyConnected(
+            this Session session,
+            Tensor x,
+            Tensor w,
+            Tensor b,
+            MatrixLayout matrixLayout)
+        {
+            // calculate output tensor in column-major mode
+            // y += W * x (product of weight and input matrices)
+            // input and output matrices are column major (one column per mini-batch item)
+            // weights matrix might have to be transposed to have a row per neuron
+            return session.MxM(
+                MatrixLayout.ColumnMajor,
+                w,
+                matrixLayout == MatrixLayout.RowMajor,
+                x,
+                false,
+                b);
+        }
+
+        /// <summary>
+        /// Computes SRN (simple recurrent network) cell.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor that contains the data.</param>
+        /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="u">The tensor that contains the hidden weights matrix <paramref name="u"/>.</param>
+        /// <param name="b">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix <paramref name="w"/>. Can be null.</param>
+        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
+        /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/>, <paramref name="b"/>, and <paramref name="u"/> are row-major or column-major.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> that contains computed data.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor SRN(
+            this Session session,
+            Tensor x,
+            Tensor w,
+            Tensor u,
+            Tensor b,
+            int numberOfNeurons,
+            MatrixLayout matrixLayout)
+        {
+            const string ActionName = "srn";
+
+            // calculate gates = W * x + b
+            Tensor y = session.FullyConnected(x, w, b, matrixLayout);
+
+            int tt = y.Axes[(int)Axis.B];               // number of vectors in time sequence
+            float[] uw = u.Weights;
+            float[] yw = y.Weights;
+
+            // add hidden layer to the output tensor
+            // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
+            Nonlinearity.ReLU(numberOfNeurons, yw, 0, yw, 0);
+
+            for (int t = 1, yi = numberOfNeurons; t < tt; t++, yi += numberOfNeurons)
+            {
+                Matrix.MxV(matrixLayout, numberOfNeurons, numberOfNeurons, uw, 0, false, yw, yi - numberOfNeurons, yw, yi, false);
+
+                // TODO: customize activation function
+                Nonlinearity.ReLU(numberOfNeurons, yw, yi, yw, yi);
+            }
+
+            if (session.CalculateGradients)
+            {
+                session.Push(
+                    ActionName,
+                    () =>
+                    {
+                        float[] duw = u.Gradient;
+                        float[] dyw = y.Gradient;
+
+                        for (int t = tt - 1, yi = t * numberOfNeurons; t > 0; t--, yi -= numberOfNeurons)
+                        {
+                            Nonlinearity.ReLUGradient(numberOfNeurons, dyw, yi, true, yw, yi, dyw, yi);
+
+                            // dA += dy * x'
+                            lock (u)
+                            {
+                                Matrix.VxV(matrixLayout, numberOfNeurons, numberOfNeurons, dyw, yi, yw, yi - numberOfNeurons, duw, 0);
+                            }
+
+                            // dx += A' * dy
+                            Matrix.MxV(matrixLayout, numberOfNeurons, numberOfNeurons, uw, 0, true, dyw, yi, dyw, yi - numberOfNeurons, false);
+                        }
+
+                        Nonlinearity.ReLUGradient(numberOfNeurons, dyw, 0, true, yw, 0, dyw, 0);
+                    });
+            }
+
+            return y;
+        }
+
+        /// <summary>
+        /// Computes LSTM (long short-term memory) cell.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor that contains the data.</param>
+        /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="u">The tensor that contains the hidden weights matrix <paramref name="u"/>.</param>
+        /// <param name="b">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix <paramref name="w"/>. Can be null.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
+        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
+        /// <param name="forgetBias">The bias to add to forget gates.</param>
+        /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/>, <paramref name="b"/>, and <paramref name="u"/> are row-major or column-major.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> that contains computed data.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor LSTM(
+            this Session session,
+            Tensor x,
+            Tensor w,
+            Tensor u,
+            Tensor b,
+            RNNDirection direction,
+            int numberOfNeurons,
+            float forgetBias,
+            MatrixLayout matrixLayout)
+        {
+            const string ActionName = "lstm";
+
+            // calculate gates = W * x + b
+            Tensor g = session.FullyConnected(x, w, b, matrixLayout);
+
+            int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
+
+            return session.RunOperation(
+                ActionName,
+                () =>
+                {
+                    bool calculateGradient = session.CalculateGradients;
+
+                    Tensor h = session.AllocateTensor("lstm", new[] { tt, numberOfNeurons }, calculateGradient);
+                    Tensor s = session.AllocateTensor("lstm cell", h.Axes, calculateGradient);
+
+                    NativeMethods.lstm(
+                        tt,
+                        numberOfNeurons,
+                        u.Weights,
+                        g.Weights,
+                        s.Weights,
+                        h.Weights,
+                        forgetBias,
+                        true, ////direction == RNNDirection.BiDirectional,
+                        matrixLayout == MatrixLayout.RowMajor);
+
+                    if (calculateGradient)
+                    {
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                NativeMethods.lstm_gradient(
+                                    tt,
+                                    numberOfNeurons,
+                                    u.Weights,
+                                    u.Gradient,
+                                    g.Weights,
+                                    g.Gradient,
+                                    s.Weights,
+                                    s.Gradient,
+                                    h.Weights,
+                                    h.Gradient,
+                                    true, ////direction == RNNDirection.BiDirectional,
+                                    matrixLayout == MatrixLayout.RowMajor);
+                            });
+                    }
+
+                    return h;
+                });
+        }
+
+        /// <summary>
+        /// Computes GRU (gated recurrent unit) cell.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor that contains the data.</param>
+        /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="u">The tensor that contains the hidden weights matrix <paramref name="u"/>.</param>
+        /// <param name="b">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix <paramref name="w"/>. Can be null.</param>
+        /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
+        /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
+        /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/>, <paramref name="b"/>, and <paramref name="u"/> are row-major or column-major.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> that contains computed data.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor GRU(
+            this Session session,
+            Tensor x,
+            Tensor w,
+            Tensor u,
+            Tensor b,
+            RNNDirection direction,
+            int numberOfNeurons,
+            MatrixLayout matrixLayout)
+        {
+            const string ActionName = "gru";
+
+            // calculate gates = W * x + b
+            Tensor g = session.FullyConnected(x, w, b, matrixLayout);
+
+            int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
+
+            return session.RunOperation(
+                ActionName,
+                () =>
+                {
+                    bool calculateGradient = session.CalculateGradients;
+
+                    Tensor h = session.AllocateTensor(ActionName, new[] { tt, numberOfNeurons }, calculateGradient);
+
+                    NativeMethods.gru(
+                        tt,
+                        numberOfNeurons,
+                        u.Weights,
+                        g.Weights,
+                        h.Weights,
+                        direction == RNNDirection.BiDirectional,
+                        matrixLayout == MatrixLayout.RowMajor);
+
+                    if (calculateGradient)
+                    {
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                NativeMethods.gru_gradient(
+                                    tt,
+                                    numberOfNeurons,
+                                    u.Weights,
+                                    u.Gradient,
+                                    g.Weights,
+                                    g.Gradient,
+                                    h.Weights,
+                                    h.Gradient,
+                                    direction == RNNDirection.BiDirectional,
+                                    matrixLayout == MatrixLayout.RowMajor);
+                            });
+                    }
+
+                    return h;
                 });
         }
 
@@ -832,6 +1095,56 @@ namespace Genix.MachineLearning
                 int WStride,
                 int HStride,
                 int CStride);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void lstm(
+                int steps,
+                int ylen,
+                [In] float[] u,
+                [Out] float[] g,
+                [Out] float[] s,
+                [Out] float[] y,
+                float forgetBias,
+                [MarshalAs(UnmanagedType.Bool)] bool forward,
+                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void lstm_gradient(
+                int steps,
+                int ylen,
+                [In] float[] u,
+                [Out] float[] du,
+                [In] float[] g,
+                [Out] float[] dg,
+                [In] float[] s,
+                [Out] float[] ds,
+                [In] float[] y,
+                [Out] float[] dy,
+                [MarshalAs(UnmanagedType.Bool)] bool forward,
+                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void gru(
+                int steps,
+                int ylen,
+                [In] float[] u,
+                [In] float[] g,
+                [Out] float[] y,
+                [MarshalAs(UnmanagedType.Bool)] bool bidirectional,
+                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void gru_gradient(
+                int steps,
+                int ylen,
+                [In] float[] u,
+                [Out] float[] du,
+                [In] float[] g,
+                [Out] float[] dg,
+                [In] float[] y,
+                [Out] float[] dy,
+                [MarshalAs(UnmanagedType.Bool)] bool bidirectional,
+                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
         }
     }
 }

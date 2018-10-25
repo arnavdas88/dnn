@@ -10,14 +10,9 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Security;
-    using System.Text;
     using System.Text.RegularExpressions;
     using Genix.Core;
     using Genix.MachineLearning;
@@ -48,7 +43,7 @@ namespace Genix.DNN.Layers
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         public LSTMCell(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons)
             : this(inputShape, direction, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
         {
@@ -65,7 +60,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMCell(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
@@ -85,9 +80,9 @@ namespace Genix.DNN.Layers
             GroupCollection groups = Layer.ParseArchitecture(architecture, LSTMCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
 
-            if (!Layer.TryParseArchitectureParameter(groups, "LSTMC", "Bi", out RNNCellDirection direction))
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTMC", "Bi", out RNNDirection direction))
             {
-                direction = RNNCellDirection.ForwardOnly;
+                direction = RNNDirection.ForwardOnly;
             }
 
             if (!Layer.TryParseArchitectureParameter(groups, "LSTMC", "ForgetBias", out float forgetBias))
@@ -140,7 +135,7 @@ namespace Genix.DNN.Layers
             get
             {
                 List<string> prms = new List<string>();
-                if (this.Direction != RNNCellDirection.ForwardOnly)
+                if (this.Direction != RNNDirection.ForwardOnly)
                 {
                     prms.Add("Bi=1");
                 }
@@ -173,120 +168,56 @@ namespace Genix.DNN.Layers
             // o(t) = SIGMOID(Wo x x(t) + Uo x h(t-1) + bo)
             // c(t) = f(t) * c(t-1) + i(t) * j(t)
             // h(t) = o(t) * TANH(c(t))
-            //
+#if TENSORFLOW
             // calculate gates = W * x + b
             Tensor g = base.Forward(session, xs)[0];
 
-#if TENSORFLOW
             float forgetBias = this.ForgetBias;
 
             Tensor[] hs = session.Unstack(g, 0);
             Tensor state = null;
 
-            hs[0] = this.Step(session, hs[0], null, ref state, forgetBias);
+            hs[0] = Step(hs[0], null);
 
             for (int t = 1, T = hs.Length; t < T; t++)
             {
-                hs[t] = this.Step(session, hs[t], hs[t - 1], ref state, forgetBias);
+                hs[t] = Step(hs[t], hs[t - 1]);
             }
 
             return new[] { session.Stack(hs, 0) };
-#else
 
-#pragma warning disable SA1312 // Variable names must begin with lower-case letter
-            int T = g.Axes[(int)Axis.B];                // number of vectors in time sequence
-#pragma warning restore SA1312 // Variable names must begin with lower-case letter
-            int ylen = this.NumberOfNeurons;            // number of neurons / size of output vector
-
-            Tensor y = session.RunOperation(
-                "lstm",
-                () =>
+            Tensor Step(Tensor x, Tensor h)
+            {
+                if (h == null)
                 {
-                    bool calculateGradient = session.CalculateGradients;
+                    Tensor[] gates = session.Split(x, 0, 4);
+                    Tensor igate = session.Sigmoid(gates[0]);
+                    Tensor jgate = session.Tanh(gates[1]);
+                    Tensor ogate = session.Sigmoid(gates[3]);
 
-                    Tensor h = session.AllocateTensor("lstm", new[] { T, ylen }, calculateGradient);
-                    Tensor s = session.AllocateTensor("lstm cell", h.Axes, calculateGradient);
+                    state = session.Multiply(igate, jgate);
+                    return session.Multiply(ogate, session.Tanh(state));
+                }
+                else
+                {
+                    // add hidden layer to the output tensor
+                    // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
+                    x = session.Add(x, session.MxV(this.MatrixLayout, this.U, false, h, null));
 
-                    NativeMethods.lstm(
-                        T,
-                        ylen,
-                        this.U.Weights,
-                        g.Weights,
-                        s.Weights,
-                        h.Weights,
-                        this.ForgetBias,
-                        true,
-                        this.MatrixLayout == MatrixLayout.RowMajor);
+                    Tensor[] gates = session.Split(x, 0, 4);
+                    Tensor igate = session.Sigmoid(gates[0]);
+                    Tensor fgate = forgetBias == 0.0f ? session.Sigmoid(gates[2]) : session.Sigmoid(session.Add(gates[2], forgetBias));
+                    Tensor jgate = session.Tanh(gates[1]);
+                    Tensor ogate = session.Sigmoid(gates[3]);
 
-                    if (calculateGradient)
-                    {
-                        session.Push(
-                            "lstm",
-                            () =>
-                            {
-                                NativeMethods.lstm_gradient(
-                                    T,
-                                    ylen,
-                                    this.U.Weights,
-                                    this.U.Gradient,
-                                    g.Weights,
-                                    g.Gradient,
-                                    s.Weights,
-                                    s.Gradient,
-                                    h.Weights,
-                                    h.Gradient,
-                                    true,
-                                    this.MatrixLayout == MatrixLayout.RowMajor);
-                            });
-                    }
-
-                    return h;
-                });
-
-            return new[] { y };
+                    state = session.Add(session.Multiply(fgate, state), session.Multiply(igate, jgate));
+                    return session.Multiply(ogate, session.Tanh(state));
+                }
+            }
+#else
+            return new[] { session.LSTM(xs[0], this.W, this.U, this.B, this.Direction, this.NumberOfNeurons, this.ForgetBias, this.MatrixLayout) };
 #endif
         }
-
-#if TENSORFLOW
-        /// <summary>
-        /// Performs one step of recurrent network.
-        /// </summary>
-        /// <param name="session">The <see cref="Session"/> that executes the layer.</param>
-        /// <param name="x">The input vector (output of fully connected layer).</param>
-        /// <param name="h">The hidden vector.</param>
-        /// <param name="state">The hidden state.</param>
-        /// <param name="forgetBias">The forget gate bias.</param>
-        /// <returns>The output vector <c>y</c>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Tensor Step(Session session, Tensor x, Tensor h, ref Tensor state, float forgetBias)
-        {
-            if (h == null)
-            {
-                Tensor[] gates = session.Split(x, 0, 4);
-                Tensor igate = session.Sigmoid(gates[0]);
-                Tensor jgate = session.Tanh(gates[1]);
-                Tensor ogate = session.Sigmoid(gates[3]);
-
-                state = session.Multiply(igate, jgate);
-                return session.Multiply(ogate, session.Tanh(state));
-            }
-            else
-            {
-                // add hidden layer to the output tensor
-                // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
-                x = session.Add(x, session.MxV(this.MatrixLayout, this.U, false, h, null));
-
-                Tensor[] gates = session.Split(x, 0, 4);
-                Tensor igate = session.Sigmoid(gates[0]);
-                Tensor fgate = forgetBias == 0.0f ? session.Sigmoid(gates[2]) : session.Sigmoid(session.Add(gates[2], forgetBias));
-                Tensor jgate = session.Tanh(gates[1]);
-                Tensor ogate = session.Sigmoid(gates[3]);
-
-                state = session.Add(session.Multiply(fgate, state), session.Multiply(igate, jgate));
-                return session.Multiply(ogate, session.Tanh(state));
-            }
-        }
-#endif
 
         /// <summary>
         /// Initializes the <see cref="LSTMCell"/>.
@@ -299,7 +230,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             float forgetBias,
@@ -332,40 +263,5 @@ namespace Genix.DNN.Layers
             this.ForgetBias = forgetBias;
             this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
         }
-
-#if !TENSORFLOW
-        [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
-        {
-            private const string DllName = "Genix.DNN.Native.dll";
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void lstm(
-                int steps,
-                int ylen,
-                [In] float[] u,
-                [Out] float[] g,
-                [Out] float[] s,
-                [Out] float[] y,
-                float forgetBias,
-                [MarshalAs(UnmanagedType.Bool)] bool forward,
-                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void lstm_gradient(
-                int steps,
-                int ylen,
-                [In] float[] u,
-                [Out] float[] du,
-                [In] float[] g,
-                [Out] float[] dg,
-                [In] float[] s,
-                [Out] float[] ds,
-                [In] float[] y,
-                [Out] float[] dy,
-                [MarshalAs(UnmanagedType.Bool)] bool forward,
-                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
-        }
-#endif
     }
 }

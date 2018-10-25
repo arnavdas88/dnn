@@ -13,6 +13,7 @@ namespace Genix.DNN.Layers
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Genix.Core;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -36,7 +37,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public LSTMLayer(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
@@ -65,9 +66,9 @@ namespace Genix.DNN.Layers
                 numberOfNeurons.Add(Convert.ToInt32(capture.Value, CultureInfo.InvariantCulture));
             }
 
-            if (!Layer.TryParseArchitectureParameter(groups, "LSTM", "Bi", out RNNCellDirection direction))
+            if (!Layer.TryParseArchitectureParameter(groups, "LSTM", "Bi", out RNNDirection direction))
             {
-                direction = RNNCellDirection.ForwardOnly;
+                direction = RNNDirection.ForwardOnly;
             }
 
             if (!Layer.TryParseArchitectureParameter(groups, "LSTM", "ForgetBias", out float forgetBias))
@@ -109,7 +110,7 @@ namespace Genix.DNN.Layers
                 LSTMCell cell = this.Graph.Sources.First() as LSTMCell;
 
                 List<string> prms = new List<string>();
-                if (cell.Direction != RNNCellDirection.ForwardOnly)
+                if (cell.Direction != RNNDirection.ForwardOnly)
                 {
                     prms.Add("Bi=1");
                 }
@@ -142,7 +143,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             IList<int> numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,

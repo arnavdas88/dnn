@@ -310,10 +310,10 @@ GENIXAPI(void, max_inc_u64)(int n, const unsigned __int64* a, int offa, int inca
 GENIXAPI(void, max_inc_f32)(int n, const float* a, int offa, int inca, const float* b, int offb, int incb, float* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
 GENIXAPI(void, max_inc_f64)(int n, const double* a, int offa, int inca, const double* b, int offb, int incb, double* y, int offy, int incy) { __max_inc(n, a, offa, inca, b, offb, incb, y, offy, incy); }
 
-extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
+template<typename T> void __forceinline __minmax_gradient(
 	int n,
-	const float* x, float* dx, int offx, BOOL cleardx,
-	const float* y, const float* dy, int offy)
+	const T* x, T* dx, int offx, BOOL cleardx,
+	const T* y, const T* dy, int offy)
 {
 	x += offx;
 	dx += offx;
@@ -324,16 +324,30 @@ extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] = (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
+			dx[i] = (x[i] == y[i] ? (T)1.0 : (T)0.0) * dy[i];
 		}
 	}
 	else
 	{
 		for (int i = 0; i < n; i++)
 		{
-			dx[i] += (x[i] == y[i] ? 1.0f : 0.0f) * dy[i];
+			dx[i] += (x[i] == y[i] ? (T)1.0 : (T)0.0) * dy[i];
 		}
 	}
+}
+extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
+	int n,
+	const float* x, float* dx, int offx, BOOL cleardx,
+	const float* y, const float* dy, int offy)
+{
+	__minmax_gradient(n, x, dx, offx, cleardx, y, dy, offy);
+}
+extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f64(
+	int n,
+	const double* x, double* dx, int offx, BOOL cleardx,
+	const double* y, const double* dy, int offy)
+{
+	__minmax_gradient(n, x, dx, offx, cleardx, y, dy, offy);
 }
 
 template<typename T> int __forceinline __argmin(int n, const T* x, int offx)

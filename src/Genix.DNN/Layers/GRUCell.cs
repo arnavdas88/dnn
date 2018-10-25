@@ -13,8 +13,6 @@ namespace Genix.DNN.Layers
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Security;
     using System.Text.RegularExpressions;
     using Genix.Core;
     using Genix.MachineLearning;
@@ -40,7 +38,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public GRUCell(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -59,9 +57,9 @@ namespace Genix.DNN.Layers
             GroupCollection groups = Layer.ParseArchitecture(architecture, GRUCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
 
-            if (!Layer.TryParseArchitectureParameter(groups, "GRUC", "Bi", out RNNCellDirection direction))
+            if (!Layer.TryParseArchitectureParameter(groups, "GRUC", "Bi", out RNNDirection direction))
             {
-                direction = RNNCellDirection.ForwardOnly;
+                direction = RNNDirection.ForwardOnly;
             }
 
             this.Initialize(
@@ -95,7 +93,7 @@ namespace Genix.DNN.Layers
             CultureInfo.InvariantCulture,
             "{0}GRUC{1}",
             this.NumberOfNeurons,
-            this.Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
+            this.Direction == RNNDirection.BiDirectional ? "(Bi=1)" : string.Empty);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -110,15 +108,14 @@ namespace Genix.DNN.Layers
             // r(t) = SIGMOID(Wr x x(t) + Ur x h(t-1) + br)
             // c(t) = TANH(Wc x x(t) + Uc x (r(t) * h(t-1)) + bc)
             // h(t) = u(t) * h(t-1) + (1 - u(t)) * c(t)
-            //
+#if TENSORFLOW
             // calculate gates = W * x + b
             Tensor g = base.Forward(session, xs)[0];
 
             int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
-            int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector
+            int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector*/
 
-#if TENSORFLOW
-            if (this.Direction == RNNCellDirection.BiDirectional)
+            if (this.Direction == RNNDirection.BiDirectional)
             {
                 Tensor[] u = session.Split(
                     this.U,
@@ -131,7 +128,7 @@ namespace Genix.DNN.Layers
 
                 for (int t = 0; t < tt; t++)
                 {
-                    fstates[t] = this.Step(session, fstates[t], t > 0 ? fstates[t - 1] : null, u[0], u[1]);
+                    fstates[t] = Step(fstates[t], t > 0 ? fstates[t - 1] : null, u[0], u[1]);
                 }
 
                 // backward pass
@@ -140,7 +137,7 @@ namespace Genix.DNN.Layers
 
                 for (int t = tt - 1; t >= 0; t--)
                 {
-                    bstates[t] = this.Step(session, bstates[t], t < tt - 1 ? bstates[t + 1] : null, u[2], u[3]);
+                    bstates[t] = Step(bstates[t], t < tt - 1 ? bstates[t + 1] : null, u[2], u[3]);
                 }
 
                 // merge states
@@ -162,103 +159,49 @@ namespace Genix.DNN.Layers
 
                 for (int t = 0; t < tt; t++)
                 {
-                    states[t] = this.Step(session, states[t], t > 0 ? states[t - 1] : null, u[0], u[1]);
+                    states[t] = Step(states[t], t > 0 ? states[t - 1] : null, u[0], u[1]);
                 }
 
                 return new[] { session.Stack(states, 0) };
             }
-#else
-            const string ActionName = "split";
 
-            Tensor y = session.RunOperation(
-                "gru",
-                () =>
+            Tensor Step(Tensor input, Tensor state, Tensor u0, Tensor u1)
+            {
+                if (state == null)
                 {
-                    bool calculateGradient = session.CalculateGradients;
+                    Tensor[] gates = session.Split(input, 0, 3);
+                    Tensor ugate = session.Sigmoid(gates[0]);
+                    Tensor candidate = session.Tanh(gates[2]);
 
-                    Tensor h = session.AllocateTensor(ActionName, new[] { tt, numberOfNeurons }, calculateGradient);
+                    return session.Multiply(ugate, candidate);
+                }
+                else
+                {
+                    int ylen = input.Axes[0] / 3;
+                    Tensor[] gates = session.Split(input, 0, new[] { 2 * ylen, ylen });
 
-                    NativeMethods.gru(
-                        tt,
-                        numberOfNeurons,
-                        this.U.Weights,
-                        g.Weights,
-                        h.Weights,
-                        this.Direction == RNNCellDirection.BiDirectional,
-                        this.MatrixLayout == MatrixLayout.RowMajor);
+                    Tensor h = session.Sigmoid(
+                        session.Add(
+                            gates[0],
+                            session.MxV(this.MatrixLayout, u0, false, state, null)));
 
-                    if (calculateGradient)
-                    {
-                        session.Push(
-                            ActionName,
-                            () =>
-                            {
-                                NativeMethods.gru_gradient(
-                                    tt,
-                                    numberOfNeurons,
-                                    this.U.Weights,
-                                    this.U.Gradient,
-                                    g.Weights,
-                                    g.Gradient,
-                                    h.Weights,
-                                    h.Gradient,
-                                    this.Direction == RNNCellDirection.BiDirectional,
-                                    this.MatrixLayout == MatrixLayout.RowMajor);
-                            });
-                    }
+                    Tensor[] gatesUR = session.Split(h, 0, 2);
 
-                    return h;
-                });
+                    Tensor rs = session.Multiply(gatesUR[1], state);
+                    Tensor candidate = session.Tanh(
+                        session.Add(
+                            gates[1],
+                            session.MxV(this.MatrixLayout, u1, false, rs, null)));
 
-            return new[] { y };
+                    return session.Add(
+                        state,
+                        session.Multiply(gatesUR[0], session.Subtract(candidate, state)));
+                }
+            }
+#else
+            return new[] { session.GRU(xs[0], this.W, this.U, this.B, this.Direction, this.NumberOfNeurons, this.MatrixLayout) };
 #endif
         }
-
-#if TENSORFLOW
-        /// <summary>
-        /// Performs one step of recurrent network.
-        /// </summary>
-        /// <param name="session">The <see cref="Session"/> that executes the layer.</param>
-        /// <param name="x">The input vector (output of fully connected layer).</param>
-        /// <param name="state">The hidden state.</param>
-        /// <param name="u0">The hidden weights matrix that contains update and reset gate weights.</param>
-        /// <param name="u1">The hidden weights matrix that contains candidate weights.</param>
-        /// <returns>The output vector <c>y</c>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Tensor Step(Session session, Tensor x, Tensor state, Tensor u0, Tensor u1)
-        {
-            if (state == null)
-            {
-                Tensor[] gates = session.Split(x, 0, 3);
-                Tensor ugate = session.Sigmoid(gates[0]);
-                Tensor candidate = session.Tanh(gates[2]);
-
-                return session.Multiply(ugate, candidate);
-            }
-            else
-            {
-                int ylen = x.Axes[0] / 3;
-                Tensor[] gates = session.Split(x, 0, new[] { 2 * ylen, ylen });
-
-                Tensor h = session.Sigmoid(
-                    session.Add(
-                        gates[0],
-                        session.MxV(this.MatrixLayout, u0, false, state, null)));
-
-                Tensor[] gatesUR = session.Split(h, 0, 2);
-
-                Tensor rs = session.Multiply(gatesUR[1], state);
-                Tensor candidate = session.Tanh(
-                    session.Add(
-                        gates[1],
-                        session.MxV(this.MatrixLayout, u1, false, rs, null)));
-
-                return session.Add(
-                    state,
-                    session.Multiply(gatesUR[0], session.Subtract(candidate, state)));
-            }
-        }
-#endif
 
         /// <summary>
         /// Initializes the <see cref="GRUCell"/>.
@@ -270,7 +213,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -291,7 +234,7 @@ namespace Genix.DNN.Layers
             // allocate three matrices (one for each of two gates and one for the state)
             int[] biasesShape = new[] { 3 * numberOfNeurons };
 
-            int hlen = direction == RNNCellDirection.ForwardOnly ? numberOfNeurons : numberOfNeurons / 2;
+            int hlen = direction == RNNDirection.ForwardOnly ? numberOfNeurons : numberOfNeurons / 2;
             int[] hiddenShape = matrixLayout == MatrixLayout.ColumnMajor ?
                 new[] { hlen, 3 * numberOfNeurons } :
                 new[] { 3 * numberOfNeurons, hlen };
@@ -310,36 +253,5 @@ namespace Genix.DNN.Layers
             // initialize biases for update and reset gates only
             Vectors.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);
         }
-
-#if !TENSORFLOW
-        [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
-        {
-            private const string DllName = "Genix.DNN.Native.dll";
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void gru(
-                int steps,
-                int ylen,
-                [In] float[] u,
-                [In] float[] g,
-                [Out] float[] y,
-                [MarshalAs(UnmanagedType.Bool)] bool forward,
-                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void gru_gradient(
-                int steps,
-                int ylen,
-                [In] float[] u,
-                [Out] float[] du,
-                [In] float[] g,
-                [Out] float[] dg,
-                [In] float[] y,
-                [Out] float[] dy,
-                [MarshalAs(UnmanagedType.Bool)] bool forward,
-                [MarshalAs(UnmanagedType.Bool)] bool rowmajor);
-        }
-#endif
     }
 }

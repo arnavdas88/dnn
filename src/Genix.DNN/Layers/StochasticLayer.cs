@@ -124,20 +124,7 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
-            // calculate output tensor in column-major mode
-            // y += W * x (product of weight and input matrices)
-            // input and output matrices are column major (one column per mini-batch item)
-            // weights matrix might have to be transposed to have a row per neuron
-            return new[]
-            {
-                session.MxM(
-                    MatrixLayout.ColumnMajor,
-                    this.W,
-                    this.MatrixLayout == MatrixLayout.RowMajor,
-                    xs[0],
-                    false,
-                    this.B),
-            };
+            return new[] { session.FullyConnected(xs[0], this.W, this.B, this.MatrixLayout) };
         }
 
         /// <inheritdoc />

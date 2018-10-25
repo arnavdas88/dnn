@@ -13,6 +13,7 @@ namespace Genix.DNN.Layers
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Genix.Core;
+    using Genix.MachineLearning;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -35,7 +36,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public SRNLayer(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -63,9 +64,9 @@ namespace Genix.DNN.Layers
                 numberOfNeurons.Add(Convert.ToInt32(capture.Value, CultureInfo.InvariantCulture));
             }
 
-            if (!Layer.TryParseArchitectureParameter(groups, "SRN", "Bi", out RNNCellDirection direction))
+            if (!Layer.TryParseArchitectureParameter(groups, "SRN", "Bi", out RNNDirection direction))
             {
-                direction = RNNCellDirection.ForwardOnly;
+                direction = RNNDirection.ForwardOnly;
             }
 
             this.Initialize(
@@ -98,7 +99,7 @@ namespace Genix.DNN.Layers
             CultureInfo.InvariantCulture,
             "{0}SRN{1}",
             string.Join("-", this.Graph.Vertices.Select(x => ((StochasticLayer)x).NumberOfNeurons)),
-            (this.Graph.Vertices.First() as SRNCell).Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
+            (this.Graph.Vertices.First() as SRNCell).Direction == RNNDirection.BiDirectional ? "(Bi=1)" : string.Empty);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -114,7 +115,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             IList<int> numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
