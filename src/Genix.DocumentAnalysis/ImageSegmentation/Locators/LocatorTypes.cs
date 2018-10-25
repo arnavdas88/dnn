@@ -20,18 +20,23 @@ namespace Genix.DocumentAnalysis
         None = 0,
 
         /// <summary>
+        /// The picture locator.
+        /// </summary>
+        PictureLocator = 1,
+
+        /// <summary>
         /// The line locator.
         /// </summary>
-        LineLocator = 1,
+        LineLocator = 2,
 
         /// <summary>
         /// The machine-printed text locator.
         /// </summary>
-        TextLocator = 2,
+        TextLocator = 4,
 
         /// <summary>
         /// All available locators.
         /// </summary>
-        All = LineLocator | TextLocator,
+        All = PictureLocator | LineLocator | TextLocator,
     }
 }

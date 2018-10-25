@@ -38,32 +38,13 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Initializes a new instance of the <see cref="Container{T}"/> class.
         /// </summary>
-        /// <param name="shapes">The shapes contained in this container.</param>
-        protected Container(IList<T> shapes)
-        {
-            if (shapes == null)
-            {
-                throw new ArgumentNullException(nameof(shapes));
-            }
-
-            this.shapes.AddRange(shapes);
-            this.Bounds = Rectangle.Union(shapes.Select(x => x.Bounds));
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Container{T}"/> class.
-        /// </summary>
-        /// <param name="shapes">The shapes contained in this container.</param>
         /// <param name="bounds">The shape boundaries.</param>
-        protected Container(IList<T> shapes, Rectangle bounds)
+        /// <param name="shapes">The shapes to add to this container.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected Container(Rectangle bounds, IEnumerable<T> shapes)
+            : this(bounds)
         {
-            if (shapes == null)
-            {
-                throw new ArgumentNullException(nameof(shapes));
-            }
-
             this.shapes.AddRange(shapes);
-            this.Bounds = bounds;
         }
 
         /// <summary>

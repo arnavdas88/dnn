@@ -8,7 +8,6 @@ namespace Genix.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Genix.Drawing;
 
     /// <summary>
@@ -20,6 +19,7 @@ namespace Genix.Core
     {
         private readonly SortedList<Rectangle, T>[][] cells;
         private readonly IComparer<Rectangle> comparer;
+        private int version = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundedObjectGrid{T}"/> class.
@@ -91,16 +91,53 @@ namespace Genix.Core
         public int NumberOfCells { get; }
 
         /// <summary>
-        /// Finds the cell that contains the given point.
+        /// Removes all objects from the grid.
         /// </summary>
-        /// <param name="x">The x-coordinate of the point to test.</param>
-        /// <param name="y">The y-coordinate of the point to test.</param>
-        /// <param name="xgrid">The x-coordinate of the found cell.</param>
-        /// <param name="ygrid">The y-coordinate of the found cell.</param>
-        public void FindCell(int x, int y, out int xgrid, out int ygrid)
+        public void Clear()
         {
-            xgrid = ((x - this.Bounds.X) / this.CellWidth).Clip(0, this.Width - 1);
-            ygrid = ((y - this.Bounds.Y) / this.CellHeight).Clip(0, this.Height - 1);
+            for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = 0; x < w; x++)
+                {
+                    lists[x] = null;
+                }
+            }
+
+            this.version++;
+        }
+
+        /// <summary>
+        /// Determines whether the specified area does not contain any objects.
+        /// </summary>
+        /// <param name="bounds">The bounds to test.</param>
+        /// <returns>
+        /// <b>true</b> if the specified area does not intersect with any object in the grid; otherwise, <b>false</b>.
+        /// </returns>
+        public bool IsEmpty(Rectangle bounds)
+        {
+            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
+
+            for (int y = starty; y <= endy; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = startx; x <= endx; x++)
+                {
+                    SortedList<Rectangle, T> list = lists[x];
+                    if (list != null)
+                    {
+                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        {
+                            if (kvp.Key.IntersectsWith(bounds))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -112,9 +149,8 @@ namespace Genix.Core
         public void Add(T obj, bool spreadHorizontally, bool spreadVertically)
         {
             Rectangle bounds = obj.Bounds;
+            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
 
-            this.FindCell(bounds.X, bounds.Y, out int startx, out int starty);
-            this.FindCell(bounds.Right - 1, bounds.Bottom - 1, out int endx, out int endy);
             if (!spreadHorizontally)
             {
                 endx = startx;
@@ -136,7 +172,51 @@ namespace Genix.Core
                         lists[x] = list = new SortedList<Rectangle, T>(this.comparer);
                     }
 
-                    list.Add(obj.Bounds, obj);
+                    list.Add(bounds, obj);
+                }
+            }
+
+            this.version++;
+        }
+
+        /// <summary>
+        /// Removes the bounded object from the grid.
+        /// </summary>
+        /// <param name="obj">The object to remove.</param>
+        public void Remove(T obj)
+        {
+            Rectangle bounds = obj.Bounds;
+            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
+
+            for (int y = starty; y <= endy; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = startx; x <= endx; x++)
+                {
+                    bool removed = false;
+
+                    SortedList<Rectangle, T> list = lists[x];
+                    if (list != null)
+                    {
+                        removed = list.Remove(bounds);
+
+                        if (removed)
+                        {
+                            this.version++;
+
+                            if (list.Count == 0)
+                            {
+                                // remove collection if cell does not contain any more elements
+                                lists[x] = null;
+                            }
+                        }
+                    }
+
+                    // stop searching if the object was not spread across multiple cells
+                    if (!removed && (y > starty || x > startx))
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -169,9 +249,36 @@ namespace Genix.Core
         /// <returns>
         /// The sequence of objects.
         /// </returns>
-        public IEnumerable<T> GetObjects()
+        public IEnumerable<T> EnumObjects()
         {
-            return this.GetObjects(0, 0, this.Width - 1, this.Height - 1);
+            int oldversion = this.version;
+
+            for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = 0; x < w; x++)
+                {
+                    SortedList<Rectangle, T> list = lists[x];
+                    if (list != null)
+                    {
+                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        {
+                            if (oldversion != this.version)
+                            {
+                                throw new InvalidOperationException("The grid was modified during enumeration.");
+                            }
+
+                            // validate that we are in object's starting cell
+                            // otherwise the object that spread across multiple cells has already been returned from other cell
+                            this.FindCell(kvp.Key.X, kvp.Key.Y, out int startx, out int starty);
+                            if (x == startx && y == starty)
+                            {
+                                yield return kvp.Value;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -179,23 +286,18 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bounds">The bounds to test.</param>
         /// <returns>
-        /// The sequence of objects found inside the specified bounds.
+        /// The sequence of objects that intersect the specified bounds.
         /// </returns>
-        public IEnumerable<T> GetObjects(Rectangle bounds)
+        public IEnumerable<T> EnumObjects(Rectangle bounds)
         {
             if (bounds.Width == 0 || bounds.Height == 0)
             {
-                return Enumerable.Empty<T>();
+                yield break;
             }
 
-            this.FindCell(bounds.X, bounds.Y, out int startx, out int starty);
-            this.FindCell(bounds.Right - 1, bounds.Bottom - 1, out int endx, out int endy);
+            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
 
-            return this.GetObjects(startx, starty, endx, endy);
-        }
-
-        private IEnumerable<T> GetObjects(int startx, int starty, int endx, int endy)
-        {
+            int oldversion = this.version;
             for (int y = starty; y <= endy; y++)
             {
                 SortedList<Rectangle, T>[] lists = this.cells[y];
@@ -206,17 +308,156 @@ namespace Genix.Core
                     {
                         foreach (KeyValuePair<Rectangle, T> kvp in list)
                         {
-                            // validate that we are in object's starting cell
-                            // otherwise the object that spread across multiple cells has already been returned from other cell
-                            this.FindCell(kvp.Key.X, kvp.Key.Y, out int firstx, out int firsty);
-                            if (x == MinMax.Max(firstx, startx) && y == MinMax.Max(firsty, starty))
+                            if (oldversion != this.version)
                             {
-                                yield return kvp.Value;
+                                throw new InvalidOperationException("The grid was modified during enumeration.");
+                            }
+
+                            if (kvp.Key.IntersectsWith(bounds))
+                            {
+                                // validate that we are in object's starting cell
+                                // otherwise the object that spread across multiple cells has already been returned from other cell
+                                this.FindCell(kvp.Key.X, kvp.Key.Y, out int firstx, out int firsty);
+                                if (x == MinMax.Max(firstx, startx) && y == MinMax.Max(firsty, starty))
+                                {
+                                    yield return kvp.Value;
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Finds an object in this <see cref="BoundedObjectGrid{T}"/> that contains the specified area.
+        /// </summary>
+        /// <param name="bounds">The bounds to test.</param>
+        /// <returns>
+        /// The object that contains the specified area; <b>null</b>, if no such object exists.
+        /// </returns>
+        public T FindContainer(Rectangle bounds)
+        {
+            if (bounds.Width == 0 || bounds.Height == 0)
+            {
+                return null;
+            }
+
+            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
+
+            int oldversion = this.version;
+            for (int y = starty; y <= endy; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = startx; x <= endx; x++)
+                {
+                    SortedList<Rectangle, T> list = lists[x];
+                    if (list != null)
+                    {
+                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        {
+                            if (oldversion != this.version)
+                            {
+                                throw new InvalidOperationException("The grid was modified during enumeration.");
+                            }
+
+                            if (kvp.Key.Contains(bounds))
+                            {
+                                return kvp.Value;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Removes objects from the grid that are completely contained by other objects.
+        /// </summary>
+        /// <returns>
+        /// The number of objects removed.
+        /// </returns>
+        public int Compact()
+        {
+            int count = 0;
+
+            for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                for (int x = 0; x < w; x++)
+                {
+                    SortedList<Rectangle, T> list = lists[x];
+                    if (list != null)
+                    {
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            if (this.FindContainer(list.Key) != null)
+                            {
+                                i++;
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Counts objects in each cell.
+        /// </summary>
+        /// <returns>
+        /// The two-dimensional array; each cells contains the number of objects in the corresponding cell of the grid.
+        /// </returns>
+        public int[][] CountObjects()
+        {
+            int[][] counts = JaggedArray.Create<int>(this.Height, this.Width);
+
+            for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
+            {
+                SortedList<Rectangle, T>[] lists = this.cells[y];
+                int[] linecounts = counts[y];
+                for (int x = 0; x < w; x++)
+                {
+                    SortedList<Rectangle, T> list = lists[x];
+                    linecounts[x] = list != null ? list.Count : 0;
+                }
+            }
+
+            return counts;
+        }
+
+        /// <summary>
+        /// Finds the cell that contains the given point.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to test.</param>
+        /// <param name="y">The y-coordinate of the point to test.</param>
+        /// <param name="xgrid">The x-coordinate of the found cell.</param>
+        /// <param name="ygrid">The y-coordinate of the found cell.</param>
+        private void FindCell(int x, int y, out int xgrid, out int ygrid)
+        {
+            xgrid = ((x - this.Bounds.X) / this.CellWidth).Clip(0, this.Width - 1);
+            ygrid = ((y - this.Bounds.Y) / this.CellHeight).Clip(0, this.Height - 1);
+        }
+
+        /// <summary>
+        /// Finds the range of cells that contains the given area.
+        /// </summary>
+        /// <param name="area">The area to test.</param>
+        /// <param name="startx">The x-coordinate of the found top-left cell.</param>
+        /// <param name="starty">The y-coordinate of the found top-left cell.</param>
+        /// <param name="endx">The x-coordinate of the found bottom-right cell.</param>
+        /// <param name="endy">The y-coordinate of the found bottom-right cell.</param>
+        private void FindCells(Rectangle area, out int startx, out int starty, out int endx, out int endy)
+        {
+            startx = ((area.X - this.Bounds.X) / this.CellWidth).Clip(0, this.Width - 1);
+            starty = ((area.Y - this.Bounds.Y) / this.CellHeight).Clip(0, this.Height - 1);
+
+            endx = ((area.Right - 1 - this.Bounds.X) / this.CellWidth).Clip(0, this.Width - 1);
+            endy = ((area.Bottom - 1 - this.Bounds.Y) / this.CellHeight).Clip(0, this.Height - 1);
         }
     }
 }

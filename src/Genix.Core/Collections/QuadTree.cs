@@ -437,7 +437,7 @@ namespace Genix.Core
         /// </summary>
         /// <param name="bounds">The bounds to test.</param>
         /// <returns>
-        /// The sequence of nodes found inside the specified bounds.
+        /// The sequence of nodes that intersect the specified bounds.
         /// </returns>
         public IEnumerable<T> GetNodes(Rectangle bounds)
         {

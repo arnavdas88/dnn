@@ -10,6 +10,7 @@ namespace Genix.DocumentAnalysis
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Genix.Drawing;
     using Newtonsoft.Json;
 
@@ -22,19 +23,21 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Initializes a new instance of the <see cref="ParagraphShape"/> class.
         /// </summary>
-        /// <param name="textLines">The collection of <see cref="TextLineShape"/> objects to include in this container.</param>
-        public ParagraphShape(IList<TextLineShape> textLines)
-            : base(textLines)
+        /// <param name="bounds">The shape boundaries.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ParagraphShape(Rectangle bounds)
+            : base(bounds)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParagraphShape"/> class.
         /// </summary>
-        /// <param name="textLines">The collection of <see cref="TextLineShape"/> objects to include in this container.</param>
         /// <param name="bounds">The shape boundaries.</param>
-        public ParagraphShape(IList<TextLineShape> textLines, Rectangle bounds)
-            : base(textLines, bounds)
+        /// <param name="shapes">The shapes to add to this container.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ParagraphShape(Rectangle bounds, IEnumerable<TextLineShape> shapes)
+            : base(bounds, shapes)
         {
         }
 

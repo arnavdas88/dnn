@@ -24,6 +24,7 @@ namespace Genix.DocumentAnalysis
         /// </summary>
         private static readonly Dictionary<LocatorTypes, Type> Types = new Dictionary<LocatorTypes, Type>()
         {
+            { LocatorTypes.PictureLocator, typeof(PictureLocator) },
             { LocatorTypes.LineLocator, typeof(LineLocator) },
             { LocatorTypes.TextLocator, typeof(TextLocator) },
         };

@@ -9,6 +9,7 @@ namespace Genix.DocumentAnalysis
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Genix.Drawing;
     using Newtonsoft.Json;
 
@@ -21,19 +22,21 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLineShape"/> class.
         /// </summary>
-        /// <param name="words">The collection of <see cref="TextShape"/> objects to include in this container.</param>
-        public TextLineShape(IList<TextShape> words)
-            : base(words)
+        /// <param name="bounds">The shape boundaries.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TextLineShape(Rectangle bounds)
+            : base(bounds)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLineShape"/> class.
         /// </summary>
-        /// <param name="words">The collection of <see cref="TextShape"/> objects to include in this container.</param>
         /// <param name="bounds">The shape boundaries.</param>
-        public TextLineShape(IList<TextShape> words, Rectangle bounds)
-            : base(words, bounds)
+        /// <param name="shapes">The shapes to add to this container.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TextLineShape(Rectangle bounds, IEnumerable<TextShape> shapes)
+            : base(bounds, shapes)
         {
         }
 

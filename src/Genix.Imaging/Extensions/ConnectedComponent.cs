@@ -19,7 +19,7 @@ namespace Genix.Imaging
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.
     /// </summary>
     [DebuggerDisplay("{Bounds}")]
-    public class ConnectedComponent : IBoundedObject
+    public class ConnectedComponent : IAlignedBoundedObject
     {
         private static readonly Stroke[][] EmptyStrokes = new Stroke[0][];
         [DebuggerDisplay("{FormattedStrokes}")]
@@ -64,13 +64,14 @@ namespace Genix.Imaging
             }
         }
 
-        /// <summary>
-        /// Gets the bounds, in pixels, of this <see cref="ConnectedComponent"/>.
-        /// </summary>
-        /// <value>
-        /// A <see cref="Rectangle"/> structure that contains the bounds, in pixels, of this <see cref="ConnectedComponent"/>.
-        /// </value>
+        /// <inheritdoc />
         public Rectangle Bounds => this.bounds;
+
+        /// <inheritdoc />
+        public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.None;
+
+        /// <inheritdoc />
+        public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.None;
 
         private string FormattedStrokes =>
             string.Join(

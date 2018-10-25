@@ -54,14 +54,55 @@ namespace Genix.DocumentAnalysis
 
             Image closing = image.MorphClose(null, StructuringElement.Brick(9, 1), 1, BorderType.BorderConst, 0);
 
-            ISet<ConnectedComponent> components = closing.FindConnectedComponents(4);
-
-            BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(
+            AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(
                 image.Bounds,
                 200.MulDiv(image.HorizontalResolution, 200),
-                100.MulDiv(image.VerticalResolution, 200),
-                new RectangleLTRBComparer());
-            grid.Add(components, false, false);
+                100.MulDiv(image.VerticalResolution, 200));
+
+            componentgrid.Add(
+                closing.FindConnectedComponents(4).Where(x => x.Power > 10 && x.Bounds.Height <= 100),
+                true,
+                true);
+
+            AlignedObjectGrid<TextShape> shapegrid = new AlignedObjectGrid<TextShape>(
+                image.Bounds,
+                200.MulDiv(image.HorizontalResolution, 200),
+                100.MulDiv(image.VerticalResolution, 200));
+
+            foreach (ConnectedComponent component in componentgrid.EnumObjects())
+            {
+                if (component.VerticalAlignment == VerticalAlignment.None)
+                {
+                    IList<ConnectedComponent> alignedComponents = componentgrid.FindVerticalAlignment(component, VerticalAlignment.Bottom, 100);
+                    if (alignedComponents.Count > 1)
+                    {
+                        foreach (ConnectedComponent alignedComponent in alignedComponents)
+                        {
+                            alignedComponent.VerticalAlignment = VerticalAlignment.Bottom;
+                        }
+
+                        shapegrid.Add(new TextShape(Rectangle.Union(alignedComponents.Select(x => x.Bounds))), true, true);
+                    }
+                }
+            }
+
+            // assign unassigned components
+            foreach (ConnectedComponent component in componentgrid.EnumObjects())
+            {
+                if (component.VerticalAlignment == VerticalAlignment.None)
+                {
+                    if (shapegrid.FindContainer(component.Bounds) == null)
+                    {
+                        shapegrid.Add(new TextShape(component.Bounds), true, true);
+                    }
+                }
+            }
+
+            Image draft = image.ConvertTo(null, 24);
+            foreach (TextShape shape in shapegrid.EnumObjects())
+            {
+                draft.DrawRectangle(shape.Bounds, 0x00800000);
+            }
 
             return new HashSet<TextShape>();
         }

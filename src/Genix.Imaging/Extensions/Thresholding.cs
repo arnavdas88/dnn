@@ -493,6 +493,14 @@ namespace Genix.Imaging
         /// <returns>
         /// The computed Otsu threshold.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        /// The pixels with values more than to the computed threshold value, should be set to 0 (white).
+        /// </para>
+        /// <para>
+        /// The pixels with values less than, or equal the computed threshold value, should be set to 1 (black).
+        /// </para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte Otsu() => this.Otsu(0, 0, this.Width, this.Height);
 
@@ -509,6 +517,14 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
         /// </exception>
+        /// <remarks>
+        /// <para>
+        /// The pixels with values more than to the computed threshold value, should be set to 0 (white).
+        /// </para>
+        /// <para>
+        /// The pixels with values less than, or equal the computed threshold value, should be set to 1 (black).
+        /// </para>
+        /// </remarks>
         [CLSCompliant(false)]
         public byte Otsu(int x, int y, int width, int height)
         {

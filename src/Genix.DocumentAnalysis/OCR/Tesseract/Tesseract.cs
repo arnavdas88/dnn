@@ -180,7 +180,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                     }
                     while (iterator.Next(PageIteratorLevel.TextBlock));
 
-                    return shapes.Count > 0 ? new TextBlockShape(shapes, bounds) : null;
+                    return shapes.Count > 0 ? new TextBlockShape(bounds, shapes) : null;
                 }
 
                 ParagraphShape ExtractParagraph()
@@ -203,7 +203,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                     while (!iterator.IsAtFinalElement(PageIteratorLevel.Paragraph, PageIteratorLevel.TextLine) &&
                             iterator.Next(PageIteratorLevel.TextLine));
 
-                    return shapes.Count > 0 ? new ParagraphShape(shapes, bounds) : null;
+                    return shapes.Count > 0 ? new ParagraphShape(bounds, shapes) : null;
                 }
 
                 TextLineShape ExtractTextLine()
@@ -226,7 +226,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                     while (!iterator.IsAtFinalElement(PageIteratorLevel.TextLine, PageIteratorLevel.Word) &&
                             iterator.Next(PageIteratorLevel.Word));
 
-                    return shapes.Count > 0 ? new TextLineShape(shapes, bounds) : null;
+                    return shapes.Count > 0 ? new TextLineShape(bounds, shapes) : null;
                 }
 
                 TextShape ExtractWord()

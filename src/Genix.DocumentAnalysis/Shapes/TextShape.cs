@@ -7,6 +7,7 @@
 namespace Genix.DocumentAnalysis
 {
     using System.Globalization;
+    using System.Runtime.CompilerServices;
     using Genix.Drawing;
     using Newtonsoft.Json;
 
@@ -21,6 +22,16 @@ namespace Genix.DocumentAnalysis
 
         [JsonProperty("confidence")]
         private readonly float confidence;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextShape"/> class.
+        /// </summary>
+        /// <param name="bounds">The shape position.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TextShape(Rectangle bounds)
+            : base(bounds)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextShape"/> class.

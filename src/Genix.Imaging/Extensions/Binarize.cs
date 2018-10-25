@@ -117,7 +117,11 @@ namespace Genix.Imaging
 
                 // apply single otsu threshold to entire normalized image
                 byte otsuThreshold = maskg.Otsu(0, 0, width, height);
-                maskg.Convert8To1(dst, otsuThreshold);
+
+                // IPP thresholding functions use more / less than, or equal thresholding method
+                // while our functions do more than, or equal / less.
+                // So, we increment computed Otsu threshold by one
+                maskg.Convert8To1(dst, (byte)Math.Min(byte.MaxValue, otsuThreshold + 1));
 
                 edges.Convert8To1(edges, 128);
                 edges.Not(edges);
@@ -339,7 +343,9 @@ namespace Genix.Imaging
                     for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                     {
                         int tw = ix + 1 == nx ? width - tx : sx;
-                        map[mapoff + ix] = this.Otsu(tx, ty, tw, th);
+
+                        // see comments above regarding +1
+                        map[mapoff + ix] = (byte)Math.Min(byte.MaxValue, this.Otsu(tx, ty, tw, th) + 1);
                     }
                 }
 
@@ -357,7 +363,16 @@ namespace Genix.Imaging
                             for (int ix = 0, tx = 0; ix < nx; ix++, tx += sx)
                             {
                                 int tw = ix + 1 == nx ? width - tx : sx;
-                                NativeMethods._convert8to1(tx, ty, tw, th, (byte*)bitssrc, this.Stride8, (byte*)bitsdst, dst.Stride8, map[mapoff + ix]);
+                                NativeMethods._convert8to1(
+                                    tx,
+                                    ty,
+                                    tw,
+                                    th,
+                                    (byte*)bitssrc,
+                                    this.Stride8,
+                                    (byte*)bitsdst,
+                                    dst.Stride8,
+                                    map[mapoff + ix]);
                             }
                         }
                     }

@@ -872,5 +872,93 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MinCBorder(Rectangle area, uint borderValue) => this.MinCBorder(area.X, area.Y, area.Width, area.Height, borderValue);
+
+        /// <summary>
+        /// Draws the 1-pixel wide border of specified color around the specified rectangular area.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <param name="color">The color of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [CLSCompliant(false)]
+        public void DrawRectangle(int x, int y, int width, int height, uint color)
+        {
+            this.ValidateArea(x, y, width, height);
+
+            if (width == 0 || height == 0)
+            {
+                // nothing to draw
+                return;
+            }
+
+            ulong[] bits = this.Bits;
+            int bitsPerPixel = this.BitsPerPixel;
+
+            if (bitsPerPixel == 24)
+            {
+                ulong[] colors = this.ColorScanline(Image.CalculateStride(width, 24), color);
+                int stride8 = this.Stride8;
+
+                unsafe
+                {
+                    fixed (ulong* ubits = &bits[y * this.Stride], ucolors = colors)
+                    {
+                        byte* ptrcolors = (byte*)ucolors;
+                        byte* ptrbits = (byte*)ubits + (x * 3);
+
+                        // draw top
+                        Vectors.Copy(width * 3, ptrcolors, ptrbits);
+                        ptrbits += stride8;
+
+                        // draw left and right
+                        for (int i = 1, ii = height - 1; i < ii; i++, ptrbits += stride8)
+                        {
+                            Vectors.Copy(3, ptrcolors, ptrbits);
+                            Vectors.Copy(3, ptrcolors, ptrbits + (width * 3));
+                        }
+
+                        // draw bottom
+                        Vectors.Copy(width * 3, ptrcolors, ptrbits);
+                    }
+                }
+            }
+            else
+            {
+                int stride1 = this.Stride1;
+                ulong colorbits = this.ColorBits(color);
+
+                // draw top
+                int pos = (y * stride1) + (x * bitsPerPixel);
+                BitUtils.SetBits(width * bitsPerPixel, colorbits, bits, pos);
+                pos += stride1;
+
+                // draw left and right
+                int posend = pos + (width * bitsPerPixel);
+                for (int i = 1, ii = height - 1; i < ii; i++, pos += stride1, posend += stride1)
+                {
+                    BitUtils.SetBits(bitsPerPixel, colorbits, bits, pos);
+                    BitUtils.SetBits(bitsPerPixel, colorbits, bits, posend);
+                }
+
+                // draw bottom
+                BitUtils.SetBits(width * bitsPerPixel, colorbits, bits, pos);
+            }
+        }
+
+        /// <summary>
+        /// Draws the 1-pixel wide border of specified color around the specified rectangular area.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <param name="color">The color of border pixels.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The rectangular area described by <paramref name="area"/> is outside of this <see cref="Image"/> bounds.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [CLSCompliant(false)]
+        public void DrawRectangle(Rectangle area, uint color) => this.DrawRectangle(area.X, area.Y, area.Width, area.Height, color);
     }
 }

@@ -55,6 +55,7 @@
     <Compile Include="Classification\PointsOfInterest\PointsOfInterestClassifier.cs" />
     <Compile Include="Classification\PointsOfInterest\PointsOfInterestFeatureBuilder.cs" />
     <Compile Include="Classification\PointsOfInterest\PointsOfInterestFeatures.cs" />
+    <Compile Include="Common\AlignedObjectGrid.cs" />
     <Compile Include="FeatureDetectors\Features.cs" />
     <Compile Include="FeatureDetectors\HistogramsOfOrientedGradients.cs" />
     <Compile Include="FeatureDetectors\IFeatureDetector.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="ImageSegmentation\Locators\LineLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorBase.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorTypes.cs" />
+    <Compile Include="ImageSegmentation\Locators\PictureLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\TextLocator.cs" />
     <Compile Include="ImageSource.cs" />
     <Compile Include="LineDetector\LineDetectionOptions.cs" />
@@ -83,6 +85,8 @@
     <Compile Include="OCR\Tesseract\Enums\TextLineOrder.cs" />
     <Compile Include="OCR\Tesseract\Enums\WritingDirection.cs" />
     <Compile Include="PageSource.cs" />
+    <Compile Include="PictureDetector\PictureDetector.cs" />
+    <Compile Include="PictureDetector\PictureDetectionOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -21,7 +21,7 @@ namespace Genix.DocumentAnalysis.OCR.Test
             {
                 using (Tesseract tess = Tesseract.Create(null))
                 {
-                    canvas.DrawText("TEST", new System.Drawing.Rectangle(0, 0, 100, 50), HorizontalAlignment.Left);
+                    canvas.DrawText("TEST", new System.Drawing.Rectangle(0, 0, 100, 50), System.Windows.HorizontalAlignment.Left);
 
                     ////Imaging.Image image = canvas.ToImage(Rectangle.Empty);
                     ////Pix pix = Pix.FromImage(image/*.Convert1To8()*/);
