@@ -113,7 +113,7 @@ namespace Genix.DNN.Layers
             Tensor g = base.Forward(session, xs)[0];
 
             int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
-            int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector*/
+            int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector
 
             if (this.Direction == RNNDirection.BiDirectional)
             {

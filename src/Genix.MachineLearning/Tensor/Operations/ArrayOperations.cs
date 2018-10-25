@@ -110,12 +110,12 @@ namespace Genix.MachineLearning
         /// <param name="xs">The tensors to concatenate.</param>
         /// <param name="axis">The axis to concatenate along.</param>
         /// <returns>
-        /// The <see cref="Tensor"/> that contains values from input tensors stacked along <c>axis</c> dimension.
-        /// The tensor shape matches that of <c>xs</c> except in <c>axis</c> where is has the sum of the sizes.
+        /// The <see cref="Tensor"/> that contains values from input tensors stacked along <paramref name="axis"/> dimension.
+        /// The tensor shape matches that of <paramref name="xs"/> except in <paramref name="axis"/> where is has the sum of the sizes.
         /// </returns>
         /// <remarks>
         /// <para>
-        /// The input tensors ranks and sizes must match in all dimensions except <c>axis</c>.
+        /// The input tensors ranks and sizes must match in all dimensions except <paramref name="axis"/>.
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -327,7 +327,7 @@ namespace Genix.MachineLearning
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="x">The tensor to split.</param>
         /// <param name="axis">The axis to split along.</param>
-        /// <param name="sizes">The sizes of sub tensors along dimension <c>axis</c>.</param>
+        /// <param name="sizes">The sizes of sub tensors along dimension <paramref name="axis"/>.</param>
         /// <returns>
         /// The collection of <see cref="Tensor"/> objects that contains sub tensors.
         /// </returns>
@@ -390,12 +390,12 @@ namespace Genix.MachineLearning
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="x">The tensor to split.</param>
         /// <param name="axis">The axis to split along.</param>
-        /// <param name="numberOfSplits">The number of tensors to split into along dimension <c>axis</c>.</param>
+        /// <param name="numberOfSplits">The number of tensors to split into along dimension <paramref name="axis"/>.</param>
         /// <returns>
         /// The collection of <see cref="Tensor"/> objects that contains sub tensors.
         /// </returns>
         /// <remarks>
-        /// Requires that <c>numberOfSplits</c> evenly divides the tensor shape along dimension <c>axis</c>.
+        /// Requires that <c>numberOfSplits</c> evenly divides the tensor shape along dimension <paramref name="axis"/>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor[] Split(this Session session, Tensor x, int axis, int numberOfSplits)
