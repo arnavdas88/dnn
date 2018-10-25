@@ -4,13 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-////#define TENSORFLOW
+#define TENSORFLOW
 
 namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -39,7 +38,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         public SRNCell(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -58,9 +57,9 @@ namespace Genix.DNN.Layers
             GroupCollection groups = Layer.ParseArchitecture(architecture, SRNCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
 
-            if (!Layer.TryParseArchitectureParameter(groups, "SRNC", "Bi", out RNNCellDirection direction))
+            if (!Layer.TryParseArchitectureParameter(groups, "SRNC", "Bi", out RNNDirection direction))
             {
-                direction = RNNCellDirection.ForwardOnly;
+                direction = RNNDirection.ForwardOnly;
             }
 
             this.Initialize(
@@ -93,7 +92,7 @@ namespace Genix.DNN.Layers
             CultureInfo.InvariantCulture,
             "{0}SRNC{1}",
             this.NumberOfNeurons,
-            this.Direction == RNNCellDirection.BiDirectional ? "(Bi=1)" : string.Empty);
+            this.Direction == RNNDirection.BiDirectional ? "(Bi=1)" : string.Empty);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -110,76 +109,77 @@ namespace Genix.DNN.Layers
             // pre-calculating matrix for all input vectors is approximately 30% faster
             // then using step-by-step x and h vectors concatenation and multiplication by joined W and U matrix
             // described in academic papers
-            IList<Tensor> ys = base.Forward(session, xs);
-
-            Tensor x = xs[0];
-            Tensor y = ys[0];
-#pragma warning disable SA1312 // Variable names must begin with lower-case letter
-            int T = x.Axes[(int)Axis.B];        // number of vectors in time sequence*/
-#pragma warning restore SA1312 // Variable names must begin with lower-case letter
-
 #if TENSORFLOW
-            Tensor[] hs = session.Unstack(y, 0);
+            Tensor y = base.Forward(session, xs)[0];
 
-            hs[0] = session.ReLU(hs[0]);
+            int tt = y.Axes[(int)Axis.B];        // number of vectors in time sequence
+
+            if (this.Direction == RNNDirection.BiDirectional)
+            {
+                int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector
+
+                Tensor[] u = session.Split(
+                    this.U,
+                    this.MatrixLayout == MatrixLayout.ColumnMajor ? 1 : 0,
+                    new[] { numberOfNeurons / 2, numberOfNeurons / 2 });
+
+                // forward pass
+                Tensor[] fhs = session.Unstack(
+                    session.Slice(y, new int[] { 0, 0 }, new int[] { tt, numberOfNeurons / 2 }), 0);
+
+                for (int t = 0; t < tt; t++)
+                {
+                    fhs[t] = Step(fhs[t], t > 0 ? fhs[t - 1] : null, u[0]);
+                }
+
+                // backward pass
+                Tensor[] bhs = session.Unstack(
+                    session.Slice(y, new int[] { 0, numberOfNeurons / 2 }, new int[] { tt, -1 }), 0);
+
+                for (int t = tt - 1; t >= 0; t--)
+                {
+                    bhs[t] = Step(bhs[t], t < tt - 1 ? bhs[t + 1] : null, u[1]);
+                }
+
+                // merge states
+                for (int t = 0; t < tt; t++)
+                {
+                    fhs[t] = session.Concat(new Tensor[] { fhs[t], bhs[t] }, 0);
+                }
+
+                return new[] { session.Stack(fhs, 0) };
+            }
+            else
+            {
+                Tensor[] hs = session.Unstack(y, (int)Axis.B);
+
+                for (int t = 0; t < tt; t++)
+                {
+                    hs[t] = Step(hs[t], t > 0 ? hs[t - 1] : null, this.U);
+                }
+
+                return new[] { session.Stack(hs, 0) };
+            }
 
             // add hidden layer to the output tensor
             // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
-            for (int t = 1; t < T; t++)
+            Tensor Step(Tensor x, Tensor state, Tensor u)
             {
-                Tensor h = session.Add(
-                    hs[t],
-                    session.MxV(this.MatrixLayout, this.U, false, hs[t - 1], null));
+                if (state == null)
+                {
+                    return session.ReLU(x);
+                }
+                else
+                {
+                    Tensor h = session.Add(
+                       x,
+                       session.MxV(this.MatrixLayout, u, false, state, null));
 
-                hs[t] = session.ReLU(h);
+                    return session.ReLU(h);
+                }
             }
-
-            return new[] { session.Stack(hs, 0) };
 #else
-            int ylen = this.NumberOfNeurons;        // number of output neurons / size of output vector
-            float[] uw = this.U.Weights;
-            float[] yw = y.Weights;
-
-            // add hidden layer to the output tensor
-            // y += U * y(t-1) (product of hidden weight matrix and hidden vector)
-            Nonlinearity.ReLU(ylen, yw, 0, yw, 0);
-
-            for (int t = 1, yi = ylen; t < T; t++, yi += ylen)
-            {
-                Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, false, yw, yi - ylen, yw, yi, false);
-
-                // TODO: customize activation function
-                Nonlinearity.ReLU(ylen, yw, yi, yw, yi);
-            }
-
-            if (session.CalculateGradients)
-            {
-                session.Push(
-                    "srn",
-                    () =>
-                    {
-                        float[] duw = this.U.Gradient;
-                        float[] dyw = y.Gradient;
-
-                        for (int t = T - 1, yi = t * ylen; t > 0; t--, yi -= ylen)
-                        {
-                            Nonlinearity.ReLUGradient(ylen, dyw, yi, true, yw, yi, dyw, yi);
-
-                            // dA += dy * x'
-                            lock (this.U)
-                            {
-                                Matrix.VxV(this.MatrixLayout, ylen, ylen, dyw, yi, yw, yi - ylen, duw, 0);
-                            }
-
-                            // dx += A' * dy
-                            Matrix.MxV(this.MatrixLayout, ylen, ylen, uw, 0, true, dyw, yi, dyw, yi - ylen, false);
-                        }
-
-                        Nonlinearity.ReLUGradient(ylen, dyw, 0, true, yw, 0, dyw, 0);
-                    });
-            }
-
-            return ys;
+            return new[] { session.SRN(xs[0], this.W, this.U, this.B, this.NumberOfNeurons, this.MatrixLayout) };
 #endif
         }
 
@@ -193,7 +193,7 @@ namespace Genix.DNN.Layers
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
             int[] inputShape,
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
@@ -205,12 +205,15 @@ namespace Genix.DNN.Layers
 
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron
-            int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int xlen = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
             int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
-                new[] { mbsize, numberOfNeurons } :
-                new[] { numberOfNeurons, mbsize };
+                new[] { xlen, numberOfNeurons } :
+                new[] { numberOfNeurons, xlen };
 
-            int[] hiddenShape = new[] { numberOfNeurons, numberOfNeurons };
+            int hlen = direction == RNNDirection.ForwardOnly ? numberOfNeurons : numberOfNeurons / 2;
+            int[] hiddenShape = matrixLayout == MatrixLayout.ColumnMajor ?
+                new[] { hlen, numberOfNeurons } :
+                new[] { numberOfNeurons, hlen };
 
             int[] biasesShape = new[] { numberOfNeurons };
 

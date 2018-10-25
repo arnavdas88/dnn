@@ -24,7 +24,7 @@
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
-                SRNCell layer = new SRNCell(shape, RNNCellDirection.ForwardOnly, numberOfNeurons, matrixLayout, null);
+                SRNCell layer = new SRNCell(shape, RNNDirection.ForwardOnly, numberOfNeurons, matrixLayout, null);
 
                 Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual("100SRNC", layer.Architecture);
@@ -53,7 +53,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new SRNCell(null, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new SRNCell(null, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("SRN")]
@@ -62,7 +62,7 @@
             const string Architecture = "100SRNC";
             SRNCell layer = new SRNCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
-            Assert.AreEqual(RNNCellDirection.ForwardOnly, layer.Direction);
+            Assert.AreEqual(RNNDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
 
@@ -88,7 +88,7 @@
             const string Architecture = "100SRNC(Bi=1)";
             SRNCell layer = new SRNCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
-            Assert.AreEqual(RNNCellDirection.BiDirectional, layer.Direction);
+            Assert.AreEqual(RNNDirection.BiDirectional, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
 
@@ -100,7 +100,7 @@
             Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
 
-            CollectionAssert.AreEqual(new[] { 100, 100 }, layer.U.Axes);
+            CollectionAssert.AreEqual(new[] { 100, 50 }, layer.U.Axes);
             Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
             Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
 
@@ -144,7 +144,7 @@
         public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            SRNCell layer1 = new SRNCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            SRNCell layer1 = new SRNCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             SRNCell layer2 = new SRNCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -160,7 +160,7 @@
         public void EnumGradientsTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            SRNCell layer = new SRNCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            SRNCell layer = new SRNCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
 
@@ -168,7 +168,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            SRNCell layer1 = new SRNCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            SRNCell layer1 = new SRNCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             SRNCell layer2 = layer1.Clone() as SRNCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -177,7 +177,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            SRNCell layer1 = new SRNCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            SRNCell layer1 = new SRNCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             SRNCell layer2 = JsonConvert.DeserializeObject<SRNCell>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -192,7 +192,7 @@
 
             Session session = new Session();
 
-            SRNCell layer = new SRNCell(new[] { -1, N }, RNNCellDirection.ForwardOnly, 2, MatrixLayout.RowMajor, null);
+            SRNCell layer = new SRNCell(new[] { -1, N }, RNNDirection.ForwardOnly, 2, MatrixLayout.RowMajor, null);
 
             layer.W.Randomize(this.random);
             layer.U.Randomize(this.random);
@@ -263,13 +263,13 @@
         /// MatrixLayout = MatrixLayout.ColumnMajor.
         /// </summary>
         [TestMethod, TestCategory("SRN")]
-        public void ForwardTest1()
+        public void ForwardTest_Forward_ColumnMajor()
         {
             const int batchSize = 2;
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[] { 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f });      // 3x2 matrix
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f, 0.17214662f, -0.4206545f });                                 // 2x2 matrix
@@ -309,13 +309,13 @@
         /// MatrixLayout = MatrixLayout.RowMajor.
         /// </summary>
         [TestMethod, TestCategory("SRN")]
-        public void ForwardTest2()
+        public void ForwardTest_Forward_RowMajor()
         {
             const int batchSize = 2;
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
+            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[] { 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f });      // 3x2 matrix
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f, 0.17214662f, -0.4206545f });                                 // 2x2 matrix
@@ -348,6 +348,98 @@
                 layer.B.Gradient);
             Helpers.AreArraysEqual(
                 new float[] { -0.02303392f, 0.04865196f, 0.06251067f, 0.1738062f, -0.06054522f, 0.1115987f, },
+                x.Gradient);
+        }
+
+        /// <summary>
+        /// BiDirectional, MatrixLayout = MatrixLayout.ColumnMajor.
+        /// </summary>
+        [TestMethod, TestCategory("SRN")]
+        public void ForwardTest_BiDirectional_ColumnMajor()
+        {
+            const int batchSize = 2;
+            const int inputSize = 3;
+            const int numberOfNeurons = 2;
+
+            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+
+            layer.W.Set(new float[] { 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f });      // 3x2 matrix
+            layer.U.Set(new float[] { -0.6668052f, 0.0096491f });                                                           // 1x2 matrix
+            layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
+
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+
+            // set expectations
+            Tensor expected = new Tensor(
+                null,
+                new[] { numberOfNeurons, numberOfNeurons },
+                new float[] { 0, 0.001524193f, 0, 0.07181925f });
+
+            // calculate
+            Session session = new Session();
+            Tensor y = layer.Forward(session, new[] { x })[0];
+            Helpers.AreTensorsEqual(expected, y);
+
+            y.SetGradient(new float[] { 0.1f, 0.2f, 0.3f, 0.4f });
+            session.Unroll();
+
+            Helpers.AreArraysEqual(
+                new float[] { 0, 0.14077194f, 0, -0.1609649f, 0, 0.3011579f, },
+                layer.W.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { 0, 0.01436385f, },
+                layer.U.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { 0, 0.601929843f, },
+                layer.B.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { -0.04036348f, -0.0227052923f, 0.0616188161f, -0.08111643f, -0.0456296727f, 0.1238322f, },
+                x.Gradient);
+        }
+
+        /// <summary>
+        /// BiDirectional, MatrixLayout = MatrixLayout.RowMajor.
+        /// </summary>
+        [TestMethod, TestCategory("SRN")]
+        public void ForwardTest_BiDirectional_RowMajor()
+        {
+            const int batchSize = 2;
+            const int inputSize = 3;
+            const int numberOfNeurons = 2;
+
+            SRNCell layer = new SRNCell(new[] { batchSize, inputSize }, RNNDirection.BiDirectional, numberOfNeurons, MatrixLayout.RowMajor, null);
+
+            layer.W.Set(new float[] { 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f });      // 3x2 matrix
+            layer.U.Set(new float[] { -0.6668052f, 0.0096491f });                                                           // 2x1 matrix
+            layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
+
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+
+            // set expectations
+            Tensor expected = new Tensor(
+                null,
+                new[] { numberOfNeurons, numberOfNeurons },
+                new float[] { 0, 0.06266524f, 0.3143638f, 0 });
+
+            // calculate
+            Session session = new Session();
+            Tensor y = layer.Forward(session, new[] { x })[0];
+            Helpers.AreTensorsEqual(expected, y);
+
+            y.SetGradient(new float[] { 0.1f, 0.2f, 0.3f, 0.4f });
+            session.Unroll();
+
+            Helpers.AreArraysEqual(
+                new float[] { 0.120000005f, -0.15f, 0.18f, -0.0200000014f, 0.0400000028f, 0.0600000024f, },
+                layer.W.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { 0f, 0f, },
+                layer.U.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { 0.3f, 0.2f, },
+                layer.B.Gradient);
+            Helpers.AreArraysEqual(
+                new float[] { -0.0227052923f, 0.0479578376f, 0.0616188161f, 0.17380622f, -0.06054522f, 0.111598708f, },
                 x.Gradient);
         }
     }

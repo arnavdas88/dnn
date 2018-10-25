@@ -24,7 +24,7 @@
         public void ConstructorTest1()
         {
             int[] shape = new[] { 1, 10, 12, 3 };
-            GRULayer layer = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
 
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
@@ -37,7 +37,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new GRULayer(null, RNNCellDirection.ForwardOnly, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new GRULayer(null, RNNDirection.ForwardOnly, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
@@ -51,7 +51,7 @@
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
             Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<GRUCell>().All(x => x.Direction == RNNCellDirection.ForwardOnly));
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<GRUCell>().All(x => x.Direction == RNNDirection.ForwardOnly));
             Assert.AreEqual(1, layer.NumberOfOutputs);
             CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
         }
@@ -67,7 +67,7 @@
             Assert.AreEqual(30, ((StochasticLayer)layer.Graph.Vertices.ElementAt(1)).NumberOfNeurons);
             Assert.AreEqual(40, ((StochasticLayer)layer.Graph.Vertices.ElementAt(2)).NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
-            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<GRUCell>().All(x => x.Direction == RNNCellDirection.BiDirectional));
+            Assert.IsTrue(layer.Graph.Vertices.Take(2).Cast<GRUCell>().All(x => x.Direction == RNNDirection.BiDirectional));
             Assert.AreEqual(1, layer.NumberOfOutputs);
             CollectionAssert.AreEqual(new[] { -1, 40 }, layer.OutputShape);
         }
@@ -109,7 +109,7 @@
         public void ConstructorTest3()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            Assert.IsNotNull(new GRULayer(shape, RNNCellDirection.ForwardOnly, null, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new GRULayer(shape, RNNDirection.ForwardOnly, null, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
@@ -117,14 +117,14 @@
         public void ConstructorTest4()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            Assert.IsNotNull(new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 20 }, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20 }, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
         public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRULayer layer1 = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
             GRULayer layer2 = new GRULayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -140,7 +140,7 @@
         public void EnumGradientsTest()
         {
             int[] shape = new[] { 1, 20, 20, 10 };
-            GRULayer layer = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(5, layer.EnumGradients().Count());
         }
 
@@ -148,7 +148,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRULayer layer1 = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             GRULayer layer2 = layer1.Clone() as GRULayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -157,7 +157,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRULayer layer1 = new GRULayer(shape, RNNCellDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
+            GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRULayer layer2 = JsonConvert.DeserializeObject<GRULayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);

@@ -96,45 +96,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Raises elements of one array starting at the specified index to the scalar power
-        /// and puts results into another array starting at the specified index.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <paramref name="x"/>.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> at which computation begins.</param>
-        /// <param name="power">The constant value for power.</param>
-        /// <param name="y">The output array <paramref name="y"/>.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y(offy + i) := x(offx + i) * x(offx + i)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Pow(int length, float[] x, int offx, float power, float[] y, int offy)
-        {
-            NativeMethods.powx_f32(length, x, offx, power, y, offy);
-        }
-
-        /// <summary>
-        /// Computes the derivative of <see cref="Pow"/> method.
-        /// </summary>
-        /// <param name="length">The number of elements to square.</param>
-        /// <param name="x">The input array <paramref name="x"/>.</param>
-        /// <param name="dx">The output array <c>dx</c>.</param>
-        /// <param name="offx">The index in the <paramref name="x"/> and <c>dx</c> at which computation begins.</param>
-        /// <param name="cleardx">Specifies whether the <c>dx</c> should be cleared before operation.</param>
-        /// <param name="power">The constant value for power.</param>
-        /// <param name="dy">The chain gradient array <c>dy</c>.</param>
-        /// <param name="offdy">The index in the <c>dy</c> at which computation begins.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>dx(offdx + i) += p * x(offx + i) ^ (p-1) * dy(offdy + i)</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void PowGradient(int length, float[] x, float[] dx, int offx, bool cleardx, float power, float[] dy, int offdy)
-        {
-            NativeMethods.powx_gradient_f32(length, x, dx, offx, cleardx, power, dy, offdy);
-        }
-
-        /// <summary>
         /// Computes a sum of two logarithms using Log-Sum-Exp trick.
         /// </summary>
         /// <param name="a">The first value to add.</param>
@@ -178,20 +139,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern void hypot_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void powx_f32(int n, [In] float[] a, int offa, float b, [Out] float[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void powx_gradient_f32(
-                int n,
-                [In] float[] x,
-                [In, Out] float[] dx,
-                int offx,
-                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
-                float power,
-                [In] float[] dy,
-                int offdy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern float slogSumExp2(float a, float b);

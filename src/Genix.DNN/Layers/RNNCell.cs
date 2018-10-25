@@ -28,7 +28,7 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
-        protected RNNCell(int[] outputShape, RNNCellDirection direction)
+        protected RNNCell(int[] outputShape, RNNDirection direction)
             : base(outputShape)
         {
             this.Direction = direction;
@@ -56,10 +56,10 @@ namespace Genix.DNN.Layers
         /// Gets the direction of this <see cref="RNNCell"/> (forward-only or bi-directional).
         /// </summary>
         /// <value>
-        /// The <see cref="RNNCellDirection"/> enumeration.
+        /// The <see cref="RNNDirection"/> enumeration.
         /// </value>
         [JsonProperty("direction")]
-        public RNNCellDirection Direction { get; private set; } = RNNCellDirection.ForwardOnly;
+        public RNNDirection Direction { get; private set; } = RNNDirection.ForwardOnly;
 
         /// <summary>
         /// Gets the hidden weights for the layer.
@@ -115,7 +115,7 @@ namespace Genix.DNN.Layers
         /// <param name="biasesShape">The dimensions of the layer's biases tensor.</param>
         /// <param name="random">The random numbers generator.</param>
         private protected void Initialize(
-            RNNCellDirection direction,
+            RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             int[] weightsShape,
@@ -133,7 +133,7 @@ namespace Genix.DNN.Layers
                 random = new RandomRangeGenerator(-0.08f, 0.08f);
             }
 
-            if (direction == RNNCellDirection.BiDirectional && (numberOfNeurons % 2) != 0)
+            if (direction == RNNDirection.BiDirectional && (numberOfNeurons % 2) != 0)
             {
                 throw new ArgumentException("The number of neurons in a bi-directional RNN must be even.", nameof(numberOfNeurons));
             }

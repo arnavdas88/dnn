@@ -389,6 +389,11 @@ template<typename T> T __forceinline sub(T a, T b) { return a - b; }
 OPC_IP(sub);
 OPC(sub);
 
+// Subtracts each element of a vector from a constant value.
+template<typename T> T __forceinline subrev(T a, T b) { return b - a; }
+OPC_IP(subrev);
+OPC(subrev);
+
 // Subtracts the elements of two vectors.
 OP_IP(sub);
 OP(sub);
@@ -739,11 +744,39 @@ GENIXAPI(void, hypot_f32)(
 }
 
 // y = a ^ b
-GENIXAPI(void, powx_f32)(
-	int n,
-	const float* a, int offa,
-	float b,
-	float* y, int offy)
+GENIXAPI(void, powx_ip_f32)(int n, float b, float* y, int offy)
+{
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::pow(y[i], b);
+		}
+	}
+	else
+	{
+		::vsPowx(n, y, b, y);
+	}
+}
+GENIXAPI(void, powx_ip_f64)(int n, double b, double* y, int offy)
+{
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::pow(y[i], b);
+		}
+	}
+	else
+	{
+		::vdPowx(n, y, b, y);
+	}
+}
+GENIXAPI(void, powx_f32)(int n, const float* a, int offa, float b, float* y, int offy)
 {
 	a += offa;
 	y += offy;
@@ -752,7 +785,7 @@ GENIXAPI(void, powx_f32)(
 	{
 		for (int i = 0; i < n; i++)
 		{
-			y[i] = ::powf(a[i], b);
+			y[i] = ::pow(a[i], b);
 		}
 	}
 	else
@@ -760,13 +793,30 @@ GENIXAPI(void, powx_f32)(
 		::vsPowx(n, a, b, y);
 	}
 }
+GENIXAPI(void, powx_f64)(int n, const double* a, int offa, double b, double* y, int offy)
+{
+	a += offa;
+	y += offy;
+
+	if (n <= 32)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] = ::pow(a[i], b);
+		}
+	}
+	else
+	{
+		::vdPowx(n, a, b, y);
+	}
+}
 
 // y += (a ^ b)'
-GENIXAPI(void, powx_gradient_f32)(
+template<typename T> void __forceinline __powx_gradient(
 	int n,
-	const float* x, float* dx, int offx, BOOL cleardx,
-	float power,
-	const float* dy, int offdy)
+	const T* x, T* dx, int offx, BOOL cleardx,
+	T power,
+	const T* dy, int offdy)
 {
 	x += offx;
 	dx += offx;
@@ -774,40 +824,57 @@ GENIXAPI(void, powx_gradient_f32)(
 
 	if (cleardx)
 	{
-		if (power == 2.0f)
+		if (power == (T)2.0)
 		{
 			for (int i = 0; i < n; i++)
 			{
-				dx[i] += 2.0f * x[i] * dy[i];
+				dx[i] += (T)2.0 * x[i] * dy[i];
 			}
 		}
 		else
 		{
-			const float p = power - 1.0f;
+			const T p = power - (T)1.0;
 			for (int i = 0; i < n; i++)
 			{
-				dx[i] += power * ::powf(x[i], p) * dy[i];
+				dx[i] += power * ::pow(x[i], p) * dy[i];
 			}
 		}
 	}
 	else
 	{
-		if (power == 2.0f)
+		if (power == (T)2.0)
 		{
 			for (int i = 0; i < n; i++)
 			{
-				dx[i] = 2.0f * x[i] * dy[i];
+				dx[i] = (T)2.0 * x[i] * dy[i];
 			}
 		}
 		else
 		{
-			const float p = power - 1.0f;
+			const T p = power - (T)1.0;
 			for (int i = 0; i < n; i++)
 			{
-				dx[i] = power * ::powf(x[i], p) * dy[i];
+				dx[i] = power * ::pow(x[i], p) * dy[i];
 			}
 		}
 	}
+}
+
+GENIXAPI(void, powx_gradient_f32)(
+	int n,
+	const float* x, float* dx, int offx, BOOL cleardx,
+	float power,
+	const float* y, const float* dy, int offdy)
+{
+	__powx_gradient(n, x, dx, offx, cleardx, power, dy, offdy);
+}
+GENIXAPI(void, powx_gradient_f64)(
+	int n,
+	const double* x, double* dx, int offx, BOOL cleardx,
+	double power,
+	const double* y, const double* dy, int offdy)
+{
+	__powx_gradient(n, x, dx, offx, cleardx, power, dy, offdy);
 }
 
 // y = ln(x)

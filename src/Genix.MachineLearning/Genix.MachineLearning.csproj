@@ -93,6 +93,7 @@
     <Compile Include="Tensor\Operations\ArrayOperations.cs" />
     <Compile Include="Tensor\Operations\MathOperations.cs" />
     <Compile Include="Tensor\Operations\NeuralOperations.cs" />
+    <Compile Include="Tensor\Operations\RNNDirection.cs" />
     <Compile Include="Tensor\Session.cs" />
     <Compile Include="Tensor\Shape.cs" />
     <Compile Include="Tensor\Tensor.cs" />

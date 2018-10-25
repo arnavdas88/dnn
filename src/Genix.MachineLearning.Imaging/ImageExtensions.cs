@@ -44,6 +44,9 @@ namespace Genix.MachineLearning.Imaging
                 case 16:
                     return Convert2to16bpp();
 
+                case 24:
+                    return Convert24bpp();
+
                 case 32:
                     return Convert32bpp();
 
@@ -99,18 +102,18 @@ namespace Genix.MachineLearning.Imaging
                 ulong[] bits = image.Bits;
                 int bstride = image.Stride;
                 int pixelsPerSample = 64 / bitsPerPixel;
-                ulong mask = ~(ulong.MaxValue << bitsPerPixel);
+                ulong maxcolor = image.MaxColor;
 
                 for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
                 {
                     for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
                     {
-                        ulong b = bits[offbx];
+                        ulong b = ~bits[offbx];
                         if (b != 0)
                         {
                             for (int shift = 0; shift < 64 && x < width; x++, shift += bitsPerPixel, offx += xstride)
                             {
-                                w[offx] = (float)((b >> shift) & mask);
+                                w[offx] = (b >> shift) & maxcolor;
                             }
                         }
                         else
@@ -122,7 +125,48 @@ namespace Genix.MachineLearning.Imaging
                 }
 
                 // normalize tensor to 1
-                Vectors.MulC(tensor.Length, (float)(1.0 / ((1 << bitsPerPixel) - 1)), w, 0);
+                tensor.MulC(1.0f / maxcolor);
+
+                return tensor;
+            }
+
+            Tensor Convert24bpp()
+            {
+                Tensor tensor = new Tensor(name, new[] { 1, width, height, 3 });
+
+                int xstride = tensor.Strides[(int)Axis.X];
+                int ystride = tensor.Strides[(int)Axis.Y];
+
+                unsafe
+                {
+                    fixed (ulong* bits = image.Bits)
+                    {
+                        fixed (float* w = tensor.Weights)
+                        {
+                            byte* bitsptry = (byte*)bits;
+                            int bstride8 = image.Stride8;
+
+                            float* wptry = w;
+
+                            for (int y = 0; y < height; y++, bitsptry += bstride8, wptry += ystride)
+                            {
+                                byte* bitsptrx = bitsptry;
+                                float* wptrx = wptry;
+
+                                for (int x = 0; x < width; x++, bitsptrx += 3, wptrx += xstride)
+                                {
+                                    wptrx[0] = bitsptrx[0];
+                                    wptrx[1] = bitsptrx[1];
+                                    wptrx[2] = bitsptrx[2];
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // normalize tensor to 1
+                tensor.SubCRev(255);
+                tensor.MulC(1.0f / 255);
 
                 return tensor;
             }
@@ -133,39 +177,37 @@ namespace Genix.MachineLearning.Imaging
 
                 int xstride = tensor.Strides[(int)Axis.X];
                 int ystride = tensor.Strides[(int)Axis.Y];
-                int cstride = tensor.Strides[(int)Axis.C];
                 float[] w = tensor.Weights;
 
                 ulong[] bits = image.Bits;
                 int bstride = image.Stride;
-                int pixelsPerSample = 64 / bitsPerPixel;
-
-                const float UnitValue = 1.0f / 255;
-                ulong mask = ~(ulong.MaxValue << bitsPerPixel);
 
                 for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
                 {
                     for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
                     {
-                        ulong b = bits[offbx];
-                        if (b != 0)
+                        ulong b = ~bits[offbx];
+                        if ((b & 0x00ff_ffff_00ff_fffful) != 0ul)
                         {
-                            for (int shift = 0; shift < 64 && x < width; x++, shift += bitsPerPixel, offx += xstride)
+                            for (int shift = 0; shift < 64 && x < width; x++, shift += 32, offx += xstride)
                             {
-                                ulong bvalue = (b >> shift) & mask;
+                                ulong bvalue = b >> shift;
 
-                                w[offx] = UnitValue * ((bvalue >> 24) & 0xff);
-                                w[offx + cstride] = UnitValue * ((bvalue >> 16) & 0xff);
-                                w[offx + (2 * cstride)] = UnitValue * ((bvalue >> 8) & 0xff);
+                                w[offx + 0] = (bvalue >> 0) & 0xff;
+                                w[offx + 1] = (bvalue >> 8) & 0xff;
+                                w[offx + 2] = (bvalue >> 16) & 0xff;
                             }
                         }
                         else
                         {
-                            x += pixelsPerSample;
-                            offx += pixelsPerSample * xstride;
+                            x += 2;
+                            offx += 2 * xstride;
                         }
                     }
                 }
+
+                // normalize tensor to 1
+                tensor.MulC(1.0f / 255);
 
                 return tensor;
             }

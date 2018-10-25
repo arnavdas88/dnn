@@ -371,7 +371,7 @@ namespace Genix.MachineLearning
                     if (calculateGradient)
                     {
                         // dx += 2 * x * dy
-                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 2.0f, y.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 2.0f, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -403,13 +403,13 @@ namespace Genix.MachineLearning
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Mathematics.Pow(x.Length, x.Weights, 0, power, y.Weights, 0);
+                    Vectors.Pow(x.Length, x.Weights, 0, power, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
                         // dx += p * x ^ (p - 1) * dy
-                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, power, y.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, power, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -446,7 +446,7 @@ namespace Genix.MachineLearning
                     if (calculateGradient)
                     {
                         // dx += 1 / (2 * sqrt(x)) * dy
-                        session.Push(ActionName, () => Mathematics.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 0.5f, y.Gradient, 0));
+                        session.Push(ActionName, () => Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 0.5f, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -527,12 +527,12 @@ namespace Genix.MachineLearning
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -579,12 +579,12 @@ namespace Genix.MachineLearning
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Maximum.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }

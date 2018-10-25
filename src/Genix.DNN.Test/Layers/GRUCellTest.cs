@@ -21,7 +21,7 @@
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
-                GRUCell layer = new GRUCell(shape, RNNCellDirection.ForwardOnly, numberOfNeurons, matrixLayout, null);
+                GRUCell layer = new GRUCell(shape, RNNDirection.ForwardOnly, numberOfNeurons, matrixLayout, null);
 
                 Assert.AreEqual(numberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual("100GRUC", layer.Architecture);
@@ -55,7 +55,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new GRUCell(null, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new GRUCell(null, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
@@ -64,7 +64,7 @@
             const string Architecture = "100GRUC";
             GRUCell layer = new GRUCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
-            Assert.AreEqual(RNNCellDirection.ForwardOnly, layer.Direction);
+            Assert.AreEqual(RNNDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
 
@@ -91,7 +91,7 @@
             const string Architecture = "100GRUC(Bi=1)";
             GRUCell layer = new GRUCell(new[] { -1, 10, 12, 3 }, Architecture, null);
 
-            Assert.AreEqual(RNNCellDirection.BiDirectional, layer.Direction);
+            Assert.AreEqual(RNNDirection.BiDirectional, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(Architecture, layer.Architecture);
 
@@ -148,7 +148,7 @@
         public void CopyConstructorTest1()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = new GRUCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -164,7 +164,7 @@
         public void EnumGradientsTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
 
@@ -172,7 +172,7 @@
         public void CloneTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = layer1.Clone() as GRUCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -181,7 +181,7 @@
         public void SerializeTest()
         {
             int[] shape = new[] { -1, 20, 20, 10 };
-            GRUCell layer1 = new GRUCell(shape, RNNCellDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
+            GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRUCell layer2 = JsonConvert.DeserializeObject<GRUCell>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -200,7 +200,7 @@
 
             Session session = new Session();
 
-            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -280,7 +280,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -365,7 +365,7 @@
 
             Session session = new Session();
 
-            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNCellDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(new[] { batchSize, inputSize }, RNNDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {

@@ -126,7 +126,7 @@ namespace Genix.MachineLearning
         /// The concatenated shape.
         /// </returns>
         /// <remarks>
-        /// The <c>shapes</c> must have the same rank and dimensions along all axes other than <c>axis</c>.
+        /// The <paramref name="shapes"/> must have the same rank and dimensions along all axes other than <paramref name="axis"/>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int[] Concat(IList<int[]> shapes, int axis)
@@ -183,7 +183,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shape">The shape to reshape.</param>
         /// <param name="axis">The new dimension axis.</param>
-        /// <param name="dimension">The new dimension along the <c>axis</c>.</param>
+        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
         /// <returns>
         /// The expanded shape.
         /// </returns>
@@ -212,7 +212,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shape">The shape to reshape.</param>
         /// <param name="axis">The axis to reshape along.</param>
-        /// <param name="dimension">The new dimension along the <c>axis</c>.</param>
+        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
         /// <returns>
         /// The reshaped shape.
         /// </returns>
@@ -261,7 +261,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shape1">The first shape to evaluate.</param>
         /// <param name="shape2">The second shape to evaluate.</param>
-        /// <returns><b>true</b> if <c>shape1</c> is the same as <c>shape2</c>; otherwise; <b>false</b>.</returns>
+        /// <returns><b>true</b> if <paramref name="shape1"/> is the same as <paramref name="shape2"/>; otherwise; <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(int[] shape1, int[] shape2)
         {
@@ -273,7 +273,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shapes">The shapes to evaluate.</param>
         /// <returns>
-        /// <b>true</b> if all shapes in <c>shapes</c> are identical; otherwise; <b>false</b>.
+        /// <b>true</b> if all shapes in <paramref name="shapes"/> are identical; otherwise; <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(IList<int[]> shapes)
@@ -294,7 +294,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="xs">The tensors to evaluate.</param>
         /// <returns>
-        /// <b>true</b> if shapes of all tensors in <c>xs</c> are identical; otherwise; <b>false</b>.
+        /// <b>true</b> if shapes of all tensors in <paramref name="xs"/> are identical; otherwise; <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool AreSame(IList<Tensor> xs)

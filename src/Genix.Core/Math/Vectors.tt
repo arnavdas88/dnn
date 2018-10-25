@@ -83,6 +83,24 @@
             },
         new MethodDescriptor()
         {
+            Name = "AddProductC",
+            NativeName = "addproductc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Adds a product of a constant value and elements of an array of {0} to elements of a destination array",
+            ConstantName = "alpha",
+            ConstantDescription = "The scalar to multiply.",
+            Op = "y[i] += x[i] * a"
+            },
+        new MethodDescriptor()
+        {
+            Name = "AddProduct",
+            NativeName = "addproduct",
+            Argument = ArgumentType.TwoVectors,
+            Summary = "Adds a product of elements of two arrays of {0} to elements of a destination array",
+            Op = "y[i] += a[i] * b[i]"
+            },
+        new MethodDescriptor()
+        {
             Name = "SubC",
             NativeName = "subc",
             Argument = ArgumentType.ConstantAndVector,
@@ -91,6 +109,17 @@
             HasIncrement = true,
             Op = "y[i] = x[i] - a",
             OpInPlace = "y[i] -= a",
+            },
+        new MethodDescriptor()
+        {
+            Name = "SubCRev",
+            NativeName = "subrevc",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Subtracts each element of an array of {0} from a constant value",
+            HasInPlace = true,
+            HasIncrement = true,
+            Op = "y[i] = a - x[i]",
+            OpInPlace = "y[i] = a - y[i]",
             },
         new MethodDescriptor()
         {
@@ -157,6 +186,21 @@
             HasIncrement = true,
             Op = "y = a / b",
             OpInPlace = "y /= x",
+            },
+        new MethodDescriptor()
+        {
+            Name = "Pow",
+            NativeName = "powx",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Raises elements of an array of {0} to the scalar power",
+            HasInPlace = true,
+            HasGradient = true,
+            ConstantName = "power",
+            ConstantDescription = "The constant value for power.",
+            Op = "y[i] = x[i] ^ power",
+            OpInPlace = "y[i] = y[i] ^ power",
+            OpGradient = "dx[i] += power * x[i] ^ (power - 1) * dy[i]",
+            SupportedTypes = "float;double",
             },
         new MethodDescriptor()
         {
@@ -813,7 +857,7 @@ namespace Genix.Core
         /// <param name="offx">The starting element position in <paramref name="x"/> and <paramref name="dx"/>.</param>
         /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
         /// <param name="y">The <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
-        /// <param name="dy">The array that contains gradient <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <c>y</c>.</param>
+        /// <param name="dy">The array that contains gradient <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
         /// <param name="offdy">The starting element position in <paramref name="dy"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void <#=method.Name#>Gradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] y, <#=typeName#>[] dy, int offdy)
@@ -1293,6 +1337,29 @@ namespace Genix.Core
             NativeMethods.<#=method.NativeName#>_inc_<#=method.NativeSuffix(typeName)#>(length, x, 0, incx, <#=method.ConstantName#>, y, 0, incy);
         }
 <#              }
+                if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
+
+        /// <summary>
+        /// Computes the derivative of the argument of the <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=method.ConstantType ?? typeName#>, <#=typeName#>[], int)"/> method.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="x">The <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=method.ConstantType ?? typeName#>, <#=typeName#>[], int)"/> method argument <paramref name="x"/>.</param>
+        /// <param name="dx">The destination array that receives calculated gradient for <paramref name="x"/>.</param>
+        /// <param name="offx">The starting element position in <paramref name="x"/> and <paramref name="dx"/>.</param>
+        /// <param name="cleardx">Specifies whether <paramref name="dx"/> should be cleared before computation starts.</param>
+        /// <param name="<#=method.ConstantName#>"><#=method.ConstantDescription#></param>
+        /// <param name="y">The <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=method.ConstantType ?? typeName#>, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
+        /// <param name="dy">The array that contains gradient <see cref="<#=method.Name#>(int, <#=typeName#>[], int, <#=method.ConstantType ?? typeName#>, <#=typeName#>[], int)"/> method argument <paramref name="y"/>.</param>
+        /// <param name="offdy">The starting element position in <paramref name="dy"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c><#=method.OpGradient#></c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void <#=method.Name#>Gradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, <#=typeName#>[] y, <#=typeName#>[] dy, int offdy)
+        {
+            NativeMethods.<#=method.NativeName#>_gradient_<#=method.NativeSuffix(typeName)#>(length, x, dx, offx, cleardx, <#=method.ConstantName#>, y, dy, offdy);
+        }
+<#              }
                 break;
             case ArgumentType.TwoVectors:
                 if (method.HasInPlace) { #>
@@ -1621,43 +1688,6 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Adds product of element of an array of <#=typeDescription#> and a constant to the elements of destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to add.</param>
-        /// <param name="x">The source array.</param>
-        /// <param name="offx">The starting position in <paramref name="x"/>.</param>
-        /// <param name="alpha">The scalar to multiply.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y[i] += x[i] * alpha</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddProductC(int length, <#=typeName#>[] x, int offx, <#=typeName#> alpha, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.addproductc_<#=MethodDescriptor.Type2Suffix(typeName)#>(length, x, offx, alpha, y, offy);
-        }
-
-        /// <summary>
-        /// Adds product of elements of two arrays of <#=typeDescription#> to the elements of destination array.
-        /// </summary>
-        /// <param name="length">The number of elements to multiply.</param>
-        /// <param name="a">The first source array.</param>
-        /// <param name="offa">The starting position in <paramref name="a"/>.</param>
-        /// <param name="b">The second source array.</param>
-        /// <param name="offb">The starting position in <paramref name="b"/>.</param>
-        /// <param name="y">The destination array.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        /// <remarks>
-        /// The method performs operation defined as <c>y += a * b</c>.
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddProduct(int length, <#=typeName#>[] a, int offa, <#=typeName#>[] b, int offb, <#=typeName#>[] y, int offy)
-        {
-            NativeMethods.addproduct_<#=MethodDescriptor.Type2Suffix(typeName)#>(length, a, offa, b, offb, y, offy);
-        }
-
-        /// <summary>
         /// Returns the position of minimum and maximum values in the array of <#=typeDescription#>.
         /// </summary>
         /// <param name="length">The number of elements to evaluate.</param>
@@ -1686,7 +1716,32 @@ namespace Genix.Core
             min = x[argmin];
             max = x[argmax];
         }
+<#          if (typeName == "float" || typeName == "double") { #>
 
+        /// <summary>
+        /// Computes the derivative of the arguments of the <see cref="Vectors.Min(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/>
+        /// and <see cref="Vectors.Max(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/> methods.
+        /// </summary>
+        /// <param name="length">The number of elements to calculate.</param>
+        /// <param name="x">One of the <see cref="Vectors.Min(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/> or
+        /// <see cref="Vectors.Max(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/> methods input arrays <c>a</c> or <c>b</c>.</param>
+        /// <param name="dx">The array that contains calculated gradient for <paramref name="x"/>.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> and <paramref name="dx"/> at which computation begins.</param>
+        /// <param name="cleardx">Specifies whether the <paramref name="dx"/> should be cleared before operation.</param>
+        /// <param name="y">The <see cref="Vectors.Min(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/> or
+        /// <see cref="Vectors.Max(int, <#=typeName#>[], int, <#=typeName#>[], int, <#=typeName#>[], int)"/> methods output array <paramref name="y"/>.</param>
+        /// <param name="dy">The array that contains gradient for <paramref name="y"/>.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> and <paramref name="dy"/> at which calculation begins.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>dx[i] += x[i] == y[i] ? dy[i] : 0</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MinMaxGradient(int length, <#=typeName#>[] x, <#=typeName#>[] dx, int offx, bool cleardx, <#=typeName#>[] y, <#=typeName#>[] dy, int offy)
+        {
+            NativeMethods.minmax_gradient_<#=MethodDescriptor.Type2Suffix(typeName)#>(length, x, dx, offx, cleardx, y, dy, offy);
+        }
+<#          } #>
+ 
         /// <summary>
         /// Performs thresholding of elements of an array of <#=typeDescription#>.
         /// Elements that are less than the threshold, are set to a specified value.
@@ -2028,6 +2083,20 @@ namespace Genix.Core
             [DllImport(NativeMethods.DllName)]
             public static extern unsafe void <#=method.NativeName#>_inc_<#=method.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx, <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>, [Out] <#=typeName#>* y, int offy, int incy);
 <#              }
+                if (method.HasGradient && (typeName == "float" || typeName == "double")) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=method.NativeName#>_gradient_<#=method.NativeSuffix(typeName)#>(
+                int n,
+                [In] <#=typeName#>[] x,
+                [Out] <#=typeName#>[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                <#=method.ConstantType ?? typeName#> <#=method.ConstantName#>,
+                [In] <#=typeName#>[] y,
+                [In] <#=typeName#>[] dy,
+                int offdy);
+<#              }
                 break;
             case ArgumentType.TwoVectors:
                 if (method.HasInPlace) { #>
@@ -2082,13 +2151,20 @@ namespace Genix.Core
 #>
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void addproductc_<#=MethodDescriptor.Type2Suffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, <#=typeName#> a, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void addproduct_<#=MethodDescriptor.Type2Suffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In, Out] <#=typeName#>[] y, int offy);
-
-            [DllImport(NativeMethods.DllName)]
             public static extern void argminmax_<#=MethodDescriptor.Type2Suffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, out int winmin, out int winmax);
+
+<#          if (typeName == "float" || typeName == "double") { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern void minmax_gradient_<#=MethodDescriptor.Type2Suffix(typeName)#>(
+                int n,
+                [In] <#=typeName#>[] x,
+                [Out] <#=typeName#>[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                [In] <#=typeName#>[] y,
+                [In] <#=typeName#>[] dy,
+                int offy);
+<#          } #>
 
             [DllImport(NativeMethods.DllName)]
             public static extern void threshold_lt_ip_<#=MethodDescriptor.Type2Suffix(typeName)#>(int n, <#=typeName#> threshold, <#=typeName#> value, [In, Out] <#=typeName#>[] y, int offy);
@@ -2174,6 +2250,7 @@ namespace Genix.Core
         public string Returns { get; set; }
         public string Op { get; set; }
         public string OpInPlace { get; set; }
+        public string OpGradient { get; set; }
         public string SupportedTypes { get; set; }
 
         public static string Type2Suffix(string typeName)
