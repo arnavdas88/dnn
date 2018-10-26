@@ -35,7 +35,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<PictureShape> FindPictures(Image image, PictureDetectionOptions options, CancellationToken cancellationToken)
+        public static ISet<PictureShape> FindPictures(Image image, PictureDetectorOptions options, CancellationToken cancellationToken)
         {
             return new HashSet<PictureShape>();
         }

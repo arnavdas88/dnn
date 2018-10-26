@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="LineDetectionOptions.cs" company="Noname, Inc.">
+// <copyright file="LineDetectorOptions.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -9,7 +9,7 @@ namespace Genix.DocumentAnalysis
     /// <summary>
     /// Represents the options for the line detection.
     /// </summary>
-    public class LineDetectionOptions
+    public class LineDetectorOptions
     {
         /// <summary>
         /// Gets or sets the value indicating the types of lines to locate.

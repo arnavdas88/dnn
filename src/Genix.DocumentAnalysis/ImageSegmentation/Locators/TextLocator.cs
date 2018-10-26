@@ -12,7 +12,7 @@ namespace Genix.DocumentAnalysis
     using Genix.Imaging;
 
     /// <summary>
-    /// Locates machine-printed text the <see cref="Image"/>.
+    /// Locates machine-printed text on the <see cref="Image"/>.
     /// </summary>
     public class TextLocator : LocatorBase
     {

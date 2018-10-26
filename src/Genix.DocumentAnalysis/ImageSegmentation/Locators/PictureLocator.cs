@@ -12,7 +12,7 @@ namespace Genix.DocumentAnalysis
     using Genix.Imaging;
 
     /// <summary>
-    /// Locates machine-printed text the <see cref="Image"/>.
+    /// Locates pictures on the <see cref="Image"/>.
     /// </summary>
     public class PictureLocator : LocatorBase
     {
@@ -26,9 +26,9 @@ namespace Genix.DocumentAnalysis
         /// <inheritdoc />
         public override void Locate(PageShape page, Image image, Image originalImage, IList<Rectangle> areas, CancellationToken cancellationToken)
         {
-            ISet<PictureShape> pictures = PictureDetector.FindPictures(image, new PictureDetectionOptions(), cancellationToken);
+            ISet<PictureShape> pictures = PictureDetector.FindPictures(image, new PictureDetectorOptions(), cancellationToken);
 
-            // add found lines to the image
+            // add found pictures to the image
             page.AddShapes(pictures);
         }
     }

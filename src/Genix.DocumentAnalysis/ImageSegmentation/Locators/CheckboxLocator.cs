@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="LineLocator.cs" company="Noname, Inc.">
+// <copyright file="CheckboxLocator.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -12,24 +12,24 @@ namespace Genix.DocumentAnalysis
     using Genix.Imaging;
 
     /// <summary>
-    /// Locates and removes lines from the <see cref="Image"/>.
+    /// Locates machine-printed text the <see cref="Image"/>.
     /// </summary>
-    public class LineLocator : LocatorBase
+    public class CheckboxLocator : LocatorBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LineLocator"/> class.
+        /// Initializes a new instance of the <see cref="CheckboxLocator"/> class.
         /// </summary>
-        public LineLocator()
+        public CheckboxLocator()
         {
         }
 
         /// <inheritdoc />
         public override void Locate(PageShape page, Image image, Image originalImage, IList<Rectangle> areas, CancellationToken cancellationToken)
         {
-            ISet<LineShape> lines = LineDetector.FindLines(image, new LineDetectorOptions(), cancellationToken);
+            ISet<CheckboxShape> checkboxes = CheckboxDetector.FindCheckboxes(image, new CheckboxDetectorOptions(), cancellationToken);
 
-            // add found lines to the image
-            page.AddShapes(lines);
+            // add found check boxes to the image
+            page.AddShapes(checkboxes);
         }
     }
 }

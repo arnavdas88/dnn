@@ -25,18 +25,23 @@ namespace Genix.DocumentAnalysis
         PictureLocator = 1,
 
         /// <summary>
+        /// The check box locator.
+        /// </summary>
+        CheckboxLocator = 2,
+
+        /// <summary>
         /// The line locator.
         /// </summary>
-        LineLocator = 2,
+        LineLocator = 4,
 
         /// <summary>
         /// The machine-printed text locator.
         /// </summary>
-        TextLocator = 4,
+        TextLocator = 8,
 
         /// <summary>
         /// All available locators.
         /// </summary>
-        All = PictureLocator | LineLocator | TextLocator,
+        All = PictureLocator | CheckboxLocator | LineLocator | TextLocator,
     }
 }

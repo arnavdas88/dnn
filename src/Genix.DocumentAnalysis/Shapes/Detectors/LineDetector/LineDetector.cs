@@ -76,7 +76,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<LineShape> FindLines(Image image, LineDetectionOptions options, CancellationToken cancellationToken)
+        public static ISet<LineShape> FindLines(Image image, LineDetectorOptions options, CancellationToken cancellationToken)
         {
             if (image == null)
             {

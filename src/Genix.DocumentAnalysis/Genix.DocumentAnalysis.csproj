@@ -62,14 +62,18 @@
     <Compile Include="ImagePreprocessing\ImagePreprocessing.cs" />
     <Compile Include="ImagePreprocessing\ImagePreprocessingOptions.cs" />
     <Compile Include="ImageSegmentation\ImageSegmentation.cs" />
+    <Compile Include="ImageSegmentation\Locators\CheckboxLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\LineLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorBase.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorTypes.cs" />
     <Compile Include="ImageSegmentation\Locators\PictureLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\TextLocator.cs" />
     <Compile Include="ImageSource.cs" />
-    <Compile Include="LineDetector\LineDetectionOptions.cs" />
-    <Compile Include="LineDetector\LineDetector.cs" />
+    <Compile Include="Shapes\CheckboxShape.cs" />
+    <Compile Include="Shapes\Detectors\CheckboxDetector\CheckboxDetector.cs" />
+    <Compile Include="Shapes\Detectors\CheckboxDetector\CheckboxDetectorOptions.cs" />
+    <Compile Include="Shapes\Detectors\LineDetector\LineDetectorOptions.cs" />
+    <Compile Include="Shapes\Detectors\LineDetector\LineDetector.cs" />
     <Compile Include="OCR\OCR.cs" />
     <Compile Include="OCR\Tesseract\NativeMethods.cs" />
     <Compile Include="OCR\Tesseract\Enums\OcrEngineMode.cs" />
@@ -85,8 +89,8 @@
     <Compile Include="OCR\Tesseract\Enums\TextLineOrder.cs" />
     <Compile Include="OCR\Tesseract\Enums\WritingDirection.cs" />
     <Compile Include="PageSource.cs" />
-    <Compile Include="PictureDetector\PictureDetector.cs" />
-    <Compile Include="PictureDetector\PictureDetectionOptions.cs" />
+    <Compile Include="Shapes\Detectors\PictureDetector\PictureDetector.cs" />
+    <Compile Include="Shapes\Detectors\PictureDetector\PictureDetectorOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
