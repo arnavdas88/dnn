@@ -111,8 +111,22 @@ namespace System
                 return value;
             }
         }
-<#
-    }
-#>
+
+        /// <summary>
+        /// Tests whether the two specified values are equal.
+        /// </summary>
+        /// <param name="value">This instance value to compare.</param>
+        /// <param name="other">The second value to compare.</param>
+        /// <param name="delta">The required accuracy.</param>
+        /// <returns>
+        /// <b>true</b> if two values are equal with the specified accuracy; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool AreEqual(this <#=type#> value, <#=type#> other, <#=type#> delta)
+        {
+            <#=type#> diff = value - other;
+            return diff >= -delta && diff <= delta;
+        }
+<# } #>
     }
 }
