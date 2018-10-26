@@ -9,7 +9,6 @@ namespace Genix.Imaging
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
     using System.Drawing.Imaging;
     using System.Globalization;
     using System.Linq;
@@ -18,9 +17,10 @@ namespace Genix.Imaging
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <summary>
-    /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="Bitmap"/> class.
+    /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="System.Drawing.Bitmap"/> class.
     /// </summary>
     public static class BitmapExtensions
     {
@@ -53,7 +53,7 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> is <b>null</b>.
         /// </exception>
-        public static Image FromBitmap(Bitmap bitmap)
+        public static Image FromBitmap(System.Drawing.Bitmap bitmap)
         {
             if (bitmap == null)
             {
@@ -68,7 +68,7 @@ namespace Genix.Imaging
                 (int)(bitmap.VerticalResolution + 0.5f));
 
             BitmapData srcData = bitmap.LockBits(
-                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly,
                 bitmap.PixelFormat);
 
@@ -109,14 +109,16 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> is <b>null</b>.
         /// </exception>
-        public static Image FromBitmap(Bitmap bitmap, Rectangle rect)
+        public static Image FromBitmap(System.Drawing.Bitmap bitmap, Rectangle rect)
         {
             if (bitmap == null)
             {
                 throw new ArgumentNullException(nameof(bitmap));
             }
 
-            using (Bitmap clonedBitmap = bitmap.Clone(rect, bitmap.PixelFormat))
+            using (System.Drawing.Bitmap clonedBitmap = bitmap.Clone(
+                new System.Drawing.Rectangle(rect.X, rect.Y, rect.Width, rect.Height),
+                bitmap.PixelFormat))
             {
                 return BitmapExtensions.FromBitmap(clonedBitmap);
             }
@@ -127,9 +129,9 @@ namespace Genix.Imaging
         /// </summary>
         /// <param name="image">The <see cref="Image"/> from which to create the GDI+ bitmap.</param>
         /// <returns>
-        /// A <see cref="Bitmap"/> that represents the converted <see cref="Image"/>.
+        /// A <see cref="System.Drawing.Bitmap"/> that represents the converted <see cref="Image"/>.
         /// </returns>
-        public static Bitmap ToBitmap(this Image image)
+        public static System.Drawing.Bitmap ToBitmap(this Image image)
         {
             if (image == null)
             {
@@ -140,14 +142,14 @@ namespace Genix.Imaging
             System.Drawing.Imaging.PixelFormat pixelFormat = BitmapExtensions.BitsPerPixelToPixelFormat(image.BitsPerPixel);
 
             // create new bitmap
-            Bitmap bitmap = new Bitmap(image.Width, image.Height, pixelFormat);
+            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(image.Width, image.Height, pixelFormat);
             try
             {
                 bitmap.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
                 // copy bits
                 BitmapData dstData = bitmap.LockBits(
-                    new Rectangle(0, 0, image.Width, image.Height),
+                    new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                     ImageLockMode.WriteOnly,
                     pixelFormat);
 

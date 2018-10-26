@@ -69,14 +69,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Point.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\Rectangle.cs" />
-    <Compile Include="Drawing\RectangleConverter.cs" />
-    <Compile Include="Drawing\RectangleJsonConverter.cs" />
-    <Compile Include="Drawing\RectangleLRBTComparer.cs" />
-    <Compile Include="Drawing\RectangleLTRBComparer.cs" />
-    <Compile Include="Drawing\Size.cs" />
-    <Compile Include="Drawing\SizeConverter.cs" />
-    <Compile Include="Drawing\SizeJsonConverter.cs" />
+    <Compile Include="Drawing\Rectangle.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Rectangle.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\Size.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Size.tt</DependentUpon>
+    </Compile>
     <Compile Include="Drawing\VerticalAlignment.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -122,9 +124,13 @@
       <DependentUpon>Vectors.tt</DependentUpon>
     </Compile>
     <Compile Include="Random\UlongRandomGenerator.cs" />
+    <Compile Include="System\NumericExtensions.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NumericExtensions.tt</DependentUpon>
+    </Compile>
     <Compile Include="Win32\Win32NativeMethods.cs" />
     <Compile Include="System\DisposableObject.cs" />
-    <Compile Include="System\FloatExtensions.cs" />
     <Compile Include="Vectors\DenseVectorF.cs" />
     <Compile Include="Vectors\DenseVectorProxyF.cs" />
     <Compile Include="Vectors\DenseVectorPackF.cs" />
@@ -157,7 +163,6 @@
     <Compile Include="System.Linq\EnumerableExtensions.cs" />
     <Compile Include="System.IO\DirectoryInfoExtensions.cs" />
     <Compile Include="System\ArrayExtensions.cs" />
-    <Compile Include="System\Int32Extensions.cs" />
     <Compile Include="System\StringExtensions.cs" />
     <Compile Include="Threading\CommonParallel.cs" />
     <Compile Include="Trees\BinaryHeap.cs" />
@@ -189,6 +194,14 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Point.Generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Drawing\Rectangle.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Rectangle.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Drawing\Size.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Size.Generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Math\MinMax.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MinMax.Generated.cs</LastGenOutput>
@@ -200,6 +213,10 @@
     <Content Include="Math\Vectors.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Vectors.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="System\NumericExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>NumericExtensions.Generated.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

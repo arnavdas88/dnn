@@ -8,13 +8,12 @@ namespace Genix.Imaging
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
     using System.Runtime.ConstrainedExecution;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using System.Security;
     using System.Security.Permissions;
-    using System.Windows;
+    using Genix.Drawing;
 
     /// <summary>
     /// Represents an area that can be used for drawing.
@@ -60,7 +59,7 @@ namespace Genix.Imaging
 
                 // select color
                 this.oldMapMode = NativeMethods.SetBkMode(this.hdc, NativeMethods.TRANSPARENT);
-                this.oldBkColor = NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.Black));
+                this.oldBkColor = NativeMethods.SetTextColor(this.hdc, System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.Black));
 
                 // erase background
                 this.Clear();
@@ -81,7 +80,7 @@ namespace Genix.Imaging
             if (this.hdc != null)
             {
                 int mapMode = NativeMethods.SetMapMode(this.hdc, NativeMethods.MM_TEXT);
-                int backColor = NativeMethods.SetBkColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.White));
+                int backColor = NativeMethods.SetBkColor(this.hdc, System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.White));
 
                 NativeMethods.Rect bounds = new NativeMethods.Rect(0, 0, this.width, this.height);
                 NativeMethods.ExtTextOut(this.hdc, 0, 0, NativeMethods.ETO_OPAQUE, ref bounds, null, 0, null);
@@ -98,7 +97,7 @@ namespace Genix.Imaging
         /// <param name="fontSize">The size of the font used to draw on the canvas.</param>
         /// <param name="fontStyle">The style of the font used to draw on the canvas.</param>
         /// <param name="unit">The GraphicsUnit of the new font. </param>
-        public void SelectFont(string fontName, float fontSize, System.Drawing.FontStyle fontStyle, GraphicsUnit unit)
+        public void SelectFont(string fontName, float fontSize, System.Drawing.FontStyle fontStyle, System.Drawing.GraphicsUnit unit)
         {
             if (this.hdc != null)
             {
@@ -109,7 +108,7 @@ namespace Genix.Imaging
                 }
 
                 // get a handle to the Font object.
-                using (Font font = new Font(fontName, fontSize, fontStyle, unit))
+                using (System.Drawing.Font font = new System.Drawing.Font(fontName, fontSize, fontStyle, unit))
                 {
                     this.hfont = new SafeGdiObjectHandle(font.ToHfont(), true);
                     NativeMethods.SelectObject(this.hdc, this.hfont);
@@ -117,7 +116,7 @@ namespace Genix.Imaging
 
                 // select color
                 NativeMethods.SetBkMode(this.hdc, NativeMethods.TRANSPARENT);
-                NativeMethods.SetTextColor(this.hdc, ColorTranslator.ToWin32(System.Drawing.Color.Black));
+                NativeMethods.SetTextColor(this.hdc, System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.Black));
             }
         }
 
@@ -187,11 +186,11 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Converts this canvas to <see cref="Bitmap"/>.
+        /// Converts this canvas to <see cref="System.Drawing.Bitmap"/>.
         /// </summary>
         /// <returns>The <see cref="Imaging.Image"/> this method creates.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", Justification = "Need to comply with .NET interface requirements.")]
-        public Bitmap ToBitmap()
+        public System.Drawing.Bitmap ToBitmap()
         {
             IntPtr hbitmap = this.bitmap.DangerousGetHandle();
             return this.bitmap != null ? System.Drawing.Image.FromHbitmap(hbitmap) : null;
@@ -204,7 +203,7 @@ namespace Genix.Imaging
         /// <returns>The <see cref="Imaging.Image"/> this method creates.</returns>
         public Image ToImage(Rectangle rect)
         {
-            using (Bitmap bmp = this.ToBitmap())
+            using (System.Drawing.Bitmap bmp = this.ToBitmap())
             {
                 if (bmp == null)
                 {

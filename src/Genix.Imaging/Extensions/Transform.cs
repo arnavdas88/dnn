@@ -7,10 +7,10 @@
 namespace Genix.Imaging
 {
     using System;
-    using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
+    using Genix.Drawing;
 
     /// <content>
     /// Provides various transformation methods like rotation and mirroring for the <see cref="Image"/> class.
@@ -57,9 +57,9 @@ namespace Genix.Imaging
             }
 
             // calculate new image size and position
-            System.Windows.Point tr = TransformPoint(src.Width, 0);
-            System.Windows.Point br = TransformPoint(src.Width, src.Height);
-            System.Windows.Point bl = TransformPoint(0, src.Height);
+            PointD tr = TransformPoint(src.Width, 0);
+            PointD br = TransformPoint(src.Width, src.Height);
+            PointD bl = TransformPoint(0, src.Height);
 
             double x1dst = Core.MinMax.Min(bl.X, tr.X, br.X, 0.0);
             double x2dst = Core.MinMax.Max(bl.X, tr.X, br.X, 0.0);
@@ -125,9 +125,9 @@ namespace Genix.Imaging
 
             return dst;
 
-            System.Windows.Point TransformPoint(int ptx, int pty)
+            PointD TransformPoint(int ptx, int pty)
             {
-                return new System.Windows.Point(
+                return new PointD(
                     (matrix.M11 * ptx) + (matrix.M12 * pty) + matrix.OffsetX,
                     (matrix.M21 * ptx) + (matrix.M22 * pty) + matrix.OffsetY);
             }

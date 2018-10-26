@@ -60,7 +60,7 @@ namespace Genix.DocumentAnalysis
                 100.MulDiv(image.VerticalResolution, 200));
 
             componentgrid.Add(
-                closing.FindConnectedComponents(4)/*.Where(x => x.Power > 10 && x.Bounds.Height <= 100)*/,
+                closing.FindConnectedComponents(4) /*.Where(x => x.Power > 10 && x.Bounds.Height <= 100)*/,
                 true,
                 true);
 

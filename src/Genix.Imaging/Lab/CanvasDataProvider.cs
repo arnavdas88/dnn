@@ -10,9 +10,8 @@ namespace Genix.Imaging.Lab
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
-    using System.Windows;
     using Genix.Core;
+    using Genix.Drawing;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -242,7 +241,7 @@ namespace Genix.Imaging.Lab
 
         private IEnumerable<TestImage> DrawBitmaps(string font, System.Drawing.FontStyle fontStyle, IEnumerable<string[]> labels)
         {
-            this.canvas.SelectFont(font, this.Height, fontStyle, GraphicsUnit.Pixel);
+            this.canvas.SelectFont(font, this.Height, fontStyle, System.Drawing.GraphicsUnit.Pixel);
 
             foreach (string[] label in labels)
             {
