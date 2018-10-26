@@ -109,8 +109,8 @@
     <Compile Include="Shapes\TextShape.cs" />
     <Compile Include="Shapes\TextBlockShape.cs" />
     <Compile Include="Shapes\TextLineShape.cs" />
-    <Compile Include="TextDetector\TextDetectionOptions.cs" />
-    <Compile Include="TextDetector\TextDetector.cs" />
+    <Compile Include="Shapes\TextDetector\TextDetectionOptions.cs" />
+    <Compile Include="Shapes\TextDetector\TextDetector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DocumentAnalysis.snk" />

@@ -24,7 +24,7 @@ namespace Genix.DocumentAnalysis
         /// <param name="options">The parameters of this method.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the <see cref="PictureDetector"/> that operation should be canceled.</param>
         /// <returns>
-        /// The detected text.
+        /// The set of detected pictures.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="image"/> is <b>null</b>.

@@ -4,12 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+#define SESSION_DIAG
+
 namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using Genix.Drawing;
     using Genix.Imaging;
@@ -25,8 +30,8 @@ namespace Genix.DocumentAnalysis
         private static readonly Dictionary<LocatorTypes, Type> Types = new Dictionary<LocatorTypes, Type>()
         {
             { LocatorTypes.PictureLocator, typeof(PictureLocator) },
-            { LocatorTypes.CheckboxLocator, typeof(CheckboxLocator) },
             { LocatorTypes.LineLocator, typeof(LineLocator) },
+            { LocatorTypes.CheckboxLocator, typeof(CheckboxLocator) },
             { LocatorTypes.TextLocator, typeof(TextLocator) },
         };
 
@@ -34,6 +39,11 @@ namespace Genix.DocumentAnalysis
         /// The locators that this <see cref="ImageSegmentation"/> uses.
         /// </summary>
         private readonly Dictionary<LocatorTypes, LocatorBase> locators = new Dictionary<LocatorTypes, LocatorBase>();
+
+#if SESSION_DIAG
+        private readonly Stopwatch stopwatch = new Stopwatch();
+        private readonly Dictionary<string, long> performance = new Dictionary<string, long>();
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSegmentation"/> class.
@@ -77,6 +87,9 @@ namespace Genix.DocumentAnalysis
             {
                 if (this.Locators.HasFlag(locatorType))
                 {
+#if SESSION_DIAG
+                    this.StartStopwatch();
+#endif
                     LocatorBase locator = InitializeLocator(locatorType);
                     if (locatorType == LocatorTypes.LineLocator)
                     {
@@ -90,6 +103,9 @@ namespace Genix.DocumentAnalysis
                     {
                         locator.Locate(page, image, originalImage, areas, cancellationToken);
                     }
+#if SESSION_DIAG
+                    this.StopStopwatch(locatorType.ToString());
+#endif
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -119,5 +135,40 @@ namespace Genix.DocumentAnalysis
                 return locator;
             }
         }
+
+        public string PrintPerformanceReport(int count)
+        {
+#if SESSION_DIAG
+            return string.Join(
+                Environment.NewLine,
+                this.performance.Select(kvp => string.Format(CultureInfo.InvariantCulture, "{0}: {1}", kvp.Key, kvp.Value / count)));
+#else
+            return null;
+#endif
+        }
+
+#if SESSION_DIAG
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void StartStopwatch()
+        {
+            this.stopwatch.Restart();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void StopStopwatch(string actionName)
+        {
+            this.stopwatch.Stop();
+            long timeSpent = this.stopwatch.ElapsedTicks;
+
+            if (this.performance.TryGetValue(actionName, out long value))
+            {
+                this.performance[actionName] = value + timeSpent;
+            }
+            else
+            {
+                this.performance[actionName] = timeSpent;
+            }
+        }
+#endif
     }
 }

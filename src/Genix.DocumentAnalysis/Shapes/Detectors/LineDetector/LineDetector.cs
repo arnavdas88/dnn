@@ -133,20 +133,20 @@ namespace Genix.DocumentAnalysis
                 // open up in both directions to find lines
                 int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
                 hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
-                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                // check for line presence
                 if (hlines.IsAllWhite())
                 {
                     hlines = null;
                 }
 
+                cancellationToken.ThrowIfCancellationRequested();
+
+                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
                 if (vlines.IsAllWhite())
                 {
                     vlines = null;
                 }
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 // various working images
                 Image nonLines = null;
