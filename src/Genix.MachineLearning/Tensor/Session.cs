@@ -5,7 +5,7 @@
 // -----------------------------------------------------------------------
 
 ////#define NOLEARNING
-////#define SESSION_DIAG
+#define SESSION_DIAG
 
 namespace Genix.MachineLearning
 {

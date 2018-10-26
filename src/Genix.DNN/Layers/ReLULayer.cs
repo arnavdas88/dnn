@@ -74,7 +74,9 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
-            return new[] { session.ReLU(xs[0]) };
+            session.ReLUIP(xs[0]);
+            return xs;
+            ////return new[] { session.ReLU(xs[0]) };
         }
     }
 }

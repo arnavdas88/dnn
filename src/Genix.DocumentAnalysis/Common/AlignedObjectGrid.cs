@@ -6,9 +6,9 @@
 
 namespace Genix.Core
 {
-    using Genix.Drawing;
     using System;
     using System.Collections.Generic;
+    using Genix.Drawing;
 
     /// <summary>
     /// Represents a grid that holds a collection of <see cref="IAlignedBoundedObject"/> objects.
@@ -24,7 +24,7 @@ namespace Genix.Core
         /// <param name="cellWidth">The width of each cell, in pixels.</param>
         /// <param name="cellHeight">The height of each cell, in pixels.</param>
         public AlignedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight)
-            : base(bounds, cellWidth, cellHeight, new RectangleLTRBComparer())
+            : base(bounds, cellWidth, cellHeight)
         {
         }
 

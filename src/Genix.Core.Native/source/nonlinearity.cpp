@@ -2,7 +2,7 @@
 #include "mkl.h"
 #include "nonlinearity.inl"
 
-extern "C" __declspec(dllexport) void WINAPI relu(
+GENIXAPI(void, relu)(
 	int n,
 	const float* x, int offx,
 	float* y, int offy)
@@ -16,7 +16,7 @@ extern "C" __declspec(dllexport) void WINAPI relu(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI relu_gradient2(
+GENIXAPI(void, relu_gradient2)(
 	int n,
 	float* dx, int offdx, BOOL cleardx,
 	const float* y, int offy,
@@ -42,7 +42,21 @@ extern "C" __declspec(dllexport) void WINAPI relu_gradient2(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI sigmoid(
+GENIXAPI(void, relu_gradient2_ip)(
+	int n,
+	float* dxy, int offdxy,
+	const float* y, int offy)
+{
+	dxy += offdxy;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		dxy[i] *= __relu_derivative2(y[i]);
+	}
+}
+
+GENIXAPI(void, sigmoid)(
 	int n,
 	const float* x, int offx,
 	float* y, int offy)
@@ -56,7 +70,7 @@ extern "C" __declspec(dllexport) void WINAPI sigmoid(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI sigmoid_gradient2(
+GENIXAPI(void, sigmoid_gradient2)(
 	int n,
 	float* dx, int offdx, BOOL cleardx,
 	const float* y, int offy,
@@ -82,7 +96,7 @@ extern "C" __declspec(dllexport) void WINAPI sigmoid_gradient2(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI _tanh(
+GENIXAPI(void, _tanh)(
 	int n,
 	const float* x, int offx,
 	float* y, int offy)
@@ -90,7 +104,7 @@ extern "C" __declspec(dllexport) void WINAPI _tanh(
 	::vsTanh(n, x + offx, y + offy);
 }
 
-extern "C" __declspec(dllexport) void WINAPI tanh_gradient2(
+GENIXAPI(void, tanh_gradient2)(
 	int n,
 	float* dx, int offdx, BOOL cleardx,
 	const float* y, int offy,
@@ -116,11 +130,10 @@ extern "C" __declspec(dllexport) void WINAPI tanh_gradient2(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI tanh_gradient2_ip(
+GENIXAPI(void, tanh_gradient2_ip)(
 	int n,
 	float* dxy, int offdxy,
-	const float* y, int offy
-	)
+	const float* y, int offy)
 {
 	dxy += offdxy;
 	y += offy;

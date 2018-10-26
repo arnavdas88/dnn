@@ -631,6 +631,36 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
+        /// Computes a rectified linear unit nonlinearity element wise on a tensor in place.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor <paramref name="x"/>.</param>
+        /// <remarks>
+        /// The method performs operation defined as <c>x(i) := max(x(i), 0)</c>.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ReLUIP(this Session session, Tensor x)
+        {
+            const string ActionName = "relu";
+
+            session.RunOperation(
+                ActionName,
+                () =>
+                {
+                    Nonlinearity.ReLU(x.Length, x.Weights, 0, x.Weights, 0);
+
+#if !NOLEARNING
+                    if (session.CalculateGradients && x.CalculateGradient)
+                    {
+                        session.Push(ActionName, () => Nonlinearity.ReLUGradientIP(x.Length, x.Gradient, 0, x.Weights, 0));
+                    }
+#endif
+
+                    return (Tensor)null;    // we have to return something
+                });
+        }
+
+        /// <summary>
         /// Computes a sigmoid nonlinearity element wise on one tensor and puts results into another tensor.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>

@@ -98,11 +98,15 @@ namespace Genix.DocumentAnalysis
                 }
             }
 
+            shapegrid.Compact();
+
             Image draft = image.ConvertTo(null, 24);
             foreach (TextShape shape in shapegrid.EnumObjects())
             {
                 draft.DrawRectangle(shape.Bounds, 0x00800000);
             }
+
+            int count = shapegrid.EnumObjects().Count();
 
             return new HashSet<TextShape>();
         }

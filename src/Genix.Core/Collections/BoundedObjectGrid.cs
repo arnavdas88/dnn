@@ -17,8 +17,7 @@ namespace Genix.Core
     public class BoundedObjectGrid<T>
         where T : class, IBoundedObject
     {
-        private readonly SortedList<Rectangle, T>[][] cells;
-        private readonly IComparer<Rectangle> comparer;
+        private readonly List<T>[][] cells;
         private int version = 0;
 
         /// <summary>
@@ -27,8 +26,7 @@ namespace Genix.Core
         /// <param name="bounds">The grid bounding box.</param>
         /// <param name="cellWidth">The width of each cell, in pixels.</param>
         /// <param name="cellHeight">The height of each cell, in pixels.</param>
-        /// <param name="comparer">The comparer used to sort object withing their cells.</param>
-        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
+        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight)
         {
             this.Bounds = bounds;
             this.CellWidth = cellWidth;
@@ -38,8 +36,7 @@ namespace Genix.Core
             this.Height = (bounds.Height + cellHeight - 1) / cellHeight;
             this.NumberOfCells = this.Width * this.Height;
 
-            this.cells = JaggedArray.Create<SortedList<Rectangle, T>>(this.Height, this.Width);
-            this.comparer = comparer;
+            this.cells = JaggedArray.Create<List<T>>(this.Height, this.Width);
         }
 
         /// <summary>
@@ -97,7 +94,7 @@ namespace Genix.Core
         {
             for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = 0; x < w; x++)
                 {
                     lists[x] = null;
@@ -120,15 +117,15 @@ namespace Genix.Core
 
             for (int y = starty; y <= endy; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = startx; x <= endx; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list != null)
                     {
-                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        foreach (T o in list)
                         {
-                            if (kvp.Key.IntersectsWith(bounds))
+                            if (o.Bounds.IntersectsWith(bounds))
                             {
                                 return false;
                             }
@@ -148,8 +145,7 @@ namespace Genix.Core
         /// <param name="spreadVertically">If <b>true</b> all the cells covered vertically by the object are used; otherwise, the object is added to the top-left cell.</param>
         public void Add(T obj, bool spreadHorizontally, bool spreadVertically)
         {
-            Rectangle bounds = obj.Bounds;
-            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
+            this.FindCells(obj.Bounds, out int startx, out int starty, out int endx, out int endy);
 
             if (!spreadHorizontally)
             {
@@ -163,16 +159,16 @@ namespace Genix.Core
 
             for (int y = starty; y <= endy; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = startx; x <= endx; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list == null)
                     {
-                        lists[x] = list = new SortedList<Rectangle, T>(this.comparer);
+                        lists[x] = list = new List<T>();
                     }
 
-                    list.Add(bounds, obj);
+                    list.Add(obj);
                 }
             }
 
@@ -185,20 +181,19 @@ namespace Genix.Core
         /// <param name="obj">The object to remove.</param>
         public void Remove(T obj)
         {
-            Rectangle bounds = obj.Bounds;
-            this.FindCells(bounds, out int startx, out int starty, out int endx, out int endy);
+            this.FindCells(obj.Bounds, out int startx, out int starty, out int endx, out int endy);
 
             for (int y = starty; y <= endy; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = startx; x <= endx; x++)
                 {
                     bool removed = false;
 
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list != null)
                     {
-                        removed = list.Remove(bounds);
+                        removed = list.Remove(obj);
 
                         if (removed)
                         {
@@ -255,13 +250,13 @@ namespace Genix.Core
 
             for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = 0; x < w; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list != null)
                     {
-                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        foreach (T o in list)
                         {
                             if (oldversion != this.version)
                             {
@@ -270,10 +265,11 @@ namespace Genix.Core
 
                             // validate that we are in object's starting cell
                             // otherwise the object that spread across multiple cells has already been returned from other cell
-                            this.FindCell(kvp.Key.X, kvp.Key.Y, out int startx, out int starty);
+                            Rectangle bounds = o.Bounds;
+                            this.FindCell(bounds.X, bounds.Y, out int startx, out int starty);
                             if (x == startx && y == starty)
                             {
-                                yield return kvp.Value;
+                                yield return o;
                             }
                         }
                     }
@@ -300,27 +296,28 @@ namespace Genix.Core
             int oldversion = this.version;
             for (int y = starty; y <= endy; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = startx; x <= endx; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list != null)
                     {
-                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        foreach (T o in list)
                         {
                             if (oldversion != this.version)
                             {
                                 throw new InvalidOperationException("The grid was modified during enumeration.");
                             }
 
-                            if (kvp.Key.IntersectsWith(bounds))
+                            Rectangle obounds = o.Bounds;
+                            if (obounds.IntersectsWith(bounds))
                             {
                                 // validate that we are in object's starting cell
                                 // otherwise the object that spread across multiple cells has already been returned from other cell
-                                this.FindCell(kvp.Key.X, kvp.Key.Y, out int firstx, out int firsty);
+                                this.FindCell(obounds.X, obounds.Y, out int firstx, out int firsty);
                                 if (x == MinMax.Max(firstx, startx) && y == MinMax.Max(firsty, starty))
                                 {
-                                    yield return kvp.Value;
+                                    yield return o;
                                 }
                             }
                         }
@@ -348,22 +345,22 @@ namespace Genix.Core
             int oldversion = this.version;
             for (int y = starty; y <= endy; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 for (int x = startx; x <= endx; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     if (list != null)
                     {
-                        foreach (KeyValuePair<Rectangle, T> kvp in list)
+                        foreach (T o in list)
                         {
                             if (oldversion != this.version)
                             {
                                 throw new InvalidOperationException("The grid was modified during enumeration.");
                             }
 
-                            if (kvp.Key.Contains(bounds))
+                            if (o.Bounds.Contains(bounds))
                             {
-                                return kvp.Value;
+                                return o;
                             }
                         }
                     }
@@ -383,20 +380,92 @@ namespace Genix.Core
         {
             int count = 0;
 
-            for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
+            for (int y0 = 0, w = this.Width, h = this.Height; y0 < h; y0++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
-                for (int x = 0; x < w; x++)
+                List<T>[] lists0 = this.cells[y0];
+                for (int x0 = 0; x0 < w; x0++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
-                    if (list != null)
+                    List<T> list0 = lists0[x0];
+                    if (list0 != null)
                     {
-                        for (int i = 0; i < list.Count; i++)
+                        for (int i0 = 0; i0 < list0.Count; i0++)
                         {
-                            if (this.FindContainer(list.Key) != null)
+                            T o0 = list0[i0];
+                            Rectangle o0bounds = o0.Bounds;
+                            this.FindCells(o0bounds, out int startx, out int starty, out int endx, out int endy);
+
+                            if (FindContainer())
                             {
-                                i++;
+                                // remove from this cell
+                                list0.RemoveAt(i0);
+                                i0--;
                                 count++;
+
+                                // remove from other cells
+                                if (endx > startx || endy > starty)
+                                {
+                                    Remove();
+                                }
+                            }
+
+                            bool FindContainer()
+                            {
+                                for (int y1 = starty; y1 <= endy; y1++)
+                                {
+                                    List<T>[] lists1 = this.cells[y1];
+                                    for (int x1 = startx; x1 <= endx; x1++)
+                                    {
+                                        List<T> list1 = lists1[x1];
+                                        if (list1 != null)
+                                        {
+                                            for (int i1 = 0; i1 < list1.Count; i1++)
+                                            {
+                                                T o1 = list1[i1];
+                                                if (o1 != o0 && o1.Bounds.Contains(o0.Bounds))
+                                                {
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                return false;
+                            }
+
+                            void Remove()
+                            {
+                                for (int y1 = starty; y1 <= endy; y1++)
+                                {
+                                    List<T>[] lists1 = this.cells[y1];
+                                    for (int x1 = startx; x1 <= endx; x1++)
+                                    {
+                                        bool removed = false;
+
+                                        List<T> list1 = lists1[x1];
+                                        if (list1 != null)
+                                        {
+                                            removed = list1.Remove(o0);
+
+                                            if (removed)
+                                            {
+                                                count++;
+
+                                                if (list1.Count == 0)
+                                                {
+                                                    // remove collection if cell does not contain any more elements
+                                                    lists1[x1] = null;
+                                                }
+                                            }
+                                        }
+
+                                        // stop searching if the object was not spread across multiple cells
+                                        if (!removed && (y1 > starty || x1 > startx))
+                                        {
+                                            return;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -418,11 +487,11 @@ namespace Genix.Core
 
             for (int y = 0, w = this.Width, h = this.Height; y < h; y++)
             {
-                SortedList<Rectangle, T>[] lists = this.cells[y];
+                List<T>[] lists = this.cells[y];
                 int[] linecounts = counts[y];
                 for (int x = 0; x < w; x++)
                 {
-                    SortedList<Rectangle, T> list = lists[x];
+                    List<T> list = lists[x];
                     linecounts[x] = list != null ? list.Count : 0;
                 }
             }

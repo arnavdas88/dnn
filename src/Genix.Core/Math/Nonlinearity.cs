@@ -31,7 +31,7 @@ namespace Genix.Core
         }
 
         /// <summary>
-        /// Computes a rectified linear unit tangent nonlinearity element wise on one array and puts results into another array.
+        /// Computes a rectified linear unit nonlinearity element wise on one array and puts results into another array.
         /// </summary>
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dx">The array that receives the computed gradient.</param>
@@ -45,6 +45,20 @@ namespace Genix.Core
         public static void ReLUGradient(int length, float[] dx, int offdx, bool cleardx, float[] y, int offy, float[] dy, int offdy)
         {
             NativeMethods.relu_gradient2(length, dx, offdx, cleardx, y, offy, dy, offdy);
+        }
+
+        /// <summary>
+        /// Computes a gradient of rectified linear unit nonlinearity element wise on an array in place.
+        /// </summary>
+        /// <param name="length">The number of elements to compute.</param>
+        /// <param name="dxy">The array that contains chain gradient from next level receives the computed gradient.</param>
+        /// <param name="offdxy">The index in the <paramref name="dxy"/> at which computation begins.</param>
+        /// <param name="y">The array that contains <see cref="Tanh(int, float[], int, float[], int)"/> method results.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ReLUGradientIP(int length, float[] dxy, int offdxy, float[] y, int offy)
+        {
+            NativeMethods.relu_gradient2_ip(length, dxy, offdxy, y, offy);
         }
 
         /// <summary>
@@ -200,6 +214,14 @@ namespace Genix.Core
                 int offy,
                 [In] float[] dy,
                 int offdy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void relu_gradient2_ip(
+                int n,
+                [In, Out] float[] dxy,
+                int offdxy,
+                [In] float[] y,
+                int offy);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void sigmoid(
