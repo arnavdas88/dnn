@@ -60,7 +60,7 @@ namespace Genix.DocumentAnalysis
                 100.MulDiv(image.VerticalResolution, 200));
 
             componentgrid.Add(
-                closing.FindConnectedComponents(4).Where(x => x.Power > 10 && x.Bounds.Height <= 100),
+                closing.FindConnectedComponents(4)/*.Where(x => x.Power > 10 && x.Bounds.Height <= 100)*/,
                 true,
                 true);
 
@@ -73,7 +73,7 @@ namespace Genix.DocumentAnalysis
             {
                 if (component.VerticalAlignment == VerticalAlignment.None)
                 {
-                    IList<ConnectedComponent> alignedComponents = componentgrid.FindVerticalAlignment(component, VerticalAlignment.Bottom, 100);
+                    IList<ConnectedComponent> alignedComponents = componentgrid.FindVerticalAlignment(component, VerticalAlignment.Bottom, 50);
                     if (alignedComponents.Count > 1)
                     {
                         foreach (ConnectedComponent alignedComponent in alignedComponents)

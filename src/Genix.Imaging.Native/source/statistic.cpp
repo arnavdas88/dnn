@@ -162,35 +162,35 @@ GENIXAPI(void, vhist_8bpp)(
 	}
 }
 
-GENIXAPI(void, minmax_8bpp)(
+GENIXAPI(int, minmax)(
+	const int bitsPerPixel,
 	const int x, const int y, const int width, const int height,
-	const unsigned __int64* bits, const int stride,
-	unsigned __int8* min, unsigned __int8* max)
+	const unsigned __int8* bits, const int stride,
+	unsigned* min, unsigned* max)
 {
-	const int stridebytes = stride * sizeof(unsigned __int64);	// 8 bytes per word
-	const Ipp8u* bits_u8 = (const Ipp8u*)bits + (ptrdiff_t(y) * stridebytes) + x;
+	IppStatus status = ippStsNoErr;
 
-	ippiMinMax_8u_C1R(
-		bits_u8,
-		stridebytes,
-		{ width, height },
-		min,
-		max);
-}
+	switch (bitsPerPixel)
+	{
+	case 8:
+	{
+		Ipp8u _min, _max;
+		status = ippiMinMax_8u_C1R(bits + (ptrdiff_t(y) * stride) + x, stride, { width, height }, &_min, &_max);
+		*min = _min;
+		*max = _max;
+	}
+	break;
 
-GENIXAPI(void, minmax_16bpp)(
-	const int x, const int y, const int width, const int height,
-	const unsigned __int64* bits, const int stride,
-	unsigned __int16* min, unsigned __int16* max)
-{
-	const int stridebytes = stride * sizeof(unsigned __int64);	// 8 bytes per word
-	const Ipp16u* bits_u16 = (const Ipp16u*)((const Ipp8u*)bits + (ptrdiff_t(y) * stridebytes)) + x;
+	case 16:
+	{
+		Ipp16u _min, _max;
+		status = ippiMinMax_16u_C1R((const Ipp16u*)(bits + (ptrdiff_t(y) * stride)) + x, stride, { width, height }, &_min, &_max);
+		*min = _min;
+		*max = _max;
+	}
+	break;
+	}
 
-	ippiMinMax_16u_C1R(
-		bits_u16,
-		stridebytes,
-		{ width, height },
-		min,
-		max);
+	return status;
 }
 

@@ -33,53 +33,33 @@ namespace Genix.Core
             ////Rectangle bounds = obj.Bounds;
             SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
 
-            ////int ystart = verticalAlignment == VerticalAlignment.Top ? bounds.Top : bounds.Bottom;
+            Rectangle obounds = obj.Bounds;
+            result.Add(obounds, obj);
 
-            result.Add(obj.Bounds, obj);
+            // calculate initial pivot points
+            Line baseline = new Line(
+                obounds.Left,
+                verticalAlignment == VerticalAlignment.Top ? obounds.Top : obounds.Bottom,
+                obounds.Right,
+                verticalAlignment == VerticalAlignment.Top ? obounds.Top : obounds.Bottom);
 
             // find objects to the left
-            T next = FindNext(obj.Bounds, false);
+            T next = FindNext(obounds, false);
             while (next != null)
             {
                 result.Add(next.Bounds, next);
-
                 next = FindNext(next.Bounds, false);
             }
 
             // find objects to the right
-            next = FindNext(obj.Bounds, true);
+            next = FindNext(obounds, true);
             while (next != null)
             {
-                if (!result.ContainsKey(next.Bounds))
-                {
-                    result.Add(next.Bounds, next);
-                }
-
+                result.Add(next.Bounds, next);
                 next = FindNext(next.Bounds, true);
             }
 
             return result.Values;
-
-            /*while (obj != null)
-            {
-                // Add the blob to the list if the appropriate side is a tab candidate,
-                // or if we are working on a ragged tab.
-                if (obj.VerticalAlignment == verticalAlignment)
-                {
-                    result.Add(obj);
-                }
-
-                // Find the next blob that is aligned with the current one.
-                // FindAlignedBlob guarantees that forward progress will be made in the
-                // top_to_bottom direction, and therefore eventually it will return nullptr,
-                // making this while (bbox != nullptr) loop safe.
-                obj = FindAlignedBlob(params, top_to_bottom, bbox, ystart, end_y);
-                if (obj != null)
-                {
-                    bounds = obj.Bounds;
-                    ystart = verticalAlignment == VerticalAlignment.Top ? bounds.Top : bounds.Bottom;
-                }
-            }*/
 
             T FindNext(Rectangle box, bool searchForward)
             {
@@ -111,7 +91,27 @@ namespace Genix.Core
                 {
                     if (candidate.VerticalAlignment == VerticalAlignment.None)
                     {
-                        int distance = box.DistanceToSquared(candidate.Bounds);
+                        Rectangle cbounds = candidate.Bounds;
+
+                        // element was already selected
+                        if (result.ContainsKey(cbounds))
+                        {
+                            continue;
+                        }
+
+                        // verify candidate position againts baseline
+                        if (verticalAlignment == VerticalAlignment.Top && baseline.IsAbove(cbounds.CenterX, cbounds.Bottom))
+                        {
+                            continue;
+                        }
+
+                        if (verticalAlignment == VerticalAlignment.Bottom && baseline.IsBelow(cbounds.CenterX, cbounds.Top))
+                        {
+                            continue;
+                        }
+
+                        // find nearest element based on Eucledian distance
+                        int distance = box.DistanceToSquared(cbounds);
                         if (distance < bestDistance)
                         {
                             bestCandidate = candidate;

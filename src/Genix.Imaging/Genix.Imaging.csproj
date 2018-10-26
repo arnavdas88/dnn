@@ -79,7 +79,7 @@
     <Compile Include="Extensions\FeatureDetectors.cs" />
     <Compile Include="Extensions\Filters.cs" />
     <Compile Include="Extensions\InterpolationType.cs" />
-    <Compile Include="Extensions\IPP.cs" />
+    <Compile Include="IPP.cs" />
     <Compile Include="Extensions\Logical.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

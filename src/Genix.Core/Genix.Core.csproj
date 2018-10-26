@@ -63,11 +63,12 @@
     <Compile Include="Drawing\HorizontalAlignment.cs" />
     <Compile Include="Drawing\IAlignedBoundedObject.cs" />
     <Compile Include="Drawing\IBoundedObject.cs" />
-    <Compile Include="Drawing\Point.cs" />
-    <Compile Include="Drawing\PointConverter.cs" />
-    <Compile Include="Drawing\PointJsonConverter.cs" />
-    <Compile Include="Drawing\PointXYComparer.cs" />
-    <Compile Include="Drawing\PointYXComparer.cs" />
+    <Compile Include="Drawing\Line.cs" />
+    <Compile Include="Drawing\Point.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Point.tt</DependentUpon>
+    </Compile>
     <Compile Include="Drawing\Rectangle.cs" />
     <Compile Include="Drawing\RectangleConverter.cs" />
     <Compile Include="Drawing\RectangleJsonConverter.cs" />
@@ -183,6 +184,10 @@
     <Content Include="BitUtils\BitUtils.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BitUtils.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Drawing\Point.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Point.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Math\MinMax.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

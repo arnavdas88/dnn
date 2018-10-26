@@ -272,6 +272,22 @@ namespace Genix.Drawing
         public int Area => this.w * this.h;
 
         /// <summary>
+        /// Gets the center of this <see cref="Rectangle"/> along x-axis.
+        /// </summary>
+        /// <value>
+        /// The center of this <see cref="Rectangle"/> along x-axis.
+        /// </value>
+        public int CenterX => this.x + (this.w / 2);
+
+        /// <summary>
+        /// Gets the center of this <see cref="Rectangle"/> along y-axis.
+        /// </summary>
+        /// <value>
+        /// The center of this <see cref="Rectangle"/> along y-axis.
+        /// </value>
+        public int CenterY => this.y + (this.h / 2);
+
+        /// <summary>
         /// Gets the center <see cref="Point"/> of this <see cref="Rectangle"/>.
         /// </summary>
         /// <value>

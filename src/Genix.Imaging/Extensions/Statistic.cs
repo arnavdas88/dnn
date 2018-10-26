@@ -523,9 +523,6 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8 or 16.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public uint Min() => this.Min(0, 0, this.Width, this.Height);
@@ -547,9 +544,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [CLSCompliant(false)]
         public uint Min(int x, int y, int width, int height)
         {
@@ -565,6 +559,10 @@ namespace Genix.Imaging
 
                     switch (this.BitsPerPixel)
                     {
+                        case 1:
+                            result = NativeMethods.is_all_black(1, x, y, width, height, this.Bits, this.Stride) ? 1u : 0u;
+                            break;
+
                         case 8:
                             if (width == stride8)
                             {
@@ -664,9 +662,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public uint Min(Rectangle area) => this.Min(area.X, area.Y, area.Width, area.Height);
@@ -680,9 +675,6 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8 or 16.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public uint Max() => this.Max(0, 0, this.Width, this.Height);
@@ -704,9 +696,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [CLSCompliant(false)]
         public uint Max(int x, int y, int width, int height)
         {
@@ -722,6 +711,10 @@ namespace Genix.Imaging
 
                     switch (this.BitsPerPixel)
                     {
+                        case 1:
+                            result = NativeMethods.is_all_white(1, x, y, width, height, this.Bits, this.Stride) ? 0u : 1u;
+                            break;
+
                         case 8:
                             if (width == stride8)
                             {
@@ -821,9 +814,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public uint Max(Rectangle area) => this.Max(area.X, area.Y, area.Width, area.Height);
@@ -836,9 +826,6 @@ namespace Genix.Imaging
         /// <exception cref="NotSupportedException">
         /// The <see cref="Image{T}.BitsPerPixel"/> is not 8 or 16.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public void MinMax(out uint min, out uint max) =>
@@ -860,9 +847,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [CLSCompliant(false)]
         public void MinMax(int x, int y, int width, int height, out uint min, out uint max)
         {
@@ -870,32 +854,49 @@ namespace Genix.Imaging
 
             switch (this.BitsPerPixel)
             {
-                case 8:
-                    NativeMethods.minmax_8bpp(
-                        x,
-                        y,
-                        width,
-                        height,
-                        this.Bits,
-                        this.Stride,
-                        out byte bmin,
-                        out byte bmax);
-                    min = bmin;
-                    max = bmax;
+                case 1:
+                    if (NativeMethods.is_all_black(1, x, y, width, height, this.Bits, this.Stride))
+                    {
+                        min = max = 1u;
+                    }
+                    else if (NativeMethods.is_all_white(1, x, y, width, height, this.Bits, this.Stride))
+                    {
+                        min = max = 0u;
+                    }
+                    else
+                    {
+                        min = 0u;
+                        max = 1u;
+                    }
+
                     break;
 
+                case 8:
                 case 16:
-                    NativeMethods.minmax_16bpp(
-                        x,
-                        y,
-                        width,
-                        height,
-                        this.Bits,
-                        this.Stride,
-                        out ushort usmin,
-                        out ushort usmax);
-                    min = usmin;
-                    max = usmax;
+                    uint localmin = 0;
+                    uint localmax = 0;
+                    IPP.Execute(() =>
+                    {
+                        unsafe
+                        {
+                            fixed (ulong* bits = this.Bits)
+                            {
+                                return NativeMethods.minmax(
+                                    this.BitsPerPixel,
+                                    x,
+                                    y,
+                                    width,
+                                    height,
+                                    (byte*)bits,
+                                    this.Stride8,
+                                    out localmin,
+                                    out localmax);
+                            }
+                        }
+                    });
+
+                    min = localmin;
+                    max = localmax;
                     break;
 
                 default:
@@ -919,9 +920,6 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        /// <remarks>
-        /// This method supports gray 8- and 16-bit images only and will throw an exception otherwise.
-        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public void MinMax(Rectangle area, out uint min, out uint max) =>
@@ -993,26 +991,16 @@ namespace Genix.Imaging
                 [Out] int[] hist);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern void minmax_8bpp(
+            public static extern unsafe int minmax(
+                int bitsPerPixel,
                 int x,
                 int y,
                 int width,
                 int height,
-                [In] ulong[] bits,
+                byte* bits,
                 int stride,
-                [Out] out byte min,
-                [Out] out byte max);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void minmax_16bpp(
-                int x,
-                int y,
-                int width,
-                int height,
-                [In] ulong[] bits,
-                int stride,
-                [Out] out ushort min,
-                [Out] out ushort max);
+                [Out] out uint min,
+                [Out] out uint max);
         }
     }
 }
