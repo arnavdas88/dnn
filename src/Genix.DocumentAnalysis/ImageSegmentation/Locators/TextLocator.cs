@@ -16,6 +16,8 @@ namespace Genix.DocumentAnalysis
     /// </summary>
     public class TextLocator : LocatorBase
     {
+        private readonly TextDetector detector = new TextDetector();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TextLocator"/> class.
         /// </summary>
@@ -26,7 +28,7 @@ namespace Genix.DocumentAnalysis
         /// <inheritdoc />
         public override void Locate(PageShape page, Image image, Image originalImage, IList<Rectangle> areas, CancellationToken cancellationToken)
         {
-            ISet<TextShape> texts = TextDetector.FindText(image, new TextDetectionOptions(), cancellationToken);
+            ISet<TextShape> texts = this.detector.FindText(image, cancellationToken);
 
             // add found lines to the image
             page.AddShapes(texts);

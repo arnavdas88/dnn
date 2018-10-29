@@ -2,7 +2,7 @@
 #include "mkl.h"
 #include "nonlinearity.inl"
 
-extern "C" __declspec(dllexport) void WINAPI lstm(
+GENIXAPI(void, lstm)(
 	int steps,
 	int ylen,
 	const float* u,
@@ -68,7 +68,7 @@ extern "C" __declspec(dllexport) void WINAPI lstm(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI lstm_gradient(
+GENIXAPI(void, lstm_gradient)(
 	int steps,
 	int ylen,
 	const float* u,
@@ -184,7 +184,7 @@ extern "C" __declspec(dllexport) void WINAPI lstm_gradient(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI gru(
+GENIXAPI(void, gru)(
 	const int steps,
 	const int ystep,
 	const float* u,
@@ -297,7 +297,7 @@ extern "C" __declspec(dllexport) void WINAPI gru(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI gru_gradient(
+GENIXAPI(void, gru_gradient)(
 	const int steps,
 	const int ystep,
 	const float* u,

@@ -16,6 +16,8 @@ namespace Genix.DocumentAnalysis
     /// </summary>
     public class PictureLocator : LocatorBase
     {
+        private readonly PictureDetector detector = new PictureDetector();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PictureLocator"/> class.
         /// </summary>
@@ -26,7 +28,7 @@ namespace Genix.DocumentAnalysis
         /// <inheritdoc />
         public override void Locate(PageShape page, Image image, Image originalImage, IList<Rectangle> areas, CancellationToken cancellationToken)
         {
-            ISet<PictureShape> pictures = PictureDetector.FindPictures(image, new PictureDetectorOptions(), cancellationToken);
+            ISet<PictureShape> pictures = this.detector.FindPictures(image, cancellationToken);
 
             // add found pictures to the image
             page.AddShapes(pictures);

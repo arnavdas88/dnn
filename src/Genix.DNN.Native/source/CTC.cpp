@@ -55,7 +55,7 @@ extern "C" __declspec(dllexport) float __forceinline WINAPI logSumExp3(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI CTCComputeAlphas(
+GENIXAPI(void, CTCComputeAlphas)(
 	int T,
 	int A,
 	int S,
@@ -110,7 +110,7 @@ extern "C" __declspec(dllexport) void WINAPI CTCComputeAlphas(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI CTCComputeBetas(
+GENIXAPI(void, CTCComputeBetas)(
 	int T,
 	int A,
 	int S,
@@ -168,7 +168,7 @@ extern "C" __declspec(dllexport) void WINAPI CTCComputeBetas(
 	}
 }
 
-extern "C" __declspec(dllexport) void WINAPI CTCReduceAlphasBetas(
+GENIXAPI(void, CTCReduceAlphasBetas)(
 	int T,
 	int A,
 	int S,

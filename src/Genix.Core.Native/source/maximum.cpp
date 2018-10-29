@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <cmath>
 #include "mkl.h"
 
 #undef min
@@ -335,14 +336,14 @@ template<typename T> void __forceinline __minmax_gradient(
 		}
 	}
 }
-extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f32(
+GENIXAPI(void, minmax_gradient_f32)(
 	int n,
 	const float* x, float* dx, int offx, BOOL cleardx,
 	const float* y, const float* dy, int offy)
 {
 	__minmax_gradient(n, x, dx, offx, cleardx, y, dy, offy);
 }
-extern "C" __declspec(dllexport) void WINAPI minmax_gradient_f64(
+GENIXAPI(void, minmax_gradient_f64)(
 	int n,
 	const double* x, double* dx, int offx, BOOL cleardx,
 	const double* y, const double* dy, int offy)
@@ -390,27 +391,27 @@ template<typename T> int __forceinline __argmax(int n, const T* x, int offx)
 	return offx + win;
 }
 
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_s8s32(int n, const __int8* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_s16s32(int n, const __int16* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_s32(int n, const __int32* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_s64s32(int n, const __int64* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_u8s32(int n, const unsigned __int8* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_u16s32(int n, const unsigned __int16* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_u32s32(int n, const unsigned __int32* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_u64s32(int n, const unsigned __int64* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_f32s32(int n, const float* x, int offx) { return __argmin(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_ip_f64s32(int n, const double* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_s8s32)(int n, const __int8* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_s16s32)(int n, const __int16* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_s32)(int n, const __int32* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_s64s32)(int n, const __int64* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_u8s32)(int n, const unsigned __int8* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_u16s32)(int n, const unsigned __int16* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_u32s32)(int n, const unsigned __int32* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_u64s32)(int n, const unsigned __int64* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_f32s32)(int n, const float* x, int offx) { return __argmin(n, x, offx); }
+GENIXAPI(int, argmin_ip_f64s32)(int n, const double* x, int offx) { return __argmin(n, x, offx); }
 
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_s8s32(int n, const __int8* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_s16s32(int n, const __int16* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_s32(int n, const __int32* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_s64s32(int n, const __int64* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_u8s32(int n, const unsigned __int8* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_u16s32(int n, const unsigned __int16* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_u32s32(int n, const unsigned __int32* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_u64s32(int n, const unsigned __int64* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_f32s32(int n, const float* x, int offx) { return __argmax(n, x, offx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_ip_f64s32(int n, const double* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_s8s32)(int n, const __int8* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_s16s32)(int n, const __int16* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_s32)(int n, const __int32* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_s64s32)(int n, const __int64* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_u8s32)(int n, const unsigned __int8* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_u16s32)(int n, const unsigned __int16* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_u32s32)(int n, const unsigned __int32* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_u64s32)(int n, const unsigned __int64* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_f32s32)(int n, const float* x, int offx) { return __argmax(n, x, offx); }
+GENIXAPI(int, argmax_ip_f64s32)(int n, const double* x, int offx) { return __argmax(n, x, offx); }
 
 template<typename T> int __forceinline __argmin_inc(int n, const T* x, int offx, int incx)
 {
@@ -452,27 +453,27 @@ template<typename T> int __forceinline __argmax_inc(int n, const T* x, int offx,
 	return offx + win;
 }
 
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_s8s32(int n, const __int8* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_s16s32(int n, const __int16* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_s32(int n, const __int32* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_s64s32(int n, const __int64* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_u8s32(int n, const unsigned __int8* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_u16s32(int n, const unsigned __int16* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_u32s32(int n, const unsigned __int32* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_u64s32(int n, const unsigned __int64* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_f32s32(int n, const float* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmin_inc_ip_f64s32(int n, const double* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_s8s32)(int n, const __int8* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_s16s32)(int n, const __int16* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_s32)(int n, const __int32* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_s64s32)(int n, const __int64* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_u8s32)(int n, const unsigned __int8* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_u16s32)(int n, const unsigned __int16* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_u32s32)(int n, const unsigned __int32* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_u64s32)(int n, const unsigned __int64* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_f32s32)(int n, const float* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
+GENIXAPI(int, argmin_inc_ip_f64s32)(int n, const double* x, int offx, int incx) { return __argmin_inc(n, x, offx, incx); }
 
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_s8s32(int n, const __int8* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_s16s32(int n, const __int16* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_s32(int n, const __int32* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_s64s32(int n, const __int64* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_u8s32(int n, const unsigned __int8* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_u16s32(int n, const unsigned __int16* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_u32s32(int n, const unsigned __int32* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_u64s32(int n, const unsigned __int64* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_f32s32(int n, const float* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) int WINAPI argmax_inc_ip_f64s32(int n, const double* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_s8s32)(int n, const __int8* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_s16s32)(int n, const __int16* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_s32)(int n, const __int32* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_s64s32)(int n, const __int64* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_u8s32)(int n, const unsigned __int8* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_u16s32)(int n, const unsigned __int16* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_u32s32)(int n, const unsigned __int32* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_u64s32)(int n, const unsigned __int64* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_f32s32)(int n, const float* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
+GENIXAPI(int, argmax_inc_ip_f64s32)(int n, const double* x, int offx, int incx) { return __argmax_inc(n, x, offx, incx); }
 
 template<typename T> void __forceinline __argminmax(int n, const T* x, int offx, int& winmin, int& winmax)
 {
@@ -501,66 +502,108 @@ template<typename T> void __forceinline __argminmax(int n, const T* x, int offx,
 	winmax += offx;
 }
 
-extern "C" __declspec(dllexport) void WINAPI argminmax_s8(int n, const __int8* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_s16(int n, const __int16* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_s32(int n, const __int32* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_s64(int n, const __int64* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_u8(int n, const unsigned __int8* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_u16(int n, const unsigned __int16* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_u32(int n, const unsigned __int32* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_u64(int n, const unsigned __int64* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_f32(int n, const float* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
-extern "C" __declspec(dllexport) void WINAPI argminmax_f64(int n, const double* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_s8)(int n, const __int8* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_s16)(int n, const __int16* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_s32)(int n, const __int32* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_s64)(int n, const __int64* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_u8)(int n, const unsigned __int8* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_u16)(int n, const unsigned __int16* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_u32)(int n, const unsigned __int32* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_u64)(int n, const unsigned __int64* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_f32)(int n, const float* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
+GENIXAPI(void, argminmax_f64)(int n, const double* x, int offx, int& winmin, int& winmax) { return __argminmax(n, x, offx, winmin, winmax); }
 
 template<typename T> T __forceinline ___min(int n, const T* x, int offx) { return x[__argmin(n, x, offx)]; }
 template<typename T> T __forceinline ___max(int n, const T* x, int offx) { return x[__argmax(n, x, offx)]; }
 
-extern "C" __declspec(dllexport) __int8  WINAPI _min_ip_s8(int n, const __int8* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) __int16 WINAPI _min_ip_s16(int n, const __int16* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) __int32 WINAPI _min_ip_s32(int n, const __int32* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) __int64 WINAPI _min_ip_s64(int n, const __int64* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int8  WINAPI _min_ip_u8(int n, const unsigned __int8* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int16 WINAPI _min_ip_u16(int n, const unsigned __int16* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int32 WINAPI _min_ip_u32(int n, const unsigned __int32* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int64 WINAPI _min_ip_u64(int n, const unsigned __int64* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) float WINAPI _min_ip_f32(int n, const float* x, int offx) { return ___min(n, x, offx); }
-extern "C" __declspec(dllexport) double WINAPI _min_ip_f64(int n, const double* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(__int8, _min_ip_s8)(int n, const __int8* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(__int16, _min_ip_s16)(int n, const __int16* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(__int32, _min_ip_s32)(int n, const __int32* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(__int64, _min_ip_s64)(int n, const __int64* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(unsigned __int8, _min_ip_u8)(int n, const unsigned __int8* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(unsigned __int16, _min_ip_u16)(int n, const unsigned __int16* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(unsigned __int32, _min_ip_u32)(int n, const unsigned __int32* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(unsigned __int64, _min_ip_u64)(int n, const unsigned __int64* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(float, _min_ip_f32)(int n, const float* x, int offx) { return ___min(n, x, offx); }
+GENIXAPI(double, _min_ip_f64)(int n, const double* x, int offx) { return ___min(n, x, offx); }
 
-extern "C" __declspec(dllexport) __int8  WINAPI _max_ip_s8(int n, const __int8* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) __int16 WINAPI _max_ip_s16(int n, const __int16* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) __int32 WINAPI _max_ip_s32(int n, const __int32* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) __int64 WINAPI _max_ip_s64(int n, const __int64* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int8  WINAPI _max_ip_u8(int n, const unsigned __int8* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int16 WINAPI _max_ip_u16(int n, const unsigned __int16* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int32 WINAPI _max_ip_u32(int n, const unsigned __int32* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) unsigned __int64 WINAPI _max_ip_u64(int n, const unsigned __int64* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) float WINAPI _max_ip_f32(int n, const float* x, int offx) { return ___max(n, x, offx); }
-extern "C" __declspec(dllexport) double WINAPI _max_ip_f64(int n, const double* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(__int8, _max_ip_s8)(int n, const __int8* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(__int16, _max_ip_s16)(int n, const __int16* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(__int32, _max_ip_s32)(int n, const __int32* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(__int64, _max_ip_s64)(int n, const __int64* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(unsigned __int8, _max_ip_u8)(int n, const unsigned __int8* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(unsigned __int16, _max_ip_u16)(int n, const unsigned __int16* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(unsigned __int32, _max_ip_u32)(int n, const unsigned __int32* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(unsigned __int64, _max_ip_u64)(int n, const unsigned __int64* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(float, _max_ip_f32)(int n, const float* x, int offx) { return ___max(n, x, offx); }
+GENIXAPI(double, _max_ip_f64)(int n, const double* x, int offx) { return ___max(n, x, offx); }
 
 template<typename T> T __forceinline ___min_inc(int n, const T* x, int offx, int incx) { return x[__argmin_inc(n, x, offx, incx)]; }
 template<typename T> T __forceinline ___max_inc(int n, const T* x, int offx, int incx) { return x[__argmax_inc(n, x, offx, incx)]; }
 
-extern "C" __declspec(dllexport) __int8  WINAPI _min_inc_ip_s8(int n, const __int8* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int16 WINAPI _min_inc_ip_s16(int n, const __int16* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int32 WINAPI _min_inc_ip_s32(int n, const __int32* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int64 WINAPI _min_inc_ip_s64(int n, const __int64* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int8  WINAPI _min_inc_ip_u8(int n, const unsigned __int8* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int16 WINAPI _min_inc_ip_u16(int n, const unsigned __int16* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int32 WINAPI _min_inc_ip_u32(int n, const unsigned __int32* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int64 WINAPI _min_inc_ip_u64(int n, const unsigned __int64* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) float WINAPI _min_inc_ip_f32(int n, const float* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) double WINAPI _min_inc_ip_f64(int n, const double* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(__int8, _min_inc_ip_s8)(int n, const __int8* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(__int16, _min_inc_ip_s16)(int n, const __int16* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(__int32, _min_inc_ip_s32)(int n, const __int32* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(__int64, _min_inc_ip_s64)(int n, const __int64* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int8, _min_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int16, _min_inc_ip_u16)(int n, const unsigned __int16* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int32, _min_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int64, _min_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(float, _min_inc_ip_f32)(int n, const float* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
+GENIXAPI(double, _min_inc_ip_f64)(int n, const double* x, int offx, int incx) { return ___min_inc(n, x, offx, incx); }
 
-extern "C" __declspec(dllexport) __int8  WINAPI _max_inc_ip_s8(int n, const __int8* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int16 WINAPI _max_inc_ip_s16(int n, const __int16* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int32 WINAPI _max_inc_ip_s32(int n, const __int32* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) __int64 WINAPI _max_inc_ip_s64(int n, const __int64* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int8  WINAPI _max_inc_ip_u8(int n, const unsigned __int8* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int16 WINAPI _max_inc_ip_u16(int n, const unsigned __int16* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int32 WINAPI _max_inc_ip_u32(int n, const unsigned __int32* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) unsigned __int64 WINAPI _max_inc_ip_u64(int n, const unsigned __int64* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) float WINAPI _max_inc_ip_f32(int n, const float* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
-extern "C" __declspec(dllexport) double WINAPI _max_inc_ip_f64(int n, const double* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(__int8, _max_inc_ip_s8)(int n, const __int8* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(__int16, _max_inc_ip_s16)(int n, const __int16* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(__int32, _max_inc_ip_s32)(int n, const __int32* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(__int64, _max_inc_ip_s64)(int n, const __int64* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int8, _max_inc_ip_u8)(int n, const unsigned __int8* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int16, _max_inc_ip_u16)(int n, const unsigned __int16* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int32, _max_inc_ip_u32)(int n, const unsigned __int32* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(unsigned __int64, _max_inc_ip_u64)(int n, const unsigned __int64* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(float, _max_inc_ip_f32)(int n, const float* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
+GENIXAPI(double, _max_inc_ip_f64)(int n, const double* x, int offx, int incx) { return ___max_inc(n, x, offx, incx); }
 
+// Softmax
+template<typename T> void __forceinline __softmax(int n, const T* x, int offx, T* y, int offy)
+{
+	x += offx;
+	y += offy;
 
+	// compute max activation
+	T amax = ___max(n, x, 0);
 
+	// compute exponentials (carefully to not blow up)
+	T esum = (T)0;
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = exp(x[i] - amax);
+		esum += y[i];
+	}
+
+	// normalize and output to sum to one
+	if (esum != 0)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			y[i] /= esum;
+		}
+	}
+}
+
+GENIXAPI(void, softmax_ip_f32)(int n, float* y, int offy) { __softmax(n, y, offy, y, offy); }
+GENIXAPI(void, softmax_ip_f64)(int n, double* y, int offy) { __softmax(n, y, offy, y, offy); }
+GENIXAPI(void, softmax_f32)(int n, const float* x, int offx, float* y, int offy) { __softmax(n, x, offx, y, offy); }
+GENIXAPI(void, softmax_f64)(int n, const double* x, int offx, double* y, int offy) { __softmax(n, x, offx, y, offy); }
+
+template<typename T> void __forceinline __softmax_batch(int n, int batchlen, const T* x, int offx, T* y, int offy)
+{
+	for (int i = 0; i < n; i += batchlen, offx += batchlen, offy += batchlen)
+	{
+		__softmax(batchlen, x, offx, y, offy);
+	}
+}
+
+GENIXAPI(void, softmax_batch_ip_f32)(int n, int batchlen, float* y, int offy) { __softmax_batch(n, batchlen, y, offy, y, offy); }
+GENIXAPI(void, softmax_batch_ip_f64)(int n, int batchlen, double* y, int offy) { __softmax_batch(n, batchlen, y, offy, y, offy); }
+GENIXAPI(void, softmax_batch_f32)(int n, const float* x, int offx, int batchlen, float* y, int offy) { __softmax_batch(n, batchlen, x, offx, y, offy); }
+GENIXAPI(void, softmax_batch_f64)(int n, const double* x, int offx, int batchlen, double* y, int offy) { __softmax_batch(n, batchlen, x, offx, y, offy); }

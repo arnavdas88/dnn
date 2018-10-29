@@ -6,7 +6,7 @@
 
 ////#define NOLEARNING
 
-namespace Genix.MachineLearning
+namespace Genix.DNN
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,10 @@ namespace Genix.MachineLearning
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
+    using System.Security;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents array operations on tensors.
@@ -687,15 +690,36 @@ namespace Genix.MachineLearning
                 int x1 = x.Axes[1];
                 int x2 = x.Axes[2];
                 int x3 = x.Axes[3];
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
 
                 int y1 = kernel.CalculateOutputWidth(x1);
                 int y2 = kernel.CalculateOutputHeight(x2);
 
                 Tensor y = session.AllocateTensor(ActionName, new[] { x0 * y1 * y2, ksize1, ksize2, x3 }, calculateGradient);
 
+#if true
+                NativeMethods.stack_kernels(
+                    ksize1,
+                    ksize2,
+                    kstride1,
+                    kstride2,
+                    kpadding1,
+                    kpadding2,
+                    x.Weights,
+                    x0,
+                    x1,
+                    x2,
+                    x.Strides[0],
+                    x.Strides[1],
+                    x.Strides[2],
+                    y.Weights,
+                    y1,
+                    y2,
+                    y.Strides[0],
+                    y.Strides[1]);
+#else
+                int xstride0 = x.Strides[0];
+                int xstride1 = x.Strides[1];
+                int xstride2 = x.Strides[2];
                 int ystride0 = y.Strides[0];
                 int ystride1 = y.Strides[1];
                 int ystride2 = y.Strides[2];
@@ -752,6 +776,7 @@ namespace Genix.MachineLearning
                         }
                     }
                 }
+#endif
 
                 return y;
             }
@@ -1370,6 +1395,33 @@ namespace Genix.MachineLearning
                     }
                 }
             }
+        }
+
+        [SuppressUnmanagedCodeSecurity]
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.DNN.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void stack_kernels(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [In] float[] xw,
+                int x0,
+                int x1,
+                int x2,
+                int xstride0,
+                int xstride1,
+                int xstride2,
+                [Out] float[] yw,
+                int y1,
+                int y2,
+                int ystride0,
+                int ystride1);
         }
     }
 }

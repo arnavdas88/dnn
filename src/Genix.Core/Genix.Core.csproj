@@ -144,7 +144,6 @@
     <Compile Include="Math\Mathematics.cs" />
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\MatrixLayout.cs" />
-    <Compile Include="Math\Maximum.cs" />
     <Compile Include="Math\Nonlinearity.cs" />
     <Compile Include="Math\Arrays.cs" />
     <Compile Include="Vectors\IVectorPack.cs" />

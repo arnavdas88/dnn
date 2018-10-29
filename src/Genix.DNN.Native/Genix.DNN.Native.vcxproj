@@ -133,6 +133,7 @@
     <ClCompile Include="source\CTC.cpp" />
     <ClCompile Include="source\LRN.cpp" />
     <ClCompile Include="source\RNN.cpp" />
+    <ClCompile Include="source\stackkernels.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -142,6 +143,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="source\nonlinearity.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Genix.Core.Native\Genix.Core.Native.vcxproj">
+      <Project>{2f91d6d7-d55a-42a2-94b1-67568ce6e446}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

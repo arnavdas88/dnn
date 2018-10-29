@@ -19,7 +19,7 @@ namespace Genix.DocumentAnalysis
     /// <summary>
     /// Detects and removes vertical and horizontal lines.
     /// </summary>
-    public static class LineDetector
+    public class LineDetector
     {
         /// <summary>
         /// The maximum line width, in pixels, for images with resolution 200 dpi.
@@ -58,11 +58,52 @@ namespace Genix.DocumentAnalysis
         private const float MaxNonLineDensity = 0.25f;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="LineDetector"/> class.
+        /// </summary>
+        public LineDetector()
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the value indicating the types of lines to locate.
+        /// </summary>
+        /// <value>
+        /// The <see cref="DocumentAnalysis.LineTypes"/> enumeration.
+        /// The default value is <see cref="LineTypes.All"/>.
+        /// </value>
+        public LineTypes LineTypes { get; set; } = LineTypes.All;
+
+        /// <summary>
+        /// Gets or sets the minimum vertical line length to look for.
+        /// </summary>
+        /// <value>
+        /// The minimum vertical line length, in inches.
+        /// The default value is 0.5.
+        /// </value>
+        public float MinVerticalLineLength { get; set; } = 0.5f;
+
+        /// <summary>
+        /// Gets or sets the minimum horizontal line length to look for.
+        /// </summary>
+        /// <value>
+        /// The minimum horizontal line length, in inches.
+        /// The default value is 1.
+        /// </value>
+        public float MinHorizontalLineLength { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the found lines should be removed from the image.
+        /// </summary>
+        /// <value>
+        /// <b>true</b> to remove found lines from the image; otherwise, <b>false</b>.
+        /// </value>
+        private bool RemoveLines { get; set; } = true;
+
+        /// <summary>
         /// Finds the horizontal and vertical lines on the <see cref="Image"/>.
-        /// The type of lines to find is determined by the <paramref name="options"/> parameter.
+        /// The type of lines to find is determined by the class parameters.
         /// </summary>
         /// <param name="image">The source <see cref="Image"/>.</param>
-        /// <param name="options">The parameters of this method.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the <see cref="LineDetector"/> that operation should be canceled.</param>
         /// <returns>
         /// The detected lines.
@@ -76,7 +117,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<LineShape> FindLines(Image image, LineDetectorOptions options, CancellationToken cancellationToken)
+        public ISet<LineShape> FindLines(Image image, CancellationToken cancellationToken)
         {
             if (image == null)
             {
@@ -113,7 +154,10 @@ namespace Genix.DocumentAnalysis
                 // re-filter lines
                 hlinesResult = FilterLines(hlines, nonHLines, false);
 
-                RemoveLines(hlines, nonHLines);
+                if (this.RemoveLines)
+                {
+                    RemoveLines(hlines, nonHLines);
+                }
             }
 
             RemoveIntersections();
@@ -324,24 +368,27 @@ namespace Genix.DocumentAnalysis
 
             void RemoveLines(Image lines, Image nonLines)
             {
-                // remove the lines
-                image.Xand(image, lines);
+                if (this.RemoveLines)
+                {
+                    // remove the lines
+                    image.Xand(image, lines);
 
-                // dilate the lines so they touch the residue
-                // then flood fill then to get all the residue (image less non-lines)
-                Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
+                    // dilate the lines so they touch the residue
+                    // then flood fill then to get all the residue (image less non-lines)
+                    Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
 
-                fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
+                    fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
 
-                // remove the residue
-                image.Xand(image, fatLines);
+                    // remove the residue
+                    image.Xand(image, fatLines);
 
-                cancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
             }
 
             void RemoveIntersections()
             {
-                if (hlines != null && vlines != null)
+                if (this.RemoveLines && hlines != null && vlines != null)
                 {
                     // get the intersection residue
                     Image residue = hlines
@@ -361,19 +408,29 @@ namespace Genix.DocumentAnalysis
             {
                 HashSet<LineShape> answer = new HashSet<LineShape>();
 
-                if (hlinesResult != null)
+                if (this.LineTypes.HasFlag(LineTypes.Horizontal) && hlinesResult != null)
                 {
+                    int minLineLength = (this.MinHorizontalLineLength * image.HorizontalResolution).Round();
+
                     foreach (Line line in hlinesResult)
                     {
-                        answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Horizontal));
+                        if (line.Component.Bounds.Width >= minLineLength)
+                        {
+                            answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Horizontal));
+                        }
                     }
                 }
 
-                if (vlinesResult != null)
+                if (this.LineTypes.HasFlag(LineTypes.Vertical) && vlinesResult != null)
                 {
+                    int minLineLength = (this.MinVerticalLineLength * image.VerticalResolution).Round();
+
                     foreach (Line line in vlinesResult)
                     {
-                        answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Vertical));
+                        if (line.Component.Bounds.Height >= minLineLength)
+                        {
+                            answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Vertical));
+                        }
                     }
                 }
 

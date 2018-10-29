@@ -528,9 +528,7 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rectangle<#=suffix#> Scale(Rectangle<#=suffix#> rect, float dx, float dy)
         {
-            return new Rectangle<#=suffix#>(
-                (int)Math.Round(dx * rect.x, MidpointRounding.AwayFromZero),
-                (int)Math.Round(dy * rect.y, MidpointRounding.AwayFromZero));
+            return new Rectangle<#=suffix#>((dx * rect.x).Round(), (dy * rect.y).Round());
         }
 #endif
 
@@ -1070,8 +1068,8 @@ namespace Genix.Drawing
             float y2 = dy * (this.y + this.h);
 
             // note: add epsilon to avoid rounding problems
-            this.x = (int)Math.Round(x1 + Rectangle<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
-            this.y = (int)Math.Round(y1 + Rectangle<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            this.x = x1.Round();
+            this.y = y1.Round();
             this.w = (int)Math.Floor(x2 - x1 + Rectangle<#=suffix#>.Eps);
             this.h = (int)Math.Floor(y2 - y1 + Rectangle<#=suffix#>.Eps);
         }
@@ -1096,8 +1094,8 @@ namespace Genix.Drawing
 
 <# if (type == "int") { #>
             // note: add epsilon to avoid rounding problems
-            this.x = (int)Math.Round(x1 + Rectangle<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
-            this.y = (int)Math.Round(y1 + Rectangle<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            this.x = x1.Round();
+            this.y = y1.Round();
             this.w = (int)Math.Floor(x2 - x1 + Rectangle<#=suffix#>.Eps);
             this.h = (int)Math.Floor(y2 - y1 + Rectangle<#=suffix#>.Eps);
 <# } else { #>

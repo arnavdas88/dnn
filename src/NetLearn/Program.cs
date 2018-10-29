@@ -204,7 +204,7 @@ namespace Genix.NetLearn
                                             ////bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
                                         }
 
-                                        return (bitmap.ToTensor(null), labels);
+                                        return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null), labels);
                                     });
                             });
                     }

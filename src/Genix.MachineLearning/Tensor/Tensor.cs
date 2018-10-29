@@ -330,6 +330,31 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
+        /// Changes the <see cref="Tensor"/> dimensions.
+        /// </summary>
+        /// <param name="shape">The new <see cref="Tensor"/> dimensions.</param>
+        /// <returns>
+        /// <b>true</b> if the tensor was changed; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Reshape(params int[] shape)
+        {
+            // validate new shape
+            if (Shape.ShapeLength(shape) != this.Length)
+            {
+                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(shape));
+            }
+
+            if (Shape.AreSame(this.Axes, shape))
+            {
+                return false;
+            }
+
+            this.InitializeShape(shape);
+            return true;
+        }
+
+        /// <summary>
         /// Sets all the weights in the tensor to zero.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -706,38 +731,13 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
-        /// Changes the <see cref="Tensor"/> dimensions.
-        /// </summary>
-        /// <param name="shape">The new <see cref="Tensor"/> dimensions.</param>
-        /// <returns>
-        /// <b>true</b> if the tensor was changed; otherwise, <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool Reshape(params int[] shape)
-        {
-            // validate new shape
-            if (Shape.ShapeLength(shape) != this.Length)
-            {
-                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(shape));
-            }
-
-            if (Shape.AreSame(this.Axes, shape))
-            {
-                return false;
-            }
-
-            this.InitializeShape(shape);
-            return true;
-        }
-
-        /// <summary>
         /// Detaches the weights from this <see cref="Tensor"/>.
         /// </summary>
         /// <returns>
         /// The weights array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal float[] DetachWeights()
+        public float[] DetachWeights()
         {
             float[] w = this.Weights;
             this.Weights = null;
@@ -751,7 +751,7 @@ namespace Genix.MachineLearning
         /// The gradient weights array.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal float[] DetachGradient()
+        public float[] DetachGradient()
         {
             float[] dw = this.gradient;
             this.gradient = null;

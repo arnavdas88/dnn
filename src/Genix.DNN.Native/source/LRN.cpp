@@ -2,7 +2,7 @@
 
 #include <stdlib.h> 
 
-extern "C" __declspec(dllexport) void WINAPI LRNKernel(
+GENIXAPI(void, LRNKernel)(
 	const float* src, float* dst,
 	int kernelSize,
 	int b, int W, int H, int C,

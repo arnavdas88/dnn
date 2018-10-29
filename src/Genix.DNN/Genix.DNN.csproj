@@ -95,6 +95,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Session\Operations\ArrayOperations.cs" />
+    <Compile Include="Session\Operations\MathOperations.cs" />
+    <Compile Include="Session\Operations\NeuralOperations.cs" />
+    <Compile Include="Session\Operations\RNNDirection.cs" />
+    <Compile Include="Session\Session.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DNN.snk" />

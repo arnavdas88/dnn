@@ -374,7 +374,7 @@ namespace Genix.Imaging
                 for (int ix = 0; ix < stride; ix++)
                 {
                     // negative shift is down
-                    int shiftY = (int)Math.Round(dblTanA * (centerX - (ix * 64) - 32), MidpointRounding.AwayFromZero);
+                    int shiftY = (dblTanA * (centerX - (ix * 64) - 32)).Round();
 
                     Vectors.Add(
                         height - Math.Abs(shiftY),

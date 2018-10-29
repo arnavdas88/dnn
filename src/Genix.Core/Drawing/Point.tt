@@ -201,9 +201,7 @@ namespace Genix.Drawing
         public static Point<#=suffix#> Scale(Point<#=suffix#> point, float dx, float dy)
         {
             // note: add epsilon to avoid rounding problems
-            return new Point<#=suffix#>(
-                (int)Math.Round((dx * point.x) + Point<#=suffix#>.Eps, MidpointRounding.AwayFromZero),
-                (int)Math.Round((dy * point.y) + Point<#=suffix#>.Eps, MidpointRounding.AwayFromZero));
+            return new Point<#=suffix#>((dx * point.x).Round(), (dy * point.y).Round());
         }
 <# } #>
 
@@ -307,8 +305,8 @@ namespace Genix.Drawing
         public void Scale(float dx, float dy)
         {
             // note: add epsilon to avoid rounding problems
-            this.x = (int)Math.Round((dx * this.x) + Point<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
-            this.y = (int)Math.Round((dy * this.y) + Point<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            this.x = (dx * this.x).Round();
+            this.y = (dy * this.y).Round();
         }
 <# } #>
 

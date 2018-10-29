@@ -248,9 +248,7 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Size<#=suffix#> Scale(Size<#=suffix#> size, float dx, float dy)
         {
-            return new Size<#=suffix#>(
-                (int)Math.Round((dx * size.width) + Size<#=suffix#>.Eps, MidpointRounding.AwayFromZero),
-                (int)Math.Round((dy * size.height) + Size<#=suffix#>.Eps, MidpointRounding.AwayFromZero));
+            return new Size<#=suffix#>((dx * size.width).Round(), (dy * size.height).Round());
         }
 <# } #>
 
@@ -320,8 +318,8 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Scale(float dx, float dy)
         {
-            this.width = (int)Math.Round((dx * this.width) + Size<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
-            this.height = (int)Math.Round((dy * this.height) + Size<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            this.width = (dx * this.width).Round();
+            this.height = (dy * this.height).Round();
         }
 <# } #>
     }

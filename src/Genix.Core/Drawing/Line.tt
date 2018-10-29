@@ -267,7 +267,7 @@ namespace Genix.Drawing
             }
 
 <# if (type == "int") { #>
-            return (int)Math.Round(((double)(x - this.x1) * (this.y2 - this.y1) / (this.x2 - this.x1)) + this.y1 + Line<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            return (((double)(x - this.x1) * (this.y2 - this.y1) / (this.x2 - this.x1)) + this.y1).Round();
 <# } else { #>
             return ((x - this.x1) * (this.y2 - this.y1) / (this.x2 - this.x1)) + this.y1;
 <# } #>
@@ -291,7 +291,7 @@ namespace Genix.Drawing
             }
 
 <# if (type == "int") { #>
-            return (int)Math.Round(((double)(y - this.y1) * (this.x2 - this.x1) / (this.y2 - this.y1)) + this.x1 + Line<#=suffix#>.Eps, MidpointRounding.AwayFromZero);
+            return (((double)(y - this.y1) * (this.x2 - this.x1) / (this.y2 - this.y1)) + this.x1).Round();
 <# } else { #>
             return ((y - this.y1) * (this.x2 - this.x1) / (this.y2 - this.y1)) + this.x1;
 <# } #>

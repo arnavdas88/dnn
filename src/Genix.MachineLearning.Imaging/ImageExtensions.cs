@@ -7,7 +7,7 @@
 namespace Genix.MachineLearning.Imaging
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Collections.Generic;
     using Genix.Core;
     using Genix.Imaging;
 
@@ -20,140 +20,219 @@ namespace Genix.MachineLearning.Imaging
         /// Creates a <see cref="Tensor"/> from the <see cref="Image"/>.
         /// </summary>
         /// <param name="image">The <see cref="Image"/> to create a <see cref="Tensor"/> from.</param>
+        /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
+        /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor ToTensor(this Image image, string name)
+        public static Tensor FromImage(Image image, int xaxis, int yaxis, string name)
         {
             if (image == null)
             {
                 throw new ArgumentNullException(nameof(image));
             }
 
+            Tensor y = new Tensor(name, new[] { 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+            FillTensor(y, 0, image);
+
+            return y;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Tensor"/> from the collection of <see cref="Image"/> objects.
+        /// </summary>
+        /// <param name="images">The collection of <see cref="Image"/> objects to create a <see cref="Tensor"/> from.</param>
+        /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
+        /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
+        /// <param name="name">The tensor name.</param>
+        /// <returns>The <see cref="Tensor"/> this method creates.</returns>
+        public static Tensor FromImages(IList<Image> images, int xaxis, int yaxis, string name)
+        {
+            if (images == null)
+            {
+                throw new ArgumentNullException(nameof(images));
+            }
+
+            if (images.Count == 0)
+            {
+                throw new ArgumentException("Cannot create tensor. The collection of images is empty.");
+            }
+
+            Tensor y = null;
+            for (int i = 0, ii = images.Count; i < ii; i++)
+            {
+                Image image = images[i];
+                if (i == 0)
+                {
+                    y = new Tensor(name, new[] { images.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+                }
+
+                FillTensor(y, i, image);
+            }
+
+            return y;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="Tensor"/> from the collection of <see cref="Image"/> objects.
+        /// </summary>
+        /// <typeparam name="T">The type of objects that contain the images.</typeparam>
+        /// <param name="sources">The collection of <see cref="Image"/> objects to create a <see cref="Tensor"/> from.</param>
+        /// <param name="selector">The selector that converts <typeparamref name="T"/> into <see cref="Image"/>.</param>
+        /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
+        /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
+        /// <param name="name">The tensor name.</param>
+        /// <returns>The <see cref="Tensor"/> this method creates.</returns>
+        public static Tensor FromImages<T>(IList<T> sources, Func<T, Image> selector, int xaxis, int yaxis, string name)
+        {
+            if (sources == null)
+            {
+                throw new ArgumentNullException(nameof(sources));
+            }
+
+            if (sources.Count == 0)
+            {
+                throw new ArgumentException("Cannot create tensor. The collection of images is empty.");
+            }
+
+            Tensor y = null;
+            for (int i = 0, ii = sources.Count; i < ii; i++)
+            {
+                Image image = selector(sources[i]);
+                if (i == 0)
+                {
+                    y = new Tensor(name, new[] { sources.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+                }
+
+                FillTensor(y, i, image);
+            }
+
+            return y;
+        }
+
+        private static void FillTensor(Tensor y, int iy0, Image image)
+        {
+            int y1 = y.Axes[(int)Axis.X];
+            int y2 = y.Axes[(int)Axis.Y];
+            int y3 = y.Axes[(int)Axis.C];
+            int ystride0 = y.Strides[(int)Axis.B];
+            int ystride1 = y.Strides[(int)Axis.X];
+            int ystride2 = y.Strides[(int)Axis.Y];
+            float[] yw = y.Weights;
+            int ypos0 = iy0 * ystride0;
+
             int bitsPerPixel = image.BitsPerPixel;
-            int width = image.Width;
-            int height = image.Height;
+            if ((bitsPerPixel > 8 ? 3 : 1) != y3)
+            {
+                throw new ArgumentException("Cannot create tensor. Images in the collection have different bit depth.");
+            }
+
+            if (image.Width != y1 || image.Height != y2)
+            {
+                image = image.FitToSize(y1, y2, ScalingOptions.None);
+            }
+
+            int stride = image.Stride;
+            ulong[] bits = image.Bits;
 
             switch (bitsPerPixel)
             {
                 case 1:
-                    return Convert1bpp();
+                    Convert1bpp();
+                    break;
 
                 case 2:
                 case 4:
                 case 8:
                 case 16:
-                    return Convert2to16bpp();
+                    Convert2to16bpp();
+                    break;
 
                 case 24:
-                    return Convert24bpp();
+                    Convert24bpp();
+                    break;
 
                 case 32:
-                    return Convert32bpp();
+                    Convert32bpp();
+                    break;
 
                 default:
                     throw new NotSupportedException();
             }
 
-            Tensor Convert1bpp()
+            void Convert1bpp()
             {
-                Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
-
-                int xstride = tensor.Strides[(int)Axis.X];
-                int ystride = tensor.Strides[(int)Axis.Y];
-                float[] w = tensor.Weights;
-
-                ulong[] bits = image.Bits;
-                int bstride = image.Stride;
-
-                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
                 {
-                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
                     {
-                        ulong b = bits[offbx];
+                        ulong b = bits[xoff1];
                         if (b != 0)
                         {
-                            for (ulong mask = 1; mask != 0 && x < width; x++, mask <<= 1, offx += xstride)
+                            for (ulong mask = 1; mask != 0 && iy1 < y1; iy1++, mask <<= 1, ypos1 += ystride1)
                             {
                                 if ((b & mask) != 0)
                                 {
-                                    w[offx] = 1.0f;
+                                    yw[ypos1] = 1.0f;
                                 }
                             }
                         }
                         else
                         {
-                            x += 64;
-                            offx += 64 * xstride;
+                            iy1 += 64;
+                            ypos1 += 64 * ystride1;
                         }
                     }
                 }
-
-                return tensor;
             }
 
-            Tensor Convert2to16bpp()
+            void Convert2to16bpp()
             {
-                Tensor tensor = new Tensor(name, new[] { 1, width, height, 1 });
-
-                int xstride = tensor.Strides[(int)Axis.X];
-                int ystride = tensor.Strides[(int)Axis.Y];
-                float[] w = tensor.Weights;
-
-                ulong[] bits = image.Bits;
-                int bstride = image.Stride;
                 int pixelsPerSample = 64 / bitsPerPixel;
                 ulong maxcolor = image.MaxColor;
 
-                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
                 {
-                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
                     {
-                        ulong b = ~bits[offbx];
+                        ulong b = ~bits[xoff1];
                         if (b != 0)
                         {
-                            for (int shift = 0; shift < 64 && x < width; x++, shift += bitsPerPixel, offx += xstride)
+                            for (int shift = 0; shift < 64 && iy1 < y1; iy1++, shift += bitsPerPixel, ypos1 += ystride1)
                             {
-                                w[offx] = (b >> shift) & maxcolor;
+                                yw[ypos1] = (b >> shift) & maxcolor;
                             }
                         }
                         else
                         {
-                            x += pixelsPerSample;
-                            offx += pixelsPerSample * xstride;
+                            iy1 += pixelsPerSample;
+                            ypos1 += pixelsPerSample * ystride1;
                         }
                     }
                 }
 
                 // normalize tensor to 1
-                tensor.MulC(1.0f / maxcolor);
-
-                return tensor;
+                Vectors.MulC(ystride0, 1.0f / maxcolor, y.Weights, ypos0);
             }
 
-            Tensor Convert24bpp()
+            void Convert24bpp()
             {
-                Tensor tensor = new Tensor(name, new[] { 1, width, height, 3 });
-
-                int xstride = tensor.Strides[(int)Axis.X];
-                int ystride = tensor.Strides[(int)Axis.Y];
-
                 unsafe
                 {
-                    fixed (ulong* bits = image.Bits)
+                    fixed (ulong* ubits = bits)
                     {
-                        fixed (float* w = tensor.Weights)
+                        fixed (float* wptr = &yw[ypos0])
                         {
-                            byte* bitsptry = (byte*)bits;
+                            byte* bitsptry = (byte*)ubits;
                             int bstride8 = image.Stride8;
 
-                            float* wptry = w;
+                            float* wptry = wptr;
 
-                            for (int y = 0; y < height; y++, bitsptry += bstride8, wptry += ystride)
+                            for (int iy2 = 0; iy2 < y2; iy2++, bitsptry += bstride8, wptry += ystride2)
                             {
                                 byte* bitsptrx = bitsptry;
                                 float* wptrx = wptry;
 
-                                for (int x = 0; x < width; x++, bitsptrx += 3, wptrx += xstride)
+                                for (int iy1 = 0; iy1 < y1; iy1++, bitsptrx += 3, wptrx += ystride1)
                                 {
                                     wptrx[0] = bitsptrx[0];
                                     wptrx[1] = bitsptrx[1];
@@ -165,135 +244,39 @@ namespace Genix.MachineLearning.Imaging
                 }
 
                 // normalize tensor to 1
-                tensor.SubCRev(255);
-                tensor.MulC(1.0f / 255);
-
-                return tensor;
+                Vectors.SubCRev(ystride0, 255, y.Weights, ypos0);
+                Vectors.MulC(ystride0, 1.0f / 255, y.Weights, ypos0);
             }
 
-            Tensor Convert32bpp()
+            void Convert32bpp()
             {
-                Tensor tensor = new Tensor(name, new[] { 1, width, height, 3 });
-
-                int xstride = tensor.Strides[(int)Axis.X];
-                int ystride = tensor.Strides[(int)Axis.Y];
-                float[] w = tensor.Weights;
-
-                ulong[] bits = image.Bits;
-                int bstride = image.Stride;
-
-                for (int y = 0, offy = 0, offby = 0; y < height; y++, offby += bstride, offy += ystride)
+                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
                 {
-                    for (int x = 0, offx = offy, offbx = offby; x < width; offbx++)
+                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
                     {
-                        ulong b = ~bits[offbx];
+                        ulong b = ~bits[xoff1];
                         if ((b & 0x00ff_ffff_00ff_fffful) != 0ul)
                         {
-                            for (int shift = 0; shift < 64 && x < width; x++, shift += 32, offx += xstride)
+                            for (int shift = 0; shift < 64 && iy1 < y1; iy1++, shift += 32, ypos1 += ystride1)
                             {
                                 ulong bvalue = b >> shift;
 
-                                w[offx + 0] = (bvalue >> 0) & 0xff;
-                                w[offx + 1] = (bvalue >> 8) & 0xff;
-                                w[offx + 2] = (bvalue >> 16) & 0xff;
+                                yw[ypos1 + 0] = (bvalue >> 0) & 0xff;
+                                yw[ypos1 + 1] = (bvalue >> 8) & 0xff;
+                                yw[ypos1 + 2] = (bvalue >> 16) & 0xff;
                             }
                         }
                         else
                         {
-                            x += 2;
-                            offx += 2 * xstride;
+                            iy1 += 2;
+                            ypos1 += 2 * ystride1;
                         }
                     }
                 }
 
                 // normalize tensor to 1
-                tensor.MulC(1.0f / 255);
-
-                return tensor;
+                Vectors.MulC(ystride0, 1.0f / 255, y.Weights, ypos0);
             }
-        }
-
-        /// <summary>
-        /// Converts the <see cref="Tensor"/> to a <see cref="System.Drawing.Bitmap"/>.
-        /// </summary>
-        /// <param name="tensor">The <see cref="Tensor"/> to convert.</param>
-        /// <returns>
-        /// The <see cref="System.Drawing.Bitmap"/> this method creates.
-        /// </returns>
-        public static System.Drawing.Bitmap ToBitmap(this Tensor tensor)
-        {
-            int width;
-            int height;
-            ////int depth;
-
-            int xstride;
-            int ystride;
-
-            if (tensor.Axes.Length == 2)
-            {
-                width = tensor.Axes[0];
-                height = tensor.Axes[1];
-                ////depth = 1;
-
-                xstride = tensor.Strides[0];
-                ystride = tensor.Strides[1];
-            }
-            else if (tensor.Axes.Length == 4)
-            {
-                width = tensor.Axes[(int)Axis.X];
-                height = tensor.Axes[(int)Axis.Y];
-                ////depth = this.Axes[(int)Axis.C];
-
-                xstride = tensor.Strides[(int)Axis.X];
-                ystride = tensor.Strides[(int)Axis.Y];
-            }
-            else
-            {
-                throw new NotSupportedException();
-            }
-
-            tensor.MinMax(out float min, out float max);
-
-            float[] w = tensor.Weights;
-
-            // create new bitmap
-            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(
-                width,
-                height,
-                System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-            try
-            {
-                System.Drawing.Imaging.BitmapData data = bitmap.LockBits(
-                    new System.Drawing.Rectangle(0, 0, width, height),
-                    System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                    bitmap.PixelFormat);
-
-                unsafe
-                {
-                    byte* p = (byte*)data.Scan0;
-                    for (int ix = 0, offx = 0; ix < width; ix++, offx += xstride)
-                    {
-                        for (int iy = 0, offy = offx; iy < height; iy++, offy += ystride)
-                        {
-                            float weight = w[offy];
-                            int color = (int)((weight - min) / (max - min) * 255);
-                            color = MinMax.Max(color, 0);
-                            color = MinMax.Min(color, 255);
-
-                            p[(iy * data.Stride) + ix] = (byte)(255 - color);
-                        }
-                    }
-                }
-
-                bitmap.UnlockBits(data);
-            }
-            catch
-            {
-                bitmap?.Dispose();
-                throw;
-            }
-
-            return bitmap;
         }
     }
 }

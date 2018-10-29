@@ -6,7 +6,7 @@
 
 ////#define NOLEARNING
 
-namespace Genix.MachineLearning
+namespace Genix.DNN
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
@@ -14,6 +14,7 @@ namespace Genix.MachineLearning
     using System.Security;
     using System.Threading.Tasks;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents neural net operations on tensors.
@@ -1002,20 +1003,11 @@ namespace Genix.MachineLearning
 
                     if (x.Rank == 1)
                     {
-                        Maximum.SoftMax(x.Length, x.Weights, 0, y.Weights, 0);
+                        Vectors.SoftMax(x.Length, x.Weights, 0, y.Weights, 0);
                     }
                     else
                     {
-                        int mb = x.Axes[0];
-                        int stride = x.Strides[0];
-
-                        float[] xw = x.Weights;
-                        float[] yw = y.Weights;
-
-                        for (int b = 0, bi = 0; b < mb; b++, bi += stride)
-                        {
-                            Maximum.SoftMax(stride, xw, bi, yw, bi);
-                        }
+                        Vectors.SoftMax(x.Length, x.Weights, 0, x.Strides[0], y.Weights, 0);
                     }
 
 #if !NOLEARNING

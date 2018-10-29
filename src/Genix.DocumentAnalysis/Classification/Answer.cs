@@ -8,7 +8,6 @@ namespace Genix.DocumentAnalysis.Classification
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -21,6 +20,7 @@ namespace Genix.DocumentAnalysis.Classification
         /// <summary>
         /// The list of answer candidates.
         /// </summary>
+        [JsonProperty("candidates")]
         private readonly List<(string className, float score)> candidates = new List<(string className, float score)>();
 
         /// <summary>
@@ -113,7 +113,6 @@ namespace Genix.DocumentAnalysis.Classification
         /// <value>
         /// A <see cref="IReadOnlyCollection{T}"/> object that contains the list of candidate answers.
         /// </value>
-        public IReadOnlyCollection<(string className, float score)> Candidates =>
-            new ReadOnlyCollection<(string, float)>(this.candidates);
+        public IReadOnlyCollection<(string className, float score)> Candidates => this.candidates;
     }
 }

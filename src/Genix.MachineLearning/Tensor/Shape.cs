@@ -238,32 +238,13 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
-        /// Calculates the element position in the tensor.
-        /// </summary>
-        /// <param name="axes">The element coordinates.</param>
-        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Position(params int[] axes)
-        {
-            int pos = 0;
-
-            int[] strides = this.Strides;
-            for (int i = 0, ii = axes.Length; i < ii; i++)
-            {
-                pos += strides[i] * axes[i];
-            }
-
-            return pos;
-        }
-
-        /// <summary>
         /// Determines whether two shapes are identical.
         /// </summary>
         /// <param name="shape1">The first shape to evaluate.</param>
         /// <param name="shape2">The second shape to evaluate.</param>
         /// <returns><b>true</b> if <paramref name="shape1"/> is the same as <paramref name="shape2"/>; otherwise; <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(int[] shape1, int[] shape2)
+        public static bool AreSame(int[] shape1, int[] shape2)
         {
             return shape1.Length == shape2.Length && Vectors.Equals(shape1.Length, shape1, 0, shape2, 0);
         }
@@ -276,7 +257,7 @@ namespace Genix.MachineLearning
         /// <b>true</b> if all shapes in <paramref name="shapes"/> are identical; otherwise; <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(IList<int[]> shapes)
+        public static bool AreSame(IList<int[]> shapes)
         {
             for (int i = 1, ii = shapes.Count; i < ii; i++)
             {
@@ -297,7 +278,7 @@ namespace Genix.MachineLearning
         /// <b>true</b> if shapes of all tensors in <paramref name="xs"/> are identical; otherwise; <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool AreSame(IList<Tensor> xs)
+        public static bool AreSame(IList<Tensor> xs)
         {
             for (int i = 1, ii = xs.Count; i < ii; i++)
             {
@@ -308,6 +289,25 @@ namespace Genix.MachineLearning
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Calculates the element position in the tensor.
+        /// </summary>
+        /// <param name="axes">The element coordinates.</param>
+        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Position(params int[] axes)
+        {
+            int pos = 0;
+
+            int[] strides = this.Strides;
+            for (int i = 0, ii = axes.Length; i < ii; i++)
+            {
+                pos += strides[i] * axes[i];
+            }
+
+            return pos;
         }
 
         /// <summary>

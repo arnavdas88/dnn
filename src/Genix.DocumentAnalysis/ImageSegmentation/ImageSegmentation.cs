@@ -136,6 +136,11 @@ namespace Genix.DocumentAnalysis
             }
         }
 
+        /// <summary>
+        /// Returns a <see cref="string"/> that contains a performance report for this <see cref="ImageSegmentation"/>.
+        /// </summary>
+        /// <param name="count">The number of segmentations performed.</param>
+        /// <returns>The <see cref="string"/> that contains a performance report.</returns>
         public string PrintPerformanceReport(int count)
         {
 #if SESSION_DIAG

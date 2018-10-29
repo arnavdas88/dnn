@@ -363,6 +363,31 @@
         },
         new MethodDescriptor()
         {
+            Name = "SoftMax",
+            NativeName = "softmax",
+            Argument = ArgumentType.Vector,
+            Summary = "Computes softmax probabilities for values of array of {0}",
+            HasInPlace = true,
+            Op = "y = softmax(x)",
+            OpInPlace = "y = softmax(y)",
+            SupportedTypes = "float;double",
+        },
+        new MethodDescriptor()
+        {
+            Name = "SoftMax",
+            NativeName = "softmax_batch",
+            Argument = ArgumentType.ConstantAndVector,
+            Summary = "Computes softmax probabilities for values of batch array of {0}",
+            HasInPlace = true,
+            ConstantName = "batchLength",
+            ConstantType = "int",
+            ConstantDescription = "The length of a batch in the source array.",
+            Op = "y = softmax(x)",
+            OpInPlace = "y = softmax(y)",
+            SupportedTypes = "float;double",
+        },
+        new MethodDescriptor()
+        {
             Name = "SwapBits",
             NativeName = "swap_bits",
             Argument = ArgumentType.ConstantAndVector,

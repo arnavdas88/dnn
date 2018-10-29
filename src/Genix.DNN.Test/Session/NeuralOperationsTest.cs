@@ -1,8 +1,9 @@
-﻿namespace Genix.MachineLearning.Test
+﻿namespace Genix.DNN.Test
 {
     using System;
     using System.Linq;
     using Genix.Core;
+    using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

@@ -6,13 +6,14 @@
 
 ////#define NOLEARNING
 
-namespace Genix.MachineLearning
+namespace Genix.DNN
 {
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents matrix operations on tensors.

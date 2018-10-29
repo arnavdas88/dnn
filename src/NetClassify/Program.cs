@@ -94,7 +94,11 @@ namespace Genix.NetClassify
 
                         this.localTimeCounter.Restart();
 
-                        Tensor x = sample.Image.ToTensor(null);
+                        Tensor x = ImageExtensions.FromImage(
+                            sample.Image,
+                            network.InputShape[(int)Axis.X],
+                            network.InputShape[(int)Axis.Y],
+                            null);
                         ////(IList<IList<ClassificationNetworkResult>> answers, _) = network.Execute(x);
                         (IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 

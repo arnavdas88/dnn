@@ -8,25 +8,29 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using Genix.Core;
     using Genix.Drawing;
     using Genix.Imaging;
-    using Genix.Imaging.Leptonica;
 
     /// <summary>
     /// Finds machine-printed text on the <see cref="Image"/>.
     /// </summary>
-    public static class TextDetector
+    public class TextDetector
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TextDetector"/> class.
+        /// </summary>
+        public TextDetector()
+        {
+        }
+
+        /// <summary>
         /// Finds machine-printed text on the <see cref="Image"/>.
-        /// The type of text to find is determined by the <paramref name="options"/> parameter.
+        /// The type of text to find is determined by the class parameters.
         /// </summary>
         /// <param name="image">The source <see cref="Image"/>.</param>
-        /// <param name="options">The parameters of this method.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the <see cref="TextDetector"/> that operation should be canceled.</param>
         /// <returns>
         /// The detected text.
@@ -40,7 +44,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public static ISet<TextShape> FindText(Image image, TextDetectionOptions options, CancellationToken cancellationToken)
+        public ISet<TextShape> FindText(Image image, CancellationToken cancellationToken)
         {
             if (image == null)
             {

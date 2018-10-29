@@ -84,7 +84,7 @@ namespace Genix.DocumentAnalysis.Classification
 
                 // classify feature vector
                 float[] w = this.svm.Classify(featureVector, null, cancellationToken);
-                Maximum.SoftMax(w.Length, w, 0);
+                Vectors.SoftMax(w.Length, w, 0);
 
                 // find best class
                 int[] indices = Arrays.Indexes(w.Length);

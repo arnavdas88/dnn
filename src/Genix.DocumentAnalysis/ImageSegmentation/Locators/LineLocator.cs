@@ -16,6 +16,8 @@ namespace Genix.DocumentAnalysis
     /// </summary>
     public class LineLocator : LocatorBase
     {
+        private readonly LineDetector detector = new LineDetector();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LineLocator"/> class.
         /// </summary>
@@ -26,7 +28,7 @@ namespace Genix.DocumentAnalysis
         /// <inheritdoc />
         public override void Locate(PageShape page, Image image, Image originalImage, IList<Rectangle> areas, CancellationToken cancellationToken)
         {
-            ISet<LineShape> lines = LineDetector.FindLines(image, new LineDetectorOptions(), cancellationToken);
+            ISet<LineShape> lines = this.detector.FindLines(image, cancellationToken);
 
             // add found lines to the image
             page.AddShapes(lines);

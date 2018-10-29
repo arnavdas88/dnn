@@ -7,7 +7,7 @@
 ////#define NOLEARNING
 #define SESSION_DIAG
 
-namespace Genix.MachineLearning
+namespace Genix.DNN
 {
     using System;
     using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace Genix.MachineLearning
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Contains a sequence of operations performed on a <see cref="Tensor"/>.

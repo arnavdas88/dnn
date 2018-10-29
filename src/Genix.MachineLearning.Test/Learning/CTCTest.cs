@@ -1,6 +1,7 @@
 ﻿namespace Genix.MachineLearning.Learning.Test
 {
     using System;
+    using Genix.Core;
     using Genix.MachineLearning.Test;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,14 +11,14 @@
         [TestMethod]
         public void TestMethod1()
         {
-            const int L = 5;    // Alphabet size
             const int T = 2;    // Length of utterance (time)
+            const int L = 5;    // Alphabet size
+            int[] shape = new[] { T, L };
 
-            Session session = new Session();
+            Tensor x = new Tensor(null, shape, new float[] { 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.6f, 0.1f, 0.1f });
+            Tensor y = new Tensor(null, shape);
 
-            Tensor activations = new Tensor(null, new[] { T, L }, new float[] { 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.6f, 0.1f, 0.1f });
-
-            Tensor y = NeuralOperations.SoftMax(session, activations);
+            Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
 
             CTCLoss loss = new CTCLoss();
 
@@ -35,10 +36,11 @@
         [TestMethod]
         public void TestMethod2()
         {
-            const int L = 6;
             const int T = 5;
+            const int L = 6;
+            int[] shape = new[] { T, L };
 
-            Tensor y = new Tensor(null, new[] { T, L });
+            Tensor y = new Tensor(null, shape);
             y.Set(new float[]
             {
                 0.633766f, 0.221185f, 0.0917319f, 0.0129757f, 0.0142857f, 0.0260553f,
@@ -73,10 +75,11 @@
         [TestMethod]
         public void TestMethod3()
         {
-            const int L = 6;
             const int T = 5;
+            const int L = 6;
+            int[] shape = new[] { T, L };
 
-            Tensor y = new Tensor(null, new[] { T, L });
+            Tensor y = new Tensor(null, shape);
             y.Set(new float[]
             {
                 0.30176f, 0.28562f, 0.0831517f, 0.0862751f, 0.0816851f, 0.161508f,
@@ -108,14 +111,14 @@
         [TestMethod]
         public void TestMethod4()
         {
-            const int L = 5;    // Alphabet size
             const int T = 3;    // Length of utterance (time)
+            const int L = 5;    // Alphabet size
+            int[] shape = new[] { T, L };
 
-            Session session = new Session();
+            Tensor x = new Tensor(null, shape, 1.0f);
+            Tensor y = new Tensor(null, shape);
 
-            Tensor activations = new Tensor(null, new[] { T, L }, 1.0f);
-
-            Tensor y = NeuralOperations.SoftMax(session, activations);
+            Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
 
             CTCLoss loss = new CTCLoss();
 
@@ -143,14 +146,14 @@
         [TestMethod, Description("Zero weight in y tensor.")]
         public void TestMethod5()
         {
-            const int L = 5;    // Alphabet size
             const int T = 3;    // Length of utterance (time)
+            const int L = 5;    // Alphabet size
+            int[] shape = new[] { T, L };
 
-            Session session = new Session();
+            Tensor x = new Tensor(null, shape, 1.0f);
+            Tensor y = new Tensor(null, shape);
 
-            Tensor activations = new Tensor(null, new[] { T, L }, 1.0f);
-
-            Tensor y = NeuralOperations.SoftMax(session, activations);
+            Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
             y.Weights[0] = 0;
 
             CTCLoss loss = new CTCLoss();

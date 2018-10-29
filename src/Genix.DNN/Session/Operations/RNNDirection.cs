@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.MachineLearning
+namespace Genix.DNN
 {
     /// <summary>
     /// Defines the direction of recurrent neural net cell (forward-only or bi-directional).

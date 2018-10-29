@@ -167,10 +167,10 @@ namespace Genix.Imaging
         /// <returns>The result of addition. </returns>
         public static Color Add(Color color1, Color color2, double scaleFactor, MidpointRounding mode)
         {
-            byte r = (byte)((int)Math.Round(scaleFactor * ((int)color1.R + (int)color2.R), mode)).Clip(0, 255);
-            byte g = (byte)((int)Math.Round(scaleFactor * ((int)color1.G + (int)color2.G), mode)).Clip(0, 255);
-            byte b = (byte)((int)Math.Round(scaleFactor * ((int)color1.B + (int)color2.B), mode)).Clip(0, 255);
-            byte a = (byte)((int)Math.Round(scaleFactor * ((int)color1.A + (int)color2.A), mode)).Clip(0, 255);
+            byte r = (byte)(scaleFactor * ((int)color1.R + (int)color2.R)).Round(mode).Clip(0, 255);
+            byte g = (byte)(scaleFactor * ((int)color1.G + (int)color2.G)).Round(mode).Clip(0, 255);
+            byte b = (byte)(scaleFactor * ((int)color1.B + (int)color2.B)).Round(mode).Clip(0, 255);
+            byte a = (byte)(scaleFactor * ((int)color1.A + (int)color2.A)).Round(mode).Clip(0, 255);
             return Color.FromArgb(a, r, g, b);
         }
 
@@ -199,10 +199,10 @@ namespace Genix.Imaging
         /// <returns>The result of subtraction.</returns>
         public static Color Subtract(Color color1, Color color2, double scaleFactor, MidpointRounding mode)
         {
-            byte r = (byte)((int)Math.Round(scaleFactor * ((int)color1.R - (int)color2.R), mode)).Clip(0, 255);
-            byte g = (byte)((int)Math.Round(scaleFactor * ((int)color1.G - (int)color2.G), mode)).Clip(0, 255);
-            byte b = (byte)((int)Math.Round(scaleFactor * ((int)color1.B - (int)color2.B), mode)).Clip(0, 255);
-            byte a = (byte)((int)Math.Round(scaleFactor * ((int)color1.A - (int)color2.A), mode)).Clip(0, 255);
+            byte r = (byte)(scaleFactor * ((int)color1.R - (int)color2.R)).Round(mode).Clip(0, 255);
+            byte g = (byte)(scaleFactor * ((int)color1.G - (int)color2.G)).Round(mode).Clip(0, 255);
+            byte b = (byte)(scaleFactor * ((int)color1.B - (int)color2.B)).Round(mode).Clip(0, 255);
+            byte a = (byte)(scaleFactor * ((int)color1.A - (int)color2.A)).Round(mode).Clip(0, 255);
             return Color.FromArgb(a, r, g, b);
         }
 
@@ -216,10 +216,10 @@ namespace Genix.Imaging
         /// <returns>The result of multiplication.</returns>
         public static Color Multiply(Color color1, Color color2, double scaleFactor, MidpointRounding mode)
         {
-            byte r = (byte)((int)Math.Round(scaleFactor * ((int)color1.R * (int)color2.R), mode)).Clip(0, 255);
-            byte g = (byte)((int)Math.Round(scaleFactor * ((int)color1.G * (int)color2.G), mode)).Clip(0, 255);
-            byte b = (byte)((int)Math.Round(scaleFactor * ((int)color1.B * (int)color2.B), mode)).Clip(0, 255);
-            byte a = (byte)((int)Math.Round(scaleFactor * ((int)color1.A * (int)color2.A), mode)).Clip(0, 255);
+            byte r = (byte)(scaleFactor * ((int)color1.R * (int)color2.R)).Round(mode).Clip(0, 255);
+            byte g = (byte)(scaleFactor * ((int)color1.G * (int)color2.G)).Round(mode).Clip(0, 255);
+            byte b = (byte)(scaleFactor * ((int)color1.B * (int)color2.B)).Round(mode).Clip(0, 255);
+            byte a = (byte)(scaleFactor * ((int)color1.A * (int)color2.A)).Round(mode).Clip(0, 255);
             return Color.FromArgb(a, r, g, b);
         }
 
@@ -233,10 +233,10 @@ namespace Genix.Imaging
         /// <returns>The result of multiplication.</returns>
         public static Color Divide(Color color1, Color color2, double scaleFactor, MidpointRounding mode)
         {
-            byte r = color2.R == 0 ? (color1.R == 0 ? (byte)0 : (byte)255) : (byte)((int)Math.Round(scaleFactor * color1.R / color2.R, mode)).Clip(0, 255);
-            byte g = color2.G == 0 ? (color1.G == 0 ? (byte)0 : (byte)255) : (byte)((int)Math.Round(scaleFactor * color1.G / color2.G, mode)).Clip(0, 255);
-            byte b = color2.B == 0 ? (color1.B == 0 ? (byte)0 : (byte)255) : (byte)((int)Math.Round(scaleFactor * color1.B / color2.B, mode)).Clip(0, 255);
-            byte a = color2.A == 0 ? (color1.A == 0 ? (byte)0 : (byte)255) : (byte)((int)Math.Round(scaleFactor * color1.A / color2.A, mode)).Clip(0, 255);
+            byte r = color2.R == 0 ? (color1.R == 0 ? (byte)0 : (byte)255) : (byte)(scaleFactor * color1.R / color2.R).Round(mode).Clip(0, 255);
+            byte g = color2.G == 0 ? (color1.G == 0 ? (byte)0 : (byte)255) : (byte)(scaleFactor * color1.G / color2.G).Round(mode).Clip(0, 255);
+            byte b = color2.B == 0 ? (color1.B == 0 ? (byte)0 : (byte)255) : (byte)(scaleFactor * color1.B / color2.B).Round(mode).Clip(0, 255);
+            byte a = color2.A == 0 ? (color1.A == 0 ? (byte)0 : (byte)255) : (byte)(scaleFactor * color1.A / color2.A).Round(mode).Clip(0, 255);
             return Color.FromArgb(a, r, g, b);
         }
 
@@ -249,10 +249,10 @@ namespace Genix.Imaging
         /// <returns>The result of scaling. </returns>
         public static Color Scale(Color color, double scaleFactor, MidpointRounding mode)
         {
-            byte r = (byte)Math.Min(255, (int)Math.Round(scaleFactor * color.R, mode));
-            byte g = (byte)Math.Min(255, (int)Math.Round(scaleFactor * color.G, mode));
-            byte b = (byte)Math.Min(255, (int)Math.Round(scaleFactor * color.B, mode));
-            byte a = (byte)Math.Min(255, (int)Math.Round(scaleFactor * color.A, mode));
+            byte r = (byte)Math.Min(255, (scaleFactor * color.R).Round(mode));
+            byte g = (byte)Math.Min(255, (scaleFactor * color.G).Round(mode));
+            byte b = (byte)Math.Min(255, (scaleFactor * color.B).Round(mode));
+            byte a = (byte)Math.Min(255, (scaleFactor * color.A).Round(mode));
             return Color.FromArgb(a, r, g, b);
         }
 

@@ -69,11 +69,13 @@
     <Compile Include="ImageSegmentation\Locators\PictureLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\TextLocator.cs" />
     <Compile Include="ImageSource.cs" />
+    <Compile Include="Recognition\CheckboxReader.cs" />
+    <Compile Include="Recognition\IFieldReader.cs" />
+    <Compile Include="Recognition\Answer.cs" />
     <Compile Include="Shapes\CheckboxShape.cs" />
-    <Compile Include="Shapes\Detectors\CheckboxDetector\CheckboxDetector.cs" />
-    <Compile Include="Shapes\Detectors\CheckboxDetector\CheckboxDetectorOptions.cs" />
+    <Compile Include="Shapes\Detectors\CheckboxDetector.cs" />
     <Compile Include="Shapes\Detectors\LineDetector\LineDetectorOptions.cs" />
-    <Compile Include="Shapes\Detectors\LineDetector\LineDetector.cs" />
+    <Compile Include="Shapes\Detectors\LineDetector.cs" />
     <Compile Include="OCR\OCR.cs" />
     <Compile Include="OCR\Tesseract\NativeMethods.cs" />
     <Compile Include="OCR\Tesseract\Enums\OcrEngineMode.cs" />
@@ -89,8 +91,7 @@
     <Compile Include="OCR\Tesseract\Enums\TextLineOrder.cs" />
     <Compile Include="OCR\Tesseract\Enums\WritingDirection.cs" />
     <Compile Include="PageSource.cs" />
-    <Compile Include="Shapes\Detectors\PictureDetector\PictureDetector.cs" />
-    <Compile Include="Shapes\Detectors\PictureDetector\PictureDetectorOptions.cs" />
+    <Compile Include="Shapes\Detectors\PictureDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -109,8 +110,7 @@
     <Compile Include="Shapes\TextShape.cs" />
     <Compile Include="Shapes\TextBlockShape.cs" />
     <Compile Include="Shapes\TextLineShape.cs" />
-    <Compile Include="Shapes\TextDetector\TextDetectionOptions.cs" />
-    <Compile Include="Shapes\TextDetector\TextDetector.cs" />
+    <Compile Include="Shapes\Detectors\TextDetector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Genix.DocumentAnalysis.snk" />
@@ -121,9 +121,17 @@
       <Project>{50b5352b-f996-4e14-8a1a-c7096f42e321}</Project>
       <Name>Genix.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Genix.DNN\Genix.DNN.csproj">
+      <Project>{75e41c3e-e491-4d38-9b62-a01e90dece12}</Project>
+      <Name>Genix.DNN</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Genix.Imaging\Genix.Imaging.csproj">
       <Project>{d19a13ba-1c8f-4ceb-840c-d485d0936d56}</Project>
       <Name>Genix.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Genix.MachineLearning.Imaging\Genix.MachineLearning.Imaging.csproj">
+      <Project>{90ab3206-dd81-433d-b55e-95649d150253}</Project>
+      <Name>Genix.MachineLearning.Imaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\Genix.MachineLearning\Genix.MachineLearning.csproj">
       <Project>{1d734863-b6c8-4552-8ace-6a0cedac5e66}</Project>

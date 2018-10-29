@@ -94,6 +94,9 @@
     <Compile Include="Neuro\NetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GraphTest.cs" />
+    <Compile Include="Session\ArrayOperationsTest.cs" />
+    <Compile Include="Session\MathOperationsTest.cs" />
+    <Compile Include="Session\NeuralOperationsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Genix.Core\Genix.Core.csproj">

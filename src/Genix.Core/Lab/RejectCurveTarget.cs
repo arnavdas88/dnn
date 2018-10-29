@@ -82,7 +82,7 @@ namespace Genix.Lab
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() => (int)Math.Round(this.Target * 100.0, MidpointRounding.AwayFromZero);
+        public override int GetHashCode() => (this.Target * 100.0f).Round();
 
         /// <inheritdoc />
         public override string ToString() =>
