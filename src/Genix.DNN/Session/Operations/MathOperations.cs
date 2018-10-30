@@ -999,13 +999,15 @@ namespace Genix.DNN
                                             if (!transa)
                                             {
                                                 // dA += dC * B
-                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0);
+                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0, !a.IsGradientInitialized);
                                             }
                                             else
                                             {
                                                 // dA += B * dC
-                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0);
+                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0, !a.IsGradientInitialized);
                                             }
+
+                                            a.IsGradientInitialized = true;
                                         }
                                     }
 
@@ -1179,12 +1181,14 @@ namespace Genix.DNN
                                     {
                                         if (transa)
                                         {
-                                            Matrix.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0);
+                                            Matrix.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0, !a.IsGradientInitialized);
                                         }
                                         else
                                         {
-                                            Matrix.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0);
+                                            Matrix.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0, !a.IsGradientInitialized);
                                         }
+
+                                        a.IsGradientInitialized = true;
                                     }
 
                                     a.Validate();
@@ -1251,7 +1255,7 @@ namespace Genix.DNN
                     int[] axes = matrixLayout == MatrixLayout.ColumnMajor ? new[] { n, m } : new[] { m, n };
                     Tensor a = session.AllocateTensor(ActionName, axes, calculateGradient);
 
-                    Matrix.VxV(matrixLayout, m, n, x.Weights, 0, y.Weights, 0, a.Weights, 0);
+                    Matrix.VxV(matrixLayout, m, n, x.Weights, 0, y.Weights, 0, a.Weights, 0, false);
 
 #if !NOLEARNING
                     if (calculateGradient)

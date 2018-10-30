@@ -100,14 +100,36 @@ namespace Genix.Core
                         }
 
                         // verify candidate position againts baseline
-                        if (verticalAlignment == VerticalAlignment.Top && baseline.IsAbove(cbounds.CenterX, cbounds.Bottom))
+                        if (verticalAlignment == VerticalAlignment.Top)
                         {
-                            continue;
+                            int nearestx = searchForward ? cbounds.Left : cbounds.Right;
+                            if (baseline.IsAbove(nearestx, cbounds.Bottom))
+                            {
+                                // candidate is above baseline
+                                continue;
+                            }
+
+                            if (Math.Abs(baseline.Y(nearestx) - cbounds.Top) > 10)
+                            {
+                                // candidate's top is far from baseline
+                                continue;
+                            }
                         }
 
-                        if (verticalAlignment == VerticalAlignment.Bottom && baseline.IsBelow(cbounds.CenterX, cbounds.Top))
+                        if (verticalAlignment == VerticalAlignment.Bottom)
                         {
-                            continue;
+                            int nearestx = searchForward ? cbounds.Left : cbounds.Right;
+                            if (baseline.IsBelow(nearestx, cbounds.Top))
+                            {
+                                // candidate is below baseline
+                                continue;
+                            }
+
+                            if (Math.Abs(baseline.Y(nearestx) - cbounds.Bottom) > 10)
+                            {
+                                // candidate's bottom is far from baseline
+                                continue;
+                            }
                         }
 
                         // find nearest element based on Eucledian distance
@@ -117,6 +139,22 @@ namespace Genix.Core
                             bestCandidate = candidate;
                             bestDistance = distance;
                         }
+                    }
+                }
+
+                // update baseline
+                if (bestCandidate != null)
+                {
+                    Rectangle cbounds = bestCandidate.Bounds;
+                    if (searchForward)
+                    {
+                        baseline.X2 = cbounds.Right;
+                        baseline.Y2 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
+                    }
+                    else
+                    {
+                        baseline.X1 = cbounds.Left;
+                        baseline.Y1 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
                     }
                 }
 

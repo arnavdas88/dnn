@@ -31,7 +31,6 @@ namespace Genix.DocumentAnalysis
         {
             { LocatorTypes.PictureLocator, typeof(PictureLocator) },
             { LocatorTypes.LineLocator, typeof(LineLocator) },
-            { LocatorTypes.CheckboxLocator, typeof(CheckboxLocator) },
             { LocatorTypes.TextLocator, typeof(TextLocator) },
         };
 

@@ -65,9 +65,14 @@ GENIXAPI(void, matrix_vv)(
 	int m, int n,
 	const float* x, int offx,
 	const float* y, int offy,
-	float* a, int offa)
+	float* a, int offa, BOOL cleara)
 {
 	const int lda = rowmajor ? n : m;
+
+	if (cleara)
+	{
+		::memset(a + offa, 0, size_t(m) * n * sizeof(float));
+	}
 
 	::cblas_sger(
 		rowmajor ? CblasRowMajor : CblasColMajor,

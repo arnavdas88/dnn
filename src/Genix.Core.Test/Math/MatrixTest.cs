@@ -27,7 +27,7 @@
             // [2] x [4, 5]
             // [3]
             float[] a = new float[m * n];
-            Matrix.VxV(MatrixLayout.ColumnMajor, m, n, x, 0, y, 0, a, 0);
+            Matrix.VxV(MatrixLayout.ColumnMajor, m, n, x, 0, y, 0, a, 0, true);
 
             float[] expected = new float[m * n]
             {
@@ -45,7 +45,7 @@
             // [2] x [4, 5]
             // [3]
             a = new float[m * n];
-            Matrix.VxV(MatrixLayout.RowMajor, m, n, x, 0, y, 0, a, 0);
+            Matrix.VxV(MatrixLayout.RowMajor, m, n, x, 0, y, 0, a, 0, true);
 
             expected = new float[m * n]
             {

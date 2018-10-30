@@ -62,7 +62,6 @@
     <Compile Include="ImagePreprocessing\ImagePreprocessing.cs" />
     <Compile Include="ImagePreprocessing\ImagePreprocessingOptions.cs" />
     <Compile Include="ImageSegmentation\ImageSegmentation.cs" />
-    <Compile Include="ImageSegmentation\Locators\CheckboxLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\LineLocator.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorBase.cs" />
     <Compile Include="ImageSegmentation\Locators\LocatorTypes.cs" />
@@ -73,7 +72,6 @@
     <Compile Include="Recognition\IFieldReader.cs" />
     <Compile Include="Recognition\Answer.cs" />
     <Compile Include="Shapes\CheckboxShape.cs" />
-    <Compile Include="Shapes\Detectors\CheckboxDetector.cs" />
     <Compile Include="Shapes\Detectors\LineDetector.cs" />
     <Compile Include="OCR\OCR.cs" />
     <Compile Include="OCR\Tesseract\NativeMethods.cs" />

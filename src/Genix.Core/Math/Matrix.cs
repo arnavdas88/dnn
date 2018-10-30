@@ -75,26 +75,27 @@ namespace Genix.Core
 
         /// <summary>
         /// Performs a rank-1 update of a general matrix.
-        /// The operation is defined as A := x*y'+ A.
+        /// The operation is defined as A := x*y'+ A or as A = x*y' depending on value of <paramref name="cleara"/> parameter.
         /// </summary>
         /// <param name="matrixLayout">Specifies whether the matrix A is row-major or column-major.</param>
         /// <param name="m">Specifies the number of rows of the matrix A.</param>
         /// <param name="n">Specifies the number of columns of the matrix A.</param>
         /// <param name="x">The array that contains the vector x.</param>
-        /// <param name="offx">The index in the <c>x</c> at which the vector x begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which the vector x begins.</param>
         /// <param name="y">The array that contains the vector y.</param>
-        /// <param name="offy">The index in the <c>y</c> at which the vector y begins.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which the vector y begins.</param>
         /// <param name="a">The array that contains the destination matrix A.</param>
         /// <param name="offa">The index in the <paramref name="a"/> at which the matrix A begins.</param>
+        /// <param name="cleara">Specifies whether the <paramref name="a"/> should be cleared before operation.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void VxV(MatrixLayout matrixLayout, int m, int n, float[] x, int offx, float[] y, int offy, float[] a, int offa)
+        public static void VxV(MatrixLayout matrixLayout, int m, int n, float[] x, int offx, float[] y, int offy, float[] a, int offa, bool cleara)
         {
-            NativeMethods.matrix_vv(matrixLayout == MatrixLayout.RowMajor, m, n, x, offx, y, offy, a, offa);
+            NativeMethods.matrix_vv(matrixLayout == MatrixLayout.RowMajor, m, n, x, offx, y, offy, a, offa, cleara);
         }
 
         /// <summary>
         /// Computes a matrix-vector product.
-        /// The operation is defined as y := op(A)*x or as y := op(A)*x + y depending on value of <c>cleary</c> parameter.
+        /// The operation is defined as y := op(A)*x or as y := op(A)*x + y depending on value of <paramref name="cleary"/> parameter.
         /// </summary>
         /// <param name="matrixLayout">Specifies whether the matrix A is row-major or column-major.</param>
         /// <param name="m">Specifies the number of rows of the matrix A.</param>
@@ -103,16 +104,16 @@ namespace Genix.Core
         /// <param name="offa">The index in the <paramref name="a"/> at which the matrix A begins.</param>
         /// <param name="transa">Specifies whether the matrix A should be transposed before computation.</param>
         /// <param name="x">The array that contains the vector x.</param>
-        /// <param name="offx">The index in the <c>x</c> at which the vector x begins.</param>
+        /// <param name="offx">The index in the <paramref name="x"/> at which the vector x begins.</param>
         /// <param name="y">The array that receives the vector y.</param>
-        /// <param name="offy">The index in the <c>y</c> at which the vector y begins.</param>
-        /// <param name="cleary">Specifies whether the <c>y</c> should be cleared before operation.</param>
+        /// <param name="offy">The index in the <paramref name="y"/> at which the vector y begins.</param>
+        /// <param name="cleary">Specifies whether the <paramref name="y"/> should be cleared before operation.</param>
         /// <remarks>
         /// <para>
-        /// The size of input vector <c>x</c> should be at least <c>n</c> when <c>transa</c> is <b>false</b> and at least <c>m</c> otherwise.
+        /// The size of input vector <paramref name="x"/> should be at least <paramref name="n"/> when <paramref name="transa"/> is <b>false</b> and at least <paramref name="m"/> otherwise.
         /// </para>
         /// <para>
-        /// The size of output vector <c>y</c> should be at least <c>m</c> when <c>transa</c> is <b>false</b> and at least <c>n</c> otherwise.
+        /// The size of output vector <paramref name="y"/> should be at least <paramref name="m"/> when <paramref name="transa"/> is <b>false</b> and at least <paramref name="n"/> otherwise.
         /// </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -123,7 +124,7 @@ namespace Genix.Core
 
         /// <summary>
         /// Computes a matrix-matrix product.
-        /// The operation is defined as C := op(A)*op(B) + C or as C := op(A)*op(B) depending on value of <c>clearc</c> parameter.
+        /// The operation is defined as C := op(A)*op(B) + C or as C := op(A)*op(B) depending on value of <paramref name="clearc"/> parameter.
         /// </summary>
         /// <param name="matrixLayout">Specifies whether the matrices A, B, and C are row-major or column-major.</param>
         /// <param name="m">Specifies the number of rows of the matrix op(A) and of the matrix C.</param>
@@ -151,7 +152,7 @@ namespace Genix.Core
         /// <param name="m">The number of rows in matrix AB before the transpose operation.</param>
         /// <param name="n">The number of columns in matrix AB before the transpose operation.</param>
         /// <param name="ab">The array that contains the matrix AB.</param>
-        /// <param name="offab">The index in the <c>ab</c> at which the matrix AB begins.</param>
+        /// <param name="offab">The index in the <paramref name="ab"/> at which the matrix AB begins.</param>
         public static void Transpose(MatrixLayout matrixLayout, int m, int n, float[] ab, int offab)
         {
             NativeMethods.matrix_transpose(matrixLayout == MatrixLayout.RowMajor, m, n, ab, offab);
@@ -178,7 +179,8 @@ namespace Genix.Core
                 [In] float[] y,
                 int offy,
                 [Out] float[] a,
-                int offa);
+                int offa,
+                [MarshalAs(UnmanagedType.Bool)] bool cleara);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void matrix_mv(

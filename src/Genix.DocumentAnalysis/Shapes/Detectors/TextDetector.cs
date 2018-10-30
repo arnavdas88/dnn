@@ -56,7 +56,7 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            Image closing = image.MorphClose(null, StructuringElement.Brick(9, 1), 1, BorderType.BorderConst, 0);
+            Image closing = image.MorphClose(null, StructuringElement.Brick(7, 1), 1, BorderType.BorderConst, 0);
 
             AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(
                 image.Bounds,
@@ -104,15 +104,19 @@ namespace Genix.DocumentAnalysis
 
             shapegrid.Compact();
 
+            // create result
+            HashSet<TextShape> shapes = new HashSet<TextShape>();
+            shapes.UnionWith(shapegrid.EnumObjects().Where(x => x.Bounds.Width > 4 && x.Bounds.Height > 10));
+
             Image draft = image.ConvertTo(null, 24);
-            foreach (TextShape shape in shapegrid.EnumObjects())
+            foreach (TextShape shape in shapes)
             {
                 draft.DrawRectangle(shape.Bounds, 0x00800000);
             }
 
-            int count = shapegrid.EnumObjects().Count();
+            int count = shapes.Count();
 
-            return new HashSet<TextShape>();
+            return shapes;
         }
     }
 }

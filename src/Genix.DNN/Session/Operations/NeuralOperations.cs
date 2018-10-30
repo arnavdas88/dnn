@@ -811,7 +811,7 @@ namespace Genix.DNN
                             // dA += dy * x'
                             lock (u)
                             {
-                                Matrix.VxV(matrixLayout, numberOfNeurons, numberOfNeurons, dyw, yi, yw, yi - numberOfNeurons, duw, 0);
+                                Matrix.VxV(matrixLayout, numberOfNeurons, numberOfNeurons, dyw, yi, yw, yi - numberOfNeurons, duw, 0, false);
                             }
 
                             // dx += A' * dy
