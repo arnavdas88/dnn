@@ -411,19 +411,6 @@ namespace Genix.MachineLearning
         public void Clear() => Vectors.Set(this.Length, 0.0f, this.Weights, 0);
 
         /// <summary>
-        /// Sets all the weights in the tensor's gradient to zero.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClearGradient()
-        {
-            if (this.gradient != null)
-            {
-                Vectors.Set(this.Length, 0, this.gradient, 0);
-                this.IsGradientInitialized = true;
-            }
-        }
-
-        /// <summary>
         /// Sets all values in the tensor to the specified value.
         /// </summary>
         /// <param name="value">The value to set.</param>
@@ -448,56 +435,6 @@ namespace Genix.MachineLearning
             }
 
             Vectors.Copy(this.Length, weights, 0, this.Weights, 0);
-        }
-
-        /// <summary>
-        /// Sets all values in the tensor gradient to the specified value.
-        /// </summary>
-        /// <param name="value">The value to set.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value)
-        {
-            Vectors.Set(this.Length, value, this.Gradient, 0);
-            this.IsGradientInitialized = true;
-        }
-
-        /// <summary>
-        /// Sets all values in the tensor gradient to the specified values.
-        /// </summary>
-        /// <param name="weights">The weights to set.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float[] weights)
-        {
-            if (weights == null)
-            {
-                throw new ArgumentNullException(nameof(weights));
-            }
-
-            if (weights.Length < this.Length)
-            {
-                throw new ArgumentException("The number of weights is less than the tensor length.", nameof(weights));
-            }
-
-            Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
-            this.IsGradientInitialized = true;
-        }
-
-        /// <summary>
-        /// Adds the specified values to the tensor's gradient.
-        /// </summary>
-        /// <param name="weights">The weights to add.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddGradient(float[] weights)
-        {
-            if (this.IsGradientInitialized)
-            {
-                Vectors.Add(this.Length, weights, 0, this.Gradient, 0);
-            }
-            else
-            {
-                Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
-                this.IsGradientInitialized = true;
-            }
         }
 
         /// <summary>
@@ -757,6 +694,87 @@ namespace Genix.MachineLearning
         public void Clip(float minValue, float maxValue) => Vectors.Clip(this.Length, minValue, maxValue, this.Weights, 0);
 
         /// <summary>
+        /// Sets all the weights in the tensor's gradient to zero.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ClearGradient()
+        {
+            if (this.gradient != null)
+            {
+                Vectors.Set(this.Length, 0, this.gradient, 0);
+                this.IsGradientInitialized = true;
+            }
+        }
+
+        /// <summary>
+        /// Sets all values in the tensor gradient to the specified value.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetGradient(float value)
+        {
+            Vectors.Set(this.Length, value, this.Gradient, 0);
+            this.IsGradientInitialized = true;
+        }
+
+        /// <summary>
+        /// Sets all values in the tensor gradient to the specified values.
+        /// </summary>
+        /// <param name="weights">The weights to set.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetGradient(float[] weights)
+        {
+            if (weights == null)
+            {
+                throw new ArgumentNullException(nameof(weights));
+            }
+
+            if (weights.Length < this.Length)
+            {
+                throw new ArgumentException("The number of weights is less than the tensor length.", nameof(weights));
+            }
+
+            Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
+            this.IsGradientInitialized = true;
+        }
+
+        /// <summary>
+        /// Adds the specified values to the tensor's gradient.
+        /// </summary>
+        /// <param name="weights">The weights to add.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddGradient(float[] weights)
+        {
+            if (this.IsGradientInitialized)
+            {
+                Vectors.Add(this.Length, weights, 0, this.Gradient, 0);
+            }
+            else
+            {
+                Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
+                this.IsGradientInitialized = true;
+            }
+        }
+
+        /// <summary>
+        /// Subtracts the specified values from the tensor's gradient.
+        /// </summary>
+        /// <param name="weights">The weights to subtract.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SubGradient(float[] weights)
+        {
+            if (this.IsGradientInitialized)
+            {
+                Vectors.Sub(this.Length, weights, 0, this.Gradient, 0);
+            }
+            else
+            {
+                Vectors.Neg(this.Length, weights, 0, this.Gradient, 0);
+                this.IsGradientInitialized = true;
+            }
+        }
+
+        /// <summary>
         /// Clips tensor values to a specified minimum and maximum values.
         /// </summary>
         /// <param name="minValue">The minimum value to clip by.</param>
@@ -765,7 +783,18 @@ namespace Genix.MachineLearning
         /// The method performs operation defined as <c>gradient(i) := min(max(gradient(i), minValue), maxValue)</c>.
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ClipGradient(float minValue, float maxValue) => Vectors.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
+        public void ClipGradient(float minValue, float maxValue)
+        {
+            if (this.IsGradientInitialized)
+            {
+                Vectors.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
+            }
+            else
+            {
+                Vectors.Set(this.Length, minValue, this.Gradient, 0);
+                this.IsGradientInitialized = true;
+            }
+        }
 
         /// <summary>
         /// Transposes a rank-2 tensor.

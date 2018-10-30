@@ -60,6 +60,17 @@
             },
         new MethodDescriptor()
         {
+            Name = "Neg",
+            NativeName = "neg",
+            Argument = ArgumentType.Vector,
+            Summary = "Changes sign if elements in the array of {0}",
+            HasInPlace = true,
+            Op = "y[i] = -x[i]",
+            OpInPlace = "y[i] = -y[i]",
+            SupportedTypes = "sbyte;short;int;long;float;double",
+        },
+        new MethodDescriptor()
+        {
             Name = "Abs",
             NativeName = "abs",
             Argument = ArgumentType.Vector,

@@ -158,6 +158,62 @@ GENIXAPI(void, abs_gradient_f64)(
 	__abs_gradient(n, x, dx, offx, cleardx, y, dy, offy);
 }
 
+// changes sign of vector elements in-place.
+template<typename T> void __forceinline __neg_ip(int n, T* y, int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = ~y[i] + 1;
+	}
+}
+template<typename T> void __forceinline __negf_ip(int n, T* y, int offy)
+{
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = -y[i];
+	}
+}
+
+GENIXAPI(void, neg_ip_s8)(int n, __int8* y, int offy) { __neg_ip(n, y, offy); }
+GENIXAPI(void, neg_ip_s16)(int n, __int16* y, int offy) { __neg_ip(n, y, offy); }
+GENIXAPI(void, neg_ip_s32)(int n, __int32* y, int offy) { __neg_ip(n, y, offy); }
+GENIXAPI(void, neg_ip_s64)(int n, __int64* y, int offy) { __neg_ip(n, y, offy); }
+GENIXAPI(void, neg_ip_f32)(int n, float* y, int offy) { __negf_ip(n, y, offy); }
+GENIXAPI(void, neg_ip_f64)(int n, double* y, int offy) { __negf_ip(n, y, offy); }
+
+// changes sign of vector elements not-in-place.
+template<typename T> void __forceinline __neg(int n, const T* x, int offx, T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = ~x[i] + 1;
+	}
+}
+template<typename T> void __forceinline __negf(int n, const T* x, int offx, T* y, int offy)
+{
+	x += offx;
+	y += offy;
+
+	for (int i = 0; i < n; i++)
+	{
+		y[i] = -x[i];
+	}
+}
+
+GENIXAPI(void, neg_s8)(int n, const __int8* x, int offx, __int8* y, int offy) { __neg(n, x, offx, y, offy); }
+GENIXAPI(void, neg_s16)(int n, const __int16* x, int offx, __int16* y, int offy) { __neg(n, x, offx, y, offy); }
+GENIXAPI(void, neg_s32)(int n, const __int32* x, int offx, __int32* y, int offy) { __neg(n, x, offx, y, offy); }
+GENIXAPI(void, neg_s64)(int n, const __int64* x, int offx, __int64* y, int offy) { __neg(n, x, offx, y, offy); }
+GENIXAPI(void, neg_f32)(int n, const float* x, int offx, float* y, int offy) { __negf(n, x, offx, y, offy); }
+GENIXAPI(void, neg_f64)(int n, const double* x, int offx, double* y, int offy) { __negf(n, x, offx, y, offy); }
+
 // inverts vector element-wise
 GENIXAPI(void, sinv)(
 	int n,

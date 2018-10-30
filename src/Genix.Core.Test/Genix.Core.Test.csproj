@@ -53,9 +53,13 @@
     <Compile Include="Drawing\RectangleTest.cs" />
     <Compile Include="GenixAssert.cs" />
     <Compile Include="BitUtils\BitUtils64Test.cs" />
+    <Compile Include="Math\VectorsTest.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VectorsTest.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\MatrixTest.cs" />
-    <Compile Include="Math\MathematicsTest.cs" />
-    <Compile Include="Math\ArraysTest.cs" />
+    <Compile Include="Math\VectorsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromSourceAnalysis>true</ExcludeFromSourceAnalysis>
     </Compile>
@@ -71,6 +75,14 @@
       <Name>Genix.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Math\VectorsTest.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VectorsTest.Generated.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

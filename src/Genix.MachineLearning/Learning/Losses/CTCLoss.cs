@@ -96,7 +96,7 @@ namespace Genix.MachineLearning.Learning
                 NativeMethods.CTCReduceAlphasBetas(T, A, S, alphas, labels, y.Gradient);
                 Vectors.Sub(y.Length, ylog, 0, y.Gradient, 0);
                 Vectors.SubC(y.Length, logLossA, y.Gradient, 0);
-                Vectors.Exp(y.Length, y.Gradient, 0, y.Gradient, 0);
+                Vectors.Exp(y.Length, y.Gradient, 0);
 
                 // remove NaN
                 // NaN may come from various sources (for instance log(y) where y = 0)

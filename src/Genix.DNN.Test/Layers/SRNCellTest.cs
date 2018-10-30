@@ -234,7 +234,7 @@
                 Nonlinearity.ReLUGradient(2, dy, oi, true, expected.Weights, oi, dy, oi);
 
                 // should be x' * dy
-                Matrix.VxV(MatrixLayout.ColumnMajor, 3, 2, x.Weights, ii, dy, oi, expectedWG, 0, true);
+                Matrix.VxV(MatrixLayout.ColumnMajor, 3, 2, x.Weights, ii, dy, oi, expectedWG, 0, false);
 
                 // should be W' * dy
                 Matrix.MxV(MatrixLayout.ColumnMajor, 3, 2, layer.W.Weights, 0, false, dy, oi, expectedDx, ii, true);

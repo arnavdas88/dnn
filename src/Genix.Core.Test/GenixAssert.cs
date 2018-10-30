@@ -6,6 +6,16 @@
 
     public static class GenixAssert
     {
+        public static void AreArraysEqual<T>(T[] expected, T[] actual)
+        {
+            Assert.AreEqual(expected.Length, actual.Length);
+
+            for (int i = 0, ii = expected.Length; i < ii; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i], i.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
         public static void AreArraysEqual(float[] expected, float[] actual)
         {
             Assert.AreEqual(expected.Length, actual.Length);
@@ -13,6 +23,16 @@
             for (int i = 0, ii = expected.Length; i < ii; i++)
             {
                 Assert.AreEqual(expected[i], actual[i], 1e-5f, i.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public static void AreArraysEqual(double[] expected, double[] actual)
+        {
+            Assert.AreEqual(expected.Length, actual.Length);
+
+            for (int i = 0, ii = expected.Length; i < ii; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i], 1e-5, i.ToString(CultureInfo.InvariantCulture));
             }
         }
 

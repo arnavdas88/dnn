@@ -173,7 +173,7 @@ namespace Genix.DNN
                                 {
                                     lock (b)
                                     {
-                                        Vectors.Sub(y.Length, y.Gradient, 0, b.Gradient, 0);
+                                        b.SubGradient(y.Gradient);
                                     }
                                 }
                             });
@@ -273,7 +273,12 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Vectors.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0));
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                Vectors.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0);
+                            });
                     }
 #endif
 
