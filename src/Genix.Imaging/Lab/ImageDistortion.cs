@@ -91,13 +91,33 @@ namespace Genix.Imaging.Lab
                 if (width > 0)
                 {
                     int newWidth = image.Width - Math.Abs(this.Random(-width / 4, width / 4));
+                    if (newWidth <= 0)
+                    {
+                        newWidth = 1;
+                    }
+
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
+                    if (newHeight <= 0)
+                    {
+                        newHeight = 1;
+                    }
+
                     image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
                 }
                 else
                 {
                     int newWidth = image.Width + this.Random(-image.Width / 10, image.Width / 10);
+                    if (newWidth <= 0)
+                    {
+                        newWidth = 1;
+                    }
+
                     int newHeight = image.Height - Math.Abs(this.Random(-height / 4, height / 4));
+                    if (newHeight <= 0)
+                    {
+                        newHeight = 1;
+                    }
+
                     image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
 
                     double angle = 0.5 * this.normalDistribution.Generate();

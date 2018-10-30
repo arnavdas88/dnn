@@ -170,7 +170,7 @@ namespace Genix.NetLearn
                     IEnumerable<(Tensor, string[])> GenerateSamples(int epoch)
                     {
                         return dataProvider
-                            .Generate(null).ToList()
+                            .Generate(null)
                             .SelectMany(x =>
                             {
                                 string[] labels = x.Labels;

@@ -37,11 +37,11 @@
                         new[] { NumberOfFilters, kernel.Size * shape[(int)Axis.C] } :
                         new[] { kernel.Size * shape[(int)Axis.C], NumberOfFilters },
                     layer.W.Axes);
-                Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
-                Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+                Assert.IsFalse(layer.W.Weights.Take(layer.W.Length).All(x => x == 0.0f));
+                Assert.AreEqual(0.0, layer.W.Weights.Take(layer.W.Length).Average(), 0.01f);
 
                 CollectionAssert.AreEqual(new[] { NumberOfFilters }, layer.B.Axes);
-                Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+                Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
             }
         }
 
@@ -83,11 +83,11 @@
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
             CollectionAssert.AreEqual(new[] { 16, 9 * shape[(int)Axis.C] }, layer.W.Axes);
-            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.05f);
+            Assert.IsFalse(layer.W.Weights.Take(layer.W.Length).All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Take(layer.W.Length).Average(), 0.05f);
 
             CollectionAssert.AreEqual(new[] { 16 }, layer.B.Axes);
-            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+            Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
         }
 
         [TestMethod, TestCategory("SRN")]
@@ -232,15 +232,15 @@
                     session.Unroll();
 
                     Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                    Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                    Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
 
                     // should be dy
                     Tensor expectedDB = session.Multiply(expectedDBTemp, i);
-                    Helpers.AreArraysEqual(expectedDB.Weights, layer.B.Gradient);
+                    Helpers.AreArraysEqual(expectedDB.Length, expectedDB.Weights, layer.B.Gradient);
 
                     // should be x * dy
                     Tensor expectedDW = session.Multiply(expectedDWTemp, i);
-                    Helpers.AreArraysEqual(expectedDW.Weights, layer.W.Gradient);
+                    Helpers.AreArraysEqual(expectedDW.Length, expectedDW.Weights, layer.W.Gradient);
                 }
             }
         }
@@ -313,15 +313,15 @@
                     session.Unroll();
 
                     Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                    Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                    Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
 
                     // should be dy
                     Tensor expectedDB = session.Multiply(expectedDBTemp, i);
-                    Helpers.AreArraysEqual(expectedDB.Weights, layer.B.Gradient);
+                    Helpers.AreArraysEqual(expectedDB.Length, expectedDB.Weights, layer.B.Gradient);
 
                     // should be x * dy
                     Tensor expectedDW = session.Multiply(expectedDWTemp, i);
-                    Helpers.AreArraysEqual(expectedDW.Weights, layer.W.Gradient);
+                    Helpers.AreArraysEqual(expectedDW.Length, expectedDW.Weights, layer.W.Gradient);
                 }
             }
         }

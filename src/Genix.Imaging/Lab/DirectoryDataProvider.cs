@@ -278,7 +278,8 @@ namespace Genix.Imaging.Lab
 
         private IEnumerable<(Imaging.Image, int?)> LoadImage(string fileName, int startingFrame, int frameCount)
         {
-            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileName, startingFrame, frameCount))
+            // TODO: remove conversion to LIST after thread-safe image loading is implemented
+            foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileName, startingFrame, frameCount).ToList())
             {
                 if (this.Width > 0 || this.Height > 0)
                 {
@@ -298,7 +299,7 @@ namespace Genix.Imaging.Lab
                     for (int i = 0; i < components.Count; i++)
                     {
                         ConnectedComponent component = components[i];
-                        if (component.Power <= 24)
+                        if (component.Power <= 24 && components.Count > 1)
                         {
                             Rectangle position = component.Bounds;
                             double distance = components.Where((x, j) => j != i).Min(x => position.DistanceTo(x.Bounds));

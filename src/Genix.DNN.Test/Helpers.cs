@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
     using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +27,7 @@
 
             Assert.AreEqual(expected.Length, actual.Length);
 
-            Helpers.AreArraysEqual(expected.Weights, actual.Weights);
+            Helpers.AreArraysEqual(expected.Length, expected.Weights, actual.Weights);
         }
 
         public static void AreGradientsEqual(Tensor expected, Tensor actual)
@@ -35,14 +36,22 @@
 
             Assert.AreEqual(expected.Length, actual.Length);
 
-            Helpers.AreArraysEqual(expected.Gradient, actual.Gradient);
+            Helpers.AreArraysEqual(expected.Length, expected.Gradient, actual.Gradient);
         }
 
         public static void AreArraysEqual(float[] expected, float[] actual)
         {
-            Assert.AreEqual(expected.Length, actual.Length);
+            Assert.IsTrue(expected.Length <= actual.Length);
 
             for (int i = 0, ii = expected.Length; i < ii; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i], 1e-5f, i.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public static void AreArraysEqual(int length, float[] expected, float[] actual)
+        {
+            for (int i = 0; i < length; i++)
             {
                 Assert.AreEqual(expected[i], actual[i], 1e-5f, i.ToString(CultureInfo.InvariantCulture));
             }

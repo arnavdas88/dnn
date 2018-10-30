@@ -1013,7 +1013,7 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Vectors.Copy(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => x.SetGradient(y.Gradient));
 
                         /* TODO:
                                 Mathematics.Add(x.Length, y.Gradient, 0, x.Gradient, 0);

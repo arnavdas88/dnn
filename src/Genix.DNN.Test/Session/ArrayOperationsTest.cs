@@ -35,7 +35,8 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
+                    length,
+                    y1.Gradient.Take(length).Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                     x.Gradient);
             }
         }
@@ -868,13 +869,14 @@
                 void validate(Tensor y)
                 {
                     CollectionAssert.AreEqual(Shape.Remove(axes, axis), y.Axes);
-                    Helpers.AreArraysEqual(x.Weights, y.Weights);
+                    Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
                 }
 
                 void validateGradient()
                 {
                     Helpers.AreArraysEqual(
-                        y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
+                        y1.Length,
+                        y1.Gradient.Take(y1.Length).Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                         x.Gradient);
                 }
             }
@@ -953,13 +955,14 @@
                 void validate(Tensor y)
                 {
                     CollectionAssert.AreEqual(Shape.Expand(axes, axis, 1), y.Axes);
-                    Helpers.AreArraysEqual(x.Weights, y.Weights);
+                    Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
                 }
 
                 void validateGradient()
                 {
                     Helpers.AreArraysEqual(
-                        y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
+                        y1.Length,
+                        y1.Gradient.Take(y1.Length).Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                         x.Gradient);
                 }
             }
@@ -1006,13 +1009,14 @@
             void validate(Tensor y, int[] yaxes)
             {
                 CollectionAssert.AreEqual(yaxes, y.Axes);
-                Helpers.AreArraysEqual(x.Weights, y.Weights);
+                Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
             }
 
             void validateGradient()
             {
                 Helpers.AreArraysEqual(
-                    y1.Gradient.Zip(y2.Gradient, (a, b) => a + b).ToArray(),
+                    y1.Length,
+                    y1.Gradient.Take(y1.Length).Zip(y2.Gradient, (a, b) => a + b).ToArray(),
                     x.Gradient);
             }
         }

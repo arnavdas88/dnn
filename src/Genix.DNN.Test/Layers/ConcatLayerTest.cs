@@ -173,8 +173,8 @@
                 Array.Copy(y.Weights, y.Gradient, y.Length);
                 session.Unroll();
 
-                Helpers.AreArraysEqual(x1.Weights, x1.Gradient);
-                Helpers.AreArraysEqual(x2.Weights, x2.Gradient);
+                Helpers.AreArraysEqual(x1.Length, x1.Weights, x1.Gradient);
+                Helpers.AreArraysEqual(x2.Length, x2.Weights, x2.Gradient);
             }
         }
     }

@@ -80,7 +80,7 @@ namespace Genix.NetClassify
 
                 using (TestImageProvider<string> dataProvider = this.options.CreateTestImageProvider(network))
                 {
-                    Context model = Context.FromRegex(@"\d{1,5}", CultureInfo.InvariantCulture);
+                    ////Context model = Context.FromRegex(@"\d{1,5}", CultureInfo.InvariantCulture);
 
                     ////int n = 0;
                     foreach (TestImage sample in dataProvider.Generate(null))
@@ -99,16 +99,36 @@ namespace Genix.NetClassify
                             network.InputShape[(int)Axis.X],
                             network.InputShape[(int)Axis.Y],
                             null);
-                        ////(IList<IList<ClassificationNetworkResult>> answers, _) = network.Execute(x);
-                        (IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
+                        (IList<IList<(string Answer, float Probability)>> answers, Tensor y) answers = network.Execute(x);
+                        ////(IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 
                         this.localTimeCounter.Stop();
                         long duration = this.localTimeCounter.ElapsedMilliseconds;
 
-                        ////string answer = answers.Last().FirstOrDefault()?.Answer;
-                        ////int prob = (int)(((answers.Last().FirstOrDefault()?.Probability ?? 0.0f) * 100) + 0.5f);
-                        string answer = answers.FirstOrDefault().Answer;
-                        float prob = answers.FirstOrDefault().Probability;
+                        foreach (IList<(string answer, float probability)> answer in answers.answers)
+                        {
+                            string text = answer.FirstOrDefault().answer;
+                            float prob = answer.FirstOrDefault().probability;
+
+                            results.Add(new ClassificationResult<string>(
+                                sample.SourceId,
+                                text,
+                                string.Concat(sample.Labels),
+                                prob,
+                                prob >= 0.38f));
+
+                            this.Write(
+                                null,
+                                "({0})\tFile: {1} ... OK ({4} ms) {2} {3:F4}",
+                                this.totalImages,
+                                sample.SourceId.ToFileName(false),
+                                duration,
+                                answer,
+                                prob);
+                        }
+
+                        /*string answer = answers.Last().FirstOrDefault()?.Answer;
+                        int prob = (int)(((answers.Last().FirstOrDefault()?.Probability ?? 0.0f) * 100) + 0.5f);
 
                         results.Add(new ClassificationResult<string>(
                             sample.SourceId,
@@ -125,7 +145,7 @@ namespace Genix.NetClassify
                             sample.SourceId.ToFileName(false),
                             duration,
                             answer,
-                            prob);
+                            prob);*/
                     }
                 }
 

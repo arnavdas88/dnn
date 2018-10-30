@@ -117,13 +117,13 @@
             x.Randomize();
 
             Tensor y = layer.Forward(session, new[] { x })[0];
-            Helpers.AreArraysEqual(x.Weights, y.Weights);
+            Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
 
             // unroll the graph
             y.SetGradient(y.Weights);
             session.Unroll();
 
-            Helpers.AreArraysEqual(x.Weights, x.Gradient);
+            Helpers.AreArraysEqual(x.Length, x.Weights, x.Gradient);
         }
     }
 }

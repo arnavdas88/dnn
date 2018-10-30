@@ -29,7 +29,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw + bw).ToArray());
+                    a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw + bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
@@ -57,13 +57,16 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => xw + alpha).ToArray());
+                    x.Weights.Take(length).Select(xw => xw + alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
-                Helpers.AreArraysEqual(y.Gradient.Select(dyw => dyw).ToArray(), x.Gradient);
+                Helpers.AreArraysEqual(
+                    length,
+                    y.Gradient.Take(length).Select(dyw => dyw).ToArray(),
+                    x.Gradient);
             }
         }
 
@@ -85,14 +88,14 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw - bw).ToArray());
+                    a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw - bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
-                Helpers.AreArraysEqual(y.Gradient, a.Gradient);
-                Helpers.AreArraysEqual(y.Gradient.Select(w => -w).ToArray(), b.Gradient);
+                Helpers.AreGradientsEqual(a, y);
+                Helpers.AreArraysEqual(length, y.Gradient.Select(w => -w).ToArray(), b.Gradient);
             }
         }
 
@@ -113,12 +116,12 @@
                 Tensor expected = new Tensor(
                     null,
                     x.Axes,
-                    x.Weights.Select(w => w * 2.0f).ToArray());
+                    x.Weights.Take(length).Select(w => w * 2.0f).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 session.Unroll();
 
-                Helpers.AreArraysEqual(y.Gradient.Select(w => 2.0f * w).ToArray(), x.Gradient);
+                Helpers.AreArraysEqual(length, y.Gradient.Take(length).Select(w => 2.0f * w).ToArray(), x.Gradient);
             }
         }
 
@@ -140,18 +143,20 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw * bw).ToArray());
+                    a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw * bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Zip(b.Weights, (yw, bw) => yw * bw).ToArray(),
+                    length,
+                    y.Gradient.Take(length).Zip(b.Weights, (yw, bw) => yw * bw).ToArray(),
                     a.Gradient);
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Zip(a.Weights, (yw, aw) => yw * aw).ToArray(),
+                    length,
+                    y.Gradient.Take(length).Zip(a.Weights, (yw, aw) => yw * aw).ToArray(),
                     b.Gradient);
             }
         }
@@ -171,14 +176,15 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => xw * xw).ToArray());
+                    x.Weights.Take(length).Select(xw => xw * xw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Zip(x.Weights, (dyw, xw) => 2.0f * xw * dyw).ToArray(),
+                    length,
+                    y.Gradient.Take(length).Zip(x.Weights, (dyw, xw) => 2.0f * xw * dyw).ToArray(),
                     x.Gradient);
             }
         }
@@ -199,14 +205,15 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => (float)Math.Pow(xw, power)).ToArray());
+                    x.Weights.Take(length).Select(xw => (float)Math.Pow(xw, power)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Zip(x.Weights, (dyw, xw) => power * (float)Math.Pow(xw, power - 1) * dyw).ToArray(),
+                    length,
+                    y.Gradient.Take(length).Zip(x.Weights, (dyw, xw) => power * (float)Math.Pow(xw, power - 1) * dyw).ToArray(),
                     x.Gradient);
             }
         }
@@ -226,14 +233,15 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => (float)Math.Sqrt(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => (float)Math.Sqrt(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Zip(x.Weights, (dyw, xw) => (1 / (2.0f * (float)Math.Sqrt(xw))) * dyw).ToArray(),
+                    length,
+                    y.Gradient.Take(length).Zip(x.Weights, (dyw, xw) => (1 / (2.0f * (float)Math.Sqrt(xw))) * dyw).ToArray(),
                     x.Gradient);
             }
         }
@@ -253,13 +261,14 @@
                 Tensor expected = new Tensor(
                     null,
                     y.Axes,
-                    x.Weights.Select(xw => Math.Abs(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => Math.Abs(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     x.Weights.Zip(y.Gradient, (xw, dyw) => xw >= 0.0f ? dyw : -dyw).ToArray(),
                     x.Gradient);
             }
@@ -282,20 +291,24 @@
                 Tensor expected = new Tensor(
                     null,
                     y.Axes,
-                    a.Weights.Zip(b.Weights, (aw, bw) => Math.Max(aw, bw)).ToArray());
+                    a.Weights.Take(length).Zip(b.Weights, (aw, bw) => Math.Max(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw >= bw ? 1.0f : 0.0f)
+                    length,
+                    a.Weights.Take(length)
+                             .Zip(b.Weights, (aw, bw) => aw >= bw ? 1.0f : 0.0f)
                              .Zip(y.Gradient, (abw, dyw) => abw * dyw)
                              .ToArray(),
                     a.Gradient);
 
                 Helpers.AreArraysEqual(
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw <= bw ? 1.0f : 0.0f)
+                    length,
+                    a.Weights.Take(length)
+                             .Zip(b.Weights, (aw, bw) => aw <= bw ? 1.0f : 0.0f)
                              .Zip(y.Gradient, (abw, dyw) => abw * dyw)
                              .ToArray(),
                     b.Gradient);
@@ -319,20 +332,24 @@
                 Tensor expected = new Tensor(
                     null,
                     y.Axes,
-                    a.Weights.Zip(b.Weights, (aw, bw) => Math.Min(aw, bw)).ToArray());
+                    a.Weights.Take(length).Zip(b.Weights, (aw, bw) => Math.Min(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 y.RandomizeGradient(this.random);
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw <= bw ? 1.0f : 0.0f)
+                    length,
+                    a.Weights.Take(length)
+                             .Zip(b.Weights, (aw, bw) => aw <= bw ? 1.0f : 0.0f)
                              .Zip(y.Gradient, (abw, dyw) => abw * dyw)
                              .ToArray(),
                     a.Gradient);
 
                 Helpers.AreArraysEqual(
-                    a.Weights.Zip(b.Weights, (aw, bw) => aw >= bw ? 1.0f : 0.0f)
+                    length,
+                    a.Weights.Take(length)
+                             .Zip(b.Weights, (aw, bw) => aw >= bw ? 1.0f : 0.0f)
                              .Zip(y.Gradient, (abw, dyw) => abw * dyw)
                              .ToArray(),
                     b.Gradient);
@@ -354,7 +371,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => Math.Max(xw, 0)).ToArray());
+                    x.Weights.Take(length).Select(xw => Math.Max(xw, 0)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.ReLU(session, x);
@@ -364,6 +381,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     x.Weights.Zip(y1.Gradient, (xw, dyw) => xw > 0.0f ? dyw : 0.0f)
                              .Zip(x.Weights.Zip(y2.Gradient, (xw, dyw) => xw > 0.0f ? dyw : 0.0f), (a, b) => a + b)
                              .ToArray(),
@@ -386,7 +404,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => Nonlinearity.Tanh(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => Nonlinearity.Tanh(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Tanh(session, x);
@@ -396,6 +414,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     y1.Weights.Zip(y1.Gradient, (yw, dyw) => Nonlinearity.TanhDerivative2(yw) * dyw)
                               .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => Nonlinearity.TanhDerivative2(yw) * dyw), (a, b) => a + b)
                               .ToArray(),
@@ -418,7 +437,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => Nonlinearity.Sigmoid(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => Nonlinearity.Sigmoid(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Sigmoid(session, x);
@@ -428,6 +447,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     y1.Weights.Zip(y1.Gradient, (yw, dyw) => Nonlinearity.SigmoidDerivative2(yw) * dyw)
                               .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => Nonlinearity.SigmoidDerivative2(yw) * dyw), (a, b) => a + b)
                               .ToArray(),
@@ -450,7 +470,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => (float)Math.Sin(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => (float)Math.Sin(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Sin(session, x);
@@ -460,6 +480,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     x.Weights.Zip(y1.Gradient, (xw, dyw) => (float)Math.Cos(xw) * dyw)
                               .Zip(x.Weights.Zip(y2.Gradient, (xw, dyw) => (float)Math.Cos(xw) * dyw), (a, b) => a + b)
                               .ToArray(),
@@ -482,7 +503,7 @@
                 Tensor expected = new Tensor(
                     null,
                     new[] { length },
-                    x.Weights.Select(xw => (float)Math.Cos(xw)).ToArray());
+                    x.Weights.Take(length).Select(xw => (float)Math.Cos(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
 
                 Tensor y2 = MathOperations.Cos(session, x);
@@ -492,6 +513,7 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
+                    length,
                     x.Weights.Zip(y1.Gradient, (xw, dyw) => -(float)Math.Sin(xw) * dyw)
                               .Zip(x.Weights.Zip(y2.Gradient, (xw, dyw) => -(float)Math.Sin(xw) * dyw), (a, b) => a + b)
                               .ToArray(),
@@ -941,7 +963,7 @@
                 x.Gradient);
 
             // db += dy
-            Helpers.AreArraysEqual(y.Gradient, bias.Gradient);
+            Helpers.AreGradientsEqual(y, bias);
         }
 
         /// <summary>
@@ -1008,7 +1030,7 @@
                 x.Gradient);
 
             // db += dy
-            Helpers.AreArraysEqual(y.Gradient, bias.Gradient);
+            Helpers.AreGradientsEqual(y, bias);
         }
 
         /// <summary>
@@ -1075,7 +1097,7 @@
                 x.Gradient);
 
             // db += dy
-            Helpers.AreArraysEqual(y.Gradient, bias.Gradient);
+            Helpers.AreGradientsEqual(y, bias);
         }
 
         /// <summary>
@@ -1142,7 +1164,7 @@
                 x.Gradient);
 
             // db += dy
-            Helpers.AreArraysEqual(y.Gradient, bias.Gradient);
+            Helpers.AreGradientsEqual(y, bias);
         }
 
         /// <summary>
@@ -1181,7 +1203,7 @@
             //          [24, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 4, 7, 10]'   [1, 4]
@@ -1189,7 +1211,7 @@
             // [3, 6, 9, 12]    [3, 6]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1228,7 +1250,7 @@
             // [24, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1, 5, 9 ]   [1, 4]
@@ -1237,7 +1259,7 @@
             // [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1274,7 +1296,7 @@
             // [3, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1, 4]'  [1, 4, 7, 10]
@@ -1282,7 +1304,7 @@
             // [3, 6]   [3, 6, 9, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1320,7 +1342,7 @@
             //                    [3, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1, 4]'   [1, 5, 9 ]'
@@ -1329,7 +1351,7 @@
             //           [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1368,7 +1390,7 @@
             //          [27, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 2,  3,  4 ]'  [1, 2]
@@ -1376,7 +1398,7 @@
             // [9, 10, 11, 12]   [5, 6]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1415,7 +1437,7 @@
             // [27, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1,  2,  3 ]   [1, 2]
@@ -1424,7 +1446,7 @@
             // [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1461,7 +1483,7 @@
             // [5, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1, 2]'  [1, 2,  3,  4 ]
@@ -1469,7 +1491,7 @@
             // [5, 6]   [9, 10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1507,7 +1529,7 @@
             //                    [5, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1, 2]'  [1,  2,  3 ]'
@@ -1516,7 +1538,7 @@
             //          [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1555,7 +1577,7 @@
             //          [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 4, 7, 10]'   [1]
@@ -1563,7 +1585,7 @@
             // [3, 6, 9, 12]    [3]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1602,7 +1624,7 @@
             // [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1, 5, 9 ]   [1]
@@ -1611,7 +1633,7 @@
             // [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1648,7 +1670,7 @@
             // [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1]'  [1, 4, 7, 10]
@@ -1656,7 +1678,7 @@
             // [3]   [3, 6, 9, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1694,7 +1716,7 @@
             //                     [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1]'   [1, 5, 9 ]'
@@ -1703,7 +1725,7 @@
             //        [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1742,7 +1764,7 @@
             //       [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 2,  3,  4 ]'  [1]
@@ -1750,7 +1772,7 @@
             // [9, 10, 11, 12]   [3]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1789,7 +1811,7 @@
             // [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1,  2,  3 ]   [1]
@@ -1798,7 +1820,7 @@
             // [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1835,7 +1857,7 @@
             // [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1]'  [1, 2,  3,  4 ]
@@ -1843,7 +1865,7 @@
             // [3]   [9, 10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1881,7 +1903,7 @@
             //                     [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1]'   [1,  2,  3 ]'
@@ -1890,7 +1912,7 @@
             //        [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
         }
 
         /// <summary>
@@ -1931,7 +1953,7 @@
             //          [24, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 4, 7, 10]'   [1, 4]
@@ -1939,11 +1961,11 @@
             // [3, 6, 9, 12]    [3, 6]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -1984,7 +2006,7 @@
             // [24, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1, 5, 9 ]   [1, 4]
@@ -1993,11 +2015,11 @@
             // [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2036,7 +2058,7 @@
             // [3, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1, 4]'  [1, 4, 7, 10]
@@ -2044,11 +2066,11 @@
             // [3, 6]   [3, 6, 9, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2088,7 +2110,7 @@
             //                    [3, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1, 4]'   [1, 5, 9 ]'
@@ -2097,11 +2119,11 @@
             //           [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2142,7 +2164,7 @@
             //          [27, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 2,  3,  4 ]'  [1, 2]
@@ -2150,11 +2172,11 @@
             // [9, 10, 11, 12]   [5, 6]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2195,7 +2217,7 @@
             // [27, 28]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1,  2,  3 ]   [1, 2]
@@ -2204,11 +2226,11 @@
             // [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2247,7 +2269,7 @@
             // [5, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1, 2]'  [1, 2,  3,  4 ]
@@ -2255,11 +2277,11 @@
             // [5, 6]   [9, 10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2299,7 +2321,7 @@
             //                    [5, 6]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1, 2]'  [1,  2,  3 ]'
@@ -2308,11 +2330,11 @@
             //          [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
             float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
-            Helpers.AreArraysEqual(expectedDbias, bias.Gradient);
+            Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
         /// <summary>
@@ -2353,7 +2375,7 @@
             //          [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 4, 7, 10]'   [1]
@@ -2361,10 +2383,10 @@
             // [3, 6, 9, 12]    [3]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2405,7 +2427,7 @@
             // [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1, 5, 9 ]   [1]
@@ -2414,10 +2436,10 @@
             // [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2456,7 +2478,7 @@
             // [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1]'  [1, 4, 7, 10]
@@ -2464,10 +2486,10 @@
             // [3]   [3, 6, 9, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2507,7 +2529,7 @@
             //                     [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1]'   [1, 5, 9 ]'
@@ -2516,10 +2538,10 @@
             //        [4, 8, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.ColumnMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2560,7 +2582,7 @@
             //       [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A' * dC
             // [1, 2,  3,  4 ]'  [1]
@@ -2568,10 +2590,10 @@
             // [9, 10, 11, 12]   [3]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, true, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2612,7 +2634,7 @@
             // [24]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, false, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += A * dC
             // [1,  2,  3 ]   [1]
@@ -2621,10 +2643,10 @@
             // [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, m, n, a.Weights, 0, false, c.Gradient, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2663,7 +2685,7 @@
             // [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, m, n, k, c.Gradient, 0, false, b.Weights, 0, false, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A
             // [1]'  [1, 2,  3,  4 ]
@@ -2671,10 +2693,10 @@
             // [3]   [9, 10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, false, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
 
         /// <summary>
@@ -2714,7 +2736,7 @@
             //                     [3]
             float[] expectedDA = new float[a.Length];
             Matrix.MxM(MatrixLayout.RowMajor, k, n, m, b.Weights, 0, true, c.Gradient, 0, true, expectedDA, 0, true);
-            Helpers.AreArraysEqual(expectedDA, a.Gradient);
+            Helpers.AreArraysEqual(a.Length, expectedDA, a.Gradient);
 
             // dB += dC' * A'
             // [1]'   [1,  2,  3 ]'
@@ -2723,10 +2745,10 @@
             //        [10, 11, 12]
             float[] expectedDB = new float[b.Length];
             Matrix.MxM(MatrixLayout.RowMajor, n, m, k, c.Gradient, 0, true, a.Weights, 0, true, expectedDB, 0, true);
-            Helpers.AreArraysEqual(expectedDB, b.Gradient);
+            Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // db += dC
-            Helpers.AreArraysEqual(c.Gradient, bias.Gradient);
+            Helpers.AreArraysEqual(c.Length, c.Gradient, bias.Gradient);
         }
     }
 }

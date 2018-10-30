@@ -121,7 +121,7 @@
 
                 Tensor y = layer.Forward(session, new[] { x })[0];
 
-                Tensor expected = new Tensor(null, x.Axes, x.Weights.Select(w => w * layer.Alpha).ToArray());
+                Tensor expected = new Tensor(null, x.Axes, x.Weights.Take(x.Length).Select(w => w * layer.Alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 // unroll the graph
@@ -129,7 +129,8 @@
                 session.Unroll();
 
                 Helpers.AreArraysEqual(
-                    y.Gradient.Select(w => w * layer.Alpha).ToArray(),
+                    y.Length,
+                    y.Gradient.Take(y.Length).Select(w => w * layer.Alpha).ToArray(),
                     x.Gradient);
             }
         }

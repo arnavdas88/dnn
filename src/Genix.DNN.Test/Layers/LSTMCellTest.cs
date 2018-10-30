@@ -36,19 +36,19 @@
                         new[] { 4 * numberOfNeurons, 10 * 12 * 3 } :
                         new[] { 10 * 12 * 3, 4 * numberOfNeurons },
                     layer.W.Axes);
-                Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
-                Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+                Assert.IsFalse(layer.W.Weights.Take(layer.W.Length).All(x => x == 0.0f));
+                Assert.AreEqual(0.0, layer.W.Weights.Take(layer.W.Length).Average(), 0.01f);
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
                         new[] { 4 * numberOfNeurons, numberOfNeurons } :
                         new[] { numberOfNeurons, 4 * numberOfNeurons },
                     layer.U.Axes);
-                Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
-                Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+                Assert.IsFalse(layer.U.Weights.Take(layer.U.Length).All(x => x == 0.0f));
+                Assert.AreEqual(0.0, layer.U.Weights.Take(layer.U.Length).Average(), 0.01f);
 
                 CollectionAssert.AreEqual(new[] { 4 * numberOfNeurons }, layer.B.Axes);
-                Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+                Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
             }
         }
 
@@ -75,15 +75,15 @@
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
             CollectionAssert.AreEqual(new[] { 4 * 100, 10 * 12 * 3 }, layer.W.Axes);
-            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+            Assert.IsFalse(layer.W.Weights.Take(layer.W.Length).All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Take(layer.W.Length).Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 4 * 100, 100 }, layer.U.Axes);
-            Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+            Assert.IsFalse(layer.U.Weights.Take(layer.U.Length).All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.U.Weights.Take(layer.U.Length).Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 4 * 100 }, layer.B.Axes);
-            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+            Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
         }
 
         [TestMethod, TestCategory("LSTM")]
@@ -102,15 +102,15 @@
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
             CollectionAssert.AreEqual(new[] { 4 * 100, 10 * 12 * 3 }, layer.W.Axes);
-            Assert.IsFalse(layer.W.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.W.Weights.Average(), 0.01f);
+            Assert.IsFalse(layer.W.Weights.Take(layer.W.Length).All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.W.Weights.Take(layer.W.Length).Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 4 * 100, 100 }, layer.U.Axes);
-            Assert.IsFalse(layer.U.Weights.All(x => x == 0.0f));
-            Assert.AreEqual(0.0, layer.U.Weights.Average(), 0.01f);
+            Assert.IsFalse(layer.U.Weights.Take(layer.U.Length).All(x => x == 0.0f));
+            Assert.AreEqual(0.0, layer.U.Weights.Take(layer.U.Length).Average(), 0.01f);
 
             CollectionAssert.AreEqual(new[] { 4 * 100 }, layer.B.Axes);
-            Assert.IsTrue(layer.B.Weights.All(x => x == 0.0f));
+            Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
         }
 
         [TestMethod, TestCategory("LSTM")]

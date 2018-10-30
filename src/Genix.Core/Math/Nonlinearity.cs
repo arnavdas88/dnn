@@ -53,7 +53,7 @@ namespace Genix.Core
         /// <param name="length">The number of elements to compute.</param>
         /// <param name="dxy">The array that contains chain gradient from next level receives the computed gradient.</param>
         /// <param name="offdxy">The index in the <paramref name="dxy"/> at which computation begins.</param>
-        /// <param name="y">The array that contains <see cref="Tanh(int, float[], int, float[], int)"/> method results.</param>
+        /// <param name="y">The array that contains <see cref="ReLU(int, float[], int, float[], int)"/> method results.</param>
         /// <param name="offy">The index in the <paramref name="y"/> at which computation begins.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReLUGradientIP(int length, float[] dxy, int offdxy, float[] y, int offy)

@@ -139,7 +139,9 @@
             session.Unroll();
 
             Helpers.AreArraysEqual(
-                y1.Weights.Zip(y1.Gradient, (yw, dyw) => yw == 0.0f ? 0.0f : dyw)
+                y1.Length,
+                y1.Weights.Take(y1.Length)
+                          .Zip(y1.Gradient, (yw, dyw) => yw == 0.0f ? 0.0f : dyw)
                           .Zip(y2.Weights.Zip(y2.Gradient, (yw, dyw) => yw == 0.0f ? 0.0f : dyw), (a, b) => a + b)
                           .ToArray(),
                 x.Gradient);

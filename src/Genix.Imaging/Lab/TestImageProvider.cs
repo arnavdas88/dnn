@@ -9,6 +9,8 @@ namespace Genix.Imaging.Lab
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Text;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -81,17 +83,45 @@ namespace Genix.Imaging.Lab
                         DirectoryDataProvider provider = new DirectoryDataProvider(width, height);
                         try
                         {
-                            if (parameters.GetValue("parameters", StringComparison.OrdinalIgnoreCase) is JArray data)
+                            JToken parametersToken = parameters.GetValue("parameters", StringComparison.OrdinalIgnoreCase);
+                            if (parametersToken.Type == JTokenType.String)
+                            {
+                                string fileName = (string)parametersToken;
+                                if (!File.Exists(fileName))
+                                {
+                                    throw new FileNotFoundException("Cannot find provider parameters file.", fileName);
+                                }
+
+                                parametersToken = JsonConvert.DeserializeObject<JToken>(File.ReadAllText(fileName, Encoding.UTF8));
+                            }
+
+                            if (parametersToken is JArray arr)
+                            {
+                                ReadJsonArray(arr);
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Cannot recognize directory data provider parameters.");
+                            }
+
+                            void ReadJsonArray(JArray jarray)
                             {
                                 JsonSerializer jsonSerializer = new JsonSerializer();
-                                using (JTokenReader jtokenReader = new JTokenReader(data))
+                                using (JTokenReader jtokenReader = new JTokenReader(jarray))
                                 {
                                     List<Test> tests = new List<Test>();
                                     jsonSerializer.Populate(jtokenReader, tests);
 
                                     foreach (Test test in tests)
                                     {
-                                        provider.Add(test.Path, test.Recursive, test.Class);
+                                        if (!string.IsNullOrEmpty(test.Class))
+                                        {
+                                            provider.Add(test.Path, test.Recursive, test.Class);
+                                        }
+                                        else
+                                        {
+                                            provider.Add(test.Path, test.Recursive, null, null);
+                                        }
                                     }
                                 }
                             }

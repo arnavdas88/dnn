@@ -68,6 +68,16 @@ namespace Genix.Imaging
                 return this.Copy(dst, true);
             }
 
+            if (width <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidWidth, nameof(width));
+            }
+
+            if (height <= 0)
+            {
+                throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
+            }
+
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Scale((double)width / this.Width, (double)height / this.Height);
 

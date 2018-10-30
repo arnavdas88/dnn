@@ -11,7 +11,6 @@ namespace Genix.DNN
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
@@ -49,7 +48,7 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => x.AddGradient(y.Gradient));
                     }
 #endif
 
@@ -91,7 +90,15 @@ namespace Genix.DNN
                             () =>
                             {
                                 float alpha = 1.0f / count;
-                                for (int i = 0; i < count; i++)
+                                int i = 0;
+
+                                if (!x.IsGradientInitialized)
+                                {
+                                    Vectors.MulC(x.Length, ys[i++].Gradient, 0, alpha, x.Gradient, 0);
+                                    x.IsGradientInitialized = true;
+                                }
+
+                                for (; i < count; i++)
                                 {
                                     Vectors.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
                                 }
@@ -665,190 +672,66 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = Stack(calculateGradient);
+                    int y1 = kernel.CalculateOutputWidth(x.Axes[1]);
+                    int y2 = kernel.CalculateOutputHeight(x.Axes[2]);
+
+                    Tensor y = session.AllocateTensor(
+                        ActionName,
+                        new[] { x.Axes[0] * y1 * y2, kernel.Width, kernel.Height, x.Axes[3] },
+                        calculateGradient);
+
+                    NativeMethods.stack_kernels(
+                        kernel.Width,
+                        kernel.Height,
+                        kernel.StrideX,
+                        kernel.StrideY,
+                        kernel.PaddingX,
+                        kernel.PaddingY,
+                        x.Weights,
+                        x.Axes[0],
+                        x.Axes[1],
+                        x.Axes[2],
+                        x.Strides[0],
+                        x.Strides[1],
+                        x.Strides[2],
+                        y.Weights,
+                        y1,
+                        y2,
+                        y.Strides[0],
+                        y.Strides[1]);
 
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () => Gradient(y));
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                NativeMethods.stack_kernels_gradient(
+                                    kernel.Width,
+                                    kernel.Height,
+                                    kernel.StrideX,
+                                    kernel.StrideY,
+                                    kernel.PaddingX,
+                                    kernel.PaddingY,
+                                    x.Gradient,
+                                    x.Axes[0],
+                                    x.Axes[1],
+                                    x.Axes[2],
+                                    x.Strides[0],
+                                    x.Strides[1],
+                                    x.Strides[2],
+                                    y.Gradient,
+                                    y1,
+                                    y2,
+                                    y.Strides[0],
+                                    y.Strides[1]);
+                            });
                     }
 #endif
 
                     return y;
                 });
-
-            Tensor Stack(bool calculateGradient)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-                int kpadding1 = kernel.PaddingX;
-                int kpadding2 = kernel.PaddingY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-                int x3 = x.Axes[3];
-
-                int y1 = kernel.CalculateOutputWidth(x1);
-                int y2 = kernel.CalculateOutputHeight(x2);
-
-                Tensor y = session.AllocateTensor(ActionName, new[] { x0 * y1 * y2, ksize1, ksize2, x3 }, calculateGradient);
-
-#if true
-                NativeMethods.stack_kernels(
-                    ksize1,
-                    ksize2,
-                    kstride1,
-                    kstride2,
-                    kpadding1,
-                    kpadding2,
-                    x.Weights,
-                    x0,
-                    x1,
-                    x2,
-                    x.Strides[0],
-                    x.Strides[1],
-                    x.Strides[2],
-                    y.Weights,
-                    y1,
-                    y2,
-                    y.Strides[0],
-                    y.Strides[1]);
-#else
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-                int ystride2 = y.Strides[2];
-
-                float[] xw = x.Weights;
-                float[] yw = y.Weights;
-
-                for (int ix0 = 0, xpos0 = (-kpadding1 * xstride1) + (-kpadding2 * xstride2), ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0)
-                {
-                    for (int iy1 = 0, ix1 = -kpadding1, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, xpos1 += xstride1)
-                    {
-                        for (int iy2 = 0, ix2 = -kpadding2, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, xpos2 += xstride2)
-                        {
-                            // optimized version for BWHC layout
-                            // copy inner HC part of the tensor in one operation
-                            for (int ixk = ix1, ixke = ixk + ksize1, xposk = xpos2, yposk = ypos0;
-                                 ixk < ixke;
-                                 ixk++, xposk += xstride1, yposk += ystride1)
-                            {
-                                if (ixk >= 0 && ixk < x1)
-                                {
-                                    int xposk2 = xposk;
-                                    int yposk2 = yposk;
-
-                                    int start = ix2;
-                                    int end = ix2 + ksize2;
-
-                                    if (start < 0)
-                                    {
-                                        int count = -start * xstride2;
-                                        Vectors.Set(count, 0.0f, yw, yposk2);
-                                        xposk2 += count;
-                                        yposk2 += count;
-
-                                        start = 0;
-                                    }
-
-                                    if (end > x2)
-                                    {
-                                        Vectors.Set((end - x2) * xstride2, 0.0f, yw, yposk2 + ((x2 - start) * xstride2));
-
-                                        end = x2;
-                                    }
-
-                                    Vectors.Copy((end - start) * xstride2, xw, xposk2, yw, yposk2);
-                                }
-                                else
-                                {
-                                    Vectors.Set(ksize2 * xstride2, 0.0f, yw, yposk);
-                                }
-                            }
-
-                            ypos0 += ystride0;
-                        }
-                    }
-                }
-#endif
-
-                return y;
-            }
-
-#if !NOLEARNING
-            void Gradient(Tensor y)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-                int kpadding1 = kernel.PaddingX;
-                int kpadding2 = kernel.PaddingY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-
-                int y1 = kernel.CalculateOutputWidth(x1);
-                int y2 = kernel.CalculateOutputHeight(x2);
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-                int ystride2 = y.Strides[2];
-
-                float[] dxw = x.Gradient;
-                float[] dyw = y.Gradient;
-
-                for (int ix0 = 0, xpos0 = (-kpadding1 * xstride1) + (-kpadding2 * xstride2), ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0)
-                {
-                    for (int iy1 = 0, ix1 = -kpadding1, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, xpos1 += xstride1)
-                    {
-                        for (int iy2 = 0, ix2 = -kpadding2, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, xpos2 += xstride2)
-                        {
-                            for (int ixk = ix1, ixke = ixk + ksize1, xposk = xpos2, yposk = ypos0;
-                                 ixk < ixke;
-                                 ixk++, xposk += xstride1, yposk += ystride1)
-                            {
-                                if (ixk >= 0 && ixk < x1)
-                                {
-                                    int xposk2 = xposk;
-                                    int yposk2 = yposk;
-
-                                    int start = ix2;
-                                    int end = ix2 + ksize2;
-
-                                    if (start < 0)
-                                    {
-                                        int count = -start * xstride2;
-                                        xposk2 += count;
-                                        yposk2 += count;
-
-                                        start = 0;
-                                    }
-
-                                    if (end > x2)
-                                    {
-                                        end = x2;
-                                    }
-
-                                    Vectors.Add((end - start) * xstride2, dyw, yposk2, dxw, xposk2);
-                                }
-                            }
-
-                            ypos0 += ystride0;
-                        }
-                    }
-                }
-            }
-#endif
         }
 
         /// <summary>
@@ -1014,7 +897,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensors
-                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => x.AddGradient(y.Gradient));
                     }
 #endif
 
@@ -1058,7 +941,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => x.AddGradient(y.Gradient));
                     }
 #endif
 
@@ -1102,7 +985,7 @@ namespace Genix.DNN
                     if (calculateGradient)
                     {
                         // simply copy tensor content
-                        session.Push(ActionName, () => Vectors.Add(x.Length, y.Gradient, 0, x.Gradient, 0));
+                        session.Push(ActionName, () => x.AddGradient(y.Gradient));
                     }
 #endif
 
@@ -1418,6 +1301,27 @@ namespace Genix.DNN
                 int xstride1,
                 int xstride2,
                 [Out] float[] yw,
+                int y1,
+                int y2,
+                int ystride0,
+                int ystride1);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void stack_kernels_gradient(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [Out] float[] dxw,
+                int x0,
+                int x1,
+                int x2,
+                int xstride0,
+                int xstride1,
+                int xstride2,
+                [In] float[] dyw,
                 int y1,
                 int y2,
                 int ystride0,

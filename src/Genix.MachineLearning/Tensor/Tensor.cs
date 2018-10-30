@@ -4,9 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+////#define USE_ARRAYPOOL
+
 namespace Genix.MachineLearning
 {
     using System;
+    using System.Buffers;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -23,6 +26,12 @@ namespace Genix.MachineLearning
     [JsonObject(MemberSerialization.OptIn)]
     public class Tensor : Shape, ICloneable
     {
+#if USE_ARRAYPOOL
+        private static ArrayPool<float> arrayPool = ArrayPool<float>.Create();
+        private bool ownWeights = false;
+        private bool ownGradient = false;
+#endif
+
         // The back-propagation gradient associated with this tensor.
         private float[] gradient;
 
@@ -37,7 +46,12 @@ namespace Genix.MachineLearning
             : base(shape)
         {
             this.Name = name;
+#if USE_ARRAYPOOL
+            this.Weights = Tensor.arrayPool.Rent(this.Length);
+            this.ownWeights = true;
+#else
             this.Weights = new float[this.Length];
+#endif
         }
 
         /// <summary>
@@ -131,6 +145,26 @@ namespace Genix.MachineLearning
         {
         }
 
+#if USE_ARRAYPOOL
+        /// <summary>
+        /// Finalizes an instance of the <see cref="Tensor"/> class.
+        /// </summary>
+        ~Tensor()
+        {
+            if (this.Weights != null && this.ownWeights)
+            {
+                Tensor.arrayPool.Return(this.Weights);
+                this.Weights = null;
+            }
+
+            if (this.gradient != null && this.ownGradient)
+            {
+                Tensor.arrayPool.Return(this.gradient);
+                this.gradient = null;
+            }
+        }
+#endif
+
         /// <summary>
         /// Gets the tensor name.
         /// </summary>
@@ -166,7 +200,14 @@ namespace Genix.MachineLearning
                     {
                         if (this.gradient == null)
                         {
+#if USE_ARRAYPOOL
+                            this.gradient = Tensor.arrayPool.Rent(this.Length);
+                            this.IsGradientInitialized = false;
+                            this.ownGradient = true;
+#else
                             this.gradient = new float[this.Length];
+                            this.IsGradientInitialized = true;
+#endif
                         }
                     }
                 }
@@ -174,6 +215,15 @@ namespace Genix.MachineLearning
                 return this.gradient;
             }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the memory allocated for <see cref="Gradient"/> property has been initialized.
+        /// </summary>
+        /// <value>
+        /// <b>true</b> if the memory was initialized; otherwise, <b>false</b>.
+        /// </value>
+        [JsonIgnore]
+        public bool IsGradientInitialized { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether a gradient for this tensor should be calculated.
@@ -369,6 +419,7 @@ namespace Genix.MachineLearning
             if (this.gradient != null)
             {
                 Vectors.Set(this.Length, 0, this.gradient, 0);
+                this.IsGradientInitialized = true;
             }
         }
 
@@ -391,9 +442,9 @@ namespace Genix.MachineLearning
                 throw new ArgumentNullException(nameof(weights));
             }
 
-            if (weights.Length != this.Length)
+            if (weights.Length < this.Length)
             {
-                throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
+                throw new ArgumentException("The number of weights is less than the tensor length.", nameof(weights));
             }
 
             Vectors.Copy(this.Length, weights, 0, this.Weights, 0);
@@ -404,7 +455,11 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetGradient(float value) => Vectors.Set(this.Length, value, this.Gradient, 0);
+        public void SetGradient(float value)
+        {
+            Vectors.Set(this.Length, value, this.Gradient, 0);
+            this.IsGradientInitialized = true;
+        }
 
         /// <summary>
         /// Sets all values in the tensor gradient to the specified values.
@@ -418,12 +473,31 @@ namespace Genix.MachineLearning
                 throw new ArgumentNullException(nameof(weights));
             }
 
-            if (weights.Length != this.Length)
+            if (weights.Length < this.Length)
             {
-                throw new ArgumentException("The number of weights does not match the tensor length.", nameof(weights));
+                throw new ArgumentException("The number of weights is less than the tensor length.", nameof(weights));
             }
 
             Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
+            this.IsGradientInitialized = true;
+        }
+
+        /// <summary>
+        /// Adds the specified values to the tensor's gradient.
+        /// </summary>
+        /// <param name="weights">The weights to add.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddGradient(float[] weights)
+        {
+            if (this.IsGradientInitialized)
+            {
+                Vectors.Add(this.Length, weights, 0, this.Gradient, 0);
+            }
+            else
+            {
+                Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
+                this.IsGradientInitialized = true;
+            }
         }
 
         /// <summary>
@@ -722,11 +796,11 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Validate()
         {
-            Debug.Assert(!this.Weights.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid weight.");
+            Debug.Assert(!this.Weights.Take(this.Length).Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid weight.");
 
             if (this.gradient != null)
             {
-                Debug.Assert(!this.gradient.Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid gradient.");
+                Debug.Assert(!this.gradient.Take(this.Length).Any(w => float.IsNaN(w) || float.IsInfinity(w)), "Tensor contains invalid gradient.");
             }
         }
 

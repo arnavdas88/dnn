@@ -118,8 +118,8 @@
             Tensor x = source.Clone() as Tensor;
             Tensor y = layer.Forward(session, new[] { x })[0];
 
-            float[] expected = source.Weights.Select(w => TanhLayerTest.activation(w)).ToArray();
-            Helpers.AreArraysEqual(expected, y.Weights);
+            float[] expected = source.Weights.Take(source.Length).Select(w => TanhLayerTest.activation(w)).ToArray();
+            Helpers.AreArraysEqual(x.Length, expected, y.Weights);
 
             // unroll the graph
             float[] dy = Enumerable.Range(1, x.Length).Select(w => (float)w).ToArray();
@@ -127,6 +127,7 @@
             session.Unroll();
 
             Helpers.AreArraysEqual(
+                expected.Length,
                 expected.Zip(dy, (w, dw) => TanhLayerTest.derivative(w) * dw).ToArray(),
                 x.Gradient);
         }

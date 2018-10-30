@@ -224,7 +224,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -273,7 +273,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -320,7 +320,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -367,7 +367,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -415,7 +415,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -462,7 +462,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
 
@@ -509,7 +509,7 @@
                 session.Unroll();
 
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                Helpers.AreArraysEqual(expectedDx.Weights, x.Gradient);
+                Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
         }
     }
