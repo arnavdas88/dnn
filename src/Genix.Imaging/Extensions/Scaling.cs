@@ -166,12 +166,32 @@ namespace Genix.Imaging
         {
             Image dst = this;
 
+            // if image is bigger than required, crop black area first
+            // try to preserve black area relative position within the image
             if (dst.Width > width || dst.Height > height)
             {
                 Rectangle blackArea = dst.BlackArea();
                 if (!blackArea.IsEmpty && blackArea != dst.Bounds)
                 {
-                    dst = dst.Crop(blackArea);
+                    ////dst = dst.Crop(blackArea);
+
+                    if (blackArea.Height < height)
+                    {
+                        int dy = Core.MinMax.Min((height - blackArea.Height) / 2, blackArea.Y, dst.Height - blackArea.Bottom);
+                        blackArea.Inflate(0, dy, 0, height - blackArea.Height - dy);
+                    }
+
+                    if (width > 0 && blackArea.Width < width)
+                    {
+                        int dx = Core.MinMax.Min((width - blackArea.Width) / 2, blackArea.X, dst.Width - blackArea.Right);
+                        blackArea.Inflate(dx, 0, width - blackArea.Width - dx, 0);
+                    }
+
+                    blackArea.Intersect(dst.Bounds);
+                    if (blackArea != dst.Bounds)
+                    {
+                        dst = dst.Crop(blackArea);
+                    }
                 }
             }
 

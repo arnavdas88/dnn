@@ -56,7 +56,7 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            Image closing = image.MorphClose(null, StructuringElement.Brick(7, 1), 1, BorderType.BorderConst, 0);
+            Image closing = image.MorphClose(null, StructuringElement.Brick(5, 1), 1, BorderType.BorderConst, 0);
 
             AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(
                 image.Bounds,
@@ -64,9 +64,10 @@ namespace Genix.DocumentAnalysis
                 100.MulDiv(image.VerticalResolution, 200));
 
             componentgrid.Add(
-                closing.FindConnectedComponents(4) /*.Where(x => x.Power > 10 && x.Bounds.Height <= 100)*/,
+                closing.FindConnectedComponents(4).Where(x => /*x.Power > 10 &&*/ x.Bounds.Height <= 100),
                 true,
                 true);
+            componentgrid.Compact();
 
             AlignedObjectGrid<TextShape> shapegrid = new AlignedObjectGrid<TextShape>(
                 image.Bounds,
@@ -78,13 +79,8 @@ namespace Genix.DocumentAnalysis
                 if (component.VerticalAlignment == VerticalAlignment.None)
                 {
                     IList<ConnectedComponent> alignedComponents = componentgrid.FindVerticalAlignment(component, VerticalAlignment.Bottom, 50);
-                    if (alignedComponents.Count > 1)
+                    if (alignedComponents.Count > 0)
                     {
-                        foreach (ConnectedComponent alignedComponent in alignedComponents)
-                        {
-                            alignedComponent.VerticalAlignment = VerticalAlignment.Bottom;
-                        }
-
                         shapegrid.Add(new TextShape(Rectangle.Union(alignedComponents.Select(x => x.Bounds))), true, true);
                     }
                 }
@@ -111,7 +107,7 @@ namespace Genix.DocumentAnalysis
             Image draft = image.ConvertTo(null, 24);
             foreach (TextShape shape in shapes)
             {
-                draft.DrawRectangle(shape.Bounds, 0x00800000);
+                draft.DrawRectangle(shape.Bounds, Color.Red);
             }
 
             int count = shapes.Count();

@@ -40,6 +40,9 @@ namespace Genix.NetLearn
 
         private class InnerProgram : Lab.Program
         {
+            // Locker for log operations.
+            private readonly object logLocker = new object();
+
             private Options options = null;
 
             protected override bool OnConfigure(string[] args)
@@ -162,15 +165,18 @@ namespace Genix.NetLearn
                             timer.ElapsedMilliseconds,
                             result);
 
-                        this.Write(logFile, s);
-                        this.WriteDebugInformation(logFile);
-                        this.WriteLine(logFile, string.Empty);
+                        lock (this.logLocker)
+                        {
+                            this.Write(logFile, s);
+                            this.WriteDebugInformation(logFile);
+                            this.WriteLine(logFile, string.Empty);
+                        }
                     }
 
                     IEnumerable<(Tensor, string[])> GenerateSamples(int epoch)
                     {
                         return dataProvider
-                            .Generate(null)
+                            .Generate(net.AllowedClasses)
                             .SelectMany(x =>
                             {
                                 string[] labels = x.Labels;
@@ -201,7 +207,9 @@ namespace Genix.NetLearn
                                     {
                                         if (epoch == 0)
                                         {
-                                            ////bitmap.Save(@"d:\dnn\temp\" + (++n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
+                                            ////Interlocked.Increment(ref n);
+                                            ////bitmap.Save(@"d:\dnn\temp\" + n.ToString(CultureInfo.InvariantCulture) + ".bmp");
+                                            ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
                                         }
 
                                         return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null), labels);
@@ -383,16 +391,16 @@ namespace Genix.NetLearn
                     [JsonProperty("epochs")]
                     public int Epochs { get; private set; } = 1;
 
-                    [JsonProperty("Shift")]
+                    [JsonProperty("shift")]
                     public bool Shift { get; private set; } = true;
 
-                    [JsonProperty("Rotate")]
+                    [JsonProperty("rotate")]
                     public bool Rotate { get; private set; } = true;
 
-                    [JsonProperty("Scale")]
+                    [JsonProperty("scale")]
                     public bool Scale { get; private set; } = true;
 
-                    [JsonProperty("Crop")]
+                    [JsonProperty("crop")]
                     public bool Crop { get; private set; } = false;
 
                     [JsonProperty("dataProvider", Required = Required.Always)]

@@ -8,7 +8,6 @@ namespace Genix.DNN
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
@@ -17,7 +16,6 @@ namespace Genix.DNN
     using System.Text;
     using Genix.Core;
     using Genix.DNN.Layers;
-    using Genix.DNN.Learning;
     using Genix.MachineLearning;
     using Genix.MachineLearning.LanguageModel;
     using Newtonsoft.Json;
@@ -127,7 +125,7 @@ namespace Genix.DNN
         /// <value>
         /// The collection of class names.
         /// </value>
-        public ReadOnlyCollection<string> Classes => new ReadOnlyCollection<string>(this.classes);
+        public IList<string> Classes => this.classes;
 
         /// <summary>
         /// Gets the classes the network is allowed to classify.

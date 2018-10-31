@@ -8,7 +8,6 @@ namespace Genix.Imaging.Lab
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using Genix.Core;
     using Genix.Drawing;
@@ -128,9 +127,9 @@ namespace Genix.Imaging.Lab
         /// Gets the classes used for text generation.
         /// </summary>
         /// <value>
-        /// The <see cref="ReadOnlyCollection{T}"/> collection that contains the classes.
+        /// The <see cref="IReadOnlyCollection{T}"/> collection that contains the classes.
         /// </value>
-        public ReadOnlyCollection<string> Classes => new ReadOnlyCollection<string>(this.classes);
+        public IReadOnlyCollection<string> Classes => this.classes;
 
         /// <summary>
         /// Gets or sets the minimum number of elements in generated string.

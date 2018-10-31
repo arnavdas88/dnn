@@ -61,8 +61,35 @@ namespace Genix.Imaging.Lab
                 image.Rotate(image, angle, BorderType.BorderConst, image.WhiteColor);
             }
 
-            // reduce image size to black area
-            image = image.CropBlackArea(1, 1);
+            // reduce image size to black area if bigger than requested
+            ////image = image.CropBlackArea(1, 1);
+            if ((width > 0 && image.Width > width) || image.Height > height)
+            {
+                Rectangle blackArea = image.BlackArea();
+                if (!blackArea.IsEmpty && blackArea != image.Bounds)
+                {
+                    blackArea.Inflate(1, 1);
+                    blackArea.Intersect(image.Bounds);
+
+                    if (blackArea.Height < height)
+                    {
+                        int dy = MinMax.Min((height - blackArea.Height) / 2, blackArea.Y, image.Height - blackArea.Bottom);
+                        blackArea.Inflate(0, dy, 0, height - blackArea.Height - dy);
+                    }
+
+                    if (width > 0 && blackArea.Width < width)
+                    {
+                        int dx = MinMax.Min((width - blackArea.Width) / 2, blackArea.X, image.Width - blackArea.Right);
+                        blackArea.Inflate(dx, 0, width - blackArea.Width - dx, 0);
+                    }
+
+                    blackArea.Intersect(image.Bounds);
+                    if (blackArea != image.Bounds)
+                    {
+                        image = image.Crop(blackArea);
+                    }
+                }
+            }
 
             // scale down if bigger than needed
             if (width > 0)

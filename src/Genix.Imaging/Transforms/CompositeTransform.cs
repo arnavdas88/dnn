@@ -8,8 +8,6 @@ namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows;
     using Newtonsoft.Json;
@@ -76,7 +74,7 @@ namespace Genix.Imaging
         /// <value>
         /// The collection of transformations.
         /// </value>
-        public ReadOnlyCollection<Transform> Transforms => new ReadOnlyCollection<Transform>(this.transforms);
+        public IReadOnlyCollection<Transform> Transforms => this.transforms;
 
         /// <inheritdoc />
         public override Point Convert(Point value)

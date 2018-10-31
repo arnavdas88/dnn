@@ -7,7 +7,7 @@
 namespace Genix.Lab
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace Genix.Lab
         /// Gets the collection of the <see cref="RejectCurvePoint"/> in the curve.
         /// </summary>
         /// <value>The collection of <see cref="RejectCurvePoint"/>.</value>
-        public ReadOnlyCollection<RejectCurvePoint> Points => new ReadOnlyCollection<RejectCurvePoint>(this.points);
+        public IReadOnlyCollection<RejectCurvePoint> Points => this.points;
 
         /// <summary>
         /// Gets the <see cref="RejectCurvePoint"/> associated with the specified threshold.

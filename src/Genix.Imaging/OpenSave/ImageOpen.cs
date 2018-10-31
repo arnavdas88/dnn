@@ -104,6 +104,9 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para><paramref name="fileName"/> refers to a non-file device, such as "con:", "com1:", "lpt1:", etc. in an NTFS environment.</para>
         /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para><paramref name="startingFrame"/> is negative.</para>
+        /// </exception>
         /// <exception cref="FileNotFoundException">
         /// <para>The file specified by <paramref name="fileName"/> does not exist.</para>
         /// </exception>
@@ -180,11 +183,6 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromMemory(byte[] buffer, int index, int count)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
-
             return new LoadedImages(buffer, index, count, 0, -1);
         }
 
@@ -205,11 +203,6 @@ namespace Genix.Imaging
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<(Image image, int? frameIndex, ImageMetadata metadata)> FromStream(Stream stream)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
             return new LoadedImages(stream, 0, -1);
         }
 
@@ -409,6 +402,11 @@ namespace Genix.Imaging
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public LoadedImages(string fileName, int startingFrame, int frameCount)
             {
+                if (startingFrame < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(startingFrame), "The starting frame must be a non-negative integer.");
+                }
+
                 this.fileName = fileName;
 
                 this.startingFrame = startingFrame;
@@ -418,7 +416,12 @@ namespace Genix.Imaging
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public LoadedImages(byte[] buffer, int index, int count, int startingFrame, int frameCount)
             {
-                this.buffer = buffer;
+                if (startingFrame < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(startingFrame), "The starting frame must be a non-negative integer.");
+                }
+
+                this.buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
                 this.index = index;
                 this.count = count;
 
@@ -429,7 +432,12 @@ namespace Genix.Imaging
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public LoadedImages(Stream stream, int startingFrame, int frameCount)
             {
-                this.stream = stream;
+                if (startingFrame < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(startingFrame), "The starting frame must be a non-negative integer.");
+                }
+
+                this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
                 this.startingFrame = startingFrame;
                 this.frameCount = frameCount;
@@ -490,9 +498,7 @@ namespace Genix.Imaging
 
                         this.frameCount = this.decoder.Frames.Count;
                         this.firstFrame = parent.startingFrame;
-                        this.lastFrame = 0; //// parent.frameCount > 0 ?
-                                            ////MinMax.Min(this.frameCount, parent.startingFrame + parent.frameCount) - 1 :
-                                            ////this.frameCount - 1;
+                        this.lastFrame = Math.Min(this.frameCount, parent.startingFrame + (parent.frameCount > 0 ? parent.frameCount : this.frameCount)) - 1;
 
                         this.currentFrame = this.firstFrame - 1;
                     }

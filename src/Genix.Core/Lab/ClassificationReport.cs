@@ -8,7 +8,6 @@ namespace Genix.Lab
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
 
     /// <summary>
     /// Represents a classification test report.
@@ -59,13 +58,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of classification results.
         /// </value>
-        public ReadOnlyCollection<ClassificationResult<T>> Results
-        {
-            get
-            {
-                return new ReadOnlyCollection<ClassificationResult<T>>(this.results);
-            }
-        }
+        public IReadOnlyCollection<ClassificationResult<T>> Results => this.results;
 
         /// <summary>
         /// Gets a collection of summary reports for classes in the test.
@@ -73,13 +66,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of reports for each class.
         /// </value>
-        public ReadOnlyCollection<ClassSummary<T>> Classes
-        {
-            get
-            {
-                return new ReadOnlyCollection<ClassSummary<T>>(this.classes);
-            }
-        }
+        public IReadOnlyCollection<ClassSummary<T>> Classes => this.classes;
 
         /// <summary>
         /// Gets a summary report for all classes in the test.

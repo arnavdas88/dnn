@@ -34,7 +34,6 @@ namespace Genix.Core
             SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
 
             Rectangle obounds = obj.Bounds;
-            result.Add(obounds, obj);
 
             // calculate initial pivot points
             Line baseline = new Line(
@@ -44,19 +43,38 @@ namespace Genix.Core
                 verticalAlignment == VerticalAlignment.Top ? obounds.Top : obounds.Bottom);
 
             // find objects to the left
-            T next = FindNext(obounds, false);
-            while (next != null)
+            T next;
+            while ((next = FindNext(obounds, false)) != null)
             {
                 result.Add(next.Bounds, next);
-                next = FindNext(next.Bounds, false);
+
+                next.VerticalAlignment = verticalAlignment;
+                obounds.Union(next.Bounds);
             }
 
             // find objects to the right
-            next = FindNext(obounds, true);
-            while (next != null)
+            while ((next = FindNext(obounds, true)) != null)
             {
                 result.Add(next.Bounds, next);
-                next = FindNext(next.Bounds, true);
+
+                next.VerticalAlignment = verticalAlignment;
+                obounds.Union(next.Bounds);
+            }
+
+            if (result.Count > 0)
+            {
+                obj.VerticalAlignment = verticalAlignment;
+                result.Add(obj.Bounds, obj);
+
+                // mark contained elements
+                foreach (T o in this.EnumObjects(obounds))
+                {
+                    if (o.VerticalAlignment == VerticalAlignment.None && obounds.Contains(o.Bounds))
+                    {
+                        o.VerticalAlignment = verticalAlignment;
+                        result.Add(o.Bounds, o);
+                    }
+                }
             }
 
             return result.Values;
@@ -70,15 +88,15 @@ namespace Genix.Core
 
                 // new objects found must extend beyond current box
                 int xstart = searchForward ? box.Right : box.Left;
-                int xend = searchForward ? xstart + maxGap : xstart - maxGap;
+                int xend = searchForward ? box.Right + maxGap : box.Left - maxGap;
                 int ystart = verticalAlignment == VerticalAlignment.Top ? box.Top : box.Bottom;
 
                 // Compute skew tolerance
                 int skewTolerance = maxGap / MaxSkewFactor;
 
                 // Expand the box
-                int ymin = ystart - (box.Height / 2) - skewTolerance;
-                int ymax = ystart + (box.Height / 5) + skewTolerance;
+                int ymin = box.Top/*ystart - (box.Height / 2)*/ - skewTolerance;
+                int ymax = box.Bottom/*ystart + (box.Height / 5)*/ + skewTolerance;
 
                 // Search the grid
                 Rectangle searchArea = searchForward ?
@@ -93,13 +111,7 @@ namespace Genix.Core
                     {
                         Rectangle cbounds = candidate.Bounds;
 
-                        // element was already selected
-                        if (result.ContainsKey(cbounds))
-                        {
-                            continue;
-                        }
-
-                        // verify candidate position againts baseline
+                        // verify candidate position against baseline
                         if (verticalAlignment == VerticalAlignment.Top)
                         {
                             int nearestx = searchForward ? cbounds.Left : cbounds.Right;
@@ -132,6 +144,13 @@ namespace Genix.Core
                             }
                         }
 
+                        if ((cbounds.Height > box.Height / 2 && cbounds.Height > 2 * box.Height) ||
+                            (box.Height > cbounds.Height / 2 && box.Height > 2 * cbounds.Height))
+                        {
+                            // box sizes too different
+                            continue;
+                        }
+
                         // find nearest element based on Eucledian distance
                         int distance = box.DistanceToSquared(cbounds);
                         if (distance < bestDistance)
@@ -142,19 +161,23 @@ namespace Genix.Core
                     }
                 }
 
-                // update baseline
+                // update baseline and box
                 if (bestCandidate != null)
                 {
                     Rectangle cbounds = bestCandidate.Bounds;
-                    if (searchForward)
+
+                    if (cbounds.Height > box.Height / 2)
                     {
-                        baseline.X2 = cbounds.Right;
-                        baseline.Y2 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
-                    }
-                    else
-                    {
-                        baseline.X1 = cbounds.Left;
-                        baseline.Y1 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
+                        if (searchForward)
+                        {
+                            baseline.X2 = cbounds.Right;
+                            baseline.Y2 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
+                        }
+                        else
+                        {
+                            baseline.X1 = cbounds.Left;
+                            baseline.Y1 = verticalAlignment == VerticalAlignment.Top ? cbounds.Top : cbounds.Bottom;
+                        }
                     }
                 }
 

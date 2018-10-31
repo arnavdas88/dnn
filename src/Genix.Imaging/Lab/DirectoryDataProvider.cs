@@ -312,7 +312,7 @@ namespace Genix.Imaging.Lab
                     }
                 }
 
-                image = image.CropBlackArea(1, 1);
+                ////image = image.CropBlackArea(1, 1);
 
                 if (this.Width > 0 || this.Height > 0)
                 {

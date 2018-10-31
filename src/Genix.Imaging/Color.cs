@@ -19,6 +19,42 @@ namespace Genix.Imaging
         : IEquatable<Color>
     {
         /// <summary>
+        /// The red color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint Red = 0xFFFF0000u;
+
+        /// <summary>
+        /// The green color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint Green = 0xFF00FF00u;
+
+        /// <summary>
+        /// The blue color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint Blue = 0xFF0000FFu;
+
+        /// <summary>
+        /// The dark red color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint DarkRed = 0xFF800000u;
+
+        /// <summary>
+        /// The dark green color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint DarkGreen = 0xFF008000u;
+
+        /// <summary>
+        /// The dark blue color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint DarkBlue = 0xFF000080u;
+
+        /// <summary>
         /// The blue component value of this <see cref="Color"/>.
         /// </summary>
         [FieldOffset(0)]

@@ -8,7 +8,6 @@ namespace Genix.Lab
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -54,7 +53,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the names of files in the truth.
         /// </value>
-        public ReadOnlyCollection<string> FileNames => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.Name).ToList());
+        public IReadOnlyCollection<string> FileNames => this.files.Keys.Select(x => x.Name).ToList();
 
         /// <summary>
         /// Gets a collection of file paths for the current truth.
@@ -62,7 +61,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the names of file paths in the truth.
         /// </value>
-        public ReadOnlyCollection<string> FilePaths => new ReadOnlyCollection<string>(this.files.Keys.Select(x => x.Id).ToList());
+        public IReadOnlyCollection<string> FilePaths => this.files.Keys.Select(x => x.Id).ToList();
 
         /// <summary>
         /// Gets a collection of files for the current truth.
@@ -70,7 +69,7 @@ namespace Genix.Lab
         /// <value>
         /// A collection of <see cref="string"/> objects that represents the names of fields in the truth.
         /// </value>
-        public ReadOnlyCollection<string> Fields => new ReadOnlyCollection<string>(this.fields);
+        public IReadOnlyCollection<string> Fields => this.fields;
 
         /// <summary>
         /// Gets or sets truth data for a field, specified by file name and field name.

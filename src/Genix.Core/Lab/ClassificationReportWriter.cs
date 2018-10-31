@@ -89,11 +89,11 @@ namespace Genix.Lab
                 ClassificationReportWriter<T>.WriteConfusionMatrix(writer, report.ConfusionMatrix);*/
 
                 // print reject curves
-                /*writer.WriteLine();
+                writer.WriteLine();
                 writer.WriteLine("=============================================================================");
                 writer.WriteLine("REJECT CURVES");
                 writer.WriteLine();
-                ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);*/
+                ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);
 
                 // print errors
                 writer.WriteLine();

@@ -12,19 +12,19 @@ namespace Genix.Drawing
     public interface IAlignedBoundedObject : IBoundedObject
     {
         /// <summary>
-        /// Gets the object horizontal alignment.
+        /// Gets or sets the object horizontal alignment.
         /// </summary>
         /// <value>
         /// A <see cref="Genix.Drawing.HorizontalAlignment"/> enumeration value.
         /// </value>
-        HorizontalAlignment HorizontalAlignment { get; }
+        HorizontalAlignment HorizontalAlignment { get; set; }
 
         /// <summary>
-        /// Gets the object vertical alignment.
+        /// Gets or sets the object vertical alignment.
         /// </summary>
         /// <value>
         /// A <see cref="Genix.Drawing.VerticalAlignment"/> enumeration value.
         /// </value>
-        VerticalAlignment VerticalAlignment { get; }
+        VerticalAlignment VerticalAlignment { get; set; }
     }
 }

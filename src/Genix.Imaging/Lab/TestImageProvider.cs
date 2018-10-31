@@ -45,7 +45,7 @@ namespace Genix.Imaging.Lab
         /// <param name="blankClass">The blank class.</param>
         /// <param name="parameters">The Json parameters.</param>
         /// <returns>The <see cref="TestImageProvider{TLabel}"/> object this method creates.</returns>
-        public static TestImageProvider<string> CreateFromJson(int width, int height, IList<string> classes, string blankClass, JObject parameters)
+        public static TestImageProvider<string> CreateFromJson(int width, int height, ICollection<string> classes, string blankClass, JObject parameters)
         {
             string name = parameters.GetValue("name", StringComparison.OrdinalIgnoreCase)?.Value<string>();
             switch (name?.ToUpperInvariant())

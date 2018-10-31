@@ -83,7 +83,7 @@ namespace Genix.NetClassify
                     ////Context model = Context.FromRegex(@"\d{1,5}", CultureInfo.InvariantCulture);
 
                     ////int n = 0;
-                    foreach (TestImage sample in dataProvider.Generate(null))
+                    foreach (TestImage sample in dataProvider.Generate(network.AllowedClasses))
                     {
                         Interlocked.Increment(ref this.totalImages);
 
@@ -99,13 +99,13 @@ namespace Genix.NetClassify
                             network.InputShape[(int)Axis.X],
                             network.InputShape[(int)Axis.Y],
                             null);
-                        (IList<IList<(string Answer, float Probability)>> answers, Tensor y) answers = network.Execute(x);
+                        IList<IList<(string Answer, float Probability)>> answers = network.Execute(x).Answers;
                         ////(IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 
                         this.localTimeCounter.Stop();
                         long duration = this.localTimeCounter.ElapsedMilliseconds;
 
-                        foreach (IList<(string answer, float probability)> answer in answers.answers)
+                        foreach (IList<(string answer, float probability)> answer in answers)
                         {
                             string text = answer.FirstOrDefault().answer;
                             float prob = answer.FirstOrDefault().probability;
@@ -117,13 +117,13 @@ namespace Genix.NetClassify
                                 prob,
                                 prob >= 0.38f));
 
-                            this.Write(
+                            this.WriteLine(
                                 null,
-                                "({0})\tFile: {1} ... OK ({4} ms) {2} {3:F4}",
+                                "({0})\tFile: {1} ... OK ({2} ms) {3} {4:F4}",
                                 this.totalImages,
                                 sample.SourceId.ToFileName(false),
                                 duration,
-                                answer,
+                                text,
                                 prob);
                         }
 

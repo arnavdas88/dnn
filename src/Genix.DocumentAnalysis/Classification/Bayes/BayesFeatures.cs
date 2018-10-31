@@ -8,7 +8,6 @@ namespace Genix.DocumentAnalysis.Classification
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using Genix.Core;
     using Newtonsoft.Json;
 
@@ -63,8 +62,8 @@ namespace Genix.DocumentAnalysis.Classification
         /// Gets a collection of words extracted from the data.
         /// </summary>
         /// <value>
-        /// The <see cref="ReadOnlyCollection{T}"/> that contains a collection of words.
+        /// The <see cref="IReadOnlyCollection{T}"/> that contains a collection of words.
         /// </value>
-        public ReadOnlyCollection<string> Words => new ReadOnlyCollection<string>(this.words);
+        public IReadOnlyCollection<string> Words => this.words;
     }
 }
