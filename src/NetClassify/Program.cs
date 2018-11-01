@@ -153,7 +153,7 @@ namespace Genix.NetClassify
                 ClassificationReport<string> testReport = new ClassificationReport<string>(results);
                 using (StreamWriter outputFile = File.CreateText(this.options.OutputFileName))
                 {
-                    ClassificationReportWriter<string>.WriteReport(outputFile, testReport);
+                    ClassificationReportWriter<string>.WriteReport(outputFile, testReport, ClassificationReportMode.All);
                 }
             }
 

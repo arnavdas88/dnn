@@ -187,7 +187,7 @@ namespace Genix.NetClassify
                 using (StreamWriter outputFile = new StreamWriter(Console.OpenStandardOutput()))
                 ////using (StreamWriter outputFile = File.CreateText(this.options.OutputFileName))
                 {
-                    ClassificationReportWriter<string>.WriteReport(outputFile, testReport);
+                    ClassificationReportWriter<string>.WriteReport(outputFile, testReport, ClassificationReportMode.All);
                 }
             }
 

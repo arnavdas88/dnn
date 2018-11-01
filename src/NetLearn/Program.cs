@@ -20,11 +20,14 @@ namespace Genix.NetLearn
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Learning;
     using Genix.Imaging.Lab;
+    using Genix.Lab;
     using Genix.MachineLearning;
     using Genix.MachineLearning.Imaging;
+    using Genix.MachineLearning.LanguageModel;
     using Genix.MachineLearning.Learning;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -106,7 +109,7 @@ namespace Genix.NetLearn
                             ClassificationNetwork.FromArchitecture(task.Architecture, task.Classes, task.Classes, task.BlankClass);
 
                         // learning
-                        this.Learn(taskIndex, task, net, logFile, cancellationToken);
+                        Learn();
                         net.SaveToFile(task.OutputFileName);
 
                         // report finish time and processing interval
@@ -114,107 +117,188 @@ namespace Genix.NetLearn
                         this.WriteLine(logFile, string.Empty);
                         this.WriteLine(logFile, string.Format(CultureInfo.InvariantCulture, "Finished: {0:G}", dateFinished));
                         this.WriteLine(logFile, string.Format(CultureInfo.InvariantCulture, "Total time: {0:g}", TimeSpan.FromSeconds((dateFinished - dateStarted).TotalSeconds)));
+
+                        void Learn()
+                        {
+                            this.WriteLine(logFile, "Learning...");
+
+                            ImageDistortion filter = new ImageDistortion();
+                            Stopwatch timer = new Stopwatch();
+
+                            this.WriteLine(logFile, "  Epochs: {0}", task.Epochs);
+
+                            this.WriteTrainerParameters(logFile, task.Trainer, task.Algorithm, task.Loss);
+
+                            this.WriteLine(logFile, "Image distortion:");
+                            this.WriteLine(logFile, "  Shift: {0}", task.Shift);
+                            this.WriteLine(logFile, "  Rotate: {0}", task.Rotate);
+                            this.WriteLine(logFile, "  Scale: {0}", task.Scale);
+                            this.WriteLine(logFile, "  Crop: {0}", task.Crop);
+
+                            int[] shape = net.InputShape;
+                            using (TestImageProvider<string> dataProvider = task.CreateDataProvider(net))
+                            {
+                                using (TestImageProvider<string> testDataProvider = task.CreateTestDataProvider(net))
+                                {
+                                    ////int n = 0;
+                                    for (int epoch = 0; epoch < task.Epochs; epoch++)
+                                    {
+                                        // run learning
+                                        timer.Restart();
+
+                                        TrainingResult result = task.Trainer.RunEpoch(
+                                            epoch,
+                                            net,
+                                            GenerateLearnSamples(dataProvider, epoch),
+                                            task.Algorithm,
+                                            task.Loss,
+                                            cancellationToken);
+
+                                        timer.Stop();
+
+                                        lock (this.logLocker)
+                                        {
+                                            string s = string.Format(
+                                                CultureInfo.InvariantCulture,
+                                                "Net: {0}, Epoch: {1}, Time: {2} ms, {3}",
+                                                taskIndex,
+                                                epoch,
+                                                timer.ElapsedMilliseconds,
+                                                result);
+
+                                            this.Write(logFile, s);
+                                            ////this.WriteDebugInformation(logFile);
+                                            this.WriteLine(logFile, string.Empty);
+                                        }
+
+                                        // run testing
+                                        string epochOutputFileName = string.Format(CultureInfo.InvariantCulture, task.EpochFileNameTemplate, epoch);
+
+                                        // save network
+                                        net.SaveToFile(epochOutputFileName);
+
+                                        // run testing
+                                        List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();
+                                        if (task.Loss is CTCLoss)
+                                        {
+                                            Context model = Context.FromRegex(@"\d", CultureInfo.InvariantCulture);
+
+                                            foreach ((DataSourceId sourceId, Tensor x, string[] labels) in GenerateTestSamples(testDataProvider))
+                                            {
+                                                (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
+
+                                                results.Add(new ClassificationResult<string>(
+                                                    sourceId,
+                                                    text,
+                                                    string.Concat(labels),
+                                                    prob,
+                                                    prob >= 0.38f));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach ((DataSourceId sourceId, Tensor x, string[] labels) in GenerateTestSamples(testDataProvider))
+                                            {
+                                                foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
+                                                {
+                                                    string text = answer.FirstOrDefault().answer;
+                                                    float prob = answer.FirstOrDefault().probability;
+
+                                                    results.Add(new ClassificationResult<string>(
+                                                        sourceId,
+                                                        text,
+                                                        string.Concat(labels),
+                                                        prob,
+                                                        prob >= 0.38f));
+                                                }
+                                            }
+                                        }
+
+                                        // write report
+                                        ClassificationReport<string> testReport = new ClassificationReport<string>(results);
+                                        this.Write(logFile, ClassificationReportWriter<string>.WriteReport(testReport, ClassificationReportMode.Summary));
+
+                                        using (StreamWriter outputFile = File.CreateText(Path.ChangeExtension(epochOutputFileName, ".res")))
+                                        {
+                                            ClassificationReportWriter<string>.WriteReport(outputFile, testReport, ClassificationReportMode.All);
+                                        }
+                                    }
+                                }
+
+                                IEnumerable<(Tensor x, string[] labels)> GenerateLearnSamples(TestImageProvider<string> provider, int epoch)
+                                {
+                                    return GenerateSamples(provider)
+                                        .SelectMany(x =>
+                                        {
+                                            if (epoch == 0)
+                                            {
+                                                ////x.Image.Save("e:\\temp\\" + x.Id + "_" + n.ToString(CultureInfo.InvariantCulture) + "_.bmp");
+                                            }
+
+                                            return filter
+                                                .Distort(
+                                                    x.image.Image,
+                                                    shape[(int)Axis.X],
+                                                    shape[(int)Axis.Y],
+                                                    task.Shift,
+                                                    task.Rotate && x.image.FontStyle != FontStyle.Italic,
+                                                    task.Scale,
+                                                    task.Crop)
+                                                .Select(bitmap =>
+                                                {
+                                                    if (epoch == 0)
+                                                    {
+                                                        ////Interlocked.Increment(ref n);
+                                                        ////bitmap.Save(@"d:\dnn\temp\" + n.ToString(CultureInfo.InvariantCulture) + ".bmp");
+                                                        ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
+                                                    }
+
+                                                    return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null), x.labels);
+                                                });
+                                        });
+                                }
+
+                                IEnumerable<(DataSourceId sourceId, Tensor x, string[] labels)> GenerateTestSamples(TestImageProvider<string> provider)
+                                {
+                                    return GenerateSamples(provider)
+                                        .Select(x =>
+                                        {
+                                            return (
+                                                x.image.SourceId,
+                                                ImageExtensions.FromImage(x.image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null),
+                                                x.labels);
+                                        })
+                                        .AsParallel()
+                                        .AsOrdered()
+                                        .WithCancellation(cancellationToken)
+                                        .WithMergeOptions(ParallelMergeOptions.AutoBuffered);
+                                }
+
+                                IEnumerable<(TestImage image, string[] labels)> GenerateSamples(TestImageProvider<string> provider)
+                                {
+                                    return provider
+                                        .Generate(net.AllowedClasses)
+                                        .Select(x =>
+                                        {
+                                            string[] labels = x.Labels;
+                                            if (!(task.Loss is CTCLoss))
+                                            {
+                                                int b = net.OutputShapes.First()[0];
+                                                if (labels.Length == 1 && b > 1)
+                                                {
+                                                    labels = Enumerable.Repeat(labels[0], b).ToArray();
+                                                }
+                                            }
+
+                                            return (x, labels);
+                                        });
+                                }
+                            }
+                        }
                     }
                     finally
                     {
                         logFile.Flush();
-                    }
-                }
-            }
-
-            private void Learn(int taskIndex, LearningTask task, ClassificationNetwork net, StreamWriter logFile, CancellationToken cancellationToken)
-            {
-                this.WriteLine(logFile, "Learning...");
-
-                ImageDistortion filter = new ImageDistortion();
-                Stopwatch timer = new Stopwatch();
-
-                this.WriteLine(logFile, "  Epochs: {0}", task.Epochs);
-
-                this.WriteTrainerParameters(logFile, task.Trainer, task.Algorithm, task.Loss);
-
-                this.WriteLine(logFile, "Image distortion:");
-                this.WriteLine(logFile, "  Shift: {0}", task.Shift);
-                this.WriteLine(logFile, "  Rotate: {0}", task.Rotate);
-                this.WriteLine(logFile, "  Scale: {0}", task.Scale);
-                this.WriteLine(logFile, "  Crop: {0}", task.Crop);
-
-                int[] shape = net.InputShape;
-                using (TestImageProvider<string> dataProvider = task.CreateTestImageProvider(net))
-                {
-                    ////int n = 0;
-                    for (int epoch = 0; epoch < task.Epochs; epoch++)
-                    {
-                        timer.Restart();
-
-                        TrainingResult result = task.Trainer.RunEpoch(
-                            epoch,
-                            net,
-                            GenerateSamples(epoch),
-                            task.Algorithm,
-                            task.Loss,
-                            cancellationToken);
-
-                        timer.Stop();
-
-                        string s = string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Net: {0}, Epoch: {1}, Time: {2} ms, {3}",
-                            taskIndex,
-                            epoch,
-                            timer.ElapsedMilliseconds,
-                            result);
-
-                        lock (this.logLocker)
-                        {
-                            this.Write(logFile, s);
-                            this.WriteDebugInformation(logFile);
-                            this.WriteLine(logFile, string.Empty);
-                        }
-                    }
-
-                    IEnumerable<(Tensor, string[])> GenerateSamples(int epoch)
-                    {
-                        return dataProvider
-                            .Generate(net.AllowedClasses)
-                            .SelectMany(x =>
-                            {
-                                string[] labels = x.Labels;
-                                if (!(task.Loss is CTCLoss))
-                                {
-                                    int b = net.OutputShapes.First()[0];
-                                    if (labels.Length == 1 && b > 1)
-                                    {
-                                        labels = Enumerable.Repeat(labels[0], b).ToArray();
-                                    }
-                                }
-
-                                if (epoch == 0)
-                                {
-                                    ////x.Image.Save("e:\\temp\\" + x.Id + "_" + n.ToString(CultureInfo.InvariantCulture) + "_.bmp");
-                                }
-
-                                return filter
-                                    .Distort(
-                                        x.Image,
-                                        shape[(int)Axis.X],
-                                        shape[(int)Axis.Y],
-                                        task.Shift,
-                                        task.Rotate && x.FontStyle != FontStyle.Italic,
-                                        task.Scale,
-                                        task.Crop)
-                                    .Select(bitmap =>
-                                    {
-                                        if (epoch == 0)
-                                        {
-                                            ////Interlocked.Increment(ref n);
-                                            ////bitmap.Save(@"d:\dnn\temp\" + n.ToString(CultureInfo.InvariantCulture) + ".bmp");
-                                            ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
-                                        }
-
-                                        return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null), labels);
-                                    });
-                            });
                     }
                 }
             }
@@ -406,6 +490,9 @@ namespace Genix.NetLearn
                     [JsonProperty("dataProvider", Required = Required.Always)]
                     public JObject DataProvider { get; private set; }
 
+                    [JsonProperty("testDataProvider", Required = Required.Always)]
+                    public JObject TestDataProvider { get; private set; }
+
                     [JsonProperty("trainerParameters")]
                     public JObject TrainerParameters { get; private set; }
 
@@ -448,6 +535,8 @@ namespace Genix.NetLearn
 
                 public string LogFileName { get; private set; }
 
+                public string EpochFileNameTemplate { get; private set; }
+
                 public ClassificationNetworkTrainer Trainer { get; private set; }
 
                 public ITrainingAlgorithm Algorithm { get; private set; }
@@ -485,6 +574,7 @@ namespace Genix.NetLearn
 
                                 OutputFileName = timestamp + '_' + architechture + ".net",
                                 LogFileName = timestamp + '_' + architechture + ".log",
+                                EpochFileNameTemplate = timestamp + '_' + architechture + "_epoch_{0}.net",
                             };
 
                             learningTask.Trainer = learningTask.CreateTrainer();
@@ -498,7 +588,7 @@ namespace Genix.NetLearn
                     return tasks;
                 }
 
-                public TestImageProvider<string> CreateTestImageProvider(ClassificationNetwork network)
+                public TestImageProvider<string> CreateDataProvider(ClassificationNetwork network)
                 {
                     int[] shape = network.InputShape;
 
@@ -508,6 +598,18 @@ namespace Genix.NetLearn
                         network.Classes,
                         network.BlankClass,
                         this.TaskParameters.DataProvider);
+                }
+
+                public TestImageProvider<string> CreateTestDataProvider(ClassificationNetwork network)
+                {
+                    int[] shape = network.InputShape;
+
+                    return TestImageProvider<string>.CreateFromJson(
+                        0,
+                        2 * shape[(int)Axis.Y],
+                        network.Classes,
+                        network.BlankClass,
+                        this.TaskParameters.TestDataProvider);
                 }
 
                 private ClassificationNetworkTrainer CreateTrainer()

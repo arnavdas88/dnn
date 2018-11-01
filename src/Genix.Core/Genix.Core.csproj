@@ -93,6 +93,7 @@
     <Compile Include="Graph\BidirectionalGraph{TVertex}.cs" />
     <Compile Include="Graph\BidirectionalVertex{TVertex,TEdge}.cs" />
     <Compile Include="Graph\Edge{TVertex}.cs" />
+    <Compile Include="Lab\ClassificationReportMode.cs" />
     <Compile Include="Lab\ClassificationResult.cs" />
     <Compile Include="Lab\ClassificationStatistics.cs" />
     <Compile Include="Lab\ClassStatistics.cs" />

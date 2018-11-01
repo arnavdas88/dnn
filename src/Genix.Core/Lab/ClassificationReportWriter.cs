@@ -33,11 +33,12 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="fileName">The path to a file to write the report to.</param>
         /// <param name="report">The report to write.</param>
-        public static void WriteReport(string fileName, ClassificationReport<T> report)
+        /// <param name="mode">Defines the components of the report to write.</param>
+        public static void WriteReport(string fileName, ClassificationReport<T> report, ClassificationReportMode mode)
         {
             using (StreamWriter outputFile = File.CreateText(fileName))
             {
-                ClassificationReportWriter<T>.WriteReport(outputFile, report);
+                ClassificationReportWriter<T>.WriteReport(outputFile, report, mode);
             }
         }
 
@@ -46,7 +47,8 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">The writer used to write the report.</param>
         /// <param name="report">The report to write.</param>
-        public static void WriteReport(StreamWriter writer, ClassificationReport<T> report)
+        /// <param name="mode">Defines the components of the report to write.</param>
+        public static void WriteReport(TextWriter writer, ClassificationReport<T> report, ClassificationReportMode mode)
         {
             if (writer == null)
             {
@@ -63,55 +65,87 @@ namespace Genix.Lab
             if (summaries.Any())
             {
                 // print report header
-                writer.WriteLine("=============================================================================");
-                writer.WriteLine("SUMMARY");
-                int maxClassNameLength = Math.Max(summaries.Max(x => x.Label.ToString().Length), 8);
-                writer.Write(string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}},", maxClassNameLength), "Class");
-                writer.Write(ShortFormat, "Total", "%", "#");
-                writer.Write(LongFormat, "Total", "%", "#", "Error %", "Error #", "Valid %", "Valid #");
-                writer.WriteLine();
-
-                // print each class
-                foreach (ClassSummary<T> summary in summaries)
+                if (mode.HasFlag(ClassificationReportMode.Summary))
                 {
-                    ClassificationReportWriter<T>.WriteClassStatistics(writer, summary, maxClassNameLength);
+                    writer.WriteLine("=============================================================================");
+                    writer.WriteLine("SUMMARY");
+                    int maxClassNameLength = Math.Max(summaries.Max(x => x.Label.ToString().Length), 8);
+                    writer.Write(string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}},", maxClassNameLength), "Class");
+                    writer.Write(ShortFormat, "Total", "%", "#");
+                    writer.Write(LongFormat, "Total", "%", "#", "Error %", "Error #", "Valid %", "Valid #");
+                    writer.WriteLine();
+
+                    // print each class
+                    foreach (ClassSummary<T> summary in summaries)
+                    {
+                        ClassificationReportWriter<T>.WriteClassStatistics(writer, summary, maxClassNameLength);
+                    }
+
+                    // print summary
+                    writer.WriteLine();
+                    ClassificationReportWriter<T>.WriteClassStatistics(writer, report.AllClasses, maxClassNameLength);
                 }
 
-                // print summary
-                writer.WriteLine();
-                ClassificationReportWriter<T>.WriteClassStatistics(writer, report.AllClasses, maxClassNameLength);
-
                 // print confusion matrix
-                /*writer.WriteLine();
-                writer.WriteLine("=============================================================================");
-                writer.WriteLine("CONFUSION MATRIX");
-                writer.WriteLine();
-                ClassificationReportWriter<T>.WriteConfusionMatrix(writer, report.ConfusionMatrix);*/
+                if (mode.HasFlag(ClassificationReportMode.ConfusionMatrix))
+                {
+                    writer.WriteLine();
+                    writer.WriteLine("=============================================================================");
+                    writer.WriteLine("CONFUSION MATRIX");
+                    writer.WriteLine();
+                    ClassificationReportWriter<T>.WriteConfusionMatrix(writer, report.ConfusionMatrix);
+                }
 
                 // print reject curves
-                writer.WriteLine();
-                writer.WriteLine("=============================================================================");
-                writer.WriteLine("REJECT CURVES");
-                writer.WriteLine();
-                ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);
+                if (mode.HasFlag(ClassificationReportMode.RejectCurves))
+                {
+                    writer.WriteLine();
+                    writer.WriteLine("=============================================================================");
+                    writer.WriteLine("REJECT CURVES");
+                    writer.WriteLine();
+                    ClassificationReportWriter<T>.WriteRejectCurves(writer, report.AllClasses, summaries);
+                }
 
                 // print errors
-                writer.WriteLine();
-                writer.WriteLine("=============================================================================");
-                writer.WriteLine("ERRORS");
-                writer.WriteLine();
-                foreach (ClassSummary<T> summary in summaries)
+                if (mode.HasFlag(ClassificationReportMode.Errors))
                 {
-                    ClassificationReportWriter<T>.WriteClassificationErrors(writer, summary);
+                    writer.WriteLine();
+                    writer.WriteLine("=============================================================================");
+                    writer.WriteLine("ERRORS");
+                    writer.WriteLine();
+                    foreach (ClassSummary<T> summary in summaries)
+                    {
+                        ClassificationReportWriter<T>.WriteClassificationErrors(writer, summary);
+                    }
                 }
             }
 
             // print file results
-            /*writer.WriteLine();
-            writer.WriteLine("=============================================================================");
-            writer.WriteLine("FILE RESULTS");
-            writer.WriteLine();
-            ClassificationResult.Write(writer, report.Results);*/
+            if (mode.HasFlag(ClassificationReportMode.Answers))
+            {
+                writer.WriteLine();
+                writer.WriteLine("=============================================================================");
+                writer.WriteLine("FILE RESULTS");
+                writer.WriteLine();
+                ClassificationResult<T>.Write(writer, report.Results);
+            }
+        }
+
+        /// <summary>
+        /// Writes a test report into a string.
+        /// </summary>
+        /// <param name="report">The report to write.</param>
+        /// <param name="mode">Defines the components of the report to write.</param>
+        /// <returns>
+        /// The <see cref="string"/> that contains test report.
+        /// </returns>
+        public static string WriteReport(ClassificationReport<T> report, ClassificationReportMode mode)
+        {
+            using (StringWriter stream = new StringWriter())
+            {
+                ClassificationReportWriter<T>.WriteReport(stream, report, mode);
+                return stream.ToString();
+            }
         }
 
         /// <summary>
@@ -119,7 +153,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="statistics">A classification statistics to get report data from.</param>
-        private static void WriteShortStatistics(StreamWriter writer, ClassificationStatistics statistics)
+        private static void WriteShortStatistics(TextWriter writer, ClassificationStatistics statistics)
         {
             writer.Write(
                 ShortFormat,
@@ -133,7 +167,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="statistics">A classification statistics to get report data from.</param>
-        private static void WriteLongStatistics(StreamWriter writer, ClassificationStatistics statistics)
+        private static void WriteLongStatistics(TextWriter writer, ClassificationStatistics statistics)
         {
             writer.Write(
                 LongFormat,
@@ -152,7 +186,7 @@ namespace Genix.Lab
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="summary">Classification results for the class.</param>
         /// <param name="classNameLength">The number of characters in the class name column.</param>
-        private static void WriteClassStatistics(StreamWriter writer, ClassSummary<T> summary, int classNameLength)
+        private static void WriteClassStatistics(TextWriter writer, ClassSummary<T> summary, int classNameLength)
         {
             writer.Write(string.Format(CultureInfo.InvariantCulture, "{{0,-{0}}},", classNameLength), summary.Label);
             WriteShortStatistics(writer, summary.Statistics.All);
@@ -165,7 +199,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="summary">Classification results for the class.</param>
-        private static void WriteClassificationErrors(StreamWriter writer, ClassSummary<T> summary)
+        private static void WriteClassificationErrors(TextWriter writer, ClassSummary<T> summary)
         {
             int acceptedErrors = summary.Errors.Count(/*error => error.IsAccepted*/);
             if (acceptedErrors > 0)
@@ -194,7 +228,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="summary">Classification results for the class.</param>
-        private static void WriteClassRejectCurve(StreamWriter writer, ClassSummary<T> summary)
+        private static void WriteClassRejectCurve(TextWriter writer, ClassSummary<T> summary)
         {
             float[] errorRates = { 0.001f, 0.005f, 0.01f, 0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.07f, 0.08f, 0.09f, 0.10f, 0.11f };
 
@@ -247,7 +281,7 @@ namespace Genix.Lab
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="all">Classification results for all classes.</param>
         /// <param name="classes">Classification results for each class.</param>
-        private static void WriteRejectCurves(StreamWriter writer, ClassSummary<T> all, IList<ClassSummary<T>> classes)
+        private static void WriteRejectCurves(TextWriter writer, ClassSummary<T> all, IList<ClassSummary<T>> classes)
         {
             float[] errorRates = { 0.001f, 0.005f, 0.01f, 0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.07f, 0.08f, 0.09f, 0.10f, 0.11f };
 
@@ -320,7 +354,7 @@ namespace Genix.Lab
         /// </summary>
         /// <param name="writer">A stream to write the report to.</param>
         /// <param name="matrix">The confusion matrix to write.</param>
-        private static void WriteConfusionMatrix(StreamWriter writer, ConfusionMatrix<T> matrix)
+        private static void WriteConfusionMatrix(TextWriter writer, ConfusionMatrix<T> matrix)
         {
             writer.Write(matrix.ToString());
         }
