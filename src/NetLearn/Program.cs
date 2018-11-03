@@ -110,7 +110,7 @@ namespace Genix.NetLearn
 
                         // learning
                         Learn();
-                        net.SaveToFile(task.OutputFileName);
+                        net.SaveToFile(task.OutputFileName, NetworkFileFormat.JSON);
 
                         // report finish time and processing interval
                         DateTime dateFinished = DateTime.Now;
@@ -175,7 +175,7 @@ namespace Genix.NetLearn
                                         string epochOutputFileName = string.Format(CultureInfo.InvariantCulture, task.EpochFileNameTemplate, epoch);
 
                                         // save network
-                                        net.SaveToFile(epochOutputFileName);
+                                        net.SaveToFile(epochOutputFileName, NetworkFileFormat.JSON);
 
                                         // run testing
                                         List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();

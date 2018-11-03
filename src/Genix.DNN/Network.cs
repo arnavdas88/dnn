@@ -10,16 +10,17 @@ namespace Genix.DNN
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using Genix.Core;
     using Genix.DNN.Layers;
-    using Genix.DNN.Learning;
     using Genix.MachineLearning;
     using Genix.MachineLearning.Learning;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Bson;
 
     /// <summary>
     /// The base neural network class.
@@ -157,27 +158,94 @@ namespace Genix.DNN
         /// Saves the current <see cref="Network"/> into the specified file.
         /// </summary>
         /// <param name="fileName">A string that contains the name of the file to which to save this <see cref="Network"/>.</param>
-        public void SaveToFile(string fileName)
+        /// <param name="format">The serialization format.</param>
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Appears to be safe to use this pattern.")]
+        public void SaveToFile(string fileName, NetworkFileFormat format)
         {
-            File.WriteAllText(fileName, this.SaveToString(), Encoding.UTF8);
+            JsonSerializer serializer = JsonSerializer.CreateDefault();
+
+            switch (format)
+            {
+                case NetworkFileFormat.BSON:
+                    using (FileStream stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        using (BsonDataWriter writer = new BsonDataWriter(stream))
+                        {
+                            writer.Formatting = serializer.Formatting;
+                            serializer.Serialize(writer, this);
+                        }
+                    }
+
+                    break;
+
+                default:
+                    using (StreamWriter writer = File.CreateText(fileName))
+                    {
+                        using (JsonTextWriter jsonWriter = new JsonTextWriter(writer))
+                        {
+                            jsonWriter.Formatting = serializer.Formatting;
+                            serializer.Serialize(jsonWriter, this);
+                        }
+                    }
+
+                    break;
+            }
         }
 
         /// <summary>
         /// Saves the current <see cref="Network"/> to the memory buffer.
         /// </summary>
+        /// <param name="format">The serialization format.</param>
         /// <returns>The buffer that contains saved <see cref="Network"/>.</returns>
-        public byte[] SaveToMemory()
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Appears to be safe to use this pattern.")]
+        public byte[] SaveToMemory(NetworkFileFormat format)
         {
-            return UTF8Encoding.UTF8.GetBytes(this.SaveToString());
+            switch (format)
+            {
+                case NetworkFileFormat.BSON:
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        using (BsonDataWriter writer = new BsonDataWriter(stream))
+                        {
+                            JsonSerializer serializer = JsonSerializer.CreateDefault();
+                            writer.Formatting = serializer.Formatting;
+                            serializer.Serialize(writer, this);
+
+                            return stream.ToArray();
+                        }
+                    }
+
+                default:
+                    return UTF8Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(this));
+            }
         }
 
         /// <summary>
         /// Saves the current <see cref="Network"/> to the text string.
         /// </summary>
+        /// <param name="format">The serialization format.</param>
         /// <returns>The string that contains saved <see cref="Network"/>.</returns>
-        public string SaveToString()
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Appears to be safe to use this pattern.")]
+        public string SaveToString(NetworkFileFormat format)
         {
-            return JsonConvert.SerializeObject(this);
+            switch (format)
+            {
+                case NetworkFileFormat.BSON:
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        using (BsonDataWriter writer = new BsonDataWriter(stream))
+                        {
+                            JsonSerializer serializer = JsonSerializer.CreateDefault();
+                            writer.Formatting = serializer.Formatting;
+                            serializer.Serialize(writer, this);
+
+                            return Convert.ToBase64String(stream.ToArray());
+                        }
+                    }
+
+                default:
+                    return JsonConvert.SerializeObject(this);
+            }
         }
 
         /// <inheritdoc />

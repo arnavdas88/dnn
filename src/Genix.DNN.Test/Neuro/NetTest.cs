@@ -27,7 +27,7 @@
         [Ignore]
         public void SaveToStringTest()
         {
-            string s = this.net.SaveToString();
+            string s = this.net.SaveToString(NetworkFileFormat.JSON);
             ClassificationNetwork net2 = ClassificationNetwork.FromString(s);
 
             string s1 = JsonConvert.SerializeObject(this.net);
@@ -39,7 +39,7 @@
         [Ignore]
         public void SaveToMemoryTest()
         {
-            ClassificationNetwork net2 = ClassificationNetwork.FromMemory(this.net.SaveToMemory());
+            ClassificationNetwork net2 = ClassificationNetwork.FromMemory(this.net.SaveToMemory(NetworkFileFormat.JSON));
             string s1 = JsonConvert.SerializeObject(this.net);
             string s2 = JsonConvert.SerializeObject(net2);
             Assert.AreEqual(s1, s2);
@@ -52,7 +52,7 @@
             string tempFileName = Path.GetTempFileName();
             try
             {
-                this.net.SaveToFile(tempFileName);
+                this.net.SaveToFile(tempFileName, NetworkFileFormat.JSON);
                 ClassificationNetwork net2 = ClassificationNetwork.FromFile(tempFileName);
                 Assert.AreEqual(JsonConvert.SerializeObject(this.net), JsonConvert.SerializeObject(net2));
             }
