@@ -6,41 +6,47 @@
 
 namespace Genix.Imaging
 {
-    using System.Diagnostics.CodeAnalysis;
+    using System;
 
     /// <summary>
     /// Specifies the format for the image file.
     /// </summary>
+    [Flags]
     public enum ImageFormat
     {
         /// <summary>
         /// A unknown image format.
         /// </summary>
-        Unknown = 0,
+        None = 0,
 
         /// <summary>
         /// A TIFF image format.
         /// </summary>
-        Tiff,
+        Tiff = 1,
 
         /// <summary>
         /// A BMP image format.
         /// </summary>
-        Bmp,
+        Bmp = 2,
 
         /// <summary>
         /// A JPEG image format.
         /// </summary>
-        Jpeg,
+        Jpeg = 4,
 
         /// <summary>
         /// A PNG image format.
         /// </summary>
-        Png,
+        Png = 8,
 
         /// <summary>
         /// A GIF image format.
         /// </summary>
-        Gif,
+        Gif = 16,
+
+        /// <summary>
+        /// All image formats.
+        /// </summary>
+        All = Tiff | Bmp | Jpeg | Png | Gif,
     }
 }

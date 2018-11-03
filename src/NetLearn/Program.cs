@@ -183,33 +183,60 @@ namespace Genix.NetLearn
                                         {
                                             Context model = Context.FromRegex(@"\d", CultureInfo.InvariantCulture);
 
-                                            foreach ((DataSourceId sourceId, Tensor x, string[] labels) in GenerateTestSamples(testDataProvider))
+                                            foreach ((TestImage image, string[] labels) in GenerateTestSamples(testDataProvider))
                                             {
-                                                (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
-
-                                                results.Add(new ClassificationResult<string>(
-                                                    sourceId,
-                                                    text,
-                                                    string.Concat(labels),
-                                                    prob,
-                                                    prob >= 0.38f));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            foreach ((DataSourceId sourceId, Tensor x, string[] labels) in GenerateTestSamples(testDataProvider))
-                                            {
-                                                foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
+                                                if (image.Image.IsAllWhite())
                                                 {
-                                                    string text = answer.FirstOrDefault().answer;
-                                                    float prob = answer.FirstOrDefault().probability;
+                                                    results.Add(new ClassificationResult<string>(
+                                                        image.SourceId,
+                                                        "0",
+                                                        string.Concat(labels),
+                                                        1.0f,
+                                                        true));
+                                                }
+                                                else
+                                                {
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null);
+                                                    (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
 
                                                     results.Add(new ClassificationResult<string>(
-                                                        sourceId,
+                                                        image.SourceId,
                                                         text,
                                                         string.Concat(labels),
                                                         prob,
                                                         prob >= 0.38f));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach ((TestImage image, string[] labels) in GenerateTestSamples(testDataProvider))
+                                            {
+                                                if (image.Image.IsAllWhite())
+                                                {
+                                                    results.Add(new ClassificationResult<string>(
+                                                        image.SourceId,
+                                                        "0",
+                                                        string.Concat(labels),
+                                                        1.0f,
+                                                        true));
+                                                }
+                                                else
+                                                {
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null);
+
+                                                    foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
+                                                    {
+                                                        string text = answer.FirstOrDefault().answer;
+                                                        float prob = answer.FirstOrDefault().probability;
+
+                                                        results.Add(new ClassificationResult<string>(
+                                                            image.SourceId,
+                                                            text,
+                                                            string.Concat(labels),
+                                                            prob,
+                                                            prob >= 0.38f));
+                                                    }
                                                 }
                                             }
                                         }
@@ -228,6 +255,7 @@ namespace Genix.NetLearn
                                 IEnumerable<(Tensor x, string[] labels)> GenerateLearnSamples(TestImageProvider<string> provider, int epoch)
                                 {
                                     return GenerateSamples(provider)
+                                        .Where(x => !x.image.Image.IsAllWhite())
                                         .SelectMany(x =>
                                         {
                                             if (epoch == 0)
@@ -258,16 +286,9 @@ namespace Genix.NetLearn
                                         });
                                 }
 
-                                IEnumerable<(DataSourceId sourceId, Tensor x, string[] labels)> GenerateTestSamples(TestImageProvider<string> provider)
+                                IEnumerable<(TestImage image, string[] labels)> GenerateTestSamples(TestImageProvider<string> provider)
                                 {
                                     return GenerateSamples(provider)
-                                        .Select(x =>
-                                        {
-                                            return (
-                                                x.image.SourceId,
-                                                ImageExtensions.FromImage(x.image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null),
-                                                x.labels);
-                                        })
                                         .AsParallel()
                                         .AsOrdered()
                                         .WithCancellation(cancellationToken)

@@ -38,13 +38,13 @@ namespace Genix.Imaging.Encoders
         /// <inheritdoc />
         public override void Save(Stream stream, Image image, ImageMetadata metadata)
         {
-            Libtiff.SaveToTiff(stream, image, metadata, this.Compression);
+            Libtiff.Save(stream, image, metadata, this.Compression);
         }
 
         /// <inheritdoc />
         public override void Save(Stream stream, System.Collections.Generic.IEnumerable<(Image image, ImageMetadata metadata)> images)
         {
-            Libtiff.SaveToTiff(stream, images, this.Compression);
+            Libtiff.Save(stream, images, this.Compression);
         }
     }
 }

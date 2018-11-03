@@ -21,8 +21,8 @@
             ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"D:\source.bmp"))
             ////foreach ((Image image, _, _) in Imaging.Image.FromFile(@"C:\Users\Alexander\Desktop\hcfa.png"))
             ////foreach ((Image image, _, _) in Imaging.Image.FromFile(@"C:\Users\Alexander\Desktop\07227200002.tif"))
-            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
-            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\Users\avolgunin\Desktop\hcfa.png"))
+            foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"L:\FormXtra\HCFA\BW\SET1\07227200002.tif"))
+            ////foreach ((Image image, int? frameIndex, _) in Imaging.Image.FromFile(@"C:\Users\avolgunin\Desktop\hcfa.png"))
             ////foreach ((Image image, _, _) in Image.FromFile(@"C:\DNN\dnn\test4.jpg"))
             {
                 Image xxx = image.ConvertTo(null, 1).CleanOverscan(0.5f, 0.5f).Deskew(null).Despeckle(null);

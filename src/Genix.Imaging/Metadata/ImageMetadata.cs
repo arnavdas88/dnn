@@ -17,6 +17,10 @@ namespace Genix.Imaging
     {
         private readonly List<PropertyItem> propertyItems = new List<PropertyItem>();
 
+        internal ImageMetadata()
+        {
+        }
+
         internal ImageMetadata(IEnumerable<PropertyItem> propertyItems)
         {
             this.propertyItems.AddRange(propertyItems);
