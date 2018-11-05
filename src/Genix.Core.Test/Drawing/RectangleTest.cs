@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     [TestClass]
-    public class RectangleTest
+    public partial class RectangleTest
     {
         [TestMethod, TestCategory("Rectangle")]
         public void ConstructorTest()

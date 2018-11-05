@@ -184,5 +184,115 @@ namespace Genix.Core
                 return bestCandidate;
             }
         }
+
+        public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap)
+        {
+            ////Rectangle bounds = obj.Bounds;
+            SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
+
+            Rectangle obounds = obj.Bounds;
+
+            // calculate initial pivot points
+            int x = BoxBound(obounds);
+            Line baseline = new Line(x, obounds.Top, x, obounds.Bottom);
+
+            // find objects to the left
+            T next;
+            while ((next = FindNext(obounds, false)) != null)
+            {
+                result.Add(next.Bounds, next);
+
+                next.HorizontalAlignment = alignment;
+                obounds.Union(next.Bounds);
+            }
+
+            // find objects to the right
+            while ((next = FindNext(obounds, true)) != null)
+            {
+                result.Add(next.Bounds, next);
+
+                next.HorizontalAlignment = alignment;
+                obounds.Union(next.Bounds);
+            }
+
+            if (result.Count > 0)
+            {
+                obj.HorizontalAlignment = alignment;
+                result.Add(obj.Bounds, obj);
+            }
+
+            return result.Values;
+
+            T FindNext(Rectangle box, bool searchForward)
+            {
+                // Tolerance to skew on top of current estimate of skew. Divide x or y length
+                // by kMaxSkewFactor to get the y or x skew distance.
+                // If the angle is small, the angle in degrees is roughly 60/kMaxSkewFactor.
+                const int MaxSkewFactor = 15;
+
+                // new objects found must extend beyond current box
+                int ystart = searchForward ? box.Bottom : box.Top - 1;
+                int xstart = baseline.X(ystart);
+
+                int yend = searchForward ? ystart + maxGap : ystart - maxGap;
+                int xend = baseline.X(yend);
+
+                Rectangle searchArea = new Rectangle(new Point(xstart, ystart), new Point(xend, yend));
+
+                // Compute skew tolerance
+                int skewTolerance = maxGap / MaxSkewFactor;
+                searchArea.Inflate(skewTolerance, 0);
+
+                T bestCandidate = null;
+                int bestDistance = int.MaxValue;
+                foreach (T candidate in this.EnumObjects(searchArea))
+                {
+                    if (candidate.HorizontalAlignment == HorizontalAlignment.None)
+                    {
+                        Rectangle cbounds = candidate.Bounds;
+
+                        // test alignment
+                        int xtest = BoxBound(cbounds);
+                        int xbase = baseline.X(searchForward ? box.Top : box.Bottom);
+                        if (Math.Abs(xbase - xtest) > 10 /* tolerance */)
+                        {
+                            continue;
+                        }
+
+                        // find nearest element based on Eucledian distance
+                        int distance = box.DistanceToSquared(cbounds);
+                        if (distance < bestDistance)
+                        {
+                            bestCandidate = candidate;
+                            bestDistance = distance;
+                        }
+                    }
+                }
+
+                // update baseline and box
+                if (bestCandidate != null)
+                {
+                    Rectangle cbounds = bestCandidate.Bounds;
+
+                    if (searchForward)
+                    {
+                        baseline.X2 = BoxBound(cbounds);
+                        baseline.Y2 = cbounds.Bottom;
+                    }
+                    else
+                    {
+                        baseline.X1 = BoxBound(cbounds);
+                        baseline.Y1 = cbounds.Top;
+                    }
+                }
+
+                return bestCandidate;
+            }
+
+            int BoxBound(Rectangle r)
+            {
+                return alignment == HorizontalAlignment.Left ? r.Left : (alignment == HorizontalAlignment.Right ? r.Right : r.CenterX);
+            }
+        }
     }
 }

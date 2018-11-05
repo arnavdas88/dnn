@@ -56,6 +56,11 @@
     </Compile>
     <Compile Include="Drawing\PointTest.cs" />
     <Compile Include="Drawing\RectangleTest.cs" />
+    <Compile Include="Drawing\RectangleTest.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RectangleTest.tt</DependentUpon>
+    </Compile>
     <Compile Include="GenixAssert.cs" />
     <Compile Include="BitUtils\BitUtils64Test.cs" />
     <Compile Include="Math\VectorsTest.Generated.cs">
@@ -84,6 +89,10 @@
     <Content Include="Drawing\LineTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LineTest.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Drawing\RectangleTest.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RectangleTest.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Math\VectorsTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

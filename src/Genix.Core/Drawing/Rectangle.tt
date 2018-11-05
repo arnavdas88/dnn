@@ -133,10 +133,27 @@ namespace Genix.Drawing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Rectangle<#=suffix#>(Point<#=suffix#> pt1, Point<#=suffix#> pt2)
         {
-            this.x = MinMax.Min(pt1.X, pt2.X);
-            this.y = MinMax.Min(pt1.Y, pt2.Y);
-            this.w = MinMax.Max(pt1.X, pt2.X) - this.x;
-            this.h = MinMax.Max(pt1.Y, pt2.Y) - this.y;
+            if (pt2.X >= pt1.X)
+            {
+                this.x = pt1.X;
+                this.w = pt2.X - pt1.X;
+            }
+            else
+            {
+                this.x = pt2.X;
+                this.w = pt1.X - pt2.X;
+            }
+
+            if (pt2.Y >= pt1.Y)
+            {
+                this.y = pt1.Y;
+                this.h = pt2.Y - pt1.Y;
+            }
+            else
+            {
+                this.y = pt2.Y;
+                this.h = pt1.Y - pt2.Y;
+            }
         }
 
         /// <summary>
@@ -309,7 +326,12 @@ namespace Genix.Drawing
         /// <value>
         /// The center of this <see cref="Rectangle<#=suffix#>"/> along x-axis.
         /// </value>
-        public <#=type#> CenterX => this.x + (this.w / 2);
+<# if (type == "int") { #>
+        /// <remarks>
+        /// <para>If the rectangle width is even, the center point is rounded toward the rectangles top-left corner.</para>
+        /// </remarks>
+<# } #>
+        public <#=type#> CenterX => this.x + ((this.w - 1) / 2);
 
         /// <summary>
         /// Gets the center of this <see cref="Rectangle<#=suffix#>"/> along y-axis.
@@ -317,7 +339,12 @@ namespace Genix.Drawing
         /// <value>
         /// The center of this <see cref="Rectangle<#=suffix#>"/> along y-axis.
         /// </value>
-        public <#=type#> CenterY => this.y + (this.h / 2);
+<# if (type == "int") { #>
+        /// <remarks>
+        /// <para>If the rectangle height is even, the center point is rounded toward the rectangles top-left corner.</para>
+        /// </remarks>
+<# } #>
+        public <#=type#> CenterY => this.y + ((this.h - 1) / 2);
 
         /// <summary>
         /// Gets the center <see cref="Point<#=suffix#>"/> of this <see cref="Rectangle<#=suffix#>"/>.
@@ -325,7 +352,12 @@ namespace Genix.Drawing
         /// <value>
         /// The center <see cref="Point<#=suffix#>"/> of this <see cref="Rectangle<#=suffix#>"/>.
         /// </value>
-        public Point<#=suffix#> CenterPoint => new Point<#=suffix#>(this.x + (this.w / 2), this.y + (this.h / 2));
+<# if (type == "int") { #>
+        /// <remarks>
+        /// <para>If the rectangle width or height is even, the center point is rounded toward the rectangles top-left corner.</para>
+        /// </remarks>
+<# } #>
+        public Point<#=suffix#> CenterPoint => new Point<#=suffix#>(this.x + ((this.w - 1) / 2), this.y + ((this.h - 1) / 2));
 
         /// <summary>
         /// Compares two <see cref="Rectangle<#=suffix#>"/> objects.

@@ -27,9 +27,14 @@ namespace Genix.DocumentAnalysis
         private const int MaxLineWidth = 10;
 
         /// <summary>
-        /// The minimum line length, in pixels, for images with resolution 200 dpi.
+        /// The minimum horizontal line length, in pixels, for images with resolution 200 dpi.
         /// </summary>
-        private const int MinLineLength = 50;
+        private const int MinHorLineLength = 50;
+
+        /// <summary>
+        /// The minimum vertical line length, in pixels, for images with resolution 200 dpi.
+        /// </summary>
+        private const int MinVerLineLength = 20;
 
         /// <summary>
         /// The maximum size of line residue, in pixels, for images with resolution 200 dpi.
@@ -162,8 +167,10 @@ namespace Genix.DocumentAnalysis
             }
 
             ISet<CheckboxShape> checkboxResult = null;
-            ISet<Line> hlinesResult = null;
-            ISet<Line> vlinesResult = null;
+            ISet<LineShape> hlinesResult = null;
+            ISet<LineShape> vlinesResult = null;
+
+            image.SetWhiteBorder(0, 0, 500, 300);
 
             // close up small holes
             int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
@@ -208,13 +215,22 @@ namespace Genix.DocumentAnalysis
 
             RemoveIntersections();
 
-            return CreateAnswer();
+            // create answer
+            HashSet<Shape> answer = new HashSet<Shape>();
+            answer.UnionWith(hlinesResult);
+            answer.UnionWith(vlinesResult);
+            if (checkboxResult != null)
+            {
+                answer.UnionWith(checkboxResult);
+            }
+
+            return answer;
 
             void FindLines()
             {
                 // open up in both directions to find lines
-                int minLineLength = LineDetector.MinLineLength.MulDiv(image.HorizontalResolution, 200);
-                hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                int minHorLineLength = LineDetector.MinHorLineLength.MulDiv(image.HorizontalResolution, 200);
+                hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minHorLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
                 if (hlines.IsAllWhite())
                 {
                     hlines = null;
@@ -222,7 +238,8 @@ namespace Genix.DocumentAnalysis
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minLineLength), 1, BorderType.BorderConst, image.WhiteColor);
+                int minVerLineLength = LineDetector.MinVerLineLength.MulDiv(image.HorizontalResolution, 200);
+                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minVerLineLength), 1, BorderType.BorderConst, image.WhiteColor);
                 if (vlines.IsAllWhite())
                 {
                     vlines = null;
@@ -285,9 +302,9 @@ namespace Genix.DocumentAnalysis
                 }
             }
 
-            ISet<Line> FilterLines(Image lines, Image nonLines, bool vertical)
+            ISet<LineShape> FilterLines(Image lines, Image nonLines, bool vertical)
             {
-                HashSet<Line> answer = new HashSet<Line>();
+                HashSet<LineShape> result = new HashSet<LineShape>();
 
                 /*using (Pix pixLines = Pix.FromImage(lines))
                 {
@@ -326,12 +343,19 @@ namespace Genix.DocumentAnalysis
                     vertical ? image.VerticalResolution : image.HorizontalResolution,
                     200);
 
+                // find connected components and do preliminary filtering
+                AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(
+                    image.Bounds,
+                    200.MulDiv(image.HorizontalResolution, 200),
+                    100.MulDiv(image.VerticalResolution, 200));
+
                 foreach (ConnectedComponent component in lines.FindConnectedComponents(8))
                 {
                     Rectangle bounds = component.Bounds;
 
                     // calculate maximum component width as twice the maximum distance between its points and the background
                     int maxWidth = (int)component.ToImage().DistanceToBackground(4, 8).Max() * 2;
+                    maxWidth = Math.Min(maxWidth, vertical ? bounds.Width : bounds.Height);
 
                     /*int maxWidth = 0;
                     using (Pix pixComp = Pix.FromImage(comp))
@@ -354,34 +378,86 @@ namespace Genix.DocumentAnalysis
                         isBad = true;
                     }
 
-                    // Test density near the line if there are not enough intersections
-                    if (!isBad && CountIntersections(bounds) < 2)
-                    {
-                        ulong count = CountAdjacentPixels(maxWidth, bounds);
-                        if (count > bounds.Area * LineDetector.MaxNonLineDensity)
-                        {
-                            isBad = true;
-                        }
-                    }
-
                     if (isBad)
                     {
                         lines.SetWhite(bounds);
                     }
                     else
                     {
-                        answer.Add(new Line()
+                        LineShape newline = new LineShape(bounds, maxWidth, vertical ? LineTypes.Vertical : LineTypes.Horizontal);
+                        Debug.Assert(newline.Bounds == bounds);
+                        grid.Add(newline, true, true);
+                    }
+                }
+
+                if (vertical)
+                {
+                    foreach (LineShape line in grid.EnumObjects())
+                    {
+                        if (line.HorizontalAlignment == HorizontalAlignment.None)
                         {
-                            Component = component,
-                            Width = maxWidth,
-                            IsVertical = vertical,
-                        });
+                            IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, line.Bounds.Height);
+                            if (alignedLines.Count > 0)
+                            {
+                                int width = alignedLines[0].Width;
+                                Point begin = alignedLines[0].Begin;
+                                Point end = alignedLines[0].End;
+                                for (int i = 1, ii = alignedLines.Count; i < ii; i++)
+                                {
+                                    width = Math.Max(width, alignedLines[i].Width);
+                                    if (alignedLines[i].Begin.Y < begin.Y)
+                                    {
+                                        begin = alignedLines[i].Begin;
+                                    }
+
+                                    if (alignedLines[i].End.Y > end.Y)
+                                    {
+                                        end = alignedLines[i].End;
+                                    }
+                                }
+
+                                LineShape newline = new LineShape(begin, end, width, LineTypes.Vertical);
+                                if (IsLineGood(newline))
+                                {
+                                    result.Add(newline);
+                                }
+                                else
+                                {
+                                    for (int i = 0, ii = alignedLines.Count; i < ii; i++)
+                                    {
+                                        lines.SetWhite(alignedLines[i].Bounds);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // process remaining lines
+                    foreach (LineShape line in grid.EnumObjects())
+                    {
+                        if (line.HorizontalAlignment == HorizontalAlignment.None)
+                        {
+                            if (IsLineGood(line))
+                            {
+                                result.Add(line);
+                            }
+                            else
+                            {
+                                lines.SetWhite(line.Bounds);
+                            }
+                        }
                     }
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return answer;
+                Image draft = image.Clone(false);
+                foreach (LineShape line in result)
+                {
+                    draft.SetBlack(line.Bounds);
+                }
+
+                return result;
 
                 ulong CountAdjacentPixels(int lineWidth, Rectangle bounds)
                 {
@@ -397,11 +473,46 @@ namespace Genix.DocumentAnalysis
                     bounds.Intersect(nonLines.Bounds);
                     return nonLines.Power(bounds);
                 }
-            }
 
-            int CountIntersections(Rectangle bounds)
-            {
-                return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
+                int CountIntersections(Rectangle bounds)
+                {
+                    return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
+                }
+
+                bool IsLineGood(LineShape line)
+                {
+                    Rectangle bounds = line.Bounds;
+
+                    // check length
+                    if (vertical)
+                    {
+                        int minLineLength = (this.MinVerticalLineLength * image.VerticalResolution).Round();
+                        if (bounds.Height < minLineLength)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        int minLineLength = (this.MinHorizontalLineLength * image.HorizontalResolution).Round();
+                        if (bounds.Width < minLineLength)
+                        {
+                            return false;
+                        }
+                    }
+
+                    // Test density near the line if there are not enough intersections
+                    if (CountIntersections(line.Bounds) < 2)
+                    {
+                        ulong count = CountAdjacentPixels(line.Width, bounds);
+                        if (count > bounds.Area * LineDetector.MaxNonLineDensity)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
             }
 
             void RemoveLines(Image lines, Image nonLines)
@@ -440,44 +551,6 @@ namespace Genix.DocumentAnalysis
 
                     cancellationToken.ThrowIfCancellationRequested();
                 }
-            }
-
-            ISet<Shape> CreateAnswer()
-            {
-                HashSet<Shape> answer = new HashSet<Shape>();
-
-                if (this.LineTypes.HasFlag(LineTypes.Horizontal) && hlinesResult != null)
-                {
-                    int minLineLength = (this.MinHorizontalLineLength * image.HorizontalResolution).Round();
-
-                    foreach (Line line in hlinesResult)
-                    {
-                        if (line.Component.Bounds.Width >= minLineLength)
-                        {
-                            answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Horizontal));
-                        }
-                    }
-                }
-
-                if (this.LineTypes.HasFlag(LineTypes.Vertical) && vlinesResult != null)
-                {
-                    int minLineLength = (this.MinVerticalLineLength * image.VerticalResolution).Round();
-
-                    foreach (Line line in vlinesResult)
-                    {
-                        if (line.Component.Bounds.Height >= minLineLength)
-                        {
-                            answer.Add(new LineShape(line.Component.Bounds, line.Width, LineTypes.Vertical));
-                        }
-                    }
-                }
-
-                if (checkboxResult != null)
-                {
-                    answer.UnionWith(checkboxResult);
-                }
-
-                return answer;
             }
 
             void FindAndRemoveCheckboxes()
@@ -658,13 +731,21 @@ namespace Genix.DocumentAnalysis
             }
         }
 
-        private class Line
+        private class Line : IAlignedBoundedObject
         {
-            public ConnectedComponent Component { get; set; }
+            private readonly List<ConnectedComponent> components = new List<ConnectedComponent>();
+
+            public IList<ConnectedComponent> Components => this.components;
 
             public int Width { get; set; }
 
             public bool IsVertical { get; set; }
+
+            public HorizontalAlignment HorizontalAlignment { get; set; }
+
+            public VerticalAlignment VerticalAlignment { get; set; }
+
+            public Rectangle Bounds => Rectangle.Union(this.components.Select(x => x.Bounds));
         }
     }
 }
