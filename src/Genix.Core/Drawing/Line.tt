@@ -43,7 +43,7 @@ namespace Genix.Drawing
     /// Represents a line in a two-dimensional plane described by two <see cref="Point<#=suffix#>"/> objects.
     /// </summary>
     /// <remarks>
-    /// <para>The line is defined by the equation: <c>y = a * x + b</c>.</para>
+    /// <para>The line is defined by the equation: <c>y = m * x + b</c>.</para>
     /// </remarks>
     public struct Line<#=suffix#>
         : IEquatable<Line<#=suffix#>>
@@ -172,7 +172,15 @@ namespace Genix.Drawing
         /// <value>
         /// (<see cref="Y2"/> - <see cref="Y1"/>) / (<see cref="X2"/> - <see cref="X1"/>); <see cref="double.PositiveInfinity"/> if <see cref="X2"/> equals <see cref="X1"/>.
         /// </value>
-        public double Slope => this.IsVertical ? double.PositiveInfinity : (double)(this.y2 - this.y1) / (this.x2 - this.x1);
+        public double M => this.IsVertical ? double.PositiveInfinity : (double)(this.y2 - this.y1) / (this.x2 - this.x1);
+
+        /// <summary>
+        /// Gets the intercept of this <see cref="Line<#=suffix#>"/>.
+        /// </summary>
+        /// <value>
+        /// (<see cref="Y2"/> - <see cref="Y1"/>) / (<see cref="X2"/> - <see cref="X1"/>); <see cref="double.PositiveInfinity"/> if <see cref="X2"/> equals <see cref="X1"/>.
+        /// </value>
+        public double B => this.IsVertical ? double.NaN : (double)this.y1 - ((double)this.x1 * (this.y2 - this.y1) / (this.x2 - this.x1));
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="Line<#=suffix#>"/> is a vertical line.
@@ -266,11 +274,9 @@ namespace Genix.Drawing
                 throw new InvalidOperationException("Cannot compute y-coordinate of the point for the vertical line.");
             }
 
-<# if (type == "int") { #>
-            return (((double)(x - this.x1) * (this.y2 - this.y1) / (this.x2 - this.x1)) + this.y1).Round();
-<# } else { #>
-            return ((x - this.x1) * (this.y2 - this.y1) / (this.x2 - this.x1)) + this.y1;
-<# } #>
+            <#=type#> dx = (this.x2 - this.x1);
+            <#=type#> dy = (this.y2 - this.y1);
+            return (<#=type#>)(((double)this.y1 - ((double)(this.x1 - x) * dy / dx))<# if (type == "int") { #>.Round()<# } #>);
         }
 
         /// <summary>
@@ -290,11 +296,9 @@ namespace Genix.Drawing
                 throw new InvalidOperationException("Cannot compute x-coordinate of the point for the horizontal line.");
             }
 
-<# if (type == "int") { #>
-            return (((double)(y - this.y1) * (this.x2 - this.x1) / (this.y2 - this.y1)) + this.x1).Round();
-<# } else { #>
-            return ((y - this.y1) * (this.x2 - this.x1) / (this.y2 - this.y1)) + this.x1;
-<# } #>
+            <#=type#> dx = (this.x2 - this.x1);
+            <#=type#> dy = (this.y2 - this.y1);
+            return (<#=type#>)(((double)this.x1 - ((double)(this.y1 - y) * dx / dy))<# if (type == "int") { #>.Round()<# } #>);
         }
 
         /// <summary>
@@ -321,6 +325,80 @@ namespace Genix.Drawing
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Point<#=suffix#> point) => this.Contains(point.X, point.Y);
+
+        /// <summary>
+        /// Computes a distance between this <see cref="Line<#=suffix#>"/> and the point specified by a pair of coordinates.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to test.</param>
+        /// <param name="y">The y-coordinate of the point to test.</param>
+        /// <returns>
+        /// The distance between this <see cref="Line<#=suffix#>"/> and a point specified by <paramref name="x"/> and <paramref name="y"/>.
+        /// </returns>
+        public double DistanceTo(<#=type#> x, <#=type#> y)
+        {
+            <#=type#> dx = (this.x2 - this.x1);
+            <#=type#> dy = (this.y2 - this.y1);
+
+            return (double)Math.Abs((dy * x) - (dx * y) + (this.x2 * this.y1) + (this.y2 * this.x1)) / Math.Sqrt((dy * dy) + (dx * dx));
+        }
+
+        /// <summary>
+        /// Computes a distance between this <see cref="Line<#=suffix#>"/> and the specified point.
+        /// </summary>
+        /// <param name="point">The point to test.</param>
+        /// <returns>
+        /// The distance between this <see cref="Line<#=suffix#>"/> and a <paramref name="point"/>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double DistanceTo(Point<#=suffix#> point) => this.DistanceTo(point.X, point.Y);
+
+        /// <summary>
+        /// Create a <see cref="Line<#=suffix#>"/> that is parallel to this <see cref="Line<#=suffix#>"/> and passes through the point specified by a pair of coordinates.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point the line passes through.</param>
+        /// <param name="y">The y-coordinate of the point the line passes through.</param>
+        /// <returns>
+        /// The <see cref="Line<#=suffix#>"/> this method creates.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Line<#=suffix#> Parallel(<#=type#> x, <#=type#> y)
+        {
+            return new Line<#=suffix#>(x, y, x - this.x1 + this.x2, y - this.y1 + this.y2);
+        }
+
+        /// <summary>
+        /// Create a <see cref="Line<#=suffix#>"/> that is parallel to this <see cref="Line<#=suffix#>"/> and passes through the specified point.
+        /// </summary>
+        /// <param name="point">The point the line passes through.</param>
+        /// <returns>
+        /// The <see cref="Line<#=suffix#>"/> this method creates.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Line<#=suffix#> Parallel(Point<#=suffix#> point) => this.Parallel(point.X, point.Y);
+
+        /// <summary>
+        /// Create a <see cref="Line<#=suffix#>"/> that is perpendicular to this <see cref="Line<#=suffix#>"/> and passes through the point specified by a pair of coordinates.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point the line passes through.</param>
+        /// <param name="y">The y-coordinate of the point the line passes through.</param>
+        /// <returns>
+        /// The <see cref="Line<#=suffix#>"/> this method creates.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Line<#=suffix#> Perpendicular(<#=type#> x, <#=type#> y)
+        {
+            return new Line<#=suffix#>(x, y, x + (this.y2 - this.y1), y - (this.x2 - this.x1));
+        }
+
+        /// <summary>
+        /// Create a <see cref="Line<#=suffix#>"/> that is perpendicular to this <see cref="Line<#=suffix#>"/> and passes through the specified point.
+        /// </summary>
+        /// <param name="point">The point the line passes through.</param>
+        /// <returns>
+        /// The <see cref="Line<#=suffix#>"/> this method creates.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Line<#=suffix#> Perpendicular(Point<#=suffix#> point) => this.Perpendicular(point.X, point.Y);
 
         /// <summary>
         /// Determines if the specified point is located above this <see cref="Line<#=suffix#>"/>.

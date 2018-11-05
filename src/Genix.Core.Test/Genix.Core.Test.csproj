@@ -49,6 +49,11 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\LineTest.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LineTest.tt</DependentUpon>
+    </Compile>
     <Compile Include="Drawing\PointTest.cs" />
     <Compile Include="Drawing\RectangleTest.cs" />
     <Compile Include="GenixAssert.cs" />
@@ -76,6 +81,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Drawing\LineTest.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LineTest.Generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Math\VectorsTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>VectorsTest.Generated.cs</LastGenOutput>
