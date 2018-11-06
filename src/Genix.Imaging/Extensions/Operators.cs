@@ -51,5 +51,25 @@ namespace Genix.Imaging
         /// The combined <see cref="Image"/>.
         /// </returns>
         public static Image operator ^(Image left, Image right) => left.Xor(null, right);
+
+        /// <summary>
+        /// Adds pixel values of two images with equal depth and returns a combined image.
+        /// </summary>
+        /// <param name="left">The <see cref="Image"/> that is to the left of the + operator.</param>
+        /// <param name="right">The <see cref="Image"/> that is to the right of the + operator.</param>
+        /// <returns>
+        /// The combined <see cref="Image"/>.
+        /// </returns>
+        public static Image operator +(Image left, Image right) => left.Add(null, right, 0);
+
+        /// <summary>
+        /// Subtracts pixel values of two images with equal depth and returns a combined image.
+        /// </summary>
+        /// <param name="left">The <see cref="Image"/> that is to the left of the + operator.</param>
+        /// <param name="right">The <see cref="Image"/> that is to the right of the + operator.</param>
+        /// <returns>
+        /// The combined <see cref="Image"/>.
+        /// </returns>
+        public static Image operator -(Image left, Image right) => left.Sub(null, right, 0);
     }
 }

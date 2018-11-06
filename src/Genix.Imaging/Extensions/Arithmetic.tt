@@ -89,7 +89,7 @@
         {
             Name = "Add",
             NativeName = "_add",
-            Summary = "Adds pixel values of two images.",
+            Summary = "Adds pixel values of two images with equal depth and returns a combined image.",
             SummaryArea = "Adds a rectangular block of pixels values of two images.",
             Remarks = "<para>This method adds corresponding pixel values of <paramref name=\"src\"/> to this <see cref=\"Image\"/> and places the results in a destination image.</para>",
             RemarksArea = "<para>This method adds corresponding pixel values of <paramref name=\"src\"/> to this <see cref=\"Image\"/>.</para>",
@@ -98,7 +98,7 @@
         {
             Name = "Sub",
             NativeName = "_sub",
-            Summary = "Subtracts pixel values of two images.",
+            Summary = "Subtracts pixel values of two images with equal depth and returns a combined image.",
             SummaryArea = "Subtracts a rectangular block of pixels values of two images.",
             Remarks = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/> and places the results in a destination image.</para>",
             RemarksArea = "<para>This method subtracts corresponding pixel values of <paramref name=\"src\"/> from this <see cref=\"Image\"/>.</para>",
@@ -107,7 +107,7 @@
         {
             Name = "Mul",
             NativeName = "_mul",
-            Summary = "Multiplies pixel values of two images.",
+            Summary = "Multiplies pixel values of two images with equal depth and returns a combined image.",
             SummaryArea = "Multiplies a rectangular block of pixels values of two images.",
             Remarks = "<para>This method multiplies corresponding pixel values of <paramref name=\"src\"/> by this <see cref=\"Image\"/> and places the results in a destination image.</para>",
             RemarksArea = "<para>This method multiplies corresponding pixel values of <paramref name=\"src\"/> by this <see cref=\"Image\"/>.</para>",
@@ -116,7 +116,7 @@
         {
             Name = "Div",
             NativeName = "_div",
-            Summary = "Divides pixel values of two images.",
+            Summary = "Divides pixel values of two images with equal depth and returns a combined image.",
             SummaryArea = "Divides a rectangular block of pixels values of two images.",
             Remarks = "<para>This method divides corresponding pixel values of this <see cref=\"Image\"/> by <paramref name=\"src\"/> and places the results in a destination image.</para>",
             RemarksArea = "<para>This method divides corresponding pixel values of this <see cref=\"Image\"/> by <paramref name=\"src\"/>.</para>",

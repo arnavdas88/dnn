@@ -239,7 +239,7 @@ namespace Genix.Core
         /// <exception cref="ArgumentNullException">
         /// <paramref name="obj"/> is <b>null</b>.
         /// </exception>
-        public void Add(IEnumerable<T> obj, bool spreadHorizontally, bool spreadVertically)
+        public void AddRange(IEnumerable<T> obj, bool spreadHorizontally, bool spreadVertically)
         {
             if (obj == null)
             {
