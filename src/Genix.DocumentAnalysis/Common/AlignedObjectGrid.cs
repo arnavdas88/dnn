@@ -28,6 +28,18 @@ namespace Genix.Core
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AlignedObjectGrid{T}"/> class.
+        /// </summary>
+        /// <param name="bounds">The grid bounding box.</param>
+        /// <param name="cellWidth">The width of each cell, in pixels.</param>
+        /// <param name="cellHeight">The height of each cell, in pixels.</param>
+        /// <param name="comparer">The <see cref="IComparer{Rectangle}"/> implementation to use when comparing object bounding boxes.</param>
+        public AlignedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
+            : base(bounds, cellWidth, cellHeight, comparer)
+        {
+        }
+
         public IList<T> FindVerticalAlignment(T obj, VerticalAlignment verticalAlignment, int maxGap)
         {
             ////Rectangle bounds = obj.Bounds;
@@ -185,7 +197,117 @@ namespace Genix.Core
             }
         }
 
-        public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap)
+        public IList<T> FindVerticalAlignment(T obj, VerticalAlignment alignment, int maxGap, int minNumberOfAlignedObjects)
+        {
+            ////Rectangle bounds = obj.Bounds;
+            SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
+
+            Rectangle obounds = obj.Bounds;
+
+            // calculate initial pivot points
+            int x = BoxBound(obounds);
+            Line baseline = new Line(x, obounds.Top, x, obounds.Bottom);
+
+            // find objects to the left
+            T next;
+            while ((next = FindNext(obounds, false)) != null)
+            {
+                result.Add(next.Bounds, next);
+
+                next.VerticalAlignment = alignment;
+                obounds.Union(next.Bounds);
+            }
+
+            // find objects to the right
+            while ((next = FindNext(obounds, true)) != null)
+            {
+                result.Add(next.Bounds, next);
+
+                next.VerticalAlignment = alignment;
+                obounds.Union(next.Bounds);
+            }
+
+            if (result.Count >= minNumberOfAlignedObjects - 1)
+            {
+                obj.VerticalAlignment = alignment;
+                result.Add(obj.Bounds, obj);
+            }
+
+            return result.Values;
+
+            T FindNext(Rectangle box, bool searchForward)
+            {
+                // Tolerance to skew on top of current estimate of skew. Divide x or y length
+                // by kMaxSkewFactor to get the y or x skew distance.
+                // If the angle is small, the angle in degrees is roughly 60/kMaxSkewFactor.
+                const int MaxSkewFactor = 15;
+
+                // new objects found must extend beyond current box
+                int xstart = searchForward ? box.Right : box.Left;
+                int ystart = baseline.Y(xstart);
+
+                int xend = searchForward ? xstart + maxGap : xstart - maxGap;
+                int yend = baseline.Y(xend);
+
+                Rectangle searchArea = new Rectangle(new Point(xstart, ystart), new Point(xend, yend));
+
+                // Compute skew tolerance
+                int skewTolerance = maxGap / MaxSkewFactor;
+                searchArea.Inflate(skewTolerance, 0);
+
+                T bestCandidate = null;
+                int bestDistance = int.MaxValue;
+                foreach (T candidate in this.EnumObjects(searchArea))
+                {
+                    if (candidate.VerticalAlignment == VerticalAlignment.None)
+                    {
+                        Rectangle cbounds = candidate.Bounds;
+
+                        // test alignment
+                        int ytest = BoxBound(cbounds);
+                        int ybase = baseline.Y(searchForward ? box.Left : box.Right);
+                        if (Math.Abs(ybase - ytest) > 10 /* tolerance */)
+                        {
+                            continue;
+                        }
+
+                        // find nearest element based on Eucledian distance
+                        int distance = box.DistanceToSquared(cbounds);
+                        if (distance < bestDistance)
+                        {
+                            bestCandidate = candidate;
+                            bestDistance = distance;
+                        }
+                    }
+                }
+
+                // update baseline and box
+                if (bestCandidate != null)
+                {
+                    Rectangle cbounds = bestCandidate.Bounds;
+
+                    if (searchForward)
+                    {
+                        baseline.X2 = cbounds.Right;
+                        baseline.Y2 = BoxBound(cbounds);
+                    }
+                    else
+                    {
+                        baseline.X1 = cbounds.Left;
+                        baseline.Y1 = BoxBound(cbounds);
+                    }
+                }
+
+                return bestCandidate;
+            }
+
+            int BoxBound(Rectangle r)
+            {
+                return alignment == VerticalAlignment.Top ? r.Top : (alignment == VerticalAlignment.Bottom ? r.Bottom : r.CenterY);
+            }
+        }
+
+        public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap, int minNumberOfAlignedObjects)
         {
             ////Rectangle bounds = obj.Bounds;
             SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
@@ -215,7 +337,7 @@ namespace Genix.Core
                 obounds.Union(next.Bounds);
             }
 
-            if (result.Count > 0)
+            if (result.Count >= minNumberOfAlignedObjects - 1)
             {
                 obj.HorizontalAlignment = alignment;
                 result.Add(obj.Bounds, obj);
@@ -231,7 +353,7 @@ namespace Genix.Core
                 const int MaxSkewFactor = 15;
 
                 // new objects found must extend beyond current box
-                int ystart = searchForward ? box.Bottom : box.Top - 1;
+                int ystart = searchForward ? box.Bottom : box.Top;
                 int xstart = baseline.X(ystart);
 
                 int yend = searchForward ? ystart + maxGap : ystart - maxGap;

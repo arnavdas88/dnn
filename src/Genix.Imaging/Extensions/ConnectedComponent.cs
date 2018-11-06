@@ -248,6 +248,45 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Returns the position and the length of a line in this <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <param name="y">The y-coordinate of the line.</param>
+        /// <returns>
+        /// The position and the length of a line.
+        /// The length is a distance between the beginning of first stroke and the end of last stroke in the line.
+        /// </returns>
+        public Vector1D GetLine(int y)
+        {
+            if (!this.bounds.ContainsY(y))
+            {
+                throw new ArgumentOutOfRangeException(nameof(y), y, "The line index is out of bounds.");
+            }
+
+            Stroke[] line = this.strokes[y - this.bounds.Y];
+            return new Vector1D(line[0].X, Stroke.Width(line));
+        }
+
+        /// <summary>
+        /// Computes the maximum width of this <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <returns>
+        /// The maximum width of this <see cref="ConnectedComponent"/>.
+        /// </returns>
+        public int MaxWidth()
+        {
+            int maxWidth = 0;
+
+            Stroke[][] lines = this.strokes;
+            for (int i = 0, ii = lines.Length, y = this.bounds.Y; i < ii; i++, y++)
+            {
+                int width = Stroke.Width(lines[i]);
+                maxWidth = MinMax.Max(maxWidth, width);
+            }
+
+            return maxWidth;
+        }
+
+        /// <summary>
         /// Merges this <see cref="ConnectedComponent"/> with the specified <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <param name="component">The <see cref="ConnectedComponent"/> to merge with.</param>
@@ -355,6 +394,14 @@ namespace Genix.Imaging
             public int X;
 
             public int Length;
+
+            public int End => this.X + this.Length;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int Width(Stroke[] line)
+            {
+                return line[line.Length - 1].End - line[0].X;
+            }
 
             /// <inheritdoc />
             public override string ToString() =>

@@ -25,5 +25,10 @@ namespace Genix.Drawing
         /// The child element is aligned to the bottom of the parent.
         /// </summary>
         Bottom = 2,
+
+        /// <summary>
+        /// The child element is aligned to the center of the parent.
+        /// </summary>
+        Center = 3,
     }
 }

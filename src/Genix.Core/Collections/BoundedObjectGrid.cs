@@ -18,6 +18,7 @@ namespace Genix.Core
         where T : class, IBoundedObject
     {
         private readonly SortedList<Rectangle, T>[][] cells;
+        private readonly IComparer<Rectangle> comparer;
         private int version = 0;
 
         /// <summary>
@@ -27,6 +28,18 @@ namespace Genix.Core
         /// <param name="cellWidth">The width of each cell, in pixels.</param>
         /// <param name="cellHeight">The height of each cell, in pixels.</param>
         public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight)
+            : this(bounds, cellWidth, cellHeight, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BoundedObjectGrid{T}"/> class.
+        /// </summary>
+        /// <param name="bounds">The grid bounding box.</param>
+        /// <param name="cellWidth">The width of each cell, in pixels.</param>
+        /// <param name="cellHeight">The height of each cell, in pixels.</param>
+        /// <param name="comparer">The <see cref="IComparer{Rectangle}"/> implementation to use when comparing object bounding boxes.</param>
+        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
         {
             this.Bounds = bounds;
             this.CellWidth = cellWidth;
@@ -37,6 +50,7 @@ namespace Genix.Core
             this.NumberOfCells = this.Width * this.Height;
 
             this.cells = JaggedArray.Create<SortedList<Rectangle, T>>(this.Height, this.Width);
+            this.comparer = comparer ?? RectangleLRBTComparer.Default;
         }
 
         /// <summary>
@@ -165,7 +179,7 @@ namespace Genix.Core
                     SortedList<Rectangle, T> list = lists[x];
                     if (list == null)
                     {
-                        lists[x] = list = new SortedList<Rectangle, T>(RectangleLRBTComparer.Default);
+                        lists[x] = list = new SortedList<Rectangle, T>(this.comparer);
                     }
 
                     list.Add(obj.Bounds, obj);

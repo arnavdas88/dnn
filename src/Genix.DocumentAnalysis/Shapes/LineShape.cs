@@ -8,7 +8,6 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Globalization;
-    using Genix.Core;
     using Genix.Drawing;
     using Newtonsoft.Json;
 
@@ -18,18 +17,10 @@ namespace Genix.DocumentAnalysis
     [JsonObject(MemberSerialization.OptIn)]
     public class LineShape : Shape
     {
-        [JsonProperty("begin")]
-        private Point begin;
-
-        [JsonProperty("end")]
-        private Point end;
-
-        [JsonProperty("width")]
-        private int width;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="LineShape"/> class.
         /// </summary>
+        /// <param name="bounds">The line bounding box.</param>
         /// <param name="begin">The starting point of the line.</param>
         /// <param name="end">The ending point of the line.</param>
         /// <param name="width">The line width, in pixels.</param>
@@ -37,19 +28,18 @@ namespace Genix.DocumentAnalysis
         /// <exception cref="ArgumentOutOfRangeException">
         /// The <paramref name="width"/> is zero or less.
         /// </exception>
-        public LineShape(Point begin, Point end, int width, LineTypes types)
+        public LineShape(Rectangle bounds, Point begin, Point end, int width, LineTypes types)
+            : base(bounds)
         {
             if (width <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(width), width, "The line width is invalid.");
             }
 
-            this.begin = begin;
-            this.end = end;
-            this.width = width;
+            this.Begin = begin;
+            this.End = end;
+            this.Width = width;
             this.Types = types;
-
-            this.UpdateBounds();
         }
 
         /// <summary>
@@ -62,6 +52,7 @@ namespace Genix.DocumentAnalysis
         /// The <paramref name="width"/> is zero or less.
         /// </exception>
         public LineShape(Rectangle bounds, int width, LineTypes types)
+            : base(bounds)
         {
             if (width <= 0)
             {
@@ -70,12 +61,10 @@ namespace Genix.DocumentAnalysis
 
             Point center = bounds.CenterPoint;
 
-            this.begin = types.HasFlag(LineTypes.Vertical) ? new Point(center.X, bounds.Top) : new Point(bounds.Left, center.Y);
-            this.end = types.HasFlag(LineTypes.Vertical) ? new Point(center.X, bounds.Bottom - 1) : new Point(bounds.Right - 1, center.Y);
-            this.width = width;
+            this.Begin = types.HasFlag(LineTypes.Vertical) ? new Point(center.X, bounds.Top) : new Point(bounds.Left, center.Y);
+            this.End = types.HasFlag(LineTypes.Vertical) ? new Point(center.X, bounds.Bottom) : new Point(bounds.Right, center.Y);
+            this.Width = width;
             this.Types = types;
-
-            this.UpdateBounds();
         }
 
         /// <summary>
@@ -91,67 +80,38 @@ namespace Genix.DocumentAnalysis
 
             this.Bounds = other.Bounds;
 
-            this.begin = other.begin;
-            this.end = other.end;
-            this.width = other.width;
+            this.Begin = other.Begin;
+            this.End = other.End;
+            this.Width = other.Width;
             this.Types = other.Types;
         }
 
         /// <summary>
-        /// Gets or sets the starting point of the line.
+        /// Gets the starting point of the line.
         /// </summary>
         /// <value>
         /// The starting point of the line.
         /// </value>
-        public Point Begin
-        {
-            get => this.begin;
-            set
-            {
-                this.begin = value;
-                this.UpdateBounds();
-            }
-        }
+        [JsonProperty("begin")]
+        public Point Begin { get; private set; }
 
         /// <summary>
-        /// Gets or sets the ending point of the line.
+        /// Gets the ending point of the line.
         /// </summary>
         /// <value>
         /// The ending point of the line.
         /// </value>
-        public Point End
-        {
-            get => this.end;
-            set
-            {
-                this.end = value;
-                this.UpdateBounds();
-            }
-        }
+        [JsonProperty("end")]
+        public Point End { get; private set; }
 
         /// <summary>
-        /// Gets or sets the line width, in pixels.
+        /// Gets the line width, in pixels.
         /// </summary>
         /// <value>
         /// The line width, in pixels.
         /// </value>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// The value is zero or less.
-        /// </exception>
-        public int Width
-        {
-            get => this.width;
-            set
-            {
-                if (value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The line width is invalid.");
-                }
-
-                this.width = value;
-                this.UpdateBounds();
-            }
-        }
+        [JsonProperty("width")]
+        public int Width { get; private set; }
 
         /// <summary>
         /// Gets the line type.
@@ -160,7 +120,7 @@ namespace Genix.DocumentAnalysis
         /// The line width, in pixels.
         /// </value>
         [JsonProperty("types")]
-        public LineTypes Types { get; }
+        public LineTypes Types { get; private set; }
 
         /// <inheritdoc />
         public override string Text => null;
@@ -172,23 +132,5 @@ namespace Genix.DocumentAnalysis
             this.Begin,
             this.End,
             this.Width);
-
-        private void UpdateBounds()
-        {
-            Rectangle bounds = new Rectangle(this.Begin, this.End);
-
-            int dw = (this.Width - 1) / 2;
-            if (this.Types.HasFlag(LineTypes.Vertical))
-            {
-                bounds.Inflate(dw, 0, this.Width - dw, 0);
-            }
-
-            if (this.Types.HasFlag(LineTypes.Horizontal))
-            {
-                bounds.Inflate(0, dw, 0, this.Width - dw);
-            }
-
-            this.Bounds = bounds;
-        }
     }
 }

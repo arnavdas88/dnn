@@ -330,8 +330,10 @@ namespace Genix.Drawing
         /// <remarks>
         /// <para>If the rectangle width is even, the center point is rounded toward the rectangles top-left corner.</para>
         /// </remarks>
-<# } #>
         public <#=type#> CenterX => this.x + ((this.w - 1) / 2);
+<# } else { #>
+        public <#=type#> CenterX => this.x + (this.w / 2);
+<# } #>
 
         /// <summary>
         /// Gets the center of this <see cref="Rectangle<#=suffix#>"/> along y-axis.
@@ -343,8 +345,10 @@ namespace Genix.Drawing
         /// <remarks>
         /// <para>If the rectangle height is even, the center point is rounded toward the rectangles top-left corner.</para>
         /// </remarks>
-<# } #>
         public <#=type#> CenterY => this.y + ((this.h - 1) / 2);
+<# } else { #>
+        public <#=type#> CenterY => this.y + (this.h / 2);
+<# } #>
 
         /// <summary>
         /// Gets the center <see cref="Point<#=suffix#>"/> of this <see cref="Rectangle<#=suffix#>"/>.
@@ -356,8 +360,10 @@ namespace Genix.Drawing
         /// <remarks>
         /// <para>If the rectangle width or height is even, the center point is rounded toward the rectangles top-left corner.</para>
         /// </remarks>
-<# } #>
         public Point<#=suffix#> CenterPoint => new Point<#=suffix#>(this.x + ((this.w - 1) / 2), this.y + ((this.h - 1) / 2));
+<# } else { #>
+        public Point<#=suffix#> CenterPoint => new Point<#=suffix#>(this.x + (this.w / 2), this.y + (this.h / 2));
+<# } #>
 
         /// <summary>
         /// Compares two <see cref="Rectangle<#=suffix#>"/> objects.
@@ -1314,6 +1320,58 @@ namespace Genix.Drawing
                     if (res == 0)
                     {
                         res = x.Top.CompareTo(y.Top);
+                    }
+                }
+            }
+<# } #>
+
+            return res;
+        }
+    }
+
+    /// <summary>
+    /// Compares two <see cref="Rectangle<#=suffix#>"/> objects,
+    /// first by <see cref="Rectangle<#=suffix#>.Top"/> then by <see cref="Rectangle<#=suffix#>.Bottom"/>, <see cref="Rectangle<#=suffix#>.Left"/> and <see cref="Rectangle<#=suffix#>.Right"/>.
+    /// </summary>
+    public class Rectangle<#=suffix#>TBLRComparer : IComparer<Rectangle<#=suffix#>>
+    {
+        /// <summary>
+        /// Gets a default <see cref="Rectangle<#=suffix#>TBLRComparer"/> comparer.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Rectangle<#=suffix#>TBLRComparer"/> object.
+        /// </value>
+        public static Rectangle<#=suffix#>TBLRComparer Default { get; } = new Rectangle<#=suffix#>TBLRComparer();
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Compare(Rectangle<#=suffix#> x, Rectangle<#=suffix#> y)
+        {
+<# if (type == "int") { #>
+            int res = x.Top - y.Top;
+            if (res == 0)
+            {
+                res = x.Bottom - y.Bottom;
+                if (res == 0)
+                {
+                    res = x.Left - y.Left;
+                    if (res == 0)
+                    {
+                        res = x.Right - y.Right;
+                    }
+                }
+            }
+<# } else { #>
+            int res = x.Top.CompareTo(y.Top);
+            if (res == 0)
+            {
+                res = x.Bottom.CompareTo(y.Bottom);
+                if (res == 0)
+                {
+                    res = x.Left.CompareTo(y.Left);
+                    if (res == 0)
+                    {
+                        res = x.Right.CompareTo(y.Right);
                     }
                 }
             }

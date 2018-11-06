@@ -156,10 +156,11 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
                                 bounds = iterator.GetBoundingBox(PageIteratorLevel.TextBlock);
                                 if (!bounds.IsEmpty)
                                 {
-                                    shapes.Add(new LineShape(
-                                        bounds,
-                                        1,
-                                        type == PolyBlockType.HorizontalLine ? LineTypes.Horizontal : LineTypes.Vertical));
+                                    LineShape line = type == PolyBlockType.HorizontalLine ?
+                                        new LineShape(bounds, bounds.Height, LineTypes.Horizontal) :
+                                        new LineShape(bounds, bounds.Width, LineTypes.Vertical);
+
+                                    shapes.Add(line);
                                 }
 
                                 break;
