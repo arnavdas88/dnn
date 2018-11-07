@@ -736,6 +736,32 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Determines if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle<#=suffix#>"/> structure along its x-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle<#=suffix#>"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle<#=suffix#>"/> structure along its x-axis; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ContainsX(Rectangle<#=suffix#> rect)
+        {
+            return this.x <= rect.x && rect.x + rect.w <= this.x + this.w;
+        }
+
+        /// <summary>
+        /// Determines if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle<#=suffix#>"/> structure along its y-axis.
+        /// </summary>
+        /// <param name="rect">The <see cref="Rectangle<#=suffix#>"/> to test.</param>
+        /// <returns>
+        /// <b>true</b> if the rectangular region represented by <paramref name="rect"/> is contained within this <see cref="Rectangle<#=suffix#>"/> structure along its y-axis; otherwise, <b>false</b>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ContainsY(Rectangle<#=suffix#> rect)
+        {
+            return this.y <= rect.y && rect.y + rect.h <= this.y + this.h;
+        }
+
+        /// <summary>
         /// Determines if the specified x-coordinate is contained within this <see cref="Rectangle<#=suffix#>"/> structure.
         /// </summary>
         /// <param name="x">The x-coordinate to check.</param>

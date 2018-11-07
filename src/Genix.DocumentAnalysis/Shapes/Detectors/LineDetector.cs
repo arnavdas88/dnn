@@ -115,7 +115,7 @@ namespace Genix.DocumentAnalysis
         /// <value>
         /// <b>true</b> to locate check boxes; otherwise, <b>false</b>.
         /// </value>
-        private bool FindCheckboxes { get; set; } = false;
+        private bool FindCheckboxes { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether the found check boxes should be removed from the image.
@@ -131,7 +131,7 @@ namespace Genix.DocumentAnalysis
         /// <value>
         /// The minimum check box size, in pixels, for images with resolution 200 dpi.
         /// </value>
-        private int MinBoxSize { get; set; } = 10;
+        private int MinBoxSize { get; set; } = 20;
 
         /// <summary>
         /// Gets or sets the minimum check box size.
@@ -374,82 +374,93 @@ namespace Genix.DocumentAnalysis
 #endif
 
             // keep track of tested horizontal components that did not yield results
-            HashSet<Rectangle> testedHBounds = new HashSet<Rectangle>();
+            ////HashSet<Rectangle> testedHBounds = new HashSet<Rectangle>();
+            HashSet<Rectangle> testedVBounds = new HashSet<Rectangle>();
 
             // the algorith proceeds in two steps
             // first, we find a pair of parallel horizontal lines that have similar length and horizontal position
             // second, we find a pair of parallel vertical lines that would connect horizontal lines on both sides to form a box
-            BoundedObjectGrid<ConnectedComponent> hgrid = FindHorizontalLines();
-            if (hgrid != null)
+            ISet<ConnectedComponent> hlines = FindHorizontalLines();
+            if (hlines != null)
             {
-                BoundedObjectGrid<ConnectedComponent> vgrid = FindVerticalLines();
-                if (vgrid != null)
+                ISet<ConnectedComponent> vlines = FindVerticalLines();
+                if (vlines != null)
                 {
-                    foreach (ConnectedComponent hcomp1 in hgrid.EnumObjects())
+                    BoundedObjectGrid<ConnectedComponent> hgrid = CreateGrid(hlines);
+                    BoundedObjectGrid<ConnectedComponent> vgrid = CreateGrid(vlines);
+                    foreach (ConnectedComponent vcomp1 in vlines.Where(x => x.Bounds.Height <= maxBoxSizeV))
                     {
-                        if (hcomp1.HorizontalAlignment == HorizontalAlignment.None)
+                        if (vcomp1.HorizontalAlignment == HorizontalAlignment.None)
                         {
-                            Rectangle hbounds1 = hcomp1.Bounds;
-                            int hdelta = hbounds1.Width / 5;
+                            Rectangle vbounds1 = vcomp1.Bounds;
+                            int vdelta = vbounds1.Height / 5;
 
-                            foreach (ConnectedComponent hcomp2 in hgrid.EnumObjects(Rectangle.Inflate(hbounds1, 0, hbounds1.Width.MulDiv(3, 2))))
+                            foreach (ConnectedComponent vcomp2 in vgrid.EnumObjects(Rectangle.Inflate(vbounds1, 0, vbounds1.Width.MulDiv(3, 2))))
                             {
-                                if (hcomp2 != hcomp1)
+                                if (vcomp2 != vcomp1)
                                 {
-                                    if (hcomp2.HorizontalAlignment == HorizontalAlignment.None)
+                                    if (vcomp2.HorizontalAlignment == HorizontalAlignment.None)
                                     {
-                                        Rectangle hbounds2 = hcomp2.Bounds;
-                                        Rectangle hbounds = Rectangle.Union(hbounds1, hbounds2);
-                                        hdelta = hbounds.Width / 5;
+                                        Rectangle vbounds2 = vcomp2.Bounds;
 
-                                        if (!testedHBounds.Contains(hbounds))
+                                        // test second vertical component
+                                        if (!TestVerticalComponents(vbounds1, vbounds2, vdelta, out bool longLine))
                                         {
-                                            testedHBounds.Add(hbounds);
+                                            continue;
+                                        }
 
-                                            if (TestHorizontalComponents(hbounds1, hbounds2, hdelta))
+                                        Rectangle vbounds = longLine ?
+                                            vbounds = Rectangle.FromLTRB(vbounds1.X, vbounds1.Y, vbounds2.Right, vbounds1.Bottom) :
+                                            Rectangle.Union(vbounds1, vbounds2);
+                                        vdelta = vbounds.Height / 5;
+
+                                        if (testedVBounds.Contains(vbounds))
+                                        {
+                                            continue;
+                                        }
+
+                                        testedVBounds.Add(vbounds);
+
+                                        // after we found a pair of matching horizontal lines
+                                        // start looking for a pair of vertical lines that connect them
+                                        ConnectedComponent hcomp1 = null;
+                                        ConnectedComponent hcomp2 = null;
+                                        foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, vdelta, 0)))
+                                        {
+                                            if (hcomp.VerticalAlignment == VerticalAlignment.None)
                                             {
-                                                // after we found a pair of matching horizontal lines
-                                                // start looking for a pair of vertical lines that connect them
-                                                ConnectedComponent vcomp1 = null;
-                                                ConnectedComponent vcomp2 = null;
-                                                foreach (ConnectedComponent vcomp in vgrid.EnumObjects(Rectangle.Inflate(hbounds, hdelta, 0)))
-                                                {
-                                                    if (vcomp.VerticalAlignment == VerticalAlignment.None)
-                                                    {
-                                                        Rectangle vbounds = vcomp.Bounds;
+                                                Rectangle hbounds = hcomp.Bounds;
 
-                                                        if (TestVerticalComponent(hbounds, vbounds, hdelta))
-                                                        {
-                                                            if (vbounds.Left.AreEqual(hbounds.Left, hdelta))
-                                                            {
-                                                                vcomp1 = vcomp;
-                                                            }
-                                                            else if (vbounds.Right.AreEqual(hbounds.Right, hdelta))
-                                                            {
-                                                                vcomp2 = vcomp;
-                                                            }
-                                                        }
+                                                if (TestHorizontalComponent(vbounds, hbounds, vdelta))
+                                                {
+                                                    if (hbounds.Left.AreEqual(vbounds.Left, vdelta))
+                                                    {
+                                                        hcomp1 = hcomp;
+                                                    }
+                                                    else if (hbounds.Right.AreEqual(vbounds.Right, vdelta))
+                                                    {
+                                                        hcomp2 = hcomp;
                                                     }
                                                 }
+                                            }
+                                        }
 
-                                                if (vcomp1 != null && vcomp2 != null)
-                                                {
-                                                    Rectangle vunion = Rectangle.Union(vcomp1.Bounds, vcomp2.Bounds);
-                                                    result.Add(new CheckboxShape(Rectangle.Union(hbounds, vunion)));
+                                        if (hcomp1 != null && hcomp2 != null)
+                                        {
+                                            Rectangle hunion = Rectangle.Union(hcomp1.Bounds, hcomp2.Bounds);
+                                            result.Add(new CheckboxShape(Rectangle.Union(vbounds, hunion)));
 #if DEBUG
-                                                    draft.AddConnectedComponent(hcomp1);
-                                                    draft.AddConnectedComponent(hcomp2);
-                                                    draft.AddConnectedComponent(vcomp1);
-                                                    draft.AddConnectedComponent(vcomp2);
+                                            draft.AddConnectedComponent(vcomp1);
+                                            draft.AddConnectedComponent(vcomp2);
+                                            draft.AddConnectedComponent(hcomp1);
+                                            draft.AddConnectedComponent(hcomp2);
 #endif
 
-                                                    // mark used components, so we do not test them twice
-                                                    hcomp1.HorizontalAlignment = HorizontalAlignment.Left;
-                                                    hcomp2.HorizontalAlignment = HorizontalAlignment.Left;
-                                                    vcomp1.VerticalAlignment = VerticalAlignment.Top;
-                                                    vcomp2.VerticalAlignment = VerticalAlignment.Top;
-                                                }
-                                            }
+                                            // mark used components, so we do not test them twice
+                                            vcomp1.HorizontalAlignment = HorizontalAlignment.Left;
+                                            vcomp2.HorizontalAlignment = HorizontalAlignment.Left;
+                                            hcomp1.VerticalAlignment = VerticalAlignment.Top;
+                                            hcomp2.VerticalAlignment = VerticalAlignment.Top;
                                         }
                                     }
                                 }
@@ -473,7 +484,22 @@ namespace Genix.DocumentAnalysis
 
             return result;
 
-            BoundedObjectGrid<ConnectedComponent> FindHorizontalLines()
+            ISet<ConnectedComponent> FindVerticalLines()
+            {
+                Image lines = image.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
+                if (lines.IsAllWhite())
+                {
+                    return null;
+                }
+
+                ISet<ConnectedComponent> comps = lines.FindConnectedComponents(8);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return comps;
+            }
+
+            ISet<ConnectedComponent> FindHorizontalLines()
             {
                 Image lines = image.MorphOpen(null, StructuringElement.Brick(minBoxSizeH, 1), 1, BorderType.BorderConst, image.WhiteColor);
                 if (lines.IsAllWhite())
@@ -487,52 +513,77 @@ namespace Genix.DocumentAnalysis
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(
-                    lines.Bounds,
-                    (lines.Width / 10).Clip(1, lines.Width),
-                    (lines.Height / 20).Clip(1, lines.Height));
-                grid.AddRange(comps.Where(x => x.Bounds.Width <= maxBoxSizeH), true, true);
+                return comps;
+            }
 
-                cancellationToken.ThrowIfCancellationRequested();
+            BoundedObjectGrid<ConnectedComponent> CreateGrid(ISet<ConnectedComponent> comps)
+            {
+                BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(
+                    image.Bounds,
+                    (image.Width / 10).Clip(1, image.Width),
+                    (image.Height / 20).Clip(1, image.Height));
+
+                grid.AddRange(comps, true, true);
 
                 return grid;
             }
 
-            BoundedObjectGrid<ConnectedComponent> FindVerticalLines()
+            bool TestVerticalComponents(Rectangle bounds1, Rectangle bounds2, int delta, out bool longLine)
             {
-                Image lines = image.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
-                if (lines.IsAllWhite())
+                longLine = false;
+
+                int dist = Math.Abs(bounds1.CenterX - bounds2.CenterX);
+                if (!dist.Between(minBoxSizeH, maxBoxSizeH))
                 {
-                    return null;
+                    // the distance between lines is invalid
+                    return false;
                 }
 
-                ISet<ConnectedComponent> comps = lines.FindConnectedComponents(8);
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(
-                    lines.Bounds,
-                    (lines.Width / 10).Clip(1, lines.Width),
-                    (lines.Height / 20).Clip(1, lines.Height));
-                grid.AddRange(comps.Where(x => x.Bounds.Height <= maxBoxSizeV), true, true);
-
-                return grid;
+                if (bounds2.Height <= maxBoxSizeV)
+                {
+                    // both lines are isolated - check for squareness of the box
+                    return (dist.AreEqual(bounds1.Height, delta) || dist.AreEqual(bounds2.Height, delta)) &&
+                        bounds2.Y.AreEqual(bounds1.Y, delta) &&
+                        bounds2.Bottom.AreEqual(bounds1.Bottom, delta);
+                }
+                else
+                {
+                    longLine = true;
+                    return bounds2.ContainsY(bounds1);
+                }
             }
 
-            bool TestHorizontalComponents(Rectangle bounds1, Rectangle bounds2, int delta)
+            bool TestHorizontalComponent(Rectangle vbounds, Rectangle hbounds, int delta, out bool longLine)
             {
+                longLine = false;
+
+                if (!hbounds.CenterY.AreEqual(vbounds.Top, delta) || !hbounds.CenterY.AreEqual(vbounds.Bottom, delta))
+                {
+                    // the line should go either through top or bottom of the box
+                    return false;
+                }
+
+                if (hbounds.Width <= maxBoxSizeH)
+                {
+                    // both lines are isolated - check for squareness of the box
+                    return hbounds.Width.AreEqual(vbounds.Width, delta) &&
+                        hbounds.X.AreEqual(vbounds.X, delta) &&
+                        hbounds.Right.AreEqual(vbounds.Right, delta);
+                }
+                else
+                {
+
+                }
+
                 int dist = Math.Abs(bounds1.CenterY - bounds2.CenterY);
                 return dist.Between(minBoxSizeV, maxBoxSizeV) &&
                     (dist.AreEqual(bounds1.Width, delta) || dist.AreEqual(bounds2.Width, delta)) &&
                     bounds2.X.AreEqual(bounds1.X, delta) &&
                     bounds2.Right.AreEqual(bounds1.Right, delta);
-            }
 
-            bool TestVerticalComponent(Rectangle hbounds, Rectangle vbounds, int delta)
-            {
-                return vbounds.Height.AreEqual(hbounds.Height, delta) &&
+                /*return vbounds.Height.AreEqual(hbounds.Height, delta) &&
                     vbounds.Top.AreEqual(hbounds.Top, delta) &&
-                    vbounds.Bottom.AreEqual(hbounds.Bottom, delta);
+                    vbounds.Bottom.AreEqual(hbounds.Bottom, delta);*/
             }
         }
 
