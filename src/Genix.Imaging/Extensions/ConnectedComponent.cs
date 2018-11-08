@@ -248,6 +248,119 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Crops the <see cref="ConnectedComponent"/> using rectangle specified by a pair of coordinates, a width, and a height.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the area.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the area.</param>
+        /// <param name="width">The width of the area.</param>
+        /// <param name="height">The height of the area.</param>
+        /// <returns>
+        /// The <see cref="ConnectedComponent"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para><paramref name="width"/> is less than or equal to zero.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="height"/> is less than or equal to zero.</para>
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/> is outside of this <see cref="ConnectedComponent"/> bounds.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This method creates a c.c. that contains only strokes that intersect with the rectangular area described by <paramref name="x"/>, <paramref name="y"/>, <paramref name="width"/> and <paramref name="height"/>.
+        /// Some of the lines may be empty and the c.c. in fact disconnected if the connecting pixels lie outside crop area.
+        /// </para>
+        /// </remarks>
+        public ConnectedComponent Crop(int x, int y, int width, int height)
+        {
+            ValidateArea();
+
+            // create component
+            ConnectedComponent dst = new ConnectedComponent();
+            dst.strokes = new Stroke[height][];
+
+            int lbound = int.MaxValue;
+            int rbound = 0;
+
+            Stroke[][] lines = this.strokes;
+            for (int isrc = y - this.bounds.Y, idst = 0; idst < height; isrc++, idst++)
+            {
+                Stroke[] thisline = this.strokes[isrc];
+                ref Stroke[] dstline = ref dst.strokes[idst];
+
+                for (int j = 0, jj = thisline.Length; j < jj; j++)
+                {
+                    int start = MinMax.Max(x, thisline[j].X);
+                    int end = MinMax.Min(x + width, thisline[j].End);
+                    if (end > start)
+                    {
+                        dstline = dstline.Add(new Stroke() { X = start, Length = end - start });
+
+                        lbound = MinMax.Min(lbound, start);
+                        rbound = MinMax.Max(rbound, end);
+                    }
+                }
+            }
+
+            dst.bounds = rbound > lbound ?
+                Rectangle.FromLTRB(lbound, y, rbound, y + height) :
+                Rectangle.FromLTRB(0, y, 0, y + height);
+            return dst;
+
+            void ValidateArea()
+            {
+                if (width <= 0)
+                {
+                    throw new ArgumentException(Properties.Resources.E_InvalidWidth, nameof(width));
+                }
+
+                if (!this.bounds.ContainsX(x))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(x), x, Properties.Resources.E_InvalidCoordinates);
+                }
+
+                if (!this.bounds.ContainsX(x + width - 1))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(width), width, Properties.Resources.E_InvalidCoordinates);
+                }
+
+                if (height <= 0)
+                {
+                    throw new ArgumentException(Properties.Resources.E_InvalidHeight, nameof(height));
+                }
+
+                if (!this.bounds.ContainsY(y))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(y), y, Properties.Resources.E_InvalidCoordinates);
+                }
+
+                if (!this.bounds.ContainsY(y + height - 1))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(height), height, Properties.Resources.E_InvalidCoordinates);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Crops the <see cref="ConnectedComponent"/> using rectangle specified by a <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="area">The width, height, and location of the area.</param>
+        /// <returns>
+        /// The <see cref="ConnectedComponent"/> this method creates.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <para>The rectangular area described by <paramref name="area"/> is outside of this <see cref="ConnectedComponent"/> bounds.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// This method creates a c.c. that contains only strokes that intersect with the rectangular area described by <paramref name="area"/>.
+        /// Some of the lines may be empty and the c.c. in fact disconnected if the connecting pixels lie outside crop area.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ConnectedComponent Crop(Rectangle area) => this.Crop(area.X, area.Y, area.Width, area.Height);
+
+        /// <summary>
         /// Returns the position and the length of a line in this <see cref="ConnectedComponent"/>.
         /// </summary>
         /// <param name="y">The y-coordinate of the line.</param>

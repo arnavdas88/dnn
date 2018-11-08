@@ -1929,47 +1929,59 @@ namespace Genix.Imaging
             this.FindConnectedComponents(connectivity, area.X, area.Y, area.Width, area.Height);
 
         /// <summary>
-        /// Adds black pixels contained in the <see cref="ConnectedComponent"/> to this <see cref="Image"/>.
+        /// Draws the <see cref="ConnectedComponent"/> on this <see cref="Image"/> using the specified color.
         /// </summary>
-        /// <param name="component">The <see cref="ConnectedComponent"/> to add.</param>
+        /// <param name="component">The <see cref="ConnectedComponent"/> to draw.</param>
+        /// <param name="color">The color of the connected component.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="component"/> is <b>null</b>.
         /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
-        /// </exception>
-        public void AddConnectedComponent(ConnectedComponent component)
+        [CLSCompliant(false)]
+        public void DrawConnectedComponent(ConnectedComponent component, uint color)
         {
             if (component == null)
             {
                 throw new ArgumentNullException(nameof(component));
             }
 
-            if (this.BitsPerPixel != 1)
-            {
-                throw new NotSupportedException(Properties.Resources.E_UnsupportedDepth_1bpp);
-            }
-
             ulong[] bits = this.Bits;
             int stride1 = this.Stride1;
+            int bitsPerPixel = this.BitsPerPixel;
+            ulong colorbits = this.ColorBits(color);
 
-            foreach ((int y, int x, int length) in component.EnumStrokes())
+            if (colorbits == 0)
             {
-                BitUtils.SetBits(length, bits, (y * stride1) + x);
+                foreach ((int y, int x, int length) in component.EnumStrokes())
+                {
+                    BitUtils.ResetBits(length * bitsPerPixel, bits, (y * stride1) + (x * bitsPerPixel));
+                }
+            }
+            else if (colorbits == ulong.MaxValue)
+            {
+                foreach ((int y, int x, int length) in component.EnumStrokes())
+                {
+                    BitUtils.SetBits(length * bitsPerPixel, bits, (y * stride1) + (x * bitsPerPixel));
+                }
+            }
+            else
+            {
+                foreach ((int y, int x, int length) in component.EnumStrokes())
+                {
+                    BitUtils.SetBits(length * bitsPerPixel, colorbits, bits, (y * stride1) + (x * bitsPerPixel));
+                }
             }
         }
 
         /// <summary>
-        /// Adds black pixels contained in the collection of <see cref="ConnectedComponent"/> objects to this <see cref="Image"/>.
+        /// Draws the collection of <see cref="ConnectedComponent"/> objects on this <see cref="Image"/> using the specified color.
         /// </summary>
-        /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to add.</param>
+        /// <param name="components">The collection if <see cref="ConnectedComponent"/> objects to draw.</param>
+        /// <param name="color">The color of the connected component.</param>
         /// <exception cref="ArgumentNullException">
         /// <para><paramref name="components"/> is <b>null</b>.</para>
         /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// <see cref="Image{T}.BitsPerPixel"/> is not 1.
-        /// </exception>
-        public void AddConnectedComponents(IEnumerable<ConnectedComponent> components)
+        [CLSCompliant(false)]
+        public void DrawConnectedComponents(IEnumerable<ConnectedComponent> components, uint color)
         {
             if (components == null)
             {
@@ -1978,7 +1990,7 @@ namespace Genix.Imaging
 
             foreach (ConnectedComponent component in components)
             {
-                this.AddConnectedComponent(component);
+                this.DrawConnectedComponent(component, color);
             }
         }
 

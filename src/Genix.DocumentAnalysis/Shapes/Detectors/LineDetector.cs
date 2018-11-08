@@ -370,7 +370,8 @@ namespace Genix.DocumentAnalysis
 
             // create a draft that would show found checkboxes
 #if DEBUG
-            Image draft = image.Clone(false);
+            Image draft = image.CreateTemplate(null, 32);
+            draft.SetWhite();
 #endif
 
             // keep track of tested horizontal components that did not yield results
@@ -395,7 +396,7 @@ namespace Genix.DocumentAnalysis
                             Rectangle vbounds1 = vcomp1.Bounds;
                             int vdelta = vbounds1.Height / 5;
 
-                            foreach (ConnectedComponent vcomp2 in vgrid.EnumObjects(Rectangle.Inflate(vbounds1, 0, vbounds1.Width.MulDiv(3, 2))))
+                            foreach (ConnectedComponent vcomp2 in vgrid.EnumObjects(Rectangle.Inflate(vbounds1, vbounds1.Height.MulDiv(3, 2), 0)))
                             {
                                 if (vcomp2 != vcomp1)
                                 {
@@ -404,13 +405,15 @@ namespace Genix.DocumentAnalysis
                                         Rectangle vbounds2 = vcomp2.Bounds;
 
                                         // test second vertical component
-                                        if (!TestVerticalComponents(vbounds1, vbounds2, vdelta, out bool longLine))
+                                        if (!TestVerticalComponents(vbounds1, vbounds2, vdelta, out bool longVLine))
                                         {
                                             continue;
                                         }
 
-                                        Rectangle vbounds = longLine ?
-                                            vbounds = Rectangle.FromLTRB(vbounds1.X, vbounds1.Y, vbounds2.Right, vbounds1.Bottom) :
+                                        Rectangle vbounds = longVLine ?
+                                            (vbounds1.X < vbounds2.X ?
+                                                Rectangle.FromLTRB(vbounds1.X, vbounds1.Y, LongLineRightBound(vcomp2, vbounds1.Y, vbounds1.Height), vbounds1.Bottom) :
+                                                Rectangle.FromLTRB(LongLineLeftBound(vcomp2, vbounds1.Y, vbounds1.Height), vbounds1.Y, vbounds1.Right, vbounds1.Bottom)) :
                                             Rectangle.Union(vbounds1, vbounds2);
                                         vdelta = vbounds.Height / 5;
 
@@ -423,44 +426,61 @@ namespace Genix.DocumentAnalysis
 
                                         // after we found a pair of matching horizontal lines
                                         // start looking for a pair of vertical lines that connect them
-                                        ConnectedComponent hcomp1 = null;
-                                        ConnectedComponent hcomp2 = null;
-                                        foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, vdelta, 0)))
+                                        ConnectedComponent hcompTop = null;
+                                        ConnectedComponent hcompBottom = null;
+                                        bool longHLine = false;
+                                        foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, 0, vdelta)))
                                         {
                                             if (hcomp.VerticalAlignment == VerticalAlignment.None)
                                             {
                                                 Rectangle hbounds = hcomp.Bounds;
 
-                                                if (TestHorizontalComponent(vbounds, hbounds, vdelta))
+                                                if (hcompTop == null && TestTopComponent(vbounds, hbounds, vdelta))
                                                 {
-                                                    if (hbounds.Left.AreEqual(vbounds.Left, vdelta))
-                                                    {
-                                                        hcomp1 = hcomp;
-                                                    }
-                                                    else if (hbounds.Right.AreEqual(vbounds.Right, vdelta))
-                                                    {
-                                                        hcomp2 = hcomp;
-                                                    }
+                                                    hcompTop = hcomp;
+                                                }
+                                                else if (hcompBottom == null && TestBottomComponent(vbounds, hbounds, vdelta, out longHLine))
+                                                {
+                                                    hcompBottom = hcomp;
                                                 }
                                             }
                                         }
 
-                                        if (hcomp1 != null && hcomp2 != null)
+                                        if (hcompTop != null && hcompBottom != null)
                                         {
-                                            Rectangle hunion = Rectangle.Union(hcomp1.Bounds, hcomp2.Bounds);
-                                            result.Add(new CheckboxShape(Rectangle.Union(vbounds, hunion)));
+                                            Rectangle bounds = Rectangle.Union(vbounds, hcompTop.Bounds);
+
+                                            if (longHLine)
+                                            {
+                                                Rectangle hbounds = Rectangle.Intersect(hcompBottom.Bounds, Rectangle.FromLTRB(bounds.X, bounds.Y, bounds.Right, hcompBottom.Bounds.Bottom));
+                                                hbounds = hcompBottom.Crop(hbounds).Bounds;
+                                                bounds.Union(hbounds);
+                                            }
+                                            else
+                                            {
+                                                bounds.Union(hcompBottom.Bounds);
+                                            }
+
+                                            result.Add(new CheckboxShape(bounds));
 #if DEBUG
-                                            draft.AddConnectedComponent(vcomp1);
-                                            draft.AddConnectedComponent(vcomp2);
-                                            draft.AddConnectedComponent(hcomp1);
-                                            draft.AddConnectedComponent(hcomp2);
+                                            draft.DrawConnectedComponent(vcomp1, draft.BlackColor);
+                                            draft.DrawConnectedComponent(vcomp2, draft.BlackColor);
+                                            draft.DrawConnectedComponent(hcompTop, draft.BlackColor);
+                                            draft.DrawConnectedComponent(hcompBottom, draft.BlackColor);
 #endif
 
                                             // mark used components, so we do not test them twice
-                                            vcomp1.HorizontalAlignment = HorizontalAlignment.Left;
-                                            vcomp2.HorizontalAlignment = HorizontalAlignment.Left;
-                                            hcomp1.VerticalAlignment = VerticalAlignment.Top;
-                                            hcomp2.VerticalAlignment = VerticalAlignment.Top;
+                                            hcompTop.VerticalAlignment = VerticalAlignment.Top;
+                                            if (!longHLine)
+                                            {
+                                                hcompBottom.VerticalAlignment = VerticalAlignment.Bottom;
+                                            }
+
+                                            vcomp1.HorizontalAlignment = vbounds1.X < vbounds2.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+                                            if (!longVLine)
+                                            {
+                                                vcomp2.HorizontalAlignment = vbounds2.X < vbounds1.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+                                            }
                                         }
                                     }
                                 }
@@ -473,10 +493,11 @@ namespace Genix.DocumentAnalysis
             // delete check boxes from the image
             if (this.RemoveCheckboxes)
             {
-                /*foreach (CheckboxShape shape in result)
+                foreach (CheckboxShape shape in result)
                 {
-                    image.SetWhite(Rectangle.Inflate(shape.Bounds, 1, 1));
-                }*/
+                    ////image.SetWhite(Rectangle.Inflate(shape.Bounds, 1, 1));
+                    draft.DrawRectangle(shape.Bounds, Color.Red);
+                }
 #if DEBUG
                 image.Sub(image, draft, 0);
 #endif
@@ -548,16 +569,26 @@ namespace Genix.DocumentAnalysis
                 }
                 else
                 {
+                    // long line should be on the left,
+                    // the distance from it to right line should be about the length of right line,
+                    // and the right line should be vertically contained in the left
                     longLine = true;
-                    return bounds2.ContainsY(bounds1);
+                    return dist.AreEqual(bounds1.Height, delta) && bounds2.X < bounds1.X && bounds2.ContainsY(bounds1);
                 }
             }
 
-            bool TestHorizontalComponent(Rectangle vbounds, Rectangle hbounds, int delta, out bool longLine)
+            bool TestTopComponent(Rectangle vbounds, Rectangle hbounds, int delta)
+            {
+                return hbounds.Top.AreEqual(vbounds.Top, delta) &&
+                    hbounds.X.AreEqual(vbounds.X, delta) &&
+                    hbounds.Right.AreEqual(vbounds.Right, delta);
+            }
+
+            bool TestBottomComponent(Rectangle vbounds, Rectangle hbounds, int delta, out bool longLine)
             {
                 longLine = false;
 
-                if (!hbounds.CenterY.AreEqual(vbounds.Top, delta) || !hbounds.CenterY.AreEqual(vbounds.Bottom, delta))
+                if (!hbounds.Bottom.AreEqual(vbounds.Bottom, delta))
                 {
                     // the line should go either through top or bottom of the box
                     return false;
@@ -566,24 +597,40 @@ namespace Genix.DocumentAnalysis
                 if (hbounds.Width <= maxBoxSizeH)
                 {
                     // both lines are isolated - check for squareness of the box
-                    return hbounds.Width.AreEqual(vbounds.Width, delta) &&
-                        hbounds.X.AreEqual(vbounds.X, delta) &&
+                    return hbounds.X.AreEqual(vbounds.X, delta) &&
                         hbounds.Right.AreEqual(vbounds.Right, delta);
                 }
                 else
                 {
+                    longLine = true;
+                    return hbounds.ContainsX(vbounds);
+                }
+            }
 
+            int LongLineLeftBound(ConnectedComponent comp, int y, int height)
+            {
+                int bound = int.MaxValue;
+                int bottom = y + height;
+                while (y < bottom)
+                {
+                    int val = comp.GetLine(y++).X;
+                    bound = MinMax.Min(bound, val);
                 }
 
-                int dist = Math.Abs(bounds1.CenterY - bounds2.CenterY);
-                return dist.Between(minBoxSizeV, maxBoxSizeV) &&
-                    (dist.AreEqual(bounds1.Width, delta) || dist.AreEqual(bounds2.Width, delta)) &&
-                    bounds2.X.AreEqual(bounds1.X, delta) &&
-                    bounds2.Right.AreEqual(bounds1.Right, delta);
+                return bound;
+            }
 
-                /*return vbounds.Height.AreEqual(hbounds.Height, delta) &&
-                    vbounds.Top.AreEqual(hbounds.Top, delta) &&
-                    vbounds.Bottom.AreEqual(hbounds.Bottom, delta);*/
+            int LongLineRightBound(ConnectedComponent comp, int y, int height)
+            {
+                int bound = 0;
+                int bottom = y + height;
+                while (y < bottom)
+                {
+                    int val = comp.GetLine(y++).End;
+                    bound = MinMax.Max(bound, val);
+                }
+
+                return bound;
             }
         }
 
