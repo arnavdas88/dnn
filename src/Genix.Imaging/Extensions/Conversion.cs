@@ -62,8 +62,15 @@ namespace Genix.Imaging
 
             Image ConvertTo1bpp()
             {
-                dst = ConvertTo8bpp();
-                return dst.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
+                switch (this.BitsPerPixel)
+                {
+                    case 8:
+                        return this.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
+
+                    default:
+                        dst = ConvertTo8bpp();
+                        return dst.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
+                }
             }
 
             Image ConvertTo8bpp()

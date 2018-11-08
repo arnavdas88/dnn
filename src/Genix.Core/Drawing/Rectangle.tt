@@ -1006,18 +1006,38 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Replaces this <see cref="Rectangle<#=suffix#>"/> with the intersection of itself and the specified rectangular area.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the top-left corner of the rectangular area with which to intersect.</param>
+        /// <param name="y">The y-coordinate of the top-left corner of the rectangular area with which to intersect.</param>
+        /// <param name="width">The width of the rectangular area with which to intersect.</param>
+        /// <param name="height">The height of the rectangular area with which to intersect.</param>
+        public void Intersect(<#=type#> x, <#=type#> y, <#=type#> width, <#=type#> height)
+        {
+            <#=type#> x1 = MinMax.Max(this.x, x);
+            <#=type#> x2 = MinMax.Min(this.x + this.w, x + width);
+            <#=type#> y1 = MinMax.Max(this.y, y);
+            <#=type#> y2 = MinMax.Min(this.y + this.h, y + height);
+
+            if (x2 >= x1 && y2 >= y1)
+            {
+                this.x = x1;
+                this.y = y1;
+                this.w = x2 - x1;
+                this.h = y2 - y1;
+            }
+            else
+            {
+                this.x = this.y = this.w = this.h = 0;
+            }
+        }
+
+        /// <summary>
         /// Replaces this <see cref="Rectangle<#=suffix#>"/> with the intersection of itself and the specified <see cref="Rectangle<#=suffix#>"/>.
         /// </summary>
         /// <param name="rect">The rectangle with which to intersect.</param>
-        public void Intersect(Rectangle<#=suffix#> rect)
-        {
-            Rectangle<#=suffix#> result = Rectangle<#=suffix#>.Intersect(rect, this);
-
-            this.x = result.x;
-            this.y = result.y;
-            this.w = result.w;
-            this.h = result.h;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Intersect(Rectangle<#=suffix#> rect) => this.Intersect(rect.x, rect.y, rect.w, rect.h);
 
         /// <summary>
         /// Determines if this rectangle <see cref="Rectangle<#=suffix#>"/> intersects with the specified <see cref="Rectangle<#=suffix#>"/>.

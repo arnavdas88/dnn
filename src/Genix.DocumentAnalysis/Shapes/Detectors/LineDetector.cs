@@ -131,7 +131,7 @@ namespace Genix.DocumentAnalysis
         /// <value>
         /// The minimum check box size, in pixels, for images with resolution 200 dpi.
         /// </value>
-        private int MinBoxSize { get; set; } = 20;
+        private int MinBoxSize { get; set; } = 15;
 
         /// <summary>
         /// Gets or sets the minimum check box size.
@@ -171,7 +171,13 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
+            // find checkboxes
             ISet<CheckboxShape> checkboxResult = null;
+            if (this.FindCheckboxes)
+            {
+                checkboxResult = this.FindBoxes(image, cancellationToken);
+            }
+
             ISet<LineShape> hlinesResult = null;
             ISet<LineShape> vlinesResult = null;
 
@@ -182,11 +188,6 @@ namespace Genix.DocumentAnalysis
             // open up to detect big solid areas
             Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
             Image hollowImage = closedImage.Sub(null, openedImage, 0);
-
-            if (this.FindCheckboxes)
-            {
-                checkboxResult = this.FindAndRemoveCheckboxes(hollowImage, cancellationToken);
-            }
 
             // masks we would like to find
             Image hlines = null;
@@ -217,6 +218,15 @@ namespace Genix.DocumentAnalysis
             }
 
             RemoveIntersections();
+
+            // delete check boxes from the image
+            if (this.RemoveCheckboxes && checkboxResult != null)
+            {
+                foreach (CheckboxShape shape in checkboxResult)
+                {
+                    image.SetWhite(Rectangle.Inflate(shape.Bounds, 1, 1));
+                }
+            }
 
             // create answer
             HashSet<Shape> answer = new HashSet<Shape>();
@@ -358,9 +368,11 @@ namespace Genix.DocumentAnalysis
             }
         }
 
-        private ISet<CheckboxShape> FindAndRemoveCheckboxes(Image image, CancellationToken cancellationToken)
+        private ISet<CheckboxShape> FindBoxes(Image image, CancellationToken cancellationToken)
         {
             HashSet<CheckboxShape> result = new HashSet<CheckboxShape>(32);
+
+            Image closedImage = image/*.MorphClose(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)*/;
 
             // compute image-dependent parameters
             int minBoxSizeH = this.MinBoxSize.MulDiv(image.HorizontalResolution, 200);
@@ -402,20 +414,14 @@ namespace Genix.DocumentAnalysis
                                 {
                                     if (vcomp2.HorizontalAlignment == HorizontalAlignment.None)
                                     {
-                                        Rectangle vbounds2 = vcomp2.Bounds;
-
                                         // test second vertical component
-                                        if (!TestVerticalComponents(vbounds1, vbounds2, vdelta, out bool longVLine))
+                                        if (!TestVerticalComponents(vbounds1, vcomp2, out Rectangle vbounds2, vdelta, out bool longVLine))
                                         {
                                             continue;
                                         }
 
-                                        Rectangle vbounds = longVLine ?
-                                            (vbounds1.X < vbounds2.X ?
-                                                Rectangle.FromLTRB(vbounds1.X, vbounds1.Y, LongLineRightBound(vcomp2, vbounds1.Y, vbounds1.Height), vbounds1.Bottom) :
-                                                Rectangle.FromLTRB(LongLineLeftBound(vcomp2, vbounds1.Y, vbounds1.Height), vbounds1.Y, vbounds1.Right, vbounds1.Bottom)) :
-                                            Rectangle.Union(vbounds1, vbounds2);
-                                        vdelta = vbounds.Height / 5;
+                                        Rectangle vbounds = Rectangle.Union(vbounds1, vbounds2);
+                                        vdelta = MinMax.Max(vbounds.Width, vbounds.Height) / 5;
 
                                         if (testedVBounds.Contains(vbounds))
                                         {
@@ -428,18 +434,17 @@ namespace Genix.DocumentAnalysis
                                         // start looking for a pair of vertical lines that connect them
                                         ConnectedComponent hcompTop = null;
                                         ConnectedComponent hcompBottom = null;
+                                        Rectangle hboundsBottom = Rectangle.Empty;
                                         bool longHLine = false;
                                         foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, 0, vdelta)))
                                         {
                                             if (hcomp.VerticalAlignment == VerticalAlignment.None)
                                             {
-                                                Rectangle hbounds = hcomp.Bounds;
-
-                                                if (hcompTop == null && TestTopComponent(vbounds, hbounds, vdelta))
+                                                if (hcompTop == null && TestTopComponent(vbounds, hcomp.Bounds, vdelta))
                                                 {
                                                     hcompTop = hcomp;
                                                 }
-                                                else if (hcompBottom == null && TestBottomComponent(vbounds, hbounds, vdelta, out longHLine))
+                                                else if (hcompBottom == null && TestBottomComponent(vbounds, hcomp, out hboundsBottom, vdelta, out longHLine))
                                                 {
                                                     hcompBottom = hcomp;
                                                 }
@@ -449,17 +454,7 @@ namespace Genix.DocumentAnalysis
                                         if (hcompTop != null && hcompBottom != null)
                                         {
                                             Rectangle bounds = Rectangle.Union(vbounds, hcompTop.Bounds);
-
-                                            if (longHLine)
-                                            {
-                                                Rectangle hbounds = Rectangle.Intersect(hcompBottom.Bounds, Rectangle.FromLTRB(bounds.X, bounds.Y, bounds.Right, hcompBottom.Bounds.Bottom));
-                                                hbounds = hcompBottom.Crop(hbounds).Bounds;
-                                                bounds.Union(hbounds);
-                                            }
-                                            else
-                                            {
-                                                bounds.Union(hcompBottom.Bounds);
-                                            }
+                                            bounds.Union(hboundsBottom);
 
                                             result.Add(new CheckboxShape(bounds));
 #if DEBUG
@@ -490,24 +485,18 @@ namespace Genix.DocumentAnalysis
                 }
             }
 
-            // delete check boxes from the image
-            if (this.RemoveCheckboxes)
-            {
-                foreach (CheckboxShape shape in result)
-                {
-                    ////image.SetWhite(Rectangle.Inflate(shape.Bounds, 1, 1));
-                    draft.DrawRectangle(shape.Bounds, Color.Red);
-                }
 #if DEBUG
-                image.Sub(image, draft, 0);
-#endif
+            foreach (CheckboxShape shape in result)
+            {
+                draft.DrawRectangle(shape.Bounds, Color.Red);
             }
+#endif
 
             return result;
 
             ISet<ConnectedComponent> FindVerticalLines()
             {
-                Image lines = image.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
+                Image lines = closedImage.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
                 if (lines.IsAllWhite())
                 {
                     return null;
@@ -522,7 +511,7 @@ namespace Genix.DocumentAnalysis
 
             ISet<ConnectedComponent> FindHorizontalLines()
             {
-                Image lines = image.MorphOpen(null, StructuringElement.Brick(minBoxSizeH, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                Image lines = closedImage.MorphOpen(null, StructuringElement.Brick(minBoxSizeH, 1), 1, BorderType.BorderConst, image.WhiteColor);
                 if (lines.IsAllWhite())
                 {
                     return null;
@@ -549,9 +538,17 @@ namespace Genix.DocumentAnalysis
                 return grid;
             }
 
-            bool TestVerticalComponents(Rectangle bounds1, Rectangle bounds2, int delta, out bool longLine)
+            bool TestVerticalComponents(Rectangle bounds1, ConnectedComponent comp, out Rectangle bounds2, int delta, out bool longLine)
             {
                 longLine = false;
+                bounds2 = comp.Bounds;
+
+                if (bounds2.Height > maxBoxSizeV)
+                {
+                    // if touching long line, get the part of it that intersects with the box
+                    bounds2 = comp.Intersect(Rectangle.FromLTRB(bounds2.X, bounds1.Y, bounds2.Right, bounds1.Bottom));
+                    longLine = true;
+                }
 
                 int dist = Math.Abs(bounds1.CenterX - bounds2.CenterX);
                 if (!dist.Between(minBoxSizeH, maxBoxSizeH))
@@ -560,21 +557,10 @@ namespace Genix.DocumentAnalysis
                     return false;
                 }
 
-                if (bounds2.Height <= maxBoxSizeV)
-                {
-                    // both lines are isolated - check for squareness of the box
-                    return (dist.AreEqual(bounds1.Height, delta) || dist.AreEqual(bounds2.Height, delta)) &&
-                        bounds2.Y.AreEqual(bounds1.Y, delta) &&
-                        bounds2.Bottom.AreEqual(bounds1.Bottom, delta);
-                }
-                else
-                {
-                    // long line should be on the left,
-                    // the distance from it to right line should be about the length of right line,
-                    // and the right line should be vertically contained in the left
-                    longLine = true;
-                    return dist.AreEqual(bounds1.Height, delta) && bounds2.X < bounds1.X && bounds2.ContainsY(bounds1);
-                }
+                // both lines are isolated - check for squareness of the box
+                return dist.Between(MinMax.Min(bounds1.Height, bounds2.Height) - delta, (int)(1.5 * MinMax.Max(bounds1.Height, bounds2.Height)) + delta) &&
+                    bounds2.Y.AreEqual(bounds1.Y, delta) &&
+                    bounds2.Bottom.AreEqual(bounds1.Bottom, delta);
             }
 
             bool TestTopComponent(Rectangle vbounds, Rectangle hbounds, int delta)
@@ -584,53 +570,27 @@ namespace Genix.DocumentAnalysis
                     hbounds.Right.AreEqual(vbounds.Right, delta);
             }
 
-            bool TestBottomComponent(Rectangle vbounds, Rectangle hbounds, int delta, out bool longLine)
+            bool TestBottomComponent(Rectangle vbounds, ConnectedComponent hcomp, out Rectangle hbounds, int delta, out bool longLine)
             {
                 longLine = false;
+                hbounds = hcomp.Bounds;
+
+                if (hbounds.Width > maxBoxSizeH)
+                {
+                    // if touching long line, get the part of it that intersects with the box
+                    hbounds = hcomp.Intersect(Rectangle.FromLTRB(vbounds.X, hbounds.Y, vbounds.Right, hbounds.Bottom));
+                    longLine = true;
+                }
 
                 if (!hbounds.Bottom.AreEqual(vbounds.Bottom, delta))
                 {
-                    // the line should go either through top or bottom of the box
+                    // the line should go either through bottom of the box
                     return false;
                 }
 
-                if (hbounds.Width <= maxBoxSizeH)
-                {
-                    // both lines are isolated - check for squareness of the box
-                    return hbounds.X.AreEqual(vbounds.X, delta) &&
-                        hbounds.Right.AreEqual(vbounds.Right, delta);
-                }
-                else
-                {
-                    longLine = true;
-                    return hbounds.ContainsX(vbounds);
-                }
-            }
-
-            int LongLineLeftBound(ConnectedComponent comp, int y, int height)
-            {
-                int bound = int.MaxValue;
-                int bottom = y + height;
-                while (y < bottom)
-                {
-                    int val = comp.GetLine(y++).X;
-                    bound = MinMax.Min(bound, val);
-                }
-
-                return bound;
-            }
-
-            int LongLineRightBound(ConnectedComponent comp, int y, int height)
-            {
-                int bound = 0;
-                int bottom = y + height;
-                while (y < bottom)
-                {
-                    int val = comp.GetLine(y++).End;
-                    bound = MinMax.Max(bound, val);
-                }
-
-                return bound;
+                // check for squareness of the box
+                return hbounds.X.AreEqual(vbounds.X, delta) &&
+                    hbounds.Right.AreEqual(vbounds.Right, delta);
             }
         }
 
