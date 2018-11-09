@@ -139,7 +139,7 @@ namespace Genix.DocumentAnalysis
         /// <value>
         /// The minimum check box size, in pixels, for images with resolution 200 dpi.
         /// </value>
-        private int MaxBoxSize { get; set; } = 50;
+        private int MaxBoxSize { get; set; } = 60;
 
         /// <summary>
         /// Finds the horizontal and vertical lines on the <see cref="Image"/>.
@@ -171,53 +171,188 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            // find checkboxes
+            // find check boxes
             ISet<CheckboxShape> checkboxResult = null;
+            BoundedObjectGrid<CheckboxShape> checkboxGrid = null;
             if (this.FindCheckboxes)
             {
                 checkboxResult = this.FindBoxes(image, cancellationToken);
+
+                checkboxGrid = new BoundedObjectGrid<CheckboxShape>(image.Bounds, 5, 10);
+                checkboxGrid.AddRange(checkboxResult, true, true);
             }
 
             ISet<LineShape> hlinesResult = null;
             ISet<LineShape> vlinesResult = null;
 
-            // close up small holes
-            int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-            Image closedImage = image.MorphClose(null, StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
-
-            // open up to detect big solid areas
-            Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
-            Image hollowImage = closedImage.Sub(null, openedImage, 0);
-
-            // masks we would like to find
-            Image hlines = null;
-            Image vlines = null;
-            Image nonVLines = null;
-            Image nonHLines = null;
-            Image itersections = null;
-            FindLines();
-
-            // remove the lines
-            if (vlines != null && this.RemoveLines)
+            if (this.LineTypes != LineTypes.None)
             {
-                RemoveLines(vlines, nonVLines);
-            }
+                // close up small holes
+                int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
+                Image closedImage = image.MorphClose(null, StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
 
-            if (hlines != null)
-            {
-                // recompute intersections
-                itersections = vlines?.And(null, hlines);
+                // open up to detect big solid areas
+                Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
+                Image hollowImage = closedImage.Sub(null, openedImage, 0);
 
-                // re-filter lines
-                hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
+                // masks we would like to find
+                Image hlines = null;
+                Image vlines = null;
+                Image nonVLines = null;
+                Image nonHLines = null;
+                Image itersections = null;
+                FindLines();
 
-                if (this.RemoveLines)
+                // remove the lines
+                if (vlines != null && this.RemoveLines)
                 {
-                    RemoveLines(hlines, nonHLines);
+                    RemoveLines(vlines, nonVLines);
+                }
+
+                if (hlines != null)
+                {
+                    // recompute intersections
+                    itersections = vlines?.And(null, hlines);
+
+                    // re-filter lines
+                    hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
+
+                    if (this.RemoveLines)
+                    {
+                        RemoveLines(hlines, nonHLines);
+                    }
+                }
+
+                RemoveIntersections();
+
+                void FindLines()
+                {
+                    // open up in both directions to find lines
+                    int minHorLineLength = LineDetector.MinHorLineLength.MulDiv(image.HorizontalResolution, 200);
+                    hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minHorLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                    if (hlines.IsAllWhite())
+                    {
+                        hlines = null;
+                    }
+                    else
+                    {
+                        hlinesResult = this.FilterHorizontalLines(hlines, checkboxGrid);
+                        if (hlinesResult.Count == 0)
+                        {
+                            hlines = null;
+                        }
+                    }
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    int minVerLineLength = LineDetector.MinVerLineLength.MulDiv(image.HorizontalResolution, 200);
+                    vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minVerLineLength), 1, BorderType.BorderConst, image.WhiteColor);
+                    if (vlines.IsAllWhite())
+                    {
+                        vlines = null;
+                    }
+                    else
+                    {
+                        vlinesResult = this.FilterVerticalLines(vlines, checkboxGrid);
+                        if (vlinesResult.Count == 0)
+                        {
+                            vlines = null;
+                        }
+                    }
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    Image nonLines = null;
+
+                    // vertical lines
+                    if (vlines != null)
+                    {
+                        nonLines = image.Sub(nonLines, vlines, 0);
+                        if (hlines != null)
+                        {
+                            nonLines -= hlines;
+                            itersections = hlines.And(itersections, vlines);
+                        }
+
+                        int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                        nonVLines = nonLines.Erode(null, StructuringElement.Brick(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                        nonVLines.FloodFill(nonVLines, 8, nonLines);
+
+                        if (hlines != null)
+                        {
+                            nonVLines += hlines;
+                            nonVLines -= itersections;
+                        }
+
+                        vlinesResult = this.FilterVerticalLines(vlinesResult, vlines, nonVLines, itersections);
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
+
+                    // horizontal lines
+                    if (hlines != null)
+                    {
+                        nonLines = image.Sub(nonLines, hlines, 0);
+                        if (vlines != null)
+                        {
+                            nonLines -= vlines;
+                            itersections = hlines.And(itersections, vlines);
+                        }
+
+                        int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                        nonHLines = nonLines.Erode(null, StructuringElement.Brick(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
+                        nonHLines.FloodFill(nonHLines, 8, nonLines);
+
+                        if (vlines != null)
+                        {
+                            nonHLines += vlines;
+                            nonHLines -= itersections;
+                        }
+
+                        hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
+                }
+
+                void RemoveLines(Image lines, Image nonLines)
+                {
+                    if (this.RemoveLines)
+                    {
+                        // remove the lines
+                        image.Xand(image, lines);
+
+                        // dilate the lines so they touch the residue
+                        // then flood fill then to get all the residue (image less non-lines)
+                        Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
+
+                        fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
+
+                        // remove the residue
+                        image.Xand(image, fatLines);
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
+                }
+
+                void RemoveIntersections()
+                {
+                    if (this.RemoveLines && hlines != null && vlines != null)
+                    {
+                        // get the intersection residue
+                        Image residue = hlines
+                            .And(null, vlines)
+                            .Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
+
+                        residue.FloodFill(residue, 8, image);
+
+                        // remove the residue
+                        image.Xand(image, residue);
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
                 }
             }
-
-            RemoveIntersections();
 
             // delete check boxes from the image
             if (this.RemoveCheckboxes && checkboxResult != null)
@@ -230,149 +365,27 @@ namespace Genix.DocumentAnalysis
 
             // create answer
             HashSet<Shape> answer = new HashSet<Shape>();
-            answer.UnionWith(hlinesResult);
-            answer.UnionWith(vlinesResult);
+            if (hlinesResult != null)
+            {
+                answer.UnionWith(hlinesResult);
+            }
+
+            if (vlinesResult != null)
+            {
+                answer.UnionWith(vlinesResult);
+            }
+
             if (checkboxResult != null)
             {
                 answer.UnionWith(checkboxResult);
             }
 
             return answer;
-
-            void FindLines()
-            {
-                // open up in both directions to find lines
-                int minHorLineLength = LineDetector.MinHorLineLength.MulDiv(image.HorizontalResolution, 200);
-                hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minHorLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
-                if (hlines.IsAllWhite())
-                {
-                    hlines = null;
-                }
-                else
-                {
-                    hlinesResult = this.FilterHorizontalLines(hlines);
-                    if (hlinesResult.Count == 0)
-                    {
-                        hlines = null;
-                    }
-                }
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                int minVerLineLength = LineDetector.MinVerLineLength.MulDiv(image.HorizontalResolution, 200);
-                vlines = hollowImage.MorphOpen(null, StructuringElement.Brick(1, minVerLineLength), 1, BorderType.BorderConst, image.WhiteColor);
-                if (vlines.IsAllWhite())
-                {
-                    vlines = null;
-                }
-                else
-                {
-                    vlinesResult = this.FilterVerticalLines(vlines);
-                    if (vlinesResult.Count == 0)
-                    {
-                        vlines = null;
-                    }
-                }
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                Image nonLines = null;
-
-                // vertical lines
-                if (vlines != null)
-                {
-                    nonLines = image.Sub(nonLines, vlines, 0);
-                    if (hlines != null)
-                    {
-                        nonLines -= hlines;
-                        itersections = hlines.And(itersections, vlines);
-                    }
-
-                    int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonVLines = nonLines.Erode(null, StructuringElement.Brick(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
-                    nonVLines.FloodFill(nonVLines, 8, nonLines);
-
-                    if (hlines != null)
-                    {
-                        nonVLines += hlines;
-                        nonVLines -= itersections;
-                    }
-
-                    vlinesResult = this.FilterVerticalLines(vlinesResult, vlines, nonVLines, itersections);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-
-                // horizontal lines
-                if (hlines != null)
-                {
-                    nonLines = image.Sub(nonLines, hlines, 0);
-                    if (vlines != null)
-                    {
-                        nonLines -= vlines;
-                        itersections = hlines.And(itersections, vlines);
-                    }
-
-                    int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                    nonHLines = nonLines.Erode(null, StructuringElement.Brick(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
-                    nonHLines.FloodFill(nonHLines, 8, nonLines);
-
-                    if (vlines != null)
-                    {
-                        nonHLines += vlines;
-                        nonHLines -= itersections;
-                    }
-
-                    hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-            }
-
-            void RemoveLines(Image lines, Image nonLines)
-            {
-                if (this.RemoveLines)
-                {
-                    // remove the lines
-                    image.Xand(image, lines);
-
-                    // dilate the lines so they touch the residue
-                    // then flood fill then to get all the residue (image less non-lines)
-                    Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
-
-                    fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
-
-                    // remove the residue
-                    image.Xand(image, fatLines);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-            }
-
-            void RemoveIntersections()
-            {
-                if (this.RemoveLines && hlines != null && vlines != null)
-                {
-                    // get the intersection residue
-                    Image residue = hlines
-                        .And(null, vlines)
-                        .Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
-
-                    residue.FloodFill(residue, 8, image);
-
-                    // remove the residue
-                    image.Xand(image, residue);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-            }
         }
 
         private ISet<CheckboxShape> FindBoxes(Image image, CancellationToken cancellationToken)
         {
             HashSet<CheckboxShape> result = new HashSet<CheckboxShape>(32);
-
-            Image closedImage = image/*.MorphClose(null, StructuringElement.Square(3), 1, BorderType.BorderConst, image.WhiteColor)*/;
 
             // compute image-dependent parameters
             int minBoxSizeH = this.MinBoxSize.MulDiv(image.HorizontalResolution, 200);
@@ -380,7 +393,7 @@ namespace Genix.DocumentAnalysis
             int minBoxSizeV = this.MinBoxSize.MulDiv(image.VerticalResolution, 200);
             int maxBoxSizeV = this.MaxBoxSize.MulDiv(image.VerticalResolution, 200);
 
-            // create a draft that would show found checkboxes
+            // create a draft that would show found check boxes
 #if DEBUG
             Image draft = image.CreateTemplate(null, 32);
             draft.SetWhite();
@@ -390,14 +403,14 @@ namespace Genix.DocumentAnalysis
             ////HashSet<Rectangle> testedHBounds = new HashSet<Rectangle>();
             HashSet<Rectangle> testedVBounds = new HashSet<Rectangle>();
 
-            // the algorith proceeds in two steps
+            // the algorithm proceeds in two steps
             // first, we find a pair of parallel horizontal lines that have similar length and horizontal position
             // second, we find a pair of parallel vertical lines that would connect horizontal lines on both sides to form a box
-            ISet<ConnectedComponent> hlines = FindHorizontalLines();
-            if (hlines != null)
+            IList<ConnectedComponent> hlines = FindHorizontalLines();
+            if (hlines != null && hlines.Count > 0)
             {
-                ISet<ConnectedComponent> vlines = FindVerticalLines();
-                if (vlines != null)
+                IList<ConnectedComponent> vlines = FindVerticalLines();
+                if (vlines != null && vlines.Count > 0)
                 {
                     BoundedObjectGrid<ConnectedComponent> hgrid = CreateGrid(hlines);
                     BoundedObjectGrid<ConnectedComponent> vgrid = CreateGrid(vlines);
@@ -408,74 +421,82 @@ namespace Genix.DocumentAnalysis
                             Rectangle vbounds1 = vcomp1.Bounds;
                             int vdelta = vbounds1.Height / 5;
 
-                            foreach (ConnectedComponent vcomp2 in vgrid.EnumObjects(Rectangle.Inflate(vbounds1, vbounds1.Height.MulDiv(3, 2), 0)))
+                            foreach (ConnectedComponent vcomp2 in vgrid.EnumObjects(Rectangle.Inflate(vbounds1, vbounds1.Height.MulDiv(2, 1), 0)))
                             {
-                                if (vcomp2 != vcomp1)
+                                if (vcomp2 != vcomp1 && vcomp2.HorizontalAlignment == HorizontalAlignment.None)
                                 {
-                                    if (vcomp2.HorizontalAlignment == HorizontalAlignment.None)
+                                    // test second vertical component
+                                    if (!TestVerticalComponents(vbounds1, vcomp2, out Rectangle vbounds2, vdelta, out bool longVLine))
                                     {
-                                        // test second vertical component
-                                        if (!TestVerticalComponents(vbounds1, vcomp2, out Rectangle vbounds2, vdelta, out bool longVLine))
+                                        continue;
+                                    }
+
+                                    Rectangle vbounds = Rectangle.Union(vbounds1, vbounds2);
+                                    vdelta = MinMax.Max(vbounds.Width, vbounds.Height) / 5;
+
+                                    if (testedVBounds.Contains(vbounds))
+                                    {
+                                        continue;
+                                    }
+
+                                    testedVBounds.Add(vbounds);
+
+                                    // after we found a pair of matching horizontal lines
+                                    // start looking for a pair of vertical lines that connect them
+                                    ConnectedComponent hcompTop = null;
+                                    int topEst = 0;
+                                    ConnectedComponent hcompBottom = null;
+                                    int bottomEst = 0;
+                                    Rectangle hboundsBottom = Rectangle.Empty;
+                                    bool longHLine = false;
+                                    foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, 0, vdelta)))
+                                    {
+                                        if (hcomp.VerticalAlignment == VerticalAlignment.None)
                                         {
-                                            continue;
-                                        }
-
-                                        Rectangle vbounds = Rectangle.Union(vbounds1, vbounds2);
-                                        vdelta = MinMax.Max(vbounds.Width, vbounds.Height) / 5;
-
-                                        if (testedVBounds.Contains(vbounds))
-                                        {
-                                            continue;
-                                        }
-
-                                        testedVBounds.Add(vbounds);
-
-                                        // after we found a pair of matching horizontal lines
-                                        // start looking for a pair of vertical lines that connect them
-                                        ConnectedComponent hcompTop = null;
-                                        ConnectedComponent hcompBottom = null;
-                                        Rectangle hboundsBottom = Rectangle.Empty;
-                                        bool longHLine = false;
-                                        foreach (ConnectedComponent hcomp in hgrid.EnumObjects(Rectangle.Inflate(vbounds, 0, vdelta)))
-                                        {
-                                            if (hcomp.VerticalAlignment == VerticalAlignment.None)
+                                            if (TestTopComponent(vbounds, hcomp.Bounds, vdelta, out int est))
                                             {
-                                                if (hcompTop == null && TestTopComponent(vbounds, hcomp.Bounds, vdelta))
+                                                if (hcompTop == null || est < topEst)
                                                 {
                                                     hcompTop = hcomp;
+                                                    topEst = est;
                                                 }
-                                                else if (hcompBottom == null && TestBottomComponent(vbounds, hcomp, out hboundsBottom, vdelta, out longHLine))
+                                            }
+
+                                            if (TestBottomComponent(vbounds, hcomp, out Rectangle hbounds, vdelta, out bool longLine, out est))
+                                            {
+                                                if (hcompBottom == null || est < bottomEst || (longHLine && !longLine))
                                                 {
                                                     hcompBottom = hcomp;
+                                                    bottomEst = est;
+                                                    hboundsBottom = hbounds;
+                                                    longHLine = longLine;
                                                 }
                                             }
                                         }
+                                    }
 
-                                        if (hcompTop != null && hcompBottom != null)
-                                        {
-                                            Rectangle bounds = Rectangle.Union(vbounds, hcompTop.Bounds);
-                                            bounds.Union(hboundsBottom);
-
-                                            result.Add(new CheckboxShape(bounds));
+                                    if (hcompTop != null && hcompBottom != null)
+                                    {
+                                        Rectangle bounds = Rectangle.FromLTRB(vbounds.X, hcompTop.Bounds.Y, vbounds.Right, hboundsBottom.Bottom);
+                                        result.Add(new CheckboxShape(bounds));
 #if DEBUG
-                                            draft.DrawConnectedComponent(vcomp1, draft.BlackColor);
-                                            draft.DrawConnectedComponent(vcomp2, draft.BlackColor);
-                                            draft.DrawConnectedComponent(hcompTop, draft.BlackColor);
-                                            draft.DrawConnectedComponent(hcompBottom, draft.BlackColor);
+                                        draft.DrawConnectedComponent(vcomp1, draft.BlackColor);
+                                        draft.DrawConnectedComponent(vcomp2, draft.BlackColor);
+                                        draft.DrawConnectedComponent(hcompTop, draft.BlackColor);
+                                        draft.DrawConnectedComponent(hcompBottom, draft.BlackColor);
 #endif
 
-                                            // mark used components, so we do not test them twice
-                                            hcompTop.VerticalAlignment = VerticalAlignment.Top;
-                                            if (!longHLine)
-                                            {
-                                                hcompBottom.VerticalAlignment = VerticalAlignment.Bottom;
-                                            }
+                                        // mark used components, so we do not test them twice
+                                        hcompTop.VerticalAlignment = VerticalAlignment.Top;
+                                        if (!longHLine)
+                                        {
+                                            hcompBottom.VerticalAlignment = VerticalAlignment.Bottom;
+                                        }
 
-                                            vcomp1.HorizontalAlignment = vbounds1.X < vbounds2.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-                                            if (!longVLine)
-                                            {
-                                                vcomp2.HorizontalAlignment = vbounds2.X < vbounds1.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-                                            }
+                                        vcomp1.HorizontalAlignment = vbounds1.X < vbounds2.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+                                        if (!longVLine)
+                                        {
+                                            vcomp2.HorizontalAlignment = vbounds2.X < vbounds1.X ? HorizontalAlignment.Left : HorizontalAlignment.Right;
                                         }
                                     }
                                 }
@@ -494,9 +515,11 @@ namespace Genix.DocumentAnalysis
 
             return result;
 
-            ISet<ConnectedComponent> FindVerticalLines()
+            IList<ConnectedComponent> FindVerticalLines()
             {
-                Image lines = closedImage.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
+                int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
+
+                Image lines = image.MorphOpen(null, StructuringElement.Brick(1, minBoxSizeV), 1, BorderType.BorderConst, image.WhiteColor);
                 if (lines.IsAllWhite())
                 {
                     return null;
@@ -506,12 +529,14 @@ namespace Genix.DocumentAnalysis
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return comps;
+                return comps.Where(x => x.MaxWidth() <= maxLineWidth).ToArray();
             }
 
-            ISet<ConnectedComponent> FindHorizontalLines()
+            IList<ConnectedComponent> FindHorizontalLines()
             {
-                Image lines = closedImage.MorphOpen(null, StructuringElement.Brick(minBoxSizeH, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.VerticalResolution, 200);
+
+                Image lines = image.MorphOpen(null, StructuringElement.Brick(minBoxSizeH, 1), 1, BorderType.BorderConst, image.WhiteColor);
                 if (lines.IsAllWhite())
                 {
                     return null;
@@ -523,18 +548,13 @@ namespace Genix.DocumentAnalysis
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return comps;
+                return comps/*.Where(x => x.Bounds.Height <= maxLineWidth)*/.ToArray(); // TODO: calculate c.c. max height
             }
 
-            BoundedObjectGrid<ConnectedComponent> CreateGrid(ISet<ConnectedComponent> comps)
+            BoundedObjectGrid<ConnectedComponent> CreateGrid(IEnumerable<ConnectedComponent> comps)
             {
-                BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(
-                    image.Bounds,
-                    (image.Width / 10).Clip(1, image.Width),
-                    (image.Height / 20).Clip(1, image.Height));
-
+                BoundedObjectGrid<ConnectedComponent> grid = new BoundedObjectGrid<ConnectedComponent>(image.Bounds, 10, 20);
                 grid.AddRange(comps, true, true);
-
                 return grid;
             }
 
@@ -558,19 +578,22 @@ namespace Genix.DocumentAnalysis
                 }
 
                 // both lines are isolated - check for squareness of the box
-                return dist.Between(MinMax.Min(bounds1.Height, bounds2.Height) - delta, (int)(1.5 * MinMax.Max(bounds1.Height, bounds2.Height)) + delta) &&
+                return dist.Between(MinMax.Min(bounds1.Height, bounds2.Height) - delta, (2 * MinMax.Max(bounds1.Height, bounds2.Height)) + delta) &&
                     bounds2.Y.AreEqual(bounds1.Y, delta) &&
                     bounds2.Bottom.AreEqual(bounds1.Bottom, delta);
             }
 
-            bool TestTopComponent(Rectangle vbounds, Rectangle hbounds, int delta)
+            bool TestTopComponent(Rectangle vbounds, Rectangle hbounds, int delta, out int est)
             {
-                return hbounds.Top.AreEqual(vbounds.Top, delta) &&
-                    hbounds.X.AreEqual(vbounds.X, delta) &&
-                    hbounds.Right.AreEqual(vbounds.Right, delta);
+                int est1 = Math.Abs(hbounds.Top - vbounds.Top);
+                int est2 = Math.Abs(hbounds.X - vbounds.X);
+                int est3 = Math.Abs(hbounds.Right - vbounds.Right);
+                est = est1 + est2 + est3;
+
+                return est1 <= delta && est2 <= delta && est3 <= delta;
             }
 
-            bool TestBottomComponent(Rectangle vbounds, ConnectedComponent hcomp, out Rectangle hbounds, int delta, out bool longLine)
+            bool TestBottomComponent(Rectangle vbounds, ConnectedComponent hcomp, out Rectangle hbounds, int delta, out bool longLine, out int est)
             {
                 longLine = false;
                 hbounds = hcomp.Bounds;
@@ -582,43 +605,55 @@ namespace Genix.DocumentAnalysis
                     longLine = true;
                 }
 
-                if (!hbounds.Bottom.AreEqual(vbounds.Bottom, delta))
-                {
-                    // the line should go either through bottom of the box
-                    return false;
-                }
+                int est1 = Math.Abs(hbounds.Bottom - vbounds.Bottom);
+                int est2 = Math.Abs(hbounds.X - vbounds.X);
+                int est3 = Math.Abs(hbounds.Right - vbounds.Right);
+                est = est1 + est2 + est3;
 
-                // check for squareness of the box
-                return hbounds.X.AreEqual(vbounds.X, delta) &&
-                    hbounds.Right.AreEqual(vbounds.Right, delta);
+                return est1 <= delta && est2 <= delta && est3 <= delta;
             }
         }
 
-        private ISet<LineShape> FilterVerticalLines(Image vlines)
+        private ISet<LineShape> FilterVerticalLines(Image vlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
         {
             HashSet<LineShape> result = new HashSet<LineShape>();
 
             int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(vlines.HorizontalResolution, 200);
             int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(vlines.VerticalResolution, 200);
+            int maxBoxSize = this.MaxBoxSize.MulDiv(vlines.VerticalResolution, 200);
 
             foreach (ConnectedComponent component in vlines.FindConnectedComponents(8))
             {
                 Rectangle bounds = component.Bounds;
                 int maxWidth = component.MaxWidth();
 
+                bool isBad = false;
+
                 if (bounds.Width.Between(minThickLineWidth, minThickLineLength - 1) &&
                    bounds.Height.Between(minThickLineWidth, minThickLineLength - 1) &&
                    maxWidth > minThickLineLength)
                 {
                     // too thick for the length
-                    vlines.SetWhite(bounds);
-                    continue;
+                    isBad = true;
                 }
 
-                Point begin = new Point(component.GetLine(bounds.Y).Center, bounds.Y);
-                Point end = new Point(component.GetLine(bounds.Bottom - 1).Center, bounds.Bottom - 1);
-                LineShape line = new LineShape(bounds, begin, end, maxWidth, LineTypes.Vertical);
-                result.Add(line);
+                if (!isBad && bounds.Height <= maxBoxSize && checkboxGrid != null && checkboxGrid.EnumObjects(bounds).Any())
+                {
+                    // is part of the check box
+                    isBad = true;
+                }
+
+                if (isBad)
+                {
+                    vlines.SetWhite(bounds);
+                }
+                else
+                {
+                    Point begin = new Point(component.GetLine(bounds.Y).Center, bounds.Y);
+                    Point end = new Point(component.GetLine(bounds.Bottom - 1).Center, bounds.Bottom - 1);
+                    LineShape line = new LineShape(bounds, begin, end, maxWidth, LineTypes.Vertical);
+                    result.Add(line);
+                }
             }
 
             return result;
@@ -629,11 +664,7 @@ namespace Genix.DocumentAnalysis
             HashSet<LineShape> result = new HashSet<LineShape>();
 
             // find connected components and do preliminary filtering
-            AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(
-                vlines.Bounds,
-                200.MulDiv(vlines.HorizontalResolution, 200),
-                100.MulDiv(vlines.VerticalResolution, 200),
-                RectangleTBLRComparer.Default);
+            AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(vlines.Bounds, 10, 20, RectangleTBLRComparer.Default);
             grid.AddRange(lines, true, true);
 
             // find line vectors
@@ -737,7 +768,7 @@ namespace Genix.DocumentAnalysis
             }
         }
 
-        private ISet<LineShape> FilterHorizontalLines(Image hlines)
+        private ISet<LineShape> FilterHorizontalLines(Image hlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
         {
             HashSet<LineShape> result = new HashSet<LineShape>();
 
@@ -773,6 +804,7 @@ namespace Genix.DocumentAnalysis
 
             int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(hlines.VerticalResolution, 200);
             int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(hlines.HorizontalResolution, 200);
+            int maxBoxSize = this.MaxBoxSize.MulDiv(hlines.HorizontalResolution, 200);
 
             foreach (ConnectedComponent component in hlines.FindConnectedComponents(8))
             {
@@ -793,17 +825,31 @@ namespace Genix.DocumentAnalysis
                     }
                 }*/
 
+                bool isBad = false;
+
                 if (bounds.Width.Between(minThickLineWidth, minThickLineLength - 1) &&
                    bounds.Height.Between(minThickLineWidth, minThickLineLength - 1) &&
                    maxWidth > minThickLineLength)
                 {
                     // too thick for the length
-                    hlines.SetWhite(bounds);
-                    continue;
+                    isBad = true;
                 }
 
-                LineShape newline = new LineShape(bounds, maxWidth, LineTypes.Horizontal);
-                result.Add(newline);
+                if (!isBad && bounds.Width <= maxBoxSize && checkboxGrid != null && checkboxGrid.EnumObjects(bounds).Any())
+                {
+                    // is part of the check box
+                    isBad = true;
+                }
+
+                if (isBad)
+                {
+                    hlines.SetWhite(bounds);
+                }
+                else
+                {
+                    LineShape newline = new LineShape(bounds, maxWidth, LineTypes.Horizontal);
+                    result.Add(newline);
+                }
             }
 
             return result;
@@ -814,11 +860,7 @@ namespace Genix.DocumentAnalysis
             HashSet<LineShape> result = new HashSet<LineShape>();
 
             // find connected components and do preliminary filtering
-            AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(
-                hlines.Bounds,
-                200.MulDiv(hlines.HorizontalResolution, 200),
-                100.MulDiv(hlines.VerticalResolution, 200),
-                RectangleLTRBComparer.Default);
+            AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(hlines.Bounds, 10, 20, RectangleLTRBComparer.Default);
             grid.AddRange(lines, true, true);
 
             int maxGap = LineDetector.MaxLineGap.MulDiv(hlines.HorizontalResolution, 200);

@@ -58,22 +58,14 @@ namespace Genix.DocumentAnalysis
 
             Image closing = image.MorphClose(null, StructuringElement.Brick(5, 1), 1, BorderType.BorderConst, 0);
 
-            AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(
-                image.Bounds,
-                200.MulDiv(image.HorizontalResolution, 200),
-                100.MulDiv(image.VerticalResolution, 200));
-
+            AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(image.Bounds, 10, 20);
             componentgrid.AddRange(
                 closing.FindConnectedComponents(4).Where(x => /*x.Power > 10 &&*/ x.Bounds.Height <= 100),
                 true,
                 true);
             componentgrid.Compact();
 
-            AlignedObjectGrid<TextShape> shapegrid = new AlignedObjectGrid<TextShape>(
-                image.Bounds,
-                200.MulDiv(image.HorizontalResolution, 200),
-                100.MulDiv(image.VerticalResolution, 200));
-
+            AlignedObjectGrid<TextShape> shapegrid = new AlignedObjectGrid<TextShape>(image.Bounds, 10, 20);
             foreach (ConnectedComponent component in componentgrid.EnumObjects())
             {
                 if (component.VerticalAlignment == VerticalAlignment.None)

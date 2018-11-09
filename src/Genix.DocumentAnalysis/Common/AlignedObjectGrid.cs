@@ -21,10 +21,10 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="AlignedObjectGrid{T}"/> class.
         /// </summary>
         /// <param name="bounds">The grid bounding box.</param>
-        /// <param name="cellWidth">The width of each cell, in pixels.</param>
-        /// <param name="cellHeight">The height of each cell, in pixels.</param>
-        public AlignedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight)
-            : base(bounds, cellWidth, cellHeight)
+        /// <param name="width">The width of the grid, in cells.</param>
+        /// <param name="height">The height of the grid, in pixels.</param>
+        public AlignedObjectGrid(Rectangle bounds, int width, int height)
+            : base(bounds, width, height)
         {
         }
 
@@ -32,11 +32,11 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="AlignedObjectGrid{T}"/> class.
         /// </summary>
         /// <param name="bounds">The grid bounding box.</param>
-        /// <param name="cellWidth">The width of each cell, in pixels.</param>
-        /// <param name="cellHeight">The height of each cell, in pixels.</param>
+        /// <param name="width">The width of the grid, in cells.</param>
+        /// <param name="height">The height of the grid, in pixels.</param>
         /// <param name="comparer">The <see cref="IComparer{Rectangle}"/> implementation to use when comparing object bounding boxes.</param>
-        public AlignedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
-            : base(bounds, cellWidth, cellHeight, comparer)
+        public AlignedObjectGrid(Rectangle bounds, int width, int height, IComparer<Rectangle> comparer)
+            : base(bounds, width, height, comparer)
         {
         }
 
@@ -205,8 +205,8 @@ namespace Genix.Core
             Rectangle obounds = obj.Bounds;
 
             // calculate initial pivot points
-            int x = BoxBound(obounds);
-            Line baseline = new Line(x, obounds.Top, x, obounds.Bottom);
+            int y = BoxBound(obounds);
+            Line baseline = new Line(obounds.X, y, obounds.Right, y);
 
             // find objects to the left
             T next;

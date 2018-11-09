@@ -25,10 +25,10 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="BoundedObjectGrid{T}"/> class.
         /// </summary>
         /// <param name="bounds">The grid bounding box.</param>
-        /// <param name="cellWidth">The width of each cell, in pixels.</param>
-        /// <param name="cellHeight">The height of each cell, in pixels.</param>
-        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight)
-            : this(bounds, cellWidth, cellHeight, null)
+        /// <param name="width">The width of the grid, in cells.</param>
+        /// <param name="height">The height of the grid, in pixels.</param>
+        public BoundedObjectGrid(Rectangle bounds, int width, int height)
+            : this(bounds, width, height, null)
         {
         }
 
@@ -36,20 +36,19 @@ namespace Genix.Core
         /// Initializes a new instance of the <see cref="BoundedObjectGrid{T}"/> class.
         /// </summary>
         /// <param name="bounds">The grid bounding box.</param>
-        /// <param name="cellWidth">The width of each cell, in pixels.</param>
-        /// <param name="cellHeight">The height of each cell, in pixels.</param>
+        /// <param name="width">The width of the grid, in cells.</param>
+        /// <param name="height">The height of the grid, in pixels.</param>
         /// <param name="comparer">The <see cref="IComparer{Rectangle}"/> implementation to use when comparing object bounding boxes.</param>
-        public BoundedObjectGrid(Rectangle bounds, int cellWidth, int cellHeight, IComparer<Rectangle> comparer)
+        public BoundedObjectGrid(Rectangle bounds, int width, int height, IComparer<Rectangle> comparer)
         {
             this.Bounds = bounds;
-            this.CellWidth = cellWidth;
-            this.CellHeight = cellHeight;
+            this.CellWidth = (bounds.Width / width).Clip(1, bounds.Width);
+            this.CellHeight = (bounds.Height / height).Clip(1, bounds.Height);
+            this.Width = width;
+            this.Height = height;
+            this.NumberOfCells = width * height;
 
-            this.Width = (bounds.Width + cellWidth - 1) / cellWidth;
-            this.Height = (bounds.Height + cellHeight - 1) / cellHeight;
-            this.NumberOfCells = this.Width * this.Height;
-
-            this.cells = JaggedArray.Create<SortedList<Rectangle, T>>(this.Height, this.Width);
+            this.cells = JaggedArray.Create<SortedList<Rectangle, T>>(height, width);
             this.comparer = comparer ?? RectangleLRBTComparer.Default;
         }
 
