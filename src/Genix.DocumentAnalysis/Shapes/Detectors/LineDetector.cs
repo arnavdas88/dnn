@@ -548,7 +548,7 @@ namespace Genix.DocumentAnalysis
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return comps/*.Where(x => x.Bounds.Height <= maxLineWidth)*/.ToArray(); // TODO: calculate c.c. max height
+                return comps.Where(x => x.MaxHeight() <= maxLineWidth).ToArray();
             }
 
             BoundedObjectGrid<ConnectedComponent> CreateGrid(IEnumerable<ConnectedComponent> comps)
@@ -669,11 +669,12 @@ namespace Genix.DocumentAnalysis
 
             // find line vectors
             int maxGap = LineDetector.MaxLineGap.MulDiv(vlines.VerticalResolution, 200);
+            int tolerance = 6.MulDiv(vlines.HorizontalResolution, 200);
             foreach (LineShape line in lines)
             {
                 if (line.HorizontalAlignment == HorizontalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, Math.Min(maxGap, line.Bounds.Height), 3);
+                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, Math.Min(maxGap, line.Bounds.Height), tolerance, 3);
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(
@@ -772,36 +773,6 @@ namespace Genix.DocumentAnalysis
         {
             HashSet<LineShape> result = new HashSet<LineShape>();
 
-            /*using (Pix pixLines = Pix.FromImage(lines))
-            {
-                Pixa pixa = null;
-                try
-                {
-                    using (Boxa boxa = pixLines.FindConnectedComponents(8, out pixa))
-                    {
-                        for (int i = 0, ii = boxa.Count; i < ii; i++)
-                        {
-                            using (Box box = boxa[i])
-                            {
-                                Rectangle bounds = box.GetBounds();
-                                using (Pix pixComp = pixa[i])
-                                {
-                                    using (Pix pixDist = pixComp.DistanceFunction(4, 8, 1))
-                                    {
-                                        pixDist.ToImage().MinMax(out byte min, out byte max);
-                                        int maxWidth = max * 2;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    pixa?.Dispose();
-                }
-            }*/
-
             int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(hlines.VerticalResolution, 200);
             int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(hlines.HorizontalResolution, 200);
             int maxBoxSize = this.MaxBoxSize.MulDiv(hlines.HorizontalResolution, 200);
@@ -809,21 +780,7 @@ namespace Genix.DocumentAnalysis
             foreach (ConnectedComponent component in hlines.FindConnectedComponents(8))
             {
                 Rectangle bounds = component.Bounds;
-
-                // calculate maximum component width as twice the maximum distance between its points and the background
-                int maxWidth = (int)component.ToImage().DistanceToBackground(4, 8).Max() * 2;
-                maxWidth = Math.Min(maxWidth, bounds.Height);
-
-                /*int maxWidth = 0;
-                using (Pix pixComp = Pix.FromImage(comp))
-                {
-                    using (Pix pixDist = pixComp.DistanceFunction(4, 8, 1))
-                    {
-                        pixDist.ToImage().MinMax(out uint min, out uint max);
-                        int maxWidth2 = (int)(max * 2);
-                        Debug.Assert(maxWidth == maxWidth2);
-                    }
-                }*/
+                int maxWidth = component.MaxHeight();
 
                 bool isBad = false;
 
@@ -864,11 +821,12 @@ namespace Genix.DocumentAnalysis
             grid.AddRange(lines, true, true);
 
             int maxGap = LineDetector.MaxLineGap.MulDiv(hlines.HorizontalResolution, 200);
+            int tolerance = 6.MulDiv(hlines.VerticalResolution, 200);
             foreach (LineShape line in lines)
             {
                 if (line.VerticalAlignment == VerticalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(line, VerticalAlignment.Center, Math.Min(maxGap, line.Bounds.Width), 3);
+                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(line, VerticalAlignment.Center, Math.Min(maxGap, line.Bounds.Width), tolerance, 3);
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(

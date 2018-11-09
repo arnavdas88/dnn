@@ -325,15 +325,65 @@ namespace Genix.Imaging
         public int MaxWidth()
         {
             int maxWidth = 0;
-
             Stroke[][] lines = this.strokes;
-            for (int i = 0, ii = lines.Length, y = this.bounds.Y; i < ii; i++, y++)
+
+            for (int i = 0, ii = lines.Length; i < ii; i++)
             {
                 int width = Stroke.Width(lines[i]);
                 maxWidth = MinMax.Max(maxWidth, width);
             }
 
+            Debug.Assert(maxWidth != 0, "The connected component is empty.");
             return maxWidth;
+        }
+
+        /// <summary>
+        /// Computes the maximum height of this <see cref="ConnectedComponent"/>.
+        /// </summary>
+        /// <returns>
+        /// The maximum height of this <see cref="ConnectedComponent"/>.
+        /// </returns>
+        public int MaxHeight()
+        {
+            int maxHeight = 0;
+            Stroke[][] lines = this.strokes;
+
+            for (int x = this.bounds.X, xx = this.bounds.Right; x < xx; x++)
+            {
+                // find first line that contains the x point
+                int top = -1;
+                for (int i = 0, ii = lines.Length; i < ii; i++)
+                {
+                    if (Stroke.Contains(lines[i], x))
+                    {
+                        top = i;
+                        break;
+                    }
+                }
+
+                Debug.Assert(top != -1, "The connected component is not connected.");
+
+                // find last line that contains the point
+                int bottom = -1;
+                for (int i = lines.Length - 1; i > top; i--)
+                {
+                    if (Stroke.Contains(lines[i], x))
+                    {
+                        bottom = i;
+                        break;
+                    }
+                }
+
+                int height = bottom == -1 ? 1 : bottom - top + 1;
+                maxHeight = MinMax.Max(maxHeight, height);
+                if (maxHeight == this.bounds.Height)
+                {
+                    break;
+                }
+            }
+
+            Debug.Assert(maxHeight != 0, "The connected component is empty.");
+            return maxHeight;
         }
 
         /// <summary>
@@ -452,6 +502,23 @@ namespace Genix.Imaging
             {
                 return line[line.Length - 1].End - line[0].X;
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static bool Contains(Stroke[] line, int x)
+            {
+                for (int i = 0, ii = line.Length; i < ii; i++)
+                {
+                    if (line[i].Contains(x))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Contains(int x) => x >= this.X && x < this.X + this.Length;
 
             /// <inheritdoc />
             public override string ToString() =>
