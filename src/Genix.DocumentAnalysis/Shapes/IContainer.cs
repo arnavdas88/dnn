@@ -26,5 +26,11 @@ namespace Genix.DocumentAnalysis
         /// <returns>A sequence of <see cref="Shape"/> objects.</returns>
         IEnumerable<TShape> EnumAllShapes<TShape>()
             where TShape : Shape;
+
+        /// <summary>
+        /// Enumerates all lines contained in this container and all its children.
+        /// </summary>
+        /// <returns>A sequence of <see cref="LineShape"/> objects.</returns>
+        IEnumerable<LineShape> EnumAllLines();
     }
 }

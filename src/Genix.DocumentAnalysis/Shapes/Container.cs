@@ -101,6 +101,10 @@ namespace Genix.DocumentAnalysis
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<LineShape> EnumAllLines() => this.EnumAllShapes<LineShape>();
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddShape(T shape)
         {
             this.shapes.Add(shape);

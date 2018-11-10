@@ -20,6 +20,11 @@ namespace Genix.DocumentAnalysis
     public class TextDetector
     {
         /// <summary>
+        /// The maximum text height, in inches.
+        /// </summary>
+        private const float MaxTextHeight = 0.5f;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TextDetector"/> class.
         /// </summary>
         public TextDetector()
@@ -31,6 +36,7 @@ namespace Genix.DocumentAnalysis
         /// The type of text to find is determined by the class parameters.
         /// </summary>
         /// <param name="image">The source <see cref="Image"/>.</param>
+        /// <param name="lines">The lines located on the <paramref name="image"/>.</param>
         /// <param name="cancellationToken">The cancellationToken token used to notify the <see cref="TextDetector"/> that operation should be canceled.</param>
         /// <returns>
         /// The detected text.
@@ -44,7 +50,7 @@ namespace Genix.DocumentAnalysis
         /// <remarks>
         /// <para>This method works with binary (1bpp) images only.</para>
         /// </remarks>
-        public ISet<TextShape> FindText(Image image, CancellationToken cancellationToken)
+        public ISet<TextShape> FindText(Image image, IEnumerable<LineShape> lines, CancellationToken cancellationToken)
         {
             if (image == null)
             {
@@ -56,16 +62,25 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            Image closing = image.MorphClose(null, StructuringElement.Brick(5, 1), 1, BorderType.BorderConst, 0);
+            Image closing = image.MorphClose(null, StructuringElement.Brick(9, 1), 1, BorderType.BorderConst, 0);
 
-            AlignedObjectGrid<ConnectedComponent> componentgrid = new AlignedObjectGrid<ConnectedComponent>(image.Bounds, 10, 20);
-            componentgrid.AddRange(
-                closing.FindConnectedComponents(4).Where(x => /*x.Power > 10 &&*/ x.Bounds.Height <= 100),
-                true,
-                true);
+            // find components
+            HashSet<ConnectedComponent> components = closing.FindConnectedComponents(4);
+
+            // filter components
+            int maxTextHeight = (TextDetector.MaxTextHeight * image.VerticalResolution).Round();
+            components.RemoveWhere(x => /*x.Power > 10 &&*/ x.Bounds.Height > maxTextHeight);
+
+            // index components
+            BoundedObjectGrid<ConnectedComponent> componentgrid = new BoundedObjectGrid<ConnectedComponent>(image.Bounds, 10, 20);
+            componentgrid.AddRange(components, true, true);
             componentgrid.Compact();
 
-            AlignedObjectGrid<TextShape> shapegrid = new AlignedObjectGrid<TextShape>(image.Bounds, 10, 20);
+            // index vertical lines
+            BoundedObjectGrid<LineShape> vlines = new BoundedObjectGrid<LineShape>(image.Bounds, 10, 1);
+            vlines.AddRange(lines.Where(x => x.Types.HasFlag(LineTypes.Vertical)), true, true);
+
+            BoundedObjectGrid<TextShape> shapegrid = new BoundedObjectGrid<TextShape>(image.Bounds, 10, 20);
             foreach (ConnectedComponent component in componentgrid.EnumObjects())
             {
                 if (component.VerticalAlignment == VerticalAlignment.None)
@@ -106,7 +121,7 @@ namespace Genix.DocumentAnalysis
 
             return shapes;
 
-            IList<ConnectedComponent> FindTextShapes(AlignedObjectGrid<ConnectedComponent> grid, ConnectedComponent obj, int maxGap)
+            IList<ConnectedComponent> FindTextShapes(BoundedObjectGrid<ConnectedComponent> grid, ConnectedComponent obj, int maxGap)
             {
                 ////Rectangle bounds = obj.Bounds;
                 SortedList<Rectangle, ConnectedComponent> result = new SortedList<Rectangle, ConnectedComponent>(RectangleLTRBComparer.Default);
@@ -160,22 +175,43 @@ namespace Genix.DocumentAnalysis
                     // If the angle is small, the angle in degrees is roughly 60/kMaxSkewFactor.
                     const int MaxSkewFactor = 15;
 
-                    // new objects found must extend beyond current box
+                    // compute search area
                     int xstart = searchForward ? box.Right : box.Left;
                     int xend = searchForward ? box.Right + maxGap : box.Left - maxGap;
-                    int ystart = box.Bottom;
 
-                    // Compute skew tolerance
-                    int skewTolerance = maxGap / MaxSkewFactor;
-
-                    // Expand the box
-                    int ymin = box.Top/*ystart - (box.Height / 2)*/ - skewTolerance;
-                    int ymax = box.Bottom/*ystart + (box.Height / 5)*/ + skewTolerance;
-
-                    // Search the grid
                     Rectangle searchArea = searchForward ?
-                        Rectangle.FromLTRB(xstart, ymin, xend, ymax) :
-                        Rectangle.FromLTRB(xend, ymin, xstart, ymax);
+                        Rectangle.FromLTRB(xstart, box.Top, xend, box.Bottom) :
+                        Rectangle.FromLTRB(xend, box.Top, xstart, box.Bottom);
+
+                    // look for lines crossing the search area
+                    foreach (LineShape line in vlines.EnumObjects(searchArea))
+                    {
+                        int x = new Line(line.Begin, line.End).X(box.Bottom);
+
+                        if (searchForward)
+                        {
+                            int right = MinMax.Min(searchArea.Right, x - (line.Width / 2));
+                            searchArea.InflateX(0, right - searchArea.Right);
+                        }
+                        else
+                        {
+                            int left = MinMax.Max(searchArea.Left, x + (line.Width / 2));
+                            searchArea.InflateX(searchArea.Left - left, 0);
+                        }
+                    }
+
+                    if (searchArea.Width == 0 || searchArea.Height == 0)
+                    {
+                        return null;
+                    }
+
+                    // Compute skew tolerance and expand the search box
+                    int skewTolerance = searchArea.Width / MaxSkewFactor;
+                    searchArea.Inflate(0, skewTolerance);
+                    //// Expand the box
+                    ////int ystart = box.Bottom;
+                    ////int ymin = box.Top/*ystart - (box.Height / 2)*/ - skewTolerance;
+                    ////int ymax = box.Bottom/*ystart + (box.Height / 5)*/ + skewTolerance;
 
                     ConnectedComponent bestCandidate = null;
                     int bestDistance = int.MaxValue;
@@ -186,7 +222,6 @@ namespace Genix.DocumentAnalysis
                             Rectangle cbounds = candidate.Bounds;
 
                             // verify candidate position against baseline
-
                             int nearestx = searchForward ? cbounds.Left : cbounds.Right;
                             if (baseline.IsBelow(nearestx, cbounds.Top))
                             {

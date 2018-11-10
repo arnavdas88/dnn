@@ -1742,7 +1742,7 @@ namespace Genix.Imaging
         /// <para>-or-</para>
         /// <para>The <see cref="Image{T}.BitsPerPixel"/> is not 1.</para>
         /// </exception>
-        public ISet<ConnectedComponent> FindConnectedComponents(int connectivity)
+        public HashSet<ConnectedComponent> FindConnectedComponents(int connectivity)
             => this.FindConnectedComponents(connectivity, 0, 0, this.Width, this.Height);
 
         /// <summary>
@@ -1765,7 +1765,7 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentOutOfRangeException">
         /// The area is out of image bounds.
         /// </exception>
-        public ISet<ConnectedComponent> FindConnectedComponents(
+        public HashSet<ConnectedComponent> FindConnectedComponents(
             int connectivity,
             int x,
             int y,

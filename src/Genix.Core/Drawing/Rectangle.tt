@@ -466,9 +466,65 @@ namespace Genix.Drawing
         public static Rectangle<#=suffix#> Inflate(Rectangle<#=suffix#> rect, <#=type#> left, <#=type#> top, <#=type#> right, <#=type#> bottom)
         {
             return new Rectangle<#=suffix#>(
-                rect.X - left,
-                rect.Y - top,
+                rect.x - left,
+                rect.y - top,
                 MinMax.Max(rect.w + left + right, 0),
+                MinMax.Max(rect.h + top + bottom, 0));
+        }
+
+        /// <summary>
+        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified amounts, along its y-axis.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="top">The amount by which to expand or shrink the top side of the rectangle.</param>
+        /// <param name="bottom">The amount by which to expand or shrink the bottom side of the rectangle.</param>
+        /// <returns>The resulting rectangle.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Height"/> of the resulting rectangle is increased or decreased by the sum of <paramref name="top"/> and <paramref name="bottom"/>,
+        /// because it is applied to both the top and bottom sides of the rectangle.
+        /// </para>
+        /// <para>
+        /// If <paramref name="top"/> and <paramref name="bottom"/> sum is negative, the <see cref="Rectangle<#=suffix#>"/> structure is deflated along its y-axis.
+        /// </para>
+        /// <para>
+        /// If the specified parameters shrink the rectangle by more than its current <see cref="Height"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle<#=suffix#>.Empty"/> rectangle.</para>
+        /// </remarks>
+        public static Rectangle<#=suffix#> InflateX(Rectangle<#=suffix#> rect, <#=type#> left, <#=type#> right)
+        {
+            return new Rectangle<#=suffix#>(
+                rect.x - left,
+                rect.y,
+                MinMax.Max(rect.w + left + right, 0),
+                rect.h);
+        }
+
+        /// <summary>
+        /// Creates a rectangle that results from expanding or shrinking the specified rectangle by the specified amounts, along its x-axis.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="left">The amount by which to expand or shrink the left side of the rectangle.</param>
+        /// <param name="right">The amount by which to expand or shrink the right side of the rectangle.</param>
+        /// <returns>The resulting rectangle.</returns>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the resulting rectangle is increased or decreased by the sum of <paramref name="left"/> and <paramref name="right"/>,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// </para>
+        /// <para>
+        /// If <paramref name="left"/> and <paramref name="right"/> sum is negative, the <see cref="Rectangle<#=suffix#>"/> structure is deflated along its x-axis.
+        /// </para>
+        /// <para>
+        /// If the specified parameters shrink the rectangle by more than its current <see cref="Width"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle<#=suffix#>.Empty"/> rectangle.</para>
+        /// </remarks>
+        public static Rectangle<#=suffix#> InflateY(Rectangle<#=suffix#> rect, <#=type#> top, <#=type#> bottom)
+        {
+            return new Rectangle<#=suffix#>(
+                rect.x,
+                rect.y - top,
+                rect.w,
                 MinMax.Max(rect.h + top + bottom, 0));
         }
 
@@ -997,12 +1053,58 @@ namespace Genix.Drawing
         /// </remarks>
         public void Inflate(<#=type#> left, <#=type#> top, <#=type#> right, <#=type#> bottom)
         {
-            Rectangle<#=suffix#> result = Rectangle<#=suffix#>.Inflate(this, left, top, right, bottom);
+            this.x -= left;
+            this.w = MinMax.Max(this.w + left + right, 0);
 
-            this.x = result.x;
-            this.y = result.y;
-            this.w = result.w;
-            this.h = result.h;
+            this.y -= top;
+            this.h = MinMax.Max(this.h + top + bottom, 0);
+        }
+
+        /// <summary>
+        /// Expands or shrinks the rectangle by the specified amounts, along its y-axis.
+        /// </summary>
+        /// <param name="top">The amount by which to expand or shrink the top side of the rectangle.</param>
+        /// <param name="bottom">The amount by which to expand or shrink the bottom side of the rectangle.</param>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Height"/> of the rectangle is increased or decreased by the sum of <paramref name="top"/> and <paramref name="bottom"/>,
+        /// because it is applied to both the top and bottom sides of the rectangle.
+        /// </para>
+        /// <para>
+        /// If <paramref name="top"/> and <paramref name="bottom"/> sum is negative, the <see cref="Rectangle<#=suffix#>"/> structure is deflated along its y-axis.
+        /// </para>
+        /// <para>
+        /// If the specified parameters shrink the rectangle by more than its current <see cref="Height"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle<#=suffix#>.Empty"/> rectangle.</para>
+        /// </remarks>
+        public void InflateX(<#=type#> left, <#=type#> right)
+        {
+            this.x -= left;
+            this.w = MinMax.Max(this.w + left + right, 0);
+        }
+
+        /// <summary>
+        /// Expands or shrinks the rectangle by the specified amounts, along its x-axis.
+        /// </summary>
+        /// <param name="rect">The rectangle to shrink or expand.</param>
+        /// <param name="left">The amount by which to expand or shrink the left side of the rectangle.</param>
+        /// <param name="right">The amount by which to expand or shrink the right side of the rectangle.</param>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Width"/> of the rectangle is increased or decreased by the sum of <paramref name="left"/> and <paramref name="right"/>,
+        /// because it is applied to both the left and right sides of the rectangle.
+        /// </para>
+        /// <para>
+        /// If <paramref name="left"/> and <paramref name="right"/> sum is negative, the <see cref="Rectangle<#=suffix#>"/> structure is deflated along its x-axis.
+        /// </para>
+        /// <para>
+        /// If the specified parameters shrink the rectangle by more than its current <see cref="Width"/>
+        /// giving the rectangle a negative area, the rectangle becomes the <see cref="Rectangle<#=suffix#>.Empty"/> rectangle.</para>
+        /// </remarks>
+        public void InflateY(<#=type#> top, <#=type#> bottom)
+        {
+            this.y -= top;
+            this.h = MinMax.Max(this.h + top + bottom, 0);
         }
 
         /// <summary>

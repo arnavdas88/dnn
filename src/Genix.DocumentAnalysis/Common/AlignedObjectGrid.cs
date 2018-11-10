@@ -52,7 +52,7 @@ namespace Genix.Core
         /// if the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfAlignedObjects"/>, the method retuns empty collection.
         /// </param>
         /// <returns>
-        /// The collection that countains found objects. <paramref name="obj"/> is included in the collection.
+        /// The collection that contains found objects. <paramref name="obj"/> is included in the collection.
         /// </returns>
         public IList<T> FindVerticalAlignment(T obj, VerticalAlignment alignment, int maxGap, int tolerance, int minNumberOfAlignedObjects)
         {
@@ -87,9 +87,11 @@ namespace Genix.Core
                 {
                     result.Values[i].VerticalAlignment = alignment;
                 }
+
+                return result.Values;
             }
 
-            return result.Values;
+            return new T[0];
 
             T FindNext(Rectangle box, bool searchForward)
             {
@@ -175,11 +177,11 @@ namespace Genix.Core
         /// if the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfAlignedObjects"/>, the method retuns empty collection.
         /// </param>
         /// <returns>
-        /// The collection that countains found objects. <paramref name="obj"/> is included in the collection.
+        /// The collection that contains found objects. <paramref name="obj"/> is included in the collection.
         /// </returns>
         public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap, int tolerance, int minNumberOfAlignedObjects)
         {
-            SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
+            SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleTBLRComparer.Default);
 
             Rectangle obounds = obj.Bounds;
 
@@ -210,9 +212,11 @@ namespace Genix.Core
                 {
                     result.Values[i].HorizontalAlignment = alignment;
                 }
+
+                return result.Values;
             }
 
-            return result.Values;
+            return new T[0];
 
             T FindNext(Rectangle box, bool searchForward)
             {
