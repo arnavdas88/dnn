@@ -56,10 +56,7 @@ namespace Genix.DocumentAnalysis
         public IReadOnlyCollection<T> Shapes => this.shapes;
 
         /// <inheritdoc />
-        public IEnumerable<T> EnumShapes()
-        {
-            return this.shapes;
-        }
+        public IEnumerable<T> EnumShapes() => this.shapes;
 
         /// <inheritdoc />
         public IEnumerable<Shape> EnumAllShapes()

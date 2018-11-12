@@ -31,6 +31,12 @@ namespace Genix.MachineLearning.Imaging
                 throw new ArgumentNullException(nameof(image));
             }
 
+            // calculate tensor width
+            if (xaxis == -1)
+            {
+                xaxis = image.Width.MulDiv(yaxis, image.Height);
+            }
+
             Tensor y = new Tensor(name, new[] { 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
             FillTensor(y, 0, image);
 
@@ -57,16 +63,20 @@ namespace Genix.MachineLearning.Imaging
                 throw new ArgumentException("Cannot create tensor. The collection of images is empty.");
             }
 
-            Tensor y = null;
+            // calculate tensor width
+            if (xaxis == -1)
+            {
+                for (int i = 0, ii = images.Count; i < ii; i++)
+                {
+                    Image image = images[i];
+                    xaxis = Math.Max(xaxis, image.Width.MulDiv(yaxis, image.Height));
+                }
+            }
+
+            Tensor y = new Tensor(name, new[] { images.Count, xaxis, yaxis, images[0].BitsPerPixel > 8 ? 3 : 1 });
             for (int i = 0, ii = images.Count; i < ii; i++)
             {
-                Image image = images[i];
-                if (i == 0)
-                {
-                    y = new Tensor(name, new[] { images.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
-                }
-
-                FillTensor(y, i, image);
+                FillTensor(y, i, images[i]);
             }
 
             return y;
@@ -92,6 +102,16 @@ namespace Genix.MachineLearning.Imaging
             if (sources.Count == 0)
             {
                 throw new ArgumentException("Cannot create tensor. The collection of images is empty.");
+            }
+
+            // calculate tensor width
+            if (xaxis == -1)
+            {
+                for (int i = 0, ii = sources.Count; i < ii; i++)
+                {
+                    Image image = selector(sources[i]);
+                    xaxis = Math.Max(xaxis, image.Width.MulDiv(yaxis, image.Height));
+                }
             }
 
             Tensor y = null;

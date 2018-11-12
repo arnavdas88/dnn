@@ -28,38 +28,31 @@ GENIXAPI(int, _add)(
 
 	if (src2 == NULL)
 	{
-		IppStatus(__stdcall *func)(const Ipp8u*, int, Ipp8u*, int, IppiSize, int) = NULL;
 		switch (bitsPerPixel)
 		{
-		case 8: func = ippiAdd_8u_C1IRSfs; break;
-		case 24: func = ippiAdd_8u_C3IRSfs; break;
-		case 32: func = ippiAdd_8u_AC4IRSfs; break;
-		}
-
-		if (func != NULL)
-		{
-			status = func(src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 8: return ippiAdd_8u_C1IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 16: return ippiAdd_16s_C1IRSfs((const Ipp16s*)src1, src1step, (Ipp16s*)dst, dststep, { width, height }, scaleFactor);
+		case 24: return ippiAdd_8u_C3IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 32: return ippiAdd_8u_AC4IRSfs(src1, src1step, dst, dststep, { width, height }, scaleFactor);
 		}
 	}
 	else
 	{
 		src2 += (ptrdiff_t(src2y) * src2step) + (src2x * bitsPerPixel / 8);
 
-		IppStatus(__stdcall *func)(const Ipp8u*, int, const Ipp8u*, int, Ipp8u*, int, IppiSize, int) = NULL;
 		switch (bitsPerPixel)
 		{
-		case 8: func = ippiAdd_8u_C1RSfs; break;
-		case 24: func = ippiAdd_8u_C3RSfs; break;
-		case 32: func = ippiAdd_8u_AC4RSfs; break;
-		}
-
-		if (func != NULL)
-		{
-			status = func(src2, src2step, src1, src1step, dst, dststep, { width, height }, scaleFactor);
-			if (status == ippStsNoErr && bitsPerPixel == 32)
+		case 8: return ippiAdd_8u_C1RSfs(src2, src2step, src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 16: return ippiAdd_16s_C1RSfs((const Ipp16s*)src2, src2step, (const Ipp16s*)src1, src1step, (Ipp16s*)dst, dststep, { width, height }, scaleFactor);
+		case 24: return ippiAdd_8u_C3RSfs(src2, src2step, src1, src1step, dst, dststep, { width, height }, scaleFactor);
+		case 32: 
+			status = ippiAdd_8u_AC4RSfs(src2, src2step, src1, src1step, dst, dststep, { width, height }, scaleFactor);
+			if (status == ippStsNoErr)
 			{
 				copyAlphaChannel(src1, src1step, dst, dststep, width, height);
 			}
+
+			return status;
 		}
 	}
 

@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Diagnostics;
 
     /// <content>
     /// Provides support methods for calling Intel IPP library functions.
@@ -21,6 +22,18 @@ namespace Genix.Imaging
 
         private static void ProcessErrorCode(int code)
         {
+            if (code > 0)
+            {
+                switch (code)
+                {
+                    case 33: /* ippStsDstSizeLessExpected */
+                        Debug.WriteLine("DC: Size of the destination buffer is less than the expected one.");
+                        break;
+                }
+
+                return;
+            }
+
             switch (code)
             {
                 case 0:

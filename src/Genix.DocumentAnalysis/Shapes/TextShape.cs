@@ -17,10 +17,10 @@ namespace Genix.DocumentAnalysis
     [JsonObject(MemberSerialization.OptIn)]
     public class TextShape : Shape
     {
-        [JsonProperty("text")]
+        [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private readonly string text;
 
-        [JsonProperty("confidence")]
+        [JsonProperty("conf", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private readonly float confidence;
 
         /// <summary>
@@ -56,6 +56,15 @@ namespace Genix.DocumentAnalysis
         /// The word confidence expressed as a probability (0.0 - 1.0).
         /// </returns>
         public float Confidence => this.confidence;
+
+        /// <summary>
+        /// Gets or sets the text orientation.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Drawing.Orientation"/> enumeration value.
+        /// </value>
+        [JsonProperty("orientation", DefaultValueHandling = DefaultValueHandling.Ignore )]
+        public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
         /// <inheritdoc />
         public override string ToString() => string.Format(

@@ -388,6 +388,126 @@ namespace Genix.Imaging
             }
         }
 
+        /// <summary>
+        /// Detects straight lines in this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="maxLineCount">Minimum number of lines to detect.</param>
+        /// <param name="threshold">Minimum number of points that are required to detect the line.</param>
+        /// <param name="deltaRho">Step of radial discretization.</param>
+        /// <param name="deltaTheta">Step of angular discretization.</param>
+        /// <returns>
+        /// The detected lines.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 8 bit per pixel.</para>
+        /// </exception>
+        public PointPolar[] HoughLine(int maxLineCount, int threshold, float deltaRho, float deltaTheta)
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            float[] lines = new float[2 * maxLineCount];
+            int lineCount = 0;
+
+            IPP.Execute(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bits = this.Bits)
+                    {
+                        return NativeMethods.houghline(
+                           0,
+                           0,
+                           this.Width,
+                           this.Height,
+                           (byte*)bits,
+                           this.Stride8,
+                           maxLineCount,
+                           threshold,
+                           deltaRho,
+                           deltaTheta,
+                           out lineCount,
+                           lines);
+                    }
+                }
+            });
+
+            // convert answer
+            PointPolar[] result = new PointPolar[lineCount];
+            for (int i = 0, j = 0; i < lineCount; i++, j+=2)
+            {
+                result[i].Rho = lines[j];
+                result[i].Theta = lines[j + 1];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Detects straight lines in this <see cref="Image"/>.
+        /// </summary>
+        /// <param name="maxLineCount">Minimum number of lines to detect.</param>
+        /// <param name="threshold">Minimum number of points that are required to detect the line.</param>
+        /// <param name="minLineLength">Minimum length of the line.</param>
+        /// <param name="maxLineGap">Maximum length of the gap between lines.</param>
+        /// <param name="deltaRho">Step of radial discretization.</param>
+        /// <param name="deltaTheta">Step of angular discretization.</param>
+        /// <returns>
+        /// The detected lines.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 8 bit per pixel.</para>
+        /// </exception>
+        public Line[] HoughProbLine(int maxLineCount, int threshold, int minLineLength, int maxLineGap, float deltaRho, float deltaTheta)
+        {
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            int[] lines = new int[4 * maxLineCount];
+            int lineCount = 0;
+
+            IPP.Execute(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bits = this.Bits)
+                    {
+                        return NativeMethods.houghprobline(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bits,
+                            this.Stride8,
+                            maxLineCount,
+                            threshold,
+                            minLineLength,
+                            maxLineGap,
+                            deltaRho,
+                            deltaTheta,
+                            out lineCount,
+                            lines);
+                    }
+                }
+            });
+
+            // convert answer
+            Line[] result = new Line[lineCount];
+            for (int i = 0, j = 0; i < lineCount; i++, j += 4)
+            {
+                result[i].X1 = lines[j];
+                result[i].Y1 = lines[j + 1];
+                result[i].X2 = lines[j + 2];
+                result[i].Y2 = lines[j + 3];
+            }
+
+            return result;
+        }
+
         [SuppressUnmanagedCodeSecurity]
         private static partial class NativeMethods
         {
@@ -410,6 +530,38 @@ namespace Genix.Imaging
                double c12,
                int borderType,
                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int houghline(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] byte* src,
+                int stridesrc,
+                int maxLineCount,
+                int threshold,
+                float deltaRho,
+                float deltaTheta,
+                out int lineCount,
+                [Out] float[] lines);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int houghprobline(
+                int x,
+                int y,
+                int width,
+                int height,
+                [In] byte* src,
+                int stridesrc,
+                int maxLineCount,
+                int threshold,
+                int minLineLength,
+                int maxLineGap,
+                float deltaRho,
+                float deltaTheta,
+                out int lineCount,
+                [Out] int[] lines);
         }
     }
 }

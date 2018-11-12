@@ -703,9 +703,6 @@
     <ClCompile Include="..\..\..\tesseract\src\cutil\structures.cpp">
       <Filter>Tesseract\cutil</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\tesseract\src\vs2010\port\gettimeofday.cpp">
-      <Filter>Tesseract\vs2010\port</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\tesseract\vs2017\dllmain.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\ccmain\mutableiterator.cpp">
       <Filter>Tesseract\ccmain</Filter>
@@ -767,12 +764,6 @@
     </Filter>
     <Filter Include="Tesseract\cutil">
       <UniqueIdentifier>{0ba74973-9e5c-497e-afc0-b016c4c83265}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tesseract\vs2010">
-      <UniqueIdentifier>{fed19631-aa55-4a98-8a53-241120239fda}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tesseract\vs2010\port">
-      <UniqueIdentifier>{34ed366a-1240-42bf-8e0b-445d47bf05f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

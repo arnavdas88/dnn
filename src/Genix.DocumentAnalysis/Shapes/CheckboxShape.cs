@@ -17,10 +17,10 @@ namespace Genix.DocumentAnalysis
     [JsonObject(MemberSerialization.OptIn)]
     public class CheckboxShape : Shape
     {
-        [JsonProperty("checked")]
+        [JsonProperty("checked", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private readonly bool isChecked;
 
-        [JsonProperty("confidence")]
+        [JsonProperty("conf", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private readonly float confidence;
 
         /// <summary>

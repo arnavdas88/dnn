@@ -33,18 +33,23 @@ GENIXAPI(void, stack_kernels)(
 	const int kpadding1,
 	const int kpadding2,
 	const float* xw,
-	const int x0,
-	const int x1,
-	const int x2,
-	const int xstride0,
-	const int xstride1,
-	const int xstride2,
+	const int* xaxes,
+	const int* xstrides,
 	float* yw,
-	const int y1,
-	const int y2,
-	const int ystride0,
-	const int ystride1)
+	const int* yaxes,
+	const int* ystrides)
 {
+	const int x0 = xaxes[0];
+	const int x1 = xaxes[1];
+	const int x2 = xaxes[2];
+	const int xstride0 = xstrides[0];
+	const int xstride1 = xstrides[1];
+	const int xstride2 = xstrides[2];
+	const int y1 = yaxes[1];
+	const int y2 = yaxes[2];
+	const int ystride0 = ystrides[0];
+	const int ystride1 = ystrides[1];
+
 	if (kpadding1 == 0 && kpadding2 == 0)
 	{
 		for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0)
@@ -164,18 +169,23 @@ GENIXAPI(void, stack_kernels_gradient)(
 	const int kpadding1,
 	const int kpadding2,
 	float* dxw,
-	const int x0,
-	const int x1,
-	const int x2,
-	const int xstride0,
-	const int xstride1,
-	const int xstride2,
+	const int* xaxes,
+	const int* xstrides,
 	const float* dyw,
-	const int y1,
-	const int y2,
-	const int ystride0,
-	const int ystride1)
+	const int* yaxes,
+	const int* ystrides)
 {
+	const int x0 = xaxes[0];
+	const int x1 = xaxes[1];
+	const int x2 = xaxes[2];
+	const int xstride0 = xstrides[0];
+	const int xstride1 = xstrides[1];
+	const int xstride2 = xstrides[2];
+	const int y1 = yaxes[1];
+	const int y2 = yaxes[2];
+	const int ystride0 = ystrides[0];
+	const int ystride1 = ystrides[1];
+
 	for (int ix0 = 0, xpos0 = (-kpadding1 * xstride1) + (-kpadding2 * xstride2), ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0)
 	{
 		for (int iy1 = 0, ix1 = -kpadding1, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, xpos1 += xstride1)

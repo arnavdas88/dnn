@@ -12,10 +12,10 @@ namespace Genix.Drawing
     public interface IBoundedObject
     {
         /// <summary>
-        /// Gets the bounds of this object.
+        /// Gets the object's bounding box.
         /// </summary>
         /// <value>
-        /// A <see cref="Rectangle"/> structure that contains the bounds of this object.
+        /// A <see cref="Rectangle"/> structure that contains the object's bounding box.
         /// </value>
         Rectangle Bounds { get; }
     }

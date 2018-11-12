@@ -348,7 +348,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\tesseract\src\viewer\svutil.cpp" />
-    <ClCompile Include="..\..\..\tesseract\src\vs2010\port\gettimeofday.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\wordrec\associate.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\wordrec\chop.cpp" />
     <ClCompile Include="..\..\..\tesseract\src\wordrec\chopper.cpp" />

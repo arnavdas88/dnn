@@ -21,22 +21,6 @@ namespace Genix.Imaging.Lab
     public abstract class TestImageProvider<TLabel> : DisposableObject
     {
         /// <summary>
-        /// Gets or sets the width of the samples this provider generates.
-        /// </summary>
-        /// <value>
-        /// The width of the samples this provider generates.
-        /// </value>
-        public int Width { get; protected set; } = 0;
-
-        /// <summary>
-        /// Gets or sets the height of the samples this provider generates.
-        /// </summary>
-        /// <value>
-        /// The height of the samples this provider generates.
-        /// </value>
-        public int Height { get; protected set; } = 0;
-
-        /// <summary>
         /// Creates a new <see cref="TestImageProvider{TLabel}"/> from a Json object.
         /// </summary>
         /// <param name="width">The width of the samples this provider generates.</param>
@@ -80,7 +64,7 @@ namespace Genix.Imaging.Lab
 
                 case "DIRECTORY":
                     {
-                        DirectoryDataProvider provider = new DirectoryDataProvider(width, height);
+                        DirectoryDataProvider provider = new DirectoryDataProvider();
                         try
                         {
                             JToken parametersToken = parameters.GetValue("parameters", StringComparison.OrdinalIgnoreCase);

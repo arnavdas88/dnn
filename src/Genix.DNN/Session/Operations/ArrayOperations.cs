@@ -688,17 +688,11 @@ namespace Genix.DNN
                         kernel.PaddingX,
                         kernel.PaddingY,
                         x.Weights,
-                        x.Axes[0],
-                        x.Axes[1],
-                        x.Axes[2],
-                        x.Strides[0],
-                        x.Strides[1],
-                        x.Strides[2],
+                        x.Axes,
+                        x.Strides,
                         y.Weights,
-                        y1,
-                        y2,
-                        y.Strides[0],
-                        y.Strides[1]);
+                        new int[] { 0, y1, y2 },
+                        y.Strides);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -715,17 +709,11 @@ namespace Genix.DNN
                                     kernel.PaddingX,
                                     kernel.PaddingY,
                                     x.Gradient,
-                                    x.Axes[0],
-                                    x.Axes[1],
-                                    x.Axes[2],
-                                    x.Strides[0],
-                                    x.Strides[1],
-                                    x.Strides[2],
+                                    x.Axes,
+                                    x.Strides,
                                     y.Gradient,
-                                    y1,
-                                    y2,
-                                    y.Strides[0],
-                                    y.Strides[1]);
+                                    new int[] { 0, y1, y2 },
+                                    y.Strides);
                             });
                     }
 #endif
@@ -1294,17 +1282,11 @@ namespace Genix.DNN
                 int kpadding1,
                 int kpadding2,
                 [In] float[] xw,
-                int x0,
-                int x1,
-                int x2,
-                int xstride0,
-                int xstride1,
-                int xstride2,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
                 [Out] float[] yw,
-                int y1,
-                int y2,
-                int ystride0,
-                int ystride1);
+                [In] int[] yaxes,
+                [In] int[] ystrides);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void stack_kernels_gradient(
@@ -1315,17 +1297,11 @@ namespace Genix.DNN
                 int kpadding1,
                 int kpadding2,
                 [Out] float[] dxw,
-                int x0,
-                int x1,
-                int x2,
-                int xstride0,
-                int xstride1,
-                int xstride2,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
                 [In] float[] dyw,
-                int y1,
-                int y2,
-                int ystride0,
-                int ystride1);
+                [In] int[] yaxes,
+                [In] int[] ystrides);
         }
     }
 }

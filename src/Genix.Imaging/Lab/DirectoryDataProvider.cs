@@ -37,17 +37,6 @@ namespace Genix.Imaging.Lab
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DirectoryDataProvider"/> class.
-        /// </summary>
-        /// <param name="width">The sample width, in pixels.</param>
-        /// <param name="height">The sample height, in pixels.</param>
-        public DirectoryDataProvider(int width, int height)
-        {
-            this.Width = width;
-            this.Height = height;
-        }
-
-        /// <summary>
         /// Adds a directory used to load images.
         /// </summary>
         /// <param name="path">The path to the directory.</param>
@@ -281,14 +270,7 @@ namespace Genix.Imaging.Lab
             // TODO: remove conversion to LIST after thread-safe image loading is implemented
             foreach ((Imaging.Image image, int? frameIndex, _) in Imaging.Image.FromFile(fileName, startingFrame, frameCount).ToList())
             {
-                if (this.Width > 0 || this.Height > 0)
-                {
-                    yield return (PrepareImage(image), frameIndex);
-                }
-                else
-                {
-                    yield return (image, frameIndex);
-                }
+                yield return (PrepareImage(image), frameIndex);
             }
 
             Imaging.Image PrepareImage(Imaging.Image image)
@@ -310,16 +292,6 @@ namespace Genix.Imaging.Lab
                             }
                         }
                     }
-                }
-
-                ////image = image.CropBlackArea(1, 1);
-
-                if (this.Width > 0 || this.Height > 0)
-                {
-                    image = image.FitToSize(
-                        this.Width > 0 ? this.Width : image.Width,
-                        this.Height > 0 ? this.Height : image.Height,
-                        ScalingOptions.None);
                 }
 
                 return image;

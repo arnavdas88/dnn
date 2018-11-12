@@ -88,6 +88,22 @@ namespace Genix.Imaging.Lab
         }
 
         /// <summary>
+        /// Gets the canvas width.
+        /// </summary>
+        /// <value>
+        /// The the canvas width.
+        /// </value>
+        public int Width { get; }
+
+        /// <summary>
+        /// Gets the canvas height.
+        /// </summary>
+        /// <value>
+        /// The the canvas height.
+        /// </value>
+        public int Height { get; }
+
+        /// <summary>
         /// Gets the fonts used in generation.
         /// </summary>
         /// <value>

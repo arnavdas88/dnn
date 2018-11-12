@@ -210,8 +210,8 @@ namespace Genix.NetClassify
                     int[] shape = network.InputShape;
 
                     return TestImageProvider<string>.CreateFromJson(
-                        shape[(int)Axis.X],
-                        shape[(int)Axis.Y],
+                        0,
+                        2 * shape[(int)Axis.Y],
                         network.Classes,
                         network.BlankClass,
                         this.Configuration.DataProvider);

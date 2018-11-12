@@ -62,7 +62,7 @@ namespace Genix.DocumentAnalysis
                 throw new NotImplementedException(Properties.Resources.E_UnsupportedDepth_1bpp);
             }
 
-            Image closing = image.MorphClose(null, StructuringElement.Brick(9, 1), 1, BorderType.BorderConst, 0);
+            Image closing = image.MorphClose(null, StructuringElement.Brick(9, 2), 1, BorderType.BorderConst, 0);
 
             // find components
             HashSet<ConnectedComponent> components = closing.FindConnectedComponents(4);
@@ -85,7 +85,7 @@ namespace Genix.DocumentAnalysis
             {
                 if (component.VerticalAlignment == VerticalAlignment.None)
                 {
-                    IList<ConnectedComponent> alignedComponents = FindTextShapes(componentgrid, component, 50);
+                    IList<ConnectedComponent> alignedComponents = FindTextShapes(componentgrid, component);
                     if (alignedComponents.Count > 0)
                     {
                         shapegrid.Add(new TextShape(Rectangle.Union(alignedComponents.Select(x => x.Bounds))), true, true);
@@ -121,7 +121,7 @@ namespace Genix.DocumentAnalysis
 
             return shapes;
 
-            IList<ConnectedComponent> FindTextShapes(BoundedObjectGrid<ConnectedComponent> grid, ConnectedComponent obj, int maxGap)
+            IList<ConnectedComponent> FindTextShapes(BoundedObjectGrid<ConnectedComponent> grid, ConnectedComponent obj)
             {
                 ////Rectangle bounds = obj.Bounds;
                 SortedList<Rectangle, ConnectedComponent> result = new SortedList<Rectangle, ConnectedComponent>(RectangleLTRBComparer.Default);
@@ -129,7 +129,8 @@ namespace Genix.DocumentAnalysis
                 Rectangle obounds = obj.Bounds;
 
                 // calculate initial pivot points
-                Line baseline = new Line(obounds.Left, obounds.Bottom, obounds.Right, obounds.Bottom);
+                Line topline = new Line(obounds.Left, obounds.Top, obounds.Right, obounds.Top);
+                Line bottomline = new Line(obounds.Left, obounds.Bottom, obounds.Right, obounds.Bottom);
 
                 // find objects to the left
                 ConnectedComponent next;
@@ -177,7 +178,7 @@ namespace Genix.DocumentAnalysis
 
                     // compute search area
                     int xstart = searchForward ? box.Right : box.Left;
-                    int xend = searchForward ? box.Right + maxGap : box.Left - maxGap;
+                    int xend = searchForward ? box.Right + (box.Height * 2) : box.Left - (box.Height * 2);
 
                     Rectangle searchArea = searchForward ?
                         Rectangle.FromLTRB(xstart, box.Top, xend, box.Bottom) :
@@ -208,10 +209,6 @@ namespace Genix.DocumentAnalysis
                     // Compute skew tolerance and expand the search box
                     int skewTolerance = searchArea.Width / MaxSkewFactor;
                     searchArea.Inflate(0, skewTolerance);
-                    //// Expand the box
-                    ////int ystart = box.Bottom;
-                    ////int ymin = box.Top/*ystart - (box.Height / 2)*/ - skewTolerance;
-                    ////int ymax = box.Bottom/*ystart + (box.Height / 5)*/ + skewTolerance;
 
                     ConnectedComponent bestCandidate = null;
                     int bestDistance = int.MaxValue;
@@ -223,13 +220,13 @@ namespace Genix.DocumentAnalysis
 
                             // verify candidate position against baseline
                             int nearestx = searchForward ? cbounds.Left : cbounds.Right;
-                            if (baseline.IsBelow(nearestx, cbounds.Top))
+                            if (bottomline.IsBelow(nearestx, cbounds.Top))
                             {
                                 // candidate is below baseline
                                 continue;
                             }
 
-                            if (Math.Abs(baseline.Y(nearestx) - cbounds.Bottom) > 10)
+                            if (Math.Abs(bottomline.Y(nearestx) - cbounds.Bottom) > 10)
                             {
                                 // candidate's bottom is far from baseline
                                 continue;
@@ -261,19 +258,19 @@ namespace Genix.DocumentAnalysis
                         {
                             if (searchForward)
                             {
-                                baseline.X2 = cbounds.Right;
-                                baseline.Y2 = cbounds.Bottom;
+                                bottomline.X2 = cbounds.Right;
+                                bottomline.Y2 = cbounds.Bottom;
                             }
                             else
                             {
-                                baseline.X1 = cbounds.Left;
-                                baseline.Y1 = cbounds.Bottom;
+                                bottomline.X1 = cbounds.Left;
+                                bottomline.Y1 = cbounds.Bottom;
                             }
                         }
                     }
 
                     return bestCandidate;
-                }
+                } 
             }
         }
     }

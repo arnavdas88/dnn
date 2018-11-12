@@ -40,11 +40,11 @@ namespace Genix.DocumentAnalysis
         public Rectangle Bounds { get; protected set; }
 
         /// <inheritdoc />
-        [JsonProperty("halign")]
+        [JsonProperty("halign", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.None;
 
         /// <inheritdoc />
-        [JsonProperty("valign")]
+        [JsonProperty("valign", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.None;
 
         /// <summary>

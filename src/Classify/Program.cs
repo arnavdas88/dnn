@@ -83,7 +83,7 @@ namespace Genix.NetClassify
 
                 PointsOfInterestClassifier classifier = new PointsOfInterestClassifier();
 
-                using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
+                using (DirectoryDataProvider dataProvider = new DirectoryDataProvider())
                 {
                     dataProvider.Add(sourcePath, false, truthPath, "#Class");
 
@@ -131,7 +131,7 @@ namespace Genix.NetClassify
 
                 List<ClassificationResult<string>> results = new List<ClassificationResult<string>>();
 
-                using (DirectoryDataProvider dataProvider = new DirectoryDataProvider(0, 0))
+                using (DirectoryDataProvider dataProvider = new DirectoryDataProvider())
                 {
                     dataProvider.Add(sourcePath, false, truthPath, "#Class");
 

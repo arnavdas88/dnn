@@ -167,6 +167,22 @@ namespace Genix.Drawing
         }
 
         /// <summary>
+        /// Gets the coordinates of the first point.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Point<#=suffix#>"/> that contains the coordinates of the first point.
+        /// </value>
+        public Point<#=suffix#> Begin => new Point<#=suffix#>(this.X1, this.Y1);
+
+        /// <summary>
+        /// Gets the coordinates of the second point.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Point<#=suffix#>"/> that contains the coordinates of the second point.
+        /// </value>
+        public Point<#=suffix#> End => new Point<#=suffix#>(this.X2, this.Y2);
+
+        /// <summary>
         /// Gets the slope of this <see cref="Line<#=suffix#>"/>.
         /// </summary>
         /// <value>

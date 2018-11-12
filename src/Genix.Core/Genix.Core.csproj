@@ -68,11 +68,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Line.tt</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\Orientation.cs" />
     <Compile Include="Drawing\Point.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Point.tt</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\PointPolar.cs" />
     <Compile Include="Drawing\Rectangle.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

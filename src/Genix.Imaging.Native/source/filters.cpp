@@ -99,7 +99,7 @@ GENIXAPI(int, filterRectangular)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	ippsFree(pSpec);
 	return (int)status;
 }
@@ -178,7 +178,7 @@ GENIXAPI(int, filterBox)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	return (int)status;
 }
 
@@ -255,7 +255,7 @@ GENIXAPI(int, filterGaussian)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	ippsFree(pSpec);
 	return (int)status;
 }
@@ -336,7 +336,286 @@ GENIXAPI(int, filterLaplace)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelHoriz)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelHorizBorderGetBufferSize(
+		roiSize,
+		mask,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelHorizBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelHorizSecond)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelHorizSecondBorderGetBufferSize(
+		roiSize,
+		mask,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelHorizSecondBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelVert)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelVertBorderGetBufferSize(
+		roiSize,
+		mask,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelVertBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelNegVert)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelNegVertBorderGetBufferSize(
+		roiSize,
+		mask,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelNegVertBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelVertSecond)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelVertSecondBorderGetBufferSize(
+		roiSize,
+		mask,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelVertSecondBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobelCross)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelCrossGetBufferSize_8u16s_C1R(
+		roiSize,
+		mask,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobelCrossBorder_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
 	return (int)status;
 }
 
@@ -409,7 +688,7 @@ GENIXAPI(int, filterWiener)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	return (int)status;
 }
 
@@ -489,7 +768,7 @@ GENIXAPI(int, filterHipass)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	return (int)status;
 }
 
@@ -540,6 +819,6 @@ GENIXAPI(int, filterLowpass)(
 	}
 
 	EXIT_MAIN
-	ippsFree(pBuffer);
+		ippsFree(pBuffer);
 	return (int)status;
 }

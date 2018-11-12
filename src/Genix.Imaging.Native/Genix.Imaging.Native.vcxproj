@@ -139,6 +139,7 @@
     <ClCompile Include="source\filters.cpp" />
     <ClCompile Include="source\gradients.cpp" />
     <ClCompile Include="source\hog.cpp" />
+    <ClCompile Include="source\hough.cpp" />
     <ClCompile Include="source\integral.cpp" />
     <ClCompile Include="source\linesuppression.cpp" />
     <ClCompile Include="source\resize.cpp" />

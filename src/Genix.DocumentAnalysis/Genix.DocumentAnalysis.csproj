@@ -71,6 +71,7 @@
     <Compile Include="Recognition\CheckboxReader.cs" />
     <Compile Include="Recognition\IFieldReader.cs" />
     <Compile Include="Recognition\Answer.cs" />
+    <Compile Include="Recognition\TextReader.cs" />
     <Compile Include="Shapes\CheckboxShape.cs" />
     <Compile Include="Shapes\Detectors\LineDetector.cs" />
     <Compile Include="OCR\OCR.cs" />

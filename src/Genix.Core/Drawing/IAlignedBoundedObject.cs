@@ -15,7 +15,7 @@ namespace Genix.Drawing
         /// Gets or sets the object horizontal alignment.
         /// </summary>
         /// <value>
-        /// A <see cref="Genix.Drawing.HorizontalAlignment"/> enumeration value.
+        /// A <see cref="Drawing.HorizontalAlignment"/> enumeration value.
         /// </value>
         HorizontalAlignment HorizontalAlignment { get; set; }
 
@@ -23,7 +23,7 @@ namespace Genix.Drawing
         /// Gets or sets the object vertical alignment.
         /// </summary>
         /// <value>
-        /// A <see cref="Genix.Drawing.VerticalAlignment"/> enumeration value.
+        /// A <see cref="Drawing.VerticalAlignment"/> enumeration value.
         /// </value>
         VerticalAlignment VerticalAlignment { get; set; }
     }
