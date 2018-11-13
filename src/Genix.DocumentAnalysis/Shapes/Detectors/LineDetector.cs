@@ -395,7 +395,7 @@ namespace Genix.DocumentAnalysis
 
             // create a draft that would show found check boxes
 #if DEBUG
-            Image draft = image.CreateTemplate(null, 32);
+            Image draft = image.ConvertTo(null, 32);
             draft.SetWhite();
 #endif
 
@@ -668,13 +668,14 @@ namespace Genix.DocumentAnalysis
             grid.AddRange(lines, true, true);
 
             // find line vectors
+            int minLineLength = (this.MinVerticalLineLength * vlines.VerticalResolution).Round();
             int maxGap = LineDetector.MaxLineGap.MulDiv(vlines.VerticalResolution, 200);
             int tolerance = 6.MulDiv(vlines.HorizontalResolution, 200);
             foreach (LineShape line in lines)
             {
                 if (line.HorizontalAlignment == HorizontalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, Math.Min(maxGap, line.Bounds.Height), tolerance, 3);
+                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, Math.Min(maxGap, line.Bounds.Height), tolerance, minLineLength, 3);
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(
@@ -741,7 +742,6 @@ namespace Genix.DocumentAnalysis
                 Rectangle bounds = line.Bounds;
 
                 // check length
-                int minLineLength = (this.MinVerticalLineLength * vlines.VerticalResolution).Round();
                 if (bounds.Height < minLineLength && !VerticalLineHasIntersectionsOnBothEnds(bounds))
                 {
                     return false;
@@ -820,13 +820,14 @@ namespace Genix.DocumentAnalysis
             AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(hlines.Bounds, 10, 20, RectangleLTRBComparer.Default);
             grid.AddRange(lines, true, true);
 
+            int minLineLength = (this.MinHorizontalLineLength * hlines.HorizontalResolution).Round();
             int maxGap = LineDetector.MaxLineGap.MulDiv(hlines.HorizontalResolution, 200);
             int tolerance = 6.MulDiv(hlines.VerticalResolution, 200);
             foreach (LineShape line in lines)
             {
                 if (line.VerticalAlignment == VerticalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(line, VerticalAlignment.Center, Math.Min(maxGap, line.Bounds.Width), tolerance, 3);
+                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(line, VerticalAlignment.Center, Math.Min(maxGap, line.Bounds.Width), tolerance, minLineLength, 3);
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(
@@ -893,7 +894,6 @@ namespace Genix.DocumentAnalysis
                 Rectangle bounds = line.Bounds;
 
                 // check length
-                int minLineLength = (this.MinHorizontalLineLength * hlines.HorizontalResolution).Round();
                 if (bounds.Width < minLineLength)
                 {
                     return false;

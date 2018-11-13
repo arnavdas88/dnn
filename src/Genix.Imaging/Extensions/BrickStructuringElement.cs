@@ -91,5 +91,22 @@ namespace Genix.Imaging
                 }
             }
         }
+
+        /// <inheritdoc />
+        public override StructuringElement Mirror()
+        {
+            Point anchor = this.GetAnchor(StructuringElement.DefaultAnchor);
+            if ((this.width & 1) != 0 && anchor.X == this.width / 2 && (this.height & 1) != 0 && anchor.Y == this.height / 2)
+            {
+                return new BrickStructuringElement(this.width, this.height, this.Anchor);
+            }
+            else
+            {
+                return new BrickStructuringElement(
+                    this.width,
+                    this.height,
+                    new Point(this.width - anchor.X - 1, this.height - anchor.Y - 1));
+            }
+        }
     }
 }

@@ -19,6 +19,18 @@ namespace Genix.Imaging
         : IEquatable<Color>
     {
         /// <summary>
+        /// The white color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint White = 0xFFFFFFFFu;
+
+        /// <summary>
+        /// The black color.
+        /// </summary>
+        [CLSCompliant(false)]
+        public const uint Black = 0xFF000000u;
+
+        /// <summary>
         /// The red color.
         /// </summary>
         [CLSCompliant(false)]

@@ -63,7 +63,7 @@ namespace Genix.DocumentAnalysis
         /// <value>
         /// The <see cref="Drawing.Orientation"/> enumeration value.
         /// </value>
-        [JsonProperty("orientation", DefaultValueHandling = DefaultValueHandling.Ignore )]
+        [JsonProperty("orientation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
         /// <inheritdoc />

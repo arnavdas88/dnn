@@ -52,15 +52,15 @@ namespace Genix.Imaging
 
             Image dst = src.Clone(false);
 
-            if (NativeMethods.supresslines(
-                src.Width,
-                src.Height,
-                src.Stride,
-                src.Bits,
-                dst.Bits) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods.supresslines(
+                    src.Width,
+                    src.Height,
+                    src.Stride,
+                    src.Bits,
+                    dst.Bits);
+            });
 
             // convert back to 1bpp
             if (convert1bpp)

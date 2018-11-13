@@ -111,7 +111,7 @@ namespace Genix.DocumentAnalysis
             HashSet<TextShape> shapes = new HashSet<TextShape>();
             shapes.UnionWith(shapegrid.EnumObjects().Where(x => x.Bounds.Width > 4 && x.Bounds.Height > 10));
 
-            Image draft = image.ConvertTo(null, 24);
+            Image draft = image.ConvertTo(null, 32);
             foreach (TextShape shape in shapes)
             {
                 draft.DrawRectangle(shape.Bounds, Color.Red);
@@ -217,34 +217,47 @@ namespace Genix.DocumentAnalysis
                         if (candidate.VerticalAlignment == VerticalAlignment.None)
                         {
                             Rectangle cbounds = candidate.Bounds;
+                            int nearestx = searchForward ? cbounds.Left : cbounds.Right;
+                            int distx = box.DistanceToX(nearestx);
+                            bool skip = false;
 
                             // verify candidate position against baseline
-                            int nearestx = searchForward ? cbounds.Left : cbounds.Right;
-                            if (bottomline.IsBelow(nearestx, cbounds.Top))
+                            if (!skip && bottomline.IsBelow(nearestx, cbounds.Top))
                             {
                                 // candidate is below baseline
-                                continue;
+                                skip = true;
                             }
 
-                            if (Math.Abs(bottomline.Y(nearestx) - cbounds.Bottom) > 10)
+                            if (!skip && Math.Abs(bottomline.Y(nearestx) - cbounds.Bottom) > 10)
                             {
                                 // candidate's bottom is far from baseline
-                                continue;
+                                skip = true;
                             }
 
-                            if ((cbounds.Height > box.Height / 2 && cbounds.Height > 2 * box.Height) ||
-                                (box.Height > cbounds.Height / 2 && box.Height > 2 * cbounds.Height))
+                            if (!skip &&
+                                ((cbounds.Height > box.Height / 2 && cbounds.Height > 2 * box.Height) ||
+                                 (box.Height > cbounds.Height / 2 && box.Height > 2 * cbounds.Height)))
                             {
                                 // box sizes too different
-                                continue;
+                                skip = true;
+
+                                if (box.ContainsY(cbounds) && distx < box.Height)
+                                {
+                                    // accept small elements locates inside the box that close to it
+                                    // could be some detached c.c. or punctuation
+                                    skip = false;
+                                }
                             }
 
                             // find nearest element based on Eucledian distance
-                            int distance = box.DistanceToSquared(cbounds);
-                            if (distance < bestDistance)
+                            if (!skip)
                             {
-                                bestCandidate = candidate;
-                                bestDistance = distance;
+                                int distance = box.DistanceToSquared(cbounds);
+                                if (distance < bestDistance)
+                                {
+                                    bestCandidate = candidate;
+                                    bestDistance = distance;
+                                }
                             }
                         }
                     }
@@ -270,7 +283,7 @@ namespace Genix.DocumentAnalysis
                     }
 
                     return bestCandidate;
-                } 
+                }
             }
         }
     }

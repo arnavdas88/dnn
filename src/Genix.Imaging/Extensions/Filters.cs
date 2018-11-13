@@ -346,6 +346,93 @@ namespace Genix.Imaging
 
 #pragma warning disable SA1629 // Documentation text should end with a period
         /// <summary>
+        /// Applies Sobel filter to the <see cref="Image"/>.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="maskSize">The size of the kernel (3 or 5).</param>
+        /// <param name="normType">The normalization type.</param>
+        /// <param name="borderType">The type of border.</param>
+        /// <param name="borderValue">The value of border pixels when <paramref name="borderType"/> is <see cref="BorderType.BorderConst"/>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is not 8 bits per pixel.</para>
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <para>The kernel size is not 3 or 5.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// The method applies the Sobel filter to the <see cref="Image"/>.
+        /// The kernel of the filter is a matrix of 3x3 or 5x5 size depending on the <paramref name="maskSize"/> value.
+        /// The values of border pixels are assigned in accordance with the <paramref name="borderType"/> and <see cref="BorderType.BorderConst"/> parameters.
+        /// </para>
+        /// <para>This filter enhances edges of an image.</para>
+        /// <para>The resulting image has depth of 16bpp and contains signed 16-bit integers.</para>
+        /// <para>The 3x3 filter uses kernels with the following values:</para>
+        /// <para>      1  0  -1          1  2  1</para>
+        /// <para> Gx=  2  0  -2     Gy=  0  0  0</para>
+        /// <para>      1  0  -1         -1 -2 -1</para>
+        /// <para>The 5x5 filter uses kernels with the following values:</para>
+        /// <para>      1   2   0   -2  -1           1  4   6  4  1</para>
+        /// <para>      4   8   0   -8  -4           2  8  12  8  2</para>
+        /// <para> Gx=  6  12   0  -12  -6      Gy=  0  0   0  0  0</para>
+        /// <para>      4   8   0   -8  -4          -2 -8 -12 -8 -2</para>
+        /// <para>      1   2   0   -2  -1          -1 -4  -6 -4 -1</para>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        [CLSCompliant(false)]
+        public Image FilterSobel(Image dst, int maskSize, NormalizationType normType, BorderType borderType, uint borderValue)
+#pragma warning restore SA1629 // Documentation text should end with a period
+        {
+            if (maskSize != 3 && maskSize != 5)
+            {
+                throw new ArgumentException("The mask size must be either 3 or 5.", nameof(maskSize));
+            }
+
+            if (this.BitsPerPixel != 8)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_8bpp);
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, 16);
+
+            IPP.Execute(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                    {
+                        return NativeMethods.filterSobel(
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (short*)bitsdst,
+                            dst.Stride8 / 2,
+                            maskSize,
+                            normType,
+                            borderType,
+                            borderValue);
+                    }
+                }
+            });
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+ #pragma warning disable SA1629 // Documentation text should end with a period
+        /// <summary>
         /// Applies horizontal Sobel filter to the <see cref="Image"/>.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -1348,6 +1435,19 @@ namespace Genix.Imaging
                 byte* dst,
                 int stridedst,
                 int maskSize,
+                BorderType borderType,
+                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static unsafe extern int filterSobel(
+                int width,
+                int height,
+                byte* src,
+                int stridesrc,
+                short* dst,
+                int stridedst,
+                int maskSize,
+                NormalizationType normType,
                 BorderType borderType,
                 uint borderValue);
 

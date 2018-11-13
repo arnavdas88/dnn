@@ -8,6 +8,7 @@ namespace Genix.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Genix.Drawing;
 
     /// <summary>
@@ -47,14 +48,16 @@ namespace Genix.Core
         /// <param name="alignment">The alignment.</param>
         /// <param name="maxGap">The maximum allowed distance between objects, in pixels.</param>
         /// <param name="tolerance">Determines by how many pixels the aligned objects can deviate from the baseline.</param>
-        /// <param name="minNumberOfAlignedObjects">
-        /// The minimum number of aligned objects.
-        /// if the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfAlignedObjects"/>, the method retuns empty collection.
+        /// <param name="smallObjectLength">The maximum length of small object. Objects equal to or longer than <paramref name="smallObjectLength"/> are considered large.</param>
+        /// <param name="minNumberOfSmallObjects">
+        /// If the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfSmallObjects"/>
+        /// and all their lengths are less than <paramref name="smallObjectLength"/>,
+        /// the method returns empty collection.
         /// </param>
         /// <returns>
         /// The collection that contains found objects. <paramref name="obj"/> is included in the collection.
         /// </returns>
-        public IList<T> FindVerticalAlignment(T obj, VerticalAlignment alignment, int maxGap, int tolerance, int minNumberOfAlignedObjects)
+        public IList<T> FindVerticalAlignment(T obj, VerticalAlignment alignment, int maxGap, int tolerance, int smallObjectLength, int minNumberOfSmallObjects)
         {
             SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleLTRBComparer.Default);
 
@@ -79,7 +82,8 @@ namespace Genix.Core
                 obounds.Union(next.Bounds);
             }
 
-            if (result.Count >= minNumberOfAlignedObjects - 1)
+            if (result.Count > 0 &&
+                (result.Count >= minNumberOfSmallObjects - 1 || obj.Bounds.Width >= smallObjectLength || result.Keys.Any(o => o.Width >= smallObjectLength)))
             {
                 result.Add(obj.Bounds, obj);
 
@@ -111,7 +115,7 @@ namespace Genix.Core
 
                 // Compute skew tolerance
                 int skewTolerance = maxGap / MaxSkewFactor;
-                searchArea.Inflate(skewTolerance, 0);
+                searchArea.Inflate(0, skewTolerance);
 
                 T bestCandidate = null;
                 int bestDistance = int.MaxValue;
@@ -172,14 +176,17 @@ namespace Genix.Core
         /// <param name="alignment">The alignment.</param>
         /// <param name="maxGap">The maximum allowed distance between objects, in pixels.</param>
         /// <param name="tolerance">Determines by how many pixels the aligned objects can deviate from the baseline.</param>
-        /// <param name="minNumberOfAlignedObjects">
-        /// The minimum number of aligned objects.
-        /// if the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfAlignedObjects"/>, the method retuns empty collection.
+        /// <param name="smallObjectLength">The maximum length of small object. Objects equal to or longer than <paramref name="smallObjectLength"/> are considered large.</param>
+        /// <param name="minNumberOfSmallObjects">
+        /// The minimum number of small aligned objects.
+        /// If the number of found objects including <paramref name="obj"/> is less than <paramref name="minNumberOfSmallObjects"/>
+        /// and all their lengths are less than <paramref name="smallObjectLength"/>,
+        /// the method returns empty collection.
         /// </param>
         /// <returns>
         /// The collection that contains found objects. <paramref name="obj"/> is included in the collection.
         /// </returns>
-        public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap, int tolerance, int minNumberOfAlignedObjects)
+        public IList<T> FindHorizontalAlignment(T obj, HorizontalAlignment alignment, int maxGap, int tolerance, int smallObjectLength, int minNumberOfSmallObjects)
         {
             SortedList<Rectangle, T> result = new SortedList<Rectangle, T>(RectangleTBLRComparer.Default);
 
@@ -189,7 +196,7 @@ namespace Genix.Core
             int x = BoxBound(obounds);
             Line baseline = new Line(x, obounds.Top, x, obounds.Bottom);
 
-            // find objects to the left
+            // find objects to the top
             T next;
             while ((next = FindNext(obounds, false)) != null)
             {
@@ -197,14 +204,15 @@ namespace Genix.Core
                 obounds.Union(next.Bounds);
             }
 
-            // find objects to the right
+            // find objects to the bottom
             while ((next = FindNext(obounds, true)) != null)
             {
                 result.Add(next.Bounds, next);
                 obounds.Union(next.Bounds);
             }
 
-            if (result.Count >= minNumberOfAlignedObjects - 1)
+            if (result.Count > 0 &&
+                (result.Count >= minNumberOfSmallObjects - 1 || obj.Bounds.Height >= smallObjectLength || result.Keys.Any(o => o.Height >= smallObjectLength)))
             {
                 result.Add(obj.Bounds, obj);
 

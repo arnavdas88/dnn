@@ -136,6 +136,50 @@ GENIXAPI(int, _convert1to16)(
 	return 0;
 }
 
+GENIXAPI(int, _convert1to32)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	unsigned __int8* dst, const int stridedst,
+	const unsigned __int32 value0,
+	const unsigned __int32 value1)
+{
+	unsigned __int64 map[4];
+	const unsigned __int64 values[2] = { value0, value1 };
+	for (int i = 0; i < 4; i++)
+	{
+		map[i] =
+			(values[(i >> 1) & 1] << (1 * 32)) |
+			(values[(i >> 0) & 1] << (0 * 32));
+	}
+
+	unsigned __int64* dst64 = (unsigned __int64*)dst;
+	const int stridedst64 = stridedst / 8;
+	const int stridedst256 = stridedst64 & ~3;
+
+	for (int y = 0; y < height; y++, src += stridesrc, dst64 += stridedst64)
+	{
+		int offdst = 0;
+		int offsrc = 0;
+
+		// convert 4 pixels at a time
+		for (; offdst < stridedst256; offdst += 4, offsrc++)
+		{
+			const unsigned __int64 b = src[offsrc];
+			dst64[offdst + 0] = map[(b >> 0) & 0x03];
+			dst64[offdst + 1] = map[(b >> 2) & 0x03];
+			dst64[offdst + 2] = map[(b >> 4) & 0x03];
+			dst64[offdst + 3] = map[(b >> 6) & 0x03];
+		}
+
+		for (int x = 0; offdst < stridedst64; x += 2, offdst++)
+		{
+			dst64[offdst] = map[(src[offsrc] >> x) & 0x03];
+		}
+	}
+
+	return 0;
+}
+
 GENIXAPI(int, _convert1to32f)(
 	const int width, const int height,
 	const unsigned __int64* src, const int stridesrc,

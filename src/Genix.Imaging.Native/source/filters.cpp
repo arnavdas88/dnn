@@ -6,6 +6,12 @@
 #define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
+enum _GenixNormalizationType : int
+{
+	genixInfinity = 0,
+	genixL1,
+	genixL2,
+};
 enum _GenixBorderType : int
 {
 	genixBorderConst = 0,
@@ -334,6 +340,64 @@ GENIXAPI(int, filterLaplace)(
 			pBuffer));
 		break;
 	}
+
+	EXIT_MAIN
+		ippsFree(pBuffer);
+	return (int)status;
+}
+
+GENIXAPI(int, filterSobel)(
+	const int width, const int height,
+	const unsigned __int8* src, const int stridesrc,
+	__int16* dst, const int stridedst,
+	const int maskSize /* 3 or 5 */,
+	const int normType,
+	const int borderType, const unsigned borderValue)
+{
+	IppStatus status = ippStsNoErr;
+	const IppiSize roiSize = { width, height };
+	int bufferSize = 0;						/* Common work buffer size */
+	Ipp8u *pBuffer = NULL;					/* Pointer to the work buffer */
+
+	IppNormType ippNormType;
+	switch (normType)
+	{
+	case genixInfinity:	ippNormType = ippNormInf; break;
+	case genixL1:		ippNormType = ippNormL1; break;
+	default:			ippNormType = ippNormL2; break;
+	}
+
+	IppiBorderType ippBorderType;
+	switch (borderType)
+	{
+	case genixBorderRepl:	ippBorderType = ippBorderRepl; break;
+	default:				ippBorderType = ippBorderConst; break;
+	}
+
+	IppiMaskSize mask = maskSize == 3 ? ippMskSize3x3 : ippMskSize5x5;
+
+	/* Allocate buffer */
+	check_sts(status = ippiFilterSobelGetBufferSize(
+		roiSize,
+		mask,
+		ippNormType,
+		ipp8u,
+		ipp16s,
+		1,
+		&bufferSize));
+
+	/* Do filtering */
+	check_sts(status = ippiFilterSobel_8u16s_C1R(
+		src,
+		stridesrc,
+		dst,
+		stridedst * sizeof(__int16),
+		roiSize,
+		mask,
+		ippNormType,
+		ippBorderType,
+		(Ipp8u)borderValue,
+		pBuffer));
 
 	EXIT_MAIN
 		ippsFree(pBuffer);

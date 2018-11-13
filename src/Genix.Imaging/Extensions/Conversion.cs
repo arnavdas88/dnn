@@ -121,7 +121,7 @@ namespace Genix.Imaging
             {
                 switch (this.BitsPerPixel)
                 {
-                    case 1: return this.Convert1To8(null).Convert8To32(dst, 255);
+                    case 1: return this.Convert1To32(dst);
                     case 2: return this.Convert2To8(null).Convert8To32(dst, 255);
                     case 4: return this.Convert4To8(null).Convert8To32(dst, 255);
                     case 8: return this.Convert8To32(dst, 255);
@@ -190,11 +190,13 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert1to8(
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                    {
+                        return NativeMethods._convert1to8(
                             this.Width,
                             this.Height,
                             (byte*)bitssrc,
@@ -202,12 +204,10 @@ namespace Genix.Imaging
                             (byte*)bitsdst,
                             dst.Stride8,
                             value0,
-                            value1) != 0)
-                    {
-                        throw new OutOfMemoryException();
+                            value1);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -272,18 +272,103 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 16);
 
-            if (NativeMethods._convert1to16(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                value0,
-                value1) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
+                return NativeMethods._convert1to16(
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride,
+                    value0,
+                    value1);
+            });
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
             }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to 32-bit gray scale image.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// <para>A simple unpacking that uses <see cref="Color.White"/> for zero (white) pixels and <see cref="Color.Black"/> for one (black) pixels.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 1 bit per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Image Convert1To32(Image dst) => this.Convert1To32(dst, Color.White, Color.Black);
+
+        /// <summary>
+        /// Converts a binary <see cref="Image"/> to 32-bit gray scale image.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="value0">32-bit value to be used for 0s pixels.</param>
+        /// <param name="value1">32-bit value to be used for 1s pixels.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>
+        /// Conversely, the method puts result of the operation in <paramref name="dst"/>.
+        /// If sizes of this <see cref="Image"/> and <paramref name="dst"/> do not match, the operation is performed in upper-left corner of image on the area of smallest size.
+        /// </para>
+        /// <para>A simple unpacking might use <paramref name="value0"/> = <see cref="Color.Black"/> and <paramref name="value1"/> = <see cref="Color.White"/>.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <para>The depth of this <see cref="Image"/> is not 1 bit per pixel.</para>
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// Not enough memory to complete this operation.
+        /// </exception>
+        [CLSCompliant(false)]
+        public Image Convert1To32(Image dst, uint value0, uint value1)
+        {
+            if (this.BitsPerPixel != 1)
+            {
+                throw new ArgumentException(Properties.Resources.E_UnsupportedDepth_1bpp);
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, 32);
+
+            IPP.Execute(() =>
+            {
+                unsafe
+                {
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                    {
+                        return NativeMethods._convert1to32(
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            value0,
+                            value1);
+                    }
+                }
+            });
 
             if (inplace)
             {
@@ -342,18 +427,18 @@ namespace Genix.Imaging
                 this.HorizontalResolution,
                 this.VerticalResolution);
 
-            if (NativeMethods._convert1to32f(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                value0,
-                value1) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods._convert1to32f(
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride,
+                    value0,
+                    value1);
+            });
 
             return dst;
         }
@@ -416,20 +501,20 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            if (NativeMethods._convert2to8(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                value0,
-                value1,
-                value2,
-                value3) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods._convert2to8(
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride,
+                    value0,
+                    value1,
+                    value2,
+                    value3);
+            });
 
             if (inplace)
             {
@@ -475,19 +560,19 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 1);
 
-            if (NativeMethods._convert4to1(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                threshold) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods._convert4to1(
+                    0,
+                    0,
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride,
+                    threshold);
+            });
 
             if (inplace)
             {
@@ -527,16 +612,16 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            if (NativeMethods._convert4to8(
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods._convert4to8(
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride);
+            });
 
             if (inplace)
             {
@@ -582,25 +667,25 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 1);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert8to1(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        threshold) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert8to1(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            threshold);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -640,24 +725,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 24);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert8to24(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert8to24(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -699,25 +784,25 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 32);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert8to32(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8,
-                        alpha) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert8to32(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8,
+                            alpha);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -769,24 +854,25 @@ namespace Genix.Imaging
             // convert pixels
             int areaWidth = Core.MinMax.Min(width, this.Width);
             int areaHeight = Core.MinMax.Min(height, this.Height);
-            unsafe
+
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert8to32f(
-                        0,
-                        0,
-                        areaWidth,
-                        areaHeight,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        dst.Bits,
-                        dst.Stride) != 0)
+                    fixed (ulong* bitssrc = this.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert8to32f(
+                            0,
+                            0,
+                            areaWidth,
+                            areaHeight,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            dst.Bits,
+                            dst.Stride);
                     }
                 }
-            }
+            });
 
             // set border
             dst.SetBorder(0, 0, areaWidth, areaHeight, borderType, borderValue);
@@ -830,19 +916,19 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 1);
 
-            if (NativeMethods._convert16to1(
-                0,
-                0,
-                this.Width,
-                this.Height,
-                this.Bits,
-                this.Stride,
-                dst.Bits,
-                dst.Stride,
-                threshold) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods._convert16to1(
+                    0,
+                    0,
+                    this.Width,
+                    this.Height,
+                    this.Bits,
+                    this.Stride,
+                    dst.Bits,
+                    dst.Stride,
+                    threshold);
+            });
 
             if (inplace)
             {
@@ -886,24 +972,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert24to8(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert24to8(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -942,24 +1028,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 32);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert24to32(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert24to32(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -1003,24 +1089,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 8);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert32to8(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert32to8(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -1059,24 +1145,24 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = this.CreateTemplate(dst, 24);
 
-            unsafe
+            IPP.Execute(() =>
             {
-                fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
+                unsafe
                 {
-                    if (NativeMethods._convert32to24(
-                        0,
-                        0,
-                        this.Width,
-                        this.Height,
-                        (byte*)bitssrc,
-                        this.Stride8,
-                        (byte*)bitsdst,
-                        dst.Stride8) != 0)
+                    fixed (ulong* bitssrc = this.Bits, bitsdst = dst.Bits)
                     {
-                        throw new OutOfMemoryException();
+                        return NativeMethods._convert32to24(
+                            0,
+                            0,
+                            this.Width,
+                            this.Height,
+                            (byte*)bitssrc,
+                            this.Stride8,
+                            (byte*)bitsdst,
+                            dst.Stride8);
                     }
                 }
-            }
+            });
 
             if (inplace)
             {
@@ -1269,6 +1355,17 @@ namespace Genix.Imaging
                int stridedst,
                ushort value0,
                ushort value1);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe int _convert1to32(
+               int width,
+               int height,
+               byte* src,
+               int stridesrc,
+               byte* dst,
+               int stridedst,
+               uint value0,
+               uint value1);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int _convert1to32f(

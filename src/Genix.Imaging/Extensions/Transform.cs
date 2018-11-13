@@ -77,27 +77,27 @@ namespace Genix.Imaging
             bool inplace = dst == this;
             dst = src.CreateTemplate(dst, widthdst, heightdst, src.BitsPerPixel);
 
-            if (NativeMethods.affine(
-                src.BitsPerPixel,
-                src.Width,
-                src.Height,
-                src.Stride,
-                src.Bits,
-                dst.Width,
-                dst.Height,
-                dst.Stride,
-                dst.Bits,
-                matrix.M11,
-                matrix.M12,
-                matrix.OffsetX,
-                matrix.M21,
-                matrix.M22,
-                matrix.OffsetY,
-                (int)borderType,
-                borderValue) != 0)
+            IPP.Execute(() =>
             {
-                throw new OutOfMemoryException();
-            }
+                return NativeMethods.affine(
+                    src.BitsPerPixel,
+                    src.Width,
+                    src.Height,
+                    src.Stride,
+                    src.Bits,
+                    dst.Width,
+                    dst.Height,
+                    dst.Stride,
+                    dst.Bits,
+                    matrix.M11,
+                    matrix.M12,
+                    matrix.OffsetX,
+                    matrix.M21,
+                    matrix.M22,
+                    matrix.OffsetY,
+                    (int)borderType,
+                    borderValue);
+            });
 
             dst.AppendTransform(new MatrixTransform(matrix));
 
@@ -436,7 +436,7 @@ namespace Genix.Imaging
 
             // convert answer
             PointPolar[] result = new PointPolar[lineCount];
-            for (int i = 0, j = 0; i < lineCount; i++, j+=2)
+            for (int i = 0, j = 0; i < lineCount; i++, j += 2)
             {
                 result[i].Rho = lines[j];
                 result[i].Theta = lines[j + 1];

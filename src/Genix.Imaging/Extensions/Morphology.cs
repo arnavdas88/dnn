@@ -1486,10 +1486,11 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image MorphOpen(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
+            StructuringElement mirrorSE = se.Mirror();
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 dst = (iteration == 0 ? this : dst).Erode(dst, se, 1, borderType, borderValue);
-                dst.Dilate(dst, se, 1, borderType, borderValue);
+                dst.Dilate(dst, mirrorSE, 1, borderType, borderValue);
             }
 
             return dst;
@@ -1524,10 +1525,11 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image MorphClose(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
+            StructuringElement mirrorSE = se.Mirror();
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 dst = (iteration == 0 ? this : dst).Dilate(dst, se, 1, borderType, borderValue);
-                dst.Erode(dst, se, 1, borderType, borderValue);
+                dst.Erode(dst, mirrorSE, 1, borderType, borderValue);
             }
 
             return dst;
@@ -1559,11 +1561,12 @@ namespace Genix.Imaging
         [CLSCompliant(false)]
         public Image MorphGradient(Image dst, StructuringElement se, int iterations, BorderType borderType, uint borderValue)
         {
+            StructuringElement mirrorSE = se.Mirror();
             for (int iteration = 0; iteration < iterations; iteration++)
             {
                 Image src = iteration == 0 ? this : dst;
                 Image dilation = src.Dilate(null, se, 1, borderType, borderValue);
-                Image erosion = src.Erode(null, se, 1, borderType, borderValue);
+                Image erosion = src.Erode(null, mirrorSE, 1, borderType, borderValue);
                 dst = dilation.Sub(dst, erosion, 0);
             }
 

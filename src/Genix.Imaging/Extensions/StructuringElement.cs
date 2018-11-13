@@ -207,5 +207,15 @@ namespace Genix.Imaging
 
             return anchor;
         }
+
+        /// <summary>
+        /// Creates a new <see cref="StructuringElement"/> by mirroring this <see cref="StructuringElement"/> across its anchor point.
+        /// </summary>
+        /// <returns>The mirrored <see cref="StructuringElement"/>.</returns>
+        /// <remarks>
+        /// The mirroring of the s.e. may be necessary in paired operation like opening or closing when the anchor point is not in the middle of s.e.
+        /// Without mirroring the image may shift as dilation and erosion would be applied unevenly on different sides of the image.
+        /// </remarks>
+        public abstract StructuringElement Mirror();
     }
 }

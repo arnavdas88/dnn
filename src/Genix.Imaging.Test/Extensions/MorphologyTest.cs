@@ -10,8 +10,9 @@
     {
         private readonly UlongRandomGenerator random = new UlongRandomGenerator();
 
-        [TestMethod, TestCategory("Image")]
-        public void DilateTest1()
+        [TestMethod]
+        [TestCategory("Image")]
+        public void DilateTest_3x3()
         {
             const int Width = 150;
             const int Height = 20;
@@ -49,7 +50,8 @@
             }
         }
 
-        [TestMethod, TestCategory("Image")]
+        [TestMethod]
+        [TestCategory("Image")]
         public void DilateTest2()
         {
             StructuringElement[] ses = new[]
@@ -135,7 +137,8 @@
             }
         }
 
-        [TestMethod, TestCategory("Image")]
+        [TestMethod]
+        [TestCategory("Image")]
         public void ErodeTest1()
         {
             const int Width = 150;
@@ -175,7 +178,8 @@
             }
         }
 
-        [TestMethod, TestCategory("Image")]
+        [TestMethod]
+        [TestCategory("Image")]
         public void ErodeTest2()
         {
             StructuringElement[] ses = new[]
@@ -252,6 +256,32 @@
 
                             return maxcolor;
                         }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("Image")]
+        public void CloseTest_3x2()
+        {
+            const int Width = 7;
+            const int Height = 7;
+            Rectangle bounds = new Rectangle(2, 2, 3, 3);
+
+            foreach (int bitsPerPixel in new[] { 1, /*2, 4,*/ 8, 16, 24, 32 })
+            {
+                Image image = new Image(Width, Height, bitsPerPixel, 200, 200);
+                image.SetWhite();
+                image.SetBlack(bounds);
+
+                Image closing = image.MorphClose(null, StructuringElement.Brick(2, 2), 1, BorderType.BorderConst, image.WhiteColor);
+
+                for (int ix = 0; ix < Width; ix++)
+                {
+                    for (int iy = 0; iy < Height; iy++)
+                    {
+                        Assert.AreEqual(bounds.Contains(ix, iy) ? image.BlackColor : image.WhiteColor, closing.GetPixel(ix, iy));
                     }
                 }
             }
