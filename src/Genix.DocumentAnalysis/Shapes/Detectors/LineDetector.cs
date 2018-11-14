@@ -182,51 +182,50 @@ namespace Genix.DocumentAnalysis
                 checkboxGrid.AddRange(checkboxResult, true, true);
             }
 
-            ISet<LineShape> hlinesResult = null;
-            ISet<LineShape> vlinesResult = null;
+            HashSet<LineShape> hlinesResult = null;
+            HashSet<LineShape> vlinesResult = null;
 
             if (this.LineTypes != LineTypes.None)
             {
-                // close up small holes
-                int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-                Image closedImage = image.MorphClose(null, StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
-
-                // open up to detect big solid areas
-                Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
-                Image hollowImage = closedImage.Sub(null, openedImage, 0);
-
                 // masks we would like to find
                 Image hlines = null;
                 Image vlines = null;
-                Image nonVLines = null;
-                Image nonHLines = null;
-                Image itersections = null;
                 FindLines();
 
-                // remove the lines
-                if (vlines != null && this.RemoveLines)
+                if (hlines != null || vlines != null)
                 {
-                    RemoveLines(vlines, nonVLines);
-                }
-
-                if (hlines != null)
-                {
-                    // recompute intersections
-                    itersections = vlines?.And(null, hlines);
-
-                    // re-filter lines
-                    hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
+                    // filter out false positives
+                    FilterFalsePositives(out Image nonHLines, out Image nonVLines);
 
                     if (this.RemoveLines)
                     {
-                        RemoveLines(hlines, nonHLines);
+                        if (hlines != null)
+                        {
+                            RemoveLines(hlines, nonHLines);
+                        }
+
+                        if (vlines != null)
+                        {
+                            RemoveLines(vlines, nonVLines);
+                        }
+
+                        if (hlines != null && vlines != null)
+                        {
+                            RemoveIntersections();
+                        }
                     }
                 }
 
-                RemoveIntersections();
-
                 void FindLines()
                 {
+                    // close up small holes
+                    int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
+                    Image closedImage = image.MorphClose(null, StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
+
+                    // open up to detect big solid areas
+                    Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
+                    Image hollowImage = closedImage.Sub(null, openedImage, 0);
+
                     // open up in both directions to find lines
                     int minHorLineLength = LineDetector.MinHorLineLength.MulDiv(image.HorizontalResolution, 200);
                     hlines = hollowImage.MorphOpen(null, StructuringElement.Brick(minHorLineLength, 1), 1, BorderType.BorderConst, image.WhiteColor);
@@ -253,7 +252,7 @@ namespace Genix.DocumentAnalysis
                     }
                     else
                     {
-                        vlinesResult = this.FilterVerticalLines(vlines, checkboxGrid);
+                        vlinesResult = this.FilterVerticalLines(vlines, hlines, checkboxGrid);
                         if (vlinesResult.Count == 0)
                         {
                             vlines = null;
@@ -261,96 +260,134 @@ namespace Genix.DocumentAnalysis
                     }
 
                     cancellationToken.ThrowIfCancellationRequested();
+                }
+
+                void FilterFalsePositives(out Image nonHLines, out Image nonVLines)
+                {
+                    nonHLines = null;
+                    nonVLines = null;
 
                     Image nonLines = null;
-
-                    // vertical lines
-                    if (vlines != null)
-                    {
-                        nonLines = image.Sub(nonLines, vlines, 0);
-                        if (hlines != null)
-                        {
-                            nonLines -= hlines;
-                            itersections = hlines.And(itersections, vlines);
-                        }
-
-                        int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
-                        nonVLines = nonLines.Erode(null, StructuringElement.Brick(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
-                        nonVLines.FloodFill(nonVLines, 8, nonLines);
-
-                        if (hlines != null)
-                        {
-                            nonVLines += hlines;
-                            nonVLines -= itersections;
-                        }
-
-                        vlinesResult = this.FilterVerticalLines(vlinesResult, vlines, nonVLines, itersections);
-
-                        cancellationToken.ThrowIfCancellationRequested();
-                    }
-
-                    // horizontal lines
                     if (hlines != null)
                     {
                         nonLines = image.Sub(nonLines, hlines, 0);
-                        if (vlines != null)
-                        {
-                            nonLines -= vlines;
-                            itersections = hlines.And(itersections, vlines);
-                        }
+                    }
 
-                        int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    if (vlines != null)
+                    {
+                        nonLines = image.Sub(nonLines, vlines, 0);
+                    }
+
+                    Image intersections = vlines != null && hlines != null ? hlines & vlines : null;
+
+                    int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    if (hlines != null)
+                    {
                         nonHLines = nonLines.Erode(null, StructuringElement.Brick(1, maxLineResidue), 1, BorderType.BorderConst, image.WhiteColor);
                         nonHLines.FloodFill(nonHLines, 8, nonLines);
 
                         if (vlines != null)
                         {
                             nonHLines += vlines;
-                            nonHLines -= itersections;
+                            nonHLines -= intersections;
+                        }
+                    }
+
+                    ////int maxLineResidue = 6; //// LineDetector.MaxLineResidue.MulDiv(image.HorizontalResolution, 200);
+                    if (vlines != null)
+                    {
+                        nonVLines = nonLines.Erode(null, StructuringElement.Brick(maxLineResidue, 1), 1, BorderType.BorderConst, image.WhiteColor);
+                        nonVLines.FloodFill(nonVLines, 8, nonLines);
+
+                        if (hlines != null)
+                        {
+                            nonVLines += hlines;
+                            nonVLines -= intersections;
+                        }
+                    }
+
+                    int removedCount = 0;
+                    do
+                    {
+                        removedCount = 0;
+
+                        // horizontal lines
+                        if (hlines != null)
+                        {
+                            int count = this.RemoveHorizontalLinesFalsePositives(hlinesResult, hlines, nonHLines, intersections);
+                            if (count > 0)
+                            {
+                                removedCount += count;
+                                if (vlines != null)
+                                {
+                                    // recompute intersections
+                                    intersections = hlines.And(intersections, vlines);
+                                }
+
+                                if (hlinesResult.Count == 0)
+                                {
+                                    hlines = null;
+                                }
+                            }
+
+                            cancellationToken.ThrowIfCancellationRequested();
                         }
 
-                        hlinesResult = this.FilterHorizontalLines(hlinesResult, hlines, nonHLines, itersections);
+                        // vertical lines
+                        if (vlines != null)
+                        {
+                            int count = this.RemoveVerticalLinesFalsePositives(vlinesResult, vlines, nonVLines, intersections);
+                            if (count > 0)
+                            {
+                                removedCount += count;
+                                if (hlines != null)
+                                {
+                                    // recompute intersections
+                                    intersections = hlines.And(intersections, vlines);
+                                }
 
-                        cancellationToken.ThrowIfCancellationRequested();
+                                if (vlinesResult.Count == 0)
+                                {
+                                    vlines = null;
+                                }
+                            }
+
+                            cancellationToken.ThrowIfCancellationRequested();
+                        }
                     }
+                    while (removedCount != 0);
                 }
 
                 void RemoveLines(Image lines, Image nonLines)
                 {
-                    if (this.RemoveLines)
-                    {
-                        // remove the lines
-                        image.Xand(image, lines);
+                    // remove the lines
+                    image.Xand(image, lines);
 
-                        // dilate the lines so they touch the residue
-                        // then flood fill then to get all the residue (image less non-lines)
-                        Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
+                    // dilate the lines so they touch the residue
+                    // then flood fill then to get all the residue (image less non-lines)
+                    Image fatLines = lines.Dilate3x3(null, BorderType.BorderConst, image.WhiteColor);
 
-                        fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
+                    fatLines.FloodFill(fatLines, 8, image.Xand(null, nonLines));
 
-                        // remove the residue
-                        image.Xand(image, fatLines);
+                    // remove the residue
+                    image.Xand(image, fatLines);
 
-                        cancellationToken.ThrowIfCancellationRequested();
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
 
                 void RemoveIntersections()
                 {
-                    if (this.RemoveLines && hlines != null && vlines != null)
-                    {
-                        // get the intersection residue
-                        Image residue = hlines
-                            .And(null, vlines)
-                            .Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
+                    // get the intersection residue
+                    Image residue = hlines
+                        .And(null, vlines)
+                        .Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
 
-                        residue.FloodFill(residue, 8, image);
+                    residue.FloodFill(residue, 8, image);
 
-                        // remove the residue
-                        image.Xand(image, residue);
+                    // remove the residue
+                    image.Xand(image, residue);
 
-                        cancellationToken.ThrowIfCancellationRequested();
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
             }
 
@@ -362,6 +399,35 @@ namespace Genix.DocumentAnalysis
                     image.SetWhite(Rectangle.Inflate(shape.Bounds, 1, 1));
                 }
             }
+
+            // create a draft that would show found check boxes
+#if DEBUG
+            Image draft = image.ConvertTo(null, 32);
+
+            if (checkboxResult != null)
+            {
+                foreach (CheckboxShape shape in checkboxResult)
+                {
+                    draft.DrawRectangle(shape.Bounds, Color.Green);
+                }
+            }
+
+            if (hlinesResult != null)
+            {
+                foreach (LineShape shape in hlinesResult)
+                {
+                    draft.DrawRectangle(shape.Bounds, Color.Red);
+                }
+            }
+
+            if (vlinesResult != null)
+            {
+                foreach (LineShape shape in vlinesResult)
+                {
+                    draft.DrawRectangle(shape.Bounds, Color.Red);
+                }
+            }
+#endif
 
             // create answer
             HashSet<Shape> answer = new HashSet<Shape>();
@@ -392,12 +458,6 @@ namespace Genix.DocumentAnalysis
             int maxBoxSizeH = this.MaxBoxSize.MulDiv(image.HorizontalResolution, 200);
             int minBoxSizeV = this.MinBoxSize.MulDiv(image.VerticalResolution, 200);
             int maxBoxSizeV = this.MaxBoxSize.MulDiv(image.VerticalResolution, 200);
-
-            // create a draft that would show found check boxes
-#if DEBUG
-            Image draft = image.ConvertTo(null, 32);
-            draft.SetWhite();
-#endif
 
             // keep track of tested horizontal components that did not yield results
             ////HashSet<Rectangle> testedHBounds = new HashSet<Rectangle>();
@@ -479,12 +539,6 @@ namespace Genix.DocumentAnalysis
                                     {
                                         Rectangle bounds = Rectangle.FromLTRB(vbounds.X, hcompTop.Bounds.Y, vbounds.Right, hboundsBottom.Bottom);
                                         result.Add(new CheckboxShape(bounds));
-#if DEBUG
-                                        draft.DrawConnectedComponent(vcomp1, draft.BlackColor);
-                                        draft.DrawConnectedComponent(vcomp2, draft.BlackColor);
-                                        draft.DrawConnectedComponent(hcompTop, draft.BlackColor);
-                                        draft.DrawConnectedComponent(hcompBottom, draft.BlackColor);
-#endif
 
                                         // mark used components, so we do not test them twice
                                         hcompTop.VerticalAlignment = VerticalAlignment.Top;
@@ -505,13 +559,6 @@ namespace Genix.DocumentAnalysis
                     }
                 }
             }
-
-#if DEBUG
-            foreach (CheckboxShape shape in result)
-            {
-                draft.DrawRectangle(shape.Bounds, Color.Red);
-            }
-#endif
 
             return result;
 
@@ -614,14 +661,15 @@ namespace Genix.DocumentAnalysis
             }
         }
 
-        private ISet<LineShape> FilterVerticalLines(Image vlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
+        private HashSet<LineShape> FilterVerticalLines(Image vlines, Image hlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
         {
-            HashSet<LineShape> result = new HashSet<LineShape>();
+            HashSet<LineShape> lines = new HashSet<LineShape>();
 
             int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(vlines.HorizontalResolution, 200);
             int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(vlines.VerticalResolution, 200);
             int maxBoxSize = this.MaxBoxSize.MulDiv(vlines.VerticalResolution, 200);
 
+            // find connected components and do preliminary filtering
             foreach (ConnectedComponent component in vlines.FindConnectedComponents(8))
             {
                 Rectangle bounds = component.Bounds;
@@ -652,30 +700,31 @@ namespace Genix.DocumentAnalysis
                     Point begin = new Point(component.GetLine(bounds.Y).Center, bounds.Y);
                     Point end = new Point(component.GetLine(bounds.Bottom - 1).Center, bounds.Bottom - 1);
                     LineShape line = new LineShape(bounds, begin, end, maxWidth, LineTypes.Vertical);
-                    result.Add(line);
+                    lines.Add(line);
                 }
             }
 
-            return result;
-        }
-
-        private ISet<LineShape> FilterVerticalLines(ISet<LineShape> lines, Image vlines, Image nonVLines, Image itersections)
-        {
-            HashSet<LineShape> result = new HashSet<LineShape>();
-
-            // find connected components and do preliminary filtering
+            // find line vectors
             AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(vlines.Bounds, 10, 20, RectangleTBLRComparer.Default);
             grid.AddRange(lines, true, true);
 
-            // find line vectors
             int minLineLength = (this.MinVerticalLineLength * vlines.VerticalResolution).Round();
             int maxGap = LineDetector.MaxLineGap.MulDiv(vlines.VerticalResolution, 200);
             int tolerance = 6.MulDiv(vlines.HorizontalResolution, 200);
+
+            HashSet<LineShape> newlines = new HashSet<LineShape>();
+
             foreach (LineShape line in lines)
             {
                 if (line.HorizontalAlignment == HorizontalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(line, HorizontalAlignment.Center, Math.Min(maxGap, line.Bounds.Height), tolerance, minLineLength, 3);
+                    IList<LineShape> alignedLines = grid.FindHorizontalAlignment(
+                        line,
+                        HorizontalAlignment.Center,
+                        Math.Min(maxGap, line.Bounds.Height),
+                        tolerance,
+                        (result, bounds) => (bounds.Height >= minLineLength && (result.Count >= 3 || result.Any(o => o.Bounds.Height >= minLineLength))) || LineHasIntersectionsOnBothEnds(bounds));
+
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(
@@ -685,98 +734,64 @@ namespace Genix.DocumentAnalysis
                             alignedLines.Max(x => x.Width),
                             LineTypes.Vertical);
 
-                        if (IsLineGood(newline))
-                        {
-                            result.Add(newline);
-                        }
-                        else
-                        {
-                            for (int i = 0, ii = alignedLines.Count; i < ii; i++)
-                            {
-                                vlines.SetWhite(alignedLines[i].Bounds);
-                            }
-                        }
+                        newlines.Add(newline);
                     }
                 }
             }
 
-            // process remaining lines
-            foreach (LineShape line in lines)
+            // remove merged and short lines
+            lines.RemoveWhere(x =>
             {
-                if (line.HorizontalAlignment == HorizontalAlignment.None)
+                // remove merged lines
+                bool remove = x.HorizontalAlignment != HorizontalAlignment.None;
+
+                // remove small not merged lines
+                // also delete them from the image
+                if (x.HorizontalAlignment == HorizontalAlignment.None && x.Bounds.Height < minLineLength && !LineHasIntersectionsOnBothEnds(x.Bounds))
                 {
-                    if (IsLineGood(line))
-                    {
-                        result.Add(line);
-                    }
-                    else
-                    {
-                        vlines.SetWhite(line.Bounds);
-                    }
+                    vlines.SetWhite(x.Bounds);
+                    remove = true;
                 }
-            }
 
-            Image draft = vlines.Clone(false);
-            foreach (LineShape line in result)
+                return remove;
+            });
+
+            lines.UnionWith(newlines);
+
+            bool LineHasIntersectionsOnBothEnds(Rectangle bounds)
             {
-                draft.SetBlack(line.Bounds);
-            }
+                if (hlines != null)
+                {
+                    int boxheight = Math.Min(bounds.Width, bounds.Height);
 
-            return result;
+                    Rectangle top = new Rectangle(bounds.X, bounds.Y, bounds.Width, boxheight);
+                    top.Inflate(0, 2 * boxheight);
+                    top.Intersect(hlines.Bounds);
 
-            ulong CountAdjacentPixels(int lineWidth, Rectangle bounds)
-            {
-                bounds.Inflate(lineWidth, 0);
-                bounds.Intersect(nonVLines.Bounds);
+                    Rectangle bottom = new Rectangle(bounds.X, bounds.Bottom - boxheight, bounds.Width, boxheight);
+                    bottom.Inflate(0, 2 * boxheight);
+                    bottom.Intersect(hlines.Bounds);
 
-                return nonVLines.Power(bounds);
-            }
-
-            int CountIntersections(Rectangle bounds)
-            {
-                return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
-            }
-
-            bool IsLineGood(LineShape line)
-            {
-                Rectangle bounds = line.Bounds;
-
-                // check length
-                if (bounds.Height < minLineLength && !VerticalLineHasIntersectionsOnBothEnds(bounds))
+                    return !hlines.IsAllWhite(top) && !hlines.IsAllWhite(bottom);
+                }
+                else
                 {
                     return false;
                 }
-
-                // Test density near the line if there are not enough intersections
-                if (CountIntersections(line.Bounds) < 2)
-                {
-                    ulong count = CountAdjacentPixels(line.Width, bounds);
-                    if (count > bounds.Area * LineDetector.MaxNonLineDensity)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
             }
 
-            bool VerticalLineHasIntersectionsOnBothEnds(Rectangle bounds)
-            {
-                int boxheight = Math.Min(bounds.Width, bounds.Height);
-                return itersections != null &&
-                    !itersections.IsAllWhite(new Rectangle(bounds.X, bounds.Y, bounds.Width, boxheight)) &&
-                    !itersections.IsAllWhite(new Rectangle(bounds.X, bounds.Bottom - boxheight, bounds.Width, boxheight));
-            }
+            return lines;
         }
 
-        private ISet<LineShape> FilterHorizontalLines(Image hlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
+        private HashSet<LineShape> FilterHorizontalLines(Image hlines, BoundedObjectGrid<CheckboxShape> checkboxGrid)
         {
-            HashSet<LineShape> result = new HashSet<LineShape>();
+            HashSet<LineShape> lines = new HashSet<LineShape>();
 
             int minThickLineWidth = LineDetector.MinThickLineWidth.MulDiv(hlines.VerticalResolution, 200);
             int minThickLineLength = LineDetector.MinThickLineLength.MulDiv(hlines.HorizontalResolution, 200);
             int maxBoxSize = this.MaxBoxSize.MulDiv(hlines.HorizontalResolution, 200);
 
+            // find connected components and do preliminary filtering
             foreach (ConnectedComponent component in hlines.FindConnectedComponents(8))
             {
                 Rectangle bounds = component.Bounds;
@@ -805,29 +820,31 @@ namespace Genix.DocumentAnalysis
                 else
                 {
                     LineShape newline = new LineShape(bounds, maxWidth, LineTypes.Horizontal);
-                    result.Add(newline);
+                    lines.Add(newline);
                 }
             }
 
-            return result;
-        }
-
-        private ISet<LineShape> FilterHorizontalLines(ISet<LineShape> lines, Image hlines, Image nonHLines, Image itersections)
-        {
-            HashSet<LineShape> result = new HashSet<LineShape>();
-
-            // find connected components and do preliminary filtering
+            // find line vectors
             AlignedObjectGrid<LineShape> grid = new AlignedObjectGrid<LineShape>(hlines.Bounds, 10, 20, RectangleLTRBComparer.Default);
             grid.AddRange(lines, true, true);
 
             int minLineLength = (this.MinHorizontalLineLength * hlines.HorizontalResolution).Round();
             int maxGap = LineDetector.MaxLineGap.MulDiv(hlines.HorizontalResolution, 200);
             int tolerance = 6.MulDiv(hlines.VerticalResolution, 200);
+
+            HashSet<LineShape> newlines = new HashSet<LineShape>();
+
             foreach (LineShape line in lines)
             {
                 if (line.VerticalAlignment == VerticalAlignment.None)
                 {
-                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(line, VerticalAlignment.Center, Math.Min(maxGap, line.Bounds.Width), tolerance, minLineLength, 3);
+                    IList<LineShape> alignedLines = grid.FindVerticalAlignment(
+                        line,
+                        VerticalAlignment.Center,
+                        Math.Min(maxGap, line.Bounds.Width),
+                        tolerance,
+                        (result, bounds) => bounds.Width >= minLineLength && (result.Count >= 2 || result.Any(o => o.Bounds.Width >= minLineLength)));
+
                     if (alignedLines.Count > 0)
                     {
                         LineShape newline = new LineShape(
@@ -837,79 +854,108 @@ namespace Genix.DocumentAnalysis
                             alignedLines.Max(x => x.Width),
                             LineTypes.Horizontal);
 
-                        if (IsLineGood(newline))
-                        {
-                            result.Add(newline);
-                        }
-                        else
-                        {
-                            for (int i = 0, ii = alignedLines.Count; i < ii; i++)
-                            {
-                                hlines.SetWhite(alignedLines[i].Bounds);
-                            }
-                        }
+                        newlines.Add(newline);
                     }
                 }
             }
 
-            // process remaining lines
-            foreach (LineShape line in lines)
+            // remove merged and short lines
+            lines.RemoveWhere(x =>
             {
-                if (line.VerticalAlignment == VerticalAlignment.None)
+                // remove merged lines
+                bool remove = x.VerticalAlignment != VerticalAlignment.None;
+
+                // remove small not merged lines
+                // also delete them from the image
+                if (x.VerticalAlignment == VerticalAlignment.None && x.Bounds.Width < minLineLength)
                 {
-                    if (IsLineGood(line))
+                    hlines.SetWhite(x.Bounds);
+                    remove = true;
+                }
+
+                return remove;
+            });
+
+            lines.UnionWith(newlines);
+
+            return lines;
+        }
+
+        private int RemoveVerticalLinesFalsePositives(HashSet<LineShape> lines, Image vlines, Image nonVLines, Image itersections)
+        {
+            return lines.RemoveWhere(line =>
+            {
+                bool isBad = false;
+                Rectangle bounds = line.Bounds;
+
+                // Test density near the line if there are not enough intersections
+                if (CountIntersections(line.Bounds) < 2)
+                {
+                    int count = CountAdjacentPixels(line.Width, bounds);
+                    if (count > (bounds.Area * LineDetector.MaxNonLineDensity).Round())
                     {
-                        result.Add(line);
-                    }
-                    else
-                    {
-                        hlines.SetWhite(line.Bounds);
+                        isBad = true;
                     }
                 }
-            }
 
-            Image draft = hlines.Clone(false);
-            foreach (LineShape line in result)
-            {
-                draft.SetBlack(line.Bounds);
-            }
+                if (isBad)
+                {
+                    vlines.SetWhite(line.Bounds);
+                }
 
-            return result;
-
-            ulong CountAdjacentPixels(int lineWidth, Rectangle bounds)
-            {
-                bounds.Inflate(0, lineWidth);
-                bounds.Intersect(nonHLines.Bounds);
-
-                return nonHLines.Power(bounds);
-            }
+                return isBad;
+            });
 
             int CountIntersections(Rectangle bounds)
             {
                 return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
             }
 
-            bool IsLineGood(LineShape line)
+            int CountAdjacentPixels(int lineWidth, Rectangle bounds)
             {
-                Rectangle bounds = line.Bounds;
+                bounds.Inflate(lineWidth, 0);
+                bounds.Intersect(nonVLines.Bounds);
 
-                // check length
-                if (bounds.Width < minLineLength)
-                {
-                    return false;
-                }
+                return (int)nonVLines.Power(bounds);
+            }
+        }
+
+        private int RemoveHorizontalLinesFalsePositives(HashSet<LineShape> lines, Image hlines, Image nonHLines, Image itersections)
+        {
+            return lines.RemoveWhere(line =>
+            {
+                bool isBad = false;
+                Rectangle bounds = line.Bounds;
 
                 // Test density near the line if there are not enough intersections
                 if (CountIntersections(line.Bounds) < 2)
                 {
-                    ulong count = CountAdjacentPixels(line.Width, bounds);
-                    if (count > bounds.Area * LineDetector.MaxNonLineDensity)
+                    int count = CountAdjacentPixels(line.Width, bounds);
+                    if (count > (bounds.Area * LineDetector.MaxNonLineDensity).Round())
                     {
-                        return false;
+                        isBad = true;
                     }
                 }
 
-                return true;
+                if (isBad)
+                {
+                    hlines.SetWhite(line.Bounds);
+                }
+
+                return isBad;
+            });
+
+            int CountAdjacentPixels(int lineWidth, Rectangle bounds)
+            {
+                bounds.Inflate(0, lineWidth);
+                bounds.Intersect(nonHLines.Bounds);
+
+                return (int)nonHLines.Power(bounds);
+            }
+
+            int CountIntersections(Rectangle bounds)
+            {
+                return itersections?.FindConnectedComponents(8, bounds)?.Count ?? 0;
             }
         }
 

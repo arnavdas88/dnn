@@ -111,13 +111,13 @@ namespace Genix.DocumentAnalysis
             HashSet<TextShape> shapes = new HashSet<TextShape>();
             shapes.UnionWith(shapegrid.EnumObjects().Where(x => x.Bounds.Width > 4 && x.Bounds.Height > 10));
 
+#if DEBUG
             Image draft = image.ConvertTo(null, 32);
             foreach (TextShape shape in shapes)
             {
                 draft.DrawRectangle(shape.Bounds, Color.Red);
             }
-
-            int count = shapes.Count();
+#endif
 
             return shapes;
 

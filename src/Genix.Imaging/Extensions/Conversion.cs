@@ -65,11 +65,11 @@ namespace Genix.Imaging
                 switch (this.BitsPerPixel)
                 {
                     case 8:
-                        return this.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
+                        return this.OtsuNormalizeBackground(dst);
 
                     default:
                         dst = ConvertTo8bpp();
-                        return dst.Binarize(dst, 0, 0, 1, 1, true, 0, 0);
+                        return dst.OtsuNormalizeBackground(dst);
                 }
             }
 

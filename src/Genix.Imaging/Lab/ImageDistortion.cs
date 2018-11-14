@@ -51,7 +51,7 @@ namespace Genix.Imaging.Lab
 
             if (image.BitsPerPixel == 8)
             {
-                image.Binarize(image, 0, 0, 1, 1, true, 0, 0);
+                image.OtsuNormalizeBackground(image);
             }
 
             if (!image.IsAllWhite())
