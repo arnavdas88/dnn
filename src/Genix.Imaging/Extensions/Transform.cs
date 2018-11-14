@@ -7,6 +7,7 @@
 namespace Genix.Imaging
 {
     using System;
+    using System.Globalization;
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
@@ -210,6 +211,126 @@ namespace Genix.Imaging
             }
 
             return this.Affine(dst, matrix, BorderType.BorderConst, this.WhiteColor);
+        }
+
+        /// <summary>
+        /// Mirrors this <see cref="Image"/> about the x-axis.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image FlipX(Image dst)
+        {
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
+            }
+
+            dst = this.Copy(dst, false);
+
+            IPP.Execute(() =>
+            {
+                if (dst == this)
+                {
+                    return NativeMethods.mirror_horz(
+                       this.BitsPerPixel,
+                       0,
+                       0,
+                       this.Width,
+                       this.Height,
+                       this.Bits,
+                       this.Stride8,
+                       null,
+                       0);
+                }
+                else
+                {
+                    return NativeMethods.mirror_horz(
+                       this.BitsPerPixel,
+                       0,
+                       0,
+                       this.Width,
+                       this.Height,
+                       this.Bits,
+                       this.Stride8,
+                       dst.Bits,
+                       dst.Stride8);
+                }
+            });
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Mirrors this <see cref="Image"/> about the y-axis.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image FlipY(Image dst)
+        {
+            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
+            }
+
+            dst = this.Copy(dst, false);
+
+            IPP.Execute(() =>
+            {
+                if (dst == this)
+                {
+                    return NativeMethods.mirror_vert(
+                       this.BitsPerPixel,
+                       0,
+                       0,
+                       this.Width,
+                       this.Height,
+                       this.Bits,
+                       this.Stride8,
+                       null,
+                       0);
+                }
+                else
+                {
+                    return NativeMethods.mirror_vert(
+                       this.BitsPerPixel,
+                       0,
+                       0,
+                       this.Width,
+                       this.Height,
+                       this.Bits,
+                       this.Stride8,
+                       dst.Bits,
+                       dst.Stride8);
+                }
+            });
+
+            return dst;
         }
 
         /// <summary>
@@ -530,6 +651,30 @@ namespace Genix.Imaging
                double c12,
                int borderType,
                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int mirror_vert(
+                int bitsPerPixel,
+                int x,
+                int y,
+                int width,
+                int height,
+                [In, Out] ulong[] src,
+                int srcstep,
+                [Out] ulong[] dst,
+                int dststep);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int mirror_horz(
+                int bitsPerPixel,
+                int x,
+                int y,
+                int width,
+                int height,
+                [In, Out] ulong[] src,
+                int srcstep,
+                [Out] ulong[] dst,
+                int dststep);
 
             [DllImport(NativeMethods.DllName)]
             public static extern unsafe int houghline(

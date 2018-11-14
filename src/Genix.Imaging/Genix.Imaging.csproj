@@ -70,7 +70,7 @@
       <DependentUpon>Arithmetic.tt</DependentUpon>
     </Compile>
     <Compile Include="Extensions\Binarize.cs" />
-    <Compile Include="Extensions\BorderType.cs" />
+    <Compile Include="Enums\BorderType.cs" />
     <Compile Include="Extensions\Cleaning.cs" />
     <Compile Include="Extensions\ColorKey.cs" />
     <Compile Include="Extensions\CrossStructuringElement.cs" />
@@ -82,8 +82,8 @@
     </Compile>
     <Compile Include="Extensions\FeatureDetectors.cs" />
     <Compile Include="Extensions\Filters.cs" />
-    <Compile Include="Extensions\InterpolationType.cs" />
-    <Compile Include="Extensions\NormalizationType.cs" />
+    <Compile Include="Enums\InterpolationType.cs" />
+    <Compile Include="Enums\NormalizationType.cs" />
     <Compile Include="IPP.cs" />
     <Compile Include="Extensions\Logical.Generated.cs">
       <AutoGen>True</AutoGen>
@@ -91,7 +91,7 @@
       <DependentUpon>Logical.tt</DependentUpon>
     </Compile>
     <Compile Include="Extensions\BrickStructuringElement.cs" />
-    <Compile Include="Extensions\RotateFlip.cs" />
+    <Compile Include="Enums\RotateFlip.cs" />
     <Compile Include="Extensions\Logical.cs" />
     <Compile Include="Extensions\Morphology.cs" />
     <Compile Include="Extensions\Operators.cs" />
@@ -124,9 +124,9 @@
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Extensions\CopyCrop.cs" />
     <Compile Include="Extensions\Edit.cs" />
-    <Compile Include="Extensions\Libtiff.cs" />
+    <Compile Include="OpenSave\Libtiff.cs" />
     <Compile Include="Extensions\Transform.cs" />
-    <Compile Include="Extensions\ScalingOptions.cs" />
+    <Compile Include="Enums\ScalingOptions.cs" />
     <Compile Include="Extensions\Statistic.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="OpenSave\ImageFormat.cs" />
