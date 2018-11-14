@@ -302,25 +302,25 @@ namespace Genix.Imaging
                         switch (orientation)
                         {
                             case TIFFOrientation.TopRight:
-                                image.RotateFlip(image, Imaging.RotateFlip.Rotate180FlipY);
+                                image.RotateFlip(image, Imaging.RotateFlip.RotateNoneFlipX);
                                 break;
                             case TIFFOrientation.BottomRight:
                                 image.RotateFlip(image, Imaging.RotateFlip.Rotate180FlipNone);
                                 break;
                             case TIFFOrientation.BottomLeft:
-                                image.RotateFlip(image, Imaging.RotateFlip.RotateNoneFlipX);
+                                image.RotateFlip(image, Imaging.RotateFlip.RotateNoneFlipY);
                                 break;
                             case TIFFOrientation.LeftTop:
-                                image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipY);
+                                image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipX);
                                 break;
                             case TIFFOrientation.RightTop:
-                                image.RotateFlip(image, Imaging.RotateFlip.Rotate90FlipNone);
+                                image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipNone);
                                 break;
                             case TIFFOrientation.RightBottom:
-                                image.RotateFlip(image, Imaging.RotateFlip.Rotate90FlipY);
+                                image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipY);
                                 break;
                             case TIFFOrientation.LeftBottom:
-                                image.RotateFlip(image, Imaging.RotateFlip.Rotate270FlipNone);
+                                image.RotateFlip(image, Imaging.RotateFlip.Rotate90FlipNone);
                                 break;
 
                             case TIFFOrientation.TopLeft:

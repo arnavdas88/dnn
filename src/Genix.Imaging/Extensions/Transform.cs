@@ -170,26 +170,28 @@ namespace Genix.Imaging
         /// </returns>
         public Image RotateFlip(Image dst, RotateFlip rotateFlipType)
         {
-            System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
-
             switch (rotateFlipType)
             {
                 case Imaging.RotateFlip.Rotate90FlipNone:
                 case Imaging.RotateFlip.Rotate90FlipX:
                 case Imaging.RotateFlip.Rotate90FlipY:
-                    matrix.Rotate(90);
+                    dst = this.Rotate90(dst);
                     break;
 
                 case Imaging.RotateFlip.Rotate180FlipNone:
                 case Imaging.RotateFlip.Rotate180FlipX:
                 case Imaging.RotateFlip.Rotate180FlipY:
-                    matrix.Rotate(180);
+                    dst = this.Rotate180(dst);
                     break;
 
                 case Imaging.RotateFlip.Rotate270FlipNone:
                 case Imaging.RotateFlip.Rotate270FlipX:
                 case Imaging.RotateFlip.Rotate270FlipY:
-                    matrix.Rotate(270);
+                    dst = this.Rotate270(dst);
+                    break;
+
+                default:
+                    dst = this.Copy(dst, true);
                     break;
             }
 
@@ -199,18 +201,18 @@ namespace Genix.Imaging
                 case Imaging.RotateFlip.Rotate90FlipX:
                 case Imaging.RotateFlip.Rotate180FlipX:
                 case Imaging.RotateFlip.Rotate270FlipX:
-                    matrix.Append(new System.Windows.Media.Matrix(-1, 0, 0, 1, 0, 0));
+                    dst = dst.Flip(dst, Imaging.Flip.X);
                     break;
 
                 case Imaging.RotateFlip.RotateNoneFlipY:
                 case Imaging.RotateFlip.Rotate90FlipY:
                 case Imaging.RotateFlip.Rotate180FlipY:
                 case Imaging.RotateFlip.Rotate270FlipY:
-                    matrix.Append(new System.Windows.Media.Matrix(1, 0, 0, -1, 0, 0));
+                    dst = dst.Flip(dst, Imaging.Flip.Y);
                     break;
             }
 
-            return this.Affine(dst, matrix, BorderType.BorderConst, this.WhiteColor);
+            return dst;
         }
 
         /// <summary>
@@ -263,6 +265,26 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Rotates this <see cref="Image"/> 180 degrees.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image Rotate180(Image dst)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Rotates this <see cref="Image"/> 90 degrees clockwise.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -312,9 +334,10 @@ namespace Genix.Imaging
         }
 
         /// <summary>
-        /// Mirrors this <see cref="Image"/> about the x-axis.
+        /// Mirrors this <see cref="Image"/> about the specified axis.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <param name="flip">The axis to flip the image about.</param>
         /// <returns>
         /// The destination <see cref="Image"/>.
         /// </returns>
@@ -326,7 +349,7 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image FlipX(Image dst)
+        public Image Flip(Image dst, Flip flip)
         {
             if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
             {
@@ -336,99 +359,31 @@ namespace Genix.Imaging
                     this.BitsPerPixel));
             }
 
-            dst = this.Copy(dst, false);
-
-            IPP.Execute(() =>
+            if (flip == Imaging.Flip.None)
             {
-                if (dst == this)
-                {
-                    return NativeMethods.mirror_horz(
-                       this.BitsPerPixel,
-                       0,
-                       0,
-                       this.Width,
-                       this.Height,
-                       this.Bits,
-                       this.Stride8,
-                       null,
-                       0);
-                }
-                else
-                {
-                    return NativeMethods.mirror_horz(
-                       this.BitsPerPixel,
-                       0,
-                       0,
-                       this.Width,
-                       this.Height,
-                       this.Bits,
-                       this.Stride8,
-                       dst.Bits,
-                       dst.Stride8);
-                }
-            });
-
-            return dst;
-        }
-
-        /// <summary>
-        /// Mirrors this <see cref="Image"/> about the y-axis.
-        /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
-        /// <exception cref="NotSupportedException">
-        /// <para>The depth of this <see cref="Image"/> is neither 8 nor 24 nor 32 bits per pixel.</para>
-        /// </exception>
-        /// <remarks>
-        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
-        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
-        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
-        /// </remarks>
-        public Image FlipY(Image dst)
-        {
-            if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
-            {
-                throw new NotSupportedException(string.Format(
-                    CultureInfo.InvariantCulture,
-                    Properties.Resources.E_UnsupportedDepth,
-                    this.BitsPerPixel));
+                return this.Copy(dst, true);
             }
-
-            dst = this.Copy(dst, false);
-
-            IPP.Execute(() =>
+            else
             {
-                if (dst == this)
-                {
-                    return NativeMethods.mirror_vert(
-                       this.BitsPerPixel,
-                       0,
-                       0,
-                       this.Width,
-                       this.Height,
-                       this.Bits,
-                       this.Stride8,
-                       null,
-                       0);
-                }
-                else
-                {
-                    return NativeMethods.mirror_vert(
-                       this.BitsPerPixel,
-                       0,
-                       0,
-                       this.Width,
-                       this.Height,
-                       this.Bits,
-                       this.Stride8,
-                       dst.Bits,
-                       dst.Stride8);
-                }
-            });
+                dst = this.Copy(dst, false);
 
-            return dst;
+                IPP.Execute(() =>
+                {
+                    return NativeMethods.mirror(
+                       this.BitsPerPixel,
+                       0,
+                       0,
+                       this.Width,
+                       this.Height,
+                       this.Bits,
+                       this.Stride8,
+                       dst == this ? null : dst.Bits,
+                       dst.Stride8,
+                       flip);
+                });
+
+                return dst;
+            }
         }
 
         /// <summary>
@@ -771,7 +726,7 @@ namespace Genix.Imaging
                 int dststep);
 
             [DllImport(NativeMethods.DllName)]
-            public static extern int mirror_vert(
+            public static extern int mirror(
                 int bitsPerPixel,
                 int x,
                 int y,
@@ -780,19 +735,8 @@ namespace Genix.Imaging
                 [In, Out] ulong[] src,
                 int srcstep,
                 [Out] ulong[] dst,
-                int dststep);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern int mirror_horz(
-                int bitsPerPixel,
-                int x,
-                int y,
-                int width,
-                int height,
-                [In, Out] ulong[] src,
-                int srcstep,
-                [Out] ulong[] dst,
-                int dststep);
+                int dststep,
+                Flip flip);
 
             [DllImport(NativeMethods.DllName)]
             public static extern unsafe int houghline(

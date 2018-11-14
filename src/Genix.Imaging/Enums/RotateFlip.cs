@@ -17,17 +17,17 @@ namespace Genix.Imaging
         RotateNoneFlipNone = 0,
 
         /// <summary>
-        /// 90-degree rotation without flipping.
+        /// 90-degree counter clockwise rotation without flipping.
         /// </summary>
         Rotate90FlipNone,
 
         /// <summary>
-        /// 180-degree rotation without flipping.
+        /// 180-degree counter clockwise rotation without flipping.
         /// </summary>
         Rotate180FlipNone,
 
         /// <summary>
-        /// 270-degree rotation without flipping.
+        /// 270-degree counter clockwise rotation without flipping.
         /// </summary>
         Rotate270FlipNone,
 
@@ -37,17 +37,17 @@ namespace Genix.Imaging
         RotateNoneFlipX,
 
         /// <summary>
-        /// 90-degree rotation followed by a horizontal flip.
+        /// 90-degree counter clockwise rotation followed by a horizontal flip.
         /// </summary>
         Rotate90FlipX,
 
         /// <summary>
-        /// 180-degree rotation followed by a horizontal flip.
+        /// 180-degree counter clockwise rotation followed by a horizontal flip.
         /// </summary>
         Rotate180FlipX,
 
         /// <summary>
-        /// 270-degree rotation followed by a horizontal flip.
+        /// 270-degree counter clockwise rotation followed by a horizontal flip.
         /// </summary>
         Rotate270FlipX,
 
@@ -57,17 +57,17 @@ namespace Genix.Imaging
         RotateNoneFlipY,
 
         /// <summary>
-        /// 90-degree rotation followed by a vertical flip.
+        /// 90-degree counter clockwise rotation followed by a vertical flip.
         /// </summary>
         Rotate90FlipY,
 
         /// <summary>
-        /// 180-degree rotation followed by a vertical flip.
+        /// 180-degree counter clockwise rotation followed by a vertical flip.
         /// </summary>
         Rotate180FlipY,
 
         /// <summary>
-        /// 270-degree rotation followed by a vertical flip.
+        /// 270-degree counter clockwise rotation followed by a vertical flip.
         /// </summary>
         Rotate270FlipY,
     }
