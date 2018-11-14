@@ -144,6 +144,7 @@
     <ClCompile Include="source\linesuppression.cpp" />
     <ClCompile Include="source\mirror.cpp" />
     <ClCompile Include="source\resize.cpp" />
+    <ClCompile Include="source\rotate.cpp" />
     <ClCompile Include="source\statistic.cpp" />
     <ClCompile Include="source\thresholding.cpp" />
     <ClCompile Include="stdafx.cpp">

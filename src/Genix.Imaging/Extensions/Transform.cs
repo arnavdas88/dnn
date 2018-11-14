@@ -214,6 +214,104 @@ namespace Genix.Imaging
         }
 
         /// <summary>
+        /// Rotates this <see cref="Image"/> 90 degrees counter clockwise.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image Rotate90(Image dst)
+        {
+            if (this.BitsPerPixel != 1 && this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.Height, this.Width, this.BitsPerPixel);
+
+            IPP.Execute(() =>
+            {
+                return NativeMethods.rotate90(
+                   this.BitsPerPixel,
+                   this.Width,
+                   this.Height,
+                   this.Bits,
+                   this.Stride8,
+                   dst.Bits,
+                   dst.Stride8);
+            });
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
+        /// Rotates this <see cref="Image"/> 90 degrees clockwise.
+        /// </summary>
+        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
+        /// <returns>
+        /// The destination <see cref="Image"/>.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
+        /// </exception>
+        /// <remarks>
+        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
+        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
+        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
+        /// </remarks>
+        public Image Rotate270(Image dst)
+        {
+            if (this.BitsPerPixel != 1 && this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
+            {
+                throw new NotSupportedException(string.Format(
+                    CultureInfo.InvariantCulture,
+                    Properties.Resources.E_UnsupportedDepth,
+                    this.BitsPerPixel));
+            }
+
+            bool inplace = dst == this;
+            dst = this.CreateTemplate(dst, this.Height, this.Width, this.BitsPerPixel);
+
+            IPP.Execute(() =>
+            {
+                return NativeMethods.rotate270(
+                   this.BitsPerPixel,
+                   this.Width,
+                   this.Height,
+                   this.Bits,
+                   this.Stride8,
+                   dst.Bits,
+                   dst.Stride8);
+            });
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
+        }
+
+        /// <summary>
         /// Mirrors this <see cref="Image"/> about the x-axis.
         /// </summary>
         /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
@@ -651,6 +749,26 @@ namespace Genix.Imaging
                double c12,
                int borderType,
                uint borderValue);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int rotate90(
+                int bitsPerPixel,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int srcstep,
+                [Out] ulong[] dst,
+                int dststep);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern int rotate270(
+                int bitsPerPixel,
+                int width,
+                int height,
+                [In] ulong[] src,
+                int srcstep,
+                [Out] ulong[] dst,
+                int dststep);
 
             [DllImport(NativeMethods.DllName)]
             public static extern int mirror_vert(
