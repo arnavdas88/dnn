@@ -69,14 +69,14 @@ namespace Genix.Core
 
             // find objects to the left
             T next;
-            while ((next = FindNext(obounds, false)) != null)
+            while ((next = FindNext(false)) != null)
             {
                 result.Add(next.Bounds, next);
                 obounds.Union(next.Bounds);
             }
 
             // find objects to the right
-            while ((next = FindNext(obounds, true)) != null)
+            while ((next = FindNext(true)) != null)
             {
                 result.Add(next.Bounds, next);
                 obounds.Union(next.Bounds);
@@ -99,25 +99,33 @@ namespace Genix.Core
 
             return new T[0];
 
-            T FindNext(Rectangle box, bool searchForward)
+            T FindNext(bool searchForward)
             {
                 // Tolerance to skew on top of current estimate of skew. Divide x or y length
                 // by kMaxSkewFactor to get the y or x skew distance.
                 // If the angle is small, the angle in degrees is roughly 60/kMaxSkewFactor.
                 const int MaxSkewFactor = 15;
 
-                // new objects found must extend beyond current box
-                int xstart = searchForward ? box.Right : box.Left;
+                // new objects found must extend beyond current baseline
+                int xstart = searchForward ? baseline.End.X : baseline.Begin.X;
                 int ystart = baseline.Y(xstart);
 
-                int xend = searchForward ? xstart + maxGap : xstart - maxGap;
+                int gap = Math.Min(maxGap, baseline.End.X - baseline.Begin.X);
+                int xend = searchForward ? xstart + gap : xstart - gap;
                 int yend = baseline.Y(xend);
+                if (yend == ystart)
+                {
+                    yend++;
+                }
 
                 Rectangle searchArea = new Rectangle(new Point(xstart, ystart), new Point(xend, yend));
 
                 // Compute skew tolerance
-                int skewTolerance = maxGap / MaxSkewFactor;
-                searchArea.Inflate(0, skewTolerance);
+                int skewTolerance = gap / MaxSkewFactor;
+                searchArea.Inflate(0, skewTolerance + tolerance);
+
+                // compute baseline end point
+                Point endPoint = new Point(xstart, ystart);
 
                 T bestCandidate = null;
                 int bestDistance = int.MaxValue;
@@ -127,16 +135,24 @@ namespace Genix.Core
                     {
                         Rectangle cbounds = candidate.Bounds;
 
+                        // test starting position
+                        // should start after baseline end point
+                        int xtest = searchForward ? cbounds.Left : cbounds.Right;
+                        if (searchForward ? xtest < endPoint.X : xtest > endPoint.X)
+                        {
+                            continue;
+                        }
+
                         // test alignment
                         int ytest = BoxBound(cbounds);
-                        int ybase = baseline.Y(searchForward ? box.Left : box.Right);
-                        if (Math.Abs(ybase - ytest) > tolerance)
+                        int ybase = baseline.Y(xtest);
+                        if (Math.Abs(ybase - ytest) > (Math.Abs(xtest - xstart) / MaxSkewFactor) + tolerance)
                         {
                             continue;
                         }
 
                         // find nearest element based on Eucledian distance
-                        int distance = box.DistanceToSquared(cbounds);
+                        int distance = endPoint.DistanceToSquared(xtest, ytest);
                         if (distance < bestDistance)
                         {
                             bestCandidate = candidate;

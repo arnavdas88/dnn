@@ -113,5 +113,49 @@ namespace Genix.DocumentAnalysis
         {
             this.shapes.AddRange(shapes);
         }
+
+        /// <inheritdoc />
+        public override void Offset(int dx, int dy)
+        {
+            base.Offset(dx, dy);
+
+            foreach (Shape shape in this.EnumAllShapes())
+            {
+                shape.Offset(dx, dy);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Offset(Point point)
+        {
+            base.Offset(point);
+
+            foreach (Shape shape in this.EnumAllShapes())
+            {
+                shape.Offset(point);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Scale(int dx, int dy)
+        {
+            base.Scale(dx, dy);
+
+            foreach (Shape shape in this.EnumAllShapes())
+            {
+                shape.Scale(dx, dy);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Scale(float dx, float dy)
+        {
+            base.Scale(dx, dy);
+
+            foreach (Shape shape in this.EnumAllShapes())
+            {
+                shape.Scale(dx, dy);
+            }
+        }
     }
 }

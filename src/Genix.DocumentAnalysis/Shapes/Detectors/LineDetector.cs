@@ -49,7 +49,7 @@ namespace Genix.DocumentAnalysis
         /// <summary>
         /// The maximum length of the gap within the line, in pixels, for images with resolution 200 dpi.
         /// </summary>
-        private const int MaxLineGap = 40;
+        private const int MaxLineGap = 150;
 
         /// <summary>
         /// The minimum line thickness, in pixels, for images with resolution 200 dpi.
@@ -220,7 +220,7 @@ namespace Genix.DocumentAnalysis
                 {
                     // close up small holes
                     int maxLineWidth = LineDetector.MaxLineWidth.MulDiv(image.HorizontalResolution, 200);
-                    Image closedImage = image.MorphClose(null, StructuringElement.Square(maxLineWidth / 3), 1, BorderType.BorderConst, image.WhiteColor);
+                    Image closedImage = image.MorphClose(null, StructuringElement.Brick(maxLineWidth / 3, 2), 1, BorderType.BorderConst, image.WhiteColor);
 
                     // open up to detect big solid areas
                     Image openedImage = closedImage.MorphOpen(null, StructuringElement.Square(maxLineWidth), 1, BorderType.BorderConst, image.WhiteColor);
@@ -275,7 +275,7 @@ namespace Genix.DocumentAnalysis
 
                     if (vlines != null)
                     {
-                        nonLines = image.Sub(nonLines, vlines, 0);
+                        nonLines = (nonLines ?? image).Sub(nonLines, vlines, 0);
                     }
 
                     Image intersections = vlines != null && hlines != null ? hlines & vlines : null;
@@ -377,8 +377,9 @@ namespace Genix.DocumentAnalysis
 
                 void RemoveIntersections()
                 {
+                    // TODO:
                     // get the intersection residue
-                    Image residue = hlines
+                    /*Image residue = hlines
                         .And(null, vlines)
                         .Dilate(null, StructuringElement.Square(5), 1, BorderType.BorderConst, image.WhiteColor);
 
@@ -387,7 +388,7 @@ namespace Genix.DocumentAnalysis
                     // remove the residue
                     image.Xand(image, residue);
 
-                    cancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();*/
                 }
             }
 
@@ -830,7 +831,7 @@ namespace Genix.DocumentAnalysis
 
             int minLineLength = (this.MinHorizontalLineLength * hlines.HorizontalResolution).Round();
             int maxGap = LineDetector.MaxLineGap.MulDiv(hlines.HorizontalResolution, 200);
-            int tolerance = 6.MulDiv(hlines.VerticalResolution, 200);
+            int tolerance = 3.MulDiv(hlines.VerticalResolution, 200);
 
             HashSet<LineShape> newlines = new HashSet<LineShape>();
 
@@ -841,7 +842,7 @@ namespace Genix.DocumentAnalysis
                     IList<LineShape> alignedLines = grid.FindVerticalAlignment(
                         line,
                         VerticalAlignment.Center,
-                        Math.Min(maxGap, line.Bounds.Width),
+                        maxGap,
                         tolerance,
                         (result, bounds) => bounds.Width >= minLineLength && (result.Count >= 2 || result.Any(o => o.Bounds.Width >= minLineLength)));
 
@@ -928,10 +929,20 @@ namespace Genix.DocumentAnalysis
                 Rectangle bounds = line.Bounds;
 
                 // Test density near the line if there are not enough intersections
-                if (CountIntersections(line.Bounds) < 2)
+                int numberOfIntersections = CountIntersections(line.Bounds);
+                if (numberOfIntersections < 2)
                 {
-                    int count = CountAdjacentPixels(line.Width, bounds);
-                    if (count > (bounds.Area * LineDetector.MaxNonLineDensity).Round())
+                    Rectangle areaBounds = Rectangle.Inflate(bounds, 0, Math.Min(2, line.Width));
+                    areaBounds.Intersect(nonHLines.Bounds);
+
+                    float threshold = LineDetector.MaxNonLineDensity * (areaBounds.Height - bounds.Height) * areaBounds.Width;
+                    if (numberOfIntersections == 1)
+                    {
+                        threshold *= 1.2f;
+                    }
+
+                    int pixelCount = (int)nonHLines.Power(areaBounds);
+                    if (pixelCount > threshold.Round())
                     {
                         isBad = true;
                     }
@@ -944,14 +955,6 @@ namespace Genix.DocumentAnalysis
 
                 return isBad;
             });
-
-            int CountAdjacentPixels(int lineWidth, Rectangle bounds)
-            {
-                bounds.Inflate(0, lineWidth);
-                bounds.Intersect(nonHLines.Bounds);
-
-                return (int)nonHLines.Power(bounds);
-            }
 
             int CountIntersections(Rectangle bounds)
             {

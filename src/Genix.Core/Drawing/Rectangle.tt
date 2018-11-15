@@ -559,7 +559,7 @@ namespace Genix.Drawing
         public static Rectangle<#=suffix#> Offset(Rectangle<#=suffix#> rect, <#=type#> dx, <#=type#> dy) => new Rectangle<#=suffix#>(rect.x + dx, rect.y + dy, rect.w, rect.h);
 
         /// <summary>
-        /// Translates the specified <see cref="Rectangle<#=suffix#>"/> by the specified <see cref="Rectangle<#=suffix#>"/>.
+        /// Translates the specified <see cref="Rectangle<#=suffix#>"/> by the specified <see cref="Point<#=suffix#>"/>.
         /// </summary>
         /// <param name="rect">The <see cref="Rectangle<#=suffix#>"/> to translate.</param>
         /// <param name="offset">The <see cref="Point<#=suffix#>"/> that contains the offset for the <paramref name="rect"/>.</param>
@@ -1191,7 +1191,7 @@ namespace Genix.Drawing
         }
 
         /// <summary>
-        /// Translates this <see cref="Rectangle<#=suffix#>"/> by the specified <see cref="Rectangle<#=suffix#>"/>.
+        /// Translates this <see cref="Rectangle<#=suffix#>"/> by the specified <see cref="Point<#=suffix#>"/>.
         /// </summary>
         /// <param name="point">The <see cref="Point<#=suffix#>"/> that contains the offset.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

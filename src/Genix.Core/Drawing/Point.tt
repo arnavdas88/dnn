@@ -311,6 +311,21 @@ namespace Genix.Drawing
 <# } #>
 
         /// <summary>
+        /// Computes the Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified point.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to compute the distance to.</param>
+        /// <param name="y">The y-coordinate of the point to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the squared Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified point.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+<# if (type == "int" || type == "float") { #>
+        public float DistanceTo(<#=type#> x, <#=type#> y) => (float)Math.Sqrt(this.DistanceToSquared(x, y));
+<# } else { #>
+        public <#=type#> DistanceTo(<#=type#> x, <#=type#> y) => Math.Sqrt(this.DistanceToSquared(x, y));
+<# } #>
+
+        /// <summary>
         /// Computes the Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified <see cref="Point<#=suffix#>"/>.
         /// </summary>
         /// <param name="point">The <see cref="Point<#=suffix#>"/> to compute the distance to.</param>
@@ -345,18 +360,29 @@ namespace Genix.Drawing
         public <#=type#> DistanceToY(Point<#=suffix#> point) => Math.Abs(this.y - point.y);
 
         /// <summary>
+        /// Computes the squared Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified point.
+        /// </summary>
+        /// <param name="x">The x-coordinate of the point to compute the distance to.</param>
+        /// <param name="y">The y-coordinate of the point to compute the distance to.</param>
+        /// <returns>
+        /// A value that represents the squared Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified point.
+        /// </returns>
+        public <#=type#> DistanceToSquared(<#=type#> x, <#=type#> y)
+        {
+            <#=type#> dx = this.x - x;
+            <#=type#> dy = this.y - y;
+            return (dx * dx) + (dy * dy);
+        }
+
+        /// <summary>
         /// Computes the squared Euclidean distance between this <see cref="Point<#=suffix#>"/> and the specified <see cref="Point<#=suffix#>"/>.
         /// </summary>
         /// <param name="point">The <see cref="Point<#=suffix#>"/> to compute the distance to.</param>
         /// <returns>
         /// A value that represents the squared Euclidean distance between this <see cref="Point<#=suffix#>"/> and <paramref name="point"/>.
         /// </returns>
-        public <#=type#> DistanceToSquared(Point<#=suffix#> point)
-        {
-            <#=type#> dx = this.x - point.x;
-            <#=type#> dy = this.y - point.y;
-            return (dx * dx) + (dy * dy);
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public <#=type#> DistanceToSquared(Point<#=suffix#> point) => this.DistanceToSquared(point.X, point.Y);
     }
 
     /// <summary>

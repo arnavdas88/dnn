@@ -17,6 +17,9 @@ namespace Genix.DocumentAnalysis
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class Shape : IAlignedBoundedObject
     {
+        [JsonProperty("bounds")]
+        private Rectangle bounds;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class.
         /// </summary>
@@ -24,7 +27,7 @@ namespace Genix.DocumentAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected Shape(Rectangle bounds)
         {
-            this.Bounds = bounds;
+            this.bounds = bounds;
         }
 
         /// <summary>
@@ -36,8 +39,11 @@ namespace Genix.DocumentAnalysis
         }
 
         /// <inheritdoc />
-        [JsonProperty("bounds")]
-        public Rectangle Bounds { get; protected set; }
+        public Rectangle Bounds
+        {
+            get => this.bounds;
+            private protected set => this.bounds = value;
+        }
 
         /// <inheritdoc />
         [JsonProperty("halign", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -60,6 +66,37 @@ namespace Genix.DocumentAnalysis
             CultureInfo.InvariantCulture,
             "{0}: {1}",
             this.GetType().Name,
-            this.Bounds);
+            this.bounds);
+
+        /// <summary>
+        /// Translates the position of this <see cref="Shape"/> by the specified amount.
+        /// </summary>
+        /// <param name="dx">The amount to offset the x-coordinate.</param>
+        /// <param name="dy">The amount to offset the y-coordinate.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void Offset(int dx, int dy) => this.bounds.Offset(dx, dy);
+
+        /// <summary>
+        /// Translates the position of this <see cref="Shape"/> by the specified <see cref="Point"/>.
+        /// </summary>
+        /// <param name="point">The <see cref="Point"/> that contains the offset.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void Offset(Point point) => this.bounds.Offset(point);
+
+        /// <summary>
+        /// Scales the location and the dimensions of this <see cref="Shape"/>.
+        /// </summary>
+        /// <param name="dx">The amount by which to scale the left position and the width of the shape.</param>
+        /// <param name="dy">The amount by which to scale the top position and the height of the shape.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void Scale(int dx, int dy) => this.bounds.Scale(dx, dy);
+
+        /// <summary>
+        /// Scales the location and the dimensions of this <see cref="Shape"/>.
+        /// </summary>
+        /// <param name="dx">The amount by which to scale the left position and the width of the shape.</param>
+        /// <param name="dy">The amount by which to scale the top position and the height of the shape.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public virtual void Scale(float dx, float dy) => this.bounds.Scale(dx, dy);
     }
 }
