@@ -64,7 +64,7 @@
     <Compile Include="Encoders\BitmapEncoder.cs" />
     <Compile Include="Encoders\ImageEncoder.cs" />
     <Compile Include="Encoders\TiffEncoder.cs" />
-    <Compile Include="Enums\Flip.cs" />
+    <Compile Include="Enums\FlipAxis.cs" />
     <Compile Include="Extensions\Arithmetic.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

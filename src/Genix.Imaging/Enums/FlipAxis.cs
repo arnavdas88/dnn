@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Flip.cs" company="Noname, Inc.">
+// <copyright file="FlipAxis.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -9,7 +9,7 @@ namespace Genix.Imaging
     /// <summary>
     /// Specifies the axis used to flip the image.
     /// </summary>
-    public enum Flip
+    public enum FlipAxis
     {
         /// <summary>
         /// No flipping.
@@ -17,13 +17,18 @@ namespace Genix.Imaging
         None = 0,
 
         /// <summary>
-        /// Horizontal flip.
+        /// Flip about x-axis (vertical flip).
         /// </summary>
         X,
 
         /// <summary>
-        /// Vertical flip.
+        /// Flip about y-axis (horizontal flip).
         /// </summary>
         Y,
+
+        /// <summary>
+        /// Flip about both axes (180 degrees rotation).
+        /// </summary>
+        Both,
     }
 }

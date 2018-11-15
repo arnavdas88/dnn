@@ -6,11 +6,12 @@
 #define check_sts(st) if((st) != ippStsNoErr) goto exitLine; /* Go to Exit if Intel(R) IPP function returned status different from ippStsNoErr */
 
 /* Results of ippMalloc() are not validated because Intel(R) IPP functions perform bad arguments check and will return an appropriate status  */
-enum _GenixFlip : int
+enum _GenixFlipAxis : int
 {
-	genixFlipNone = 0,
-	genixFlipX,
-	genixFlipY,
+	genixFlipAxisNone = 0,
+	genixFlipAxisX,
+	genixFlipAxisY,
+	genixFlipAxisXY,
 };
 
 GENIXAPI(int, mirror)(
@@ -25,9 +26,10 @@ GENIXAPI(int, mirror)(
 	IppiAxis ippAxis;
 	switch (flip)
 	{
-	case genixFlipX:	ippAxis = ippAxsHorizontal; break;
-	case genixFlipY:	ippAxis = ippAxsVertical; break;
-	default:			ippAxis = (IppiAxis)-1; break;
+	case genixFlipAxisX:	ippAxis = ippAxsHorizontal; break;
+	case genixFlipAxisY:	ippAxis = ippAxsVertical; break;
+	case genixFlipAxisXY:	ippAxis = ippAxsBoth; break;
+	default:				ippAxis = (IppiAxis)-1; break;
 	}
 
 	src += (ptrdiff_t(y) * srcstep) + (x * bitsPerPixel / 8);
