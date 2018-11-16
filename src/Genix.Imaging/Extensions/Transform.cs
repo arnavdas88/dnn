@@ -181,7 +181,7 @@ namespace Genix.Imaging
                 case Imaging.RotateFlip.Rotate180FlipNone:
                 case Imaging.RotateFlip.Rotate180FlipX:
                 case Imaging.RotateFlip.Rotate180FlipY:
-                    dst = this.Rotate180(dst);
+                    dst = this.Flip(dst, FlipAxis.Both);
                     break;
 
                 case Imaging.RotateFlip.Rotate270FlipNone:
@@ -201,14 +201,14 @@ namespace Genix.Imaging
                 case Imaging.RotateFlip.Rotate90FlipX:
                 case Imaging.RotateFlip.Rotate180FlipX:
                 case Imaging.RotateFlip.Rotate270FlipX:
-                    dst = dst.Flip(dst, Imaging.Flip.X);
+                    dst = dst.Flip(dst, FlipAxis.Y);
                     break;
 
                 case Imaging.RotateFlip.RotateNoneFlipY:
                 case Imaging.RotateFlip.Rotate90FlipY:
                 case Imaging.RotateFlip.Rotate180FlipY:
                 case Imaging.RotateFlip.Rotate270FlipY:
-                    dst = dst.Flip(dst, Imaging.Flip.Y);
+                    dst = dst.Flip(dst, FlipAxis.X);
                     break;
             }
 
@@ -262,26 +262,6 @@ namespace Genix.Imaging
             }
 
             return dst;
-        }
-
-        /// <summary>
-        /// Rotates this <see cref="Image"/> 180 degrees.
-        /// </summary>
-        /// <param name="dst">The destination <see cref="Image"/>. Can be <b>null</b>.</param>
-        /// <returns>
-        /// The destination <see cref="Image"/>.
-        /// </returns>
-        /// <exception cref="NotSupportedException">
-        /// <para>The depth of this <see cref="Image"/> is neither 1 nor 8 nor 24 nor 32 bits per pixel.</para>
-        /// </exception>
-        /// <remarks>
-        /// <para>If <paramref name="dst"/> is <b>null</b> the method creates new destination <see cref="Image"/> with dimensions of this <see cref="Image"/>.</para>
-        /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
-        /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
-        /// </remarks>
-        public Image Rotate180(Image dst)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -349,7 +329,7 @@ namespace Genix.Imaging
         /// <para>If <paramref name="dst"/> equals this <see cref="Image"/>, the operation is performed in-place.</para>
         /// <para>Conversely, the <paramref name="dst"/> is reallocated to the dimensions of this <see cref="Image"/>.</para>
         /// </remarks>
-        public Image Flip(Image dst, Flip flip)
+        public Image Flip(Image dst, FlipAxis flip)
         {
             if (this.BitsPerPixel != 8 && this.BitsPerPixel != 24 && this.BitsPerPixel != 32)
             {
@@ -359,7 +339,7 @@ namespace Genix.Imaging
                     this.BitsPerPixel));
             }
 
-            if (flip == Imaging.Flip.None)
+            if (flip == Imaging.FlipAxis.None)
             {
                 return this.Copy(dst, true);
             }
@@ -736,7 +716,7 @@ namespace Genix.Imaging
                 int srcstep,
                 [Out] ulong[] dst,
                 int dststep,
-                Flip flip);
+                FlipAxis flip);
 
             [DllImport(NativeMethods.DllName)]
             public static extern unsafe int houghline(
