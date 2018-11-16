@@ -222,12 +222,14 @@
 
             Tensor x = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { batchSize, inputSize },
                 new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[]
                 {
@@ -303,12 +305,14 @@
 
             Tensor x = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { batchSize, inputSize },
                 new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[]
                 {
@@ -386,12 +390,14 @@
 
             Tensor x = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { batchSize, inputSize },
                 new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[]
                 {

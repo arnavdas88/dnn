@@ -18,8 +18,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor a = new Tensor(null, new[] { length });
-                Tensor b = new Tensor(null, new[] { length });
+                Tensor a = new Tensor(null, TensorShape.Unknown, new[] { length });
+                Tensor b = new Tensor(null, TensorShape.Unknown, new[] { length });
                 a.Randomize(this.random);
                 b.Randomize(this.random);
 
@@ -28,6 +28,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw + bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -48,7 +49,7 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 // simple multiplication
@@ -56,6 +57,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => xw + alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -77,8 +79,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor a = new Tensor(null, new[] { length });
-                Tensor b = new Tensor(null, new[] { length });
+                Tensor a = new Tensor(null, TensorShape.Unknown, new[] { length });
+                Tensor b = new Tensor(null, TensorShape.Unknown, new[] { length });
                 a.Randomize(this.random);
                 b.Randomize(this.random);
 
@@ -87,6 +89,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw - bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -106,7 +109,7 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 // simple multiplication
@@ -115,6 +118,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     x.Axes,
                     x.Weights.Take(length).Select(w => w * 2.0f).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -132,8 +136,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor a = new Tensor(null, new[] { length });
-                Tensor b = new Tensor(null, new[] { length });
+                Tensor a = new Tensor(null, TensorShape.Unknown, new[] { length });
+                Tensor b = new Tensor(null, TensorShape.Unknown, new[] { length });
                 a.Randomize(this.random);
                 b.Randomize(this.random);
 
@@ -142,6 +146,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     a.Weights.Take(length).Zip(b.Weights, (aw, bw) => aw * bw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -168,13 +173,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y = MathOperations.Square(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => xw * xw).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -197,13 +203,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y = MathOperations.Pow(session, x, power);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => (float)Math.Pow(xw, power)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -225,13 +232,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y = MathOperations.Sqrt(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => (float)Math.Sqrt(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -253,13 +261,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y = MathOperations.Abs(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     y.Axes,
                     x.Weights.Take(length).Select(xw => Math.Abs(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -281,8 +290,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor a = new Tensor(null, new[] { length });
-                Tensor b = new Tensor(null, new[] { length });
+                Tensor a = new Tensor(null, TensorShape.Unknown, new[] { length });
+                Tensor b = new Tensor(null, TensorShape.Unknown, new[] { length });
                 a.Randomize(this.random);
                 b.Randomize(this.random);
 
@@ -290,6 +299,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     y.Axes,
                     a.Weights.Take(length).Zip(b.Weights, (aw, bw) => Math.Max(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -322,8 +332,8 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor a = new Tensor(null, new[] { length });
-                Tensor b = new Tensor(null, new[] { length });
+                Tensor a = new Tensor(null, TensorShape.Unknown, new[] { length });
+                Tensor b = new Tensor(null, TensorShape.Unknown, new[] { length });
                 a.Randomize(this.random);
                 b.Randomize(this.random);
 
@@ -331,6 +341,7 @@
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     y.Axes,
                     a.Weights.Take(length).Zip(b.Weights, (aw, bw) => Math.Min(aw, bw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
@@ -363,13 +374,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.ReLU(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => Math.Max(xw, 0)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
@@ -396,13 +408,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Tanh(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => Nonlinearity.Tanh(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
@@ -429,13 +442,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Sigmoid(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => Nonlinearity.Sigmoid(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
@@ -462,13 +476,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Sin(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => (float)Math.Sin(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
@@ -495,13 +510,14 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, new[] { length });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { length });
                 x.Randomize(this.random);
 
                 Tensor y1 = MathOperations.Cos(session, x);
 
                 Tensor expected = new Tensor(
                     null,
+                    TensorShape.Unknown,
                     new[] { length },
                     x.Weights.Take(length).Select(xw => (float)Math.Cos(xw)).ToArray());
                 Helpers.AreTensorsEqual(expected, y1);
@@ -532,8 +548,8 @@
 
             Session session = new Session();
 
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
-            Tensor y = new Tensor(null, new[] { n }, new float[] { 4, 5 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor y = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 4, 5 });
 
             // column-major
             // [1]
@@ -543,6 +559,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { n, m },
                 new float[]
                 {
@@ -595,8 +612,8 @@
 
             Session session = new Session();
 
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
-            Tensor y = new Tensor(null, new[] { n }, new float[] { 4, 5 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor y = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 4, 5 });
 
             // row-major
             // [1]
@@ -606,6 +623,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { m, n },
                 new float[]
                 {
@@ -658,8 +676,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { n }, new float[] { 7, 8 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 7, 8 });
 
             // y = A * x
             // [1, 4]
@@ -669,6 +687,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { m },
                 new float[]
                 {
@@ -721,8 +740,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 7, 8, 9 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 7, 8, 9 });
 
             // y = A' * x
             // [1, 4]'   [7]
@@ -732,6 +751,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { n },
                 new float[]
                 {
@@ -784,8 +804,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { n }, new float[] { 7, 8 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 7, 8 });
 
             // y = A * x
             // [1, 2]
@@ -795,6 +815,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { m },
                 new float[]
                 {
@@ -847,8 +868,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 7, 8, 9 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 7, 8, 9 });
 
             // y = A' * x
             // [1, 2]'   [7]
@@ -858,6 +879,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { n },
                 new float[]
                 {
@@ -910,9 +932,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { n }, new float[] { 7, 8 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 7, 8 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // y = A * x
             // [1, 4]         [1]
@@ -922,6 +944,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { m },
                 new float[]
                 {
@@ -977,9 +1000,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 7, 8, 9 });
-            Tensor bias = new Tensor(null, new[] { n }, new float[] { 1, 2 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { n, m }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 7, 8, 9 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 1, 2 });
 
             // y = A' * x
             // [1, 4]'   [7]
@@ -989,6 +1012,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { n },
                 new float[]
                 {
@@ -1044,9 +1068,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { n }, new float[] { 7, 8 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 7, 8 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // y = A * x
             // [1, 2]         [1]
@@ -1056,6 +1080,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { m },
                 new float[]
                 {
@@ -1111,9 +1136,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
-            Tensor x = new Tensor(null, new[] { m }, new float[] { 7, 8, 9 });
-            Tensor bias = new Tensor(null, new[] { n }, new float[] { 1, 2 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, n }, new float[] { 1, 2, 3, 4, 5, 6 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 7, 8, 9 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { n }, new float[] { 1, 2 });
 
             // y = A' * x
             // [1, 2]'   [7]
@@ -1123,6 +1148,7 @@
 
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { n },
                 new float[]
                 {
@@ -1179,8 +1205,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A * B
             // [1, 4, 7, 10]   [21, 25]
@@ -1189,7 +1215,7 @@
             //                 [24, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1226,8 +1252,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A' * B
             // [1, 5, 9 ]'   [21, 25]
@@ -1236,7 +1262,7 @@
             // [4, 8, 12]    [24, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1274,8 +1300,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A * B'
             // [1, 4, 7, 10]   [21, 23, 25, 27]'
@@ -1283,7 +1309,7 @@
             // [3, 6, 9, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1319,8 +1345,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A' * B'
             // [1, 5, 9 ]'   [21, 23, 25, 27]'
@@ -1329,7 +1355,7 @@
             // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1366,8 +1392,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A * B
             // [1, 2,  3,  4 ]   [21, 22]
@@ -1376,7 +1402,7 @@
             //                   [27, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1413,8 +1439,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A' * B
             // [1,  2,  3 ]'   [21, 22]
@@ -1423,7 +1449,7 @@
             // [10, 11, 12]    [27, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1461,8 +1487,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A * B'
             // [1, 2,  3,  4 ]   [21, 22, 23, 24]'
@@ -1470,7 +1496,7 @@
             // [9, 10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1506,8 +1532,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
 
             // C = A' * B'
             // [1,  2,  3 ]'   [21, 22, 23, 24]'
@@ -1516,7 +1542,7 @@
             // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1553,8 +1579,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
 
             // C = A * B
             // [1, 4, 7, 10]   [21]
@@ -1563,7 +1589,7 @@
             //                 [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1600,8 +1626,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
 
             // C = A' * B
             // [1, 5, 9 ]'   [21]
@@ -1610,7 +1636,7 @@
             // [4, 8, 12]    [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1648,8 +1674,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
 
             // C = A * B'
             // [1, 4, 7, 10]
@@ -1657,7 +1683,7 @@
             // [3, 6, 9, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1693,8 +1719,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
 
             // C = A' * B'
             // [1, 5, 9 ]'
@@ -1703,7 +1729,7 @@
             // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1740,8 +1766,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
 
             // C = A * B
             // [1, 2,  3,  4 ]   [21]
@@ -1750,7 +1776,7 @@
             //                   [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1787,8 +1813,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
 
             // C = A' * B
             // [1,  2,  3 ]'   [21]
@@ -1797,7 +1823,7 @@
             // [10, 11, 12]    [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1835,8 +1861,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
 
             // C = A * B'
             // [1, 2,  3,  4 ]
@@ -1844,7 +1870,7 @@
             // [9, 10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1880,8 +1906,8 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
 
             // C = A' * B'
             // [1,  2,  3 ]'
@@ -1890,7 +1916,7 @@
             // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, null);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Helpers.AreTensorsEqual(expected, c);
 
@@ -1927,9 +1953,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B
             // [1, 4, 7, 10]   [21, 25]   [1, 1]
@@ -1938,7 +1964,7 @@
             //                 [24, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -1964,7 +1990,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 0, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -1980,9 +2006,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B
             // [1, 5, 9 ]'   [21, 25]   [1, 1]
@@ -1991,7 +2017,7 @@
             // [4, 8, 12]    [24, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2018,7 +2044,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 0, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2034,9 +2060,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B'
             // [1, 4, 7, 10]   [21, 23, 25, 27]'   [1, 1]
@@ -2044,7 +2070,7 @@
             // [3, 6, 9, 12]                       [3, 3]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2069,7 +2095,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 0, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2085,9 +2111,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B'
             // [1, 5, 9 ]'   [21, 23, 25, 27]'   [1, 1]
@@ -2096,7 +2122,7 @@
             // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2122,7 +2148,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 0, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 0, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2138,9 +2164,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B
             // [1, 2,  3,  4 ]   [21, 22]   [1, 1]
@@ -2149,7 +2175,7 @@
             //                   [27, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2175,7 +2201,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 1, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2191,9 +2217,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B
             // [1,  2,  3 ]'   [21, 22]   [1, 1]
@@ -2202,7 +2228,7 @@
             // [10, 11, 12]    [27, 28]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2229,7 +2255,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 1, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2245,9 +2271,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B'
             // [1, 2,  3,  4 ]   [21, 22, 23, 24]'   [1, 1]
@@ -2255,7 +2281,7 @@
             // [9, 10, 11, 12]                       [3, 3]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2280,7 +2306,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 1, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2296,9 +2322,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24, 25, 26, 27, 28 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B'
             // [1,  2,  3 ]'   [21, 22, 23, 24]'   [1, 1]
@@ -2307,7 +2333,7 @@
             // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Vectors.Tile(m, n, bias.Weights, 0, expected.Weights, 0);
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, false);
             Helpers.AreTensorsEqual(expected, c);
@@ -2333,7 +2359,7 @@
             Helpers.AreArraysEqual(b.Length, expectedDB, b.Gradient);
 
             // dbias += sum(dC) by column
-            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, c.Axes, c.Gradient), 1, n).Weights;
+            float[] expectedDbias = ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, c.Axes, c.Gradient), 1, n).Weights;
             Helpers.AreArraysEqual(expectedDbias.Length, expectedDbias, bias.Gradient);
         }
 
@@ -2349,9 +2375,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B
             // [1, 4, 7, 10]   [21]   [1]
@@ -2360,7 +2386,7 @@
             //                 [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2401,9 +2427,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B
             // [1, 5, 9 ]'   [21]   [1]
@@ -2412,7 +2438,7 @@
             // [4, 8, 12]    [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2454,9 +2480,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B'
             // [1, 4, 7, 10]                       [1]
@@ -2464,7 +2490,7 @@
             // [3, 6, 9, 12]                       [3]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, false, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2504,9 +2530,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B'
             // [1, 5, 9 ]'                       [1]
@@ -2515,7 +2541,7 @@
             // [4, 8, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.ColumnMajor, a, true, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { n, m });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { n, m });
             Matrix.MxM(MatrixLayout.ColumnMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2556,9 +2582,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B
             // [1, 2,  3,  4 ]   [21]   [1]
@@ -2567,7 +2593,7 @@
             //                   [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, false, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2608,9 +2634,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { k, n }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { k, n }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B
             // [1,  2,  3 ]'   [21]   [1]
@@ -2619,7 +2645,7 @@
             // [10, 11, 12]    [24]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, false, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, false, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2661,9 +2687,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { m, k }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A * B'
             // [1, 2,  3,  4 ]                       [1]
@@ -2671,7 +2697,7 @@
             // [9, 10, 11, 12]                       [3]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, false, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, false, b.Weights, 0, true, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);
@@ -2711,9 +2737,9 @@
 
             Session session = new Session();
 
-            Tensor a = new Tensor(null, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
-            Tensor b = new Tensor(null, new[] { n, k }, new float[] { 21, 22, 23, 24 });
-            Tensor bias = new Tensor(null, new[] { m }, new float[] { 1, 2, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { k, m }, new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+            Tensor b = new Tensor(null, TensorShape.Unknown, new[] { n, k }, new float[] { 21, 22, 23, 24 });
+            Tensor bias = new Tensor(null, TensorShape.Unknown, new[] { m }, new float[] { 1, 2, 3 });
 
             // C = A' * B'
             // [1,  2,  3 ]'                       [1]
@@ -2722,7 +2748,7 @@
             // [10, 11, 12]
             Tensor c = MathOperations.MxM(session, MatrixLayout.RowMajor, a, true, b, true, bias);
 
-            Tensor expected = new Tensor(null, new[] { m, n });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { m, n });
             Matrix.MxM(MatrixLayout.RowMajor, m, k, n, a.Weights, 0, true, b.Weights, 0, true, expected.Weights, 0, true);
             Vectors.Add(m, bias.Weights, 0, expected.Weights, 0);
             Helpers.AreTensorsEqual(expected, c);

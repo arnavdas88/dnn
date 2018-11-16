@@ -113,7 +113,7 @@
 
             Session session = new Session();
 
-            Tensor source = new Tensor(null, shape, new float[] { 2, -3 });
+            Tensor source = new Tensor(null, TensorShape.Unknown, shape, new float[] { 2, -3 });
             Tensor x = source.Clone() as Tensor;
             Tensor y = layer.Forward(session, new[] { x })[0];
 

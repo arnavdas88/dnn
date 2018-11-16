@@ -120,7 +120,7 @@
 
             for (int i = 1; i <= 3; i++)
             {
-                Tensor x = new Tensor(null, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
                 x.Randomize();
                 IList<Tensor> xs = new[] { x };
                 IList<Tensor> ys = layer.Forward(null, xs);
@@ -138,7 +138,7 @@
 
             try
             {
-                Tensor x = new Tensor(null, shape);
+                Tensor x = new Tensor(null, TensorShape.Unknown, shape);
                 x.Randomize();
                 IList<Tensor> xs = new[] { x, x };
 
@@ -162,7 +162,7 @@
 
             try
             {
-                Tensor x = new Tensor(null, shape);
+                Tensor x = new Tensor(null, TensorShape.Unknown, shape);
                 layer.Forward(null, new[] { x, x });
             }
             catch (ArgumentException e)
@@ -181,7 +181,7 @@
 
             try
             {
-                Tensor x = new Tensor(null, new[] { 1, 2, 3 });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1, 2, 3 });
                 layer.Forward(null, new[] { x });
             }
             catch (ArgumentException e)
@@ -206,7 +206,7 @@
 
             try
             {
-                Tensor x = new Tensor(null, new[] { 1, 30, 15, 10 });
+                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1, 30, 15, 10 });
                 layer.Forward(null, new[] { x });
             }
             catch (ArgumentException e)

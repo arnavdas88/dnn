@@ -142,7 +142,7 @@ namespace Genix.DNN.Layers
 
             this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
 
-            this.U = new Tensor("hidden weights", hiddenShape);
+            this.U = new Tensor("hidden weights", TensorShape.Unknown, hiddenShape);
             this.U.Randomize(random);
         }
     }

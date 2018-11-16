@@ -113,7 +113,7 @@
             int[] shape = new[] { -1, 3, 2, 4 };
             MaxOutLayer layer = new MaxOutLayer(shape, 2);
 
-            Tensor xTemp = new Tensor(null, Shape.Reshape(shape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, 1));
             xTemp.Set(new float[]
             {
                 11, 12, 13, 14,  12, -11, 15, 16,
@@ -121,7 +121,7 @@
                 31, 32, 33, 34,  32, -31, 35, 36,
             });
 
-            Tensor expectedTemp = new Tensor(null, Shape.Reshape(layer.OutputShape, (int)Axis.B, 1));
+            Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, Shape.Reshape(layer.OutputShape, (int)Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 12, 14,  12, 16,
@@ -129,7 +129,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor dyTemp = new Tensor(null, expectedTemp.Axes);
+            Tensor dyTemp = new Tensor(null, TensorShape.Unknown, expectedTemp.Axes);
             dyTemp.Set(new float[]
             {
                 12, 14,  12, 16,
@@ -137,7 +137,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, xTemp.Axes);
+            Tensor expectedDxTemp = new Tensor(null, TensorShape.Unknown, xTemp.Axes);
             expectedDxTemp.Set(new float[]
             {
                 0, 12, 0, 14,  12, 0, 0, 16,

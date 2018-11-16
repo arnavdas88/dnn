@@ -45,7 +45,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Add(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -109,7 +109,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.AddC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
@@ -149,7 +149,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Sub(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -209,7 +209,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Mul(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -267,7 +267,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.MulC(x.Length, x.Weights, 0, alpha, y.Weights, 0);
 
 #if !NOLEARNING
@@ -311,7 +311,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Div(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -370,7 +370,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Square(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -414,7 +414,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Pow(x.Length, x.Weights, 0, power, y.Weights, 0);
 
 #if !NOLEARNING
@@ -457,7 +457,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Sqrt(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -500,7 +500,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Abs(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -545,7 +545,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Max(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -599,7 +599,7 @@ namespace Genix.DNN
 
                     bool calculateGradient = session.CalculateGradients && (a.CalculateGradient || b.CalculateGradient);
 
-                    Tensor y = session.AllocateTensor(ActionName, a.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, a.Shape, a.Axes, calculateGradient);
                     Vectors.Min(a.Length, a.Weights, 0, b.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -650,7 +650,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Nonlinearity.ReLU(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -727,7 +727,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Nonlinearity.Sigmoid(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -769,7 +769,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Nonlinearity.Tanh(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -841,7 +841,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Sin(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -883,7 +883,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
                     Vectors.Cos(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -966,7 +966,7 @@ namespace Genix.DNN
                     // calculate matrix C dimensions
                     int ccols = matrixLayout == MatrixLayout.RowMajor ? m : n;
                     int crows = matrixLayout == MatrixLayout.RowMajor ? n : m;
-                    Tensor c = session.AllocateTensor(ActionName, new[] { ccols, crows }, calculateGradient);
+                    Tensor c = session.AllocateTensor(ActionName, TensorShape.Unknown, new[] { ccols, crows }, calculateGradient);
 
                     bool cleary = true;
                     if (bias != null)
@@ -1156,7 +1156,7 @@ namespace Genix.DNN
                         throw new ArgumentException("The number of columns in matrix op(A) must match the length of vector X.");
                     }
 
-                    Tensor y = session.AllocateTensor(ActionName, new[] { ylen }, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, TensorShape.Unknown, new[] { ylen }, calculateGradient);
 
                     bool cleary = true;
                     if (bias != null)
@@ -1258,7 +1258,7 @@ namespace Genix.DNN
                     int n = y.Length;
 
                     int[] axes = matrixLayout == MatrixLayout.ColumnMajor ? new[] { n, m } : new[] { m, n };
-                    Tensor a = session.AllocateTensor(ActionName, axes, calculateGradient);
+                    Tensor a = session.AllocateTensor(ActionName, TensorShape.Unknown, axes, calculateGradient);
 
                     Matrix.VxV(matrixLayout, m, n, x.Weights, 0, y.Weights, 0, a.Weights, 0, false);
 

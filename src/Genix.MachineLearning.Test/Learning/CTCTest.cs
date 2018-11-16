@@ -15,8 +15,8 @@
             const int L = 5;    // Alphabet size
             int[] shape = new[] { T, L };
 
-            Tensor x = new Tensor(null, shape, new float[] { 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.6f, 0.1f, 0.1f });
-            Tensor y = new Tensor(null, shape);
+            Tensor x = new Tensor(null, TensorShape.Unknown, shape, new float[] { 0.1f, 0.6f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.6f, 0.1f, 0.1f });
+            Tensor y = new Tensor(null, TensorShape.Unknown, shape);
 
             Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
 
@@ -40,7 +40,7 @@
             const int L = 6;
             int[] shape = new[] { T, L };
 
-            Tensor y = new Tensor(null, shape);
+            Tensor y = new Tensor(null, TensorShape.Unknown, shape);
             y.Set(new float[]
             {
                 0.633766f, 0.221185f, 0.0917319f, 0.0129757f, 0.0142857f, 0.0260553f,
@@ -79,7 +79,7 @@
             const int L = 6;
             int[] shape = new[] { T, L };
 
-            Tensor y = new Tensor(null, shape);
+            Tensor y = new Tensor(null, TensorShape.Unknown, shape);
             y.Set(new float[]
             {
                 0.30176f, 0.28562f, 0.0831517f, 0.0862751f, 0.0816851f, 0.161508f,
@@ -115,8 +115,8 @@
             const int L = 5;    // Alphabet size
             int[] shape = new[] { T, L };
 
-            Tensor x = new Tensor(null, shape, 1.0f);
-            Tensor y = new Tensor(null, shape);
+            Tensor x = new Tensor(null, TensorShape.Unknown, shape, 1.0f);
+            Tensor y = new Tensor(null, TensorShape.Unknown, shape);
 
             Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
 
@@ -150,8 +150,8 @@
             const int L = 5;    // Alphabet size
             int[] shape = new[] { T, L };
 
-            Tensor x = new Tensor(null, shape, 1.0f);
-            Tensor y = new Tensor(null, shape);
+            Tensor x = new Tensor(null, TensorShape.Unknown, shape, 1.0f);
+            Tensor y = new Tensor(null, TensorShape.Unknown, shape);
 
             Vectors.SoftMax(x.Length, x.Weights, 0, L, y.Weights, 0);
             y.Weights[0] = 0;

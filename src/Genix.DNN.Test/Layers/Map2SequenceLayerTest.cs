@@ -113,7 +113,7 @@
             int[] shape = new[] { 1, 20, 15, 10 };
             Map2SequenceLayer layer = new Map2SequenceLayer(shape);
 
-            Tensor x = new Tensor(null, shape);
+            Tensor x = new Tensor(null, TensorShape.BWHC, shape);
             x.Randomize();
 
             Tensor y = layer.Forward(session, new[] { x })[0];

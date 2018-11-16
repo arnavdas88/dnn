@@ -155,25 +155,25 @@
 
                 layer.B.Set(new float[] { 1, 2 });
 
-                Tensor xTemp = new Tensor(null, new[] { 1, 12 });
+                Tensor xTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 12 });
                 xTemp.Set(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 
                 // should be W * x + b
-                Tensor expectedTemp = new Tensor(null, new[] { 1, NumberOfNeurons });
+                Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, NumberOfNeurons });
                 expectedTemp.Set(FullyConnectedLayerTest.CalculateNeurons(layer.W, xTemp, layer.B, NumberOfNeurons, matrixLayout));
 
-                Tensor dyTemp = new Tensor(null, new[] { 1, NumberOfNeurons });
+                Tensor dyTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, NumberOfNeurons });
                 dyTemp.Set(new float[] { 1, 2 });
 
                 // should be W' * dy
-                Tensor expectedDxTemp = new Tensor(null, xTemp.Axes);
+                Tensor expectedDxTemp = new Tensor(null, TensorShape.Unknown, xTemp.Axes);
                 expectedDxTemp.Set(FullyConnectedLayerTest.CalculateDx(layer.W, dyTemp, NumberOfNeurons, matrixLayout));
 
-                Tensor expectedDBTemp = new Tensor(null, layer.B.Axes);
+                Tensor expectedDBTemp = new Tensor(null, TensorShape.Unknown, layer.B.Axes);
                 expectedDBTemp.Set(FullyConnectedLayerTest.CalculateDB(dyTemp));
 
                 // should be sum(x' * dy)
-                Tensor expectedDWTemp = new Tensor(null, layer.W.Axes);
+                Tensor expectedDWTemp = new Tensor(null, TensorShape.Unknown, layer.W.Axes);
                 expectedDWTemp.Set(FullyConnectedLayerTest.CalculateDW(xTemp, dyTemp, matrixLayout));
 
                 for (int i = 1; i <= 3; i++)

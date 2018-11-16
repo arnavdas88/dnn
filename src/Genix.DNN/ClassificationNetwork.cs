@@ -310,7 +310,7 @@ namespace Genix.DNN
                 LossLayer[] lossLayers = this.Graph.Sinks.OfType<LossLayer>().ToArray();
                 if (lossLayers != null && lossLayers.Length > 0)
                 {
-                    Tensor mask = new Tensor("mask", new[] { this.classes.Count })
+                    Tensor mask = new Tensor("mask", TensorShape.Unknown, new[] { this.classes.Count })
                     {
                         CalculateGradient = false,
                     };

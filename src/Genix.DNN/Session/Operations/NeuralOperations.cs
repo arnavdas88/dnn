@@ -151,7 +151,7 @@ namespace Genix.DNN
                 int y1 = kernel.CalculateOutputWidth(x1);
                 int y2 = kernel.CalculateOutputHeight(x2);
 
-                Tensor y = session.AllocateTensor("avg pool", new[] { x0, y1, y2, x3 }, calculateGradient);
+                Tensor y = session.AllocateTensor("avg pool", TensorShape.BWHC, new[] { x0, y1, y2, x3 }, calculateGradient);
 
                 int ystride0 = y.Strides[0];
                 int ystride1 = y.Strides[1];
@@ -380,7 +380,7 @@ namespace Genix.DNN
                 int y1 = kernel.CalculateOutputWidth(x1);
                 int y2 = kernel.CalculateOutputHeight(x2);
 
-                Tensor y = session.AllocateTensor(ActionName, new[] { x0, y1, y2, x3 }, calculateGradient);
+                Tensor y = session.AllocateTensor(ActionName, TensorShape.BWHC, new[] { x0, y1, y2, x3 }, calculateGradient);
 
                 int ystride0 = y.Strides[0];
                 int ystride1 = y.Strides[1];
@@ -583,7 +583,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
 
                     float[] xw = x.Weights;
                     float[] yw = y.Weights;
@@ -669,8 +669,8 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
-                    Tensor scale = session.AllocateTensor("lrn wsp", x.Axes, false);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
+                    Tensor scale = session.AllocateTensor("lrn wsp", x.Shape, x.Axes, false);
 
                     // 1. calculate scale
                     // scale(i) = k + alpha / n * sum(x(j) ^ 2)
@@ -693,7 +693,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Tensor work = session.AllocateTensor("lrn wsp2", x.Axes, false);
+                                Tensor work = session.AllocateTensor("lrn wsp2", x.Shape, x.Axes, false);
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
@@ -866,8 +866,8 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients;
 
-                    Tensor h = session.AllocateTensor("lstm", new[] { tt, numberOfNeurons }, calculateGradient);
-                    Tensor s = session.AllocateTensor("lstm cell", h.Axes, calculateGradient);
+                    Tensor h = session.AllocateTensor("lstm", TensorShape.Unknown, new[] { tt, numberOfNeurons }, calculateGradient);
+                    Tensor s = session.AllocateTensor("lstm cell", h.Shape, h.Axes, calculateGradient);
 
                     NativeMethods.lstm(
                         tt,
@@ -945,7 +945,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients;
 
-                    Tensor h = session.AllocateTensor(ActionName, new[] { tt, numberOfNeurons }, calculateGradient);
+                    Tensor h = session.AllocateTensor(ActionName, TensorShape.Unknown, new[] { tt, numberOfNeurons }, calculateGradient);
 
                     NativeMethods.gru(
                         tt,
@@ -999,7 +999,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
 
                     if (x.Rank == 1)
                     {

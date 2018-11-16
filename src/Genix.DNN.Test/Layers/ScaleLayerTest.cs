@@ -116,12 +116,12 @@
             {
                 Session session = new Session();
 
-                Tensor x = new Tensor(null, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
                 x.Randomize();
 
                 Tensor y = layer.Forward(session, new[] { x })[0];
 
-                Tensor expected = new Tensor(null, x.Axes, x.Weights.Take(x.Length).Select(w => w * layer.Alpha).ToArray());
+                Tensor expected = new Tensor(null, TensorShape.Unknown, x.Axes, x.Weights.Take(x.Length).Select(w => w * layer.Alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 // unroll the graph

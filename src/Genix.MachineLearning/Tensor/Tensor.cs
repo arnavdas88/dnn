@@ -40,12 +40,14 @@ namespace Genix.MachineLearning
         /// with the specified dimensions.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape)
-            : base(shape)
+        public Tensor(string name, TensorShape shape, int[] axes)
+            : base(axes)
         {
             this.Name = name;
+            this.Shape = shape;
 #if USE_ARRAYPOOL
             this.Weights = Tensor.arrayPool.Rent(this.Length);
             this.ownWeights = true;
@@ -59,11 +61,12 @@ namespace Genix.MachineLearning
         /// with the specified dimensions and all the weights having the specified value.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         /// <param name="value">The value to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float value)
-            : this(name, shape)
+        public Tensor(string name, TensorShape shape, int[] axes, float value)
+            : this(name, shape, axes)
         {
             this.Set(value);
         }
@@ -73,11 +76,12 @@ namespace Genix.MachineLearning
         /// with the specified dimensions and the weights having the specified values.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         /// <param name="values">The values to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float[] values)
-            : base(shape)
+        public Tensor(string name, TensorShape shape, int[] axes, float[] values)
+            : base(axes)
         {
             if (values == null)
             {
@@ -90,6 +94,7 @@ namespace Genix.MachineLearning
             }
 
             this.Name = name;
+            this.Shape = shape;
             this.Weights = values;
         }
 
@@ -98,12 +103,13 @@ namespace Genix.MachineLearning
         /// with the specified dimensions and the weights and gradient having the specified values.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         /// <param name="values">The values to set.</param>
         /// <param name="gradient">The gradient values to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor(string name, int[] shape, float[] values, float[] gradient)
-            : this(name, shape, values)
+        public Tensor(string name, TensorShape shape, int[] axes, float[] values, float[] gradient)
+            : this(name, shape, axes, values)
         {
             if (gradient == null)
             {
@@ -132,6 +138,7 @@ namespace Genix.MachineLearning
             }
 
             this.Name = other.Name;
+            this.Shape = other.Shape;
             this.Weights = other.Weights.ToArray();
             this.gradient = other.gradient?.ToArray();
         }
@@ -171,8 +178,17 @@ namespace Genix.MachineLearning
         /// <value>
         /// The <see cref="string"/> that contains tensor name.
         /// </value>
-        [JsonProperty("Name")]
+        [JsonProperty("name")]
         public string Name { get; internal set; }
+
+        /// <summary>
+        /// Gets the tensor shape.
+        /// </summary>
+        /// <value>
+        /// The <see cref="TensorShape"/> enumeration value.
+        /// </value>
+        [JsonProperty("shape")]
+        public TensorShape Shape { get; private set; }
 
         /// <summary>
         /// Gets the weights stored in this <see cref="Tensor"/>.
@@ -180,7 +196,7 @@ namespace Genix.MachineLearning
         /// <value>
         /// The array of <see cref="float"/>.
         /// </value>
-        [JsonProperty("Weights")]
+        [JsonProperty("weights")]
         public float[] Weights { get; private set; }
 
         /// <summary>
@@ -263,28 +279,29 @@ namespace Genix.MachineLearning
         /// Creates a one-hot tensor.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         /// <param name="on">The value that one-hot location takes.</param>
         /// <param name="off">The value that all other locations take.</param>
-        /// <param name="axes">The one-hot element coordinates in the tensor.</param>
+        /// <param name="position">The one-hot element coordinates in the tensor.</param>
         /// <returns>The tensor this method creates.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor OneHot(string name, int[] shape, float on, float off, params int[] axes)
+        public static Tensor OneHot(string name, TensorShape shape, int[] axes, float on, float off, params int[] position)
         {
-            if (shape == null)
+            if (axes == null)
             {
-                throw new ArgumentNullException(nameof(shape));
+                throw new ArgumentNullException(nameof(axes));
             }
 
-            Tensor tensor = new Tensor(name, shape);
+            Tensor tensor = new Tensor(name, shape, axes);
 
             if (off != 0.0f)
             {
                 tensor.Set(off);
             }
 
-            int position = tensor.Position(axes);
-            tensor.Weights[position] = on;
+            int pos = tensor.Position(position);
+            tensor.Weights[pos] = on;
 
             return tensor;
         }
@@ -294,20 +311,24 @@ namespace Genix.MachineLearning
         /// The one-hot location takes the value 1, while all other locations take the value 0.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
-        /// <param name="axes">The one-hot element coordinates in the tensor.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
+        /// <param name="position">The one-hot element coordinates in the tensor.</param>
         /// <returns>The tensor this method creates.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor OneHot(string name, int[] shape, params int[] axes) => Tensor.OneHot(name, shape, 1.0f, 0.0f, axes);
+        public static Tensor OneHot(string name, TensorShape shape, int[] axes, params int[] position) =>
+            Tensor.OneHot(name, shape, axes, 1.0f, 0.0f, position);
 
         /// <summary>
         /// Creates a tensor with all elements set to 1.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
         /// <returns>The tensor this method creates.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor Ones(string name, params int[] shape) => new Tensor(name, shape, 1.0f);
+        public static Tensor Ones(string name, TensorShape shape, params int[] axes) =>
+            new Tensor(name, shape, axes, 1.0f);
 
         /// <summary>
         /// Creates a <see cref="Tensor"/> from the specified file.
@@ -374,7 +395,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor Copy()
         {
-            Tensor y = new Tensor("copy", this.Axes);
+            Tensor y = new Tensor("copy", this.Shape, this.Axes);
             Vectors.Copy(this.Length, this.Weights, 0, y.Weights, 0);
             return y;
         }
@@ -382,25 +403,27 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Changes the <see cref="Tensor"/> dimensions.
         /// </summary>
-        /// <param name="shape">The new <see cref="Tensor"/> dimensions.</param>
+        /// <param name="shape">The tensor shape.</param>
+        /// <param name="axes">The new tensor dimensions along its axes.</param>
         /// <returns>
         /// <b>true</b> if the tensor was changed; otherwise, <b>false</b>.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Reshape(params int[] shape)
+        public bool Reshape(TensorShape shape, params int[] axes)
         {
             // validate new shape
-            if (Shape.ShapeLength(shape) != this.Length)
+            if (MachineLearning.Shape.ShapeLength(axes) != this.Length)
             {
-                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(shape));
+                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(axes));
             }
 
-            if (Shape.AreSame(this.Axes, shape))
+            if (shape == this.Shape && MachineLearning.Shape.AreSame(this.Axes, axes))
             {
                 return false;
             }
 
-            this.InitializeShape(shape);
+            this.Shape = shape;
+            this.InitializeShape(axes);
             return true;
         }
 

@@ -17,7 +17,7 @@
 
             string[] classes = new string[] { "@", "A" };
 
-            Tensor a = new Tensor(null, new[] { 2, 2 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { 2, 2 });
             a.Set(new float[]
             {
                 0.2f, 0.5f,
@@ -48,7 +48,7 @@
 
             string[] classes = new string[] { "@", "A", "B" };
 
-            Tensor a = new Tensor(null, new[] { 3, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { 3, 3 });
             a.Set(new float[]
             {
                 0.2f, 0.5f, 0.3f,
@@ -84,7 +84,7 @@
 
             string[] classes = new string[] { "@", "A", "B" };
 
-            Tensor a = new Tensor(null, new[] { 4, 3 });
+            Tensor a = new Tensor(null, TensorShape.Unknown, new[] { 4, 3 });
             a.Set(new float[]
             {
                 0.2f, 0.5f, 0.3f,

@@ -37,7 +37,7 @@ namespace Genix.MachineLearning.Imaging
                 xaxis = image.Width.MulDiv(yaxis, image.Height);
             }
 
-            Tensor y = new Tensor(name, new[] { 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+            Tensor y = new Tensor(name, TensorShape.BWHC, new[] { 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
             FillTensor(y, 0, image);
 
             return y;
@@ -73,7 +73,7 @@ namespace Genix.MachineLearning.Imaging
                 }
             }
 
-            Tensor y = new Tensor(name, new[] { images.Count, xaxis, yaxis, images[0].BitsPerPixel > 8 ? 3 : 1 });
+            Tensor y = new Tensor(name, TensorShape.BWHC, new[] { images.Count, xaxis, yaxis, images[0].BitsPerPixel > 8 ? 3 : 1 });
             for (int i = 0, ii = images.Count; i < ii; i++)
             {
                 FillTensor(y, i, images[i]);
@@ -120,7 +120,7 @@ namespace Genix.MachineLearning.Imaging
                 Image image = selector(sources[i]);
                 if (i == 0)
                 {
-                    y = new Tensor(name, new[] { sources.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+                    y = new Tensor(name, TensorShape.BWHC, new[] { sources.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
                 }
 
                 FillTensor(y, i, image);

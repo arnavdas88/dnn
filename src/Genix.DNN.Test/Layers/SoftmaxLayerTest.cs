@@ -120,7 +120,7 @@
 
             Session session = new Session();
 
-            Tensor x = new Tensor(null, shape, SoftMaxLayerTest.weights);
+            Tensor x = new Tensor(null, TensorShape.Unknown, shape, SoftMaxLayerTest.weights);
             Tensor y = layer.Forward(session, new[] { x })[0];
 
             Helpers.AreArraysEqual(SoftMaxLayerTest.activations, y.Weights);

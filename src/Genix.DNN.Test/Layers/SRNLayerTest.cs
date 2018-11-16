@@ -182,8 +182,8 @@
 
             (Tensor, Tensor) createSample(int size)
             {
-                Tensor input = new Tensor(null, new[] { size, 1, 1, 1 });
-                Tensor expected = new Tensor(null, new[] { size, 1 });
+                Tensor input = new Tensor(null, TensorShape.Unknown, new[] { size, 1, 1, 1 });
+                Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { size, 1 });
 
                 double rv = (float)(random.NextDouble() * Math.PI * 2);
                 for (int b = 0; b <= size; b++, rv += batchStep)

@@ -118,7 +118,7 @@ namespace Genix.DNN.Layers
             }
 
             // reshape the tensor so it matches the layer output
-            session.ReshapeIP(ys[0], ConvolutionLayer.CalculateOutputShape(x.Axes, this.NumberOfNeurons, this.Kernel));
+            session.ReshapeIP(ys[0], TensorShape.BWHC, ConvolutionLayer.CalculateOutputShape(x.Axes, this.NumberOfNeurons, this.Kernel));
 
             return ys;
         }

@@ -117,7 +117,7 @@
             {
                 Session session = new Session(false);
 
-                Tensor x = new Tensor(null, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
                 x.Randomize();
 
                 IList<Tensor> xs = new[] { x };
@@ -138,7 +138,7 @@
             {
                 Session session = new Session(true);
 
-                Tensor x = new Tensor(null, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
                 x.Randomize();
 
                 Tensor y = layer.Forward(session, new[] { x })[0];

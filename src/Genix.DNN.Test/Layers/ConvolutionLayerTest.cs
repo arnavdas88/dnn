@@ -186,7 +186,7 @@
 
                 layer.B.Set(new float[] { 1, 2 });
 
-                Tensor xTemp = new Tensor(null, new[] { 1, 2, 3, 2 });
+                Tensor xTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 3, 2 });
                 xTemp.Set(new float[]
                 {
                     1,  2,   3,  4,
@@ -194,10 +194,10 @@
                     9, 10,  11, 12
                 });
 
-                Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
+                Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
                 expectedTemp.Set(ConvolutionLayerTest.CalculateConvolution(layer.W, xTemp, layer.B, kernel, NumberOfFilters, matrixLayout));
 
-                Tensor dyTemp = new Tensor(null, new[] { 1, 2, 2, 2 });
+                Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
                 dyTemp.Set(new float[]
                 {
                     1, 2,  3, 4,
@@ -205,13 +205,13 @@
                 });
 
                 // should be W' * dy
-                Tensor expectedDxTemp = new Tensor(null, xTemp.Axes);
+                Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, xTemp.Axes);
                 expectedDxTemp.Set(ConvolutionLayerTest.CalculateDx(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
 
-                Tensor expectedDBTemp = new Tensor(null, layer.B.Axes);
+                Tensor expectedDBTemp = new Tensor(null, TensorShape.Unknown, layer.B.Axes);
                 expectedDBTemp.Set(ConvolutionLayerTest.CalculateDB(dyTemp, NumberOfFilters));
 
-                Tensor expectedDWTemp = new Tensor(null, layer.W.Axes);
+                Tensor expectedDWTemp = new Tensor(null, TensorShape.Unknown, layer.W.Axes);
                 expectedDWTemp.Set(ConvolutionLayerTest.CalculateDW(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
 
                 for (int i = 1; i <= 3; i++)
@@ -265,7 +265,7 @@
 
                 layer.B.Set(new float[] { 1, 2 });
 
-                Tensor xTemp = new Tensor(null, new[] { 1, 2, 3, 2 });
+                Tensor xTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 3, 2 });
                 xTemp.Set(new float[]
                 {
                     1,  2,   3,  4,
@@ -273,10 +273,10 @@
                     9, 10,  11, 12
                 });
 
-                Tensor expectedTemp = new Tensor(null, new[] { 1, 4, 4, 2 });
+                Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 4, 4, 2 });
                 expectedTemp.Set(ConvolutionLayerTest.CalculateConvolution(layer.W, xTemp, layer.B, kernel, NumberOfFilters, matrixLayout));
 
-                Tensor dyTemp = new Tensor(null, new[] { 1, 4, 4, 2 });
+                Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 4, 4, 2 });
                 dyTemp.Set(new float[]
                 {
                      1,  2,   3,  4,   5,  6,   7,  8,
@@ -286,13 +286,13 @@
                 });
 
                 // should be sum(filter[i] * out_grad[i])
-                Tensor expectedDxTemp = new Tensor(null, xTemp.Axes);
+                Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, xTemp.Axes);
                 expectedDxTemp.Set(ConvolutionLayerTest.CalculateDx(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
 
-                Tensor expectedDBTemp = new Tensor(null, layer.B.Axes);
+                Tensor expectedDBTemp = new Tensor(null, TensorShape.Unknown, layer.B.Axes);
                 expectedDBTemp.Set(ConvolutionLayerTest.CalculateDB(dyTemp, NumberOfFilters));
 
-                Tensor expectedDWTemp = new Tensor(null, layer.W.Axes);
+                Tensor expectedDWTemp = new Tensor(null, TensorShape.Unknown, layer.W.Axes);
                 expectedDWTemp.Set(ConvolutionLayerTest.CalculateDW(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
 
                 for (int i = 1; i <= 3; i++)
@@ -328,7 +328,7 @@
 
         private static Tensor CropKernel(Tensor input, int x, int y, Kernel kernel)
         {
-            Tensor res = new Tensor(null, new[] { 1, kernel.Width, kernel.Height, input.Axes[(int)Axis.C] });
+            Tensor res = new Tensor(null, TensorShape.BWHC, new[] { 1, kernel.Width, kernel.Height, input.Axes[(int)Axis.C] });
 
             for (int ix = x; ix < x + kernel.Width; ix++)
             {
@@ -378,10 +378,10 @@
             {
                 for (int iy = 0, ypos = -kernel.PaddingY, iiy = dy.Axes[(int)Axis.Y]; iy < iiy; iy++, ypos += kernel.StrideY)
                 {
-                    Tensor subdy = new Tensor(null, new[] { 1, 1, 1, numberOfFilters });
+                    Tensor subdy = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 1, numberOfFilters });
                     subdy.Set(dy.Weights.Skip(dy.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
 
-                    Tensor subdx = new Tensor(null, new[] { 1, kernel.Width, kernel.Height, numberOfFilters });
+                    Tensor subdx = new Tensor(null, TensorShape.BWHC, new[] { 1, kernel.Width, kernel.Height, numberOfFilters });
                     subdx.Set(FullyConnectedLayerTest.CalculateDx(w, subdy, numberOfFilters, matrixLayout));
 
                     for (int kx = 0; kx < kernel.Width; kx++)
@@ -426,7 +426,7 @@
                 {
                     Tensor subx = ConvolutionLayerTest.CropKernel(x, xpos, ypos, kernel);
 
-                    Tensor subdy = new Tensor(null, new[] { 1, 1, 1, numberOfFilters });
+                    Tensor subdy = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 1, numberOfFilters });
                     subdy.Set(dy.Weights.Skip(dy.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
 
                     float[] dw = FullyConnectedLayerTest.CalculateDW(subx, subdy, matrixLayout);

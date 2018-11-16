@@ -146,12 +146,12 @@
                 ConcatLayerTest.inputShape2
             });
 
-            Tensor xTemp1 = new Tensor(null, Shape.Reshape(ConcatLayerTest.inputShape1, (int)Axis.B, 1));
+            Tensor xTemp1 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(ConcatLayerTest.inputShape1, (int)Axis.B, 1));
             xTemp1.Set(ConcatLayerTest.weights1);
-            Tensor xTemp2 = new Tensor(null, Shape.Reshape(ConcatLayerTest.inputShape2, (int)Axis.B, 1));
+            Tensor xTemp2 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(ConcatLayerTest.inputShape2, (int)Axis.B, 1));
             xTemp2.Set(ConcatLayerTest.weights2);
 
-            Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 3, 5 });
+            Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 2, 3, 5 });
             expectedTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42,   3, 13, 23, 33, 43,

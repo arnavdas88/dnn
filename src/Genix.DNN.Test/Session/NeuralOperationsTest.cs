@@ -124,7 +124,7 @@
 
             Session session = new Session();
 
-            Tensor x = new Tensor(null, new[] { 1024 });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1024 });
             x.Randomize(this.random);
             float xsum = x.Weights.Sum();
 

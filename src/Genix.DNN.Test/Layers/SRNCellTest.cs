@@ -201,14 +201,14 @@
             ////layer.U.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f });                     // 2x2 matrix
             ////layer.B.Set(new float[] { 0.1f, 0.2f });                                 // 2x1 vector
 
-            Tensor x = new Tensor(null, new[] { T, N });
+            Tensor x = new Tensor(null, TensorShape.Unknown, new[] { T, N });
             x.Randomize(this.random);
             ////x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
             IList<Tensor> xs = new[] { x };
             IList<Tensor> ys = layer.Forward(session, xs);
 
             float[] bw = layer.B.Weights;
-            Tensor expected = new Tensor(null, new[] { 2, 2 });
+            Tensor expected = new Tensor(null, TensorShape.Unknown, new[] { 2, 2 });
             expected.Weights[0] = Matrix.DotProduct(3, layer.W.Weights, 0, x.Weights, 0) + bw[0];
             expected.Weights[1] = Matrix.DotProduct(3, layer.W.Weights, 3, x.Weights, 0) + bw[1];
             Nonlinearity.ReLU(2, expected.Weights, 0, expected.Weights, 0);
@@ -275,11 +275,16 @@
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f, 0.17214662f, -0.4206545f });                                 // 2x2 matrix
             layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
 
-            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+            Tensor x = new Tensor(
+                null,
+                TensorShape.Unknown,
+                new[] { batchSize, inputSize },
+                new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[] { 0f, 0.0008311934f, 0f, 0.07146961f, });
 
@@ -321,11 +326,16 @@
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f, 0.17214662f, -0.4206545f });                                 // 2x2 matrix
             layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
 
-            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+            Tensor x = new Tensor(
+                null,
+                TensorShape.Unknown,
+                new[] { batchSize, inputSize },
+                new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[] { 0f, 0.06266524f, 0.3149685f, 0f, });
 
@@ -367,11 +377,16 @@
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f });                                                           // 1x2 matrix
             layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
 
-            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+            Tensor x = new Tensor(
+                null,
+                TensorShape.Unknown,
+                new[] { batchSize, inputSize },
+                new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[] { 0, 0.001524193f, 0, 0.07181925f });
 
@@ -413,11 +428,16 @@
             layer.U.Set(new float[] { -0.6668052f, 0.0096491f });                                                           // 2x1 matrix
             layer.B.Set(new float[] { -0.2414839f, -0.08907348f });                                                         // 2x1 vector
 
-            Tensor x = new Tensor(null, new[] { batchSize, inputSize }, new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
+            Tensor x = new Tensor(
+                null,
+                TensorShape.Unknown,
+                new[] { batchSize, inputSize },
+                new float[] { -0.1f, 0.2f, 0.3f, 0.4f, -0.5f, 0.6f });
 
             // set expectations
             Tensor expected = new Tensor(
                 null,
+                TensorShape.Unknown,
                 new[] { numberOfNeurons, numberOfNeurons },
                 new float[] { 0, 0.06266524f, 0.3143638f, 0 });
 

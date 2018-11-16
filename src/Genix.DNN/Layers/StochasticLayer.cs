@@ -163,10 +163,10 @@ namespace Genix.DNN.Layers
             this.NumberOfNeurons = numberOfNeurons;
             this.MatrixLayout = matrixLayout;
 
-            this.W = new Tensor("weights", weightsShape);
+            this.W = new Tensor("weights", TensorShape.Unknown, weightsShape);
             this.W.Randomize(random ?? new GaussianGenerator(0.0, Math.Sqrt((double)numberOfNeurons / this.W.Length)));
 
-            this.B = new Tensor("biases", biasesShape);
+            this.B = new Tensor("biases", TensorShape.Unknown, biasesShape);
         }
     }
 }

@@ -193,7 +193,7 @@
 
             (Tensor, int[]) createSample(int size)
             {
-                Tensor input = new Tensor(null, new[] { size, 1, 1, VectorSize });
+                Tensor input = new Tensor(null, TensorShape.Unknown, new[] { size, 1, 1, VectorSize });
                 int[] truth = new int[size];
 
                 int v = 0;
@@ -272,8 +272,8 @@
 
             (Tensor, Tensor) createSample(int size)
             {
-                Tensor input = new Tensor(null, new[] { size, 1, 1, 1 });
-                Tensor expected = new Tensor(null, input.Axes);
+                Tensor input = new Tensor(null, TensorShape.Unknown, new[] { size, 1, 1, 1 });
+                Tensor expected = new Tensor(null, TensorShape.Unknown, input.Axes);
 
                 double rv = (float)(random.NextDouble() * Math.PI * 2);
                 for (int b = 0; b <= size; b++, rv += batchStep)
@@ -352,7 +352,7 @@
                                                   .ToDictionary(x => x.Item1, x => x.Item2);
 
             // create character vectors
-            Tensor letters = new Tensor(null, new[] { alphabet.Count + 1, 1, 1, letterSize });
+            Tensor letters = new Tensor(null, TensorShape.Unknown, new[] { alphabet.Count + 1, 1, 1, letterSize });
             letters.Randomize();
 
             // create network
@@ -393,7 +393,7 @@
                         Tensor.Copy(letterSize, letters, alphabet[w[i]] * letterSize, x, i * letterSize);
                     }*/
                     Tensor x = new Session().Concat(
-                        w.Select(ch => Tensor.OneHot(null, network.InputShape, 0, 0, 0, alphabet[ch])).ToArray(),
+                        w.Select(ch => Tensor.OneHot(null, TensorShape.Unknown, network.InputShape, 0, 0, 0, alphabet[ch])).ToArray(),
                         (int)Axis.B);
 
                     int[] y = new int[w.Length];
@@ -414,7 +414,7 @@
             {
                 string w1 = w.Substring(0, w.Length - 1);
 
-                Tensor x = new Tensor(null, Shape.Reshape(network.InputShape, (int)Axis.B, w1.Length));
+                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(network.InputShape, (int)Axis.B, w1.Length));
                 for (int i = 0, ii = w1.Length; i < ii; i++)
                 {
                     Vectors.Copy(letterSize, letters.Weights, alphabet[w1[i]] * letterSize, x.Weights, i * letterSize);
