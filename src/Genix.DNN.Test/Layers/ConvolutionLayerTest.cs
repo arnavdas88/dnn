@@ -30,7 +30,7 @@
                 Assert.AreEqual(matrixLayout, layer.MatrixLayout);
 
                 Assert.AreEqual(1, layer.NumberOfOutputs);
-                CollectionAssert.AreEqual(new[] { 2, 5, 5, NumberOfFilters }, layer.OutputShape);
+                CollectionAssert.AreEqual(new[] { 2, 5, 5, NumberOfFilters }, layer.OutputShape.Axes);
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
@@ -56,7 +56,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             Assert.IsNotNull(new ConvolutionLayer(shape, 100, null, MatrixLayout.ColumnMajor, null));
         }
 
@@ -78,7 +78,7 @@
             Assert.AreEqual(-1, layer.Kernel.PaddingX);
             Assert.AreEqual(-1, layer.Kernel.PaddingY);
 
-            CollectionAssert.AreEqual(new[] { 2, 3, 8, 16 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { 2, 3, 8, 16 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
@@ -97,7 +97,7 @@
             string architecture = "16C";
             try
             {
-                ConvolutionLayer layer = new ConvolutionLayer(new[] { -1, 10, 12, 3 }, architecture, null);
+                ConvolutionLayer layer = new ConvolutionLayer(new Shape(-1, 10, 12, 3), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -119,13 +119,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new ConvolutionLayer(new[] { -1, 10, 12, 3 }, null, null));
+            Assert.IsNotNull(new ConvolutionLayer(new Shape(-1, 10, 12, 3), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             ConvolutionLayer layer2 = new ConvolutionLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -141,7 +141,7 @@
         [TestMethod]
         public void EnumGradientsTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             ConvolutionLayer layer = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(2, layer.EnumGradients().Count());
         }
@@ -149,7 +149,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             ConvolutionLayer layer2 = layer1.Clone() as ConvolutionLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -158,7 +158,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             ConvolutionLayer layer2 = JsonConvert.DeserializeObject<ConvolutionLayer>(s1);
@@ -176,7 +176,7 @@
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
                 ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
-                CollectionAssert.AreEqual(new[] { -1, 2, 2, NumberOfFilters }, layer.OutputShape);
+                CollectionAssert.AreEqual(new[] { -1, 2, 2, NumberOfFilters }, layer.OutputShape.Axes);
 
                 layer.W.Set(new float[]
                 {
@@ -255,7 +255,7 @@
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
                 ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
-                CollectionAssert.AreEqual(new[] { -1, 4, 4, NumberOfFilters }, layer.OutputShape);
+                CollectionAssert.AreEqual(new[] { -1, 4, 4, NumberOfFilters }, layer.OutputShape.Axes);
 
                 layer.W.Set(new float[]
                 {

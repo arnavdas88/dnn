@@ -8,10 +8,8 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text.RegularExpressions;
     using Genix.Core;
     using Genix.MachineLearning;
     using Newtonsoft.Json;
@@ -27,27 +25,22 @@ namespace Genix.DNN.Layers
         public const string ArchitecturePattern = @"^CONCAT$";
 
         /// <summary>
-        /// The axis to concatenate along.
-        /// </summary>
-        private const int Axis = 3;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ConcatLayer"/> class.
         /// </summary>
-        /// <param name="inputShapes">The dimensions of the layer's input tensors.</param>
-        public ConcatLayer(IList<int[]> inputShapes)
-            : base(1, Shape.Concat(inputShapes, ConcatLayer.Axis))
+        /// <param name="shapes">The shapes of the layer's input tensor.</param>
+        public ConcatLayer(IList<Shape> shapes)
+            : base(1, Shape.Concat(axes, ConcatLayer.GetAxis(shape)))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConcatLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShapes">The dimensions of the layer's input tensors.</param>
+        /// <param name="shapes">The shapes of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ConcatLayer(IList<int[]> inputShapes, string architecture, RandomNumberGenerator<float> random)
-            : base(1, Shape.Concat(inputShapes, ConcatLayer.Axis))
+        public ConcatLayer(IList<Shape> shapes, string architecture, RandomNumberGenerator<float> random)
+            : base(1, Shape.Concat(axes, ConcatLayer.GetAxis(shape)))
         {
             Layer.ParseArchitecture(architecture, ConcatLayer.ArchitecturePattern);
         }
@@ -80,7 +73,32 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
-            return new[] { session.Concat(xs, ConcatLayer.Axis) };
+            // compute the channel axis
+            int axis = ConcatLayer.GetAxis(xs[0].Shape);
+
+            return new[] { session.Concat(xs, axis) };
+        }
+
+        /// <summary>
+        /// Gets the channel axis index.
+        /// </summary>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        /// <returns>The channel axis index.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int GetAxis(TensorShape shape)
+        {
+            switch (shape)
+            {
+                case TensorShape.BWHC:
+                case TensorShape.BHWC:
+                    return 3;
+
+                case TensorShape.BCHW:
+                    return 1;
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
         }
     }
 }

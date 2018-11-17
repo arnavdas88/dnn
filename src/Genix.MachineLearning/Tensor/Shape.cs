@@ -8,7 +8,6 @@ namespace Genix.MachineLearning
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
@@ -20,23 +19,50 @@ namespace Genix.MachineLearning
     public class Shape
     {
         /// <summary>
+        /// Batch, width, height, channels.
+        /// </summary>
+        public const string BWHC = "BWHC";
+
+        /// <summary>
+        /// Batch, height, width, channels.
+        /// </summary>
+        public const string BHWC = "BHWC";
+
+        /// <summary>
+        /// Batch, channels, height, width.
+        /// </summary>
+        public const string BCHW = "BCHW";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class with the specified dimensions.
         /// </summary>
-        /// <param name="shape">The shape dimensions.</param>
+        /// <param name="format">The shape format.</param>
+        /// <param name="axes">The shape dimensions along its axes.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Shape(params int[] shape)
+        public Shape(string format, params int[] axes)
         {
-            if (shape == null)
+            if (axes == null)
             {
-                throw new ArgumentNullException(nameof(shape));
+                throw new ArgumentNullException(nameof(axes));
             }
 
-            if (shape.Any(x => x <= 0))
+            if (axes.Any(x => x <= 0))
             {
                 throw new ArgumentException(Properties.Resources.E_CannotCreateTensor_LayoutIsFlexible);
             }
 
-            this.InitializeShape(shape);
+            this.InitializeShape(axes);
+            this.Format = format;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Shape"/> class with the specified dimensions.
+        /// </summary>
+        /// <param name="axes">The shape dimensions.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape(params int[] axes)
+            : this(null, axes)
+        {
         }
 
         /// <summary>
@@ -51,6 +77,7 @@ namespace Genix.MachineLearning
                 throw new ArgumentNullException(nameof(other));
             }
 
+            this.Format = other.Format;
             this.Length = other.Length;
             this.Axes = other.Axes.ToArray();
             this.Strides = other.Strides.ToArray();
@@ -64,6 +91,15 @@ namespace Genix.MachineLearning
         protected Shape()
         {
         }
+
+        /// <summary>
+        /// Gets the shape format.
+        /// </summary>
+        /// <value>
+        /// The shape format.
+        /// </value>
+        [JsonProperty("format")]
+        public string Format { get; private set; }
 
         /// <summary>
         /// Gets the total number of elements in all the dimensions of the <see cref="Shape"/>.
@@ -315,7 +351,7 @@ namespace Genix.MachineLearning
         /// </summary>
         /// <param name="shape">The shape dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void InitializeShape(int[] shape)
+        private protected void InitializeShape(int[] shape)
         {
             if (shape == null)
             {

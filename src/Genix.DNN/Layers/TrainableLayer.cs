@@ -20,8 +20,8 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="TrainableLayer"/> class.
         /// </summary>
-        /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
-        protected TrainableLayer(int[] outputShape)
+        /// <param name="outputShape">The shape of the layer's output tensor.</param>
+        protected TrainableLayer(Shape outputShape)
             : base(1, outputShape)
         {
         }

@@ -17,14 +17,14 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { 1, 10, 12, 3 };
+            Shape shape = new Shape(1, 10, 12, 3);
             const int NumberOfNeurons = 100;
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
                 FullyConnectedLayer layer = new FullyConnectedLayer(shape, NumberOfNeurons, matrixLayout, null);
                 Assert.AreEqual("100N", layer.Architecture);
-                CollectionAssert.AreEqual(new[] { 1, NumberOfNeurons }, layer.OutputShape);
+                CollectionAssert.AreEqual(new[] { 1, NumberOfNeurons }, layer.OutputShape.Axes);
                 Assert.AreEqual(NumberOfNeurons, layer.NumberOfNeurons);
                 Assert.AreEqual(matrixLayout, layer.MatrixLayout);
 
@@ -51,12 +51,12 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            FullyConnectedLayer layer = new FullyConnectedLayer(new[] { -1, 10, 12, 3 }, "100N", null);
+            FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(-1, 10, 12, 3), "100N", null);
 
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual("100N", layer.Architecture);
 
-            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
@@ -75,7 +75,7 @@
             string architecture = "100NN";
             try
             {
-                FullyConnectedLayer layer = new FullyConnectedLayer(new[] { -1, 20, 20, 10 }, architecture, null);
+                FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(-1, 20, 20, 10), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -97,13 +97,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new FullyConnectedLayer(new[] { -1, 20, 20, 10 }, null, null));
+            Assert.IsNotNull(new FullyConnectedLayer(new Shape(-1, 20, 20, 10), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             FullyConnectedLayer layer2 = new FullyConnectedLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -119,7 +119,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             FullyConnectedLayer layer2 = layer1.Clone() as FullyConnectedLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -128,7 +128,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             FullyConnectedLayer layer2 = JsonConvert.DeserializeObject<FullyConnectedLayer>(s1);
@@ -139,7 +139,7 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
-            int[] shape = new[] { -1, 2, 3, 2 };
+            Shape shape = new Shape(-1, 2, 3, 2);
             const int NumberOfNeurons = 2;
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())

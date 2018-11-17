@@ -677,7 +677,7 @@ namespace Genix.DNN
                     // scale will be later reused in back-propagation
                     // use output as a temporary buffer
                     Vectors.Square(x.Length, x.Weights, 0, scale.Weights, 0);
-                    NeuralOperations.LRNKernel(scale, scale.Weights, y.Weights, kernelSize);
+                    NeuralOperations.LRNKernel(scale.Axes, scale.Strides, scale.Weights, y.Weights, kernelSize);
                     scale.Set(k);
                     scale.AddProductC(y, alpha / kernelSize);
 
@@ -700,7 +700,7 @@ namespace Genix.DNN
                                 Vectors.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
                                 Vectors.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
-                                NeuralOperations.LRNKernel(x, x.Gradient, work.Weights, kernelSize);
+                                NeuralOperations.LRNKernel(x.Axes, x.Strides, x.Gradient, work.Weights, kernelSize);
                                 work.Mul(x);
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
@@ -1029,25 +1029,17 @@ namespace Genix.DNN
         /// <summary>
         /// The local response normalization kernel.
         /// </summary>
-        /// <param name="shape">The input tensor shapes.</param>
+        /// <param name="axes">The input tensor dimensions.</param>
+        /// <param name="strides">The input tensor strides.</param>
         /// <param name="xw">The input tensor weights.</param>
         /// <param name="yw">The output tensor weights.</param>
         /// <param name="kernelSize">The number of channels to normalize across. Should be odd number.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void LRNKernel(Shape shape, float[] xw, float[] yw, int kernelSize)
+        private static void LRNKernel(int[] axes, int[] strides, float[] xw, float[] yw, int kernelSize)
         {
-            int x0 = shape.Axes[0];
-            int x1 = shape.Axes[1];
-            int x2 = shape.Axes[2];
-            int x3 = shape.Axes[3];
-            int xstride0 = shape.Strides[0];
-            int xstride1 = shape.Strides[1];
-            int xstride2 = shape.Strides[2];
-            int xstride3 = shape.Strides[3];
-
             CommonParallel.For(
                 0,
-                x0,
+                axes[0],
                 (a, b) =>
                 {
                     for (; a < b; a++)
@@ -1056,14 +1048,9 @@ namespace Genix.DNN
                             xw,
                             yw,
                             kernelSize,
-                            a/*x0*/,
-                            x1,
-                            x2,
-                            x3,
-                            xstride0,
-                            xstride1,
-                            xstride2,
-                            xstride3);
+                            a,
+                            axes,
+                            strides);
                     }
                 },
                 new ParallelOptions());
@@ -1079,14 +1066,9 @@ namespace Genix.DNN
                 [In] float[] x,
                 [In] float[] y,
                 int kernelSize,
-                int B,
-                int W,
-                int H,
-                int C,
-                int BStride,
-                int WStride,
-                int HStride,
-                int CStride);
+                int b,
+                [In] int[] axes,
+                [In] int[] strides);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void lstm(

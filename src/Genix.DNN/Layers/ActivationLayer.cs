@@ -7,6 +7,7 @@
 namespace Genix.DNN.Layers
 {
     using System.Runtime.CompilerServices;
+    using Genix.MachineLearning;
 
     /// <summary>
     /// Represents the layer of activation neurons. This is an abstract class.
@@ -20,9 +21,9 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivationLayer"/> class.
         /// </summary>
-        /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
+        /// <param name="outputShape">The shape of the layer's output tensor.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ActivationLayer(int[] outputShape)
+        protected ActivationLayer(Shape outputShape)
             : base(1, outputShape)
         {
         }

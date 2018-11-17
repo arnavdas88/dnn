@@ -29,27 +29,27 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        public FullyConnectedLayer(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
+        public FullyConnectedLayer(Shape shape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfNeurons, matrixLayout, random);
+            this.Initialize(shape, numberOfNeurons, matrixLayout, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FullyConnectedLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public FullyConnectedLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public FullyConnectedLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, FullyConnectedLayer.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
 
-            this.Initialize(inputShape, numberOfNeurons, MatrixLayout.RowMajor, random);
+            this.Initialize(shape, numberOfNeurons, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
@@ -82,20 +82,22 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes the <see cref="FullyConnectedLayer"/>.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The dimensions of the layer's input tensor.</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
-        private void Initialize(int[] inputShape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
+        private void Initialize(Shape shape, int numberOfNeurons, MatrixLayout matrixLayout, RandomNumberGenerator<float> random)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
+
+            int[] axes = shape.Axes;
 
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron
-            int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int mbsize = axes.Skip(1).Aggregate(1, (total, next) => total * next);
             int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
                 new[] { mbsize, numberOfNeurons } :
                 new[] { numberOfNeurons, mbsize };
@@ -103,7 +105,8 @@ namespace Genix.DNN.Layers
             int[] biasesShape = new[] { numberOfNeurons };
 
             this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
-            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
+
+            this.OutputShape = new Shape(axes[(int)Axis.B], numberOfNeurons);
         }
     }
 }

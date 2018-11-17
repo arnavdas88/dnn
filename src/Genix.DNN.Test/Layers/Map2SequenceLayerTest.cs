@@ -13,10 +13,10 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             Map2SequenceLayer layer = new Map2SequenceLayer(shape);
 
-            CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape.Axes);
             Assert.AreEqual("M2S", layer.Architecture);
         }
 
@@ -24,16 +24,16 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new Map2SequenceLayer((int[])null));
+            Assert.IsNotNull(new Map2SequenceLayer((Shape)null));
         }
 
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             Map2SequenceLayer layer = new Map2SequenceLayer(shape, "M2S", null);
 
-            CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { 20, 150 }, layer.OutputShape.Axes);
             Assert.AreEqual("M2S", layer.Architecture);
         }
 
@@ -44,7 +44,7 @@
             string architecture = "MS";
             try
             {
-                Map2SequenceLayer layer = new Map2SequenceLayer(new[] { -1, 20, 15, 10 }, architecture, null);
+                Map2SequenceLayer layer = new Map2SequenceLayer(new Shape(-1, 20, 15, 10), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -66,7 +66,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new Map2SequenceLayer(new[] { -1, 20, 15, 10 }, null, null));
+            Assert.IsNotNull(new Map2SequenceLayer(new Shape(-1, 20, 15, 10), null, null));
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@
         [TestMethod]
         public void CopyConstructorTest2()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             Map2SequenceLayer layer1 = new Map2SequenceLayer(shape);
             Map2SequenceLayer layer2 = new Map2SequenceLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -88,7 +88,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             Map2SequenceLayer layer1 = new Map2SequenceLayer(shape);
             Map2SequenceLayer layer2 = layer1.Clone() as Map2SequenceLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -97,7 +97,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             Map2SequenceLayer layer1 = new Map2SequenceLayer(shape);
             string s1 = JsonConvert.SerializeObject(layer1);
             Map2SequenceLayer layer2 = JsonConvert.DeserializeObject<Map2SequenceLayer>(s1);
@@ -110,10 +110,10 @@
         {
             Session session = new Session();
 
-            int[] shape = new[] { 1, 20, 15, 10 };
+            Shape shape = new Shape(TensorShape.BWHC, 1, 20, 15, 10);
             Map2SequenceLayer layer = new Map2SequenceLayer(shape);
 
-            Tensor x = new Tensor(null, TensorShape.BWHC, shape);
+            Tensor x = new Tensor(null, shape);
             x.Randomize();
 
             Tensor y = layer.Forward(session, new[] { x })[0];

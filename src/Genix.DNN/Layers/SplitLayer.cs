@@ -28,21 +28,21 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="SplitLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfOutputs">The number of output tensors.</param>
-        public SplitLayer(int[] inputShape, int numberOfOutputs)
-            : base(numberOfOutputs, inputShape)
+        public SplitLayer(Shape shape, int numberOfOutputs)
+            : base(numberOfOutputs, shape)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SplitLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public SplitLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(1 /* temp */, inputShape)
+        public SplitLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(1 /* temp */, shape)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, SplitLayer.ArchitecturePattern);
             this.NumberOfOutputs = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);

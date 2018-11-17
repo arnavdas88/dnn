@@ -24,7 +24,7 @@ namespace Genix.MachineLearning
     /// Represents a multi-dimensional tensor used to store weights, gradients, etc.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class Tensor : Shape, ICloneable
+    public class Tensor : ICloneable
     {
 #if USE_ARRAYPOOL
         private static ArrayPool<float> arrayPool = ArrayPool<float>.Create();
@@ -44,10 +44,11 @@ namespace Genix.MachineLearning
         /// <param name="axes">The tensor dimensions along its axes.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor(string name, TensorShape shape, int[] axes)
-            : base(axes)
         {
             this.Name = name;
             this.Shape = shape;
+            this.InitializeShape(axes);
+
 #if USE_ARRAYPOOL
             this.Weights = Tensor.arrayPool.Rent(this.Length);
             this.ownWeights = true;
@@ -81,8 +82,11 @@ namespace Genix.MachineLearning
         /// <param name="values">The values to set.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor(string name, TensorShape shape, int[] axes, float[] values)
-            : base(axes)
         {
+            this.Name = name;
+            this.Shape = shape;
+            this.InitializeShape(axes);
+
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
@@ -93,8 +97,6 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("The number of weights does not match the tensor length.", nameof(values));
             }
 
-            this.Name = name;
-            this.Shape = shape;
             this.Weights = values;
         }
 
@@ -130,7 +132,6 @@ namespace Genix.MachineLearning
         /// <param name="other">The <see cref="Tensor"/> to copy the data from.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Tensor(Tensor other)
-            : base(other)
         {
             if (other == null)
             {
@@ -139,6 +140,9 @@ namespace Genix.MachineLearning
 
             this.Name = other.Name;
             this.Shape = other.Shape;
+            this.Length = other.Length;
+            this.Axes = other.Axes.ToArray();
+            this.Strides = other.Strides.ToArray();
             this.Weights = other.Weights.ToArray();
             this.gradient = other.gradient?.ToArray();
         }
@@ -189,6 +193,41 @@ namespace Genix.MachineLearning
         /// </value>
         [JsonProperty("shape")]
         public TensorShape Shape { get; private set; }
+
+        /// <summary>
+        /// Gets the total number of elements in all the dimensions of the <see cref="Tensor"/>.
+        /// </summary>
+        /// <value>
+        /// The total number of elements in all the dimensions of the <see cref="Tensor"/>.
+        /// </value>
+        [JsonProperty("length")]
+        public int Length { get; private set; }
+
+        /// <summary>
+        /// Gets the rank (number of dimensions) of the <see cref="Tensor"/>.
+        /// </summary>
+        /// <value>
+        /// The rank (number of dimensions) of the <see cref="Tensor"/>.
+        /// </value>
+        public int Rank => this.Axes.Length;
+
+        /// <summary>
+        /// Gets the axes dimensions.
+        /// </summary>
+        /// <value>
+        /// The axes dimensions.
+        /// </value>
+        [JsonProperty("axes")]
+        public int[] Axes { get; private set; }
+
+        /// <summary>
+        /// Gets the axes strides.
+        /// </summary>
+        /// <value>
+        /// The axes strides.
+        /// </value>
+        [JsonProperty("strides")]
+        public int[] Strides { get; private set; }
 
         /// <summary>
         /// Gets the weights stored in this <see cref="Tensor"/>.
@@ -425,6 +464,25 @@ namespace Genix.MachineLearning
             this.Shape = shape;
             this.InitializeShape(axes);
             return true;
+        }
+
+        /// <summary>
+        /// Calculates the element position in the tensor.
+        /// </summary>
+        /// <param name="axes">The element coordinates.</param>
+        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Position(params int[] axes)
+        {
+            int pos = 0;
+
+            int[] strides = this.Strides;
+            for (int i = 0, ii = axes.Length; i < ii; i++)
+            {
+                pos += strides[i] * axes[i];
+            }
+
+            return pos;
         }
 
         /// <summary>
@@ -882,6 +940,42 @@ namespace Genix.MachineLearning
             float[] dw = this.gradient;
             this.gradient = null;
             return dw;
+        }
+
+        /// <summary>
+        /// Initializes the tensor shape after it has been constructed.
+        /// </summary>
+        /// <param name="axes">The tensor dimensions along its axes.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void InitializeShape(int[] axes)
+        {
+            if (axes == null)
+            {
+                throw new ArgumentNullException(nameof(axes));
+            }
+
+            int length = 1;
+
+            int rank = axes.Length;
+            this.Axes = new int[rank];
+            int[] strides = this.Strides = new int[rank];
+
+            for (int i = rank - 1; i >= 0; i--)
+            {
+                this.Axes[i] = axes[i];
+                length *= axes[i];
+
+                if (i == rank - 1)
+                {
+                    strides[i] = 1;
+                }
+                else
+                {
+                    strides[i] = strides[i + 1] * axes[i + 1];
+                }
+            }
+
+            this.Length = length;
         }
     }
 }

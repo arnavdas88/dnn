@@ -20,10 +20,10 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="PoolingLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
-        protected PoolingLayer(int[] inputShape, Kernel kernel)
-            : base(1, PoolingLayer.CalculateOutputShape(inputShape, kernel))
+        protected PoolingLayer(Shape shape, Kernel kernel)
+            : base(1, PoolingLayer.CalculateOutputShape(shape, kernel))
         {
             this.Kernel = kernel;
         }
@@ -56,26 +56,26 @@ namespace Genix.DNN.Layers
         public Kernel Kernel { get; protected set; }
 
         /// <summary>
-        /// Computes the dimensions of the layer's output tensor.
+        /// Computes the shape of the layer's output tensor.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
         /// <returns>
-        /// The dimensions of the layer's output tensor.
+        /// The shape of the layer's output tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, Kernel kernel)
+        private static Shape CalculateOutputShape(Shape shape, Kernel kernel)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
-            int[] axes = inputShape.ToArray();
+            int[] axes = shape.Axes.ToArray();
             axes[(int)Axis.X] = kernel.CalculateOutputWidth(axes[(int)Axis.X]);
             axes[(int)Axis.Y] = kernel.CalculateOutputHeight(axes[(int)Axis.Y]);
 
-            return axes;
+            return new Shape(shape.Format, axes);
         }
     }
 }

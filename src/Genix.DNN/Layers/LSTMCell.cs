@@ -38,44 +38,44 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="LSTMCell"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         public LSTMCell(
-            int[] inputShape,
+            Shape shape,
             RNNDirection direction,
             int numberOfNeurons)
-            : this(inputShape, direction, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
+            : this(shape, direction, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LSTMCell"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public LSTMCell(
-            int[] inputShape,
+            Shape shape,
             RNNDirection direction,
             int numberOfNeurons,
             float forgetBias,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, direction, numberOfNeurons, matrixLayout, forgetBias, random);
+            this.Initialize(shape, direction, numberOfNeurons, matrixLayout, forgetBias, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LSTMCell"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public LSTMCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public LSTMCell(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, LSTMCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
@@ -91,7 +91,7 @@ namespace Genix.DNN.Layers
             }
 
             this.Initialize(
-                inputShape,
+                shape,
                 direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
@@ -222,23 +222,30 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes the <see cref="LSTMCell"/>.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The dimensions of the layer's input tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="forgetBias">The bias added to forget gates.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
-            int[] inputShape,
+            Shape shape,
             RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             float forgetBias,
             RandomNumberGenerator<float> random)
         {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            int[] axes = shape.Axes;
+
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron
-            int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int mbsize = axes.Skip(1).Aggregate(1, (total, next) => total * next);
             int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
                 new[] { mbsize, 4 * numberOfNeurons } :
                 new[] { 4 * numberOfNeurons, mbsize };
@@ -261,7 +268,8 @@ namespace Genix.DNN.Layers
                 random ?? new RandomRangeGenerator(-0.08f, 0.08f));
 
             this.ForgetBias = forgetBias;
-            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
+
+            this.OutputShape = new Shape(axes[(int)Axis.B], numberOfNeurons);
         }
     }
 }

@@ -53,9 +53,10 @@ namespace Genix.DocumentAnalysis.Recognition
             // create input tensor
             Tensor x = ImageExtensions.FromImage(
                 source.Image,
-                this.network.InputShape[(int)Axis.X],
-                this.network.InputShape[(int)Axis.Y],
-                "checkbox");
+                this.network.InputAxes[(int)Axis.X],
+                this.network.InputAxes[(int)Axis.Y],
+                "checkbox",
+                TensorShape.BWHC);
 
             // recognize the image
             IList<(string Answer, float Probability)> result = this.network.Execute(x).Answers[0];
@@ -79,9 +80,10 @@ namespace Genix.DocumentAnalysis.Recognition
             Tensor x = ImageExtensions.FromImages(
                 sources,
                 source => source.Image,
-                this.network.InputShape[(int)Axis.X],
-                this.network.InputShape[(int)Axis.Y],
-                "checkbox");
+                this.network.InputAxes[(int)Axis.X],
+                this.network.InputAxes[(int)Axis.Y],
+                "checkbox",
+                TensorShape.BWHC);
 
             // recognize the image
             IList<IList<(string Answer, float Probability)>> results = this.network.Execute(x).Answers;

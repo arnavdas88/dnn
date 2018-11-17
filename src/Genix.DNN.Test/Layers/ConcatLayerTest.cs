@@ -13,8 +13,8 @@
     [TestClass]
     public class ConcatLayerTest
     {
-        private static int[] inputShape1 = new[] { -1, 2, 3, 2 };
-        private static int[] inputShape2 = new[] { -1, 2, 3, 3 };
+        private static Shape inputShape1 = new Shape(Shape.BWHC, -1, 2, 3, 2);
+        private static Shape inputShape2 = new Shape(Shape.BWHC, -1, 2, 3, 3);
 
         private static int[] outputShape = Shape.Reshape(
             ConcatLayerTest.inputShape1,
@@ -37,9 +37,9 @@
         public void ConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
 
-            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape);
+            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape.Axes);
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
@@ -47,18 +47,18 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new ConcatLayer((IList<int[]>)null));
+            Assert.IsNotNull(new ConcatLayer((IList<Shape>)null));
         }
 
         [TestMethod, TestCategory("Concat")]
         public void ArchitectureConstructorTest1()
         {
             ConcatLayer layer = new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
                 "CONCAT",
                 null);
 
-            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape);
+            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape.Axes);
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
@@ -70,7 +70,7 @@
             try
             {
                 ConcatLayer layer = new ConcatLayer(
-                    new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
+                    new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
                     architecture,
                     null);
             }
@@ -95,7 +95,7 @@
         public void ArchitectureConstructorTest4()
         {
             Assert.IsNotNull(new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 },
                 null,
                 null));
         }
@@ -104,7 +104,7 @@
         public void CopyConstructorTest1()
         {
             ConcatLayer layer1 = new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
             ConcatLayer layer2 = new ConcatLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -120,7 +120,7 @@
         public void CloneTest()
         {
             ConcatLayer layer1 = new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
             ConcatLayer layer2 = layer1.Clone() as ConcatLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -129,7 +129,7 @@
         public void SerializeTest()
         {
             ConcatLayer layer1 = new ConcatLayer(
-                new int[][] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
             string s1 = JsonConvert.SerializeObject(layer1);
             ConcatLayer layer2 = JsonConvert.DeserializeObject<ConcatLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -140,11 +140,8 @@
         [Description("Filter 2x2, stride 2x2.")]
         public void ForwardBackwardTest()
         {
-            ConcatLayer layer = new ConcatLayer(new int[][]
-            {
-                ConcatLayerTest.inputShape1,
-                ConcatLayerTest.inputShape2
-            });
+            ConcatLayer layer = new ConcatLayer(
+                new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
 
             Tensor xTemp1 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(ConcatLayerTest.inputShape1, (int)Axis.B, 1));
             xTemp1.Set(ConcatLayerTest.weights1);

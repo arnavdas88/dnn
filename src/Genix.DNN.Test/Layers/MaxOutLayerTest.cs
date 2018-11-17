@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using Genix.DNN.Layers;
     using Genix.MachineLearning;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,10 +14,13 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, 2);
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
-            Assert.AreEqual(2, layer.GroupSize);
-            Assert.AreEqual("MO2", layer.Architecture);
+            ////foreach (TensorShape shape in Enum.GetValues(typeof(TensorShape)))
+            {
+                MaxOutLayer layer = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), 2);
+                CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
+                Assert.AreEqual(2, layer.GroupSize);
+                Assert.AreEqual("MO2", layer.Architecture);
+            }
         }
 
         [TestMethod]
@@ -30,14 +34,14 @@
         [ExpectedException(typeof(ArgumentException))]
         public void ConstructorTest3()
         {
-            Assert.IsNotNull(new MaxOutLayer(new[] { -1, 3, 2, 4 }, 3));
+            Assert.IsNotNull(new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), 3));
         }
 
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, "MO2", null);
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            MaxOutLayer layer = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), "MO2", null);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
             Assert.AreEqual(2, layer.GroupSize);
             Assert.AreEqual("MO2", layer.Architecture);
         }
@@ -49,7 +53,7 @@
             string architecture = "MO";
             try
             {
-                MaxOutLayer layer = new MaxOutLayer(new[] { -1, 3, 2, 4 }, architecture, null);
+                MaxOutLayer layer = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -71,13 +75,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new MaxOutLayer(new[] { -1, 3, 2, 4 }, null, null));
+            Assert.IsNotNull(new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            MaxOutLayer layer1 = new MaxOutLayer(new[] { -1, 3, 2, 4 }, 2);
+            MaxOutLayer layer1 = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), 2);
             MaxOutLayer layer2 = new MaxOutLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -92,7 +96,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            MaxOutLayer layer1 = new MaxOutLayer(new[] { -1, 3, 2, 4 }, 2);
+            MaxOutLayer layer1 = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), 2);
             MaxOutLayer layer2 = layer1.Clone() as MaxOutLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -100,7 +104,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            MaxOutLayer layer1 = new MaxOutLayer(new[] { -1, 3, 2, 4 }, 2);
+            MaxOutLayer layer1 = new MaxOutLayer(new Shape(Shape.BWHC, -1, 3, 2, 4), 2);
             string s1 = JsonConvert.SerializeObject(layer1);
             MaxOutLayer layer2 = JsonConvert.DeserializeObject<MaxOutLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -110,10 +114,10 @@
         [TestMethod]
         public void ForwardBackwardTest1()
         {
-            int[] shape = new[] { -1, 3, 2, 4 };
+            Shape shape = new Shape(Shape.BWHC, -1, 3, 2, 4);
             MaxOutLayer layer = new MaxOutLayer(shape, 2);
 
-            Tensor xTemp = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(shape, (int)Axis.B, 1));
             xTemp.Set(new float[]
             {
                 11, 12, 13, 14,  12, -11, 15, 16,
@@ -121,7 +125,7 @@
                 31, 32, 33, 34,  32, -31, 35, 36,
             });
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, Shape.Reshape(layer.OutputShape, (int)Axis.B, 1));
+            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(layer.OutputAxes, (int)Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 12, 14,  12, 16,
@@ -129,7 +133,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.Unknown, expectedTemp.Axes);
+            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, expectedTemp.Axes);
             dyTemp.Set(new float[]
             {
                 12, 14,  12, 16,
@@ -137,7 +141,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.Unknown, xTemp.Axes);
+            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, xTemp.Axes);
             expectedDxTemp.Set(new float[]
             {
                 0, 12, 0, 14,  12, 0, 0, 16,

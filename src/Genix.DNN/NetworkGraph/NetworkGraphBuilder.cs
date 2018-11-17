@@ -14,6 +14,7 @@ namespace Genix.DNN
     using Genix.Core;
     using Genix.DNN.Layers;
     using Genix.Graph;
+    using Genix.MachineLearning;
 
     internal class NetworkGraphBuilder
     {
@@ -22,7 +23,7 @@ namespace Genix.DNN
         private const char StartQualifier = '{';
         private const char EndQualifier = '}';
 
-        public static NetworkGraph CreateNetworkGraph(string architecture, bool addActivationLayers, bool addLossLayer)
+        public static NetworkGraph CreateNetworkGraph(string architecture, TensorShape shape, bool addActivationLayers, bool addLossLayer)
         {
             if (architecture == null)
             {
@@ -41,7 +42,7 @@ namespace Genix.DNN
             RandomNumberGenerator<float> random = null; //// new Random(0);
             foreach (ComponentVertex sink in componentGraph.Sinks)
             {
-                NetworkGraphBuilder.CreateLayerInGraph(componentGraph, sink, random);
+                NetworkGraphBuilder.CreateLayerInGraph(shape, componentGraph, sink, random);
             }
 
             // 3. convert to network graph
@@ -169,17 +170,17 @@ namespace Genix.DNN
             }
         }
 
-        private static void CreateLayerInGraph(ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator<float> random)
+        private static void CreateLayerInGraph(TensorShape shape, ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator<float> random)
         {
             if (graph.InDegree(vertex) == 0)
             {
                 // use some arbitrary layout to start
                 // source layer must be input layer that overrides it
-                vertex.Layer = Layer.CreateFromArchitecture(new[] { -1, 100, 100, 100 }, vertex.Architecture, random);
+                vertex.Layer = Layer.CreateFromArchitecture(shape, new[] { -1, 100, 100, 100 }, vertex.Architecture, random);
             }
             else
             {
-                IList<int[]> inputShapes = new List<int[]>();
+                IList<int[]> axes = new List<int[]>();
                 foreach (Edge<ComponentVertex> edge in graph.InEdges(vertex))
                 {
                     if (edge.Source.Layer == null)
@@ -187,12 +188,12 @@ namespace Genix.DNN
                         NetworkGraphBuilder.CreateLayerInGraph(graph, edge.Source, random);
                     }
 
-                    inputShapes.Add(edge.Source.Layer.OutputShape);
+                    axes.Add(edge.Source.Layer.OutputAxes);
                 }
 
-                vertex.Layer = inputShapes.Count == 1 ?
-                    Layer.CreateFromArchitecture(inputShapes[0], vertex.Architecture, random) :
-                    Layer.CreateFromArchitecture(inputShapes, vertex.Architecture, random);
+                vertex.Layer = axes.Count == 1 ?
+                    Layer.CreateFromArchitecture(axes[0], vertex.Architecture, random) :
+                    Layer.CreateFromArchitecture(axes, vertex.Architecture, random);
             }
         }
 

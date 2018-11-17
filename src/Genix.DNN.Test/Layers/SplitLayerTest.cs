@@ -15,11 +15,11 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer = new SplitLayer(shape, 3);
 
             Assert.AreEqual(3, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("SP3", layer.Architecture);
         }
 
@@ -33,11 +33,11 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer = new SplitLayer(shape, "SP3", null);
 
             Assert.AreEqual(3, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("SP3", layer.Architecture);
         }
 
@@ -48,7 +48,7 @@
             string architecture = "SP";
             try
             {
-                SplitLayer layer = new SplitLayer(new[] { -1, 2, 2, 2 }, architecture, null);
+                SplitLayer layer = new SplitLayer(new Shape(Shape.BWHC, -1, 2, 2, 2), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -70,13 +70,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new SplitLayer(new[] { -1, 2, 2, 2 }, null, null));
+            Assert.IsNotNull(new SplitLayer(new Shape(Shape.BWHC, -1, 2, 2, 2), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer1 = new SplitLayer(shape, 3);
             SplitLayer layer2 = new SplitLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -92,7 +92,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer1 = new SplitLayer(shape, 3);
             SplitLayer layer2 = layer1.Clone() as SplitLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -101,7 +101,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer1 = new SplitLayer(shape, 3);
             string s1 = JsonConvert.SerializeObject(layer1);
             SplitLayer layer2 = JsonConvert.DeserializeObject<SplitLayer>(s1);
@@ -112,7 +112,7 @@
         [TestMethod]
         public void ForwardBackwardTest1()
         {
-            int[] shape = new[] { -1, 2, 2, 2 };
+            Shape shape = new Shape(Shape.BWHC, -1, 2, 2, 2);
             SplitLayer layer = new SplitLayer(shape, 3);
 
             for (int mb = 1; mb <= 3; mb++)

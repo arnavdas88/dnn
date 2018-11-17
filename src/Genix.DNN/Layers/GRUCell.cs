@@ -31,28 +31,28 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="GRUCell"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public GRUCell(
-            int[] inputShape,
+            Shape shape,
             RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, direction, numberOfNeurons, matrixLayout, random);
+            this.Initialize(shape, direction, numberOfNeurons, matrixLayout, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GRUCell"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public GRUCell(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public GRUCell(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, GRUCell.ArchitecturePattern);
             int numberOfNeurons = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
@@ -63,7 +63,7 @@ namespace Genix.DNN.Layers
             }
 
             this.Initialize(
-                inputShape,
+                shape,
                 direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,
@@ -206,26 +206,33 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes the <see cref="GRUCell"/>.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The dimensions of the layer's input tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
         /// <param name="numberOfNeurons">The number of neurons in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
-            int[] inputShape,
+            Shape shape,
             RNNDirection direction,
             int numberOfNeurons,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
             if (random == null)
             {
                 random = new RandomRangeGenerator(-0.08f, 0.08f);
             }
 
+            int[] axes = shape.Axes;
+
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron
-            int xlen = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int xlen = axes.Skip(1).Aggregate(1, (total, next) => total * next);
             int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
                 new[] { xlen, 3 * numberOfNeurons } :
                 new[] { 3 * numberOfNeurons, xlen };
@@ -248,7 +255,7 @@ namespace Genix.DNN.Layers
                 biasesShape,
                 random ?? new RandomRangeGenerator(-0.08f, 0.08f));
 
-            this.OutputShape = new[] { inputShape[(int)Axis.B], numberOfNeurons };
+            this.OutputShape = new Shape( axes[(int)Axis.B], numberOfNeurons);
 
             // initialize biases for update and reset gates only
             Vectors.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);

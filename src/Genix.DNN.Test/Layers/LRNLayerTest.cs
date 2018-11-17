@@ -12,7 +12,7 @@
     [TestClass]
     public class LRNLayerTest
     {
-        private static int[] sourceShape = new[] { -1, 24, 24, 20 };
+        private static Shape sourceShape = new Shape(Shape.BWHC, -1, 24, 24, 20);
 
         [TestMethod]
         public void ConstructorTest1()
@@ -20,7 +20,7 @@
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, 7, 0.001f, 0.5f, 3f);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape.Axes, layer.OutputShape.Axes);
 
             Assert.AreEqual("LRN7(A=0.001;B=0.5;K=3)", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -35,7 +35,7 @@
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, 7);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape.Axes, layer.OutputShape.Axes);
 
             Assert.AreEqual("LRN7", layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -90,7 +90,7 @@
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape.Axes, layer.OutputShape.Axes);
 
             Assert.AreEqual(Architecture, layer.Architecture);
             Assert.AreEqual(5, layer.KernelSize);
@@ -106,7 +106,7 @@
             LRNLayer layer = new LRNLayer(LRNLayerTest.sourceShape, Architecture, null);
 
             Assert.AreEqual(1, layer.NumberOfOutputs);
-            CollectionAssert.AreEqual(LRNLayerTest.sourceShape, layer.OutputShape);
+            CollectionAssert.AreEqual(LRNLayerTest.sourceShape.Axes, layer.OutputShape.Axes);
 
             Assert.AreEqual(Architecture, layer.Architecture);
             Assert.AreEqual(7, layer.KernelSize);
@@ -183,16 +183,16 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
-            int[] shape = new[] { -1, 1, 2, 5 };
+            Shape shape = new Shape(Shape.BWHC, -1, 1, 2, 5);
             LRNLayer layer = new LRNLayer(shape, 3);
 
-            Tensor xTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 1, 2, 5 });
+            Tensor xTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
             xTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42
             });
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 1, 2, 5 });
+            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
             expectedTemp.Set(new float[]
             {
                 LRNLayerTest.Forward(layer, 1, 11),
@@ -208,13 +208,13 @@
                 LRNLayerTest.Forward(layer, 42, 32),
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 1, 2, 5 });
+            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
             dyTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 1, 2, 5 });
+            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
             expectedDxTemp.Set(new float[]
             {
                 0.591914058f, 6.406341f, 11.8103943f, 16.4343262f, 22.1168289f,   1.18269f, 6.97113f, 12.3151608f, 16.8460541f, 22.5372047f

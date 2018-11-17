@@ -21,11 +21,11 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="LossLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        protected LossLayer(int[] inputShape)
-            : base(1, LossLayer.CalculateOutputShape(inputShape))
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        protected LossLayer(Shape shape)
+            : base(1, LossLayer.CalculateOutputShape(shape))
         {
-            this.NumberOfClasses = this.OutputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            this.NumberOfClasses = this.OutputAxes.Skip(1).Aggregate(1, (total, next) => total * next);
         }
 
         /// <summary>
@@ -63,23 +63,24 @@ namespace Genix.DNN.Layers
         internal Tensor Mask { get; set; }
 
         /// <summary>
-        /// Computes the dimensions of the layer's source and destination tensors.
+        /// Computes the shape of the layer's source and destination tensors.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <returns>
-        /// The dimensions of the layer's destination tensor.
+        /// The shape of the layer's destination tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape)
+        private static Shape CalculateOutputShape(Shape shape)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
-            int mbsize = inputShape.Skip(1).Aggregate(1, (total, next) => total * next);
+            int[] axes = shape.Axes;
+            int mbsize = axes.Skip(1).Aggregate(1, (total, next) => total * next);
 
-            return new[] { inputShape[0], mbsize };
+            return new Shape(axes[0], mbsize);
         }
     }
 }

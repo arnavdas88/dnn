@@ -185,7 +185,7 @@ namespace Genix.DNN.Layers
 
             this.Initialize(numberOfFilters, matrixLayout, weightsShape, biasesShape, random);
             this.Kernel = kernel;
-            this.OutputShape = new[]
+            this.OutputAxes = new[]
             {
                 inputShape[(int)Axis.B],
                 kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),

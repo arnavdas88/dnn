@@ -77,13 +77,22 @@ namespace Genix.DNN
         public string Architecture => this.Graph?.ToString();
 
         /// <summary>
+        /// Gets the network input shape.
+        /// </summary>
+        /// <value>
+        /// The <see cref="TensorShape"/> enumeration.
+        /// </value>
+        [JsonIgnore]
+        public TensorShape InputShape => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Shape ?? TensorShape.Unknown;
+
+        /// <summary>
         /// Gets the network input layout.
         /// </summary>
         /// <value>
         /// The network input layout.
         /// </value>
         [JsonIgnore]
-        public int[] InputShape => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Shape;
+        public int[] InputAxes => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Axes;
 
         /// <summary>
         /// Gets the network output layouts.
@@ -92,7 +101,7 @@ namespace Genix.DNN
         /// The network output layouts.
         /// </value>
         [JsonIgnore]
-        public IList<int[]> OutputShapes => this.Graph?.Sinks.Select(x => x.OutputShape).ToList();
+        public IList<int[]> OutputAxes => this.Graph?.Sinks.Select(x => x.OutputAxes).ToList();
 
         /// <summary>
         /// Gets the graph representation of the network.
@@ -107,10 +116,11 @@ namespace Genix.DNN
         /// Creates a classification neural network from a string that contains network architecture.
         /// </summary>
         /// <param name="architecture">The network architecture.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <returns>The <see cref="Network"/> object this method creates.</returns>
-        public static Network FromArchitecture(string architecture)
+        public static Network FromArchitecture(string architecture, TensorShape shape)
         {
-            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, true, false);
+            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, shape, true, false);
 
             return new Network(graph);
         }

@@ -8,7 +8,6 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
     using Genix.Core;
     using Genix.MachineLearning;
@@ -25,11 +24,11 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="StochasticLayer"/> class.
         /// </summary>
-        /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
+        /// <param name="outputShape">The shape of the layer's output tensor.</param>
         /// <remarks>
         /// After using this constructor, the <see cref="StochasticLayer"/> should be initialized by calling <see cref="Initialize"/> method.
         /// </remarks>
-        protected StochasticLayer(int[] outputShape)
+        protected StochasticLayer(Shape outputShape)
             : base(outputShape)
         {
         }

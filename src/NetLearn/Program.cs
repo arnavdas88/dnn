@@ -135,7 +135,7 @@ namespace Genix.NetLearn
                             this.WriteLine(logFile, "  Scale: {0}", task.Scale);
                             this.WriteLine(logFile, "  Crop: {0}", task.Crop);
 
-                            int[] shape = net.InputShape;
+                            int[] shape = net.InputAxes;
                             using (TestImageProvider<string> dataProvider = task.CreateDataProvider(net))
                             {
                                 using (TestImageProvider<string> testDataProvider = task.CreateTestDataProvider(net))
@@ -196,7 +196,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC);
                                                     (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
 
                                                     results.Add(new ClassificationResult<string>(
@@ -223,7 +223,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC);
 
                                                     foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
                                                     {
@@ -281,7 +281,7 @@ namespace Genix.NetLearn
                                                         ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
                                                     }
 
-                                                    return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null), x.labels);
+                                                    return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC), x.labels);
                                                 });
                                         });
                                 }
@@ -304,7 +304,7 @@ namespace Genix.NetLearn
                                             string[] labels = x.Labels;
                                             if (!(task.Loss is CTCLoss))
                                             {
-                                                int b = net.OutputShapes.First()[0];
+                                                int b = net.OutputAxes.First()[0];
                                                 if (labels.Length == 1 && b > 1)
                                                 {
                                                     labels = Enumerable.Repeat(labels[0], b).ToArray();
@@ -611,7 +611,7 @@ namespace Genix.NetLearn
 
                 public TestImageProvider<string> CreateDataProvider(ClassificationNetwork network)
                 {
-                    int[] shape = network.InputShape;
+                    int[] shape = network.InputAxes;
 
                     return TestImageProvider<string>.CreateFromJson(
                         0,
@@ -623,7 +623,7 @@ namespace Genix.NetLearn
 
                 public TestImageProvider<string> CreateTestDataProvider(ClassificationNetwork network)
                 {
-                    int[] shape = network.InputShape;
+                    int[] shape = network.InputAxes;
 
                     return TestImageProvider<string>.CreateFromJson(
                         0,

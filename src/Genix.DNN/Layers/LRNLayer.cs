@@ -50,23 +50,23 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="LRNLayer"/> class, using default parameters.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernelSize">The number of channels to normalize across. Should be odd number.</param>
-        public LRNLayer(int[] inputShape, int kernelSize)
-            : this(inputShape, kernelSize, LRNLayer.DefaultAlpha, LRNLayer.DefaultBeta, LRNLayer.DefaultK)
+        public LRNLayer(Shape shape, int kernelSize)
+            : this(shape, kernelSize, LRNLayer.DefaultAlpha, LRNLayer.DefaultBeta, LRNLayer.DefaultK)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LRNLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernelSize">The number of channels to normalize across. Should be odd number.</param>
         /// <param name="alpha">The α parameter.</param>
         /// <param name="beta">The β parameter.</param>
         /// <param name="k">The k parameter.</param>
-        public LRNLayer(int[] inputShape, int kernelSize, float alpha, float beta, float k)
-            : base(1, inputShape)
+        public LRNLayer(Shape shape, int kernelSize, float alpha, float beta, float k)
+            : base(1, shape)
         {
             if (kernelSize < 3 || (kernelSize % 2) == 0)
             {
@@ -82,11 +82,11 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="LRNLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public LRNLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(1, inputShape)
+        public LRNLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(1, shape)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, LRNLayer.ArchitecturePattern);
 

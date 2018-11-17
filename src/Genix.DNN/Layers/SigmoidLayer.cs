@@ -28,20 +28,20 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public SigmoidLayer(int[] inputShape)
-            : base(inputShape)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        public SigmoidLayer(Shape shape)
+            : base(shape)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SigmoidLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public SigmoidLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(inputShape)
+        public SigmoidLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(shape)
         {
             Layer.ParseArchitecture(architecture, SigmoidLayer.ArchitecturePattern);
         }

@@ -8,7 +8,6 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.MachineLearning;
@@ -22,9 +21,9 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="RNNLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        protected RNNLayer(int[] inputShape)
-            : base(inputShape)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        protected RNNLayer(Shape shape)
+            : base(shape)
         {
             this.Graph = new NetworkGraph();
         }

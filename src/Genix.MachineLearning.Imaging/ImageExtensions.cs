@@ -23,8 +23,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
+        /// <param name="shape">The tensor shape.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImage(Image image, int xaxis, int yaxis, string name)
+        public static Tensor FromImage(Image image, int xaxis, int yaxis, string name, TensorShape shape)
         {
             if (image == null)
             {
@@ -37,7 +38,7 @@ namespace Genix.MachineLearning.Imaging
                 xaxis = image.Width.MulDiv(yaxis, image.Height);
             }
 
-            Tensor y = new Tensor(name, TensorShape.BWHC, new[] { 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+            Tensor y = ImageExtensions.CreateTensor(image, 1, xaxis, yaxis, name, shape);
             FillTensor(y, 0, image);
 
             return y;
@@ -50,8 +51,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
+        /// <param name="shape">The tensor shape.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImages(IList<Image> images, int xaxis, int yaxis, string name)
+        public static Tensor FromImages(IList<Image> images, int xaxis, int yaxis, string name, TensorShape shape)
         {
             if (images == null)
             {
@@ -73,7 +75,7 @@ namespace Genix.MachineLearning.Imaging
                 }
             }
 
-            Tensor y = new Tensor(name, TensorShape.BWHC, new[] { images.Count, xaxis, yaxis, images[0].BitsPerPixel > 8 ? 3 : 1 });
+            Tensor y = ImageExtensions.CreateTensor(images[0], images.Count, xaxis, yaxis, name, shape);
             for (int i = 0, ii = images.Count; i < ii; i++)
             {
                 FillTensor(y, i, images[i]);
@@ -91,8 +93,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
+        /// <param name="shape">The tensor shape.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImages<T>(IList<T> sources, Func<T, Image> selector, int xaxis, int yaxis, string name)
+        public static Tensor FromImages<T>(IList<T> sources, Func<T, Image> selector, int xaxis, int yaxis, string name, TensorShape shape)
         {
             if (sources == null)
             {
@@ -120,7 +123,7 @@ namespace Genix.MachineLearning.Imaging
                 Image image = selector(sources[i]);
                 if (i == 0)
                 {
-                    y = new Tensor(name, TensorShape.BWHC, new[] { sources.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1 });
+                    y = ImageExtensions.CreateTensor(image, sources.Count, xaxis, yaxis, name, shape);
                 }
 
                 FillTensor(y, i, image);
@@ -129,32 +132,53 @@ namespace Genix.MachineLearning.Imaging
             return y;
         }
 
-        private static void FillTensor(Tensor y, int iy0, Image image)
+        private static Tensor CreateTensor(Image image, int b, int x, int y, string name, TensorShape shape)
         {
-            int y1 = y.Axes[(int)Axis.X];
-            int y2 = y.Axes[(int)Axis.Y];
-            int y3 = y.Axes[(int)Axis.C];
-            int ystride0 = y.Strides[(int)Axis.B];
-            int ystride1 = y.Strides[(int)Axis.X];
-            int ystride2 = y.Strides[(int)Axis.Y];
-            float[] yw = y.Weights;
-            int ypos0 = iy0 * ystride0;
+            int c = image.BitsPerPixel > 8 ? 3 : 1;
+            switch (shape)
+            {
+                case TensorShape.BWHC:
+                    return new Tensor(name, shape, new[] { b, x, y, c });
 
-            int bitsPerPixel = image.BitsPerPixel;
-            if ((bitsPerPixel > 8 ? 3 : 1) != y3)
+                case TensorShape.BHWC:
+                    return new Tensor(name, shape, new[] { b, y, x, c });
+
+                case TensorShape.BCHW:
+                    return new Tensor(name, shape, new[] { b, c, y, x });
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
+        }
+
+        private static void FillTensor(Tensor y, int b, Image image)
+        {
+            int yX = y.Axes[(int)Axis.X];
+            int yY = y.Axes[(int)Axis.Y];
+            int yC = y.Axes[(int)Axis.C];
+            int ystrideB = y.Strides[(int)Axis.B];
+            int ystrideX = y.Strides[(int)Axis.X];
+            int ystrideY = y.Strides[(int)Axis.Y];
+            int ystrideC = y.Strides[(int)Axis.C];
+
+            float[] yw = y.Weights;
+            int posB = b * ystrideB;
+
+            int bpp = image.BitsPerPixel;
+            if ((bpp > 8 ? 3 : 1) != yC)
             {
                 throw new ArgumentException("Cannot create tensor. Images in the collection have different bit depth.");
             }
 
-            if (image.Width != y1 || image.Height != y2)
+            if (image.Width != yX || image.Height != yY)
             {
-                image = image.FitToSize(y1, y2, ScalingOptions.None);
+                image = image.FitToSize(yX, yY, ScalingOptions.None);
             }
 
             int stride = image.Stride;
             ulong[] bits = image.Bits;
 
-            switch (bitsPerPixel)
+            switch (bpp)
             {
                 case 1:
                     Convert1bpp();
@@ -168,11 +192,8 @@ namespace Genix.MachineLearning.Imaging
                     break;
 
                 case 24:
-                    Convert24bpp();
-                    break;
-
                 case 32:
-                    Convert32bpp();
+                    Convert24to32bpp();
                     break;
 
                 default:
@@ -181,25 +202,25 @@ namespace Genix.MachineLearning.Imaging
 
             void Convert1bpp()
             {
-                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
+                for (int iy = 0, posY = posB, offY = 0; iy < yY; iy++, posY += ystrideY, offY += stride)
                 {
-                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
+                    for (int ix = 0, posX = posY, offX = offY; ix < yX; offX++)
                     {
-                        ulong b = bits[xoff1];
-                        if (b != 0)
+                        ulong ubits = bits[offX];
+                        if (ubits != 0)
                         {
-                            for (ulong mask = 1; mask != 0 && iy1 < y1; iy1++, mask <<= 1, ypos1 += ystride1)
+                            for (ulong mask = 1; mask != 0 && ix < yX; ix++, mask <<= 1, posX += ystrideX)
                             {
-                                if ((b & mask) != 0)
+                                if ((ubits & mask) != 0)
                                 {
-                                    yw[ypos1] = 1.0f;
+                                    yw[posX] = 1.0f;
                                 }
                             }
                         }
                         else
                         {
-                            iy1 += 64;
-                            ypos1 += 64 * ystride1;
+                            ix += 64;
+                            posX += 64 * ystrideX;
                         }
                     }
                 }
@@ -207,95 +228,59 @@ namespace Genix.MachineLearning.Imaging
 
             void Convert2to16bpp()
             {
-                int pixelsPerSample = 64 / bitsPerPixel;
+                int pixelsPerSample = 64 / bpp;
                 ulong maxcolor = image.MaxColor;
 
-                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
+                for (int iy = 0, posY = posB, offY = 0; iy < yY; iy++, posY += ystrideY, offY += stride)
                 {
-                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
+                    for (int ix = 0, posX = posY, offX = offY; ix < yX; offX++)
                     {
-                        ulong b = ~bits[xoff1];
-                        if (b != 0)
+                        ulong ubits = ~bits[offX];
+                        if (ubits != 0)
                         {
-                            for (int shift = 0; shift < 64 && iy1 < y1; iy1++, shift += bitsPerPixel, ypos1 += ystride1)
+                            for (int shift = 0; shift < 64 && ix < yX; ix++, shift += bpp, posX += ystrideX)
                             {
-                                yw[ypos1] = (b >> shift) & maxcolor;
+                                yw[posX] = (ubits >> shift) & maxcolor;
                             }
                         }
                         else
                         {
-                            iy1 += pixelsPerSample;
-                            ypos1 += pixelsPerSample * ystride1;
+                            ix += pixelsPerSample;
+                            posX += pixelsPerSample * ystrideX;
                         }
                     }
                 }
 
                 // normalize tensor to 1
-                Vectors.MulC(ystride0, 1.0f / maxcolor, y.Weights, ypos0);
+                Vectors.DivC(ystrideB, maxcolor, y.Weights, posB);
             }
 
-            void Convert24bpp()
+            void Convert24to32bpp()
             {
+                int xinc = bpp == 24 ? 3 : 4;
+
                 unsafe
                 {
                     fixed (ulong* ubits = bits)
                     {
-                        fixed (float* wptr = &yw[ypos0])
+                        byte* src = (byte*)ubits;
+                        int stride8 = image.Stride8;
+
+                        for (int iy = 0, posY = posB, offY = 0; iy < yY; iy++, posY += ystrideY, offY += stride8)
                         {
-                            byte* bitsptry = (byte*)ubits;
-                            int bstride8 = image.Stride8;
-
-                            float* wptry = wptr;
-
-                            for (int iy2 = 0; iy2 < y2; iy2++, bitsptry += bstride8, wptry += ystride2)
+                            for (int ix = 0, posX = posY, offX = offY; ix < yX; posX += ystrideX, offX += xinc)
                             {
-                                byte* bitsptrx = bitsptry;
-                                float* wptrx = wptry;
-
-                                for (int iy1 = 0; iy1 < y1; iy1++, bitsptrx += 3, wptrx += ystride1)
-                                {
-                                    wptrx[0] = bitsptrx[0];
-                                    wptrx[1] = bitsptrx[1];
-                                    wptrx[2] = bitsptrx[2];
-                                }
+                                yw[posX + (ystrideC * 0)] = src[offX + 0];
+                                yw[posX + (ystrideC * 1)] = src[offX + 1];
+                                yw[posX + (ystrideC * 2)] = src[offX + 2];
                             }
                         }
                     }
                 }
 
                 // normalize tensor to 1
-                Vectors.SubCRev(ystride0, 255, y.Weights, ypos0);
-                Vectors.MulC(ystride0, 1.0f / 255, y.Weights, ypos0);
-            }
-
-            void Convert32bpp()
-            {
-                for (int iy2 = 0, ypos2 = ypos0, xoff2 = 0; iy2 < y2; iy2++, xoff2 += stride, ypos2 += ystride2)
-                {
-                    for (int iy1 = 0, ypos1 = ypos2, xoff1 = xoff2; iy1 < y1; xoff1++)
-                    {
-                        ulong b = ~bits[xoff1];
-                        if ((b & 0x00ff_ffff_00ff_fffful) != 0ul)
-                        {
-                            for (int shift = 0; shift < 64 && iy1 < y1; iy1++, shift += 32, ypos1 += ystride1)
-                            {
-                                ulong bvalue = b >> shift;
-
-                                yw[ypos1 + 0] = (bvalue >> 0) & 0xff;
-                                yw[ypos1 + 1] = (bvalue >> 8) & 0xff;
-                                yw[ypos1 + 2] = (bvalue >> 16) & 0xff;
-                            }
-                        }
-                        else
-                        {
-                            iy1 += 2;
-                            ypos1 += 2 * ystride1;
-                        }
-                    }
-                }
-
-                // normalize tensor to 1
-                Vectors.MulC(ystride0, 1.0f / 255, y.Weights, ypos0);
+                Vectors.SubCRev(ystrideB, 255, y.Weights, posB);
+                Vectors.DivC(ystrideB, 255, y.Weights, posB);
             }
         }
     }

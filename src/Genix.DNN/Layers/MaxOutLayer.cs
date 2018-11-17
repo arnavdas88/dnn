@@ -42,24 +42,24 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="MaxOutLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="groupSize">The number of neurons in maxout unit.</param>
-        public MaxOutLayer(int[] inputShape, int groupSize)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        /// <param name="groupSize">The number of neurons in max out unit.</param>
+        public MaxOutLayer(Shape shape, int groupSize)
         {
-            this.Initialize(inputShape, groupSize);
+            this.Initialize(shape, groupSize);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaxOutLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public MaxOutLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public MaxOutLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, MaxOutLayer.ArchitecturePattern);
             int groupSize = Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture);
-            this.Initialize(inputShape, groupSize);
+            this.Initialize(shape, groupSize);
         }
 
         /// <summary>
@@ -84,10 +84,10 @@ namespace Genix.DNN.Layers
         public override string Architecture => string.Format(CultureInfo.InvariantCulture, "MO{0}", this.GroupSize);
 
         /// <summary>
-        /// Gets the number of neurons in maxout unit.
+        /// Gets the number of neurons in max out unit.
         /// </summary>
         /// <value>
-        /// The number of neurons in maxout unit.
+        /// The number of neurons in max out unit.
         /// </value>
         [JsonProperty("GroupSize")]
         public int GroupSize { get; private set; }
@@ -100,28 +100,56 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
-            return new[] { session.MaxReduce(xs[0], (int)Axis.C, this.GroupSize) };
+            // compute the channel axis
+            int axis = GetAxis(xs[0].Shape);
+
+            return new[] { session.MaxReduce(xs[0], axis, this.GroupSize) };
+        }
+
+        /// <summary>
+        /// Gets the channel axis index.
+        /// </summary>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        /// <returns>The channel axis index.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int GetAxis(TensorShape shape)
+        {
+            switch (shape)
+            {
+                case TensorShape.BWHC:
+                case TensorShape.BHWC:
+                    return 3;
+
+                case TensorShape.BCHW:
+                    return 1;
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
         }
 
         /// <summary>
         /// Initializes the <see cref="MaxOutLayer"/>.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        /// <param name="groupSize">The number of neurons in maxout unit.</param>
-        private void Initialize(int[] inputShape, int groupSize)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        /// <param name="groupSize">The number of neurons in max out unit.</param>
+        private void Initialize(Shape shape, int groupSize)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
-            if ((inputShape[(int)Axis.C] % groupSize) != 0)
+            // compute the channel axis
+            int axis = GetAxis(shape);
+
+            if ((axes[axis] % groupSize) != 0)
             {
                 throw new ArgumentException("The number of channels must be a multiple of a group size.");
             }
 
             this.GroupSize = groupSize;
-            this.OutputShape = Shape.Reshape(inputShape, (int)Axis.C, inputShape[(int)Axis.C] / groupSize);
+            this.OutputAxes = Shape.Reshape(axes, axis, axes[axis] / groupSize);
         }
     }
 }

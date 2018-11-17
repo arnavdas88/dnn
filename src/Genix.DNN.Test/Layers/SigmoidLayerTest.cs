@@ -17,9 +17,9 @@
         [TestMethod, TestCategory("Sigmoid")]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             SigmoidLayer layer = new SigmoidLayer(shape);
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("SIG", layer.Architecture);
         }
 
@@ -27,16 +27,16 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new SigmoidLayer((int[])null));
+            Assert.IsNotNull(new SigmoidLayer((Shape)null));
         }
 
         [TestMethod, TestCategory("Sigmoid")]
         public void ArchitectureConstructorTest1()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             SigmoidLayer layer = new SigmoidLayer(shape, "SIG", null);
 
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("SIG", layer.Architecture);
         }
 
@@ -47,7 +47,7 @@
             string architecture = "SI";
             try
             {
-                SigmoidLayer layer = new SigmoidLayer(new[] { 2 }, architecture, null);
+                SigmoidLayer layer = new SigmoidLayer(new Shape(2), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -69,13 +69,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new SigmoidLayer(new[] { 2 }, null, null));
+            Assert.IsNotNull(new SigmoidLayer(new Shape(2), null, null));
         }
 
         [TestMethod, TestCategory("Sigmoid")]
         public void CopyConstructorTest1()
         {
-            SigmoidLayer layer1 = new SigmoidLayer(new[] { 2 });
+            SigmoidLayer layer1 = new SigmoidLayer(new Shape(2));
             SigmoidLayer layer2 = new SigmoidLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -90,7 +90,7 @@
         [TestMethod, TestCategory("Sigmoid")]
         public void CloneTest()
         {
-            SigmoidLayer layer1 = new SigmoidLayer(new[] { 2 });
+            SigmoidLayer layer1 = new SigmoidLayer(new Shape(2));
             SigmoidLayer layer2 = layer1.Clone() as SigmoidLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -98,7 +98,7 @@
         [TestMethod, TestCategory("Sigmoid")]
         public void SerializeTest()
         {
-            SigmoidLayer layer1 = new SigmoidLayer(new[] { 2 });
+            SigmoidLayer layer1 = new SigmoidLayer(new Shape(2));
             string s1 = JsonConvert.SerializeObject(layer1);
             SigmoidLayer layer2 = JsonConvert.DeserializeObject<SigmoidLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -108,7 +108,7 @@
         [TestMethod, TestCategory("Sigmoid")]
         public void ForwardBackwardTest()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             SigmoidLayer layer = new SigmoidLayer(shape);
 
             Session session = new Session();

@@ -4,10 +4,19 @@
 
 GENIXAPI(void, LRNKernel)(
 	const float* src, float* dst,
-	int kernelSize,
-	int b, int W, int H, int C,
-	int BStride, int WStride, int HStride, int CStride)
+	const int kernelSize,
+	const int b,
+	const int* axes,
+	const int* strides)
 {
+	const int W = axes[1];
+	const int H = axes[2];
+	const int C = axes[3];
+	const int BStride = strides[0];
+	const int WStride = strides[1];
+	const int HStride = strides[2];
+	const int CStride = strides[3];
+
 	const int kernelSize2 = kernelSize / 2;
 	const int kernelCStride = kernelSize2 * CStride;
 	const int anchor1 = __min(C, kernelSize2 + 1);

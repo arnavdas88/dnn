@@ -26,9 +26,9 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="RNNCell"/> class.
         /// </summary>
-        /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
+        /// <param name="outputShape">The shape of the layer's output tensor.</param>
         /// <param name="direction">The cell direction (forward-only or bi-directional).</param>
-        protected RNNCell(int[] outputShape, RNNDirection direction)
+        protected RNNCell(Shape outputShape, RNNDirection direction)
             : base(outputShape)
         {
             this.Direction = direction;

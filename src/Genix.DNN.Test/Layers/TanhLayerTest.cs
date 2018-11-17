@@ -18,9 +18,9 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             TanhLayer layer = new TanhLayer(shape);
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("TH", layer.Architecture);
         }
 
@@ -28,16 +28,16 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new TanhLayer((int[])null));
+            Assert.IsNotNull(new TanhLayer((Shape)null));
         }
 
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             TanhLayer layer = new TanhLayer(shape, "TH", null);
 
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("TH", layer.Architecture);
         }
 
@@ -48,7 +48,7 @@
             string architecture = "THH";
             try
             {
-                TanhLayer layer = new TanhLayer(new[] { 2 }, architecture, null);
+                TanhLayer layer = new TanhLayer(new Shape(2), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -70,13 +70,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new TanhLayer(new[] { 2 }, null, null));
+            Assert.IsNotNull(new TanhLayer(new Shape(2), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            TanhLayer layer1 = new TanhLayer(new Shape(2));
             TanhLayer layer2 = new TanhLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -91,7 +91,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            TanhLayer layer1 = new TanhLayer(new Shape(2));
             TanhLayer layer2 = layer1.Clone() as TanhLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -99,7 +99,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            TanhLayer layer1 = new TanhLayer(new[] { 2 });
+            TanhLayer layer1 = new TanhLayer(new Shape(2));
             string s1 = JsonConvert.SerializeObject(layer1);
             TanhLayer layer2 = JsonConvert.DeserializeObject<TanhLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -109,7 +109,7 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
-            int[] shape = new[] { 2 };
+            Shape shape = new Shape(2);
             TanhLayer layer = new TanhLayer(shape);
 
             Session session = new Session();

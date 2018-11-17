@@ -28,20 +28,20 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="ReLULayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public ReLULayer(int[] inputShape)
-            : base(inputShape)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        public ReLULayer(Shape shape)
+            : base(shape)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReLULayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ReLULayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(inputShape)
+        public ReLULayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(shape)
         {
             Layer.ParseArchitecture(architecture, ReLULayer.ArchitecturePattern);
         }

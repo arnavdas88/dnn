@@ -16,7 +16,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { 1, 10, 12, 3 };
+            Shape shape = new Shape(1, 10, 12, 3);
             int numberOfNeurons = 100;
             float forgetBias = 2.0f;
 
@@ -29,7 +29,7 @@
                 Assert.AreEqual("100LSTMC(ForgetBias=2)", layer.Architecture);
 
                 Assert.AreEqual(1, layer.NumberOfOutputs);
-                CollectionAssert.AreEqual(new[] { 1, numberOfNeurons }, layer.OutputShape);
+                CollectionAssert.AreEqual(new[] { 1, numberOfNeurons }, layer.OutputShape.Axes);
 
                 CollectionAssert.AreEqual(
                     matrixLayout == MatrixLayout.RowMajor ?
@@ -56,21 +56,21 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new LSTMCell(null, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new LSTMCell(TensorShape.Unknown, null, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         public void ArchitectureConstructorTest1()
         {
             const string Architecture = "100LSTMC(ForgetBias=3.6)";
-            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, Architecture, null);
+            LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), Architecture, null);
 
             Assert.AreEqual(RNNDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(3.6f, layer.ForgetBias);
             Assert.AreEqual(Architecture, layer.Architecture);
 
-            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
@@ -90,14 +90,14 @@
         public void ArchitectureConstructorTest2()
         {
             const string Architecture = "100LSTMC(Bi=1,ForgetBias=3.6)";
-            LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, Architecture, null);
+            LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), Architecture, null);
 
             Assert.AreEqual(RNNDirection.BiDirectional, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual(3.6f, layer.ForgetBias);
             Assert.AreEqual(Architecture, layer.Architecture);
 
-            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 100 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual(MatrixLayout.RowMajor, layer.MatrixLayout);
 
@@ -120,7 +120,7 @@
             string architecture = "100LSTM";
             try
             {
-                LSTMCell layer = new LSTMCell(new[] { -1, 10, 12, 3 }, architecture, null);
+                LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -142,13 +142,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest5()
         {
-            Assert.IsNotNull(new LSTMCell(new[] { -1, 10, 12, 3 }, null, null));
+            Assert.IsNotNull(new LSTMCell(new Shape(-1, 10, 12, 3), null, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         public void CopyConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = new LSTMCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -164,7 +164,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void EnumGradientsTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             LSTMCell layer = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
@@ -172,7 +172,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = layer1.Clone() as LSTMCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -181,7 +181,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 20, 10 };
+            Shape shape = new Shape(-1, 20, 20, 10);
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             LSTMCell layer2 = JsonConvert.DeserializeObject<LSTMCell>(s1);
@@ -199,7 +199,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -282,7 +282,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -365,7 +365,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -448,7 +448,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new[] { batchSize, inputSize }, RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {

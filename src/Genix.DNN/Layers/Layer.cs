@@ -67,17 +67,12 @@ namespace Genix.DNN.Layers
         /// Initializes a new instance of the <see cref="Layer"/> class.
         /// </summary>
         /// <param name="numberOfOutputs">The number of output tensors.</param>
-        /// <param name="outputShape">The dimensions of the layer's output tensor.</param>
+        /// <param name="outputShape">The shape of the layer's output tensor.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Layer(int numberOfOutputs, int[] outputShape)
+        protected Layer(int numberOfOutputs, Shape outputShape)
         {
-            if (outputShape == null)
-            {
-                throw new ArgumentNullException(nameof(outputShape));
-            }
-
             this.NumberOfOutputs = numberOfOutputs;
-            this.OutputShape = outputShape;
+            this.OutputShape = outputShape ?? throw new ArgumentNullException(nameof(outputShape));
         }
 
         /// <summary>
@@ -118,7 +113,7 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The number of outputs.
         /// </value>
-        [JsonProperty("NumberOfOutputs")]
+        [JsonProperty("numberOfOutputs")]
         public int NumberOfOutputs { get; private protected set; } = 1;
 
         /// <summary>
@@ -127,8 +122,8 @@ namespace Genix.DNN.Layers
         /// <value>
         /// The array that contains output tensor dimensions.
         /// </value>
-        [JsonProperty("Output")]
-        public int[] OutputShape { get; private protected set; }
+        [JsonProperty("outputShape")]
+        public Shape OutputShape { get; private protected set; }
 
         /// <summary>
         /// Registers a new type of layer.
@@ -153,19 +148,19 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Makes an attempt to create a <see cref="Layer"/> from the specified architecture string.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
         /// <returns>
         /// The <see cref="Layer"/> this method creates.
         /// </returns>
-        public static Layer CreateFromArchitecture(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public static Layer CreateFromArchitecture(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             foreach (KeyValuePair<Type, Regex> layer in Layer.registeredLayers)
             {
                 if (layer.Value.IsMatch(architecture))
                 {
-                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { inputShape, architecture, random });
+                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { shape, architecture, random });
                 }
             }
 
@@ -177,19 +172,20 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Makes an attempt to create a <see cref="Layer"/> from the specified architecture string.
         /// </summary>
-        /// <param name="inputShapes">The dimensions of the layer's input tensors.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        /// <param name="axes">The dimensions of the layer's input tensors.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
         /// <returns>
         /// The <see cref="Layer"/> this method creates.
         /// </returns>
-        public static Layer CreateFromArchitecture(IList<int[]> inputShapes, string architecture, RandomNumberGenerator<float> random)
+        public static Layer CreateFromArchitecture(TensorShape shape, IList<int[]> axes, string architecture, RandomNumberGenerator<float> random)
         {
             foreach (KeyValuePair<Type, Regex> layer in Layer.registeredLayers)
             {
                 if (layer.Value.IsMatch(architecture))
                 {
-                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { inputShapes, architecture, random });
+                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { shape, architecture, random });
                 }
             }
 

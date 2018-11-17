@@ -11,7 +11,7 @@
     [TestClass]
     public class MaxPoolingLayerTest
     {
-        private static int[] sourceShape = new[] { -1, 5, 4, 2 };
+        private static Shape sourceShape = new Shape(Shape.BWHC, -1, 5, 4, 2);
 
         private static float[] weights = new float[]
         {
@@ -27,7 +27,7 @@
         {
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
             Assert.AreEqual("MP2", layer.Architecture);
             Assert.AreEqual(2, layer.Kernel.Width);
             Assert.AreEqual(2, layer.Kernel.Height);
@@ -40,7 +40,7 @@
         {
             MaxPoolingLayer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
             Assert.AreEqual("MP3x2+1x2(S)", layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
             Assert.AreEqual(2, layer.Kernel.Height);
@@ -186,7 +186,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -234,7 +234,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(2, 2, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -283,7 +283,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 3, 3));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -330,7 +330,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -377,7 +377,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(3, 3, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -425,7 +425,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(4, 4, 4, 4));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);
@@ -472,7 +472,7 @@
         {
             Layer layer = new MaxPoolingLayer(MaxPoolingLayerTest.sourceShape, new Kernel(4, 4, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(MaxPoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(MaxPoolingLayerTest.weights);

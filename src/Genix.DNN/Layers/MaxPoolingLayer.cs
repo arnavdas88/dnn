@@ -30,21 +30,21 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
-        public MaxPoolingLayer(int[] inputShape, Kernel kernel)
-            : base(inputShape, kernel)
+        public MaxPoolingLayer(Shape shape, Kernel kernel)
+            : base(shape, kernel)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaxPoolingLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public MaxPoolingLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(inputShape, MaxPoolingLayer.KernelFromArchitecture(architecture))
+        public MaxPoolingLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(shape, MaxPoolingLayer.KernelFromArchitecture(architecture))
         {
         }
 

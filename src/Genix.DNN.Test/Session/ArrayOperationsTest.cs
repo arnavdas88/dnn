@@ -921,7 +921,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Squeeze(session, new Tensor(null, TensorShape.Unknown, new[] { 2 }), 0);
+                ArrayOperations.Squeeze(session, new Tensor(null, new Shape(2)), 0);
             }
             catch (ArgumentException e)
             {

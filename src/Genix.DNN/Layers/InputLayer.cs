@@ -8,7 +8,6 @@ namespace Genix.DNN.Layers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -31,24 +30,24 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="InputLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public InputLayer(int[] inputShape)
-            : base(1, inputShape)
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        public InputLayer(Shape shape)
+            : base(1, shape)
         {
-            this.Shape = inputShape;
+            this.Shape = shape;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public InputLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(1, inputShape /* temp */)
+        public InputLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(1, shape /* temp */)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, InputLayer.ArchitecturePattern);
-            this.Shape = this.OutputShape = new[]
+            this.Axes = this.OutputAxes = new[]
             {
                 -1,
                 Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture),
@@ -77,16 +76,16 @@ namespace Genix.DNN.Layers
         }
 
         /// <inheritdoc />
-        public override string Architecture => string.Join("x", this.Shape.Skip(1));
+        public override string Architecture => string.Join("x", this.Shape.Axes.Skip(1));
 
         /// <summary>
-        /// Gets the dimensions of the layer's input tensor.
+        /// Gets the shape of the layer's input tensor.
         /// </summary>
         /// <value>
-        /// The array of <see cref="Shape"/> objects that contains layer dimensions.
+        /// The <see cref="TensorShape"/> enumeration.
         /// </value>
-        [JsonProperty("Shape")]
-        public int[] Shape { get; private set; }
+        [JsonProperty("shape")]
+        public Shape Shape { get; private set; }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,29 +101,29 @@ namespace Genix.DNN.Layers
                 throw new ArgumentException(Properties.Resources.E_InvalidInputTensor_InvalidCount);
             }
 
-            int[] shape = this.Shape;
+            int[] axes = this.Axes;
             Tensor x = xs[0];
 
             // validate tensor layout
-            if (x.Rank != shape.Length)
+            if (x.Rank != axes.Length)
             {
                 throw new ArgumentException(string.Format(
                     CultureInfo.InvariantCulture,
                     Properties.Resources.E_InvalidInputTensor_InvalidRank,
                     x.Rank,
-                    shape.Length));
+                    axes.Length));
             }
 
-            for (int i = 0, ii = shape.Length; i < ii; i++)
+            for (int i = 0, ii = axes.Length; i < ii; i++)
             {
-                if (shape[i] >= 0 && shape[i] != x.Axes[i])
+                if (axes[i] >= 0 && axes[i] != x.Axes[i])
                 {
                     throw new ArgumentException(string.Format(
                         CultureInfo.InvariantCulture,
                         Properties.Resources.E_InvalidInputTensor_InvalidDimension,
                         x.Axes[i],
                         i,
-                        shape[i]));
+                        axes[i]));
                 }
             }
 

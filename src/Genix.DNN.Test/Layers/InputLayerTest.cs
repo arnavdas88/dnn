@@ -15,11 +15,11 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
-            CollectionAssert.AreEqual(shape, layer.Shape);
-            CollectionAssert.AreEqual(shape, layer.OutputShape);
+            CollectionAssert.AreEqual(shape.Axes, layer.Shape.Axes);
+            CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual("20x15x10", layer.Architecture);
         }
@@ -28,17 +28,17 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new InputLayer((int[])null));
+            Assert.IsNotNull(new InputLayer((Shape)null));
         }
 
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            int[] shape = new[] { -1, 1, 1, 1 };
+            Shape shape = new Shape(-1, 1, 1, 1);
             InputLayer layer = new InputLayer(shape, "20x15x10", null);
 
-            CollectionAssert.AreEqual(new[] { -1, 20, 15, 10 }, layer.Shape);
-            CollectionAssert.AreEqual(new[] { -1, 20, 15, 10 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 20, 15, 10 }, layer.Shape.Axes);
+            CollectionAssert.AreEqual(new[] { -1, 20, 15, 10 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
             Assert.AreEqual("20x15x10", layer.Architecture);
         }
@@ -50,7 +50,7 @@
             string architecture = "20x15";
             try
             {
-                InputLayer layer = new InputLayer(new[] { -1, 1, 1, 1 }, architecture, null);
+                InputLayer layer = new InputLayer(new Shape(-1, 1, 1, 1), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -72,13 +72,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new InputLayer(new[] { -1, 20, 15, 10 }, null, null));
+            Assert.IsNotNull(new InputLayer(new Shape(-1, 20, 15, 10), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             InputLayer layer2 = new InputLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -94,7 +94,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             InputLayer layer2 = layer1.Clone() as InputLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -103,7 +103,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             string s1 = JsonConvert.SerializeObject(layer1);
             InputLayer layer2 = JsonConvert.DeserializeObject<InputLayer>(s1);
@@ -115,7 +115,7 @@
         [Description("Shall pass thru input.")]
         public void ForwardBackwardTest1()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             for (int i = 1; i <= 3; i++)
@@ -133,12 +133,12 @@
         [Description("Wrong count of input tensors.")]
         public void ForwardTest1()
         {
-            int[] shape = new[] { 1, 20, 15, 10 };
+            Shape shape = new Shape(1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, shape);
+                Tensor x = new Tensor(null, shape);
                 x.Randomize();
                 IList<Tensor> xs = new[] { x, x };
 
@@ -157,12 +157,12 @@
         [Description("Invalid number of input tensors.")]
         public void ForwardTest2()
         {
-            int[] shape = new[] { 1, 20, 15, 10 };
+            Shape shape = new Shape(1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, shape);
+                Tensor x = new Tensor(null, shape);
                 layer.Forward(null, new[] { x, x });
             }
             catch (ArgumentException e)
@@ -176,7 +176,7 @@
         [Description("Invalid tensor rank.")]
         public void ForwardTest3()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try
@@ -201,7 +201,7 @@
         [Description("Invalid tensor dimension.")]
         public void ForwardTest4()
         {
-            int[] shape = new[] { -1, 20, 15, 10 };
+            Shape shape = new Shape(-1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try

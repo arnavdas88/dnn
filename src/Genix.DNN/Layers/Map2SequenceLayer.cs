@@ -27,20 +27,20 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
-        public Map2SequenceLayer(int[] inputShape)
-            : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
+        /// <param name="shape">The shape of the layer's input tensor.</param>
+        public Map2SequenceLayer(Shape shape)
+            : base(1, Map2SequenceLayer.CalculateOutputShape(shape))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Map2SequenceLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public Map2SequenceLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(1, Map2SequenceLayer.CalculateOutputShape(inputShape))
+        public Map2SequenceLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(1, Map2SequenceLayer.CalculateOutputShape(shape))
         {
             Layer.ParseArchitecture(architecture, Map2SequenceLayer.ArchitecturePattern);
         }
@@ -78,22 +78,23 @@ namespace Genix.DNN.Layers
         }
 
         /// <summary>
-        /// Computes the dimensions of the layer's output tensor.
+        /// Computes the shape of the layer's output tensor.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <returns>
-        /// The dimensions of the layer's output tensor.
+        /// The shape of the layer's output tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape)
+        private static Shape CalculateOutputShape(Shape shape)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
-            int mbsize = inputShape.Skip(2).Aggregate(1, (total, next) => total * next);
-            return new[] { inputShape[1], mbsize };
+            int[] axes = shape.Axes;
+            int mbsize = axes.Skip(2).Aggregate(1, (total, next) => total * next);
+            return new Shape(axes[1], mbsize);
         }
     }
 }

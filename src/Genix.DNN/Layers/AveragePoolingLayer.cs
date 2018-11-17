@@ -29,21 +29,21 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="AveragePoolingLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
-        public AveragePoolingLayer(int[] inputShape, Kernel kernel)
-            : base(inputShape, kernel)
+        public AveragePoolingLayer(Shape shape, Kernel kernel)
+            : base(shape, kernel)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AveragePoolingLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public AveragePoolingLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
-            : base(inputShape, AveragePoolingLayer.KernelFromArchitecture(architecture))
+        public AveragePoolingLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
+            : base(shape, AveragePoolingLayer.KernelFromArchitecture(architecture))
         {
         }
 

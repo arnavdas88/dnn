@@ -12,7 +12,7 @@
     [TestClass]
     public class AveragePoolingLayerTest
     {
-        private static int[] sourceShape = new[] { -1, 5, 4, 2 };
+        private static Shape sourceShape = new Shape(Shape.BWHC, -1, 5, 4, 2);
 
         private static float[] weights = new float[]
         {
@@ -28,7 +28,7 @@
         {
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
             Assert.AreEqual("AP2", layer.Architecture);
             Assert.AreEqual(2, layer.Kernel.Width);
             Assert.AreEqual(2, layer.Kernel.Height);
@@ -41,7 +41,7 @@
         {
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 2, 1, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
             Assert.AreEqual("AP3x2+1x2(S)", layer.Architecture);
             Assert.AreEqual(3, layer.Kernel.Width);
             Assert.AreEqual(2, layer.Kernel.Height);
@@ -153,7 +153,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
-            Assert.IsNotNull(new AveragePoolingLayer(null, new Kernel(2, 2, 2, 2)));
+            Assert.IsNotNull(new AveragePoolingLayer(TensorShape.BWHC, null, new Kernel(2, 2, 2, 2)));
         }
 
         [TestMethod]
@@ -187,7 +187,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -243,7 +243,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(2, 2, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -301,7 +301,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 3, 3));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -355,7 +355,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 2, 2));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -409,7 +409,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(3, 3, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -465,7 +465,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(4, 4, 4, 4));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
@@ -519,7 +519,7 @@
         {
             Layer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sourceShape, new Kernel(4, 4, 1, 1));
 
-            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape);
+            CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
             Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
