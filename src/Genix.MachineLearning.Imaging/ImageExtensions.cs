@@ -23,9 +23,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor shape.</param>
+        /// <param name="format">The format of the destination.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImage(Image image, int xaxis, int yaxis, string name, TensorShape shape)
+        public static Tensor FromImage(Image image, int xaxis, int yaxis, string name, string format)
         {
             if (image == null)
             {
@@ -38,7 +38,9 @@ namespace Genix.MachineLearning.Imaging
                 xaxis = image.Width.MulDiv(yaxis, image.Height);
             }
 
-            Tensor y = ImageExtensions.CreateTensor(image, 1, xaxis, yaxis, name, shape);
+            Shape shape = new Shape(format, 1, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1);
+            Tensor y = new Tensor(name, shape);
+
             FillTensor(y, 0, image);
 
             return y;
@@ -51,9 +53,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor shape.</param>
+        /// <param name="format">The format of the destination.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImages(IList<Image> images, int xaxis, int yaxis, string name, TensorShape shape)
+        public static Tensor FromImages(IList<Image> images, int xaxis, int yaxis, string name, string format)
         {
             if (images == null)
             {
@@ -75,7 +77,9 @@ namespace Genix.MachineLearning.Imaging
                 }
             }
 
-            Tensor y = ImageExtensions.CreateTensor(images[0], images.Count, xaxis, yaxis, name, shape);
+            Shape shape = new Shape(format, images.Count, xaxis, yaxis, images[0].BitsPerPixel > 8 ? 3 : 1);
+            Tensor y = new Tensor(name, shape);
+
             for (int i = 0, ii = images.Count; i < ii; i++)
             {
                 FillTensor(y, i, images[i]);
@@ -93,9 +97,9 @@ namespace Genix.MachineLearning.Imaging
         /// <param name="xaxis">The destination tensor dimension along its x-axis.</param>
         /// <param name="yaxis">The destination tensor dimension along its y-axis.</param>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor shape.</param>
+        /// <param name="format">The format of the destination.</param>
         /// <returns>The <see cref="Tensor"/> this method creates.</returns>
-        public static Tensor FromImages<T>(IList<T> sources, Func<T, Image> selector, int xaxis, int yaxis, string name, TensorShape shape)
+        public static Tensor FromImages<T>(IList<T> sources, Func<T, Image> selector, int xaxis, int yaxis, string name, string format)
         {
             if (sources == null)
             {
@@ -123,7 +127,8 @@ namespace Genix.MachineLearning.Imaging
                 Image image = selector(sources[i]);
                 if (i == 0)
                 {
-                    y = ImageExtensions.CreateTensor(image, sources.Count, xaxis, yaxis, name, shape);
+                    Shape shape = new Shape(format, sources.Count, xaxis, yaxis, image.BitsPerPixel > 8 ? 3 : 1);
+                    y = new Tensor(name, shape);
                 }
 
                 FillTensor(y, i, image);
@@ -132,34 +137,15 @@ namespace Genix.MachineLearning.Imaging
             return y;
         }
 
-        private static Tensor CreateTensor(Image image, int b, int x, int y, string name, TensorShape shape)
-        {
-            int c = image.BitsPerPixel > 8 ? 3 : 1;
-            switch (shape)
-            {
-                case TensorShape.BWHC:
-                    return new Tensor(name, shape, new[] { b, x, y, c });
-
-                case TensorShape.BHWC:
-                    return new Tensor(name, shape, new[] { b, y, x, c });
-
-                case TensorShape.BCHW:
-                    return new Tensor(name, shape, new[] { b, c, y, x });
-
-                default:
-                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
-            }
-        }
-
         private static void FillTensor(Tensor y, int b, Image image)
         {
-            int yX = y.Axes[(int)Axis.X];
-            int yY = y.Axes[(int)Axis.Y];
-            int yC = y.Axes[(int)Axis.C];
-            int ystrideB = y.Strides[(int)Axis.B];
-            int ystrideX = y.Strides[(int)Axis.X];
-            int ystrideY = y.Strides[(int)Axis.Y];
-            int ystrideC = y.Strides[(int)Axis.C];
+            int yX = y.Shape.GetAxis(Axis.X);
+            int yY = y.Shape.GetAxis(Axis.Y);
+            int yC = y.Shape.GetAxis(Axis.C);
+            int ystrideB = y.Shape.GetStride(Axis.B);
+            int ystrideX = y.Shape.GetStride(Axis.X);
+            int ystrideY = y.Shape.GetStride(Axis.Y);
+            int ystrideC = y.Shape.GetStride(Axis.C);
 
             float[] yw = y.Weights;
             int posB = b * ystrideB;

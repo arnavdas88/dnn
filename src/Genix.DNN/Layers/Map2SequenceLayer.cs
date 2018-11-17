@@ -94,7 +94,7 @@ namespace Genix.DNN.Layers
 
             int[] axes = shape.Axes;
             int mbsize = axes.Skip(2).Aggregate(1, (total, next) => total * next);
-            return new Shape(axes[1], mbsize);
+            return new Shape(new int[] { axes[1], mbsize });
         }
     }
 }

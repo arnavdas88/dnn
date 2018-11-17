@@ -135,7 +135,7 @@ namespace Genix.NetLearn
                             this.WriteLine(logFile, "  Scale: {0}", task.Scale);
                             this.WriteLine(logFile, "  Crop: {0}", task.Crop);
 
-                            int[] shape = net.InputAxes;
+                            Shape shape = net.InputShape;
                             using (TestImageProvider<string> dataProvider = task.CreateDataProvider(net))
                             {
                                 using (TestImageProvider<string> testDataProvider = task.CreateTestDataProvider(net))
@@ -196,7 +196,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC);
                                                     (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
 
                                                     results.Add(new ClassificationResult<string>(
@@ -223,7 +223,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC);
 
                                                     foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
                                                     {
@@ -266,8 +266,8 @@ namespace Genix.NetLearn
                                             return filter
                                                 .Distort(
                                                     x.image.Image,
-                                                    shape[(int)Axis.X],
-                                                    shape[(int)Axis.Y],
+                                                    shape.GetAxis(Axis.X),
+                                                    shape.GetAxis(Axis.Y),
                                                     task.Shift,
                                                     task.Rotate && x.image.FontStyle != FontStyle.Italic,
                                                     task.Scale,
@@ -281,7 +281,7 @@ namespace Genix.NetLearn
                                                         ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
                                                     }
 
-                                                    return (ImageExtensions.FromImage(bitmap, shape[(int)Axis.X], shape[(int)Axis.Y], null, TensorShape.BWHC), x.labels);
+                                                    return (ImageExtensions.FromImage(bitmap, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC), x.labels);
                                                 });
                                         });
                                 }
@@ -304,7 +304,7 @@ namespace Genix.NetLearn
                                             string[] labels = x.Labels;
                                             if (!(task.Loss is CTCLoss))
                                             {
-                                                int b = net.OutputShapes.First()[0];
+                                                int b = net.OutputShapes.First().GetAxis(Axis.B);
                                                 if (labels.Length == 1 && b > 1)
                                                 {
                                                     labels = Enumerable.Repeat(labels[0], b).ToArray();
@@ -611,11 +611,11 @@ namespace Genix.NetLearn
 
                 public TestImageProvider<string> CreateDataProvider(ClassificationNetwork network)
                 {
-                    int[] shape = network.InputAxes;
+                    Shape shape = network.InputShape;
 
                     return TestImageProvider<string>.CreateFromJson(
                         0,
-                        2 * shape[(int)Axis.Y],
+                        2 * shape.GetAxis(Axis.Y),
                         network.Classes,
                         network.BlankClass,
                         this.TaskParameters.DataProvider);
@@ -623,11 +623,11 @@ namespace Genix.NetLearn
 
                 public TestImageProvider<string> CreateTestDataProvider(ClassificationNetwork network)
                 {
-                    int[] shape = network.InputAxes;
+                    Shape shape = network.InputShape;
 
                     return TestImageProvider<string>.CreateFromJson(
                         0,
-                        2 * shape[(int)Axis.Y],
+                        2 * shape.GetAxis(Axis.Y),
                         network.Classes,
                         network.BlankClass,
                         this.TaskParameters.TestDataProvider);

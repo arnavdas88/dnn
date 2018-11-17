@@ -186,13 +186,13 @@
             Shape shape = new Shape(Shape.BWHC, -1, 1, 2, 5);
             LRNLayer layer = new LRNLayer(shape, 3);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
+            Tensor xTemp = new Tensor(null, shape.Reshape(Axis.B, 1));
             xTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42
             });
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 LRNLayerTest.Forward(layer, 1, 11),
@@ -208,13 +208,13 @@
                 LRNLayerTest.Forward(layer, 42, 32),
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 2, 5 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                 0.591914058f, 6.406341f, 11.8103943f, 16.4343262f, 22.1168289f,   1.18269f, 6.97113f, 12.3151608f, 16.8460541f, 22.5372047f

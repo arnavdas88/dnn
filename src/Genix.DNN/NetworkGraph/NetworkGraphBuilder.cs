@@ -23,7 +23,7 @@ namespace Genix.DNN
         private const char StartQualifier = '{';
         private const char EndQualifier = '}';
 
-        public static NetworkGraph CreateNetworkGraph(string architecture, TensorShape shape, bool addActivationLayers, bool addLossLayer)
+        public static NetworkGraph CreateNetworkGraph(string architecture, bool addActivationLayers, bool addLossLayer)
         {
             if (architecture == null)
             {
@@ -42,7 +42,7 @@ namespace Genix.DNN
             RandomNumberGenerator<float> random = null; //// new Random(0);
             foreach (ComponentVertex sink in componentGraph.Sinks)
             {
-                NetworkGraphBuilder.CreateLayerInGraph(shape, componentGraph, sink, random);
+                NetworkGraphBuilder.CreateLayerInGraph(componentGraph, sink, random);
             }
 
             // 3. convert to network graph
@@ -170,17 +170,17 @@ namespace Genix.DNN
             }
         }
 
-        private static void CreateLayerInGraph(TensorShape shape, ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator<float> random)
+        private static void CreateLayerInGraph(ComponentGraph graph, ComponentVertex vertex, RandomNumberGenerator<float> random)
         {
             if (graph.InDegree(vertex) == 0)
             {
                 // use some arbitrary layout to start
                 // source layer must be input layer that overrides it
-                vertex.Layer = Layer.CreateFromArchitecture(shape, new[] { -1, 100, 100, 100 }, vertex.Architecture, random);
+                vertex.Layer = Layer.CreateFromArchitecture(new Shape(Shape.BWHC, -1, 100, 100, 100), vertex.Architecture, random);
             }
             else
             {
-                IList<int[]> axes = new List<int[]>();
+                IList<Shape> shapes = new List<Shape>();
                 foreach (Edge<ComponentVertex> edge in graph.InEdges(vertex))
                 {
                     if (edge.Source.Layer == null)
@@ -188,12 +188,12 @@ namespace Genix.DNN
                         NetworkGraphBuilder.CreateLayerInGraph(graph, edge.Source, random);
                     }
 
-                    axes.Add(edge.Source.Layer.OutputAxes);
+                    shapes.Add(edge.Source.Layer.OutputShape);
                 }
 
-                vertex.Layer = axes.Count == 1 ?
-                    Layer.CreateFromArchitecture(axes[0], vertex.Architecture, random) :
-                    Layer.CreateFromArchitecture(axes, vertex.Architecture, random);
+                vertex.Layer = shapes.Count == 1 ?
+                    Layer.CreateFromArchitecture(shapes[0], vertex.Architecture, random) :
+                    Layer.CreateFromArchitecture(shapes, vertex.Architecture, random);
             }
         }
 

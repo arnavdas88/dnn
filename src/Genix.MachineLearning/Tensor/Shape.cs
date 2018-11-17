@@ -37,15 +37,39 @@ namespace Genix.MachineLearning
         private static readonly int[] BHWCAxes = { 0, 2, 1, 3 };
         private static readonly int[] BCHWAxes = { 0, 3, 2, 1 };
 
+        [JsonProperty("axes")]
+        private int[] axes;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="Shape"/> class with the specified dimensions.
+        /// Initializes a new instance of the <see cref="Shape"/> class with known layout.
         /// </summary>
         /// <param name="format">The shape format.</param>
-        /// <param name="axes">The shape dimensions along its axes.</param>
+        /// <param name="b">The shape dimensions along b axes.</param>
+        /// <param name="x">The shape dimensions along x axes.</param>
+        /// <param name="y">The shape dimensions along y axes.</param>
+        /// <param name="c">The shape dimensions along c axes.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Shape(string format, params int[] axes)
+        public Shape(string format, int b, int x, int y, int c)
         {
-            if (axes == null)
+            switch (format)
+            {
+                case Shape.BWHC:
+                    this.InitializeShape(new int[] { b, x, y, c });
+                    break;
+
+                case Shape.BHWC:
+                    this.InitializeShape(new int[] { b, y, x, c });
+                    break;
+
+                case Shape.BCHW:
+                    this.InitializeShape(new int[] { b, c, y, x });
+                    break;
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
+
+            /*if (axes == null)
             {
                 throw new ArgumentNullException(nameof(axes));
             }
@@ -53,20 +77,19 @@ namespace Genix.MachineLearning
             if (axes.Any(x => x <= 0))
             {
                 throw new ArgumentException(Properties.Resources.E_CannotCreateTensor_LayoutIsFlexible);
-            }
+            }*/
 
-            this.InitializeShape(axes);
             this.Format = format;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Shape"/> class with the specified dimensions.
+        /// Initializes a new instance of the <see cref="Shape"/> class with unknown layout.
         /// </summary>
         /// <param name="axes">The shape dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Shape(params int[] axes)
-            : this(null, axes)
+        public Shape(int[] axes)
         {
+            this.InitializeShape(axes ?? throw new ArgumentNullException(nameof(axes)));
         }
 
         /// <summary>
@@ -83,8 +106,8 @@ namespace Genix.MachineLearning
 
             this.Format = other.Format;
             this.Length = other.Length;
-            this.Axes = other.Axes.ToArray();
-            this.Strides = other.Strides.ToArray();
+            this.axes = other.axes;
+            this.Strides = other.Strides;
         }
 
         /// <summary>
@@ -120,6 +143,7 @@ namespace Genix.MachineLearning
         /// <value>
         /// The rank (number of dimensions) of the <see cref="Shape"/>.
         /// </value>
+        [JsonIgnore]
         public int Rank => this.Axes.Length;
 
         /// <summary>
@@ -128,8 +152,7 @@ namespace Genix.MachineLearning
         /// <value>
         /// The axes dimensions.
         /// </value>
-        [JsonProperty("axes")]
-        public int[] Axes { get; private set; }
+        public int[] Axes => this.axes;
 
         /// <summary>
         /// Gets the axes strides.
@@ -141,35 +164,17 @@ namespace Genix.MachineLearning
         public int[] Strides { get; private set; }
 
         /// <summary>
-        /// Calculate the total shape size.
-        /// </summary>
-        /// <param name="shape">The shape to evaluate.</param>
-        /// <returns>The product of shape dimensions.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ShapeLength(int[] shape)
-        {
-            int length = 1;
-            for (int i = 0, ii = shape.Length; i < ii; i++)
-            {
-                length *= shape[i];
-            }
-
-            return length;
-        }
-
-        /// <summary>
         /// Creates a new shape by concatenating a group of shapes along the specified axis.
         /// </summary>
         /// <param name="shapes">The shapes to concatenate.</param>
         /// <param name="axis">The axis to concatenate along.</param>
         /// <returns>
-        /// The concatenated shape.
+        /// The concatenated <see cref="Shape"/>.
         /// </returns>
         /// <remarks>
         /// The <paramref name="shapes"/> must have the same rank and dimensions along all axes other than <paramref name="axis"/>.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] Concat(IList<int[]> shapes, int axis)
+        public static Shape Concat(IList<Shape> shapes, int axis)
         {
             if (shapes == null)
             {
@@ -181,8 +186,8 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("At least one shape must be specified.", nameof(shapes));
             }
 
-            int[] shape0 = shapes[0].ToArray();
-            int rank = shape0.Length;
+            Shape shape0 = shapes[0];
+            int rank = shape0.Rank;
 
             if (axis < 0)
             {
@@ -194,10 +199,12 @@ namespace Genix.MachineLearning
                 throw new ArgumentException("Invalid axis.", nameof(axis));
             }
 
+            int[] axes0 = shape0.Axes;
+            int sum = axes0[axis];
             for (int i = 1, ii = shapes.Count; i < ii; i++)
             {
-                int[] shape = shapes[i];
-                if (shape.Length != rank)
+                Shape shape = shapes[i];
+                if (shape.Rank != rank)
                 {
                     throw new ArgumentException("The shapes must have the same rank.", nameof(shapes));
                 }
@@ -206,75 +213,38 @@ namespace Genix.MachineLearning
                 {
                     if (j == axis)
                     {
-                        shape0[j] += shape[j];
+                        sum += shape.Axes[j];
                     }
-                    else if (shape0[j] != shape[j])
+                    else if (axes0[j] != shape.Axes[j])
                     {
                         throw new ArgumentException("The shapes must have the same dimensions.", nameof(shapes));
                     }
                 }
             }
 
-            return shape0;
+            return shape0.Reshape(axis, sum);
         }
 
         /// <summary>
-        /// Inserts a new dimension into the shape at the dimension index.
+        /// Creates a new shape by concatenating a group of shapes along the specified axis.
         /// </summary>
-        /// <param name="shape">The shape to reshape.</param>
-        /// <param name="axis">The new dimension axis.</param>
-        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
+        /// <param name="shapes">The shapes to concatenate.</param>
+        /// <param name="axis">The axis to concatenate along.</param>
         /// <returns>
-        /// The expanded shape.
+        /// The concatenated <see cref="Shape"/>.
         /// </returns>
+        /// <remarks>
+        /// The <paramref name="shapes"/> must have the same rank and dimensions along all axes other than <paramref name="axis"/>.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] Expand(int[] shape, int axis, int dimension)
+        public static Shape Concat(IList<Shape> shapes, Axis axis)
         {
-            return shape.InsertAt(axis, dimension);
-        }
-
-        /// <summary>
-        /// Removes the dimension from the shape.
-        /// </summary>
-        /// <param name="shape">The shape to reshape.</param>
-        /// <param name="axis">The dimension axis to remove.</param>
-        /// <returns>
-        /// The squeezed shape.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] Remove(int[] shape, int axis)
-        {
-            return shape.RemoveAt(axis);
-        }
-
-        /// <summary>
-        /// Creates a new shape by reshaping the shape along the specified axis.
-        /// </summary>
-        /// <param name="shape">The shape to reshape.</param>
-        /// <param name="axis">The axis to reshape along.</param>
-        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
-        /// <returns>
-        /// The reshaped shape.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int[] Reshape(int[] shape, int axis, int dimension)
-        {
-            shape = shape?.ToArray() ?? throw new ArgumentNullException(nameof(shape));
-            int rank = shape.Length;
-
-            if (axis < 0)
+            if (shapes == null)
             {
-                throw new ArgumentException(Properties.Resources.E_NegativeAxisIndex, nameof(axis));
+                throw new ArgumentNullException(nameof(shapes));
             }
 
-            if (axis >= rank)
-            {
-                throw new ArgumentException("Invalid axis.", nameof(axis));
-            }
-
-            shape[axis] = dimension;
-
-            return shape;
+            return Shape.Concat(shapes, shapes[0].GetAxisIndex(axis));
         }
 
         /// <summary>
@@ -290,27 +260,6 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
-        /// Determines whether all shapes in the collection are identical.
-        /// </summary>
-        /// <param name="shapes">The shapes to evaluate.</param>
-        /// <returns>
-        /// <b>true</b> if all shapes in <paramref name="shapes"/> are identical; otherwise; <b>false</b>.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AreSame(IList<int[]> shapes)
-        {
-            for (int i = 1, ii = shapes.Count; i < ii; i++)
-            {
-                if (!Shape.AreSame(shapes[0], shapes[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Determines whether the shapes of all tensors in the collection are identical.
         /// </summary>
         /// <param name="xs">The tensors to evaluate.</param>
@@ -322,13 +271,29 @@ namespace Genix.MachineLearning
         {
             for (int i = 1, ii = xs.Count; i < ii; i++)
             {
-                if (!Shape.AreSame(xs[0].Axes, xs[i].Axes))
+                if (!Shape.AreSame(xs[0].Shape.Axes, xs[i].Shape.Axes))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Attaches the data from specified <see cref="Shape"/> to this <see cref="Shape"/>.
+        /// </summary>
+        /// <param name="shape">The <see cref="Shape"/> to attach.</param>
+        public void Attach(Shape shape)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            this.Format = shape.Format;
+            this.axes = shape.axes;
+            this.Strides = shape.Strides;
         }
 
         /// <summary>
@@ -378,9 +343,20 @@ namespace Genix.MachineLearning
         /// <param name="axis">The axis.</param>
         /// <returns>The axis dimension.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetAxis(int axis)
+        {
+            return this.axes[axis];
+        }
+
+        /// <summary>
+        /// Gets the specified axis dimension in this shape.
+        /// </summary>
+        /// <param name="axis">The axis.</param>
+        /// <returns>The axis dimension.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetAxis(Axis axis)
         {
-            return this.Axes[this.GetAxisIndex(axis)];
+            return this.axes[this.GetAxisIndex(axis)];
         }
 
         /// <summary>
@@ -403,37 +379,125 @@ namespace Genix.MachineLearning
         /// The reshaped shape.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Shape Reshape(Axis axis, int dimension)
+        public Shape Reshape(int axis, int dimension)
         {
-            int index = this.GetAxisIndex(axis);
-
-            int[] axes = this.Axes.ToArray() ?? throw new ArgumentNullException(nameof(axes));
-            axes[index] = dimension;
-
-            return new Shape(this.Format, axes);
+            return new Shape(this.axes.UpdateAt(axis, dimension))
+            {
+                Format = this.Format,
+            };
         }
+
+        /// <summary>
+        /// Creates a new shape by reshaping this <see cref="Shape"/> along the specified axis.
+        /// </summary>
+        /// <param name="axis">The axis to reshape along.</param>
+        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
+        /// <returns>
+        /// The reshaped shape.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape Reshape(Axis axis, int dimension) => this.Reshape(this.GetAxisIndex(axis), dimension);
+
+        /// <summary>
+        /// Extracts a slice of size <paramref name="size"/> from this <see cref="Shape"/> starting at location specified by <paramref name="begin"/>.
+        /// </summary>
+        /// <param name="begin">The starting location for the slice as an offset in each dimension of this shape.</param>
+        /// <param name="size">The number of elements in each dimension of this shape you want to slice.</param>
+        /// <returns>
+        /// The reshaped shape.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <paramref name="begin"/> is zero based. <paramref name="size"/> is one-based.
+        /// If <paramref name="size"/>[i] is -1, all remaining elements in the dimension i are included in the slice.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape Slice(int[] begin, int[] size)
+        {
+            int[] axes = this.axes;
+            int rank = axes.Length;
+
+            if (begin.Length != rank)
+            {
+                throw new ArgumentException("The parameter dimension must match the number of axes.", nameof(begin));
+            }
+
+            if (size.Length != rank)
+            {
+                throw new ArgumentException("The parameter dimension must match the number of axes.", nameof(size));
+            }
+
+            int[] newaxes = new int[rank];
+            for (int i = 0; i < rank; i++)
+            {
+                int axis = axes[i];
+                int b = begin[i];
+                int s = size[i];
+
+                if (!b.Between(0, axis - 1))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(begin));
+                }
+
+                if (s == -1)
+                {
+                    newaxes[i] = axis - b;
+                }
+                else
+                {
+                    newaxes[i] = s;
+
+                    if (!(b + newaxes[i]).Between(1, axis))
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(size));
+                    }
+                }
+            }
+
+            return new Shape(newaxes)
+            {
+                Format = this.Format,
+            };
+        }
+
+        /// <summary>
+        /// Inserts a new dimension into the shape at the specified index.
+        /// </summary>
+        /// <param name="axis">The axis to insert.</param>
+        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
+        /// <returns>
+        /// The expanded shape.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape InsertAxis(int axis, int dimension) => new Shape(this.axes.InsertAt(axis, dimension));
+
+        /// <summary>
+        /// Removes the dimension from the shape.
+        /// </summary>
+        /// <param name="axis">The axis to remove.</param>
+        /// <returns>
+        /// The squeezed shape.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape RemoveAxis(int axis) => new Shape(this.axes.RemoveAt(axis));
 
         /// <summary>
         /// Initializes the shape after it has been constructed.
         /// </summary>
-        /// <param name="shape">The shape dimensions.</param>
+        /// <param name="axes">The shape dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private protected void InitializeShape(int[] shape)
+        private void InitializeShape(int[] axes)
         {
-            if (shape == null)
-            {
-                throw new ArgumentNullException(nameof(shape));
-            }
-
             int length = 1;
 
-            int rank = shape.Length;
-            int[] axes = this.Axes = new int[rank];
+            this.axes = axes;
+            int rank = axes.Length;
+
             int[] strides = this.Strides = new int[rank];
 
             for (int i = rank - 1; i >= 0; i--)
             {
-                axes[i] = shape[i];
                 length *= axes[i];
 
                 if (i == rank - 1)

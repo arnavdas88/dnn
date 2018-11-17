@@ -71,7 +71,6 @@ namespace Genix.DNN.Layers
 
             this.Initialize(
                 shape,
-                axes,
                 direction,
                 numberOfNeurons,
                 MatrixLayout.RowMajor,

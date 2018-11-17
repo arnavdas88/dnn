@@ -14,8 +14,8 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            int[] shape = new[] { 2, 3, 4, 5 };
-            Tensor tensor = new Tensor("test", TensorShape.Unknown, shape);
+            int[] axes = new[] { 2, 3, 4, 5 };
+            Tensor tensor = new Tensor("test", axes);
 
             Assert.AreEqual("test", tensor.Name);
             CollectionAssert.AreEqual(new[] { 2, 3, 4, 5 }, tensor.Axes);
@@ -36,7 +36,7 @@
         [TestMethod]
         public void CopyConstructorTest2()
         {
-            Tensor tensor1 = new Tensor("test", TensorShape.Unknown, new[] { 2, 10, 20, 5 });
+            Tensor tensor1 = new Tensor("test", new[] { 2, 10, 20, 5 });
             tensor1.Randomize();
             Tensor tensor2 = new Tensor(tensor1);
 
@@ -47,7 +47,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            Tensor tensor1 = new Tensor(null, TensorShape.Unknown, new[] { 1, 2, 3, 4 });
+            Tensor tensor1 = new Tensor(null, new[] { 1, 2, 3, 4 });
             tensor1.Randomize();
             string s1 = JsonConvert.SerializeObject(tensor1);
             Tensor tensor2 = JsonConvert.DeserializeObject<Tensor>(s1);
@@ -58,19 +58,19 @@
         [TestMethod]
         public void PositionTest1()
         {
-            Tensor tensor = new Tensor(null, TensorShape.Unknown, new[] { 2, 3, 4, 5 });
-            Assert.AreEqual((1 * 5) + (2 * 1), tensor.Position(0, 0, 1, 2));
-            Assert.AreEqual((1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Position(0, 1, 2, 3));
-            Assert.AreEqual((1 * 3 * 4 * 5) + (1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Position(1, 1, 2, 3));
+            Tensor tensor = new Tensor(null, new[] { 2, 3, 4, 5 });
+            Assert.AreEqual((1 * 5) + (2 * 1), tensor.Shape.Position(0, 0, 1, 2));
+            Assert.AreEqual((1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(0, 1, 2, 3));
+            Assert.AreEqual((1 * 3 * 4 * 5) + (1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(1, 1, 2, 3));
         }
 
         [TestMethod]
         public void OnesTest1()
         {
-            int[] axes = new[] { 2, 10, 20, 5 };
-            Tensor tensor = Tensor.Ones(null, TensorShape.Unknown, axes);
+            Shape shape = new Shape(new[] { 2, 10, 20, 5 });
+            Tensor tensor = Tensor.Ones(null, shape);
 
-            CollectionAssert.AreEqual(axes, tensor.Axes);
+            CollectionAssert.AreEqual(shape.Axes, tensor.Axes);
             Assert.IsTrue(tensor.Weights.All(x => x == 1.0f));
         }
     }

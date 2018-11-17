@@ -42,7 +42,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
                     Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
@@ -76,7 +76,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor[] ys = session.AllocateTensors(ActionName, count, x.Shape, x.Axes, calculateGradient);
+                    Tensor[] ys = session.AllocateTensors(ActionName, count, x.Shape, calculateGradient);
                     for (int i = 0; i < count; i++)
                     {
                         Vectors.Copy(x.Length, x.Weights, 0, ys[i].Weights, 0);
@@ -144,8 +144,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && xs.Any(x => x.CalculateGradient);
 
-                    int[] yaxes = Shape.Concat(xs.Select(x => x.Axes).ToArray(), axis);
-                    Tensor y = session.AllocateTensor(ActionName, xs[0].Shape, yaxes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, Shape.Concat(xs.Select(x => x.Shape).ToArray(), axis), calculateGradient);
 
                     ArrayOperations.Concat(xs, axis, y, false);
 
@@ -192,10 +191,8 @@ namespace Genix.DNN
                 throw new ArgumentException("The parameter dimension must match the number of axes in the tensor.", nameof(size));
             }
 
-            int[] xaxes = x.Axes;
-            int[] yaxes = GetOutputSize();
-
-            if (Shape.ShapeLength(xaxes) == Shape.ShapeLength(yaxes))
+            Shape yshape = x.Shape.Slice(begin, size);
+            if (x.Length == yshape.Length)
             {
                 // copy entire tensor
                 return session.Copy(x);
@@ -208,7 +205,10 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, yaxes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, yshape, calculateGradient);
+
+                    int[] xaxes = x.Axes;
+                    int[] yaxes = yshape.Axes;
 
                     // 1. find last axis of the slice that occupies the entire tensor
                     int blocksize = 1;
@@ -297,38 +297,6 @@ namespace Genix.DNN
 
                     return y;
                 });
-
-            int[] GetOutputSize()
-            {
-                int[] ysize = new int[dims];
-                for (int i = 0, ii = ysize.Length; i < ii; i++)
-                {
-                    int axis = x.Axes[i];
-                    int b = begin[i];
-                    int s = size[i];
-
-                    if (!b.Between(0, axis - 1))
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(begin));
-                    }
-
-                    if (s == -1)
-                    {
-                        ysize[i] = axis - b;
-                    }
-                    else
-                    {
-                        ysize[i] = s;
-
-                        if (!(b + ysize[i]).Between(1, axis))
-                        {
-                            throw new ArgumentOutOfRangeException(nameof(size));
-                        }
-                    }
-                }
-
-                return ysize;
-            }
         }
 
         /// <summary>
@@ -365,7 +333,7 @@ namespace Genix.DNN
                         sum += sizes[i];
                     }
 
-                    if (sum != x.Axes[axis])
+                    if (sum != x.Shape.Axes[axis])
                     {
                         throw new ArgumentException("The sub tensors sizes must be provided.");
                     }
@@ -374,8 +342,7 @@ namespace Genix.DNN
                     Tensor[] ys = new Tensor[ydim];
                     for (int i = 0; i < ydim; i++)
                     {
-                        int[] yaxes = Shape.Reshape(x.Axes, axis, sizes[i]);
-                        ys[i] = session.AllocateTensor(ActionName, x.Shape, yaxes, calculateGradient);
+                        ys[i] = session.AllocateTensor(ActionName, x.Shape.Reshape(axis, sizes[i]), calculateGradient);
                     }
 
                     ArrayOperations.Split(x, axis, ys, false);
@@ -430,8 +397,11 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] yaxes = Shape.Reshape(x.Axes, axis, x.Axes[axis] / numberOfSplits);
-                    Tensor[] ys = session.AllocateTensors(ActionName, numberOfSplits, x.Shape, yaxes, calculateGradient);
+                    Tensor[] ys = session.AllocateTensors(
+                        ActionName,
+                        numberOfSplits,
+                        x.Shape.Reshape(axis, x.Axes[axis] / numberOfSplits),
+                        calculateGradient);
 
                     ArrayOperations.Split(x, axis, ys, false);
 
@@ -486,8 +456,7 @@ namespace Genix.DNN
                         throw new ArgumentException("All source tensors must have the same rank and shape.");
                     }
 
-                    int[] yaxes = Shape.Expand(xs[0].Axes, axis, xdim);
-                    Tensor y = session.AllocateTensor(ActionName, TensorShape.Unknown, yaxes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, xs[0].Shape.InsertAxis(axis, xdim), calculateGradient);
 
                     ArrayOperations.Stack(xs, axis, y, false);
 
@@ -530,8 +499,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] yaxes = Shape.Remove(x.Axes, axis);
-                    Tensor[] ys = session.AllocateTensors(ActionName, x.Axes[axis], TensorShape.Unknown, yaxes, calculateGradient);
+                    Tensor[] ys = session.AllocateTensors(ActionName, x.Axes[axis], x.Shape.RemoveAxis(axis), calculateGradient);
 
                     ArrayOperations.Unstack(x, axis, ys, false);
 
@@ -581,8 +549,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] yaxes = Shape.Reshape(x.Axes, axis, x.Axes[axis] * count);
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, yaxes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape.Reshape(axis, x.Axes[axis] * count), calculateGradient);
 
                     ArrayOperations.Tile(x, axis, count, y, false);
 
@@ -635,8 +602,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] yaxes = Shape.Reshape(x.Axes, axis, xsize / count);
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, yaxes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape.Reshape(axis, xsize / count), calculateGradient);
 
                     ArrayOperations.Untile(x, axis, count, y, false);
 
@@ -677,8 +643,7 @@ namespace Genix.DNN
 
                     Tensor y = session.AllocateTensor(
                         ActionName,
-                        TensorShape.BWHC,
-                        new[] { x.Axes[0] * y1 * y2, kernel.Width, kernel.Height, x.Axes[3] },
+                        new Shape(Shape.BWHC, x.Axes[0] * y1 * y2, kernel.Width, kernel.Height, x.Axes[3]),
                         calculateGradient);
 
                     NativeMethods.stack_kernels(
@@ -762,13 +727,8 @@ namespace Genix.DNN
                         throw new ArgumentException("The axis dimension must be a count multiple.");
                     }
 
-                    int yaxis = xaxis / count;
-
-                    // calculate destination layout
-                    int[] axes = Shape.Reshape(x.Axes, axis, yaxis);
-
                     // allocate destination
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape.Reshape(axis, xaxis / count), calculateGradient);
 
                     float[] xw = x.Weights;
                     float[] yw = y.Weights;
@@ -876,8 +836,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] axes = Shape.Remove(x.Axes, axis);
-                    Tensor y = session.AllocateTensor(ActionName, TensorShape.Unknown, axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape.RemoveAxis(axis), calculateGradient);
 
                     // simply copy tensor content
                     Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
@@ -920,8 +879,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    int[] axes = Shape.Expand(x.Axes, axis, 1);
-                    Tensor y = session.AllocateTensor(ActionName, TensorShape.Unknown, axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape.InsertAxis(axis, 1), calculateGradient);
 
                     // simply copy tensor content
                     Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
@@ -943,20 +901,19 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="x">The tensor to reshape.</param>
-        /// <param name="shape">The tensor shape.</param>
-        /// <param name="axes">The new tensor dimensions along its axes.</param>
+        /// <param name="shape">The new tensor shape.</param>
         /// <returns>
         /// The <c>x</c> tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor Reshape(this Session session, Tensor x, TensorShape shape, params int[] axes)
+        public static Tensor Reshape(this Session session, Tensor x, Shape shape)
         {
             const string ActionName = "reshape";
 
             // validate new shape
-            if (Shape.ShapeLength(axes) != x.Length)
+            if (shape.Length != x.Length)
             {
-                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(axes));
+                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(shape));
             }
 
             return session.RunOperation(
@@ -966,7 +923,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
-                    Tensor y = session.AllocateTensor(ActionName, shape, axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, shape, calculateGradient);
 
                     // simply copy tensor content
                     Vectors.Copy(x.Length, x.Weights, 0, y.Weights, 0);
@@ -988,18 +945,11 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="session">The graph this operation should be added to.</param>
         /// <param name="x">The tensor to reshape.</param>
-        /// <param name="shape">The tensor shape.</param>
-        /// <param name="axes">The new tensor dimensions along its axes.</param>
+        /// <param name="shape">The new tensor shape.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ReshapeIP(this Session session, Tensor x, TensorShape shape, params int[] axes)
+        public static void ReshapeIP(this Session session, Tensor x, Shape shape)
         {
             const string ActionName = "reshape";
-
-            // validate new shape
-            if (Shape.ShapeLength(axes) != x.Length)
-            {
-                throw new ArgumentException("The size of new shape must be the same as tensor length.", nameof(axes));
-            }
 
             session.RunOperation(
                 ActionName,
@@ -1008,17 +958,16 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (session.CalculateGradients && x.CalculateGradient)
                     {
-                        TensorShape oldshape = x.Shape;
-                        int[] oldaxes = x.Axes.ToArray();
-                        if (x.Reshape(shape, axes))
+                        Shape oldshape = new Shape(x.Shape);
+                        if (x.Reshape(shape))
                         {
-                            session.Push(ActionName, () => x.Reshape(oldshape, oldaxes));
+                            session.Push(ActionName, () => x.Reshape(oldshape));
                         }
                     }
                     else
 #endif
                     {
-                        x.Reshape(shape, axes);
+                        x.Reshape(shape);
                     }
 
                     return (Tensor)null;    // have to return something

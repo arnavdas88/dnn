@@ -112,7 +112,7 @@ namespace Genix.DNN.Layers
             // calculate gates = W * x + b
             Tensor g = base.Forward(session, xs)[0];
 
-            int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
+            int tt = g.Axes.GetAxis(Axis.B);               // number of vectors in time sequence
             int numberOfNeurons = this.NumberOfNeurons; // number of neurons / size of output vector
 
             if (this.Direction == RNNDirection.BiDirectional)
@@ -255,7 +255,7 @@ namespace Genix.DNN.Layers
                 biasesShape,
                 random ?? new RandomRangeGenerator(-0.08f, 0.08f));
 
-            this.OutputShape = new Shape( axes[(int)Axis.B], numberOfNeurons);
+            this.OutputShape = new Shape(new int[] { shape.GetAxis(0), numberOfNeurons });
 
             // initialize biases for update and reset gates only
             Vectors.Set(2 * numberOfNeurons, 1.0f, this.B.Weights, 0);

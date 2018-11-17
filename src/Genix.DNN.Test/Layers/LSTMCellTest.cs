@@ -16,7 +16,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(1, 10, 12, 3);
+            Shape shape = new Shape(new int[] { 1, 10, 12, 3 });
             int numberOfNeurons = 100;
             float forgetBias = 2.0f;
 
@@ -63,7 +63,7 @@
         public void ArchitectureConstructorTest1()
         {
             const string Architecture = "100LSTMC(ForgetBias=3.6)";
-            LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), Architecture, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { -1, 10, 12, 3 }), Architecture, null);
 
             Assert.AreEqual(RNNDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
@@ -90,7 +90,7 @@
         public void ArchitectureConstructorTest2()
         {
             const string Architecture = "100LSTMC(Bi=1,ForgetBias=3.6)";
-            LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), Architecture, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { -1, 10, 12, 3 }), Architecture, null);
 
             Assert.AreEqual(RNNDirection.BiDirectional, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
@@ -120,7 +120,7 @@
             string architecture = "100LSTM";
             try
             {
-                LSTMCell layer = new LSTMCell(new Shape(-1, 10, 12, 3), architecture, null);
+                LSTMCell layer = new LSTMCell(new Shape(new int[] { -1, 10, 12, 3 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -142,13 +142,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest5()
         {
-            Assert.IsNotNull(new LSTMCell(new Shape(-1, 10, 12, 3), null, null));
+            Assert.IsNotNull(new LSTMCell(new Shape(new int[] { -1, 10, 12, 3 }), null, null));
         }
 
         [TestMethod, TestCategory("LSTM")]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = new LSTMCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -164,7 +164,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void EnumGradientsTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             LSTMCell layer = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
@@ -172,7 +172,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void CloneTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             LSTMCell layer2 = layer1.Clone() as LSTMCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -181,7 +181,7 @@
         [TestMethod, TestCategory("LSTM")]
         public void SerializeTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             LSTMCell layer1 = new LSTMCell(shape, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             LSTMCell layer2 = JsonConvert.DeserializeObject<LSTMCell>(s1);
@@ -199,7 +199,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -219,21 +219,15 @@
                 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.1842714f, -0.02906899f, 0.3444413f, -0.05849501f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.1842714f, -0.02906899f, 0.3444413f, -0.05849501f
+            });
 
             // calculate
             Session session = new Session();
@@ -282,7 +276,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -302,21 +296,15 @@
                 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.1842714f, -0.02906899f, 0.3693406f, -0.06449991f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.1842714f, -0.02906899f, 0.3693406f, -0.06449991f
+            });
 
             // calculate
             Session session = new Session();
@@ -365,7 +353,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, 0, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -385,21 +373,15 @@
                 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.06790479f, -0.04298752f, 0.05931183f, -0.07943144f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.06790479f, -0.04298752f, 0.05931183f, -0.07943144f
+            });
 
             // calculate
             Session session = new Session();
@@ -448,7 +430,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            LSTMCell layer = new LSTMCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
+            LSTMCell layer = new LSTMCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, LSTMCell.DefaultForgetBias, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -468,21 +450,15 @@
                 0.57935405f, -0.2018174f, 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.06790479f, -0.04298752f, 0.07423161f, -0.08913845f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.06790479f, -0.04298752f, 0.07423161f, -0.08913845f
+            });
 
             // calculate
             Session session = new Session();

@@ -133,7 +133,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, expectedTemp.Axes);
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 12, 14,  12, 16,
@@ -141,7 +141,7 @@
                 32, 34,  32, 36,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, xTemp.Axes);
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                 0, 12, 0, 14,  12, 0, 0, 16,

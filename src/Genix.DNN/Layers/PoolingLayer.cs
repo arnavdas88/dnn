@@ -71,11 +71,12 @@ namespace Genix.DNN.Layers
                 throw new ArgumentNullException(nameof(shape));
             }
 
-            int[] axes = shape.Axes.ToArray();
-            axes[(int)Axis.X] = kernel.CalculateOutputWidth(axes[(int)Axis.X]);
-            axes[(int)Axis.Y] = kernel.CalculateOutputHeight(axes[(int)Axis.Y]);
-
-            return new Shape(shape.Format, axes);
+            return new Shape(
+                Shape.BWHC,
+                shape.GetAxis(Axis.B),
+                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
+                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                shape.GetAxis(Axis.C));
         }
     }
 }

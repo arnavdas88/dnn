@@ -83,6 +83,36 @@ namespace System
         }
 
         /// <summary>
+        /// Updates an element in the array at the specified position.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
+        /// <param name="array">The array to update the element in.</param>
+        /// <param name="position">The update position.</param>
+        /// <param name="value">The value to update.</param>
+        /// <returns>The modified array.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T[] UpdateAt<T>(this T[] array, int position, T value)
+        {
+            int rank = array?.Length ?? throw new ArgumentNullException(nameof(array));
+
+            if (position < 0 || position >= rank)
+            {
+                throw new ArgumentOutOfRangeException(nameof(position));
+            }
+
+            T[] newarray = new T[rank];
+
+            for (int i = 0; i < rank; i++)
+            {
+                newarray[i] = array[i];
+            }
+
+            newarray[position] = value;
+
+            return newarray;
+        }
+
+        /// <summary>
         /// Adds an element to the end of the array.
         /// </summary>
         /// <typeparam name="T">The type of the elements of the array.</typeparam>

@@ -75,7 +75,7 @@
         {
             ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x2~5N~5N~3N", this.classes);
 
-            Tensor x = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 1, 2 });
+            Tensor x = new Tensor(null, new Shape(Shape.BWHC, 1, 1, 1, 2));
             x.Set(new float[] { 0.2f, -0.3f });
 
             Tensor probability = network.Forward(null, x);
@@ -114,7 +114,7 @@
             {
                 int gti = (int)Math.Floor(random.NextDouble() * 3);
 
-                Tensor x = new Tensor(null, TensorShape.BWHC, new[] { 1, 1, 1, 2 });
+                Tensor x = new Tensor(null, new Shape(Shape.BWHC, 1, 1, 1, 2));
                 x.Set(new float[] { ((float)random.NextDouble() * 2) - 1, ((float)random.NextDouble() * 2) - 1 });
 
                 Tensor pv = network.Forward(null, x).Clone() as Tensor;

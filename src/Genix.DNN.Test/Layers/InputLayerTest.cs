@@ -15,7 +15,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             CollectionAssert.AreEqual(shape.Axes, layer.Shape.Axes);
@@ -34,7 +34,7 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            Shape shape = new Shape(-1, 1, 1, 1);
+            Shape shape = new Shape(new[] { -1, 1, 1, 1 });
             InputLayer layer = new InputLayer(shape, "20x15x10", null);
 
             CollectionAssert.AreEqual(new[] { -1, 20, 15, 10 }, layer.Shape.Axes);
@@ -50,7 +50,7 @@
             string architecture = "20x15";
             try
             {
-                InputLayer layer = new InputLayer(new Shape(-1, 1, 1, 1), architecture, null);
+                InputLayer layer = new InputLayer(new Shape(new[] { -1, 1, 1, 1 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -72,13 +72,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new InputLayer(new Shape(-1, 20, 15, 10), null, null));
+            Assert.IsNotNull(new InputLayer(new Shape(new[] { -1, 20, 15, 10 }), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             InputLayer layer2 = new InputLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -94,7 +94,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             InputLayer layer2 = layer1.Clone() as InputLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -103,7 +103,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer1 = new InputLayer(shape);
             string s1 = JsonConvert.SerializeObject(layer1);
             InputLayer layer2 = JsonConvert.DeserializeObject<InputLayer>(s1);
@@ -115,12 +115,12 @@
         [Description("Shall pass thru input.")]
         public void ForwardBackwardTest1()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             for (int i = 1; i <= 3; i++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, shape.Reshape(Axis.B, i));
                 x.Randomize();
                 IList<Tensor> xs = new[] { x };
                 IList<Tensor> ys = layer.Forward(null, xs);
@@ -133,7 +133,7 @@
         [Description("Wrong count of input tensors.")]
         public void ForwardTest1()
         {
-            Shape shape = new Shape(1, 20, 15, 10);
+            Shape shape = new Shape(new[] { 1, 20, 15, 10 });
             InputLayer layer = new InputLayer(shape);
 
             try
@@ -157,7 +157,7 @@
         [Description("Invalid number of input tensors.")]
         public void ForwardTest2()
         {
-            Shape shape = new Shape(1, 20, 15, 10);
+            Shape shape = new Shape(new[] { 1, 20, 15, 10 });
             InputLayer layer = new InputLayer(shape);
 
             try
@@ -176,12 +176,12 @@
         [Description("Invalid tensor rank.")]
         public void ForwardTest3()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1, 2, 3 });
+                Tensor x = new Tensor(null, new[] { 1, 2, 3 });
                 layer.Forward(null, new[] { x });
             }
             catch (ArgumentException e)
@@ -201,12 +201,12 @@
         [Description("Invalid tensor dimension.")]
         public void ForwardTest4()
         {
-            Shape shape = new Shape(-1, 20, 15, 10);
+            Shape shape = new Shape(Shape.BWHC, -1, 20, 15, 10);
             InputLayer layer = new InputLayer(shape);
 
             try
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1, 30, 15, 10 });
+                Tensor x = new Tensor(null, new[] { 1, 30, 15, 10 });
                 layer.Forward(null, new[] { x });
             }
             catch (ArgumentException e)

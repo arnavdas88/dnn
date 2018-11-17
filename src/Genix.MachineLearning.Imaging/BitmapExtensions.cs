@@ -40,12 +40,12 @@ namespace Genix.MachineLearning.Imaging
             }
             else if (tensor.Rank == 4)
             {
-                x1 = tensor.Axes[(int)Axis.X];
-                x2 = tensor.Axes[(int)Axis.Y];
-                x3 = tensor.Axes[(int)Axis.C];
+                x1 = tensor.Shape.GetAxis(Axis.X);
+                x2 = tensor.Shape.GetAxis(Axis.Y);
+                x3 = tensor.Shape.GetAxis(Axis.C);
 
-                xstride1 = tensor.Strides[(int)Axis.X];
-                xstride2 = tensor.Strides[(int)Axis.Y];
+                xstride1 = tensor.Shape.GetStride(Axis.X);
+                xstride2 = tensor.Shape.GetStride(Axis.Y);
             }
             else
             {

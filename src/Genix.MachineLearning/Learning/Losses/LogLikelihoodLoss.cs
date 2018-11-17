@@ -43,15 +43,15 @@ namespace Genix.MachineLearning.Learning
 
             int mb;
             int mbsize;
-            if (y.Rank == 1)
+            if (y.Shape.Rank == 1)
             {
                 mb = 1;
                 mbsize = y.Length;
             }
             else
             {
-                mb = y.Axes[0];
-                mbsize = y.Strides[0];
+                mb = y.Shape.Axes[0];
+                mbsize = y.Shape.Strides[0];
             }
 
             if (expected.Length != mb)

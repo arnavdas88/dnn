@@ -106,7 +106,7 @@ namespace Genix.DNN.Layers
 
             this.Initialize(numberOfNeurons, matrixLayout, weightsShape, biasesShape, random);
 
-            this.OutputShape = new Shape(axes[(int)Axis.B], numberOfNeurons);
+            this.OutputShape = new Shape(new int[] { shape.GetAxis(0), numberOfNeurons });
         }
     }
 }

@@ -21,7 +21,7 @@
 
             foreach (int length in new[] { 24, 128 })
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, new[] { 1, 1, 1, length });
+                Tensor x = new Tensor(null, new[] { 1, 1, 1, length });
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Copy(session, x);
@@ -49,8 +49,8 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x1 = new Tensor(null, TensorShape.Unknown, axes);
-                Tensor x2 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(axes, axis, axes[axis] + 1));
+                Tensor x1 = new Tensor(null, axes);
+                Tensor x2 = new Tensor(null, axes.UpdateAt(axis, axes[axis] + 1));
                 x1.Randomize(this.random);
                 x2.Randomize(this.random);
                 Tensor[] xs = new[] { x1, x2 };
@@ -68,7 +68,7 @@
 
                 void validate(Tensor y)
                 {
-                    int[] yaxes = Shape.Reshape(axes, axis, (2 * axes[axis]) + 1);
+                    int[] yaxes = axes.UpdateAt(axis, (2 * axes[axis]) + 1);
                     CollectionAssert.AreEqual(yaxes, y.Axes);
 
                     int[] i = new int[3];
@@ -79,7 +79,7 @@
                             for (i[2] = 0; i[2] < yaxes[2]; i[2]++)
                             {
                                 float expected = i[axis] < axes[axis] ?
-                                    x1[i] : x2[Shape.Reshape(i, axis, i[axis] - axes[axis])];
+                                    x1[i] : x2[i.UpdateAt(axis, i[axis] - axes[axis])];
 
                                 Assert.AreEqual(expected, y[i], ArrayOperationsTest.Eps);
                             }
@@ -96,11 +96,11 @@
                         {
                             for (i[2] = 0; i[2] < y1.Axes[2]; i[2]++)
                             {
-                                float expected = y1.Gradient[y1.Position(i)] + y2.Gradient[y2.Position(i)];
+                                float expected = y1.Gradient[y1.Shape.Position(i)] + y2.Gradient[y2.Shape.Position(i)];
 
                                 Assert.AreEqual(
                                     expected,
-                                    i[axis] < axes[axis] ? x1.Gradient[x1.Position(i)] : x2.Gradient[x2.Position(Shape.Reshape(i, axis, i[axis] - axes[axis]))],
+                                    i[axis] < axes[axis] ? x1.Gradient[x1.Shape.Position(i)] : x2.Gradient[x2.Shape.Position(i.UpdateAt(axis, i[axis] - axes[axis]))],
                                     ArrayOperationsTest.Eps);
                             }
                         }
@@ -116,7 +116,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Concat(session, new[] { new Tensor(null, TensorShape.Unknown, new[] { 1 }) }, -1);
+                ArrayOperations.Concat(session, new[] { new Tensor(null, new[] { 1 }) }, -1);
             }
             catch (ArgumentException e)
             {
@@ -131,16 +131,18 @@
             int[] axes = new[] { 3, 2, 3 };
             Session session = new Session();
 
-            Tensor x = new Tensor(null, TensorShape.Unknown, axes, new float[]
+            Tensor x = new Tensor(null, axes);
+            x.Set(new float[]
             {
                 1, 1, 1,    2, 2, 2,
                 3, 3, 3,    4, 4, 4,
                 5, 5, 5,    6, 6, 6
             });
-            Tensor xe = new Tensor(null, TensorShape.Unknown, axes);
+            Tensor xe = new Tensor(null, axes);
 
             Tensor y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 1, 1, 3 });
-            Tensor ye = new Tensor(null, TensorShape.Unknown, new int[] { 1, 1, 3 }, new float[] { 3, 3, 3 });
+            Tensor ye = new Tensor(null, new int[] { 1, 1, 3 });
+            ye.Set(new float[] { 3, 3, 3 });
             Helpers.AreTensorsEqual(ye, y);
 
             y.SetGradient(new float[] { 1, 2, 3 });
@@ -154,10 +156,11 @@
             Helpers.AreGradientsEqual(xe, x);
 
             y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 1, 2, 3 });
-            ye = new Tensor(null, TensorShape.Unknown, new int[] { 1, 2, 3 }, new float[] { 3, 3, 3,     4, 4, 4 });
+            ye = new Tensor(null, new int[] { 1, 2, 3 });
+            ye.Set(new float[] { 3, 3, 3, 4, 4, 4 });
             Helpers.AreTensorsEqual(ye, y);
 
-            y.SetGradient(new float[] { 1, 2, 3,    4, 5, 6 });
+            y.SetGradient(new float[] { 1, 2, 3, 4, 5, 6 });
             xe.SetGradient(new float[]
             {
                 0, 0, 0,    0, 0, 0,
@@ -168,10 +171,11 @@
             Helpers.AreGradientsEqual(xe, x);
 
             y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 2, 1, 3 });
-            ye = new Tensor(null, TensorShape.Unknown, new int[] { 2, 1, 3 }, new float[] { 3, 3, 3,     5, 5, 5 });
+            ye = new Tensor(null, new int[] { 2, 1, 3 });
+            ye.Set(new float[] { 3, 3, 3, 5, 5, 5 });
             Helpers.AreTensorsEqual(ye, y);
 
-            y.SetGradient(new float[] { 1, 2, 3,    4, 5, 6 });
+            y.SetGradient(new float[] { 1, 2, 3, 4, 5, 6 });
             xe.SetGradient(new float[]
             {
                 0, 0, 0,    0, 0, 0,
@@ -182,10 +186,11 @@
             Helpers.AreGradientsEqual(xe, x);
 
             y = session.Slice(x, new int[] { 1, 0, 0 }, new int[] { 2, 1, 2 });
-            ye = new Tensor(null, TensorShape.Unknown, new int[] { 2, 1, 2 }, new float[] { 3, 3,     5, 5 });
+            ye = new Tensor(null, new int[] { 2, 1, 2 });
+            ye.Set(new float[] { 3, 3, 5, 5 });
             Helpers.AreTensorsEqual(ye, y);
 
-            y.SetGradient(new float[] { 1, 2,    4, 5 });
+            y.SetGradient(new float[] { 1, 2, 4, 5 });
             xe.SetGradient(new float[]
             {
                 0, 0, 0,    0, 0, 0,
@@ -204,7 +209,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
                 int[] sizes = new[] { axes[axis] / 2, axes[axis] - (axes[axis] / 2) };
 
@@ -242,7 +247,7 @@
                             {
                                 for (i[2] = 0; i[2] < y.Axes[2]; i[2]++)
                                 {
-                                    float expected = x[Shape.Reshape(i, axis, i[axis] + start)];
+                                    float expected = x[i.UpdateAt(axis, i[axis] + start)];
 
                                     Assert.AreEqual(expected, y[i], ArrayOperationsTest.Eps);
                                 }
@@ -268,15 +273,15 @@
                                 {
                                     if (i[axis] - start < y1.Axes[axis])
                                     {
-                                        int[] yaxes = Shape.Reshape(i, axis, i[axis] - start);
-                                        expected = y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)];
+                                        int[] yaxes = i.UpdateAt(axis, i[axis] - start);
+                                        expected = y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)];
                                         break;
                                     }
 
                                     start += y1.Axes[axis];
                                 }
 
-                                Assert.AreEqual(expected, x.Gradient[x.Position(i)], ArrayOperationsTest.Eps);
+                                Assert.AreEqual(expected, x.Gradient[x.Shape.Position(i)], ArrayOperationsTest.Eps);
                             }
                         }
                     }
@@ -291,7 +296,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Split(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1, new[] { 1 });
+                ArrayOperations.Split(session, new Tensor(null, new[] { 1 }), -1, new[] { 1 });
             }
             catch (ArgumentException e)
             {
@@ -309,7 +314,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 IList<Tensor> ys1 = ArrayOperations.Split(session, x, axis, numsplits);
@@ -348,7 +353,7 @@
                             {
                                 for (i[2] = 0; i[2] < y.Axes[2]; i[2]++)
                                 {
-                                    float expected = x[Shape.Reshape(i, axis, i[axis] + (y.Axes[axis] * count))];
+                                    float expected = x[i.UpdateAt(axis, i[axis] + (y.Axes[axis] * count))];
 
                                     Assert.AreEqual(expected, y[i], ArrayOperationsTest.Eps);
                                 }
@@ -374,15 +379,15 @@
                                 {
                                     if (i[axis] - start < y1.Axes[axis])
                                     {
-                                        int[] yaxes = Shape.Reshape(i, axis, i[axis] - start);
-                                        expected = y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)];
+                                        int[] yaxes = i.UpdateAt(axis, i[axis] - start);
+                                        expected = y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)];
                                         break;
                                     }
 
                                     start += y1.Axes[axis];
                                 }
 
-                                Assert.AreEqual(expected, x.Gradient[x.Position(i)], ArrayOperationsTest.Eps);
+                                Assert.AreEqual(expected, x.Gradient[x.Shape.Position(i)], ArrayOperationsTest.Eps);
                             }
                         }
                     }
@@ -397,7 +402,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Split(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1, 1);
+                ArrayOperations.Split(session, new Tensor(null, new[] { 1 }), -1, 1);
             }
             catch (ArgumentException e)
             {
@@ -413,7 +418,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Split(session, new Tensor(null, TensorShape.Unknown, new[] { 3 }), 0, 2);
+                ArrayOperations.Split(session, new Tensor(null, new[] { 3 }), 0, 2);
             }
             catch (ArgumentException e)
             {
@@ -434,7 +439,7 @@
                 Tensor[] xs = new Tensor[N];
                 for (int i = 0; i < N; i++)
                 {
-                    xs[i] = new Tensor(null, TensorShape.Unknown, axes);
+                    xs[i] = new Tensor(null, axes);
                     xs[i].Randomize(this.random);
                 }
 
@@ -479,8 +484,8 @@
                                 Tensor x = xs[i[axis]];
 
                                 Assert.AreEqual(
-                                    y1.Gradient[y1.Position(i)] + y2.Gradient[y2.Position(i)],
-                                    x.Gradient[x.Position(i.RemoveAt(axis))]);
+                                    y1.Gradient[y1.Shape.Position(i)] + y2.Gradient[y2.Shape.Position(i)],
+                                    x.Gradient[x.Shape.Position(i.RemoveAt(axis))]);
                             }
                         }
                     }
@@ -495,7 +500,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Stack(session, new[] { new Tensor(null, TensorShape.Unknown, new[] { 1 }) }, -1);
+                ArrayOperations.Stack(session, new[] { new Tensor(null, new[] { 1 }) }, -1);
             }
             catch (ArgumentException e)
             {
@@ -512,7 +517,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 IList<Tensor> ys1 = ArrayOperations.Unstack(session, x, axis);
@@ -564,7 +569,7 @@
                                 Tensor y2 = ys2[i[axis]];
 
                                 int[] yaxes = i.RemoveAt(axis);
-                                Assert.AreEqual(y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)], x.Gradient[x.Position(i)]);
+                                Assert.AreEqual(y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)], x.Gradient[x.Shape.Position(i)]);
                             }
                         }
                     }
@@ -579,7 +584,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Unstack(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1);
+                ArrayOperations.Unstack(session, new Tensor(null, new[] { 1 }), -1);
             }
             catch (ArgumentException e)
             {
@@ -597,7 +602,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Tile(session, x, axis, count);
@@ -613,7 +618,7 @@
 
                 void validate(Tensor y)
                 {
-                    int[] yaxes = Shape.Reshape(axes, axis, axes[axis] * count);
+                    int[] yaxes = axes.UpdateAt(axis, axes[axis] * count);
                     CollectionAssert.AreEqual(yaxes, y.Axes);
 
                     int[] i = new int[3];
@@ -623,7 +628,7 @@
                         {
                             for (i[2] = 0; i[2] < yaxes[2]; i[2]++)
                             {
-                                int[] xaxes = Shape.Reshape(i, axis, i[axis] % axes[axis]);
+                                int[] xaxes = i.UpdateAt(axis, i[axis] % axes[axis]);
                                 float expected = x[xaxes];
 
                                 Assert.AreEqual(expected, y[i], ArrayOperationsTest.Eps);
@@ -643,11 +648,11 @@
                             {
                                 float expected = Enumerable.Range(0, count).Sum(idx =>
                                 {
-                                    int[] yaxes = Shape.Reshape(i, axis, i[axis] + (axes[axis] * idx));
-                                    return y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)];
+                                    int[] yaxes = i.UpdateAt(axis, i[axis] + (axes[axis] * idx));
+                                    return y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)];
                                 });
 
-                                Assert.AreEqual(expected, x.Gradient[x.Position(i)], ArrayOperationsTest.Eps);
+                                Assert.AreEqual(expected, x.Gradient[x.Shape.Position(i)], ArrayOperationsTest.Eps);
                             }
                         }
                     }
@@ -662,7 +667,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Tile(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1, 1);
+                ArrayOperations.Tile(session, new Tensor(null, new[] { 1 }), -1, 1);
             }
             catch (ArgumentException e)
             {
@@ -680,7 +685,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Untile(session, x, axis, count);
@@ -696,7 +701,7 @@
 
                 void validate(Tensor y)
                 {
-                    int[] yaxes = Shape.Reshape(axes, axis, axes[axis] / count);
+                    int[] yaxes = axes.UpdateAt(axis, axes[axis] / count);
                     CollectionAssert.AreEqual(yaxes, y.Axes);
 
                     int[] i = new int[3];
@@ -708,7 +713,7 @@
                             {
                                 float expected = Enumerable.Range(0, count).Sum(idx =>
                                 {
-                                    int[] xaxes = Shape.Reshape(i, axis, i[axis] + (yaxes[axis] * idx));
+                                    int[] xaxes = i.UpdateAt(axis, i[axis] + (yaxes[axis] * idx));
                                     return x[xaxes];
                                 });
 
@@ -727,10 +732,10 @@
                         {
                             for (i[2] = 0; i[2] < axes[2]; i[2]++)
                             {
-                                int[] yaxes = Shape.Reshape(i, axis, i[axis] % (axes[axis] / count));
-                                float expected = y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)];
+                                int[] yaxes = i.UpdateAt(axis, i[axis] % (axes[axis] / count));
+                                float expected = y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)];
 
-                                Assert.AreEqual(expected, x.Gradient[x.Position(i)], ArrayOperationsTest.Eps);
+                                Assert.AreEqual(expected, x.Gradient[x.Shape.Position(i)], ArrayOperationsTest.Eps);
                             }
                         }
                     }
@@ -745,7 +750,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Untile(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1, 1);
+                ArrayOperations.Untile(session, new Tensor(null, new[] { 1 }), -1, 1);
             }
             catch (ArgumentException e)
             {
@@ -763,7 +768,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.MaxReduce(session, x, axis, count);
@@ -816,9 +821,9 @@
                                 int[] yaxes = i.ToArray();
                                 yaxes[axis] /= count;
 
-                                float expected = y1[yaxes] == x[i] ? y1.Gradient[y1.Position(yaxes)] + y2.Gradient[y2.Position(yaxes)] : 0.0f;
+                                float expected = y1[yaxes] == x[i] ? y1.Gradient[y1.Shape.Position(yaxes)] + y2.Gradient[y2.Shape.Position(yaxes)] : 0.0f;
 
-                                Assert.AreEqual(expected, x.Gradient[x.Position(i)]);
+                                Assert.AreEqual(expected, x.Gradient[x.Shape.Position(i)]);
                             }
                         }
                     }
@@ -833,7 +838,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.MaxReduce(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1, 1);
+                ArrayOperations.MaxReduce(session, new Tensor(null, new[] { 1 }), -1, 1);
             }
             catch (ArgumentException e)
             {
@@ -852,7 +857,7 @@
             {
                 int[] newaxes = axes.ToArray();
                 newaxes[axis] = 1;
-                Tensor x = new Tensor(null, TensorShape.Unknown, newaxes);
+                Tensor x = new Tensor(null, newaxes);
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Squeeze(session, x, axis);
@@ -868,7 +873,7 @@
 
                 void validate(Tensor y)
                 {
-                    CollectionAssert.AreEqual(Shape.Remove(axes, axis), y.Axes);
+                    CollectionAssert.AreEqual(axes.RemoveAt(axis), y.Axes);
                     Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
                 }
 
@@ -889,7 +894,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Squeeze(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1);
+                ArrayOperations.Squeeze(session, new Tensor(null, new[] { 1 }), -1);
             }
             catch (ArgumentException e)
             {
@@ -905,7 +910,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Squeeze(session, new Tensor(null, TensorShape.Unknown, new[] { 2, 1 }), 0);
+                ArrayOperations.Squeeze(session, new Tensor(null, new[] { 2, 1 }), 0);
             }
             catch (ArgumentException e)
             {
@@ -921,7 +926,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Squeeze(session, new Tensor(null, new Shape(2)), 0);
+                ArrayOperations.Squeeze(session, new Tensor(null, new Shape(new int[] { 2 })), 0);
             }
             catch (ArgumentException e)
             {
@@ -938,7 +943,7 @@
 
             for (int axis = 0; axis < axes.Length; axis++)
             {
-                Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+                Tensor x = new Tensor(null, axes);
                 x.Randomize(this.random);
 
                 Tensor y1 = ArrayOperations.Expand(session, x, axis);
@@ -954,7 +959,7 @@
 
                 void validate(Tensor y)
                 {
-                    CollectionAssert.AreEqual(Shape.Expand(axes, axis, 1), y.Axes);
+                    CollectionAssert.AreEqual(axes.InsertAt(axis, 1), y.Axes);
                     Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
                 }
 
@@ -975,7 +980,7 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Expand(session, new Tensor(null, TensorShape.Unknown, new[] { 1 }), -1);
+                ArrayOperations.Expand(session, new Tensor(null, new[] { 1 }), -1);
             }
             catch (ArgumentException e)
             {
@@ -987,28 +992,28 @@
         [TestMethod]
         public void ReshapeTest0()
         {
-            int[] axes = new[] { 2, 4, 6 };
-            int[] axes1 = new[] { 4, 2, 6 };
-            int[] axes2 = new[] { 2, 4, 3, 2 };
+            Shape shape = new Shape(new[] { 2, 4, 6 });
+            Shape shape1 = new Shape(new[] { 4, 2, 6 });
+            Shape shape2 = new Shape(new[] { 2, 4, 3, 2 });
             Session session = new Session();
 
-            Tensor x = new Tensor(null, TensorShape.Unknown, axes);
+            Tensor x = new Tensor(null, shape);
             x.Randomize(this.random);
 
-            Tensor y1 = ArrayOperations.Reshape(session, x, TensorShape.Unknown, axes1);
-            validate(y1, axes1);
+            Tensor y1 = ArrayOperations.Reshape(session, x, shape1);
+            validate(y1, shape1);
 
-            Tensor y2 = ArrayOperations.Reshape(session, x, TensorShape.Unknown, axes2);
-            validate(y2, axes2);
+            Tensor y2 = ArrayOperations.Reshape(session, x, shape2);
+            validate(y2, shape2);
 
             y1.RandomizeGradient(this.random);
             y2.RandomizeGradient(this.random);
             session.Unroll();
             validateGradient();
 
-            void validate(Tensor y, int[] yaxes)
+            void validate(Tensor y, Shape yshape)
             {
-                CollectionAssert.AreEqual(yaxes, y.Axes);
+                CollectionAssert.AreEqual(yshape.Axes, y.Axes);
                 Helpers.AreArraysEqual(x.Length, x.Weights, y.Weights);
             }
 
@@ -1028,11 +1033,11 @@
             try
             {
                 Session session = new Session();
-                ArrayOperations.Reshape(session, new Tensor(null, TensorShape.Unknown, new[] { 1, 2 }), TensorShape.Unknown, 3, 4);
+                ArrayOperations.Reshape(session, new Tensor(null, new[] { 1, 2 }), new Shape(new[] { 3, 4 }));
             }
             catch (ArgumentException e)
             {
-                Assert.AreEqual(new ArgumentException("The size of new shape must be the same as tensor length.", "axes").Message, e.Message);
+                Assert.AreEqual(new ArgumentException("The size of new shape must be the same as tensor length.", "shape").Message, e.Message);
                 throw;
             }
         }

@@ -16,7 +16,7 @@
         [TestMethod, TestCategory("GRU")]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(1, 10, 12, 3);
+            Shape shape = new Shape(new int[] { 1, 10, 12, 3 });
             int numberOfNeurons = 100;
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
@@ -62,7 +62,7 @@
         public void ArchitectureConstructorTest1()
         {
             const string Architecture = "100GRUC";
-            GRUCell layer = new GRUCell(new Shape(-1, 10, 12, 3), Architecture, null);
+            GRUCell layer = new GRUCell(new Shape(new int[] { -1, 10, 12, 3 }), Architecture, null);
 
             Assert.AreEqual(RNNDirection.ForwardOnly, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
@@ -89,7 +89,7 @@
         public void ArchitectureConstructorTest2()
         {
             const string Architecture = "100GRUC(Bi=1)";
-            GRUCell layer = new GRUCell(new Shape(-1, 10, 12, 3), Architecture, null);
+            GRUCell layer = new GRUCell(new Shape(new int[] { -1, 10, 12, 3 }), Architecture, null);
 
             Assert.AreEqual(RNNDirection.BiDirectional, layer.Direction);
             Assert.AreEqual(100, layer.NumberOfNeurons);
@@ -119,7 +119,7 @@
             string architecture = "100GRU";
             try
             {
-                GRUCell layer = new GRUCell(new Shape(-1, 10, 12, 3), architecture, null);
+                GRUCell layer = new GRUCell(new Shape(new int[] { -1, 10, 12, 3 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -141,13 +141,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest5()
         {
-            Assert.IsNotNull(new GRUCell(new Shape(-1, 10, 12, 3), null, null));
+            Assert.IsNotNull(new GRUCell(new Shape(new int[] { -1, 10, 12, 3 }), null, null));
         }
 
         [TestMethod, TestCategory("GRU")]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = new GRUCell(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -163,7 +163,7 @@
         [TestMethod, TestCategory("GRU")]
         public void EnumGradientsTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRUCell layer = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(3, layer.EnumGradients().Count());
         }
@@ -171,7 +171,7 @@
         [TestMethod, TestCategory("GRU")]
         public void CloneTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             GRUCell layer2 = layer1.Clone() as GRUCell;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -180,7 +180,7 @@
         [TestMethod, TestCategory("GRU")]
         public void SerializeTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRUCell layer1 = new GRUCell(shape, RNNDirection.ForwardOnly, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRUCell layer2 = JsonConvert.DeserializeObject<GRUCell>(s1);
@@ -200,7 +200,7 @@
 
             Session session = new Session();
 
-            GRUCell layer = new GRUCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -220,21 +220,15 @@
                 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.2988823f, -0.1389049f, 0.5474511f, -0.1845018f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.2988823f, -0.1389049f, 0.5474511f, -0.1845018f
+            });
 
             // calculate
             Tensor y = layer.Forward(session, new[] { x })[0];
@@ -282,7 +276,7 @@
             const int inputSize = 3;
             const int numberOfNeurons = 2;
 
-            GRUCell layer = new GRUCell(new Shape(batchSize, inputSize), RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
+            GRUCell layer = new GRUCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.ForwardOnly, numberOfNeurons, MatrixLayout.RowMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -303,21 +297,15 @@
                 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.3631181f, -0.1901545f, 0.5813864f, -0.382444f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.3631181f, -0.1901545f, 0.5813864f, -0.382444f
+            });
 
             // calculate
             Session session = new Session();
@@ -369,7 +357,7 @@
 
             Session session = new Session();
 
-            GRUCell layer = new GRUCell(new Shape(batchSize, inputSize), RNNDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
+            GRUCell layer = new GRUCell(new Shape(new int[] { batchSize, inputSize }), RNNDirection.BiDirectional, numberOfNeurons, MatrixLayout.ColumnMajor, null);
 
             layer.W.Set(new float[]
             {
@@ -388,21 +376,15 @@
                 0.3719957f, -0.11352646f, 0.23978919f, 0.30809408f, 0.5805608f, -0.33490005f
             });
 
-            Tensor x = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { batchSize, inputSize },
-                new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
+            Tensor x = new Tensor(null, new[] { batchSize, inputSize });
+            x.Set(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f });
 
             // set expectations
-            Tensor expected = new Tensor(
-                null,
-                TensorShape.Unknown,
-                new[] { numberOfNeurons, numberOfNeurons },
-                new float[]
-                {
-                    0.2298902f, -0.2274744f, 0.4774976f, -0.124593f
-                });
+            Tensor expected = new Tensor(null, new[] { numberOfNeurons, numberOfNeurons });
+            expected.Set(new float[]
+            {
+                0.2298902f, -0.2274744f, 0.4774976f, -0.124593f
+            });
 
             // calculate
             Tensor y = layer.Forward(session, new[] { x })[0];

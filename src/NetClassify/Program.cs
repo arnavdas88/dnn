@@ -96,10 +96,10 @@ namespace Genix.NetClassify
 
                         Tensor x = ImageExtensions.FromImage(
                             sample.Image,
-                            network.InputAxes[(int)Axis.X],
-                            network.InputAxes[(int)Axis.Y],
+                            network.InputShape.GetAxis(Axis.X),
+                            network.InputShape.GetAxis(Axis.Y),
                             null,
-                            TensorShape.BWHC);
+                            Shape.BWHC);
                         IList<IList<(string Answer, float Probability)>> answers = network.Execute(x).Answers;
                         ////(IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 
@@ -208,11 +208,11 @@ namespace Genix.NetClassify
 
                 public TestImageProvider<string> CreateTestImageProvider(ClassificationNetwork network)
                 {
-                    int[] shape = network.InputAxes;
+                    Shape shape = network.InputShape;
 
                     return TestImageProvider<string>.CreateFromJson(
                         0,
-                        2 * shape[(int)Axis.Y],
+                        2 * shape.GetAxis(Axis.Y),
                         network.Classes,
                         network.BlankClass,
                         this.Configuration.DataProvider);

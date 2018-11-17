@@ -13,8 +13,8 @@
         {
             NetworkGraph graph = new NetworkGraph();
 
-            Layer layer1 = new FullyConnectedLayer(new Shape(1, 2, 3, 1), 5, MatrixLayout.ColumnMajor, null);
-            Layer layer2 = new FullyConnectedLayer(new Shape(2, 3, 4, 1), 6, MatrixLayout.ColumnMajor, null);
+            Layer layer1 = new FullyConnectedLayer(new Shape(new[] { 1, 2, 3, 1 }), 5, MatrixLayout.ColumnMajor, null);
+            Layer layer2 = new FullyConnectedLayer(new Shape(new[] { 2, 3, 4, 1 }), 6, MatrixLayout.ColumnMajor, null);
 
             NetworkEdge edge1 = new NetworkEdge(layer1, layer2);
             NetworkEdge edge2 = new NetworkEdge(layer1, layer2);

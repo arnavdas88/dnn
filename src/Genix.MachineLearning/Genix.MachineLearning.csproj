@@ -95,7 +95,6 @@
     <Compile Include="Tensor\Kernel.cs" />
     <Compile Include="Tensor\Shape.cs" />
     <Compile Include="Tensor\Tensor.cs" />
-    <Compile Include="Tensor\TensorShape.cs" />
     <Compile Include="VectorMachines\Learning\ISupportVectorMachineLearning.cs" />
     <Compile Include="VectorMachines\Learning\LibSVMOptimization.cs" />
     <Compile Include="VectorMachines\Learning\SequentualMinimalOptimization.cs" />

@@ -16,10 +16,9 @@
         private static Shape inputShape1 = new Shape(Shape.BWHC, -1, 2, 3, 2);
         private static Shape inputShape2 = new Shape(Shape.BWHC, -1, 2, 3, 3);
 
-        private static int[] outputShape = Shape.Reshape(
-            ConcatLayerTest.inputShape1,
-            (int)Axis.C,
-            ConcatLayerTest.inputShape1[(int)Axis.C] + ConcatLayerTest.inputShape2[(int)Axis.C]);
+        private static Shape outputShape = ConcatLayerTest.inputShape1.Reshape(
+            Axis.C,
+            ConcatLayerTest.inputShape1.GetAxis(Axis.C) + ConcatLayerTest.inputShape2.GetAxis(Axis.C));
 
         private static float[] weights1 = new float[]
         {
@@ -39,7 +38,7 @@
             ConcatLayer layer = new ConcatLayer(
                 new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
 
-            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape.Axes);
+            CollectionAssert.AreEqual(ConcatLayerTest.outputShape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
@@ -58,7 +57,7 @@
                 "CONCAT",
                 null);
 
-            CollectionAssert.AreEqual(ConcatLayerTest.outputShape, layer.OutputShape.Axes);
+            CollectionAssert.AreEqual(ConcatLayerTest.outputShape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("CONCAT", layer.Architecture);
         }
 
@@ -143,12 +142,12 @@
             ConcatLayer layer = new ConcatLayer(
                 new Shape[] { ConcatLayerTest.inputShape1, ConcatLayerTest.inputShape2 });
 
-            Tensor xTemp1 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(ConcatLayerTest.inputShape1, (int)Axis.B, 1));
+            Tensor xTemp1 = new Tensor(null, ConcatLayerTest.inputShape1.Reshape(Axis.B, 1));
             xTemp1.Set(ConcatLayerTest.weights1);
-            Tensor xTemp2 = new Tensor(null, TensorShape.Unknown, Shape.Reshape(ConcatLayerTest.inputShape2, (int)Axis.B, 1));
+            Tensor xTemp2 = new Tensor(null, ConcatLayerTest.inputShape2.Reshape(Axis.B, 1));
             xTemp2.Set(ConcatLayerTest.weights2);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 2, 3, 5 });
+            Tensor expectedTemp = new Tensor(null, new[] { 1, 2, 3, 5 });
             expectedTemp.Set(new float[]
             {
                 1, 11, 21, 31, 41,   2, 12, 22, 32, 42,   3, 13, 23, 33, 43,

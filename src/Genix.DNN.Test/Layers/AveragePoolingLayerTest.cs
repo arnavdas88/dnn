@@ -153,7 +153,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
-            Assert.IsNotNull(new AveragePoolingLayer(TensorShape.BWHC, null, new Kernel(2, 2, 2, 2)));
+            Assert.IsNotNull(new AveragePoolingLayer(null, new Kernel(2, 2, 2, 2)));
         }
 
         [TestMethod]
@@ -192,7 +192,7 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 (1 + 3 + 19 + 21) / 4.0f,  (2 + 4 + 20 + 22) / 4.0f,           (7 + 5 + 25 + 23) / 4.0f,   (8 + 6 + 26 + 24) / 4.0f,
@@ -200,7 +200,7 @@
                         (13 + 15) / 4.0f,          (14 + 16) / 4.0f,                   (19 + 17) / 4.0f,           (20 + 18) / 4.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,   2, 12,
@@ -208,7 +208,7 @@
                 5, 15,   6, 16,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                 1 / 4.0f, 11 / 4.0f,   1 / 4.0f, 11 / 4.0f,   2 / 4.0f, 12 / 4.0f,   2 / 4.0f, 12 / 4.0f,
@@ -248,7 +248,7 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 4, 3, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                   (1 + 3 + 19 + 21) / 4.0f,   (2 + 4 + 20 + 22) / 4.0f,     (3 + 7 + 21 + 25) / 4.0f,   (4 + 8 + 22 + 26) / 4.0f,     (7 + 5 + 25 + 23) / 4.0f,   (8 + 6 + 26 + 24) / 4.0f,
@@ -257,7 +257,7 @@
                 (25 + 27 + 13 + 15) / 4.0f, (26 + 28 + 14 + 16) / 4.0f,   (27 + 31 + 15 + 19) / 4.0f, (28 + 32 + 16 + 20) / 4.0f,   (31 + 29 + 19 + 17) / 4.0f, (32 + 30 + 20 + 18) / 4.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 4, 3, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                  1, 11,   2, 12,   3, 13,
@@ -266,7 +266,7 @@
                 10, 20,  11, 21,  12, 22,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                        1 / 4.0f,        11 / 4.0f,             (1 + 2) / 4.0f,           (11 + 12) / 4.0f,             (2 + 3) / 4.0f,           (12 + 13) / 4.0f,          3 / 4.0f,        13 / 4.0f,
@@ -306,21 +306,21 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 (1 + 3 + 7 + 19 + 21 + 25 + 7 + 9 + 13) / 9.0f, (2 + 4 + 8 + 20 + 22 + 26 + 8 + 10 + 14) / 9.0f,         (5 + 23 + 11) / 9.0f,  (6 + 24 + 12) / 9.0f,
                           (25 + 27 + 31 + 13 + 15 + 19) / 9.0f,            (26 + 28 + 32 + 14 + 16 + 20) / 9.0f,             (29 + 17) / 9.0f,      (30 + 18) / 9.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,   2, 12,
                 3, 13,   4, 14,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                 1 / 9.0f, 11 / 9.0f,   1 / 9.0f, 11 / 9.0f,   1 / 9.0f, 11 / 9.0f,   2 / 9.0f, 12 / 9.0f,
@@ -360,21 +360,21 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                    (1 + 3 + 7 + 19 + 21 + 25 + 7 + 9 + 13) / 9.0f,    (2 + 4 + 8 + 20 + 22 + 26 + 8 + 10 + 14) / 9.0f,      (7 + 5 + 25 + 23 + 13 + 11) / 9.0f,   (8 + 6 + 26 + 24 + 14 + 12) / 9.0f,
                 (7 + 9 + 13 + 25 + 27 + 31 + 13 + 15 + 19) / 9.0f, (8 + 10 + 14 + 26 + 28 + 32 + 14 + 16 + 20) / 9.0f,    (13 + 11 + 31 + 29 + 19 + 17) / 9.0f, (14 + 12 + 32 + 30 + 20 + 18) / 9.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,   2, 12,
                 3, 13,   4, 14,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                       1 / 9.0f,        11 / 9.0f,         1 / 9.0f,        11 / 9.0f,           (1 + 2) / 9.0f,           (11 + 12) / 9.0f,         2 / 9.0f,        12 / 9.0f,
@@ -414,7 +414,7 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                    (1 + 3 + 7 + 19 + 21 + 25 + 7 + 9 + 13) / 9.0f,    (2 + 4 + 8 + 20 + 22 + 26 + 8 + 10 + 14) / 9.0f,      (3 + 7 + 5 + 21 + 25 + 23 + 9 + 13 + 11) / 9.0f,    (4 + 8 + 6 + 22 + 26 + 24 + 10 + 14 + 12) / 9.0f,
@@ -422,7 +422,7 @@
                 (7 + 9 + 13 + 25 + 27 + 31 + 13 + 15 + 19) / 9.0f, (8 + 10 + 14 + 26 + 28 + 32 + 14 + 16 + 20) / 9.0f,   (9 + 13 + 11 + 27 + 31 + 29 + 15 + 19 + 17) / 9.0f, (10 + 14 + 12 + 28 + 32 + 30 + 16 + 20 + 18) / 9.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,   2, 12,
@@ -430,7 +430,7 @@
                 5, 15,   6, 16,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                           1 / 9.0f,             11 / 9.0f,                   (1 + 2) / 9.0f,                     (11 + 12) / 9.0f,                   (1 + 2) / 9.0f,                     (11 + 12) / 9.0f,             2 / 9.0f,             12 / 9.0f,
@@ -470,21 +470,21 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                 (1 + 3 + 7 + 5 + 19 + 21 + 25 + 23 + 7 + 9 + 13 + 11 + 25 + 27 + 31 + 29) / 16.0f, (2 + 4 + 8 + 6 + 20 + 22 + 26 + 24 + 8 + 10 + 14 + 12 + 26 + 28 + 32 + 30) / 16.0f,
                                                                       (13 + 15 + 19 + 17) / 16.0f,                                                        (14 + 16 + 20 + 18) / 16.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,
                 2, 12,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                 1 / 16.0f, 11 / 16.0f,   1 / 16.0f, 11 / 16.0f,   1 / 16.0f, 11 / 16.0f,   1 / 16.0f, 11 / 16.0f,
@@ -524,21 +524,21 @@
             Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
-            Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });
+            Tensor expectedTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
             expectedTemp.Set(new float[]
             {
                     (1 + 3 + 7 + 5 + 19 + 21 + 25 + 23 + 7 + 9 + 13 + 11 + 25 + 27 + 31 + 29) / 16.0f,     (2 + 4 + 8 + 6 + 20 + 22 + 26 + 24 + 8 + 10 + 14 + 12 + 26 + 28 + 32 + 30) / 16.0f,
                 (19 + 21 + 25 + 23 + 7 + 9 + 13 + 11 + 25 + 27 + 31 + 29 + 13 + 15 + 19 + 17) / 16.0f, (20 + 22 + 26 + 24 + 8 + 10 + 14 + 12 + 26 + 28 + 32 + 30 + 14 + 16 + 20 + 18) / 16.0f,
             });
 
-            Tensor dyTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });
+            Tensor dyTemp = new Tensor(null, expectedTemp.Shape);
             dyTemp.Set(new float[]
             {
                 1, 11,
                 2, 12,
             });
 
-            Tensor expectedDxTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 5, 4, 2 });
+            Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
             expectedDxTemp.Set(new float[]
             {
                       1 / 16.0f,        11 / 16.0f,         1 / 16.0f,        11 / 16.0f,         1 / 16.0f,        11 / 16.0f,         1 / 16.0f,        11 / 16.0f,

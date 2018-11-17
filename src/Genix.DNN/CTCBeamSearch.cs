@@ -139,8 +139,8 @@ namespace Genix.DNN
             }
 
 #pragma warning disable SA1312 // Variable names must begin with lower-case letter
-            int T = y.Axes[0];          // Number of mini-batches (time)
-            int A = y.Strides[0];       // Number of classes (alphabet size)
+            int T = y.Shape.Axes[0];          // Number of mini-batches (time)
+            int A = y.Shape.Strides[0];       // Number of classes (alphabet size)
 #pragma warning restore SA1312 // Variable names must begin with lower-case letter
 
             // allocate buffers

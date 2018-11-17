@@ -23,7 +23,7 @@
         [TestMethod, TestCategory("GRU")]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(1, 10, 12, 3);
+            Shape shape = new Shape(new int[] { 1, 10, 12, 3 });
             GRULayer layer = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
 
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
@@ -44,7 +44,7 @@
         public void ArchitectureConstructorTest1()
         {
             const string Architecture = "20-30-40GRU";
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRULayer layer = new GRULayer(shape, Architecture, null);
 
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
@@ -60,7 +60,7 @@
         public void ArchitectureConstructorTest2()
         {
             const string Architecture = "20-30-40GRU(Bi=1)";
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRULayer layer = new GRULayer(shape, Architecture, null);
 
             Assert.AreEqual(20, ((StochasticLayer)layer.Graph.Vertices.ElementAt(0)).NumberOfNeurons);
@@ -79,7 +79,7 @@
             string architecture = "100GRU";
             try
             {
-                GRULayer layer = new GRULayer(new Shape(1, 20, 20, 10), architecture, null);
+                GRULayer layer = new GRULayer(new Shape(new int[] { 1, 20, 20, 10 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -101,14 +101,14 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest5()
         {
-            Assert.IsNotNull(new GRULayer(new Shape(1, 20, 20, 10), null, null));
+            Assert.IsNotNull(new GRULayer(new Shape(new int[] { 1, 20, 20, 10 }), null, null));
         }
 
         [TestMethod, TestCategory("GRU")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             Assert.IsNotNull(new GRULayer(shape, RNNDirection.ForwardOnly, null, MatrixLayout.ColumnMajor, null));
         }
 
@@ -116,14 +116,14 @@
         [ExpectedException(typeof(ArgumentException))]
         public void ConstructorTest4()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             Assert.IsNotNull(new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20 }, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("GRU")]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 20 }, MatrixLayout.ColumnMajor, null);
             GRULayer layer2 = new GRULayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -139,7 +139,7 @@
         [TestMethod, TestCategory("GRU")]
         public void EnumGradientsTest()
         {
-            Shape shape = new Shape(1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { 1, 20, 20, 10 });
             GRULayer layer = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 20, 30 }, MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(5, layer.EnumGradients().Count());
         }
@@ -147,7 +147,7 @@
         [TestMethod, TestCategory("GRU")]
         public void CloneTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             GRULayer layer2 = layer1.Clone() as GRULayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -156,7 +156,7 @@
         [TestMethod, TestCategory("GRU")]
         public void SerializeTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             GRULayer layer1 = new GRULayer(shape, RNNDirection.ForwardOnly, new[] { 2, 3 }, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             GRULayer layer2 = JsonConvert.DeserializeObject<GRULayer>(s1);
@@ -187,13 +187,13 @@
             Random random = new Random(0);
 
             string[] classes = Enumerable.Range(0, AlphabetSize).Select(v => v.ToString(CultureInfo.InvariantCulture)).ToArray();
-            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x4~80-80-80-16GRU", TensorShape.Unknown, classes);
+            ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x4~80-80-80-16GRU", classes);
 
             float[] vectors = new RandomGenerator().Generate(AlphabetSize * VectorSize);
 
             (Tensor, int[]) createSample(int size)
             {
-                Tensor input = new Tensor(null, TensorShape.Unknown, new[] { size, 1, 1, VectorSize });
+                Tensor input = new Tensor(null, new[] { size, 1, 1, VectorSize });
                 int[] truth = new int[size];
 
                 int v = 0;
@@ -268,12 +268,12 @@
             const int epochs = 10000;
             const int testBatchSize = 5;
             Random random = new Random(0);
-            Network network = Network.FromArchitecture("1x1x1~10-10-1GRU", TensorShape.Unknown);
+            Network network = Network.FromArchitecture("1x1x1~10-10-1GRU");
 
             (Tensor, Tensor) createSample(int size)
             {
-                Tensor input = new Tensor(null, TensorShape.Unknown, new[] { size, 1, 1, 1 });
-                Tensor expected = new Tensor(null, TensorShape.Unknown, input.Axes);
+                Tensor input = new Tensor(null, new[] { size, 1, 1, 1 });
+                Tensor expected = new Tensor(null, input.Shape);
 
                 double rv = (float)(random.NextDouble() * Math.PI * 2);
                 for (int b = 0; b <= size; b++, rv += batchStep)
@@ -352,7 +352,7 @@
                                                   .ToDictionary(x => x.Item1, x => x.Item2);
 
             // create character vectors
-            Tensor letters = new Tensor(null, TensorShape.Unknown, new[] { alphabet.Count + 1, 1, 1, letterSize });
+            Tensor letters = new Tensor(null, new[] { alphabet.Count + 1, 1, 1, letterSize });
             letters.Randomize();
 
             // create network
@@ -362,7 +362,7 @@
                 alphabet.Count,
                 alphabet.Count + 1);
 
-            Network network = Network.FromArchitecture(architechture, TensorShape.Unknown);
+            Network network = Network.FromArchitecture(architechture);
             ////string a = network.Architecture;
 
             // learn network
@@ -393,7 +393,7 @@
                         Tensor.Copy(letterSize, letters, alphabet[w[i]] * letterSize, x, i * letterSize);
                     }*/
                     Tensor x = new Session().Concat(
-                        w.Select(ch => Tensor.OneHot(null, TensorShape.Unknown, network.InputAxes, 0, 0, 0, alphabet[ch])).ToArray(),
+                        w.Select(ch => Tensor.OneHot(null, network.InputShape, 0, 0, 0, alphabet[ch])).ToArray(),
                         (int)Axis.B);
 
                     int[] y = new int[w.Length];
@@ -414,7 +414,7 @@
             {
                 string w1 = w.Substring(0, w.Length - 1);
 
-                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(network.InputAxes, (int)Axis.B, w1.Length));
+                Tensor x = new Tensor(null, network.InputShape.Reshape(Axis.B, w1.Length));
                 for (int i = 0, ii = w1.Length; i < ii; i++)
                 {
                     Vectors.Copy(letterSize, letters.Weights, alphabet[w1[i]] * letterSize, x.Weights, i * letterSize);
@@ -425,7 +425,7 @@
                                     w1.Select(ch => alphabet[ch]).ToList());*/
 
                 Tensor y = network.Forward(null, x);
-                int start = y.Strides[0] * (y.Axes[(int)Axis.B] - 1);
+                int start = y.Strides[0] * (y.Shape.GetAxis(Axis.B) - 1);
                 int argmax = Vectors.ArgMax(y.Strides[0], y.Weights, start);
                 int classIndex = argmax - start;
                 char res = alphabet.ElementAt(classIndex).Key;

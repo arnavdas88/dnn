@@ -15,7 +15,7 @@
         [TestMethod, TestCategory("Dropout")]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 10000 });
             DropoutLayer layer = new DropoutLayer(shape, 0.5);
 
             Assert.AreEqual(0.5, layer.Probability);
@@ -33,7 +33,7 @@
         [TestMethod, TestCategory("Dropout")]
         public void ArchitectureConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 10000 });
             DropoutLayer layer = new DropoutLayer(shape, "D0.5", null);
 
             Assert.AreEqual(0.5, layer.Probability);
@@ -48,7 +48,7 @@
             string architecture = "DD";
             try
             {
-                DropoutLayer layer = new DropoutLayer(new Shape(-1, 20, 20, 10), architecture, null);
+                DropoutLayer layer = new DropoutLayer(new Shape(new int[] { -1, 10000 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -70,13 +70,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new DropoutLayer(new Shape(-1, 20, 20, 10), null, null));
+            Assert.IsNotNull(new DropoutLayer(new Shape(new int[] { -1, 10000 }), null, null));
         }
 
         [TestMethod, TestCategory("Dropout")]
         public void CopyConstructorTest1()
         {
-            DropoutLayer layer1 = new DropoutLayer(new Shape(-1, 20, 20, 10), 0.5);
+            DropoutLayer layer1 = new DropoutLayer(new Shape(new int[] { -1, 10000 }), 0.5);
             DropoutLayer layer2 = new DropoutLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -91,7 +91,7 @@
         [TestMethod, TestCategory("Dropout")]
         public void CloneTest()
         {
-            DropoutLayer layer1 = new DropoutLayer(new Shape(-1, 20, 20, 10), 0.5);
+            DropoutLayer layer1 = new DropoutLayer(new Shape(new int[] { -1, 10000 }), 0.5);
             DropoutLayer layer2 = layer1.Clone() as DropoutLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -99,7 +99,7 @@
         [TestMethod, TestCategory("Dropout")]
         public void SerializeTest()
         {
-            DropoutLayer layer1 = new DropoutLayer(new Shape(-1, 20, 20, 10), 0.5);
+            DropoutLayer layer1 = new DropoutLayer(new Shape(new int[] { -1, 10000 }), 0.5);
             string s1 = JsonConvert.SerializeObject(layer1);
             DropoutLayer layer2 = JsonConvert.DeserializeObject<DropoutLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -110,14 +110,14 @@
         [Description("Shall multiply all weights by probability.")]
         public void ForwardTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 10000 });
             DropoutLayer layer = new DropoutLayer(shape, 0.5);
 
             for (int i = 1; i <= 3; i++)
             {
                 Session session = new Session(false);
 
-                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, shape.Reshape(0, i));
                 x.Randomize();
 
                 IList<Tensor> xs = new[] { x };
@@ -131,14 +131,14 @@
         [Description("Shall drop some weights based on probability.")]
         public void ForwardBackwardTest2()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 10000 });
             DropoutLayer layer = new DropoutLayer(shape, 0.5);
 
             for (int i = 1; i <= 3; i++)
             {
                 Session session = new Session(true);
 
-                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, shape.Reshape(0, i));
                 x.Randomize();
 
                 Tensor y = layer.Forward(session, new[] { x })[0];

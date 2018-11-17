@@ -172,20 +172,19 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Makes an attempt to create a <see cref="Layer"/> from the specified architecture string.
         /// </summary>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
-        /// <param name="axes">The dimensions of the layer's input tensors.</param>
+        /// <param name="shapes">The shapes of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
         /// <returns>
         /// The <see cref="Layer"/> this method creates.
         /// </returns>
-        public static Layer CreateFromArchitecture(TensorShape shape, IList<int[]> axes, string architecture, RandomNumberGenerator<float> random)
+        public static Layer CreateFromArchitecture(IList<Shape> shapes, string architecture, RandomNumberGenerator<float> random)
         {
             foreach (KeyValuePair<Type, Regex> layer in Layer.registeredLayers)
             {
                 if (layer.Value.IsMatch(architecture))
                 {
-                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { shape, architecture, random });
+                    return (Layer)Activator.CreateInstance(layer.Key, new object[] { shapes, architecture, random });
                 }
             }
 

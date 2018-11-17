@@ -23,7 +23,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(1, SoftMaxLayerTest.weights.Length);
+            Shape shape = new Shape(new[] { 1, SoftMaxLayerTest.weights.Length });
             SoftMaxLayer layer = new SoftMaxLayer(shape);
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("SM", layer.Architecture);
@@ -39,7 +39,7 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            Shape shape = new Shape(1, SoftMaxLayerTest.weights.Length);
+            Shape shape = new Shape(new[] { 1, SoftMaxLayerTest.weights.Length });
             SoftMaxLayer layer = new SoftMaxLayer(shape, "SM", null);
 
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
@@ -53,7 +53,7 @@
             string architecture = "SMX";
             try
             {
-                SoftMaxLayer layer = new SoftMaxLayer(new Shape(1, SoftMaxLayerTest.weights.Length), architecture, null);
+                SoftMaxLayer layer = new SoftMaxLayer(new Shape(new[] { 1, SoftMaxLayerTest.weights.Length }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -75,13 +75,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new SoftMaxLayer(new Shape(1, SoftMaxLayerTest.weights.Length), null, null));
+            Assert.IsNotNull(new SoftMaxLayer(new Shape(new[] { 1, SoftMaxLayerTest.weights.Length }), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(1, SoftMaxLayerTest.weights.Length);
+            Shape shape = new Shape(new[] { 1, SoftMaxLayerTest.weights.Length });
             SoftMaxLayer layer1 = new SoftMaxLayer(shape);
             SoftMaxLayer layer2 = new SoftMaxLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -97,7 +97,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            SoftMaxLayer layer1 = new SoftMaxLayer(new Shape(1, SoftMaxLayerTest.weights.Length));
+            SoftMaxLayer layer1 = new SoftMaxLayer(new Shape(new[] { 1, SoftMaxLayerTest.weights.Length }));
             SoftMaxLayer layer2 = layer1.Clone() as SoftMaxLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -105,7 +105,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            SoftMaxLayer layer1 = new SoftMaxLayer(new Shape(1, SoftMaxLayerTest.weights.Length));
+            SoftMaxLayer layer1 = new SoftMaxLayer(new Shape(new[] { 1, SoftMaxLayerTest.weights.Length }));
             string s1 = JsonConvert.SerializeObject(layer1);
             SoftMaxLayer layer2 = JsonConvert.DeserializeObject<SoftMaxLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -115,12 +115,13 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
-            Shape shape = new Shape(1, SoftMaxLayerTest.weights.Length);
+            Shape shape = new Shape(new[] { 1, SoftMaxLayerTest.weights.Length });
             SoftMaxLayer layer = new SoftMaxLayer(shape);
 
             Session session = new Session();
 
-            Tensor x = new Tensor(null, TensorShape.Unknown, shape, SoftMaxLayerTest.weights);
+            Tensor x = new Tensor(null, shape);
+            x.Set(SoftMaxLayerTest.weights);
             Tensor y = layer.Forward(session, new[] { x })[0];
 
             Helpers.AreArraysEqual(SoftMaxLayerTest.activations, y.Weights);

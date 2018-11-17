@@ -17,7 +17,7 @@
         [TestMethod, TestCategory("ReLU")]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(2);
+            Shape shape = new Shape(new int[2]);
             ReLULayer layer = new ReLULayer(shape);
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
             Assert.AreEqual("RELU", layer.Architecture);
@@ -33,7 +33,7 @@
         [TestMethod, TestCategory("ReLU")]
         public void ArchitectureConstructorTest1()
         {
-            Shape shape = new Shape(2);
+            Shape shape = new Shape(new int[2]);
             ReLULayer layer = new ReLULayer(shape, "RELU", null);
 
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
@@ -47,7 +47,7 @@
             string architecture = "REL";
             try
             {
-                ReLULayer layer = new ReLULayer(new Shape(2), architecture, null);
+                ReLULayer layer = new ReLULayer(new Shape(new int[2]), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -69,13 +69,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new ReLULayer(new Shape(2), null, null));
+            Assert.IsNotNull(new ReLULayer(new Shape(new int[2]), null, null));
         }
 
         [TestMethod, TestCategory("ReLU")]
         public void CopyConstructorTest1()
         {
-            ReLULayer layer1 = new ReLULayer(new Shape(2));
+            ReLULayer layer1 = new ReLULayer(new Shape(new int[2]));
             ReLULayer layer2 = new ReLULayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -90,7 +90,7 @@
         [TestMethod, TestCategory("ReLU")]
         public void CloneTest()
         {
-            ReLULayer layer1 = new ReLULayer(new Shape(2));
+            ReLULayer layer1 = new ReLULayer(new Shape(new int[2]));
             ReLULayer layer2 = layer1.Clone() as ReLULayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -98,7 +98,7 @@
         [TestMethod, TestCategory("ReLU")]
         public void SerializeTest()
         {
-            ReLULayer layer1 = new ReLULayer(new Shape(2));
+            ReLULayer layer1 = new ReLULayer(new Shape(new int[2]));
             string s1 = JsonConvert.SerializeObject(layer1);
             ReLULayer layer2 = JsonConvert.DeserializeObject<ReLULayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -108,12 +108,13 @@
         [TestMethod, TestCategory("ReLU")]
         public void ForwardBackwardTest()
         {
-            Shape shape = new Shape(2);
+            Shape shape = new Shape(new int[2]);
             ReLULayer layer = new ReLULayer(shape);
 
             Session session = new Session();
 
-            Tensor source = new Tensor(null, TensorShape.Unknown, shape, new float[] { 2, -3 });
+            Tensor source = new Tensor(null, shape);
+            source.Set(new float[] { 2, -3 });
             Tensor x = source.Clone() as Tensor;
             Tensor y = layer.Forward(session, new[] { x })[0];
 

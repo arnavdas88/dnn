@@ -17,7 +17,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(1, 10, 12, 3);
+            Shape shape = new Shape(new int[] { 1, 10, 12, 3 });
             const int NumberOfNeurons = 100;
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
@@ -51,7 +51,7 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(-1, 10, 12, 3), "100N", null);
+            FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(new int[] { -1, 10, 12, 3 }), "100N", null);
 
             Assert.AreEqual(100, layer.NumberOfNeurons);
             Assert.AreEqual("100N", layer.Architecture);
@@ -75,7 +75,7 @@
             string architecture = "100NN";
             try
             {
-                FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(-1, 20, 20, 10), architecture, null);
+                FullyConnectedLayer layer = new FullyConnectedLayer(new Shape(new int[] { -1, 20, 20, 10 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -97,13 +97,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new FullyConnectedLayer(new Shape(-1, 20, 20, 10), null, null));
+            Assert.IsNotNull(new FullyConnectedLayer(new Shape(new int[] { -1, 20, 20, 10 }), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             FullyConnectedLayer layer2 = new FullyConnectedLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -119,7 +119,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             FullyConnectedLayer layer2 = layer1.Clone() as FullyConnectedLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
@@ -128,7 +128,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 20, 20, 10 });
             FullyConnectedLayer layer1 = new FullyConnectedLayer(shape, 100, MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             FullyConnectedLayer layer2 = JsonConvert.DeserializeObject<FullyConnectedLayer>(s1);
@@ -139,7 +139,7 @@
         [TestMethod]
         public void ForwardBackwardTest()
         {
-            Shape shape = new Shape(-1, 2, 3, 2);
+            Shape shape = new Shape(new[] { -1, 2, 3, 2 });
             const int NumberOfNeurons = 2;
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
@@ -155,25 +155,25 @@
 
                 layer.B.Set(new float[] { 1, 2 });
 
-                Tensor xTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, 12 });
+                Tensor xTemp = new Tensor(null, new[] { 1, 12 });
                 xTemp.Set(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 
                 // should be W * x + b
-                Tensor expectedTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, NumberOfNeurons });
+                Tensor expectedTemp = new Tensor(null, new[] { 1, NumberOfNeurons });
                 expectedTemp.Set(FullyConnectedLayerTest.CalculateNeurons(layer.W, xTemp, layer.B, NumberOfNeurons, matrixLayout));
 
-                Tensor dyTemp = new Tensor(null, TensorShape.Unknown, new[] { 1, NumberOfNeurons });
+                Tensor dyTemp = new Tensor(null, new[] { 1, NumberOfNeurons });
                 dyTemp.Set(new float[] { 1, 2 });
 
                 // should be W' * dy
-                Tensor expectedDxTemp = new Tensor(null, TensorShape.Unknown, xTemp.Axes);
+                Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
                 expectedDxTemp.Set(FullyConnectedLayerTest.CalculateDx(layer.W, dyTemp, NumberOfNeurons, matrixLayout));
 
-                Tensor expectedDBTemp = new Tensor(null, TensorShape.Unknown, layer.B.Axes);
+                Tensor expectedDBTemp = new Tensor(null, layer.B.Shape);
                 expectedDBTemp.Set(FullyConnectedLayerTest.CalculateDB(dyTemp));
 
                 // should be sum(x' * dy)
-                Tensor expectedDWTemp = new Tensor(null, TensorShape.Unknown, layer.W.Axes);
+                Tensor expectedDWTemp = new Tensor(null, layer.W.Shape);
                 expectedDWTemp.Set(FullyConnectedLayerTest.CalculateDW(xTemp, dyTemp, matrixLayout));
 
                 for (int i = 1; i <= 3; i++)

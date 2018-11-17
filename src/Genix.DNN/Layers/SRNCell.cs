@@ -112,7 +112,7 @@ namespace Genix.DNN.Layers
 #if TENSORFLOW
             Tensor y = base.Forward(session, xs)[0];
 
-            int tt = y.Axes[(int)Axis.B];        // number of vectors in time sequence
+            int tt = y.Shape.GetAxis(0);          // number of vectors in time sequence
 
             if (this.Direction == RNNDirection.BiDirectional)
             {
@@ -221,7 +221,7 @@ namespace Genix.DNN.Layers
 
             this.Initialize(direction, numberOfNeurons, matrixLayout, weightsShape, hiddenShape, biasesShape, random);
 
-            this.OutputShape = new Shape(axes[(int)Axis.B], numberOfNeurons);
+            this.OutputShape = new Shape(new int[] { shape.GetAxis(0), numberOfNeurons });
         }
     }
 }

@@ -148,28 +148,26 @@ namespace Genix.DNN
         /// Creates a classification neural network from a string that contains network architecture.
         /// </summary>
         /// <param name="architecture">The network architecture.</param>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="classes">The classes the network should able to classify into.</param>
         /// <returns>The <see cref="ClassificationNetwork"/> object this method creates.</returns>
-        public static ClassificationNetwork FromArchitecture(string architecture, TensorShape shape, IList<string> classes)
+        public static ClassificationNetwork FromArchitecture(string architecture, IList<string> classes)
         {
-            return ClassificationNetwork.FromArchitecture(architecture, shape, classes, classes, null);
+            return ClassificationNetwork.FromArchitecture(architecture, classes, classes, null);
         }
 
         /// <summary>
         /// Creates a classification neural network from a string that contains network architecture.
         /// </summary>
         /// <param name="architecture">The network architecture.</param>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="classes">The classes the network should able to classify into.</param>
         /// <param name="allowedClasses">The classes the network is allowed to classify.</param>
         /// <param name="blankClass">The blank class that represents none of the real classes.</param>
         /// <returns>
         /// The <see cref="ClassificationNetwork"/> object this method creates.
         /// </returns>
-        public static ClassificationNetwork FromArchitecture(string architecture, TensorShape shape, IList<string> classes, IList<string> allowedClasses, string blankClass)
+        public static ClassificationNetwork FromArchitecture(string architecture, IList<string> classes, IList<string> allowedClasses, string blankClass)
         {
-            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, shape, true, true);
+            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, true, true);
 
             return new ClassificationNetwork(graph, classes, allowedClasses, blankClass);
         }
@@ -312,7 +310,7 @@ namespace Genix.DNN
                 LossLayer[] lossLayers = this.Graph.Sinks.OfType<LossLayer>().ToArray();
                 if (lossLayers != null && lossLayers.Length > 0)
                 {
-                    Tensor mask = new Tensor("mask", TensorShape.Unknown, new[] { this.classes.Count })
+                    Tensor mask = new Tensor("mask", new[] { this.classes.Count })
                     {
                         CalculateGradient = false,
                     };

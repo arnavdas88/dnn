@@ -164,38 +164,30 @@ namespace Genix.DNN
         /// Allocates the tensor.
         /// </summary>
         /// <param name="name">The tensor name.</param>
-        /// <param name="shape">The tensor shape.</param>
-        /// <param name="axes">The new tensor dimensions along its axes.</param>
+        /// <param name="shape">The new tensor shape.</param>
         /// <param name="calculateGradient">Determines whether the gradient should be calculated for the allocated tensor.</param>
         /// <returns>
         /// The tensor this method allocates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor AllocateTensor(string name, TensorShape shape, int[] axes, bool calculateGradient)
+        public Tensor AllocateTensor(string name, Shape shape, bool calculateGradient)
         {
-            int length = Shape.ShapeLength(axes);
+            int length = shape.Length;
             Tensor x;
             if (this.cache.TryGetValue(length, out Stack<float[]> stack) && stack.Count > 0)
             {
-                float[] w = stack.Pop();
+                x = new Tensor(name, shape, stack.Pop());
 
 #if !NOLEARNING
                 if (calculateGradient && stack.Count > 0)
                 {
-                    float[] dw = stack.Pop();
-                    Vectors.Set(length, 0.0f, dw, 0);
-
-                    x = new Tensor(name, shape, axes, w, dw);
+                    x.AttachGradient(stack.Pop());
                 }
-                else
 #endif
-                {
-                    x = new Tensor(name, shape, axes, w);
-                }
             }
             else
             {
-                x = new Tensor(name, shape, axes);
+                x = new Tensor(name, shape);
             }
 
             x.CalculateGradient = calculateGradient;
@@ -208,19 +200,18 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="name">The tensor name.</param>
         /// <param name="count">The number of tensors to allocate.</param>
-        /// <param name="shape">The tensor shape.</param>
-        /// <param name="axes">The new tensor dimensions along its axes.</param>
+        /// <param name="shape">The new tensor shape.</param>
         /// <param name="calculateGradient">Determines whether the gradients should be calculated for the allocated tensors.</param>
         /// <returns>
         /// The tensors this method allocates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor[] AllocateTensors(string name, int count, TensorShape shape, int[] axes, bool calculateGradient)
+        public Tensor[] AllocateTensors(string name, int count, Shape shape, bool calculateGradient)
         {
             Tensor[] ys = new Tensor[count];
             for (int i = 0; i < count; i++)
             {
-                ys[i] = this.AllocateTensor(name, shape, axes, calculateGradient);
+                ys[i] = this.AllocateTensor(name, shape, calculateGradient);
             }
 
             return ys;

@@ -101,7 +101,7 @@ namespace Genix.DNN.Layers
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             // compute the channel axis
-            int axis = xs[0].GetAxisIndex(Axis.C);
+            int axis = xs[0].Shape.GetAxisIndex(Axis.C);
 
             return new[] { session.MaxReduce(xs[0], axis, this.GroupSize) };
         }

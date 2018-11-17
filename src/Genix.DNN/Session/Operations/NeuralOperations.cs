@@ -151,7 +151,7 @@ namespace Genix.DNN
                 int y1 = kernel.CalculateOutputWidth(x1);
                 int y2 = kernel.CalculateOutputHeight(x2);
 
-                Tensor y = session.AllocateTensor("avg pool", TensorShape.BWHC, new[] { x0, y1, y2, x3 }, calculateGradient);
+                Tensor y = session.AllocateTensor("avg pool", new Shape(Shape.BWHC, x0, y1, y2, x3), calculateGradient);
 
                 int ystride0 = y.Strides[0];
                 int ystride1 = y.Strides[1];
@@ -380,7 +380,7 @@ namespace Genix.DNN
                 int y1 = kernel.CalculateOutputWidth(x1);
                 int y2 = kernel.CalculateOutputHeight(x2);
 
-                Tensor y = session.AllocateTensor(ActionName, TensorShape.BWHC, new[] { x0, y1, y2, x3 }, calculateGradient);
+                Tensor y = session.AllocateTensor(ActionName, new Shape(Shape.BWHC, x0, y1, y2, x3), calculateGradient);
 
                 int ystride0 = y.Strides[0];
                 int ystride1 = y.Strides[1];
@@ -583,7 +583,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
 
                     float[] xw = x.Weights;
                     float[] yw = y.Weights;
@@ -669,8 +669,8 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
-                    Tensor scale = session.AllocateTensor("lrn wsp", x.Shape, x.Axes, false);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
+                    Tensor scale = session.AllocateTensor("lrn wsp", x.Shape, false);
 
                     // 1. calculate scale
                     // scale(i) = k + alpha / n * sum(x(j) ^ 2)
@@ -693,14 +693,14 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Tensor work = session.AllocateTensor("lrn wsp2", x.Shape, x.Axes, false);
+                                Tensor work = session.AllocateTensor("lrn wsp2", x.Shape, false);
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
                                 Vectors.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
                                 Vectors.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
-                                NeuralOperations.LRNKernel(x.Axes, x.Strides, x.Gradient, work.Weights, kernelSize);
+                                NeuralOperations.LRNKernel(x.Shape.Axes, x.Shape.Strides, x.Gradient, work.Weights, kernelSize);
                                 work.Mul(x);
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
@@ -779,7 +779,7 @@ namespace Genix.DNN
             // calculate gates = W * x + b
             Tensor y = session.FullyConnected(x, w, b, matrixLayout);
 
-            int tt = y.Axes[(int)Axis.B];               // number of vectors in time sequence
+            int tt = y.Shape.GetAxis(Axis.B);               // number of vectors in time sequence
             float[] uw = u.Weights;
             float[] yw = y.Weights;
 
@@ -858,7 +858,7 @@ namespace Genix.DNN
             // calculate gates = W * x + b
             Tensor g = session.FullyConnected(x, w, b, matrixLayout);
 
-            int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
+            int tt = g.Shape.GetAxis(0);                  // number of vectors in time sequence
 
             return session.RunOperation(
                 ActionName,
@@ -866,8 +866,8 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients;
 
-                    Tensor h = session.AllocateTensor("lstm", TensorShape.Unknown, new[] { tt, numberOfNeurons }, calculateGradient);
-                    Tensor s = session.AllocateTensor("lstm cell", h.Shape, h.Axes, calculateGradient);
+                    Tensor h = session.AllocateTensor("lstm", new Shape(new int[] { tt, numberOfNeurons }), calculateGradient);
+                    Tensor s = session.AllocateTensor("lstm cell", h.Shape, calculateGradient);
 
                     NativeMethods.lstm(
                         tt,
@@ -937,7 +937,7 @@ namespace Genix.DNN
             // calculate gates = W * x + b
             Tensor g = session.FullyConnected(x, w, b, matrixLayout);
 
-            int tt = g.Axes[(int)Axis.B];               // number of vectors in time sequence
+            int tt = g.Shape.GetAxis(0);                  // number of vectors in time sequence
 
             return session.RunOperation(
                 ActionName,
@@ -945,7 +945,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients;
 
-                    Tensor h = session.AllocateTensor(ActionName, TensorShape.Unknown, new[] { tt, numberOfNeurons }, calculateGradient);
+                    Tensor h = session.AllocateTensor(ActionName, new Shape(new int[] { tt, numberOfNeurons }), calculateGradient);
 
                     NativeMethods.gru(
                         tt,
@@ -999,7 +999,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, x.Shape, x.Axes, calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
 
                     if (x.Rank == 1)
                     {

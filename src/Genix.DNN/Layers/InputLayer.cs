@@ -47,13 +47,13 @@ namespace Genix.DNN.Layers
             : base(1, shape /* temp */)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, InputLayer.ArchitecturePattern);
-            this.Axes = this.OutputAxes = new[]
-            {
+
+            this.Shape = this.OutputShape = new Shape(
+                Shape.BWHC,
                 -1,
                 Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture),
                 Convert.ToInt32(groups[2].Value, CultureInfo.InvariantCulture),
-                Convert.ToInt32(groups[3].Value, CultureInfo.InvariantCulture),
-            };
+                Convert.ToInt32(groups[3].Value, CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Genix.DNN.Layers
         /// Gets the shape of the layer's input tensor.
         /// </summary>
         /// <value>
-        /// The <see cref="TensorShape"/> enumeration.
+        /// The <see cref="Shape"/> object.
         /// </value>
         [JsonProperty("shape")]
         public Shape Shape { get; private set; }

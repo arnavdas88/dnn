@@ -15,7 +15,7 @@
         [TestMethod]
         public void ConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 1000 });
             ScaleLayer layer = new ScaleLayer(shape, 0.7f);
 
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
@@ -33,7 +33,7 @@
         [TestMethod]
         public void ArchitectureConstructorTest1()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 1000 });
             ScaleLayer layer = new ScaleLayer(shape, "S0.7", null);
 
             CollectionAssert.AreEqual(shape.Axes, layer.OutputShape.Axes);
@@ -47,7 +47,7 @@
             string architecture = "S";
             try
             {
-                ScaleLayer layer = new ScaleLayer(new Shape(-1, 20, 20, 10), architecture, null);
+                ScaleLayer layer = new ScaleLayer(new Shape(new int[] { -1, 1000 }), architecture, null);
             }
             catch (ArgumentException e)
             {
@@ -69,13 +69,13 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
-            Assert.IsNotNull(new ScaleLayer(new Shape(-1, 20, 20, 10), null, null));
+            Assert.IsNotNull(new ScaleLayer(new Shape(new int[] { -1, 1000 }), null, null));
         }
 
         [TestMethod]
         public void CopyConstructorTest1()
         {
-            ScaleLayer layer1 = new ScaleLayer(new Shape(-1, 20, 20, 10), 0.7f);
+            ScaleLayer layer1 = new ScaleLayer(new Shape(new int[] { -1, 1000 }), 0.7f);
             ScaleLayer layer2 = new ScaleLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -90,7 +90,7 @@
         [TestMethod]
         public void CloneTest()
         {
-            ScaleLayer layer1 = new ScaleLayer(new Shape(-1, 20, 20, 10), 0.7f);
+            ScaleLayer layer1 = new ScaleLayer(new Shape(new int[] { -1, 1000 }), 0.7f);
             ScaleLayer layer2 = layer1.Clone() as ScaleLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -98,7 +98,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            ScaleLayer layer1 = new ScaleLayer(new Shape(-1, 20, 20, 10), 0.7f);
+            ScaleLayer layer1 = new ScaleLayer(new Shape(new int[] { -1, 1000 }), 0.7f);
             string s1 = JsonConvert.SerializeObject(layer1);
             ScaleLayer layer2 = JsonConvert.DeserializeObject<ScaleLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -109,19 +109,20 @@
         [Description("Shall multiply all weights by scale factor.")]
         public void ForwardBackwardTest()
         {
-            Shape shape = new Shape(-1, 20, 20, 10);
+            Shape shape = new Shape(new int[] { -1, 1000 });
             ScaleLayer layer = new ScaleLayer(shape, 0.7f);
 
             for (int i = 1; i <= 3; i++)
             {
                 Session session = new Session();
 
-                Tensor x = new Tensor(null, TensorShape.Unknown, Shape.Reshape(shape, (int)Axis.B, i));
+                Tensor x = new Tensor(null, shape.Reshape(0, i));
                 x.Randomize();
 
                 Tensor y = layer.Forward(session, new[] { x })[0];
 
-                Tensor expected = new Tensor(null, TensorShape.Unknown, x.Axes, x.Weights.Take(x.Length).Select(w => w * layer.Alpha).ToArray());
+                Tensor expected = new Tensor(null, x.Axes);
+                expected.Set(x.Weights.Take(x.Length).Select(w => w * layer.Alpha).ToArray());
                 Helpers.AreTensorsEqual(expected, y);
 
                 // unroll the graph

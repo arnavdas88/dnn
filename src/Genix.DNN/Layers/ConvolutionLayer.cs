@@ -29,34 +29,34 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>
         /// <param name="kernel">The convolution kernel.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         public ConvolutionLayer(
-            int[] inputShape,
+            Shape shape,
             int numberOfFilters,
             Kernel kernel,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(inputShape, numberOfFilters, kernel, matrixLayout, random);
+            this.Initialize(shape, numberOfFilters, kernel, matrixLayout, random);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvolutionLayer"/> class, using the specified architecture.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
-        public ConvolutionLayer(int[] inputShape, string architecture, RandomNumberGenerator<float> random)
+        public ConvolutionLayer(Shape shape, string architecture, RandomNumberGenerator<float> random)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, ConvolutionLayer.ArchitecturePattern);
             int numberOfFilters = Convert.ToInt32(groups[1].Value, CultureInfo.InvariantCulture);
             Kernel kernel = Layer.ParseKernel(groups, 3, 1, true);
 
-            this.Initialize(inputShape, numberOfFilters, kernel, MatrixLayout.RowMajor, random);
+            this.Initialize(shape, numberOfFilters, kernel, MatrixLayout.RowMajor, random);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Genix.DNN.Layers
             Tensor x = xs[0];
 
             IList<Tensor> ys;
-            if (this.Kernel.SameAsInput(x.Axes[(int)Axis.X], x.Axes[(int)Axis.Y]))
+            if (this.Kernel.SameAsInput(x.Shape.GetAxis(Axis.X), x.Shape.GetAxis(Axis.Y)))
             {
                 ys = base.Forward(session, xs);
             }
@@ -118,7 +118,7 @@ namespace Genix.DNN.Layers
             }
 
             // reshape the tensor so it matches the layer output
-            session.ReshapeIP(ys[0], TensorShape.BWHC, ConvolutionLayer.CalculateOutputShape(x.Axes, this.NumberOfNeurons, this.Kernel));
+            session.ReshapeIP(ys[0], ConvolutionLayer.CalculateOutputShape(x.Shape, this.NumberOfNeurons, this.Kernel));
 
             return ys;
         }
@@ -126,47 +126,46 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// Computes the dimensions of the layer's output tensor.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>
         /// <param name="kernel">The convolution kernel.</param>
         /// <returns>
-        /// The dimensions of the layer's output tensor.
+        /// The shape of the layer's output tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int[] CalculateOutputShape(int[] inputShape, int numberOfFilters, Kernel kernel)
+        private static Shape CalculateOutputShape(Shape shape, int numberOfFilters, Kernel kernel)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
-            return new[]
-            {
-                inputShape[(int)Axis.B],
-                kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),
-                kernel.CalculateOutputHeight(inputShape[(int)Axis.Y]),
-                numberOfFilters,
-            };
+            return new Shape(
+                Shape.BWHC,
+                shape.GetAxis(Axis.B),
+                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
+                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                numberOfFilters);
         }
 
         /// <summary>
         /// Initializes the <see cref="FullyConnectedLayer"/>.
         /// </summary>
-        /// <param name="inputShape">The dimensions of the layer's input tensor.</param>
+        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>
         /// <param name="kernel">The convolution kernel.</param>
         /// <param name="matrixLayout">Specifies whether the weight matrices are row-major or column-major.</param>
         /// <param name="random">The random numbers generator.</param>
         private void Initialize(
-            int[] inputShape,
+            Shape shape,
             int numberOfFilters,
             Kernel kernel,
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            if (inputShape == null)
+            if (shape == null)
             {
-                throw new ArgumentNullException(nameof(inputShape));
+                throw new ArgumentNullException(nameof(shape));
             }
 
             if (kernel == null)
@@ -176,7 +175,7 @@ namespace Genix.DNN.Layers
 
             // column-major matrix organization - each row contains all weights for one neuron
             // row-major matrix organization - each column contains all weights for one neuron
-            int mbsize = kernel.Size * inputShape[(int)Axis.C];
+            int mbsize = kernel.Size * shape.GetAxis(Axis.C);
             int[] weightsShape = matrixLayout == MatrixLayout.ColumnMajor ?
                 new[] { mbsize, numberOfFilters } :
                 new[] { numberOfFilters, mbsize };
@@ -185,13 +184,8 @@ namespace Genix.DNN.Layers
 
             this.Initialize(numberOfFilters, matrixLayout, weightsShape, biasesShape, random);
             this.Kernel = kernel;
-            this.OutputAxes = new[]
-            {
-                inputShape[(int)Axis.B],
-                kernel.CalculateOutputWidth(inputShape[(int)Axis.X]),
-                kernel.CalculateOutputHeight(inputShape[(int)Axis.Y]),
-                numberOfFilters,
-            };
+
+            this.OutputShape = ConvolutionLayer.CalculateOutputShape(shape, numberOfFilters, kernel);
         }
     }
 }

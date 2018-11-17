@@ -107,11 +107,10 @@ namespace Genix.DNN
         /// Creates a classification neural network from a string that contains network architecture.
         /// </summary>
         /// <param name="architecture">The network architecture.</param>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <returns>The <see cref="Network"/> object this method creates.</returns>
-        public static Network FromArchitecture(string architecture, TensorShape shape)
+        public static Network FromArchitecture(string architecture)
         {
-            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, shape, true, false);
+            NetworkGraph graph = NetworkGraphBuilder.CreateNetworkGraph(architecture, true, false);
 
             return new Network(graph);
         }

@@ -29,7 +29,7 @@ namespace Genix.DNN.Layers
         /// </summary>
         /// <param name="shapes">The shapes of the layer's input tensor.</param>
         public ConcatLayer(IList<Shape> shapes)
-            : base(1, Shape.Concat(axes, ConcatLayer.GetAxis(shape)))
+            : base(1, Shape.Concat(shapes, Axis.C))
         {
         }
 
@@ -40,7 +40,7 @@ namespace Genix.DNN.Layers
         /// <param name="architecture">The layer architecture.</param>
         /// <param name="random">The random numbers generator.</param>
         public ConcatLayer(IList<Shape> shapes, string architecture, RandomNumberGenerator<float> random)
-            : base(1, Shape.Concat(axes, ConcatLayer.GetAxis(shape)))
+            : base(1, Shape.Concat(shapes, Axis.C))
         {
             Layer.ParseArchitecture(architecture, ConcatLayer.ArchitecturePattern);
         }
@@ -74,31 +74,9 @@ namespace Genix.DNN.Layers
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             // compute the channel axis
-            int axis = ConcatLayer.GetAxis(xs[0].Shape);
+            int axis = xs[0].Shape.GetAxisIndex(Axis.C);
 
             return new[] { session.Concat(xs, axis) };
-        }
-
-        /// <summary>
-        /// Gets the channel axis index.
-        /// </summary>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
-        /// <returns>The channel axis index.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int GetAxis(TensorShape shape)
-        {
-            switch (shape)
-            {
-                case TensorShape.BWHC:
-                case TensorShape.BHWC:
-                    return 3;
-
-                case TensorShape.BCHW:
-                    return 1;
-
-                default:
-                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
-            }
         }
     }
 }
