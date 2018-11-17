@@ -304,7 +304,7 @@ namespace Genix.NetLearn
                                             string[] labels = x.Labels;
                                             if (!(task.Loss is CTCLoss))
                                             {
-                                                int b = net.OutputAxes.First()[0];
+                                                int b = net.OutputShapes.First()[0];
                                                 if (labels.Length == 1 && b > 1)
                                                 {
                                                     labels = Enumerable.Repeat(labels[0], b).ToArray();

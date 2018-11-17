@@ -33,6 +33,10 @@ namespace Genix.MachineLearning
         /// </summary>
         public const string BCHW = "BCHW";
 
+        private static readonly int[] BWHCAxes = { 0, 1, 2, 3 };
+        private static readonly int[] BHWCAxes = { 0, 2, 1, 3 };
+        private static readonly int[] BCHWAxes = { 0, 3, 2, 1 };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class with the specified dimensions.
         /// </summary>
@@ -344,6 +348,69 @@ namespace Genix.MachineLearning
             }
 
             return pos;
+        }
+
+        /// <summary>
+        /// Gets the index of the specified axis in this shape.
+        /// </summary>
+        /// <param name="axis">The axis.</param>
+        /// <returns>The axis index.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetAxisIndex(Axis axis)
+        {
+            switch (this.Format)
+            {
+                case Shape.BWHC:
+                    return Shape.BWHCAxes[(int)axis];
+                case Shape.BHWC:
+                    return Shape.BHWCAxes[(int)axis];
+                case Shape.BCHW:
+                    return Shape.BCHWAxes[(int)axis];
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified axis dimension in this shape.
+        /// </summary>
+        /// <param name="axis">The axis.</param>
+        /// <returns>The axis dimension.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetAxis(Axis axis)
+        {
+            return this.Axes[this.GetAxisIndex(axis)];
+        }
+
+        /// <summary>
+        /// Gets the specified axis stride in this shape.
+        /// </summary>
+        /// <param name="axis">The axis.</param>
+        /// <returns>The axis stride.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetStride(Axis axis)
+        {
+            return this.Strides[this.GetAxisIndex(axis)];
+        }
+
+        /// <summary>
+        /// Creates a new shape by reshaping this <see cref="Shape"/> along the specified axis.
+        /// </summary>
+        /// <param name="axis">The axis to reshape along.</param>
+        /// <param name="dimension">The new dimension along the <paramref name="axis"/>.</param>
+        /// <returns>
+        /// The reshaped shape.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape Reshape(Axis axis, int dimension)
+        {
+            int index = this.GetAxisIndex(axis);
+
+            int[] axes = this.Axes.ToArray() ?? throw new ArgumentNullException(nameof(axes));
+            axes[index] = dimension;
+
+            return new Shape(this.Format, axes);
         }
 
         /// <summary>

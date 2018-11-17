@@ -56,7 +56,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new LSTMCell(TensorShape.Unknown, null, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new LSTMCell(null, RNNDirection.ForwardOnly, 100, LSTMCell.DefaultForgetBias, MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod, TestCategory("LSTM")]

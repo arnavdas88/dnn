@@ -80,28 +80,19 @@ namespace Genix.DNN
         /// Gets the network input shape.
         /// </summary>
         /// <value>
-        /// The <see cref="TensorShape"/> enumeration.
+        /// The network input shape.
         /// </value>
         [JsonIgnore]
-        public TensorShape InputShape => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Shape ?? TensorShape.Unknown;
+        public Shape InputShape => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Shape;
 
         /// <summary>
-        /// Gets the network input layout.
+        /// Gets the network output shapes.
         /// </summary>
         /// <value>
-        /// The network input layout.
+        /// The network output shapes.
         /// </value>
         [JsonIgnore]
-        public int[] InputAxes => this.Graph?.Sources.OfType<InputLayer>().FirstOrDefault()?.Axes;
-
-        /// <summary>
-        /// Gets the network output layouts.
-        /// </summary>
-        /// <value>
-        /// The network output layouts.
-        /// </value>
-        [JsonIgnore]
-        public IList<int[]> OutputAxes => this.Graph?.Sinks.Select(x => x.OutputAxes).ToList();
+        public IList<Shape> OutputShapes => this.Graph?.Sinks.Select(x => x.OutputShape).ToList();
 
         /// <summary>
         /// Gets the graph representation of the network.

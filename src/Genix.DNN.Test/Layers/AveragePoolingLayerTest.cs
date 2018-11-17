@@ -189,7 +189,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
@@ -245,7 +245,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 4, 3, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 4, 3, 2 });
@@ -303,7 +303,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
@@ -357,7 +357,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 2, 2, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 2, 2 });
@@ -411,7 +411,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 3, 2, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 3, 2, 2 });
@@ -467,7 +467,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });
@@ -521,7 +521,7 @@
 
             CollectionAssert.AreEqual(new[] { -1, 2, 1, 2 }, layer.OutputShape.Axes);
 
-            Tensor xTemp = new Tensor(null, TensorShape.BWHC, Shape.Reshape(AveragePoolingLayerTest.sourceShape, (int)Axis.B, 1));
+            Tensor xTemp = new Tensor(null, AveragePoolingLayerTest.sourceShape.Reshape(Axis.B, 1));
             xTemp.Set(AveragePoolingLayerTest.weights);
 
             Tensor expectedTemp = new Tensor(null, TensorShape.BWHC, new[] { 1, 2, 1, 2 });

@@ -101,7 +101,7 @@ namespace Genix.DNN.Layers
                 throw new ArgumentException(Properties.Resources.E_InvalidInputTensor_InvalidCount);
             }
 
-            int[] axes = this.Axes;
+            int[] axes = this.Shape.Axes;
             Tensor x = xs[0];
 
             // validate tensor layout

@@ -101,31 +101,9 @@ namespace Genix.DNN.Layers
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             // compute the channel axis
-            int axis = GetAxis(xs[0].Shape);
+            int axis = xs[0].GetAxisIndex(Axis.C);
 
             return new[] { session.MaxReduce(xs[0], axis, this.GroupSize) };
-        }
-
-        /// <summary>
-        /// Gets the channel axis index.
-        /// </summary>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
-        /// <returns>The channel axis index.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int GetAxis(TensorShape shape)
-        {
-            switch (shape)
-            {
-                case TensorShape.BWHC:
-                case TensorShape.BHWC:
-                    return 3;
-
-                case TensorShape.BCHW:
-                    return 1;
-
-                default:
-                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
-            }
         }
 
         /// <summary>
@@ -141,15 +119,14 @@ namespace Genix.DNN.Layers
             }
 
             // compute the channel axis
-            int axis = GetAxis(shape);
-
-            if ((axes[axis] % groupSize) != 0)
+            int axis = shape.GetAxis(Axis.C);
+            if ((axis % groupSize) != 0)
             {
                 throw new ArgumentException("The number of channels must be a multiple of a group size.");
             }
 
             this.GroupSize = groupSize;
-            this.OutputAxes = Shape.Reshape(axes, axis, axes[axis] / groupSize);
+            this.OutputShape = shape.Reshape(Axis.C, axis / groupSize);
         }
     }
 }

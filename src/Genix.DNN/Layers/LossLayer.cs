@@ -25,7 +25,7 @@ namespace Genix.DNN.Layers
         protected LossLayer(Shape shape)
             : base(1, LossLayer.CalculateOutputShape(shape))
         {
-            this.NumberOfClasses = this.OutputAxes.Skip(1).Aggregate(1, (total, next) => total * next);
+            this.NumberOfClasses = this.OutputShape.Axes.Skip(1).Aggregate(1, (total, next) => total * next);
         }
 
         /// <summary>
