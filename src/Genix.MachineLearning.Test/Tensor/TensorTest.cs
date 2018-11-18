@@ -59,9 +59,9 @@
         public void PositionTest1()
         {
             Tensor tensor = new Tensor(null, new[] { 2, 3, 4, 5 });
-            Assert.AreEqual((1 * 5) + (2 * 1), tensor.Shape.Position(0, 0, 1, 2));
-            Assert.AreEqual((1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(0, 1, 2, 3));
-            Assert.AreEqual((1 * 3 * 4 * 5) + (1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(1, 1, 2, 3));
+            Assert.AreEqual((1 * 5) + (2 * 1), tensor.Shape.Position(new int[] { 0, 0, 1, 2 }));
+            Assert.AreEqual((1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(new int[] { 0, 1, 2, 3 }));
+            Assert.AreEqual((1 * 3 * 4 * 5) + (1 * 4 * 5) + (2 * 5) + (3 * 1), tensor.Shape.Position(new int[] { 1, 1, 2, 3 }));
         }
 
         [TestMethod]

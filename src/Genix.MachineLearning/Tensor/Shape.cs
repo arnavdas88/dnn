@@ -299,6 +299,34 @@ namespace Genix.MachineLearning
         /// <summary>
         /// Calculates the element position in the tensor.
         /// </summary>
+        /// <param name="b">The element position along b axes.</param>
+        /// <param name="x">The element position along x axes.</param>
+        /// <param name="y">The element position along y axes.</param>
+        /// <param name="c">The element position along c axes.</param>
+        /// <returns>The dot product of element coordinates and corresponding strides.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Position(int b, int x, int y, int c)
+        {
+            int[] strides = this.Strides;
+            switch (this.Format)
+            {
+                case Shape.BWHC:
+                    return (b * strides[0]) + (x * strides[1]) + (y * strides[2]) + (c * strides[3]);
+
+                case Shape.BHWC:
+                    return (b * strides[0]) + (x * strides[2]) + (y * strides[1]) + (c * strides[3]);
+
+                case Shape.BCHW:
+                    return (b * strides[0]) + (x * strides[3]) + (y * strides[2]) + (c * strides[1]);
+
+                default:
+                    throw new NotSupportedException("The tensor shape is not supported by this operation.");
+            }
+        }
+
+        /// <summary>
+        /// Calculates the element position in the tensor.
+        /// </summary>
         /// <param name="axes">The element coordinates.</param>
         /// <returns>The dot product of element coordinates and corresponding strides.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

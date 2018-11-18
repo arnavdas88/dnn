@@ -381,8 +381,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, 2.0f, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 2.0f, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -425,8 +424,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, power, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, power, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -468,8 +466,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, 0.5f, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.PowGradient(x.Length, x.Weights, x.Gradient, 0, false, 0.5f, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -510,8 +507,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.AbsGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.AbsGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -557,14 +553,12 @@ namespace Genix.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, !a.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                    a.IsGradientInitialized = true;
+                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, !b.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                    b.IsGradientInitialized = true;
+                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -611,14 +605,12 @@ namespace Genix.DNN
                             {
                                 if (a.CalculateGradient)
                                 {
-                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, !a.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                    a.IsGradientInitialized = true;
+                                    Vectors.MinMaxGradient(a.Length, a.Weights, a.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
 
                                 if (b.CalculateGradient)
                                 {
-                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, !b.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                    b.IsGradientInitialized = true;
+                                    Vectors.MinMaxGradient(b.Length, b.Weights, b.Gradient, 0, false, y.Weights, y.Gradient, 0);
                                 }
                             });
                     }
@@ -660,8 +652,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Nonlinearity.ReLUGradient(x.Length, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, 0, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Nonlinearity.ReLUGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
                             });
                     }
 #endif
@@ -737,8 +728,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Nonlinearity.SigmoidGradient(x.Length, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, 0, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Nonlinearity.SigmoidGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
                             });
                     }
 #endif
@@ -779,8 +769,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Nonlinearity.TanhGradient(x.Length, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, 0, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Nonlinearity.TanhGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
                             });
                     }
 #endif
@@ -851,8 +840,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.SinGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -893,8 +881,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.CosGradient(x.Length, x.Weights, x.Gradient, 0, !x.IsGradientInitialized, y.Weights, y.Gradient, 0);
-                                x.IsGradientInitialized = true;
+                                Vectors.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -1004,15 +991,13 @@ namespace Genix.DNN
                                             if (!transa)
                                             {
                                                 // dA += dC * B
-                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0, !a.IsGradientInitialized);
+                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0, false);
                                             }
                                             else
                                             {
                                                 // dA += B * dC
-                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0, !a.IsGradientInitialized);
+                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0, false);
                                             }
-
-                                            a.IsGradientInitialized = true;
                                         }
                                     }
 
@@ -1021,8 +1006,7 @@ namespace Genix.DNN
                                         lock (b)
                                         {
                                             // dB += !transa ? A' * dC : A * dC
-                                            Matrix.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, !b.IsGradientInitialized);
-                                            b.IsGradientInitialized = true;
+                                            Matrix.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, false);
                                         }
                                     }
 
@@ -1057,15 +1041,13 @@ namespace Genix.DNN
                                             if (!transa)
                                             {
                                                 // dA += !transb ? dC * B' : dC * B
-                                                Matrix.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, !a.IsGradientInitialized);
+                                                Matrix.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, false);
                                             }
                                             else
                                             {
                                                 // dA += !transb ? B * dC' : B' * dC'
-                                                Matrix.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, !a.IsGradientInitialized);
+                                                Matrix.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, false);
                                             }
-
-                                            a.IsGradientInitialized = true;
                                         }
                                     }
 
@@ -1076,15 +1058,13 @@ namespace Genix.DNN
                                             if (!transb)
                                             {
                                                 // dB += !transa ? A' * dC : A * dC
-                                                Matrix.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, !b.IsGradientInitialized);
+                                                Matrix.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, false);
                                             }
                                             else
                                             {
                                                 // dB += !transa ? dC' * A : dC' * A'
-                                                Matrix.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, !b.IsGradientInitialized);
+                                                Matrix.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, false);
                                             }
-
-                                            b.IsGradientInitialized = true;
                                         }
                                     }
 
@@ -1094,8 +1074,7 @@ namespace Genix.DNN
 
                                         lock (bias)
                                         {
-                                            Matrix.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, !bias.IsGradientInitialized);
-                                            bias.IsGradientInitialized = true;
+                                            Matrix.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, false);
                                         }
 
                                         bias.Validate();
@@ -1186,14 +1165,12 @@ namespace Genix.DNN
                                     {
                                         if (transa)
                                         {
-                                            Matrix.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0, !a.IsGradientInitialized);
+                                            Matrix.VxV(matrixLayout, xlen, ylen, x.Weights, 0, y.Gradient, 0, a.Gradient, 0, false);
                                         }
                                         else
                                         {
-                                            Matrix.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0, !a.IsGradientInitialized);
+                                            Matrix.VxV(matrixLayout, ylen, xlen, y.Gradient, 0, x.Weights, 0, a.Gradient, 0, false);
                                         }
-
-                                        a.IsGradientInitialized = true;
                                     }
 
                                     a.Validate();
@@ -1204,8 +1181,7 @@ namespace Genix.DNN
                                 {
                                     lock (x)
                                     {
-                                        Matrix.MxV(matrixLayout, m, n, a.Weights, 0, !transa, y.Gradient, 0, x.Gradient, 0, !x.IsGradientInitialized);
-                                        x.IsGradientInitialized = true;
+                                        Matrix.MxV(matrixLayout, m, n, a.Weights, 0, !transa, y.Gradient, 0, x.Gradient, 0, false);
                                     }
 
                                     x.Validate();
@@ -1276,8 +1252,7 @@ namespace Genix.DNN
                                 {
                                     lock (x)
                                     {
-                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, false, y.Weights, 0, x.Gradient, 0, !x.IsGradientInitialized);
-                                        x.IsGradientInitialized = true;
+                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, false, y.Weights, 0, x.Gradient, 0, false);
                                     }
                                 }
 
@@ -1286,8 +1261,7 @@ namespace Genix.DNN
                                 {
                                     lock (y)
                                     {
-                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, true, x.Weights, 0, y.Gradient, 0, !y.IsGradientInitialized);
-                                        y.IsGradientInitialized = true;
+                                        Matrix.MxV(matrixLayout, m, n, a.Gradient, 0, true, x.Weights, 0, y.Gradient, 0, false);
                                     }
                                 }
                             });

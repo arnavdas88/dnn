@@ -72,6 +72,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.DocumentAnalysis.Test
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Genix.CUDA.Native", "Genix.CUDA.Native\Genix.CUDA.Native.vcxproj", "{6D085890-CAE1-4B05-9B46-3F43331CF76C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genix.MachineLearning.Imaging.Test", "Genix.MachineLearning.Imaging.Test\Genix.MachineLearning.Imaging.Test.csproj", "{3873C0C0-8BA1-449B-AC02-9817EC601B38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -424,6 +426,22 @@ Global
 		{6D085890-CAE1-4B05-9B46-3F43331CF76C}.Release|x64.Build.0 = Release|x64
 		{6D085890-CAE1-4B05-9B46-3F43331CF76C}.Release|x86.ActiveCfg = Release|Win32
 		{6D085890-CAE1-4B05-9B46-3F43331CF76C}.Release|x86.Build.0 = Release|Win32
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|ARM.Build.0 = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|x64.Build.0 = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Debug|x86.Build.0 = Debug|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|ARM.ActiveCfg = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|ARM.Build.0 = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|x64.ActiveCfg = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|x64.Build.0 = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|x86.ActiveCfg = Release|Any CPU
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -442,6 +460,7 @@ Global
 		{7B1AFB34-FD94-40AA-B58E-F9F900B03A67} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
 		{18DE2CD6-1C5F-40AA-834A-42BB2FDFCF9C} = {4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}
 		{6D085890-CAE1-4B05-9B46-3F43331CF76C} = {C4A7CBA2-C5C8-4B1A-9F6C-B8ABD448AC19}
+		{3873C0C0-8BA1-449B-AC02-9817EC601B38} = {4FBCF2BF-EF61-4FCA-B71F-93580CADC53D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D80916AC-677F-4083-B57A-3562C04772D2}

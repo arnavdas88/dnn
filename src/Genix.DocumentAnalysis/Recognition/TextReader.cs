@@ -91,10 +91,10 @@ namespace Genix.DocumentAnalysis.Recognition
             // create input tensor
             Tensor x = ImageExtensions.FromImage(
                 source.Image,
-                this.network.InputShape.GetAxis(Axis.X),
-                this.network.InputShape.GetAxis(Axis.Y),
                 "text",
-                this.network.InputShape.Format);
+                this.network.InputShape.Format,
+                this.network.InputShape.GetAxis(Axis.X),
+                this.network.InputShape.GetAxis(Axis.Y));
 
             // recognize the image
             IList<(string Answer, float Probability)> result = this.network.ExecuteSequence(x, this.context).Answers;

@@ -181,7 +181,7 @@ namespace Genix.DNN
 #if !NOLEARNING
                 if (calculateGradient && stack.Count > 0)
                 {
-                    x.AttachGradient(stack.Pop());
+                    x.AttachGradient(stack.Pop(), true);
                 }
 #endif
             }

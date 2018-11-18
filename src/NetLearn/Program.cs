@@ -196,7 +196,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, null, Shape.BWHC, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y));
                                                     (string text, float prob) = net.ExecuteSequence(x, model).Answers.FirstOrDefault();
 
                                                     results.Add(new ClassificationResult<string>(
@@ -223,7 +223,7 @@ namespace Genix.NetLearn
                                                 }
                                                 else
                                                 {
-                                                    Tensor x = ImageExtensions.FromImage(image.Image, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC);
+                                                    Tensor x = ImageExtensions.FromImage(image.Image, null, Shape.BWHC, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y));
 
                                                     foreach (IList<(string answer, float probability)> answer in net.Execute(x).Answers)
                                                     {
@@ -281,7 +281,7 @@ namespace Genix.NetLearn
                                                         ////bitmap.Save(@"d:\dnn\temp\" + (n).ToString(CultureInfo.InvariantCulture) + "_" + x.SourceId.Id + ".bmp");
                                                     }
 
-                                                    return (ImageExtensions.FromImage(bitmap, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y), null, Shape.BWHC), x.labels);
+                                                    return (ImageExtensions.FromImage(bitmap, null, Shape.BWHC, shape.GetAxis(Axis.X), shape.GetAxis(Axis.Y)), x.labels);
                                                 });
                                         });
                                 }

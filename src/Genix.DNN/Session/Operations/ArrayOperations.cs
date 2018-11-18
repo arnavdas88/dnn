@@ -90,15 +90,7 @@ namespace Genix.DNN
                             () =>
                             {
                                 float alpha = 1.0f / count;
-                                int i = 0;
-
-                                if (!x.IsGradientInitialized)
-                                {
-                                    Vectors.MulC(x.Length, ys[i++].Gradient, 0, alpha, x.Gradient, 0);
-                                    x.IsGradientInitialized = true;
-                                }
-
-                                for (; i < count; i++)
+                                for (int i = 0; i < count; i++)
                                 {
                                     Vectors.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
                                 }
@@ -991,15 +983,16 @@ namespace Genix.DNN
                 for (int i = 0, ii = xs.Count, offy = 0; i < ii; i++)
                 {
                     Tensor x = xs[i];
+                    float[] xw = useGradients ? x.Gradient : x.Weights;
                     int xstride = x.Length;
 
                     if (useGradients)
                     {
-                        Vectors.Add(xstride, x.Gradient, 0, yw, offy);
+                        Vectors.Add(xstride, xw, 0, yw, offy);
                     }
                     else
                     {
-                        Vectors.Copy(xstride, x.Weights, 0, yw, offy);
+                        Vectors.Copy(xstride, xw, 0, yw, offy);
                     }
 
                     offy += xstride;
@@ -1032,20 +1025,21 @@ namespace Genix.DNN
                 for (int i = 0, offy = 0, ii = xs.Count; i < ii; i++)
                 {
                     Tensor x = xs[i];
+                    float[] xw = useGradients ? x.Gradient : x.Weights;
                     int xstride = x.Strides[axis - 1];
 
                     if (useGradients)
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Vectors.Add(xstride, x.Gradient, offx, yw, offyy);
+                            Vectors.Add(xstride, xw, offx, yw, offyy);
                         }
                     }
                     else
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Vectors.Copy(xstride, x.Weights, offx, yw, offyy);
+                            Vectors.Copy(xstride, xw, offx, yw, offyy);
                         }
                     }
 
@@ -1109,13 +1103,16 @@ namespace Genix.DNN
             {
                 for (int i = 0; i < xdim; i++, offy += ystride)
                 {
+                    Tensor x = xs[i];
+                    float[] xw = useGradients ? x.Gradient : x.Weights;
+
                     if (useGradients)
                     {
-                        Vectors.Add(ystride, xs[i].Gradient, offx, yw, offy);
+                        Vectors.Add(ystride, xw, offx, yw, offy);
                     }
                     else
                     {
-                        Vectors.Copy(ystride, xs[i].Weights, offx, yw, offy);
+                        Vectors.Copy(ystride, xw, offx, yw, offy);
                     }
                 }
             }
@@ -1139,7 +1136,8 @@ namespace Genix.DNN
 
             for (int i = 0, offx = 0; i < xdim; i++, offx += xstride0)
             {
-                float[] yw = useGradients ? ys[i].Gradient : ys[i].Weights;
+                Tensor y = ys[i];
+                float[] yw = useGradients ? y.Gradient : y.Weights;
 
                 for (int offxx = offx, offy = 0; offxx < xlen; offxx += xstride1, offy += xstride0)
                 {

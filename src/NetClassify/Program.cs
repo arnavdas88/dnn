@@ -96,10 +96,10 @@ namespace Genix.NetClassify
 
                         Tensor x = ImageExtensions.FromImage(
                             sample.Image,
-                            network.InputShape.GetAxis(Axis.X),
-                            network.InputShape.GetAxis(Axis.Y),
                             null,
-                            Shape.BWHC);
+                            Shape.BWHC,
+                            network.InputShape.GetAxis(Axis.X),
+                            network.InputShape.GetAxis(Axis.Y));
                         IList<IList<(string Answer, float Probability)>> answers = network.Execute(x).Answers;
                         ////(IList<(string Answer, float Probability)> answers, _) = network.ExecuteSequence(x, model);
 

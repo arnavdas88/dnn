@@ -248,7 +248,6 @@ namespace Genix.MachineLearning
                             this.ownGradient = true;
 #else
                             this.gradient = new float[this.Length];
-                            this.IsGradientInitialized = true;
 #endif
                         }
                     }
@@ -257,15 +256,6 @@ namespace Genix.MachineLearning
                 return this.gradient;
             }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the memory allocated for <see cref="Gradient"/> property has been initialized.
-        /// </summary>
-        /// <value>
-        /// <b>true</b> if the memory was initialized; otherwise, <b>false</b>.
-        /// </value>
-        [JsonIgnore]
-        public bool IsGradientInitialized { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether a gradient for this tensor should be calculated.
@@ -745,7 +735,6 @@ namespace Genix.MachineLearning
             if (this.gradient != null)
             {
                 Vectors.Set(this.Length, 0, this.gradient, 0);
-                this.IsGradientInitialized = true;
             }
         }
 
@@ -757,7 +746,6 @@ namespace Genix.MachineLearning
         public void SetGradient(float value)
         {
             Vectors.Set(this.Length, value, this.Gradient, 0);
-            this.IsGradientInitialized = true;
         }
 
         /// <summary>
@@ -778,7 +766,6 @@ namespace Genix.MachineLearning
             }
 
             Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
-            this.IsGradientInitialized = true;
         }
 
         /// <summary>
@@ -788,15 +775,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddGradient(float[] weights)
         {
-            if (this.IsGradientInitialized)
-            {
-                Vectors.Add(this.Length, weights, 0, this.Gradient, 0);
-            }
-            else
-            {
-                Vectors.Copy(this.Length, weights, 0, this.Gradient, 0);
-                this.IsGradientInitialized = true;
-            }
+            Vectors.Add(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>
@@ -806,15 +785,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SubGradient(float[] weights)
         {
-            if (this.IsGradientInitialized)
-            {
-                Vectors.Sub(this.Length, weights, 0, this.Gradient, 0);
-            }
-            else
-            {
-                Vectors.Neg(this.Length, weights, 0, this.Gradient, 0);
-                this.IsGradientInitialized = true;
-            }
+            Vectors.Sub(this.Length, weights, 0, this.Gradient, 0);
         }
 
         /// <summary>
@@ -828,15 +799,7 @@ namespace Genix.MachineLearning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ClipGradient(float minValue, float maxValue)
         {
-            if (this.IsGradientInitialized)
-            {
-                Vectors.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
-            }
-            else
-            {
-                Vectors.Set(this.Length, minValue, this.Gradient, 0);
-                this.IsGradientInitialized = true;
-            }
+            Vectors.Clip(this.Length, minValue, maxValue, this.Gradient, 0);
         }
 
         /// <summary>
@@ -894,11 +857,16 @@ namespace Genix.MachineLearning
         /// Attaches the gradient weights to this <see cref="Tensor"/>.
         /// </summary>
         /// <param name="gradient">The gradient to attach.</param>
+        /// <param name="setToZero">Determines whether the gradient memory should be set to zero.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AttachGradient(float[] gradient)
+        public void AttachGradient(float[] gradient, bool setToZero)
         {
             this.gradient = gradient;
-            this.IsGradientInitialized = false;
+
+            if (setToZero)
+            {
+                Vectors.Set(gradient.Length, 0, gradient, 0);
+            }
         }
 
         /// <summary>
