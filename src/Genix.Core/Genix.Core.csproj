@@ -60,37 +60,49 @@
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\DataSourceId.cs" />
     <Compile Include="Collections\BoundedObjectGrid.cs" />
-    <Compile Include="Drawing\HorizontalAlignment.cs" />
-    <Compile Include="Drawing\IAlignedBoundedObject.cs" />
-    <Compile Include="Drawing\IBoundedObject.cs" />
-    <Compile Include="Drawing\Line.Generated.cs">
+    <Compile Include="Geometry\Enums\HorizontalAlignment.cs" />
+    <Compile Include="Geometry\IAlignedBoundedObject.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IAlignedBoundedObject.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Geometry\IBoundedObject.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IBoundedObject.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Geometry\Line.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Line.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\Orientation.cs" />
-    <Compile Include="Drawing\Point.Generated.cs">
+    <Compile Include="Geometry\Enums\Orientation.cs" />
+    <Compile Include="Geometry\Point.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Point.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\PointPolar.cs" />
-    <Compile Include="Drawing\Rectangle.Generated.cs">
+    <Compile Include="Geometry\PointPolar.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PointPolar.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Geometry\Rectangle.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Rectangle.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\Size.Generated.cs">
+    <Compile Include="Geometry\Size.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Size.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\Vector1D.Generated.cs">
+    <Compile Include="Geometry\Vector1D.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Vector1D.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\VerticalAlignment.cs" />
+    <Compile Include="Geometry\Enums\VerticalAlignment.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
@@ -201,23 +213,35 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BitUtils.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\Line.tt">
+    <Content Include="Geometry\IAlignedBoundedObject.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IAlignedBoundedObject.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Geometry\IBoundedObject.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IBoundedObject.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Geometry\Line.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Line.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\Point.tt">
+    <Content Include="Geometry\Point.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Point.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\Rectangle.tt">
+    <Content Include="Geometry\PointPolar.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PointPolar.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Geometry\Rectangle.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Rectangle.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\Size.tt">
+    <Content Include="Geometry\Size.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Size.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\Vector1D.tt">
+    <Content Include="Geometry\Vector1D.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Vector1D.Generated.cs</LastGenOutput>
     </Content>

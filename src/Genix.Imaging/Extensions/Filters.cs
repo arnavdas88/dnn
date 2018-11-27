@@ -10,7 +10,7 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <content>
     /// Provides filtering methods for the <see cref="Image"/> class.

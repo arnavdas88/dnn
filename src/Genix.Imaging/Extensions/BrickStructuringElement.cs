@@ -8,7 +8,7 @@ namespace Genix.Imaging
 {
     using System;
     using System.Collections.Generic;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents a rectangular structuring element.

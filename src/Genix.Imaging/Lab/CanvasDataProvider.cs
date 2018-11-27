@@ -10,7 +10,7 @@ namespace Genix.Imaging.Lab
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Newtonsoft.Json;
 
     /// <summary>

@@ -13,7 +13,7 @@ namespace Genix.Imaging
     using System.Linq;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <content>
     /// Provides morphology extension methods for the <see cref="Image"/> class.

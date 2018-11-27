@@ -9,7 +9,7 @@ namespace Genix.DocumentAnalysis.Recognition
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Newtonsoft.Json;
 
     /// <summary>

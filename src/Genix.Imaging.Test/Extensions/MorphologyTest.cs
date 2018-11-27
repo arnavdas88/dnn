@@ -2,7 +2,7 @@
 {
     using System.Globalization;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

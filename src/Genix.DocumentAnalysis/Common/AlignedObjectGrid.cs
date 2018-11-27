@@ -9,7 +9,7 @@ namespace Genix.Core
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents a grid that holds a collection of <see cref="IAlignedBoundedObject"/> objects.

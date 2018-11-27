@@ -20,7 +20,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Genix.Drawing
+namespace Genix.Geometry
 {
     using System;
     using System.Collections.Generic;

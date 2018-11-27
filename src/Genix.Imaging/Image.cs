@@ -10,7 +10,7 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Encapsulates a bitmap, which consists of the pixel data for a graphics image and its attributes.

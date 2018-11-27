@@ -9,7 +9,7 @@ namespace Genix.Imaging.Lab
     using System;
     using System.Collections.Generic;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
 
     /// <summary>

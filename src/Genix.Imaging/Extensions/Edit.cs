@@ -10,7 +10,7 @@ namespace Genix.Imaging
     using System.Globalization;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <content>
     /// Provides editing extension methods for the <see cref="Image"/> class.

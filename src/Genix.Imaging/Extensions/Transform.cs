@@ -11,7 +11,7 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <content>
     /// Provides various transformation methods like rotation and mirroring for the <see cref="Image"/> class.
@@ -555,7 +555,7 @@ namespace Genix.Imaging
         /// <exception cref="ArgumentException">
         /// <para>The depth of this <see cref="Image"/> is not 8 bit per pixel.</para>
         /// </exception>
-        public PointPolar[] HoughLine(int maxLineCount, int threshold, float deltaRho, float deltaTheta)
+        public PointPolarF[] HoughLine(int maxLineCount, int threshold, float deltaRho, float deltaTheta)
         {
             if (this.BitsPerPixel != 8)
             {
@@ -589,7 +589,7 @@ namespace Genix.Imaging
             });
 
             // convert answer
-            PointPolar[] result = new PointPolar[lineCount];
+            PointPolarF[] result = new PointPolarF[lineCount];
             for (int i = 0, j = 0; i < lineCount; i++, j += 2)
             {
                 result[i].Rho = lines[j];

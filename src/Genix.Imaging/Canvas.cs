@@ -13,7 +13,7 @@ namespace Genix.Imaging
     using System.Runtime.Versioning;
     using System.Security;
     using System.Security.Permissions;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents an area that can be used for drawing.

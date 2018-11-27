@@ -71,7 +71,7 @@ namespace Genix.Imaging
     using System;
     using System.Runtime.CompilerServices;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     public partial class Image
     {

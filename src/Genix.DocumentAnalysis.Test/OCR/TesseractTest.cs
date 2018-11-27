@@ -6,7 +6,7 @@ namespace Genix.DocumentAnalysis.OCR.Test
     using Genix.DocumentAnalysis.OCR.Tesseract;
     using Genix.Imaging;
     using Genix.Imaging.Leptonica;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using System.Collections.Generic;
 
     [TestClass]

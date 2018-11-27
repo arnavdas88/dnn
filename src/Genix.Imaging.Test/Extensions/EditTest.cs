@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

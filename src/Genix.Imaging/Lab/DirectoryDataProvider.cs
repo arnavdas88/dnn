@@ -13,7 +13,7 @@ namespace Genix.Imaging.Lab
     using System.Linq;
     using System.Text;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
     using Genix.Lab;
 

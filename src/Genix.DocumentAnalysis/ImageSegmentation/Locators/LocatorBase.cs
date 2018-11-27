@@ -8,7 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System.Collections.Generic;
     using System.Threading;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
 
     /// <summary>

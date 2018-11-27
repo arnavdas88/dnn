@@ -11,7 +11,7 @@ namespace Genix.DocumentAnalysis.OCR.Tesseract
     using System.Globalization;
     using System.IO;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging.Leptonica;
 
     /// <summary>

@@ -8,7 +8,7 @@ namespace Genix.Core
 {
     using System;
     using System.Collections.Generic;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents a grid that holds a collection of <see cref="IBoundedObject"/> objects and provides a fast access to those objects.

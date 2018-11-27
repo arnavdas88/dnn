@@ -12,7 +12,7 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <content>
     /// Provides statistical methods for the <see cref="Image"/> class.

@@ -1,4 +1,4 @@
-﻿namespace Genix.Drawing.Test
+﻿namespace Genix.Geometry.Test
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

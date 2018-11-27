@@ -8,7 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System;
     using System.Globalization;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Newtonsoft.Json;
 
     /// <summary>

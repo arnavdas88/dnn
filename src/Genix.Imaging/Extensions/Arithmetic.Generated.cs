@@ -22,7 +22,7 @@ namespace Genix.Imaging
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     public partial class Image
     {

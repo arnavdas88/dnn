@@ -16,7 +16,7 @@ namespace Genix.DocumentAnalysis
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
 
     /// <summary>

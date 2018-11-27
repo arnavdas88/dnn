@@ -8,7 +8,7 @@ namespace Genix.Imaging.Leptonica
 {
     using System;
     using System.Runtime.InteropServices;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents the Leptonica's Box object.

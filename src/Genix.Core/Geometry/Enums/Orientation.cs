@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.Drawing
+namespace Genix.Geometry
 {
     /// <summary>
     /// Describes how a child element is oriented within a parent.

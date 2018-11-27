@@ -12,7 +12,7 @@ namespace Genix.DocumentAnalysis
     using System.Linq;
     using System.Threading;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
     using Genix.Imaging.Leptonica;
 

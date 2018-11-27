@@ -49,14 +49,14 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\LineTest.Generated.cs">
+    <Compile Include="Geometry\LineTest.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>LineTest.tt</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\PointTest.cs" />
-    <Compile Include="Drawing\RectangleTest.cs" />
-    <Compile Include="Drawing\RectangleTest.Generated.cs">
+    <Compile Include="Geometry\PointTest.cs" />
+    <Compile Include="Geometry\RectangleTest.cs" />
+    <Compile Include="Geometry\RectangleTest.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RectangleTest.tt</DependentUpon>
@@ -86,11 +86,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Drawing\LineTest.tt">
+    <Content Include="Geometry\LineTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LineTest.Generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Drawing\RectangleTest.tt">
+    <Content Include="Geometry\RectangleTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>RectangleTest.Generated.cs</LastGenOutput>
     </Content>

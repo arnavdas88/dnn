@@ -6,7 +6,7 @@
 
 namespace Genix.DocumentAnalysis
 {
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Genix.Imaging;
     using Newtonsoft.Json;
 

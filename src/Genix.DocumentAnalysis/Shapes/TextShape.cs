@@ -8,7 +8,7 @@ namespace Genix.DocumentAnalysis
 {
     using System.Globalization;
     using System.Runtime.CompilerServices;
-    using Genix.Drawing;
+    using Genix.Geometry;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -61,7 +61,7 @@ namespace Genix.DocumentAnalysis
         /// Gets or sets the text orientation.
         /// </summary>
         /// <value>
-        /// The <see cref="Drawing.Orientation"/> enumeration value.
+        /// The <see cref="Geometry.Orientation"/> enumeration value.
         /// </value>
         [JsonProperty("orientation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;

@@ -8,7 +8,7 @@ namespace Genix.Imaging
 {
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Represents a structuring element of the specified size and shape for morphological operations.

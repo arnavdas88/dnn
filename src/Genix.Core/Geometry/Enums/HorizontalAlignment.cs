@@ -1,15 +1,15 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="VerticalAlignment.cs" company="Noname, Inc.">
+// <copyright file="HorizontalAlignment.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Genix.Drawing
+namespace Genix.Geometry
 {
     /// <summary>
-    /// Describes how a child element is vertically positioned within a parent.
+    /// Describes how a child element is horizontally positioned within a parent.
     /// </summary>
-    public enum VerticalAlignment
+    public enum HorizontalAlignment
     {
         /// <summary>
         /// None or unknown alignment.
@@ -17,14 +17,14 @@ namespace Genix.Drawing
         None = 0,
 
         /// <summary>
-        /// The child element is aligned to the top of the parent.
+        /// The child element is aligned to the left of the parent.
         /// </summary>
-        Top = 1,
+        Left = 1,
 
         /// <summary>
-        /// The child element is aligned to the bottom of the parent.
+        /// The child element is aligned to the right of the parent.
         /// </summary>
-        Bottom = 2,
+        Right = 2,
 
         /// <summary>
         /// The child element is aligned to the center of the parent.

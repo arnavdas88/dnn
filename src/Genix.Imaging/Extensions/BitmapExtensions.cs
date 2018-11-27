@@ -17,7 +17,7 @@ namespace Genix.Imaging
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Provides extension methods for the <see cref="Image"/> class that let you work with Windows <see cref="System.Drawing.Bitmap"/> class.

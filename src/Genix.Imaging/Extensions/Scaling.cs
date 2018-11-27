@@ -13,7 +13,7 @@ namespace Genix.Imaging
     using System.Runtime.InteropServices;
     using System.Security;
     using Genix.Core;
-    using Genix.Drawing;
+    using Genix.Geometry;
 
     /// <summary>
     /// Provides scaling extension methods for the <see cref="Image"/> class.
