@@ -16,7 +16,7 @@ namespace Genix.Core
     {
         private readonly float minValue;
         private readonly float maxValue;
-        private readonly RandomGenerator random;
+        private readonly RandomGeneratorF random;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RandomRangeGenerator"/> class.
@@ -40,7 +40,7 @@ namespace Genix.Core
         {
             this.minValue = minValue;
             this.maxValue = maxValue;
-            this.random = new RandomGenerator(random);
+            this.random = new RandomGeneratorF(random);
         }
 
         /// <summary>

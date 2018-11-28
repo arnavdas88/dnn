@@ -9,7 +9,7 @@
     [TestClass]
     public class MathOperationsTest
     {
-        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
         [TestMethod]
         public void AddTest1()

@@ -191,7 +191,7 @@
             string[] classes = Enumerable.Range(0, AlphabetSize).Select(v => v.ToString(CultureInfo.InvariantCulture)).ToArray();
             ClassificationNetwork network = ClassificationNetwork.FromArchitecture("1x1x4~80-80-80-16LSTM", classes);
 
-            float[] vectors = new RandomGenerator().Generate(AlphabetSize * VectorSize);
+            float[] vectors = new RandomGeneratorF().Generate(AlphabetSize * VectorSize);
 
             (Tensor, int[]) createSample(int size)
             {

@@ -28,7 +28,7 @@ namespace Genix.DNN.Layers
         /// <summary>
         /// The random numbers generator.
         /// </summary>
-        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DropoutLayer"/> class.

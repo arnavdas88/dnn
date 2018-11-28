@@ -142,10 +142,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Statistic.tt</DependentUpon>
     </Compile>
+    <Compile Include="Math\Trigonometry.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Trigonometry.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\Vectors.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Random\RandomGenerator.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RandomGenerator.tt</DependentUpon>
     </Compile>
     <Compile Include="Random\UlongRandomGenerator.cs" />
     <Compile Include="System\NumericExtensions.Generated.cs">
@@ -180,7 +190,6 @@
     <Compile Include="Random\BinarySampleGenerator.cs" />
     <Compile Include="Random\GaussianGenerator.cs" />
     <Compile Include="Random\ProbabilityDistribution.cs" />
-    <Compile Include="Random\RandomGenerator.cs" />
     <Compile Include="Random\RandomNumberGenerator.cs" />
     <Compile Include="Random\RandomRangeGenerator.cs" />
     <Compile Include="System.Linq\EnumerableExtensions.cs" />
@@ -199,7 +208,6 @@
     <None Include="Genix.Core.snk" />
     <None Include="packages.config" />
     <None Include="T4\MethodDescriptor.ttinclude" />
-    <None Include="T4\ReuseableTemplate1.ttinclude" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -255,9 +263,17 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Statistic.Generated.cs</LastGenOutput>
     </Content>
+    <Content Include="Math\Trigonometry.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Trigonometry.Generated.cs</LastGenOutput>
+    </Content>
     <Content Include="Math\Vectors.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Vectors.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Random\RandomGenerator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RandomGenerator.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="System\NumericExtensions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

@@ -9,7 +9,7 @@
     [TestClass]
     public class NeuralOperationsTest
     {
-        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
 #if false
         [TestMethod]

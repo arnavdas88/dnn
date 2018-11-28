@@ -40,13 +40,17 @@ namespace Genix.Geometry.Test
         public void CenterXTest_<#=type#>()
         {
             Rectangle<#=suffix#> rect = new Rectangle<#=suffix#>(0, 2, 7, 9);
+<# if (type == "int") { #>
             Assert.AreEqual((<#=type#>)3, rect.CenterX);
+<# } else { #>
+            Assert.AreEqual((<#=type#>)3.5, rect.CenterX);
+<# } #>
 
             rect = new Rectangle<#=suffix#>(0, 2, 8, 10);
 <# if (type == "int") { #>
             Assert.AreEqual((<#=type#>)3, rect.CenterX);
 <# } else { #>
-            Assert.AreEqual((<#=type#>)3.5, rect.CenterX);
+            Assert.AreEqual((<#=type#>)4, rect.CenterX);
 <# } #>
         }
 
@@ -54,13 +58,17 @@ namespace Genix.Geometry.Test
         public void CenterYTest_<#=type#>()
         {
             Rectangle<#=suffix#> rect = new Rectangle<#=suffix#>(0, 2, 7, 9);
+<# if (type == "int") { #>
             Assert.AreEqual((<#=type#>)6, rect.CenterY);
+<# } else { #>
+            Assert.AreEqual((<#=type#>)6.5, rect.CenterY);
+<# } #>
 
             rect = new Rectangle<#=suffix#>(0, 2, 8, 10);
 <# if (type == "int") { #>
             Assert.AreEqual((<#=type#>)6, rect.CenterY);
 <# } else { #>
-            Assert.AreEqual((<#=type#>)6.5, rect.CenterY);
+            Assert.AreEqual((<#=type#>)7, rect.CenterY);
 <# } #>
         }
 
@@ -68,16 +76,21 @@ namespace Genix.Geometry.Test
         public void CenterTest_<#=type#>()
         {
             Rectangle<#=suffix#> rect = new Rectangle<#=suffix#>(0, 2, 7, 9);
-            Assert.AreEqual((<#=type#>)3, rect.CenterX);
-            Assert.AreEqual((<#=type#>)6, rect.CenterY);
-
-            rect = new Rectangle<#=suffix#>(0, 2, 8, 10);
 <# if (type == "int") { #>
             Assert.AreEqual((<#=type#>)3, rect.CenterX);
             Assert.AreEqual((<#=type#>)6, rect.CenterY);
 <# } else { #>
             Assert.AreEqual((<#=type#>)3.5, rect.CenterX);
             Assert.AreEqual((<#=type#>)6.5, rect.CenterY);
+<# } #>
+
+            rect = new Rectangle<#=suffix#>(0, 2, 8, 10);
+<# if (type == "int") { #>
+            Assert.AreEqual((<#=type#>)3, rect.CenterX);
+            Assert.AreEqual((<#=type#>)6, rect.CenterY);
+<# } else { #>
+            Assert.AreEqual((<#=type#>)4, rect.CenterX);
+            Assert.AreEqual((<#=type#>)7, rect.CenterY);
 <# } #>
         }
 <#  } #>

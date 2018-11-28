@@ -7,7 +7,7 @@
     [TestClass]
     public partial class VectorsTest
     {
-        private readonly RandomNumberGenerator<float> random = new RandomGenerator();
+        private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
         [TestMethod]
         public void AddTest()

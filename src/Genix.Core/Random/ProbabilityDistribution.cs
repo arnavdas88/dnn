@@ -38,7 +38,7 @@ namespace Genix.Core
                 throw new ArgumentNullException(nameof(weights));
             }
 
-            this.random = new RandomGenerator(random);
+            this.random = new RandomGeneratorF(random);
 
             this.pdf = weights.ToArray();
             float sum = Vectors.CumulativeSum(this.pdf.Length, this.pdf, 0);

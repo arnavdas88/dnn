@@ -63,6 +63,11 @@
     </Compile>
     <Compile Include="GenixAssert.cs" />
     <Compile Include="BitUtils\BitUtils64Test.cs" />
+    <Compile Include="Math\TrigonometryTest.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TrigonometryTest.tt</DependentUpon>
+    </Compile>
     <Compile Include="Math\VectorsTest.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -93,6 +98,10 @@
     <Content Include="Geometry\RectangleTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>RectangleTest.Generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Math\TrigonometryTest.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TrigonometryTest.Generated.cs</LastGenOutput>
     </Content>
     <Content Include="Math\VectorsTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

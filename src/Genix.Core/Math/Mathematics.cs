@@ -15,7 +15,7 @@ namespace Genix.Core
     /// <summary>
     /// Provides mathematical methods.
     /// </summary>
-    public static class Mathematics
+    public static partial class Mathematics
     {
         /// <summary>
         /// Adds a range of values from one array starting at the specified source index
@@ -108,7 +108,7 @@ namespace Genix.Core
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
+        private static partial class NativeMethods
         {
             private const string DllName = "Genix.Core.Native.dll";
 

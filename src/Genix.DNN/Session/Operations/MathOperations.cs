@@ -831,7 +831,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
-                    Vectors.Sin(x.Length, x.Weights, 0, y.Weights, 0);
+                    Trigonometry.Sin(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -840,7 +840,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                Trigonometry.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
@@ -872,7 +872,7 @@ namespace Genix.DNN
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     Tensor y = session.AllocateTensor(ActionName, x.Shape, calculateGradient);
-                    Vectors.Cos(x.Length, x.Weights, 0, y.Weights, 0);
+                    Trigonometry.Cos(x.Length, x.Weights, 0, y.Weights, 0);
 
 #if !NOLEARNING
                     if (calculateGradient)
@@ -881,7 +881,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-                                Vectors.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
+                                Trigonometry.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
                             });
                     }
 #endif
