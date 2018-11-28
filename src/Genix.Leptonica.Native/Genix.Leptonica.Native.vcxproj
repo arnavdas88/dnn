@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\leptonica\src\bootnumgen4.c" />
     <ClCompile Include="..\..\..\leptonica\vs2017\dllmain.cpp" />
     <ClCompile Include="..\..\..\leptonica\src\adaptmap.c" />
     <ClCompile Include="..\..\..\leptonica\src\affine.c" />

@@ -798,6 +798,14 @@ GENIXAPI(void, hypot_f32)(
 {
 	::vsHypot(n, a + offa, b + offb, y + offy);
 }
+GENIXAPI(void, hypot_f64)(
+	int n,
+	const double* a, int offa,
+	const double* b, int offb,
+	double* y, int offy)
+{
+	::vdHypot(n, a + offa, b + offb, y + offy);
+}
 
 // y = a ^ b
 GENIXAPI(void, powx_ip_f32)(int n, float b, float* y, int offy)
@@ -1047,6 +1055,14 @@ GENIXAPI(void, atan2_f32)(
 	float* y, int offy)
 {
 	::vsAtan2(n, a + offa, b + offb, y + offy);
+}
+GENIXAPI(void, atan2_f64)(
+	int n,
+	const double* a, int offa,
+	const double* b, int offb,
+	double* y, int offy)
+{
+	::vdAtan2(n, a + offa, b + offb, y + offy);
 }
 
 // L1 normalization

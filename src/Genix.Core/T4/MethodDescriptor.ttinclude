@@ -1,0 +1,304 @@
+﻿<#+ 
+
+    enum ArgumentType
+    {
+        Constant = 0,
+        Vector = 1,
+        VectorAggregate = 2,
+        TwoVectorsAggregate = 3,
+        ConstantAndVector = 4,
+        TwoVectors = 5,
+        ThreeVectors = 6,
+        FourVectors = 7,
+    }
+
+    class MethodDescriptor
+    {
+        public MethodDescriptor()
+        {
+            this.HasNotInPlace = true;
+            this.ConstantName = "a";
+            this.ConstantDescription = "The constant value.";
+        }
+
+        public string Name { get; set; }
+        public string NativeName { get; set; }
+        public ArgumentType Argument { get; set; }
+        public string Summary { get; set; }
+        public bool HasNotInPlace { get; set; }
+        public bool HasInPlace { get; set; }
+        public bool HasIncrement { get; set; }
+        public bool HasGradient { get; set; }
+        public string ConstantType { get; set; }
+        public string ConstantName { get; set; }
+        public string ConstantDescription { get; set; }
+        public string ReturnType { get; set; }
+        public string Returns { get; set; }
+        public string Op { get; set; }
+        public string OpInPlace { get; set; }
+        public string OpGradient { get; set; }
+        public string SupportedTypes { get; set; }
+
+        public static string Type2Suffix(string typeName)
+        {
+            switch (typeName)
+            {
+                case "sbyte": return "s8";
+                case "byte": return "u8";
+                case "short": return "s16";
+                case "ushort": return "u16";
+                case "int": return "s32";
+                case "uint": return "u32";
+                case "long": return "s64";
+                case "ulong": return "u64";
+                case "float": return "f32";
+                case "double": return "f64";
+                default: return string.Empty;
+            }
+        }
+
+        public string GetReturnType(string typeName)
+        {
+            switch (this.Name)
+            {
+                case "Sum":
+                case "CumulativeSum":
+                    if (typeName == "byte" || typeName == "ushort") return "uint";
+                    else if (typeName == "sbyte" || typeName == "short") return "int";
+                    break;
+            }
+
+            return this.ReturnType ?? typeName;
+        }
+
+        public string NativeSuffix(string typeName)
+        {
+            string suffix = MethodDescriptor.Type2Suffix(typeName);
+            string retType = this.GetReturnType(typeName);
+            if (retType != typeName)
+            {
+                suffix += MethodDescriptor.Type2Suffix(retType);
+            }
+            
+            return suffix;
+        }
+
+        public void RenderNativeMethod(string typeName)
+        {
+            switch (this.Argument) {
+                case ArgumentType.Constant:
+#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>* y, int offy);
+<#+             if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>* y, int offy, int incy);
+<#+             }
+                break;
+            case ArgumentType.Vector:
+                if (this.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In, Out] <#=typeName#>* y, int offy);
+<#+             } #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, [Out] <#=typeName#>* y, int offy);
+<#+             if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx, [Out] <#=typeName#>* y, int offy, int incy);
+<#+             }
+                if (this.HasGradient && (typeName == "float" || typeName == "double")) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_gradient_<#=this.NativeSuffix(typeName)#>(
+                int n,
+                [In] <#=typeName#>[] x,
+                [Out] <#=typeName#>[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                [In] <#=typeName#>[] y,
+                [In] <#=typeName#>[] dy,
+                int offdy);
+<#+             }
+                break;
+            case ArgumentType.VectorAggregate:
+                if (this.HasInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, int incx);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx);
+<#+                 }
+                }
+                if (this.HasNotInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, [In] <#=this.GetReturnType(typeName)#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, [In] <#=this.GetReturnType(typeName)#>* y, int offy);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [In] <#=this.GetReturnType(typeName)#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx, [In] <#=this.GetReturnType(typeName)#>* y, int offy, int incy);
+<#+                 }
+                }
+                break;
+            case ArgumentType.TwoVectorsAggregate:
+                if (this.HasInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, int inca, [In] <#=typeName#>* b, int offb, int incb);
+<#+                 }
+                }
+                if (this.HasNotInPlace) { #>
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=this.GetReturnType(typeName)#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb, [In] <#=this.GetReturnType(typeName)#>* y, int offy);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [In] <#=this.GetReturnType(typeName)#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe <#=this.GetReturnType(typeName)#> <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, int inca, [In] <#=typeName#>* b, int offb, int incb, [In] <#=this.GetReturnType(typeName)#>* y, int offy, int incy);
+<#+                 }
+                }
+                break;
+            case ArgumentType.ConstantAndVector:
+                if (this.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [In, Out] <#=typeName#>* y, int offy);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [In, Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [In, Out] <#=typeName#>* y, int offy, int incy);
+<#+                 }
+                } #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>* y, int offy);
+<#+             if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, int incx, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx, <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>, [Out] <#=typeName#>* y, int offy, int incy);
+<#+             }
+                if (this.HasGradient && (typeName == "float" || typeName == "double")) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_gradient_<#=this.NativeSuffix(typeName)#>(
+                int n,
+                [In] <#=typeName#>[] x,
+                [Out] <#=typeName#>[] dx,
+                int offx,
+                [MarshalAs(UnmanagedType.Bool)] bool cleardx,
+                <#=this.ConstantType ?? typeName#> <#=this.ConstantName#>,
+                [In] <#=typeName#>[] y,
+                [In] <#=typeName#>[] dy,
+                int offdy);
+<#+             }
+                break;
+            case ArgumentType.TwoVectors:
+                if (this.HasInPlace) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, [In, Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, [In, Out] <#=typeName#>* y, int offy);
+<#+                 if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] x, int offx, int incx, [In, Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_ip_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* x, int offx, int incx, [In, Out] <#=typeName#>* y, int offy, int incy);
+<#+                 }
+                } #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb, [Out] <#=typeName#>* y, int offy);
+<#+             if (this.HasIncrement) { #>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, int inca, [In] <#=typeName#>[] b, int offb, int incb, [Out] <#=typeName#>[] y, int offy, int incy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_inc_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, int inca, [In] <#=typeName#>* b, int offb, int incb, [Out] <#=typeName#>* y, int offy, int incy);
+<#+             }
+                break;
+            case ArgumentType.ThreeVectors:#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=typeName#>[] c, int offc, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb, [In] <#=typeName#>* c, int offc, [Out] <#=typeName#>* y, int offy);
+<#+             break;
+            case ArgumentType.FourVectors:#>
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>[] a, int offa, [In] <#=typeName#>[] b, int offb, [In] <#=typeName#>[] c, int offc, [In] <#=typeName#>[] d, int offd, [Out] <#=typeName#>[] y, int offy);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern unsafe void <#=this.NativeName#>_<#=this.NativeSuffix(typeName)#>(int n, [In] <#=typeName#>* a, int offa, [In] <#=typeName#>* b, int offb, [In] <#=typeName#>* c, int offc, [In] <#=typeName#>* d, int offd, [Out] <#=typeName#>* y, int offy);
+<#+             break;
+            }
+        }
+    }
+#>

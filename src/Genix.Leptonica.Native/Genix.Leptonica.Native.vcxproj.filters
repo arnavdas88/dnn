@@ -518,6 +518,9 @@
       <Filter>Leptonica</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\leptonica\vs2017\dllmain.cpp" />
+    <ClCompile Include="..\..\..\leptonica\src\bootnumgen4.c">
+      <Filter>Leptonica</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Leptonica">

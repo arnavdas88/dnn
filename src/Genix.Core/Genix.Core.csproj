@@ -198,6 +198,8 @@
   <ItemGroup>
     <None Include="Genix.Core.snk" />
     <None Include="packages.config" />
+    <None Include="T4\MethodDescriptor.ttinclude" />
+    <None Include="T4\ReuseableTemplate1.ttinclude" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -107,22 +107,6 @@ namespace Genix.Core
             return NativeMethods.slogSumExp2(a, b);
         }
 
-        /// <summary>
-        /// Computes the angle whose tangent is the quotient of two specified numbers element-wise.
-        /// </summary>
-        /// <param name="length">The number of elements to compute.</param>
-        /// <param name="a">The array that contains the y coordinate of points.</param>
-        /// <param name="offa">The index in the <paramref name="a"/> at which computation begins.</param>
-        /// <param name="b">The array that contains the x coordinate of points.</param>
-        /// <param name="offb">The index in the <paramref name="b"/> at which computation begins.</param>
-        /// <param name="y">The array that receives the computed data.</param>
-        /// <param name="offy">The starting position in <paramref name="y"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Atan2(int length, float[] a, int offa, float[] b, int offb, float[] y, int offy)
-        {
-            NativeMethods.atan2_f32(length, a, offa, b, offb, y, offy);
-        }
-
         [SuppressUnmanagedCodeSecurity]
         private static class NativeMethods
         {
@@ -142,9 +126,6 @@ namespace Genix.Core
 
             [DllImport(NativeMethods.DllName)]
             public static extern float slogSumExp2(float a, float b);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void atan2_f32(int n, [In] float[] a, int offa, [In] float[] b, int offb, [Out] float[] y, int offy);
         }
     }
 }
