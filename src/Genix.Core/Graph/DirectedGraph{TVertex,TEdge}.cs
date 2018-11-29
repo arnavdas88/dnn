@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BidirectionalGraph{TVertex,TEdge}.cs" company="Noname, Inc.">
+// <copyright file="DirectedGraph{TVertex,TEdge}.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -17,14 +17,14 @@ namespace Genix.Graph
     /// </summary>
     /// <typeparam name="TVertex">The type of the vertices.</typeparam>
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
-    public class BidirectionalGraph<TVertex, TEdge>
+    public class DirectedGraph<TVertex, TEdge>
         where TVertex : ICloneable
         where TEdge : Edge<TVertex>
     {
         /// <summary>
         /// The adjacency lists that hold in vertices and edges.
         /// </summary>
-        private readonly Dictionary<TVertex, BidirectionalVertex<TVertex, TEdge>> vertices;
+        private readonly Dictionary<TVertex, Vertex<TVertex, TEdge>> vertices;
 
         /// <summary>
         /// The number of edges that the new graph can initially store.
@@ -32,65 +32,65 @@ namespace Genix.Graph
         private readonly int edgeCapacity = -1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex, TEdge}"/> class
         /// that is empty, allows parallel edges, and has the default initial capacity for vertices and edges.
         /// </summary>
-        public BidirectionalGraph()
+        public DirectedGraph()
             : this(true, -1, -1)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex, TEdge}"/> class
         /// that is empty and has the default initial capacity for vertices and edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
-        public BidirectionalGraph(bool allowParallelEdges)
+        public DirectedGraph(bool allowParallelEdges)
             : this(allowParallelEdges, -1, -1)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex, TEdge}"/> class
         /// that is empty, has the specified initial capacity for vertices and the default initial capacity for edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
-        public BidirectionalGraph(bool allowParallelEdges, int vertexCapacity)
+        public DirectedGraph(bool allowParallelEdges, int vertexCapacity)
             : this(allowParallelEdges, vertexCapacity, -1)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex, TEdge}"/> class
         /// that is empty and has the specified initial capacity for vertices and edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
         /// <param name="edgeCapacity">The number of edges that the new graph can initially store.</param>
-        public BidirectionalGraph(bool allowParallelEdges, int vertexCapacity, int edgeCapacity)
+        public DirectedGraph(bool allowParallelEdges, int vertexCapacity, int edgeCapacity)
         {
             this.AllowParallelEdges = allowParallelEdges;
 
             if (vertexCapacity > -1)
             {
-                this.vertices = new Dictionary<TVertex, BidirectionalVertex<TVertex, TEdge>>(vertexCapacity);
+                this.vertices = new Dictionary<TVertex, Vertex<TVertex, TEdge>>(vertexCapacity);
             }
             else
             {
-                this.vertices = new Dictionary<TVertex, BidirectionalVertex<TVertex, TEdge>>();
+                this.vertices = new Dictionary<TVertex, Vertex<TVertex, TEdge>>();
             }
 
             this.edgeCapacity = edgeCapacity;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex, TEdge}"/> class
         /// using existing graph as a source.
         /// </summary>
-        /// <param name="other">The existing <see cref="BidirectionalGraph{TVertex, TEdge}"/> to create this graph from.</param>
+        /// <param name="other">The existing <see cref="DirectedGraph{TVertex, TEdge}"/> to create this graph from.</param>
         /// <param name="cloneVertices">The value indicating whether the graph vertices should be cloned.</param>
-        public BidirectionalGraph(BidirectionalGraph<TVertex, TEdge> other, bool cloneVertices)
+        public DirectedGraph(DirectedGraph<TVertex, TEdge> other, bool cloneVertices)
         {
             if (other == null)
             {
@@ -101,13 +101,13 @@ namespace Genix.Graph
             this.Size = other.Size;
 
             // clone vertices
-            this.vertices = new Dictionary<TVertex, BidirectionalVertex<TVertex, TEdge>>(other.vertices.Count);
+            this.vertices = new Dictionary<TVertex, Vertex<TVertex, TEdge>>(other.vertices.Count);
             Dictionary<TVertex, TVertex> clonedVertices = new Dictionary<TVertex, TVertex>(other.vertices.Count);
-            foreach (KeyValuePair<TVertex, BidirectionalVertex<TVertex, TEdge>> kvp in other.vertices)
+            foreach (KeyValuePair<TVertex, Vertex<TVertex, TEdge>> kvp in other.vertices)
             {
                 TVertex clonedVertex = cloneVertices ? (TVertex)kvp.Key.Clone() : kvp.Key;
                 clonedVertices.Add(kvp.Key, clonedVertex);
-                this.vertices.Add(clonedVertex, new BidirectionalVertex<TVertex, TEdge>(kvp.Value.InDegree, kvp.Value.OutDegree));
+                this.vertices.Add(clonedVertex, new Vertex<TVertex, TEdge>(kvp.Value.InDegree, kvp.Value.OutDegree));
             }
 
             // clone edges - preserve the order of edges in vertices
@@ -121,9 +121,9 @@ namespace Genix.Graph
             }
 
             // move edges from one graph into another
-            foreach (KeyValuePair<TVertex, BidirectionalVertex<TVertex, TEdge>> kvp in other.vertices)
+            foreach (KeyValuePair<TVertex, Vertex<TVertex, TEdge>> kvp in other.vertices)
             {
-                BidirectionalVertex<TVertex, TEdge> clonedVertex = this.vertices[clonedVertices[kvp.Key]];
+                Vertex<TVertex, TEdge> clonedVertex = this.vertices[clonedVertices[kvp.Key]];
 
                 foreach (TEdge edge in kvp.Value.InEdges)
                 {
@@ -323,8 +323,8 @@ namespace Genix.Graph
         /// <returns>
         /// A new object that is a copy of this instance.
         /// </returns>
-        public virtual BidirectionalGraph<TVertex, TEdge> Clone(bool cloneVertices) =>
-            new BidirectionalGraph<TVertex, TEdge>(this, cloneVertices);
+        public virtual DirectedGraph<TVertex, TEdge> Clone(bool cloneVertices) =>
+            new DirectedGraph<TVertex, TEdge>(this, cloneVertices);
 
         /// <summary>
         /// Determines whether the specified vertex is already part of the graph.
@@ -477,11 +477,11 @@ namespace Genix.Graph
 
             if (this.edgeCapacity > 0)
             {
-                this.vertices.Add(vertex, new BidirectionalVertex<TVertex, TEdge>(this.edgeCapacity, this.edgeCapacity));
+                this.vertices.Add(vertex, new Vertex<TVertex, TEdge>(this.edgeCapacity, this.edgeCapacity));
             }
             else
             {
-                this.vertices.Add(vertex, new BidirectionalVertex<TVertex, TEdge>());
+                this.vertices.Add(vertex, new Vertex<TVertex, TEdge>());
             }
 
             this.OnVertexAdded(vertex);
@@ -498,7 +498,7 @@ namespace Genix.Graph
         /// </returns>
         public bool RemoveVertex(TVertex vertex)
         {
-            if (!this.TryGetVertex(vertex, out BidirectionalVertex<TVertex, TEdge> edges))
+            if (!this.TryGetVertex(vertex, out Vertex<TVertex, TEdge> edges))
             {
                 return false;
             }
@@ -508,7 +508,7 @@ namespace Genix.Graph
             {
                 this.OnEdgeRemoved(edge);
 
-                if (this.vertices.TryGetValue(edge.Source, out BidirectionalVertex<TVertex, TEdge> s))
+                if (this.vertices.TryGetValue(edge.Source, out Vertex<TVertex, TEdge> s))
                 {
                     s.OutEdges.Remove(edge);
                 }
@@ -519,7 +519,7 @@ namespace Genix.Graph
             {
                 this.OnEdgeRemoved(edge);
 
-                if (this.vertices.TryGetValue(edge.Target, out BidirectionalVertex<TVertex, TEdge> t))
+                if (this.vertices.TryGetValue(edge.Target, out Vertex<TVertex, TEdge> t))
                 {
                     t.InEdges.Remove(edge);
                 }
@@ -599,8 +599,8 @@ namespace Genix.Graph
         /// </returns>
         public bool RemoveEdge(TEdge edge, bool removeIsolatedVertices)
         {
-            if (this.vertices.TryGetValue(edge.Source, out BidirectionalVertex<TVertex, TEdge> s) &&
-                this.vertices.TryGetValue(edge.Target, out BidirectionalVertex<TVertex, TEdge> t))
+            if (this.vertices.TryGetValue(edge.Source, out Vertex<TVertex, TEdge> s) &&
+                this.vertices.TryGetValue(edge.Target, out Vertex<TVertex, TEdge> t))
             {
                 this.OnEdgeRemoved(edge);
 
@@ -663,7 +663,7 @@ namespace Genix.Graph
         /// <returns>
         /// <b>true</b> if at least one edge was added to the graph;otherwise, <b>false</b>.
         /// </returns>
-        public bool AddGraph(BidirectionalGraph<TVertex, TEdge> graph)
+        public bool AddGraph(DirectedGraph<TVertex, TEdge> graph)
         {
             if (graph == null)
             {
@@ -673,14 +673,14 @@ namespace Genix.Graph
             return this.AddEdges(graph.Edges) > 0;
         }
 
-        internal bool TryGetVertex(TVertex vertex, out BidirectionalVertex<TVertex, TEdge> value)
+        internal bool TryGetVertex(TVertex vertex, out Vertex<TVertex, TEdge> value)
         {
             return this.vertices.TryGetValue(vertex, out value);
         }
 
         internal bool TryGetInEdges(TVertex vertex, out IList<TEdge> edges)
         {
-            if (this.vertices.TryGetValue(vertex, out BidirectionalVertex<TVertex, TEdge> v))
+            if (this.vertices.TryGetValue(vertex, out Vertex<TVertex, TEdge> v))
             {
                 edges = v.InEdges;
                 return true;
@@ -692,7 +692,7 @@ namespace Genix.Graph
 
         internal bool TryGetOutEdges(TVertex vertex, out IList<TEdge> edges)
         {
-            if (this.vertices.TryGetValue(vertex, out BidirectionalVertex<TVertex, TEdge> v))
+            if (this.vertices.TryGetValue(vertex, out Vertex<TVertex, TEdge> v))
             {
                 edges = v.OutEdges;
                 return true;

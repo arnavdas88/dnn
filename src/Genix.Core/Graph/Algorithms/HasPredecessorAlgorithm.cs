@@ -25,7 +25,7 @@ namespace Genix.Graph
         /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions of the element to search for.</param>
         /// <returns><b>true</b> if the <c>vertex</c> has a predecessor that matches the conditions defined by the specified predicate; otherwise, <b>false</b>.</returns>
         public static bool HasPredecessor<TVertex, TEdge>(
-            this BidirectionalGraph<TVertex, TEdge> graph,
+            this DirectedGraph<TVertex, TEdge> graph,
             TVertex vertex,
             Predicate<TVertex> match)
             where TVertex : ICloneable
@@ -35,7 +35,7 @@ namespace Genix.Graph
         }
 
         private static bool HasPredecessor<TVertex, TEdge>(
-            BidirectionalGraph<TVertex, TEdge> graph,
+            DirectedGraph<TVertex, TEdge> graph,
             TVertex vertex,
             Predicate<TVertex> match,
             HashSet<TVertex> cache)

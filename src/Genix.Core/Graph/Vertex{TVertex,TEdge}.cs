@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BidirectionalVertex{TVertex,TEdge}.cs" company="Noname, Inc.">
+// <copyright file="Vertex{TVertex,TEdge}.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -13,7 +13,7 @@ namespace Genix.Graph
     /// </summary>
     /// <typeparam name="TVertex">The type of the vertex.</typeparam>
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
-    public class BidirectionalVertex<TVertex, TEdge>
+    public class Vertex<TVertex, TEdge>
         where TEdge : Edge<TVertex>
     {
         /// <summary>
@@ -27,21 +27,21 @@ namespace Genix.Graph
         private readonly List<TEdge> outEdges;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalVertex{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="Vertex{TVertex, TEdge}"/> class
         /// that is empty and has the default initial capacity.
         /// </summary>
-        public BidirectionalVertex()
+        public Vertex()
             : this(-1, -1)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalVertex{TVertex, TEdge}"/> class
+        /// Initializes a new instance of the <see cref="Vertex{TVertex, TEdge}"/> class
         /// that is empty and has the specified initial capacity.
         /// </summary>
         /// <param name="inputCapacity">The number of in edges that the vertex can initially store.</param>
         /// <param name="outputCapacity">The number of out edges that the vertex can initially store.</param>
-        public BidirectionalVertex(int inputCapacity, int outputCapacity)
+        public Vertex(int inputCapacity, int outputCapacity)
         {
             this.inpEdges = inputCapacity > 0 ? new List<TEdge>(inputCapacity) : new List<TEdge>();
             this.outEdges = outputCapacity > 0 ? new List<TEdge>(outputCapacity) : new List<TEdge>();

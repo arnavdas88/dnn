@@ -156,7 +156,7 @@ namespace Genix.MachineLearning.LanguageModel
         }
 
         [JsonConverter(typeof(GraphJsonConverter))]
-        internal class ContextGraph : BidirectionalGraph<Context>
+        internal class ContextGraph : DirectedGraph<Context>
         {
             public ContextGraph(GraphContext parent)
             {
@@ -204,7 +204,7 @@ namespace Genix.MachineLearning.LanguageModel
             }
         }
 
-        private class GraphJsonConverter : BidirectionalGraphJsonConverter<ContextGraph, Context>
+        private class GraphJsonConverter : DirectedGraphJsonConverter<ContextGraph, Context>
         {
         }
     }

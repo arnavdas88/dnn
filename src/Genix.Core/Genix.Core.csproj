@@ -106,11 +106,11 @@
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
-    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
-    <Compile Include="Graph\BidirectionalGraphJsonConverter{TGraph,TVertex}.cs" />
-    <Compile Include="Graph\BidirectionalGraph{TVertex,TEdge}.cs" />
-    <Compile Include="Graph\BidirectionalGraph{TVertex}.cs" />
-    <Compile Include="Graph\BidirectionalVertex{TVertex,TEdge}.cs" />
+    <Compile Include="Graph\DirectedGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
+    <Compile Include="Graph\DirectedGraphJsonConverter{TGraph,TVertex}.cs" />
+    <Compile Include="Graph\DirectedGraph{TVertex,TEdge}.cs" />
+    <Compile Include="Graph\DirectedGraph{TVertex}.cs" />
+    <Compile Include="Graph\Vertex{TVertex,TEdge}.cs" />
     <Compile Include="Graph\Edge{TVertex}.cs" />
     <Compile Include="Lab\ClassificationReportMode.cs" />
     <Compile Include="Lab\ClassificationResult.cs" />

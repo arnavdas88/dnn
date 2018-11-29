@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BidirectionalGraph{TVertex}.cs" company="Noname, Inc.">
+// <copyright file="DirectedGraph{TVertex}.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -14,57 +14,57 @@ namespace Genix.Graph
     /// where out-edge and in-edges need to be enumerated.
     /// </summary>
     /// <typeparam name="TVertex">The type of the vertices.</typeparam>
-    public class BidirectionalGraph<TVertex> : BidirectionalGraph<TVertex, Edge<TVertex>>
+    public class DirectedGraph<TVertex> : DirectedGraph<TVertex, Edge<TVertex>>
         where TVertex : ICloneable
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex}"/> class
         /// that is empty, allows parallel edges, and has the default initial capacity for vertices and edges.
         /// </summary>
-        public BidirectionalGraph()
+        public DirectedGraph()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex}"/> class
         /// that is empty and has the default initial capacity for vertices and edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
-        public BidirectionalGraph(bool allowParallelEdges)
+        public DirectedGraph(bool allowParallelEdges)
             : base(allowParallelEdges)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex}"/> class
         /// that is empty, has the specified initial capacity for vertices and the default initial capacity for edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
-        public BidirectionalGraph(bool allowParallelEdges, int vertexCapacity)
+        public DirectedGraph(bool allowParallelEdges, int vertexCapacity)
             : base(allowParallelEdges, vertexCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex}"/> class
         /// that is empty and has the specified initial capacity for vertices and edges.
         /// </summary>
         /// <param name="allowParallelEdges"><b>true</b> to allow parallel edges; otherwise, <b>false</b>.</param>
         /// <param name="vertexCapacity">The number of vertices that the new graph can initially store.</param>
         /// <param name="edgeCapacity">The number of edges that the new graph can initially store.</param>
-        public BidirectionalGraph(bool allowParallelEdges, int vertexCapacity, int edgeCapacity)
+        public DirectedGraph(bool allowParallelEdges, int vertexCapacity, int edgeCapacity)
             : base(allowParallelEdges, vertexCapacity, edgeCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BidirectionalGraph{TVertex}"/> class
+        /// Initializes a new instance of the <see cref="DirectedGraph{TVertex}"/> class
         /// using existing graph as a source.
         /// </summary>
-        /// <param name="other">The existing <see cref="BidirectionalGraph{TVertex}"/> to create this graph from.</param>
+        /// <param name="other">The existing <see cref="DirectedGraph{TVertex}"/> to create this graph from.</param>
         /// <param name="cloneVertices">The value indicating whether the graph vertices should be cloned.</param>
-        public BidirectionalGraph(BidirectionalGraph<TVertex> other, bool cloneVertices)
+        public DirectedGraph(DirectedGraph<TVertex> other, bool cloneVertices)
             : base(other, cloneVertices)
         {
         }

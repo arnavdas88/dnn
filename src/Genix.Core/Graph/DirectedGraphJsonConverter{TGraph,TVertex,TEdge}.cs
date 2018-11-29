@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BidirectionalGraphJsonConverter{TGraph,TVertex,TEdge}.cs" company="Noname, Inc.">
+// <copyright file="DirectedGraphJsonConverter{TGraph,TVertex,TEdge}.cs" company="Noname, Inc.">
 // Copyright (c) 2018, Alexander Volgunin. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -15,13 +15,13 @@ namespace Genix.Graph
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a Json.NET converter for <see cref="BidirectionalGraphJsonConverter{TGraph, TVertex, TEdge}"/> class.
+    /// Represents a Json.NET converter for <see cref="DirectedGraphJsonConverter{TGraph, TVertex, TEdge}"/> class.
     /// </summary>
     /// <typeparam name="TGraph">The type of the graph.</typeparam>
     /// <typeparam name="TVertex">The type of the vertices.</typeparam>
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
-    public class BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge> : JsonConverter
-        where TGraph : BidirectionalGraph<TVertex, TEdge>
+    public class DirectedGraphJsonConverter<TGraph, TVertex, TEdge> : JsonConverter
+        where TGraph : DirectedGraph<TVertex, TEdge>
         where TVertex : ICloneable
         where TEdge : Edge<TVertex>
     {
@@ -41,7 +41,7 @@ namespace Genix.Graph
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            BidirectionalGraph<TVertex, TEdge> graph = (BidirectionalGraph<TVertex, TEdge>)value;
+            DirectedGraph<TVertex, TEdge> graph = (DirectedGraph<TVertex, TEdge>)value;
 
             int count = 0;
             Dictionary<TVertex, int> vertices = graph.Vertices.ToDictionary(v => v, v => count++);
@@ -56,10 +56,10 @@ namespace Genix.Graph
                 JObject jo = JObject.FromObject(edge, serializer);
                 jo.AddFirst(new JProperty(
                     "$type",
-                    BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge>.RemoveAssemblyDetails(edge.GetType().AssemblyQualifiedName)));
+                    DirectedGraphJsonConverter<TGraph, TVertex, TEdge>.RemoveAssemblyDetails(edge.GetType().AssemblyQualifiedName)));
                 jo.AddFirst(new JProperty(
                     "$path",
-                    string.Join(BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge>.EdgeSeparator, vertices[edge.Source], vertices[edge.Target])));
+                    string.Join(DirectedGraphJsonConverter<TGraph, TVertex, TEdge>.EdgeSeparator, vertices[edge.Source], vertices[edge.Target])));
                 jo.WriteTo(writer);
             }
 
@@ -73,7 +73,7 @@ namespace Genix.Graph
                 JObject jo = JObject.FromObject(vertex, serializer);
                 jo.AddFirst(new JProperty(
                     "$type",
-                    BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge>.RemoveAssemblyDetails(vertex.GetType().AssemblyQualifiedName)));
+                    DirectedGraphJsonConverter<TGraph, TVertex, TEdge>.RemoveAssemblyDetails(vertex.GetType().AssemblyQualifiedName)));
                 jo.WriteTo(writer);
             }
 
@@ -117,7 +117,7 @@ namespace Genix.Graph
                 foreach (JToken edgeToken in o["Edges"])
                 {
                     string path = edgeToken["$path"].ToString();
-                    string[] parts = path.Split(new string[] { BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge>.EdgeSeparator }, StringSplitOptions.None);
+                    string[] parts = path.Split(new string[] { DirectedGraphJsonConverter<TGraph, TVertex, TEdge>.EdgeSeparator }, StringSplitOptions.None);
                     int sourceIndex = int.Parse(parts[0], CultureInfo.InvariantCulture);
                     int targetIndex = int.Parse(parts[1], CultureInfo.InvariantCulture);
 

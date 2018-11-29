@@ -21,7 +21,7 @@ namespace Genix.DNN
     /// Represents a bi-directional graph that holds network layers.
     /// </summary>
     [JsonConverter(typeof(NetworkGraphJsonConverter))]
-    internal class NetworkGraph : BidirectionalGraph<Layer>
+    internal class NetworkGraph : DirectedGraph<Layer>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkGraph"/> class.
@@ -121,7 +121,7 @@ namespace Genix.DNN
         }
 
         /// <inheritdoc />
-        public override BidirectionalGraph<Layer, Edge<Layer>> Clone(bool cloneLayers)
+        public override DirectedGraph<Layer, Edge<Layer>> Clone(bool cloneLayers)
         {
             return new NetworkGraph(this, cloneLayers);
         }

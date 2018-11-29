@@ -276,7 +276,7 @@ namespace Genix.DNN
             }
         }
 
-        private class ComponentGraph : BidirectionalGraph<ComponentVertex>
+        private class ComponentGraph : DirectedGraph<ComponentVertex>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ComponentGraph"/> class.
@@ -453,7 +453,7 @@ namespace Genix.DNN
             /// <returns>
             /// A new object that is a copy of this instance.
             /// </returns>
-            public override BidirectionalGraph<ComponentVertex, Edge<ComponentVertex>> Clone(bool cloneVertices)
+            public override DirectedGraph<ComponentVertex, Edge<ComponentVertex>> Clone(bool cloneVertices)
             {
                 return new ComponentGraph(this, cloneVertices);
             }

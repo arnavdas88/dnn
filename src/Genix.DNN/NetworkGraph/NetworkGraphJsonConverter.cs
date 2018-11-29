@@ -9,7 +9,7 @@ namespace Genix.DNN
     using Genix.DNN.Layers;
     using Genix.Graph;
 
-    internal class NetworkGraphJsonConverter : BidirectionalGraphJsonConverter<NetworkGraph, Layer>
+    internal class NetworkGraphJsonConverter : DirectedGraphJsonConverter<NetworkGraph, Layer>
     {
     }
 }
