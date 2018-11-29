@@ -103,23 +103,23 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha) => Vectors.AddC(this.length, alpha, this.x, this.offset);
+        public void AddC(float alpha) => Mathematics.AddC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha) => Vectors.SubC(this.length, alpha, this.x, this.offset);
+        public void SubC(float alpha) => Mathematics.SubC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha) => Vectors.MulC(this.length, alpha, this.x, this.offset);
+        public void MulC(float alpha) => Mathematics.MulC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Vectors.DivC(this.length, alpha, this.x, this.offset);
+        public void DivC(float alpha) => Mathematics.DivC(this.length, alpha, this.x, this.offset);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddProductC(float alpha, float[] y, int offy) => Vectors.AddProductC(this.length, this.x, this.offset, alpha, y, offy);
+        public void AddProductC(float alpha, float[] y, int offy) => Mathematics.AddProductC(this.length, this.x, this.offset, alpha, y, offy);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

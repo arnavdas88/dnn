@@ -118,7 +118,7 @@ namespace Genix.Imaging
             NativeMethods.gradientVectorPrewitt_f32(width, height, bits, stride, mag, stride, ang, stride);
 
             // convert angles to bins
-            Vectors.DivC(ang.Length, (float)(Math.PI / numberOfBins), ang, 0);
+            Mathematics.DivC(ang.Length, (float)(Math.PI / numberOfBins), ang, 0);
             Vectors.Abs(ang.Length, ang, 0);
 
             // calculate histograms
@@ -164,7 +164,7 @@ namespace Genix.Imaging
             for (int i = 0, off = 0; i < blockCount; i++, off += blockSizeInBins)
             {
                 float norm = Vectors.L2Norm(blockSizeInBins, blocks, off);
-                Vectors.DivC(blockSizeInBins, norm + Eps, blocks, off);
+                Mathematics.DivC(blockSizeInBins, norm + Eps, blocks, off);
             }
 
             // apply threshold

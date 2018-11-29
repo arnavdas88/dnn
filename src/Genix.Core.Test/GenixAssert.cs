@@ -43,5 +43,13 @@
                 Assert.AreEqual(expected[expectedIndex + i], actual[actualIndex + i], 1e-6f);
             }
         }
+
+        public static void AreArraysEqual(int length, double[] expected, int expectedIndex, double[] actual, int actualIndex)
+        {
+            for (int i = 0, ii = length; i < ii; i++)
+            {
+                Assert.AreEqual(expected[expectedIndex + i], actual[actualIndex + i], 1e-6f);
+            }
+        }
     }
 }

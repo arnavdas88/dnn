@@ -161,19 +161,19 @@ namespace Genix.Core
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddC(float alpha) => Vectors.AddC(this.Idx.Length, alpha, this.X, 0);
+        public void AddC(float alpha) => Mathematics.AddC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SubC(float alpha) => Vectors.SubC(this.Idx.Length, alpha, this.X, 0);
+        public void SubC(float alpha) => Mathematics.SubC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MulC(float alpha) => Vectors.MulC(this.Idx.Length, alpha, this.X, 0);
+        public void MulC(float alpha) => Mathematics.MulC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DivC(float alpha) => Vectors.DivC(this.Idx.Length, alpha, this.X, 0);
+        public void DivC(float alpha) => Mathematics.DivC(this.Idx.Length, alpha, this.X, 0);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

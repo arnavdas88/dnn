@@ -530,7 +530,7 @@ namespace Genix.Imaging
                     // negative shift is down
                     int shiftY = (dblTanA * (centerX - (ix * 64) - 32)).Round();
 
-                    Vectors.Add(
+                    Mathematics.Add(
                         height - Math.Abs(shiftY),
                         histogram[ix],
                         shiftY < 0 ? 0 : shiftY,

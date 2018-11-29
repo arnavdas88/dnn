@@ -174,7 +174,7 @@ namespace Genix.DNN
                     PoolNxN();
                 }
 
-                Vectors.DivC(y.Length, ksize1 * ksize2, yw, 0);
+                Mathematics.DivC(y.Length, ksize1 * ksize2, yw, 0);
 
                 return y;
 
@@ -186,7 +186,7 @@ namespace Genix.DNN
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
                             }
                             else
                             {
@@ -197,7 +197,7 @@ namespace Genix.DNN
                             {
                                 if (ix2 + 1 < x2)
                                 {
-                                    Vectors.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
                                 }
                                 else
                                 {
@@ -216,7 +216,7 @@ namespace Genix.DNN
                         {
                             if (ix1 + 1 < x1)
                             {
-                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
                             }
                             else
                             {
@@ -239,11 +239,11 @@ namespace Genix.DNN
                             }
                             else
                             {
-                                Vectors.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
 
                                 for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
                                 {
-                                    Vectors.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                    Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
                                 }
                             }
 
@@ -256,11 +256,11 @@ namespace Genix.DNN
                                 }
                                 else
                                 {
-                                    Vectors.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
 
                                     for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
                                     {
-                                        Vectors.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
                                     }
                                 }
                             }
@@ -313,7 +313,7 @@ namespace Genix.DNN
                             {
                                 for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
                                 {
-                                    Vectors.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                    Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
                                 }
                             }
                         }
@@ -618,7 +618,7 @@ namespace Genix.DNN
                     else
 #endif
                     {
-                        Vectors.MulC(x.Length, xw, 0, probability, yw, 0);
+                        Mathematics.MulC(x.Length, xw, 0, probability, yw, 0);
                     }
 
                     return y;
@@ -697,18 +697,18 @@ namespace Genix.DNN
 
                                 // 1. calculate x(i) * sum(y(j) * dy(j) / scale(j))
                                 // use dx as a temporary buffer
-                                Vectors.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
-                                Vectors.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
+                                Mathematics.Mul(y.Length, y.Weights, 0, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Div(x.Length, scale.Weights, 0, x.Gradient, 0);
 
                                 NeuralOperations.LRNKernel(x.Shape.Axes, x.Shape.Strides, x.Gradient, work.Weights, kernelSize);
                                 work.Mul(x);
 
                                 // 2. calculate scale(i) ^ -beta * dy(i)
                                 Vectors.Pow(scale.Length, scale.Weights, 0, -beta, x.Gradient, 0);
-                                Vectors.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
+                                Mathematics.Mul(x.Length, y.Gradient, 0, x.Gradient, 0);
 
                                 // 3. calculate final sum
-                                Vectors.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);
+                                Mathematics.AddProductC(x.Length, work.Weights, 0, -2.0f * alpha * beta / kernelSize, x.Gradient, 0);
                             });
                     }
 #endif

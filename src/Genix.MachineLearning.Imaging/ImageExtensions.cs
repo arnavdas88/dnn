@@ -312,7 +312,7 @@ namespace Genix.MachineLearning.Imaging
                 }
 
                 // normalize tensor to 1
-                Vectors.DivC(strideB, maxcolor, dstw, posB);
+                Mathematics.DivC(strideB, maxcolor, dstw, posB);
             }
 
             void Convert24to32bpp()
@@ -339,8 +339,8 @@ namespace Genix.MachineLearning.Imaging
                 }
 
                 // normalize tensor to 1
-                Vectors.SubCRev(strideB, 255, dstw, posB);
-                Vectors.DivC(strideB, 255, dstw, posB);
+                Mathematics.SubCRev(strideB, 255, dstw, posB);
+                Mathematics.DivC(strideB, 255, dstw, posB);
             }
         }
     }

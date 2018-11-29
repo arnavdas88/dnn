@@ -92,10 +92,10 @@ namespace Genix.MachineLearning.Learning
                 ////float logLossB = MKL.LogSumExp(betas.Weights[0], betas.Weights[1]);
 
                 // compute unnormalized gradient
-                Vectors.Add(alphas.Length, betas, 0, alphas, 0);
+                Mathematics.Add(alphas.Length, betas, 0, alphas, 0);
                 NativeMethods.CTCReduceAlphasBetas(T, A, S, alphas, labels, y.Gradient);
-                Vectors.Sub(y.Length, ylog, 0, y.Gradient, 0);
-                Vectors.SubC(y.Length, logLossA, y.Gradient, 0);
+                Mathematics.Sub(y.Length, ylog, 0, y.Gradient, 0);
+                Mathematics.SubC(y.Length, logLossA, y.Gradient, 0);
                 Vectors.Exp(y.Length, y.Gradient, 0);
 
                 // remove NaN

@@ -163,8 +163,8 @@ namespace Genix.MachineLearning.Clustering
 
                         lock (sync)
                         {
-                            Vectors.Add(lcounts.Length, lcounts, 0, counts, 0);
-                            Vectors.Add(lmeans.Length, lmeans, 0, means, 0);
+                            Mathematics.Add(lcounts.Length, lcounts, 0, counts, 0);
+                            Mathematics.Add(lmeans.Length, lmeans, 0, means, 0);
                         }
                     },
                     new ParallelOptions());
@@ -174,7 +174,7 @@ namespace Genix.MachineLearning.Clustering
                 {
                     if (counts[i] != 0)
                     {
-                        Vectors.DivC(dimension, means, off, counts[i], clusters[i].Centroid, 0);
+                        Mathematics.DivC(dimension, means, off, counts[i], clusters[i].Centroid, 0);
                     }
                 }
             }
@@ -274,7 +274,7 @@ namespace Genix.MachineLearning.Clustering
                 float sum = Vectors.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
-                    Vectors.DivC(result.Length, sum, result, 0);
+                    Mathematics.DivC(result.Length, sum, result, 0);
                 }
             }
 
@@ -336,7 +336,7 @@ namespace Genix.MachineLearning.Clustering
                 float sum = Vectors.Sum(result.Length, result, 0);
                 if (sum != 0.0f)
                 {
-                    Vectors.DivC(result.Length, sum, result, 0);
+                    Mathematics.DivC(result.Length, sum, result, 0);
                 }
             }
 

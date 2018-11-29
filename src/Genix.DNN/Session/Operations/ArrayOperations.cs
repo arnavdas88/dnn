@@ -92,7 +92,7 @@ namespace Genix.DNN
                                 float alpha = 1.0f / count;
                                 for (int i = 0; i < count; i++)
                                 {
-                                    Vectors.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
+                                    Mathematics.AddProductC(x.Length, ys[i].Gradient, 0, alpha, x.Gradient, 0);
                                 }
                             });
 
@@ -272,7 +272,7 @@ namespace Genix.DNN
 
                                     if (axis == lastaxis)
                                     {
-                                        Vectors.Add(blocksize, dyw, offy, dxw, offx);
+                                        Mathematics.Add(blocksize, dyw, offy, dxw, offx);
                                         offy += blocksize;
                                     }
                                     else
@@ -988,7 +988,7 @@ namespace Genix.DNN
 
                     if (useGradients)
                     {
-                        Vectors.Add(xstride, xw, 0, yw, offy);
+                        Mathematics.Add(xstride, xw, 0, yw, offy);
                     }
                     else
                     {
@@ -1032,7 +1032,7 @@ namespace Genix.DNN
                     {
                         for (int offx = 0, offyy = offy; offyy < ylen; offx += xstride, offyy += ystride)
                         {
-                            Vectors.Add(xstride, xw, offx, yw, offyy);
+                            Mathematics.Add(xstride, xw, offx, yw, offyy);
                         }
                     }
                     else
@@ -1072,7 +1072,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        Vectors.Add(ystride, xw, offxx, yw, offy);
+                        Mathematics.Add(ystride, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1108,7 +1108,7 @@ namespace Genix.DNN
 
                     if (useGradients)
                     {
-                        Vectors.Add(ystride, xw, offx, yw, offy);
+                        Mathematics.Add(ystride, xw, offx, yw, offy);
                     }
                     else
                     {
@@ -1143,7 +1143,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        Vectors.Add(xstride0, xw, offxx, yw, offy);
+                        Mathematics.Add(xstride0, xw, offxx, yw, offy);
                     }
                     else
                     {
@@ -1176,7 +1176,7 @@ namespace Genix.DNN
                 {
                     if (useGradients)
                     {
-                        Vectors.Add(xstride, xw, offx, yw, offy);
+                        Mathematics.Add(xstride, xw, offx, yw, offy);
                     }
                     else
                     {
@@ -1209,7 +1209,7 @@ namespace Genix.DNN
                 {
                     if (useGradients || i > 0)
                     {
-                        Vectors.Add(ystride, xw, offx, yw, offy);
+                        Mathematics.Add(ystride, xw, offx, yw, offy);
                     }
                     else
                     {

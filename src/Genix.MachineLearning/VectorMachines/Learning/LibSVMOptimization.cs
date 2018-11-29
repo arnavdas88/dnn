@@ -163,7 +163,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                 {
                     q(i, indices, numberOfVariables, qi);
 
-                    Vectors.AddProductC(numberOfVariables, qi, 0, alpha[i], g, 0);
+                    Mathematics.AddProductC(numberOfVariables, qi, 0, alpha[i], g, 0);
                     /*float alpha_i = alpha[i];
                     for (int j = 0; j < numberOfVariables; j++)
                     {
@@ -172,7 +172,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
 
                     if (IsUpperBound(i))
                     {
-                        Vectors.AddProductC(numberOfVariables, qi, 0, c[i], gbar, 0);
+                        Mathematics.AddProductC(numberOfVariables, qi, 0, c[i], gbar, 0);
                         /*for (int j = 0; j < numberOfVariables; j++)
                         {
                             gbar[j] += c[i] * qi[j];
@@ -345,7 +345,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     if (ui != IsUpperBound(i))
                     {
                         q(i, indices, numberOfVariables, qi);
-                        Vectors.AddProductC(numberOfVariables, qi, 0, ui ? -ci : ci, gbar, 0);
+                        Mathematics.AddProductC(numberOfVariables, qi, 0, ui ? -ci : ci, gbar, 0);
                         /*if (ui)
                         {
                             for (int k = 0; k < numberOfVariables; k++)
@@ -365,7 +365,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     if (uj != IsUpperBound(j))
                     {
                         q(j, indices, numberOfVariables, qj);
-                        Vectors.AddProductC(numberOfVariables, qj, 0, uj ? -cj : cj, gbar, 0);
+                        Mathematics.AddProductC(numberOfVariables, qj, 0, uj ? -cj : cj, gbar, 0);
                         /*if (uj)
                         {
                             for (int k = 0; k < numberOfVariables; k++)
@@ -634,7 +634,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                     return;
                 }
 
-                Vectors.Add(
+                Mathematics.Add(
                     numberOfVariables - activeSize,
                     gbar,
                     activeSize,
@@ -684,7 +684,7 @@ namespace Genix.MachineLearning.VectorMachines.Learning
                         {
                             q(indices[i], indices, numberOfVariables, temp);
 
-                            Vectors.AddProductC(
+                            Mathematics.AddProductC(
                                 numberOfVariables - activeSize,
                                 temp,
                                 activeSize,
