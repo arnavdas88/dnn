@@ -1,8 +1,9 @@
 ﻿namespace Genix.DNN.Test
 {
     using Genix.Core;
+    using Genix.DNN.Layers;
+    using Genix.Graph;
     using Genix.MachineLearning;
-    using Layers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -16,10 +17,10 @@
             Layer layer1 = new FullyConnectedLayer(new Shape(new[] { 1, 2, 3, 1 }), 5, MatrixLayout.ColumnMajor, null);
             Layer layer2 = new FullyConnectedLayer(new Shape(new[] { 2, 3, 4, 1 }), 6, MatrixLayout.ColumnMajor, null);
 
-            NetworkEdge edge1 = new NetworkEdge(layer1, layer2);
-            NetworkEdge edge2 = new NetworkEdge(layer1, layer2);
+            Edge<Layer> edge1 = new Edge<Layer>(layer1, layer2);
+            Edge<Layer> edge2 = new Edge<Layer>(layer1, layer2);
 
-            graph.AddEdges(new NetworkEdge[] { edge1, edge2 });
+            graph.AddEdges(new Edge<Layer>[] { edge1, edge2 });
 
             string s1 = graph.SaveToString();
 

@@ -141,7 +141,7 @@ namespace Genix.DNN.Layers
             }
 
             return new Shape(
-                Shape.BWHC,
+                shape.Format,
                 shape.GetAxis(Axis.B),
                 kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
                 kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
@@ -149,7 +149,7 @@ namespace Genix.DNN.Layers
         }
 
         /// <summary>
-        /// Initializes the <see cref="FullyConnectedLayer"/>.
+        /// Initializes the <see cref="ConvolutionLayer"/>.
         /// </summary>
         /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>

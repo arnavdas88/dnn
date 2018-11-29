@@ -205,7 +205,7 @@ namespace Genix.DNN
                 if (graph.OutDegree(source) == 1)
                 {
                     // optimization - add activation layer after max pooling layer that follows stochastic
-                    NetworkEdge edge = graph.OutEdges(source)[0];
+                    Edge<Layer> edge = graph.OutEdges(source)[0];
                     if (edge.Target is MaxPoolingLayer)
                     {
                         source = edge.Target;
@@ -214,21 +214,21 @@ namespace Genix.DNN
 
                 if (graph.OutDegree(source) == 1)
                 {
-                    NetworkEdge edge = graph.OutEdges(source)[0];
+                    Edge<Layer> edge = graph.OutEdges(source)[0];
                     if (!(edge.Target is ActivationLayer) && !(edge.Target is LossLayer))
                     {
                         Layer activationLayer = new TanhLayer(edge.Source.OutputShape);
                         graph.AddVertex(activationLayer);
 
-                        NetworkEdge newEdge = new NetworkEdge(edge.Source, activationLayer);
+                        Edge<Layer> newEdge = new Edge<Layer>(edge.Source, activationLayer);
                         graph.OutEdges(source)[0] = newEdge;
                         graph.InEdges(activationLayer).Add(newEdge);
 
                         if (edge.Target != null)
                         {
-                            IList<NetworkEdge> inedges = graph.InEdges(edge.Target);
+                            IList<Edge<Layer>> inedges = graph.InEdges(edge.Target);
                             int index = inedges.IndexOf(edge);
-                            newEdge = new NetworkEdge(activationLayer, edge.Target);
+                            newEdge = new Edge<Layer>(activationLayer, edge.Target);
                             inedges[index] = newEdge;
                             graph.OutEdges(activationLayer).Add(newEdge);
                         }
@@ -258,7 +258,7 @@ namespace Genix.DNN
                 Layer target = layer;
                 if (graph.InDegree(target) == 1)
                 {
-                    NetworkEdge edge = graph.InEdges(target)[0];
+                    Edge<Layer> edge = graph.InEdges(target)[0];
                     if (edge.Target is MaxPoolingLayer)
                     {
                         target = edge.Source;
@@ -267,7 +267,7 @@ namespace Genix.DNN
 
                 if (graph.InDegree(target) == 1)
                 {
-                    NetworkEdge edge = graph.InEdges(target)[0];
+                    Edge<Layer> edge = graph.InEdges(target)[0];
                     if (edge.Source is StochasticLayer stochasticLayer)
                     {
                         stochasticLayer.B.Set(0.1f);

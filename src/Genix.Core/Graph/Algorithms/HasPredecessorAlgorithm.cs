@@ -28,8 +28,8 @@ namespace Genix.Graph
             this BidirectionalGraph<TVertex, TEdge> graph,
             TVertex vertex,
             Predicate<TVertex> match)
-            where TEdge : Edge<TVertex>
             where TVertex : ICloneable
+            where TEdge : Edge<TVertex>
         {
             return HasPredecessor(graph, vertex, match, new HashSet<TVertex>());
         }
@@ -39,11 +39,10 @@ namespace Genix.Graph
             TVertex vertex,
             Predicate<TVertex> match,
             HashSet<TVertex> cache)
-            where TEdge : Edge<TVertex>
             where TVertex : ICloneable
+            where TEdge : Edge<TVertex>
         {
-            IList<TEdge> edges;
-            if (!graph.TryGetInEdges(vertex, out edges))
+            if (!graph.TryGetInEdges(vertex, out IList<TEdge> edges))
             {
                 return false;
             }

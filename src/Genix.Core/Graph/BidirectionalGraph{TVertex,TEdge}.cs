@@ -18,8 +18,8 @@ namespace Genix.Graph
     /// <typeparam name="TVertex">The type of the vertices.</typeparam>
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
     public class BidirectionalGraph<TVertex, TEdge>
-        where TEdge : Edge<TVertex>
         where TVertex : ICloneable
+        where TEdge : Edge<TVertex>
     {
         /// <summary>
         /// The adjacency lists that hold in vertices and edges.
@@ -107,15 +107,16 @@ namespace Genix.Graph
             {
                 TVertex clonedVertex = cloneVertices ? (TVertex)kvp.Key.Clone() : kvp.Key;
                 clonedVertices.Add(kvp.Key, clonedVertex);
-
                 this.vertices.Add(clonedVertex, new BidirectionalVertex<TVertex, TEdge>(kvp.Value.InDegree, kvp.Value.OutDegree));
             }
 
-            // clone edges
+            // clone edges - preserve the order of edges in vertices
             Dictionary<TEdge, TEdge> clonedEdges = new Dictionary<TEdge, TEdge>();
             foreach (TEdge edge in other.Edges)
             {
-                TEdge clonedEdge = (TEdge)edge.Clone(clonedVertices);
+                TEdge clonedEdge = (TEdge)edge.Clone();
+                clonedEdge.Source = clonedVertices[edge.Source];
+                clonedEdge.Target = clonedVertices[edge.Target];
                 clonedEdges.Add(edge, clonedEdge);
             }
 
@@ -322,10 +323,8 @@ namespace Genix.Graph
         /// <returns>
         /// A new object that is a copy of this instance.
         /// </returns>
-        public virtual BidirectionalGraph<TVertex, TEdge> Clone(bool cloneVertices)
-        {
-            return new BidirectionalGraph<TVertex, TEdge>(this, cloneVertices);
-        }
+        public virtual BidirectionalGraph<TVertex, TEdge> Clone(bool cloneVertices) =>
+            new BidirectionalGraph<TVertex, TEdge>(this, cloneVertices);
 
         /// <summary>
         /// Determines whether the specified vertex is already part of the graph.
@@ -333,10 +332,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns><b>true</b> if the specified vertex is already part of the graph; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsVertex(TVertex vertex)
-        {
-            return this.vertices.ContainsKey(vertex);
-        }
+        public bool ContainsVertex(TVertex vertex) => this.vertices.ContainsKey(vertex);
 
         /// <summary>
         /// Determines whether the specified edge is already part of the graph.
@@ -369,10 +365,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns>The number of edges coming out of the specified vertex.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int OutDegree(TVertex vertex)
-        {
-            return this.vertices[vertex].OutDegree;
-        }
+        public int OutDegree(TVertex vertex) => this.vertices[vertex].OutDegree;
 
         /// <summary>
         /// Returns the number of edges coming into the specified vertex.
@@ -380,10 +373,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns>The number of edges coming into the specified vertex.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int InDegree(TVertex vertex)
-        {
-            return this.vertices[vertex].InDegree;
-        }
+        public int InDegree(TVertex vertex) => this.vertices[vertex].InDegree;
 
         /// <summary>
         /// Returns the total number of edges coming in and out of the specified vertex.
@@ -391,10 +381,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns>The total number of edges coming in and out of the specified vertex.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Degree(TVertex vertex)
-        {
-            return this.vertices[vertex].Degree;
-        }
+        public int Degree(TVertex vertex) => this.vertices[vertex].Degree;
 
         /// <summary>
         /// Returns the edges coming out of the specified vertex.
@@ -402,10 +389,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns>The collection edges coming out of the specified vertex.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IList<TEdge> OutEdges(TVertex vertex)
-        {
-            return this.vertices[vertex].OutEdges;
-        }
+        public IList<TEdge> OutEdges(TVertex vertex) => this.vertices[vertex].OutEdges;
 
         /// <summary>
         /// Returns the edges coming into the specified vertex.
@@ -413,10 +397,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns>The collection edges coming into the specified vertex.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IList<TEdge> InEdges(TVertex vertex)
-        {
-            return this.vertices[vertex].InEdges;
-        }
+        public IList<TEdge> InEdges(TVertex vertex) => this.vertices[vertex].InEdges;
 
         /// <summary>
         /// Determines whether there are edges coming out of the specified vertex.
@@ -424,10 +405,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns><b>true</b> when <see cref="OutDegree"/> is greater than zero; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasOutEdges(TVertex vertex)
-        {
-            return this.OutDegree(vertex) > 0;
-        }
+        public bool HasOutEdges(TVertex vertex) => this.OutDegree(vertex) > 0;
 
         /// <summary>
         /// Determines whether there are edges coming into the specified vertex.
@@ -435,10 +413,7 @@ namespace Genix.Graph
         /// <param name="vertex">The vertex to test.</param>
         /// <returns><b>true</b> when <see cref="InDegree"/> is greater than zero; otherwise, <b>false</b>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasInEdges(TVertex vertex)
-        {
-            return this.InDegree(vertex) > 0;
-        }
+        public bool HasInEdges(TVertex vertex) => this.InDegree(vertex) > 0;
 
         /// <summary>
         /// Removes all vertices and edges from the graph.

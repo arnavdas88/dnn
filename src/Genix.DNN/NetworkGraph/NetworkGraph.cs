@@ -21,7 +21,7 @@ namespace Genix.DNN
     /// Represents a bi-directional graph that holds network layers.
     /// </summary>
     [JsonConverter(typeof(NetworkGraphJsonConverter))]
-    internal class NetworkGraph : BidirectionalGraph<Layer, NetworkEdge>
+    internal class NetworkGraph : BidirectionalGraph<Layer>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkGraph"/> class.
@@ -120,29 +120,10 @@ namespace Genix.DNN
             return JsonConvert.SerializeObject(this);
         }
 
-        /// <summary>
-        /// Creates a new object that is a copy of the current instance.
-        /// </summary>
-        /// <param name="cloneLayers">The value indicating whether the layers should be cloned.</param>
-        /// <returns>
-        /// A new object that is a copy of this instance.
-        /// </returns>
-        public override BidirectionalGraph<Layer, NetworkEdge> Clone(bool cloneLayers)
+        /// <inheritdoc />
+        public override BidirectionalGraph<Layer, Edge<Layer>> Clone(bool cloneLayers)
         {
             return new NetworkGraph(this, cloneLayers);
-        }
-
-        /// <summary>
-        /// Adds an edge to the graph.
-        /// </summary>
-        /// <param name="source">The source layer.</param>
-        /// <param name="target">The target layer.</param>
-        /// <returns>
-        /// <b>true</b> if the edge was added to the graph; <b>false</b> if the edge is already part of the graph.
-        /// </returns>
-        public bool AddEdge(Layer source, Layer target)
-        {
-            return this.AddEdge(new NetworkEdge(source, target));
         }
 
         /// <summary>
@@ -158,7 +139,7 @@ namespace Genix.DNN
                 throw new ArgumentNullException(nameof(sources));
             }
 
-            return this.AddEdges(sources.Select(x => new NetworkEdge(x, target)));
+            return this.AddEdges(sources.Select(x => (x, target)));
         }
 
         /// <summary>
@@ -174,7 +155,7 @@ namespace Genix.DNN
                 throw new ArgumentNullException(nameof(targets));
             }
 
-            return this.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
+            return this.AddEdges(targets.Select(x => (source, x)));
         }
 
         /// <summary>
@@ -198,7 +179,7 @@ namespace Genix.DNN
             int count = 0;
             foreach (Layer source in sources)
             {
-                count += this.AddEdges(targets.Select(x => new NetworkEdge(source, x)));
+                count += this.AddEdges(targets.Select(x => (source, x)));
             }
 
             return count;
@@ -241,17 +222,17 @@ namespace Genix.DNN
                 session,
                 this.Sources.First(),
                 new[] { x },
-                new Dictionary<NetworkEdge, Tensor>(this.Size));
+                new Dictionary<Edge<Layer>, Tensor>(this.Size));
         }
 
-        private Tensor Forward(Session session, Layer target, IList<Tensor> xs, Dictionary<NetworkEdge, Tensor> tensorMap)
+        private Tensor Forward(Session session, Layer target, IList<Tensor> xs, Dictionary<Edge<Layer>, Tensor> tensorMap)
         {
             while (target != null)
             {
                 // collect input tensors
                 if (xs == null)
                 {
-                    IList<NetworkEdge> inputEdges = this.InEdges(target);
+                    IList<Edge<Layer>> inputEdges = this.InEdges(target);
                     int inputDegree = inputEdges.Count;
 
                     // all inputs have to be computed to continue
@@ -271,7 +252,7 @@ namespace Genix.DNN
                 IList<Tensor> ys = target.Forward(session, xs);
 
                 // process output tensors
-                IList<NetworkEdge> outEdges = this.OutEdges(target);
+                IList<Edge<Layer>> outEdges = this.OutEdges(target);
                 int outDegree = outEdges.Count;
                 Debug.Assert(ys.Count == outDegree || (ys.Count == 1 && outDegree == 0), "The number of output tensors must match out degree.");
                 Debug.Assert(ys.SelectMany(t => t.Weights).All(w => !float.IsNaN(w)), "Tensor contains invalid weight.");

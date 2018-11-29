@@ -22,8 +22,8 @@ namespace Genix.Graph
     /// <typeparam name="TEdge">The type of the edges.</typeparam>
     public class BidirectionalGraphJsonConverter<TGraph, TVertex, TEdge> : JsonConverter
         where TGraph : BidirectionalGraph<TVertex, TEdge>
-        where TEdge : Edge<TVertex>
         where TVertex : ICloneable
+        where TEdge : Edge<TVertex>
     {
         private const string EdgeSeparator = "->";
 

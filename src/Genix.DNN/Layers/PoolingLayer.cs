@@ -72,7 +72,7 @@ namespace Genix.DNN.Layers
             }
 
             return new Shape(
-                Shape.BWHC,
+                shape.Format,
                 shape.GetAxis(Axis.B),
                 kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
                 kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),

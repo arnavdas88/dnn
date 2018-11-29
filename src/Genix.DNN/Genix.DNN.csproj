@@ -74,7 +74,6 @@
     <Compile Include="Layers\ScaleLayer.cs" />
     <Compile Include="Layers\SplitLayer.cs" />
     <Compile Include="NetworkGraph\NetworkGraphBuilder.cs" />
-    <Compile Include="NetworkGraph\NetworkEdge.cs" />
     <Compile Include="NetworkGraph\NetworkGraph.cs" />
     <Compile Include="Layers\ActivationLayer.cs" />
     <Compile Include="Layers\MaxOutLayer.cs" />

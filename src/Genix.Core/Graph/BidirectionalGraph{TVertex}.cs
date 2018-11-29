@@ -7,6 +7,7 @@
 namespace Genix.Graph
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// A mutable directed graph data structure efficient for sparse graph representation
@@ -76,9 +77,30 @@ namespace Genix.Graph
         /// <returns>
         /// <b>true</b> if the edge was added to the graph; <b>false</b> if the edge is already part of the graph.
         /// </returns>
-        public bool AddEdge(TVertex source, TVertex target)
+        public bool AddEdge(TVertex source, TVertex target) => this.AddEdge(new Edge<TVertex>(source, target));
+
+        /// <summary>
+        /// Adds a collection of edges to the graph.
+        /// </summary>
+        /// <param name="edges">The edges to add.</param>
+        /// <returns>The number of edges that were added.</returns>
+        public int AddEdges(IEnumerable<(TVertex source, TVertex target)> edges)
         {
-            return this.AddEdge(new Edge<TVertex>(source, target));
+            if (edges == null)
+            {
+                throw new ArgumentNullException(nameof(edges));
+            }
+
+            int count = 0;
+            foreach ((TVertex source, TVertex target) in edges)
+            {
+                if (this.AddEdge(new Edge<TVertex>(source, target)))
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
     }
 }
