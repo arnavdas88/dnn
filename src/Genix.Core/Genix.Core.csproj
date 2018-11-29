@@ -105,6 +105,7 @@
     <Compile Include="Geometry\Enums\VerticalAlignment.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Graph\Algorithms\BreadthFirstSearchAlgorithm.cs" />
     <Compile Include="Graph\Algorithms\HasPredecessorAlgorithm.cs" />
     <Compile Include="Graph\DirectedGraphJsonConverter{TGraph,TVertex,TEdge}.cs" />
     <Compile Include="Graph\DirectedGraphJsonConverter{TGraph,TVertex}.cs" />

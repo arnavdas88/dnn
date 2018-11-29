@@ -218,85 +218,61 @@ namespace Genix.DNN
 
         public Tensor Forward(Session session, Tensor x)
         {
-            return this.Forward(
-                session,
+            Dictionary<Edge<Layer>, Tensor> tensorMap = new Dictionary<Edge<Layer>, Tensor>(this.Size);
+            Tensor y = null;
+
+            this.BreadthFirstSearch(
                 this.Sources.First(),
-                new[] { x },
-                new Dictionary<Edge<Layer>, Tensor>(this.Size));
-        }
-
-        private Tensor Forward(Session session, Layer target, IList<Tensor> xs, Dictionary<Edge<Layer>, Tensor> tensorMap)
-        {
-            while (target != null)
-            {
-                // collect input tensors
-                if (xs == null)
+                layer =>
                 {
-                    IList<Edge<Layer>> inputEdges = this.InEdges(target);
-                    int inputDegree = inputEdges.Count;
+                    // build input tensors
+                    IList<Edge<Layer>> inEdges = this.InEdges(layer);
+                    int inDegree = inEdges.Count;
 
-                    // all inputs have to be computed to continue
-                    xs = new Tensor[inputDegree];
-                    for (int i = 0; i < inputDegree; i++)
+                    Tensor[] xs;
+                    if (inDegree == 0)
                     {
-                        if (!tensorMap.TryGetValue(inputEdges[i], out Tensor x))
-                        {
-                            return null;
-                        }
-
-                        xs[i] = x;
+                        xs = new Tensor[] { x };
                     }
-                }
+                    else
+                    {
+                        xs = new Tensor[inDegree];
+                        for (int i = 0; i < inDegree; i++)
+                        {
+                            if (!tensorMap.TryGetValue(inEdges[i], out xs[i]))
+                            {
+                                Debug.Assert(false, "All input tensors must be present.");
+                            }
+                        }
+                    }
 
-                // execute layer on created inputs
-                IList<Tensor> ys = target.Forward(session, xs);
+                    // execute layer
+                    IList<Tensor> ys = layer.Forward(session, xs);
 
-                // process output tensors
-                IList<Edge<Layer>> outEdges = this.OutEdges(target);
-                int outDegree = outEdges.Count;
-                Debug.Assert(ys.Count == outDegree || (ys.Count == 1 && outDegree == 0), "The number of output tensors must match out degree.");
-                Debug.Assert(ys.SelectMany(t => t.Weights).All(w => !float.IsNaN(w)), "Tensor contains invalid weight.");
-
-                if (outDegree == 0)
-                {
-                    // return result
-                    return ys[0];
-                }
-                else if (outDegree == 1)
-                {
-                    // save output tensor
-                    tensorMap[outEdges[0]] = ys[0];
-
-                    // advance further down the tree
-                    target = outEdges[0].Target;
-                    xs = null;
-                }
-                else if (outDegree > 1)
-                {
                     // save output tensors
-                    for (int i = 0; i < outDegree; i++)
-                    {
-                        tensorMap[outEdges[i]] = ys[i];
-                    }
+                    IList<Edge<Layer>> outEdges = this.OutEdges(layer);
+                    int outDegree = outEdges.Count;
+                    Debug.Assert(ys.Count == outDegree || (ys.Count == 1 && outDegree == 0), "The number of output tensors must match out degree.");
+                    Debug.Assert(ys.SelectMany(t => t.Weights).All(w => !float.IsNaN(w)), "Tensor contains invalid weight.");
 
-                    // multiple out edges - traverse each one separately
-                    for (int i = 0; i < outDegree; i++)
+                    if (outDegree == 0)
                     {
-                        Tensor y = this.Forward(session, outEdges[i].Target, null, tensorMap);
-                        if (y != null)
+                        // return result
+                        y = ys[0];
+                    }
+                    else
+                    {
+                        for (int i = 0; i < outDegree; i++)
                         {
-                            // we have reached the end
-                            return y;
+                            tensorMap[outEdges[i]] = ys[i];
                         }
                     }
+                },
+                null,
+                null);
 
-                    // we are inside bigger loop
-                    return null;
-                }
-            }
-
-            Debug.Assert(false, "Something is wrong.");
-            return null;
+            Debug.Assert(y != null, "Something is wrong.");
+            return y;
         }
     }
 }

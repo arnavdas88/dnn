@@ -35,7 +35,7 @@ namespace Genix.Graph
         }
 
         private static bool HasPredecessor<TVertex, TEdge>(
-            DirectedGraph<TVertex, TEdge> graph,
+            this DirectedGraph<TVertex, TEdge> graph,
             TVertex vertex,
             Predicate<TVertex> match,
             HashSet<TVertex> cache)
