@@ -64,19 +64,6 @@ namespace Genix.DNN.Layers
         /// The shape of the layer's output tensor.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Shape CalculateOutputShape(Shape shape, Kernel kernel)
-        {
-            if (shape == null)
-            {
-                throw new ArgumentNullException(nameof(shape));
-            }
-
-            return new Shape(
-                shape.Format,
-                shape.GetAxis(Axis.B),
-                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
-                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
-                shape.GetAxis(Axis.C));
-        }
+        private static Shape CalculateOutputShape(Shape shape, Kernel kernel) => kernel.CalculateOutputShape(shape);
     }
 }

@@ -8,7 +8,7 @@
 
 namespace Genix.DNN
 {
-    using System.Diagnostics.CodeAnalysis;
+    using System;
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using System.Security;
@@ -103,9 +103,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Unroll cycles to improve performance.")]
-        [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "Unroll cycles to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor AveragePooling(this Session session, Tensor x, Kernel kernel)
         {
@@ -117,210 +114,239 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = Pool(calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, kernel.CalculateOutputShape(x.Shape), calculateGradient);
 
-#if !NOLEARNING
-                    if (calculateGradient)
+                    int ksize1, ksize2, kstride1, kstride2;
+                    int x0, x1, x2, xstride0, xstride1, xstride2;
+                    int y1, y2, ystride0, ystride1, ystride2;
+
+                    switch (x.Shape.Format)
                     {
-                        session.Push(ActionName, () => Gradient(y));
+                        case Shape.BWHC:
+                            ksize1 = kernel.Width;
+                            ksize2 = kernel.Height;
+                            kstride1 = kernel.StrideX;
+                            kstride2 = kernel.StrideY;
+
+                            x0 = x.Axes[0];
+                            x1 = x.Axes[1];
+                            x2 = x.Axes[2];
+
+                            xstride0 = x.Strides[0];
+                            xstride1 = x.Strides[1];
+                            xstride2 = x.Strides[2];
+
+                            y1 = y.Axes[1];
+                            y2 = y.Axes[2];
+
+                            ystride0 = y.Strides[0];
+                            ystride1 = y.Strides[1];
+                            ystride2 = y.Strides[2];
+                            break;
+
+                        case Shape.BHWC:
+                            ksize1 = kernel.Height;
+                            ksize2 = kernel.Width;
+                            kstride1 = kernel.StrideY;
+                            kstride2 = kernel.StrideX;
+
+                            x0 = x.Axes[0];
+                            x1 = x.Axes[1];
+                            x2 = x.Axes[2];
+
+                            xstride0 = x.Strides[0];
+                            xstride1 = x.Strides[1];
+                            xstride2 = x.Strides[2];
+
+                            y1 = y.Axes[1];
+                            y2 = y.Axes[2];
+
+                            ystride0 = y.Strides[0];
+                            ystride1 = y.Strides[1];
+                            ystride2 = y.Strides[2];
+                            break;
+
+                        case Shape.BCHW:
+                            ksize1 = kernel.Height;
+                            ksize2 = kernel.Width;
+                            kstride1 = kernel.StrideY;
+                            kstride2 = kernel.StrideX;
+
+                            x0 = x.Axes[0] * x.Axes[1];
+                            x1 = x.Axes[2];
+                            x2 = x.Axes[3];
+
+                            xstride0 = x.Strides[1];
+                            xstride1 = x.Strides[2];
+                            xstride2 = x.Strides[3];
+
+                            y1 = y.Axes[2];
+                            y2 = y.Axes[3];
+
+                            ystride0 = y.Strides[1];
+                            ystride1 = y.Strides[2];
+                            ystride2 = y.Strides[3];
+                            break;
+
+                        default:
+                            throw new NotSupportedException("The tensor shape is not supported by this operation.");
                     }
-#endif
 
-                    return y;
-                });
+                    Pool();
 
-            Tensor Pool(bool calculateGradient)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-                int x3 = x.Axes[3];
-
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-
-                int xstride1K = xstride1 * kstride1;
-                int xstride2K = xstride2 * kstride2;
-
-                int y1 = kernel.CalculateOutputWidth(x1);
-                int y2 = kernel.CalculateOutputHeight(x2);
-
-                Tensor y = session.AllocateTensor("avg pool", new Shape(Shape.BWHC, x0, y1, y2, x3), calculateGradient);
-
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-                int ystride2 = y.Strides[2];
-
-                float[] wspw = new float[xstride1];
-                float[] xw = x.Weights;
-                float[] yw = y.Weights;
-
-                if (ksize1 == 2 && ksize2 == 2)
-                {
-                    Pool2x2();
-                }
-                else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
-                {
-                    Pool2x1();
-                }
-                else
-                {
-                    PoolNxN();
-                }
-
-                Mathematics.DivC(y.Length, ksize1 * ksize2, yw, 0);
-
-                return y;
-
-                void Pool2x2()
-                {
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                    void Pool()
                     {
-                        for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                        {
-                            if (ix1 + 1 < x1)
-                            {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
-                            }
-                            else
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                            }
+                        int xstride1K = xstride1 * kstride1;
+                        int xstride2K = xstride2 * kstride2;
 
-                            for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
-                            {
-                                if (ix2 + 1 < x2)
-                                {
-                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-                                }
-                                else
-                                {
-                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                }
-                            }
+                        float[] wspw = new float[xstride1];
+                        float[] xw = x.Weights;
+                        float[] yw = y.Weights;
+
+                        if (ksize1 == 2 && ksize2 == 2)
+                        {
+                            Pool2x2();
                         }
-                    }
-                }
-
-                void Pool2x1()
-                {
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                    {
-                        for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                        else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
                         {
-                            if (ix1 + 1 < x1)
-                            {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
-                            }
-                            else
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
-                            }
+                            Pool2x1();
                         }
-                    }
-                }
-
-                void PoolNxN()
-                {
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                    {
-                        for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                        else
                         {
-                            int ix1e = MinMax.Min(ix1 + ksize1, x1);
-                            if (ix1e - ix1 == 1)
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                            }
-                            else
-                            {
-                                Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                            PoolNxN();
+                        }
 
-                                for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
-                                {
-                                    Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
-                                }
-                            }
+                        Mathematics.DivC(y.Length, ksize1 * ksize2, yw, 0);
 
-                            for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                        void Pool2x2()
+                        {
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                             {
-                                int ix2e = MinMax.Min(ix2 + ksize2, x2);
-                                if (ix2e - ix2 == 1)
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                 {
-                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                }
-                                else
-                                {
-                                    Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-
-                                    for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
+                                    if (ix1 + 1 < x1)
                                     {
-                                        Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                    }
+                                    else
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
+                                    }
+
+                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                                    {
+                                        if (ix2 + 1 < x2)
+                                        {
+                                            Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                        }
+                                        else
+                                        {
+                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        void Pool2x1()
+                        {
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                            {
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                {
+                                    if (ix1 + 1 < x1)
+                                    {
+                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                    }
+                                    else
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                    }
+                                }
+                            }
+                        }
+
+                        void PoolNxN()
+                        {
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                            {
+                                for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                {
+                                    int ix1e = MinMax.Min(ix1 + ksize1, x1);
+                                    if (ix1e - ix1 == 1)
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
+                                    }
+                                    else
+                                    {
+                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+
+                                        for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
+                                        {
+                                            Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
+                                        }
+                                    }
+
+                                    for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                                    {
+                                        int ix2e = MinMax.Min(ix2 + ksize2, x2);
+                                        if (ix2e - ix2 == 1)
+                                        {
+                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                        }
+                                        else
+                                        {
+                                            Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+
+                                            for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
+                                            {
+                                                Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            }
 
 #if !NOLEARNING
-            void Gradient(Tensor y)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-
-                int xstride1K = xstride1 * kstride1;
-                int xstride2K = xstride2 * kstride2;
-
-                int y1 = y.Axes[1];
-                int y2 = y.Axes[2];
-
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-                int ystride2 = y.Strides[2];
-
-                float[] dxw = x.Gradient;
-                float[] dyw = y.Gradient;
-                float alpha = 1.0f / (ksize1 * ksize2);
-
-                // cycle by the output
-                for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
-                {
-                    for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                    if (calculateGradient)
                     {
-                        for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                        session.Push(ActionName, () =>
                         {
-                            // cycle by the kernel
-                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
-                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
-                            for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                            int xstride1K = xstride1 * kstride1;
+                            int xstride2K = xstride2 * kstride2;
+
+                            float[] dxw = x.Gradient;
+                            float[] dyw = y.Gradient;
+                            float alpha = 1.0f / (ksize1 * ksize2);
+
+                            // cycle by the output
+                            for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
                             {
-                                for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                 {
-                                    Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                                    {
+                                        // cycle by the kernel
+                                        int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                                        int ike2 = MinMax.Min(ix2 + ksize2, x2);
+                                        for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                                        {
+                                            for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                            {
+                                                Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        });
                     }
-                }
-            }
 #endif
+
+                    return y;
+                });
         }
 
         /// <summary>
@@ -332,9 +358,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Unroll cycles to improve performance.")]
-        [SuppressMessage("Microsoft.Performance", "CA1809:AvoidExcessiveLocals", Justification = "Unroll cycles to improve performance.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor MaxPooling(this Session session, Tensor x, Kernel kernel)
         {
@@ -346,212 +369,242 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = Pool(calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, kernel.CalculateOutputShape(x.Shape), calculateGradient);
 
-#if !NOLEARNING
-                    if (calculateGradient)
+                    int ksize1, ksize2, kstride1, kstride2;
+                    int x0, x1, x2, xstride0, xstride1, xstride2;
+                    int y1, y2, ystride0, ystride1, ystride2;
+
+                    switch (x.Shape.Format)
                     {
-                        session.Push(ActionName, () => Gradient(y));
+                        case Shape.BWHC:
+                            ksize1 = kernel.Width;
+                            ksize2 = kernel.Height;
+                            kstride1 = kernel.StrideX;
+                            kstride2 = kernel.StrideY;
+
+                            x0 = x.Axes[0];
+                            x1 = x.Axes[1];
+                            x2 = x.Axes[2];
+
+                            xstride0 = x.Strides[0];
+                            xstride1 = x.Strides[1];
+                            xstride2 = x.Strides[2];
+
+                            y1 = y.Axes[1];
+                            y2 = y.Axes[2];
+
+                            ystride0 = y.Strides[0];
+                            ystride1 = y.Strides[1];
+                            ystride2 = y.Strides[2];
+                            break;
+
+                        case Shape.BHWC:
+                            ksize1 = kernel.Height;
+                            ksize2 = kernel.Width;
+                            kstride1 = kernel.StrideY;
+                            kstride2 = kernel.StrideX;
+
+                            x0 = x.Axes[0];
+                            x1 = x.Axes[1];
+                            x2 = x.Axes[2];
+
+                            xstride0 = x.Strides[0];
+                            xstride1 = x.Strides[1];
+                            xstride2 = x.Strides[2];
+
+                            y1 = y.Axes[1];
+                            y2 = y.Axes[2];
+
+                            ystride0 = y.Strides[0];
+                            ystride1 = y.Strides[1];
+                            ystride2 = y.Strides[2];
+                            break;
+
+                        case Shape.BCHW:
+                            ksize1 = kernel.Height;
+                            ksize2 = kernel.Width;
+                            kstride1 = kernel.StrideY;
+                            kstride2 = kernel.StrideX;
+
+                            x0 = x.Axes[0] * x.Axes[1];
+                            x1 = x.Axes[2];
+                            x2 = x.Axes[3];
+
+                            xstride0 = x.Strides[1];
+                            xstride1 = x.Strides[2];
+                            xstride2 = x.Strides[3];
+
+                            y1 = y.Axes[2];
+                            y2 = y.Axes[3];
+
+                            ystride0 = y.Strides[1];
+                            ystride1 = y.Strides[2];
+                            ystride2 = y.Strides[3];
+                            break;
+
+                        default:
+                            throw new NotSupportedException("The tensor shape is not supported by this operation.");
                     }
-#endif
 
-                    return y;
-                });
+                    Pool();
 
-            Tensor Pool(bool calculateGradient)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-                int x3 = x.Axes[3];
-
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-
-                int xstride1K = xstride1 * kstride1;
-                int xstride2K = xstride2 * kstride2;
-
-                int y1 = kernel.CalculateOutputWidth(x1);
-                int y2 = kernel.CalculateOutputHeight(x2);
-
-                Tensor y = session.AllocateTensor(ActionName, new Shape(Shape.BWHC, x0, y1, y2, x3), calculateGradient);
-
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-
-                float[] xw = x.Weights;
-                float[] yw = y.Weights;
-
-                if (ksize1 == 2 && ksize2 == 2)
-                {
-                    Pool2x2();
-                }
-                else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
-                {
-                    Pool2x1();
-                }
-                else
-                {
-                    PoolNxN();
-                }
-
-                return y;
-
-                void Pool2x2()
-                {
-                    float[] wspw = new float[xstride1];
-
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                    void Pool()
                     {
-                        for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                        {
-                            if (ix1 + 1 < x1)
-                            {
-                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
-                            }
-                            else
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                            }
+                        int xstride1K = xstride1 * kstride1;
+                        int xstride2K = xstride2 * kstride2;
 
-                            for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
-                            {
-                                if (ix2 + 1 < x2)
-                                {
-                                    Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-                                }
-                                else
-                                {
-                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                }
-                            }
+                        float[] xw = x.Weights;
+                        float[] yw = y.Weights;
+
+                        if (ksize1 == 2 && ksize2 == 2)
+                        {
+                            Pool2x2();
                         }
-                    }
-                }
-
-                void Pool2x1()
-                {
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                    {
-                        for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                        else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
                         {
-                            if (ix1 + 1 < x1)
-                            {
-                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
-                            }
-                            else
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
-                            }
+                            Pool2x1();
                         }
-                    }
-                }
-
-                void PoolNxN()
-                {
-                    float[] wspw = new float[xstride1];
-
-                    for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                    {
-                        for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                        else
                         {
-                            int ix1e = MinMax.Min(ix1 + ksize1, x1);
-                            if (ix1e - ix1 == 1)
-                            {
-                                Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                            }
-                            else
-                            {
-                                Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                            PoolNxN();
+                        }
 
-                                for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
-                                {
-                                    Vectors.Max(xstride1, xw, pos, wspw, 0);
-                                }
-                            }
+                        void Pool2x2()
+                        {
+                            float[] wspw = new float[xstride1];
 
-                            for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
                             {
-                                int ix2e = MinMax.Min(ix2 + ksize2, x2);
-                                if (ix2e - ix2 == 1)
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                 {
-                                    Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                }
-                                else
-                                {
-                                    Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-
-                                    for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
+                                    if (ix1 + 1 < x1)
                                     {
-                                        Vectors.Max(xstride2, wspw, pos, yw, ypos2);
+                                        Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+                                    }
+                                    else
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
+                                    }
+
+                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                                    {
+                                        if (ix2 + 1 < x2)
+                                        {
+                                            Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+                                        }
+                                        else
+                                        {
+                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        void Pool2x1()
+                        {
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                            {
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                {
+                                    if (ix1 + 1 < x1)
+                                    {
+                                        Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
+                                    }
+                                    else
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
+                                    }
+                                }
+                            }
+                        }
+
+                        void PoolNxN()
+                        {
+                            float[] wspw = new float[xstride1];
+
+                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
+                            {
+                                for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                {
+                                    int ix1e = MinMax.Min(ix1 + ksize1, x1);
+                                    if (ix1e - ix1 == 1)
+                                    {
+                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
+                                    }
+                                    else
+                                    {
+                                        Vectors.Max(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
+
+                                        for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
+                                        {
+                                            Vectors.Max(xstride1, xw, pos, wspw, 0);
+                                        }
+                                    }
+
+                                    for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
+                                    {
+                                        int ix2e = MinMax.Min(ix2 + ksize2, x2);
+                                        if (ix2e - ix2 == 1)
+                                        {
+                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
+                                        }
+                                        else
+                                        {
+                                            Vectors.Max(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
+
+                                            for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
+                                            {
+                                                Vectors.Max(xstride2, wspw, pos, yw, ypos2);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            }
 
 #if !NOLEARNING
-            void Gradient(Tensor y)
-            {
-                int ksize1 = kernel.Width;
-                int ksize2 = kernel.Height;
-                int kstride1 = kernel.StrideX;
-                int kstride2 = kernel.StrideY;
-
-                int x0 = x.Axes[0];
-                int x1 = x.Axes[1];
-                int x2 = x.Axes[2];
-
-                int xstride0 = x.Strides[0];
-                int xstride1 = x.Strides[1];
-                int xstride2 = x.Strides[2];
-
-                int xstride1K = xstride1 * kstride1;
-                int xstride2K = xstride2 * kstride2;
-
-                int y1 = y.Axes[1];
-                int y2 = y.Axes[2];
-
-                int ystride0 = y.Strides[0];
-                int ystride1 = y.Strides[1];
-                int ystride2 = y.Strides[2];
-
-                float[] xw = x.Weights;
-                float[] yw = y.Weights;
-                float[] dxw = x.Gradient;
-                float[] dyw = y.Gradient;
-
-                // cycle by the output
-                for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
-                {
-                    for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                    if (calculateGradient)
                     {
-                        for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                        session.Push(ActionName, () =>
                         {
-                            // cycle by the kernel
-                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
-                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
-                            for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                            int xstride1K = xstride1 * kstride1;
+                            int xstride2K = xstride2 * kstride2;
+
+                            float[] xw = x.Weights;
+                            float[] yw = y.Weights;
+                            float[] dxw = x.Gradient;
+                            float[] dyw = y.Gradient;
+
+                            // cycle by the output
+                            for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
                             {
-                                for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                 {
-                                    // cycle inside the kernel
-                                    Mathematics.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
+                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                                    {
+                                        // cycle by the kernel
+                                        int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                                        int ike2 = MinMax.Min(ix2 + ksize2, x2);
+                                        for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                                        {
+                                            for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                            {
+                                                // cycle inside the kernel
+                                                Mathematics.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        });
                     }
-                }
-            }
 #endif
+
+                    return y;
+                });
         }
 
         /// <summary>
@@ -651,7 +704,6 @@ namespace Genix.DNN
         /// dx(i) = scale(i) ^ -beta * dy(i) - (2 * alpha * beta / kernelSize) * x(i) * sum(y(j) * dy(j) / scale(j)).
         /// </para>
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor LRN(
             this Session session,
@@ -728,7 +780,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor FullyConnected(
             this Session session,
@@ -763,7 +814,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor SRN(
             this Session session,
@@ -840,7 +890,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor LSTM(
             this Session session,
@@ -920,7 +969,6 @@ namespace Genix.DNN
         /// <returns>
         /// The <see cref="Tensor"/> that contains computed data.
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Need to pass as a reference to reallocate.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Tensor GRU(
             this Session session,

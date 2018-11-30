@@ -290,6 +290,29 @@ namespace Genix.MachineLearning
             return Kernel.CalculateOutputSize(height, this.Height, this.StrideY, this.PaddingY);
         }
 
+        /// <summary>
+        /// Computes the output shape.
+        /// </summary>
+        /// <param name="shape">The input shape.</param>
+        /// <returns>
+        /// The output shape.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Shape CalculateOutputShape(Shape shape)
+        {
+            if (shape == null)
+            {
+                throw new ArgumentNullException(nameof(shape));
+            }
+
+            return new Shape(
+                shape.Format,
+                shape.GetAxis(Axis.B),
+                this.CalculateOutputWidth(shape.GetAxis(Axis.X)),
+                this.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                shape.GetAxis(Axis.C));
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int CalculateOutputSize(int size, int kernelSize, int stride, int padding)
         {
