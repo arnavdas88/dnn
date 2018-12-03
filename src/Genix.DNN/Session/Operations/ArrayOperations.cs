@@ -633,10 +633,17 @@ namespace Genix.DNN
                     int y1 = kernel.CalculateOutputWidth(x.Axes[1]);
                     int y2 = kernel.CalculateOutputHeight(x.Axes[2]);
 
+#if true
+                    Tensor y = session.AllocateTensor(
+                        ActionName,
+                        new Shape(new int[] { x.Shape.GetAxis(Axis.B) * y1 * y2, kernel.Width * kernel.Height * x.Shape.GetAxis(Axis.C) }),
+                        calculateGradient);
+#else
                     Tensor y = session.AllocateTensor(
                         ActionName,
                         new Shape(Shape.BWHC, x.Axes[0] * y1 * y2, kernel.Width, kernel.Height, x.Axes[3]),
                         calculateGradient);
+#endif
 
                     NativeMethods.stack_kernels(
                         kernel.Width,
@@ -649,6 +656,7 @@ namespace Genix.DNN
                         x.Axes,
                         x.Strides,
                         y.Weights,
+                        y.Length,
                         new int[] { 0, y1, y2 },
                         y.Strides);
 
@@ -1236,6 +1244,7 @@ namespace Genix.DNN
                 [In] int[] xaxes,
                 [In] int[] xstrides,
                 [Out] float[] yw,
+                int ywlen,
                 [In] int[] yaxes,
                 [In] int[] ystrides);
 

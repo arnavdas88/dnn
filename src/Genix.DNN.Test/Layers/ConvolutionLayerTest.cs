@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -15,6 +16,31 @@
     [TestClass]
     public class ConvolutionLayerTest
     {
+        [TestMethod]
+        public void StackKernelsTest()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            const int Count = 1000;
+
+            Tensor x = new Tensor(null, new Shape(Shape.BWHC, 1, 24, 24, 129));
+            x.Randomize();
+            Kernel kernel = new Kernel(5, 5, 1, 1, 1, 1);
+
+            Session session = new Session(false);
+
+            stopwatch.Restart();
+
+            for (int i = 0; i < Count; i++)
+            {
+                Tensor y = session.StackKernels(x, kernel);
+
+                session.EndSession();
+            }
+
+            stopwatch.Stop();
+            Console.WriteLine("{0:F4} ms, {1:F4} ms", stopwatch.ElapsedMilliseconds, (float)stopwatch.ElapsedMilliseconds / Count);
+        }
+
         [TestMethod]
         public void ConstructorTest1()
         {
