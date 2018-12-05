@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <cmath>
-#include "mkl.h"
 
 #undef min
 #undef max

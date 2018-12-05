@@ -156,6 +156,7 @@
   <ItemGroup>
     <None Include="source\bitutils.inl" />
     <None Include="source\nonlinearity.inl" />
+    <None Include="source\parallel.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
