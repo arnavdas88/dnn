@@ -802,6 +802,66 @@ namespace Genix.DNN
         }
 
         /// <summary>
+        /// Computes a convolution cell.
+        /// </summary>
+        /// <param name="session">The scope that executes this operation.</param>
+        /// <param name="x">The tensor that contains the data.</param>
+        /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="kernel">The convolution kernel.</param>
+        /// <param name="numberOfFilters">The number of filters in the layer.</param>
+        /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/> and <paramref name="b"/> are row-major or column-major.</param>
+        /// <returns>
+        /// The <see cref="Tensor"/> that contains computed data.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Tensor Convolution(
+            this Session session,
+            Tensor x,
+            Tensor w,
+            Kernel kernel,
+            int numberOfFilters,
+            MatrixLayout matrixLayout)
+        {
+            const string ActionName = "convolution";
+
+            return session.RunOperation(
+                ActionName,
+                () =>
+                {
+                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
+
+                    Tensor y = session.AllocateTensor(
+                        ActionName,
+                        new Shape(
+                            x.Shape.Format,
+                            x.Shape.GetAxis(Axis.B),
+                            kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)),
+                            kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)),
+                            numberOfFilters),
+                        calculateGradient);
+
+                    NativeMethods.convolution(
+                        kernel.Width,
+                        kernel.Height,
+                        kernel.StrideX,
+                        kernel.StrideY,
+                        kernel.PaddingX,
+                        kernel.PaddingY,
+                        w.Weights,
+                        w.Axes,
+                        w.Strides,
+                        x.Weights,
+                        x.Axes,
+                        x.Strides,
+                        y.Weights,
+                        y.Axes,
+                        y.Strides);
+
+                    return y;
+                });
+        }
+
+        /// <summary>
         /// Computes SRN (simple recurrent network) cell.
         /// </summary>
         /// <param name="session">The scope that executes this operation.</param>
@@ -1117,6 +1177,24 @@ namespace Genix.DNN
                 int b,
                 [In] int[] axes,
                 [In] int[] strides);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void convolution(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [In] float[] ww,
+                [In] int[] waxes,
+                [In] int[] wstrides,
+                [In] float[] xw,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
+                [Out] float[] yw,
+                [In] int[] yaxes,
+                [In] int[] ystrides);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void lstm(

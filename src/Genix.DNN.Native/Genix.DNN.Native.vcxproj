@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="source\convolution.cpp" />
     <ClCompile Include="source\CTC.cpp" />
     <ClCompile Include="source\LRN.cpp" />
     <ClCompile Include="source\RNN.cpp" />
