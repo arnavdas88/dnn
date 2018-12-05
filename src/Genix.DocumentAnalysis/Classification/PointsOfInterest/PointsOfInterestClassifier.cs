@@ -112,12 +112,6 @@ namespace Genix.DocumentAnalysis.Classification
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float[] PrepareVector(KMeans kmeans, IVectorPack<float> x, CancellationToken cancellationToken)
-        {
-            return kmeans.Transform(x, null, false, null, cancellationToken);
-        }
-
         /// <inheritdoc />
         private protected override void BeginTraining(CancellationToken cancellationToken)
         {
@@ -138,6 +132,12 @@ namespace Genix.DocumentAnalysis.Classification
 
             this.learner.AddFeatures(features, truth);
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float[] PrepareVector(KMeans kmeans, IVectorPack<float> x, CancellationToken cancellationToken)
+        {
+            return kmeans.Transform(x, null, false, null, cancellationToken);
         }
 
         private class Learner
