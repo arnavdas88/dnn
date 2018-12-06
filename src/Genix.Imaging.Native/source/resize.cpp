@@ -38,7 +38,7 @@ GENIXAPI(int, resize)(
 
 	IppStatus(__stdcall *func)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
 	IppStatus(__stdcall *funcWithBorder)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, const Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
-	IppStatus(__stdcall *funcAliasing)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
+	IppStatus(__stdcall *funcAliasing)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, const Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
 
 	IppiInterpolationType ippInterpolationType;
 	switch (interpolationType)
@@ -172,7 +172,7 @@ GENIXAPI(int, resize)(
 			{ 0, 0 },
 			dstSize,
 			ippBorderType,
-			(Ipp8u*)&borderValue,
+			(const Ipp8u*)&borderValue,
 			pSpec,
 			pBuffer));
 	}

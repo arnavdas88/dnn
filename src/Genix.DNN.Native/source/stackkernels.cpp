@@ -126,8 +126,8 @@ GENIXAPI(void, stack_kernels)(
 			}
 		}
 #else
-		//#pragma loop(hint_parallel(0))
-		//#pragma loop(ivdep)
+		#pragma loop(hint_parallel(0))
+		#pragma loop(ivdep)
 		for (int iy = 0, iiy = ywlen / ystride0; iy < iiy; iy++)
 		{
 			int ix1 = (iy / y2) * kstride1;
@@ -142,7 +142,6 @@ GENIXAPI(void, stack_kernels)(
 
 			if (ix2 + ksize2 <= x2)
 			{
-				////__copy_strides(ix1m - ix1, ystride2, xw, xposk, xstride1, yw, yposk, ystride2);
 				for (; ix1 < ix1m; ix1++, xposk += xstride1, yposk += ystride2)
 				{
 					__copy(ystride2, xw, xposk, yw, yposk);
@@ -169,8 +168,8 @@ GENIXAPI(void, stack_kernels)(
 	else
 	{
 #if true
-		#pragma loop(hint_parallel(0))
-		#pragma loop(ivdep)
+		//#pragma loop(hint_parallel(0))
+		//#pragma loop(ivdep)
 		for (int iy = 0, iiy = ywlen / ystride0; iy < iiy; iy++)
 		{
 			int iy1 = iy / y2;

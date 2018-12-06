@@ -807,6 +807,7 @@ namespace Genix.DNN
         /// <param name="session">The scope that executes this operation.</param>
         /// <param name="x">The tensor that contains the data.</param>
         /// <param name="w">The tensor that contains the weights matrix <paramref name="w"/>.</param>
+        /// <param name="b">The tensor that contains the bias vector <paramref name="b"/> to add to each column of matrix <paramref name="w"/>. Can be null.</param>
         /// <param name="kernel">The convolution kernel.</param>
         /// <param name="numberOfFilters">The number of filters in the layer.</param>
         /// <param name="matrixLayout">Specifies whether the matrices <paramref name="w"/> and <paramref name="b"/> are row-major or column-major.</param>
@@ -818,6 +819,7 @@ namespace Genix.DNN
             this Session session,
             Tensor x,
             Tensor w,
+            Tensor b,
             Kernel kernel,
             int numberOfFilters,
             MatrixLayout matrixLayout)
@@ -848,6 +850,7 @@ namespace Genix.DNN
                         kernel.PaddingX,
                         kernel.PaddingY,
                         w.Weights,
+                        b.Weights,
                         w.Axes,
                         w.Strides,
                         x.Weights,
@@ -1187,6 +1190,7 @@ namespace Genix.DNN
                 int kpadding1,
                 int kpadding2,
                 [In] float[] ww,
+                [In] float[] bw,
                 [In] int[] waxes,
                 [In] int[] wstrides,
                 [In] float[] xw,

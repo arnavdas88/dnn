@@ -104,7 +104,9 @@ namespace Genix.DNN.Layers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
-            Tensor x = xs[0];
+            return new[] { session.Convolution(xs[0], this.W, this.B, this.Kernel, this.NumberOfNeurons, this.MatrixLayout) };
+
+            /*Tensor x = xs[0];
 
             IList<Tensor> ys;
             if (this.Kernel.SameAsInput(x.Shape.GetAxis(Axis.X), x.Shape.GetAxis(Axis.Y)))
@@ -120,7 +122,7 @@ namespace Genix.DNN.Layers
             // reshape the tensor so it matches the layer output
             session.ReshapeIP(ys[0], ConvolutionLayer.CalculateOutputShape(x.Shape, this.NumberOfNeurons, this.Kernel));
 
-            return ys;
+            return ys;*/
         }
 
         /// <summary>
