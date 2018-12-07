@@ -280,6 +280,14 @@ namespace Genix.MachineLearning
             return true;
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return string.IsNullOrEmpty(this.Format) ?
+                string.Join(" ", this.axes) :
+                this.Format + ": " + string.Join(" ", this.axes);
+        }
+
         /// <summary>
         /// Attaches the data from specified <see cref="Shape"/> to this <see cref="Shape"/>.
         /// </summary>

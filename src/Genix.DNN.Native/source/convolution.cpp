@@ -13,9 +13,19 @@ void __forceinline tile(const int count, const int length, const float* src, flo
 	}
 }
 
-int __forceinline kernel_output_size(const int size, const int ksize, const int kstride, const int kpadding)
+int __forceinline output_size_floor(const int size, const int ksize, const int kstride, const int kpadding)
 {
-	return ((max(size - ksize + (2 * kpadding), 0) + kstride - 1) / kstride) + 1;
+	return (max(size - ksize + (2 * kpadding), 0) / kstride) + 1;
+}
+
+int __forceinline divide_ceiling(const int value, const int divisor)
+{
+	return (value + divisor - 1) / divisor;
+}
+
+int __forceinline output_size_ceiling(const int size, const int ksize, const int kstride, const int kpadding)
+{
+	return divide_ceiling(max(size - ksize + (2 * kpadding), 0), kstride) + 1;
 }
 
 void __forceinline matmul(
@@ -74,57 +84,74 @@ GENIXAPI(void, convolution)(
 	const int y0 = yaxes[0];
 	const int y1 = yaxes[1];
 	const int y2 = yaxes[2];
-	const int y3 = yaxes[3];
+	const int y3 = yaxes[3];	// number of channels
 	const int ystride0 = ystrides[0];
 	const int ystride1 = ystrides[1];
 	const int ystride2 = ystrides[2];
 
-	const int ldw = y3;		// number of channels
-	const int ldx = xstride1;
+	const int ldw = y3;
+	const int ldx = kstride1 * xstride1;
 	const int ldy = ystride1;
 	const int kstep = ksize2 * xstride2 * ldw;
 
-	//for (int iy2 = 0; iy2 < y2; iy2++) {
-	parallel_for(0, y2, [&](int iy2) {
+	// if kpadding1 or kpadding2 are negative we need to shrink working area of x tensor
+	if (kpadding1 < 0)
+	{
+		xw += -ptrdiff_t(kpadding1) * xstride1;
+	}
 
+	if (kpadding2 < 0)
+	{
+		xw += -ptrdiff_t(kpadding2) * xstride2;
+	}
+
+	const int x1e = kpadding1 < 0 ? x1 + (2 * kpadding1) : x1;
+	const int x2e = kpadding2 < 0 ? x2 + (2 * kpadding2) : x2;
+
+	for (int iy2 = 0; iy2 < y2; iy2++) {
+		//parallel_for(0, y2, [&](int iy2) {
+
+		const float* www = ww;
+		const float* xww = xw;
 		float* yww = yw + (ptrdiff_t(iy2) * ystride2);
 
 		// 1. initialize destination tensor with biases
 		tile(y0 * y1, y3, bw, yww, ldy);
 
 		// 2. add matrix product to destination
+		const int ix2 = kpadding2 > 0 ? (iy2 * kstride2) - kpadding2 : (iy2 * kstride2);
+		const int ix2e = min(ix2 + ksize2, x2e);
+		const int k = (ix2e - max(ix2, 0)) * xstride2;
+
 		// k may be zero if the current portion of input tensor
 		// is completely in the padding area
-		const int ix2 = (iy2 * kstride2) - kpadding2;
-		const int ix2e = min(ix2 + ksize2, x2);
-		if (ix2e > max(ix2, 0))
+		if (k > 0)
 		{
-			const int k = (ix2e - max(ix2, 0)) * xstride2;
-			const int m = y3;
+			xww += ptrdiff_t(max(ix2, 0)) * xstride2;
+			www += ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
 
-			int wpos = max(-ix2, 0) * xstride2 * ldw;
-			int xpos = max(ix2, 0) * xstride2;
-
-			for (int ixy1 = 0; ixy1 < ksize1; ixy1++, wpos += kstep, xpos += xstride1)
+			for (int ixy0 = 0; ixy0 < x0; ixy0++, xww += xstride0, yww += ystride0)
 			{
-				const int n = y0 * y1; //// min(y1, (x1 - ixy1 + 1) / kstride1);
-
-				/*int ix1 = ixy1 - kpadding1;
-				const int ix1e = min(x1, ix1 + ((y1 - 1) * kstride1) + ksize1);
-
-				int xposaddon = 0;
-				int yposaddon = 0;
-				while (ix1 < 0)
+				for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
 				{
-					ix1 += kstride1;
-					xposaddon += xstride1 * kstride1;
-					yposaddon += ystride1;
+					int ix1 = ixy1 - max(kpadding1, 0);
+					int iy1 = 0;
+					int n = min(y1, ((x1e - ix1 - 1) / kstride1 + 1));
+
+					while (ix1 < 0)
+					{
+						ix1 += kstride1;
+						n--;
+						iy1++;
+					}
+
+					matmul(
+						y3, n, k,
+						www + (ptrdiff_t(ixy1) * kstep), ldw,
+						xww + (ptrdiff_t(ix1) * xstride1), ldx,
+						yww + (ptrdiff_t(iy1) * ystride1), ldy);
 				}
-
-				const int n = min(y1, kernel_output_size(ix1e - ix1, ksize1, kstride1, 0));*/
-
-				matmul(m, n, k, ww + wpos, ldw, xw + xpos/* + xposaddon*/, ldx, yww/* + yposaddon*/, ldy);
 			}
 		}
-	});
+	}/*);*/
 }
