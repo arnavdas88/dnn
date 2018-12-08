@@ -320,9 +320,9 @@ namespace Genix.DNN.Layers
         /// <param name="groups">The collection of regular expression groups.</param>
         /// <param name="startingGroup">The first group to start parsing.</param>
         /// <param name="defaultStride">The default value for stride parameter.</param>
-        /// <param name="padding">Determines whether padding should be parsed.</param>
+        /// <param name="parsePadding">Determines whether padding should be parsed.</param>
         /// <returns>The <see cref="Kernel"/> object this method creates.</returns>
-        private protected static Kernel ParseKernel(GroupCollection groups, int startingGroup, int? defaultStride, bool padding)
+        private protected static Kernel ParseKernel(GroupCollection groups, int startingGroup, int? defaultStride, bool parsePadding)
         {
             int width = Convert.ToInt32(groups[startingGroup].Value, CultureInfo.InvariantCulture);
             int height = !string.IsNullOrEmpty(groups[startingGroup + 1].Value) ? Convert.ToInt32(groups[startingGroup + 1].Value, CultureInfo.InvariantCulture) : width;
@@ -337,18 +337,17 @@ namespace Genix.DNN.Layers
             }
 
             // padding
-            int paddingX = 0;
-            int paddingY = 0;
-            if (padding)
+            PaddingMode padding = default;
+            if (parsePadding)
             {
                 if (!string.IsNullOrEmpty(groups[startingGroup + 4].Value))
                 {
-                    paddingX = Convert.ToInt32(groups[startingGroup + 4].Value, CultureInfo.InvariantCulture);
-                    paddingY = !string.IsNullOrEmpty(groups[startingGroup + 5].Value) ? Convert.ToInt32(groups[startingGroup + 5].Value, CultureInfo.InvariantCulture) : paddingX;
+                    ////paddingX = Convert.ToInt32(groups[startingGroup + 4].Value, CultureInfo.InvariantCulture);
+                    ////paddingY = !string.IsNullOrEmpty(groups[startingGroup + 5].Value) ? Convert.ToInt32(groups[startingGroup + 5].Value, CultureInfo.InvariantCulture) : paddingX;
                 }
             }
 
-            return new Kernel(width, height, strideX, strideY, paddingX, paddingY);
+            return new Kernel(width, height, strideX, strideY, padding);
         }
     }
 }

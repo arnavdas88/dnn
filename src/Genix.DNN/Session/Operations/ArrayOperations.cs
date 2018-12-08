@@ -609,6 +609,7 @@ namespace Genix.DNN
                 });
         }
 
+#if false
         /// <summary>
         /// Crops the three-dimensional sub-tensors from a specified tensor by using the specified kernel,
         /// and then stacks the sub-tensors batch-wise in the destination tensor.
@@ -687,6 +688,7 @@ namespace Genix.DNN
                     return y;
                 });
         }
+#endif
 
         /// <summary>
         /// Compacts a tensor along the specified axis by choosing a maximum value out of group of elements.

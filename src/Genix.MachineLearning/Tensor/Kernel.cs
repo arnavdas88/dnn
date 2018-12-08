@@ -27,7 +27,7 @@ namespace Genix.MachineLearning
         /// <param name="strideX">The horizontal step at which kernel is applied.</param>
         /// <param name="strideY">The vertical step at which kernel is applied.</param>
         public Kernel(int width, int height, int strideX, int strideY)
-            : this(width, height, strideX, strideY, 0, 0)
+            : this(width, height, strideX, strideY, default)
         {
         }
 
@@ -38,9 +38,8 @@ namespace Genix.MachineLearning
         /// <param name="height">The height of the kernel.</param>
         /// <param name="strideX">The horizontal step at which kernel is applied.</param>
         /// <param name="strideY">The vertical step at which kernel is applied.</param>
-        /// <param name="paddingX">The size of the horizontal zero padding.</param>
-        /// <param name="paddingY">The size of the vertical zero padding.</param>
-        public Kernel(int width, int height, int strideX, int strideY, int paddingX, int paddingY)
+        /// <param name="padding">The padding mode.</param>
+        public Kernel(int width, int height, int strideX, int strideY, PaddingMode padding)
         {
             if (width <= 0)
             {
@@ -66,8 +65,7 @@ namespace Genix.MachineLearning
             this.Height = height;
             this.StrideX = strideX;
             this.StrideY = strideY;
-            this.PaddingX = paddingX;
-            this.PaddingY = paddingY;
+            this.Padding = padding;
         }
 
         /// <summary>
@@ -85,8 +83,7 @@ namespace Genix.MachineLearning
             this.Height = other.Height;
             this.StrideX = other.StrideX;
             this.StrideY = other.StrideY;
-            this.PaddingX = other.PaddingX;
-            this.PaddingY = other.PaddingY;
+            this.Padding = other.Padding;
         }
 
         /// <summary>
@@ -134,22 +131,13 @@ namespace Genix.MachineLearning
         public int StrideY { get; private set; }
 
         /// <summary>
-        /// Gets the size of the horizontal zero padding.
+        /// Gets the padding mode.
         /// </summary>
         /// <value>
-        /// The size of the horizontal zero padding.
+        /// The <see cref="PaddingMode"/> enumeration.
         /// </value>
-        [JsonProperty("PaddingX")]
-        public int PaddingX { get; private set; }
-
-        /// <summary>
-        /// Gets the size of the vertical zero padding.
-        /// </summary>
-        /// <value>
-        /// The size of the vertical zero padding.
-        /// </value>
-        [JsonProperty("PaddingY")]
-        public int PaddingY { get; private set; }
+        [JsonProperty("Padding")]
+        public PaddingMode Padding { get; private set; }
 
         /// <summary>
         /// Gets the size of the kernel.
@@ -180,8 +168,7 @@ namespace Genix.MachineLearning
                 this.Height == other.Height &&
                 this.StrideX == other.StrideX &&
                 this.StrideY == other.StrideY &&
-                this.PaddingX == other.PaddingX &&
-                this.PaddingY == other.PaddingY;
+                this.Padding == other.Padding;
         }
 
         /// <inheritdoc />
@@ -190,7 +177,7 @@ namespace Genix.MachineLearning
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return this.Width ^ this.Height ^ this.StrideX ^ this.StrideY ^ this.PaddingX ^ this.PaddingY;
+            return this.Width ^ this.Height ^ this.StrideX ^ this.StrideY ^ (int)this.Padding;
         }
 
         /// <inheritdoc />
@@ -219,19 +206,11 @@ namespace Genix.MachineLearning
                 {
                     sb.AppendFormat(CultureInfo.InvariantCulture, "x{0}", this.StrideY);
                 }
-
-                sb.Append("(S)");
             }
 
-            if (this.PaddingX != 0 || this.PaddingY != 0)
+            if (this.Padding != default)
             {
-                sb.AppendFormat(CultureInfo.InvariantCulture, "+{0}", this.PaddingX);
-                if (this.PaddingX != this.PaddingY)
-                {
-                    sb.AppendFormat(CultureInfo.InvariantCulture, "x{0}", this.PaddingY);
-                }
-
-                sb.Append("(P)");
+                sb.AppendFormat(CultureInfo.InvariantCulture, "+{0}", this.Padding);
             }
 
             return sb.ToString();
@@ -249,48 +228,6 @@ namespace Genix.MachineLearning
         }
 
         /// <summary>
-        /// Determines whether the kernel dimensions matches the input window.
-        /// </summary>
-        /// <param name="width">The input width.</param>
-        /// <param name="height">The input height.</param>
-        /// <returns>
-        /// <b>true</b> if the kernel matches the input window; otherwise, <b>false</b>.
-        /// </returns>
-        public bool SameAsInput(int width, int height)
-        {
-            return this.Width == width &&
-                   this.Height == height &&
-                   this.PaddingX == 0 &&
-                   this.PaddingY == 0;
-        }
-
-        /// <summary>
-        /// Computes the output width.
-        /// </summary>
-        /// <param name="width">The input width.</param>
-        /// <returns>
-        /// The output width.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CalculateOutputWidth(int width)
-        {
-            return Kernel.CalculateOutputSize(width, this.Width, this.StrideX, this.PaddingX);
-        }
-
-        /// <summary>
-        /// Computes the output height.
-        /// </summary>
-        /// <param name="height">The input height.</param>
-        /// <returns>
-        /// The output height.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CalculateOutputHeight(int height)
-        {
-            return Kernel.CalculateOutputSize(height, this.Height, this.StrideY, this.PaddingY);
-        }
-
-        /// <summary>
         /// Computes the output shape.
         /// </summary>
         /// <param name="shape">The input shape.</param>
@@ -298,7 +235,7 @@ namespace Genix.MachineLearning
         /// The output shape.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Shape CalculateOutputShape(Shape shape)
+        public Shape ComputeOutputShape(Shape shape)
         {
             if (shape == null)
             {
@@ -308,15 +245,102 @@ namespace Genix.MachineLearning
             return new Shape(
                 shape.Format,
                 shape.GetAxis(Axis.B),
-                this.CalculateOutputWidth(shape.GetAxis(Axis.X)),
-                this.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                this.ComputeOutputWidth(shape.GetAxis(Axis.X)),
+                this.ComputeOutputHeight(shape.GetAxis(Axis.Y)),
                 shape.GetAxis(Axis.C));
         }
 
+        /// <summary>
+        /// Computes the output width.
+        /// </summary>
+        /// <param name="inputWidth">The input width.</param>
+        /// <returns>
+        /// The output width.
+        /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int CalculateOutputSize(int size, int kernelSize, int stride, int padding)
+        public int ComputeOutputWidth(int inputWidth)
         {
-            return size != -1 ? ((MinMax.Max(size - kernelSize + (2 * padding), 0) + stride - 1) / stride) + 1 : -1;
+            return Kernel.ComputeOutputSize(inputWidth, this.Width, this.StrideX, this.Padding);
+        }
+
+        /// <summary>
+        /// Computes the output height.
+        /// </summary>
+        /// <param name="inputHeight">The input height.</param>
+        /// <returns>
+        /// The output height.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int ComputeOutputHeight(int inputHeight)
+        {
+            return Kernel.ComputeOutputSize(inputHeight, this.Height, this.StrideY, this.Padding);
+        }
+
+        /// <summary>
+        /// Computes the horizontal padding.
+        /// </summary>
+        /// <param name="inputWidth">The input width.</param>
+        /// <param name="outputWidth">The output width.</param>
+        /// <returns>
+        /// The left and right padding.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public (int paddingLeft, int paddingRight) ComputeHorizontalPadding(int inputWidth, int outputWidth)
+        {
+            return Kernel.ComputePadding(inputWidth, outputWidth, this.Width, this.StrideX, this.Padding);
+        }
+
+        /// <summary>
+        /// Computes the vertical padding.
+        /// </summary>
+        /// <param name="inputHeight">The input height.</param>
+        /// <param name="outputHeight">The output height.</param>
+        /// <returns>
+        /// The top and bottom padding.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public (int paddingTop, int paddingBottom) ComputeVerticalPadding(int inputHeight, int outputHeight)
+        {
+            return Kernel.ComputePadding(inputHeight, outputHeight, this.Height, this.StrideY, this.Padding);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int ComputeOutputSize(int inputSize, int kernelSize, int stride, PaddingMode mode)
+        {
+            if (inputSize == -1)
+            {
+                return -1;
+            }
+
+            switch (mode)
+            {
+                case PaddingMode.Same:
+                    return (inputSize + stride - 1) / stride;
+
+                case PaddingMode.Valid:
+                    return (MinMax.Max(inputSize - kernelSize + 1, 0) + stride - 1) / stride;
+
+                default:
+                    throw new ArgumentException("The padding mode is invalid.");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static (int, int) ComputePadding(int inputSize, int outputSize, int kernelSize, int stride, PaddingMode mode)
+        {
+            switch (mode)
+            {
+                case PaddingMode.Same:
+                    int padding = MinMax.Max(((outputSize - 1) * stride) + kernelSize - inputSize, 0);
+                    int half = padding / 2;
+                    return (half, padding - half);
+
+                case PaddingMode.Valid:
+                    return (0, 0);
+
+                default:
+                    throw new ArgumentException("The padding mode is invalid.");
+            }
         }
     }
 }

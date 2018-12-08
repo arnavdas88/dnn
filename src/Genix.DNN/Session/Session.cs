@@ -161,6 +161,16 @@ namespace Genix.DNN
         }
 
         /// <summary>
+        /// Detaches the tensor from the session.
+        /// </summary>
+        /// <param name="x">The tensor to detach.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DetachTensor(Tensor x)
+        {
+            this.tensors.Remove(x);
+        }
+
+        /// <summary>
         /// Allocates the tensor.
         /// </summary>
         /// <param name="name">The tensor name.</param>
@@ -170,7 +180,7 @@ namespace Genix.DNN
         /// The tensor this method allocates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor AllocateTensor(string name, Shape shape, bool calculateGradient)
+        internal Tensor AllocateTensor(string name, Shape shape, bool calculateGradient)
         {
             int length = shape.Length;
             Tensor x;
@@ -206,7 +216,7 @@ namespace Genix.DNN
         /// The tensors this method allocates.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Tensor[] AllocateTensors(string name, int count, Shape shape, bool calculateGradient)
+        internal Tensor[] AllocateTensors(string name, int count, Shape shape, bool calculateGradient)
         {
             Tensor[] ys = new Tensor[count];
             for (int i = 0; i < count; i++)
@@ -217,15 +227,35 @@ namespace Genix.DNN
             return ys;
         }
 
+#if !NOLEARNING
         /// <summary>
-        /// Detaches the tensor from the session.
+        /// Attaches the gradient to the tensor.
         /// </summary>
-        /// <param name="x">The tensor to detach.</param>
+        /// <param name="x">The tensor to attach the gradient to.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DetachTensor(Tensor x)
+        internal void AttachGradient(Tensor x)
         {
-            this.tensors.Remove(x);
+            if (this.cache.TryGetValue(x.Length, out Stack<float[]> stack) && stack.Count > 0)
+            {
+                x.AttachGradient(stack.Pop(), true);
+            }
+
+            x.CalculateGradient = true;
         }
+
+        /// <summary>
+        /// Attaches the gradient to the tensors.
+        /// </summary>
+        /// <param name="xs">The tensors to attach the gradient to.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void AttachGradients(Tensor[] xs)
+        {
+            for (int i = 0, ii = xs.Length; i < ii; i++)
+            {
+                this.AttachGradient(xs[i]);
+            }
+        }
+#endif
 
         /*internal string PrintSessionReport()
         {

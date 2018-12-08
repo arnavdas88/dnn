@@ -82,8 +82,7 @@
             Assert.AreEqual(2, layer.Kernel.Height);
             Assert.AreEqual(3, layer.Kernel.StrideX);
             Assert.AreEqual(2, layer.Kernel.StrideY);
-            Assert.AreEqual(0, layer.Kernel.PaddingX);
-            Assert.AreEqual(0, layer.Kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, layer.Kernel.Padding);
         }
 
         [TestMethod]
@@ -97,8 +96,7 @@
             Assert.AreEqual(2, layer.Kernel.Height);
             Assert.AreEqual(2, layer.Kernel.StrideX);
             Assert.AreEqual(2, layer.Kernel.StrideY);
-            Assert.AreEqual(0, layer.Kernel.PaddingX);
-            Assert.AreEqual(0, layer.Kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, layer.Kernel.Padding);
         }
 
         [TestMethod]
@@ -112,8 +110,7 @@
             Assert.AreEqual(2, layer.Kernel.Height);
             Assert.AreEqual(2, layer.Kernel.StrideX);
             Assert.AreEqual(1, layer.Kernel.StrideY);
-            Assert.AreEqual(0, layer.Kernel.PaddingX);
-            Assert.AreEqual(0, layer.Kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, layer.Kernel.Padding);
         }
 
         [TestMethod]
@@ -127,8 +124,7 @@
             Assert.AreEqual(2, layer.Kernel.Height);
             Assert.AreEqual(2, layer.Kernel.StrideX);
             Assert.AreEqual(2, layer.Kernel.StrideY);
-            Assert.AreEqual(0, layer.Kernel.PaddingX);
-            Assert.AreEqual(0, layer.Kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, layer.Kernel.Padding);
         }
 
         [TestMethod]

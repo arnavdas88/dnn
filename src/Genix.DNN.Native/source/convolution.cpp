@@ -56,8 +56,10 @@ GENIXAPI(void, convolution)(
 	const int ksize2,
 	const int kstride1,
 	const int kstride2,
-	const int kpadding1,
-	const int kpadding2,
+	const int kpadding1l,
+	const int kpadding1r,
+	const int kpadding2l,
+	const int kpadding2r,
 	const float* ww,
 	const float* bw,
 	const int* waxes,
@@ -95,18 +97,18 @@ GENIXAPI(void, convolution)(
 	const int kstep = ksize2 * xstride2 * ldw;
 
 	// if kpadding1 or kpadding2 are negative we need to shrink working area of x tensor
-	if (kpadding1 < 0)
+	if (kpadding1l < 0)
 	{
-		xw += -ptrdiff_t(kpadding1) * xstride1;
+		xw += -ptrdiff_t(kpadding1l) * xstride1;
 	}
 
-	if (kpadding2 < 0)
+	if (kpadding2l < 0)
 	{
-		xw += -ptrdiff_t(kpadding2) * xstride2;
+		xw += -ptrdiff_t(kpadding2l) * xstride2;
 	}
 
-	const int x1e = kpadding1 < 0 ? x1 + (2 * kpadding1) : x1;
-	const int x2e = kpadding2 < 0 ? x2 + (2 * kpadding2) : x2;
+	const int x1e = x1 + min(kpadding1l, 0) + min(kpadding1r, 0);
+	const int x2e = x2 + min(kpadding2l, 0) + min(kpadding2r, 0);
 
 	for (int iy2 = 0; iy2 < y2; iy2++) {
 		//parallel_for(0, y2, [&](int iy2) {
@@ -119,7 +121,7 @@ GENIXAPI(void, convolution)(
 		tile(y0 * y1, y3, bw, yww, ldy);
 
 		// 2. add matrix product to destination
-		const int ix2 = kpadding2 > 0 ? (iy2 * kstride2) - kpadding2 : (iy2 * kstride2);
+		const int ix2 = (iy2 * kstride2) - max(kpadding2l, 0);
 		const int ix2e = min(ix2 + ksize2, x2e);
 		const int k = (ix2e - max(ix2, 0)) * xstride2;
 
@@ -134,7 +136,7 @@ GENIXAPI(void, convolution)(
 			{
 				for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
 				{
-					int ix1 = ixy1 - max(kpadding1, 0);
+					int ix1 = ixy1 - max(kpadding1l, 0);
 					int iy1 = 0;
 					int n = min(y1, ((x1e - ix1 - 1) / kstride1 + 1));
 

@@ -17,21 +17,19 @@
             Assert.AreEqual(0, kernel.Height);
             Assert.AreEqual(0, kernel.StrideX);
             Assert.AreEqual(0, kernel.StrideY);
-            Assert.AreEqual(0, kernel.PaddingX);
-            Assert.AreEqual(0, kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, kernel.Padding);
         }
 
         [TestMethod]
         public void ConstructorTest1()
         {
-            Kernel kernel = new Kernel(1, 2, 3, 4, 5, 6);
+            Kernel kernel = new Kernel(1, 2, 3, 4, PaddingMode.Valid);
 
             Assert.AreEqual(1, kernel.Width);
             Assert.AreEqual(2, kernel.Height);
             Assert.AreEqual(3, kernel.StrideX);
             Assert.AreEqual(4, kernel.StrideY);
-            Assert.AreEqual(5, kernel.PaddingX);
-            Assert.AreEqual(6, kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Valid, kernel.Padding);
         }
 
         [TestMethod]
@@ -43,8 +41,7 @@
             Assert.AreEqual(2, kernel.Height);
             Assert.AreEqual(3, kernel.StrideX);
             Assert.AreEqual(4, kernel.StrideY);
-            Assert.AreEqual(0, kernel.PaddingX);
-            Assert.AreEqual(0, kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Same, kernel.Padding);
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Uses argument of the method being tested.")]
@@ -114,14 +111,13 @@
         [TestMethod]
         public void CopyConstructorTest0()
         {
-            Kernel kernel = new Kernel(new Kernel(1, 2, 3, 4, 5, 6));
+            Kernel kernel = new Kernel(new Kernel(1, 2, 3, 4, PaddingMode.Valid));
 
             Assert.AreEqual(1, kernel.Width);
             Assert.AreEqual(2, kernel.Height);
             Assert.AreEqual(3, kernel.StrideX);
             Assert.AreEqual(4, kernel.StrideY);
-            Assert.AreEqual(5, kernel.PaddingX);
-            Assert.AreEqual(6, kernel.PaddingY);
+            Assert.AreEqual(PaddingMode.Valid, kernel.Padding);
         }
 
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
@@ -133,24 +129,23 @@
         [TestMethod]
         public void EqualsTest()
         {
-            Kernel kernel = new Kernel(1, 2, 3, 4, 5, 6);
+            Kernel kernel = new Kernel(1, 2, 3, 4, PaddingMode.Same);
 
             Assert.IsFalse(kernel.Equals(null));
             Assert.IsTrue(kernel.Equals(kernel));
             Assert.IsFalse(kernel.Equals(new { x = 1 }));
-            Assert.IsFalse(kernel.Equals(new Kernel(10, 2, 3, 4, 5, 6)));
-            Assert.IsFalse(kernel.Equals(new Kernel(1, 20, 3, 4, 5, 6)));
-            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 30, 4, 5, 6)));
-            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 3, 40, 5, 6)));
-            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 3, 4, 50, 6)));
-            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 3, 4, 5, 60)));
+            Assert.IsFalse(kernel.Equals(new Kernel(10, 2, 3, 4, PaddingMode.Same)));
+            Assert.IsFalse(kernel.Equals(new Kernel(1, 20, 3, 4, PaddingMode.Same)));
+            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 30, 4, PaddingMode.Same)));
+            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 3, 40, PaddingMode.Same)));
+            Assert.IsFalse(kernel.Equals(new Kernel(1, 2, 3, 4, PaddingMode.Valid)));
         }
 
         [TestMethod]
         public void GetHashCodeTest()
         {
-            Kernel kernel = new Kernel(1, 2, 3, 4, 5, 6);
-            Assert.AreEqual(1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6, kernel.GetHashCode());
+            Kernel kernel = new Kernel(1, 2, 3, 4, PaddingMode.Valid);
+            Assert.AreEqual(1 ^ 2 ^ 3 ^ 4 ^ (int)PaddingMode.Valid, kernel.GetHashCode());
         }
 
         [TestMethod]
@@ -159,17 +154,17 @@
             Assert.AreEqual("2", new Kernel(2, 2, 1, 1).ToString());
             Assert.AreEqual("2x3", new Kernel(2, 3, 1, 1).ToString());
 
-            Assert.AreEqual("2+2(S)", new Kernel(2, 2, 2, 2).ToString());
-            Assert.AreEqual("2x3+2x3(S)", new Kernel(2, 3, 2, 3).ToString());
+            Assert.AreEqual("2+2", new Kernel(2, 2, 2, 2).ToString());
+            Assert.AreEqual("2x3+2x3", new Kernel(2, 3, 2, 3).ToString());
 
-            Assert.AreEqual("2+2(S)+1(P)", new Kernel(2, 2, 2, 2, 1, 1).ToString());
-            Assert.AreEqual("2x3+2x3(S)+1x2(P)", new Kernel(2, 3, 2, 3, 1, 2).ToString());
+            Assert.AreEqual("2+2+Valid", new Kernel(2, 2, 2, 2, PaddingMode.Valid).ToString());
+            Assert.AreEqual("2x3+2x3+Valid", new Kernel(2, 3, 2, 3, PaddingMode.Valid).ToString());
         }
 
         [TestMethod]
         public void CloneTest()
         {
-            Kernel kernel1 = new Kernel(1, 2, 3, 4, 5, 6);
+            Kernel kernel1 = new Kernel(1, 2, 3, 4, PaddingMode.Valid);
             Kernel kernel2 = kernel1.Clone() as Kernel;
             Assert.AreEqual(JsonConvert.SerializeObject(kernel1), JsonConvert.SerializeObject(kernel2));
         }
@@ -177,7 +172,7 @@
         [TestMethod]
         public void SerializeTest()
         {
-            Kernel kernel1 = new Kernel(1, 2, 3, 4, 5, 6);
+            Kernel kernel1 = new Kernel(1, 2, 3, 4, PaddingMode.Valid);
             string s1 = JsonConvert.SerializeObject(kernel1);
             Kernel kernel2 = JsonConvert.DeserializeObject<Kernel>(s1);
             string s2 = JsonConvert.SerializeObject(kernel2);
@@ -185,13 +180,23 @@
         }
 
         [TestMethod]
-        public void CalculateOutputTest()
+        public void CalculateOutputTest_PaddingSame()
         {
-            Kernel kernel = new Kernel(1, 2, 3, 4, 5, 6);
-            Assert.AreEqual(38, kernel.CalculateOutputWidth(100));
-            Assert.AreEqual(29, kernel.CalculateOutputHeight(100));
-            Assert.AreEqual(-1, kernel.CalculateOutputWidth(-1));
-            Assert.AreEqual(-1, kernel.CalculateOutputHeight(-1));
+            Kernel kernel = new Kernel(1, 2, 3, 4, PaddingMode.Same);
+            Assert.AreEqual((100 + kernel.StrideX - 1) / kernel.StrideX, kernel.ComputeOutputWidth(100));
+            Assert.AreEqual((99 + kernel.StrideY - 1) / kernel.StrideY, kernel.ComputeOutputHeight(99));
+            Assert.AreEqual(-1, kernel.ComputeOutputWidth(-1));
+            Assert.AreEqual(-1, kernel.ComputeOutputHeight(-1));
+        }
+
+        [TestMethod]
+        public void CalculateOutputTest_PaddingValid()
+        {
+            Kernel kernel = new Kernel(1, 2, 3, 4, PaddingMode.Valid);
+            Assert.AreEqual((100 - kernel.Width + 1 + kernel.StrideX - 1) / kernel.StrideX, kernel.ComputeOutputWidth(100));
+            Assert.AreEqual((99 - kernel.Height + 1 + kernel.StrideY - 1) / kernel.StrideY, kernel.ComputeOutputHeight(99));
+            Assert.AreEqual(-1, kernel.ComputeOutputWidth(-1));
+            Assert.AreEqual(-1, kernel.ComputeOutputHeight(-1));
         }
     }
 }
