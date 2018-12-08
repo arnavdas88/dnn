@@ -93,7 +93,6 @@
     </Compile>
     <Compile Include="Tensor\Axis.cs" />
     <Compile Include="Tensor\Kernel.cs" />
-    <Compile Include="Tensor\PaddingMode.cs" />
     <Compile Include="Tensor\Shape.cs" />
     <Compile Include="Tensor\Tensor.cs" />
     <Compile Include="VectorMachines\Learning\ISupportVectorMachineLearning.cs" />

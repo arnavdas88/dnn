@@ -142,9 +142,12 @@ namespace Genix.DNN.Layers
                 throw new ArgumentNullException(nameof(shape));
             }
 
-            int outputWidth = kernel.ComputeOutputWidth(shape.GetAxis(Axis.X));
-            int outputHeight = kernel.ComputeOutputHeight(shape.GetAxis(Axis.Y));
-            return new Shape(shape.Format, shape.GetAxis(Axis.B), outputWidth, outputHeight, numberOfFilters);
+            return new Shape(
+                shape.Format,
+                shape.GetAxis(Axis.B),
+                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
+                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                numberOfFilters);
         }
 
         /// <summary>

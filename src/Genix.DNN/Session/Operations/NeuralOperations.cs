@@ -114,7 +114,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, kernel.ComputeOutputShape(x.Shape), calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, kernel.CalculateOutputShape(x.Shape), calculateGradient);
 
                     int ksize1, ksize2, kstride1, kstride2;
                     int x0, x1, x2, xstride0, xstride1, xstride2;
@@ -369,7 +369,7 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    Tensor y = session.AllocateTensor(ActionName, kernel.ComputeOutputShape(x.Shape), calculateGradient);
+                    Tensor y = session.AllocateTensor(ActionName, kernel.CalculateOutputShape(x.Shape), calculateGradient);
 
                     int ksize1, ksize2, kstride1, kstride2;
                     int x0, x1, x2, xstride0, xstride1, xstride2;
@@ -832,28 +832,23 @@ namespace Genix.DNN
                 {
                     bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
-                    int inputWidth = x.Shape.GetAxis(Axis.X);
-                    int inputHeight = x.Shape.GetAxis(Axis.Y);
-                    int outputWidth = kernel.ComputeOutputWidth(inputWidth);
-                    int outputHeight = kernel.ComputeOutputHeight(inputHeight);
-
                     Tensor y = session.AllocateTensor(
                         ActionName,
-                        new Shape(x.Shape.Format, x.Shape.GetAxis(Axis.B), outputWidth, outputHeight, numberOfFilters),
+                        new Shape(
+                            x.Shape.Format,
+                            x.Shape.GetAxis(Axis.B),
+                            kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)),
+                            kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)),
+                            numberOfFilters),
                         calculateGradient);
-
-                    (int paddingLeft, int paddingRight) = kernel.ComputeHorizontalPadding(inputWidth, outputWidth);
-                    (int paddingTop, int paddingBottom) = kernel.ComputeVerticalPadding(inputHeight, outputHeight);
 
                     NativeMethods.convolution(
                                 kernel.Width,
                                 kernel.Height,
                                 kernel.StrideX,
                                 kernel.StrideY,
-                                paddingLeft,
-                                paddingRight,
-                                paddingTop,
-                                paddingBottom,
+                                kernel.PaddingX,
+                                kernel.PaddingY,
                                 w.Weights,
                                 b.Weights,
                                 w.Axes,
@@ -1192,10 +1187,8 @@ namespace Genix.DNN
                 int ksize2,
                 int kstride1,
                 int kstride2,
-                int kpadding1l,
-                int kpadding1r,
-                int kpadding2l,
-                int kpadding2r,
+                int kpadding1,
+                int kpadding2,
                 [In] float[] ww,
                 [In] float[] bw,
                 [In] int[] waxes,

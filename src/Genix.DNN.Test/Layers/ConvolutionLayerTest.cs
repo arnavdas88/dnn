@@ -50,7 +50,7 @@
         {
             Shape shape = new Shape(Shape.BWHC, 2, 10, 12, 3);
             const int NumberOfFilters = 100;
-            Kernel kernel = new Kernel(3, 4, 3, 3, PaddingMode.Same);
+            Kernel kernel = new Kernel(3, 4, 3, 3, 2, 1);
 
             foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
             {
@@ -79,7 +79,7 @@
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
-            Assert.IsNotNull(new ConvolutionLayer(null, 100, new Kernel(3, 4, 3, 3), MatrixLayout.ColumnMajor, null));
+            Assert.IsNotNull(new ConvolutionLayer(null, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null));
         }
 
         [TestMethod]
@@ -105,7 +105,8 @@
             Assert.AreEqual(3, layer.Kernel.Height);
             Assert.AreEqual(4, layer.Kernel.StrideX);
             Assert.AreEqual(1, layer.Kernel.StrideY);
-            Assert.AreEqual(PaddingMode.Valid, layer.Kernel.Padding);
+            Assert.AreEqual(-1, layer.Kernel.PaddingX);
+            Assert.AreEqual(-1, layer.Kernel.PaddingY);
 
             CollectionAssert.AreEqual(new[] { 2, 3, 8, 16 }, layer.OutputShape.Axes);
             Assert.AreEqual(1, layer.NumberOfOutputs);
@@ -155,7 +156,7 @@
         public void CopyConstructorTest1()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
-            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, PaddingMode.Valid), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             ConvolutionLayer layer2 = new ConvolutionLayer(layer1);
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -171,7 +172,7 @@
         public void EnumGradientsTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
-            ConvolutionLayer layer = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, PaddingMode.Valid), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             Assert.AreEqual(2, layer.EnumGradients().Count());
         }
 
@@ -179,7 +180,7 @@
         public void CloneTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
-            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, PaddingMode.Valid), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             ConvolutionLayer layer2 = layer1.Clone() as ConvolutionLayer;
             Assert.AreEqual(JsonConvert.SerializeObject(layer1), JsonConvert.SerializeObject(layer2));
         }
@@ -188,7 +189,7 @@
         public void SerializeTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
-            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, PaddingMode.Valid), MatrixLayout.ColumnMajor, null);
+            ConvolutionLayer layer1 = new ConvolutionLayer(shape, 100, new Kernel(3, 4, 3, 3, 2, 1), MatrixLayout.ColumnMajor, null);
             string s1 = JsonConvert.SerializeObject(layer1);
             ConvolutionLayer layer2 = JsonConvert.DeserializeObject<ConvolutionLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
@@ -501,19 +502,11 @@
         {
             List<float> res = new List<float>();
 
-            int inputWidth = x.Shape.GetAxis(Axis.X);
-            int inputHeight = x.Shape.GetAxis(Axis.Y);
-            int outputWidth = kernel.ComputeOutputWidth(inputWidth);
-            int outputHeight = kernel.ComputeOutputHeight(inputHeight);
-
-            (int paddingLeft, int paddingRight) = kernel.ComputeHorizontalPadding(inputWidth, outputWidth);
-            (int paddingTop, int paddingBottom) = kernel.ComputeVerticalPadding(inputHeight, outputHeight);
-
             for (int ib = 0, iib = x.Shape.GetAxis(Axis.B); ib < iib; ib++)
             {
-                for (int ix = 0, xpos = -paddingLeft; ix < outputWidth; ix++, xpos += kernel.StrideX)
+                for (int ix = 0, xpos = -kernel.PaddingX, iix = kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)); ix < iix; ix++, xpos += kernel.StrideX)
                 {
-                    for (int iy = 0, ypos = -paddingTop; iy < outputHeight; iy++, ypos += kernel.StrideY)
+                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
                         Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel);
                         res.AddRange(FullyConnectedLayerTest.CalculateNeurons(w, k, b, numberOfFilters, matrixLayout));
@@ -528,17 +521,9 @@
         {
             float[] res = new float[x.Length];
 
-            int inputWidth = x.Shape.GetAxis(Axis.X);
-            int inputHeight = x.Shape.GetAxis(Axis.Y);
-            int outputWidth = kernel.ComputeOutputWidth(inputWidth);
-            int outputHeight = kernel.ComputeOutputHeight(inputHeight);
-
-            (int paddingLeft, int paddingRight) = kernel.ComputeHorizontalPadding(inputWidth, outputWidth);
-            (int paddingTop, int paddingBottom) = kernel.ComputeVerticalPadding(inputHeight, outputHeight);
-
-            for (int ix = 0, xpos = -paddingLeft; ix < outputWidth; ix++, xpos += kernel.StrideX)
+            for (int ix = 0, xpos = -kernel.PaddingX, iix = dy.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
             {
-                for (int iy = 0, ypos = -paddingTop; iy < outputHeight; iy++, ypos += kernel.StrideY)
+                for (int iy = 0, ypos = -kernel.PaddingY, iiy = dy.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                 {
                     Tensor subdy = new Tensor(null, new Shape(Shape.BWHC, 1, 1, 1, numberOfFilters));
                     subdy.Set(dy.Weights.Skip(dy.Shape.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
@@ -582,17 +567,9 @@
         {
             float[] res = new float[w.Length];
 
-            int inputWidth = x.Shape.GetAxis(Axis.X);
-            int inputHeight = x.Shape.GetAxis(Axis.Y);
-            int outputWidth = kernel.ComputeOutputWidth(inputWidth);
-            int outputHeight = kernel.ComputeOutputHeight(inputHeight);
-
-            (int paddingLeft, int paddingRight) = kernel.ComputeHorizontalPadding(inputWidth, outputWidth);
-            (int paddingTop, int paddingBottom) = kernel.ComputeVerticalPadding(inputHeight, outputHeight);
-
-            for (int ix = 0, xpos = -paddingLeft; ix < outputWidth; ix++, xpos += kernel.StrideX)
+            for (int ix = 0, xpos = -kernel.PaddingX, iix = dy.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
             {
-                for (int iy = 0, ypos = -paddingTop; iy < outputHeight; iy++, ypos += kernel.StrideY)
+                for (int iy = 0, ypos = -kernel.PaddingY, iiy = dy.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                 {
                     Tensor subx = ConvolutionLayerTest.CropKernel(x, 0, xpos, ypos, kernel);
 
