@@ -301,6 +301,7 @@ namespace Genix.MachineLearning
         private static int CalculateOutputSize(int size, int kernelSize, int stride, int padding)
         {
             return size != -1 ? ((MinMax.Max(size - kernelSize + (2 * padding), 0) + stride - 1) / stride) + 1 : -1;
+            ////return size != -1 ? ((MinMax.Max(size + (2 * padding), 0) + stride - 1) / stride) : -1;
         }
     }
 }

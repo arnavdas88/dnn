@@ -34,9 +34,6 @@
     <ClCompile Include="source\RNN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\stackkernels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\convolution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -18,33 +18,6 @@
     {
         private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
-#if false
-        [TestMethod]
-        public void StackKernelsTest()
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            const int Count = 1000;
-
-            Tensor x = new Tensor(null, new Shape(Shape.BWHC, 1, 24, 24, 129));
-            x.Randomize();
-            Kernel kernel = new Kernel(5, 5, 1, 1, 1, 1);
-
-            Session session = new Session(false);
-
-            stopwatch.Restart();
-
-            for (int i = 0; i < Count; i++)
-            {
-                Tensor y = session.StackKernels(x, kernel);
-
-                session.EndSession();
-            }
-
-            stopwatch.Stop();
-            Console.WriteLine("{0:F4} ms, {1:F4} ms", stopwatch.ElapsedMilliseconds, (float)stopwatch.ElapsedMilliseconds / Count);
-        }
-#endif
-
         [TestMethod]
         public void ConstructorTest1()
         {
@@ -202,7 +175,7 @@
             (Shape shape, Kernel kernel, int numberOfFilters)[] testCases = new (Shape, Kernel, int)[]
             {
                 // no padding
-                /*(new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 1, 0, 0), 2),
+                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 1, 0, 0), 2),
                 (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 1, 1, 0, 0), 2),
                 (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 1, 1, 0, 0), 2),
                 (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 1, 1, 0, 0), 2),
@@ -251,11 +224,10 @@
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 1, 1, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 1, 1, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 1, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 1, -1, -2), 2),*/
+                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 1, -1, -2), 2),
 
-                //(new Shape(Shape.BWHC, -1, 6, 6, 1), new Kernel(1, 2, 2, 1, -2, -1), 1),
-                //(new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 2, 1, -2, -1), 2),
-                /*(new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 1, 2, 1, -2, -1), 2),
+                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 2, 1, -2, -1), 2),
+                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 1, 2, 1, -2, -1), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 2, 1, -2, -1), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 2, 1, -2, -1), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 2, 1, -2, -1), 2),
@@ -266,7 +238,11 @@
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 1, 2, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 1, 2, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 2, -1, -2), 2),*/
+                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 2, -1, -2), 2),
+
+                //(new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 1, 1, -1, -2), 2),
+
+                //(new Shape(Shape.BWHC, -1, 1, 6, 1), new Kernel(1, 2, 1, 1, 0, -2), 1),
             };
 
             foreach ((Shape shape, Kernel kernel, int numberOfFilters) in testCases)
@@ -294,201 +270,51 @@
 
                         Tensor y = layer.Forward(session, new[] { x })[0];
 
-                        Tensor expected = new Tensor(null, layer.OutputShape.Reshape(Axis.B, mb));
-                        expected.Set(ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, numberOfFilters, matrixLayout));
+                        Tensor expected = ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, numberOfFilters, matrixLayout);
                         Helpers.AreTensorsEqual(expected, y);
 
                         // unroll the graph
                         y.RandomizeGradient(this.random);
                         session.Unroll();
+
+                        // should be dy * numberOfCells in y
+                        Tensor expectedDB = ConvolutionLayerTest.CalculateDB(y);
+                        Helpers.AreGradientsEqual(expectedDB, layer.B);
+
+                        // should be dy * x'
+                        Tensor expectedDW = ConvolutionLayerTest.CalculateDW(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
+                        Helpers.AreGradientsEqual(expectedDW, layer.W);
+
+                        // should be dW' * dy
+                        Tensor expectedDX = ConvolutionLayerTest.CalculateDX(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
+                        Helpers.AreGradientsEqual(expectedDX, x);
                     }
                 }
             }
         }
 
-#if false
-        [TestMethod]
-        public void ForwardBackwardTest1()
-        {
-            Shape shape = new Shape(Shape.BWHC, -1, 2, 3, 2);
-            const int NumberOfFilters = 2;
-            Kernel kernel = new Kernel(1, 2, 1, 1, 0, 0);
-
-            foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
-            {
-                if (matrixLayout != MatrixLayout.ColumnMajor)
-                {
-                    continue;
-                }
-
-                ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
-                CollectionAssert.AreEqual(new[] { -1, 2, 2, NumberOfFilters }, layer.OutputShape.Axes);
-
-                layer.W.Set(new float[]
-                {
-                    1, 2, 3, 4,
-                    5, 6, 7, 8
-                });
-
-                layer.B.Set(new float[] { 1, 2 });
-
-                Tensor xTemp = new Tensor(null, shape.Reshape(Axis.B, 1));
-                xTemp.Set(new float[]
-                {
-                    1,  2,   3,  4,
-                    5,  6,   7,  8,
-                    9, 10,  11, 12
-                });
-
-                Tensor dyTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
-                dyTemp.Set(new float[]
-                {
-                    1, 2,  3, 4,
-                    5, 6,  7, 8
-                });
-
-                // should be W' * dy
-                Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
-                expectedDxTemp.Set(ConvolutionLayerTest.CalculateDx(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
-
-                Tensor expectedDBTemp = new Tensor(null, layer.B.Shape);
-                expectedDBTemp.Set(ConvolutionLayerTest.CalculateDB(dyTemp, NumberOfFilters));
-
-                Tensor expectedDWTemp = new Tensor(null, layer.W.Shape);
-                expectedDWTemp.Set(ConvolutionLayerTest.CalculateDW(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
-
-                for (int i = 1; i <= 3; i++)
-                {
-                    Session session = new Session();
-
-                    layer.W.ClearGradient();
-                    layer.B.ClearGradient();
-
-                    Tensor x = session.Tile(xTemp, (int)Axis.B, i);
-                    Tensor y = layer.Forward(session, new[] { x })[0];
-
-                    Tensor expected = new Tensor(null, layer.OutputShape.Reshape(Axis.B, i));
-                    expected.Set(ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, NumberOfFilters, matrixLayout));
-                    Helpers.AreTensorsEqual(expected, y);
-
-                    // unroll the graph
-                    y.SetGradient(session.Tile(dyTemp, (int)Axis.B, i).Weights);
-                    session.Unroll();
-
-                    /*Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                    Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
-
-                    // should be dy
-                    Tensor expectedDB = session.Multiply(expectedDBTemp, i);
-                    Helpers.AreArraysEqual(expectedDB.Length, expectedDB.Weights, layer.B.Gradient);
-
-                    // should be x * dy
-                    Tensor expectedDW = session.Multiply(expectedDWTemp, i);
-                    Helpers.AreArraysEqual(expectedDW.Length, expectedDW.Weights, layer.W.Gradient);*/
-                }
-            }
-        }
-
-        [TestMethod]
-        public void ForwardBackwardTest2()
-        {
-            Shape shape = new Shape(Shape.BWHC, -1, 2, 3, 2);
-            const int NumberOfFilters = 2;
-            Kernel kernel = new Kernel(1, 2, 1, 1, 1, 1);
-
-            foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
-            {
-                if (matrixLayout != MatrixLayout.ColumnMajor)
-                {
-                    continue;
-                }
-
-                ConvolutionLayer layer = new ConvolutionLayer(shape, NumberOfFilters, kernel, matrixLayout, null);
-                CollectionAssert.AreEqual(new[] { -1, 4, 4, NumberOfFilters }, layer.OutputShape.Axes);
-
-                layer.W.Set(new float[]
-                {
-                    1, 2, 3, 4,
-                    5, 6, 7, 8
-                });
-
-                layer.B.Set(new float[] { 1, 2 });
-
-                Tensor xTemp = new Tensor(null, shape.Reshape(Axis.B, 1));
-                xTemp.Set(new float[]
-                {
-                    1,  2,   3,  4,
-                    5,  6,   7,  8,
-                    9, 10,  11, 12
-                });
-
-                Tensor dyTemp = new Tensor(null, layer.OutputShape.Reshape(Axis.B, 1));
-                dyTemp.Set(new float[]
-                {
-                     1,  2,   3,  4,   5,  6,   7,  8,
-                     9, 10,  11, 12,  13, 14,  15, 16,
-                    17, 18,  19, 20,  21, 22,  23, 24,
-                    25, 26,  27, 28,  29, 30,  31, 32
-                });
-
-                // should be sum(filter[i] * out_grad[i])
-                Tensor expectedDxTemp = new Tensor(null, xTemp.Shape);
-                expectedDxTemp.Set(ConvolutionLayerTest.CalculateDx(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
-
-                Tensor expectedDBTemp = new Tensor(null, layer.B.Shape);
-                expectedDBTemp.Set(ConvolutionLayerTest.CalculateDB(dyTemp, NumberOfFilters));
-
-                Tensor expectedDWTemp = new Tensor(null, layer.W.Axes);
-                expectedDWTemp.Set(ConvolutionLayerTest.CalculateDW(layer.W, xTemp, dyTemp, kernel, NumberOfFilters, matrixLayout));
-
-                for (int i = 1; i <= 3; i++)
-                {
-                    Session session = new Session();
-
-                    layer.W.ClearGradient();
-                    layer.B.ClearGradient();
-
-                    Tensor x = session.Tile(xTemp, (int)Axis.B, i);
-                    Tensor y = layer.Forward(session, new[] { x })[0];
-
-                    Tensor expected = new Tensor(null, layer.OutputShape.Reshape(Axis.B, i));
-                    expected.Set(ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, NumberOfFilters, matrixLayout));
-                    Helpers.AreTensorsEqual(expected, y);
-
-                    // unroll the graph
-                    y.SetGradient(session.Tile(dyTemp, (int)Axis.B, i).Weights);
-                    session.Unroll();
-
-                    /*Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
-                    Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
-
-                    // should be dy
-                    Tensor expectedDB = session.Multiply(expectedDBTemp, i);
-                    Helpers.AreArraysEqual(expectedDB.Length, expectedDB.Weights, layer.B.Gradient);
-
-                    // should be x * dy
-                    Tensor expectedDW = session.Multiply(expectedDWTemp, i);
-                    Helpers.AreArraysEqual(expectedDW.Length, expectedDW.Weights, layer.W.Gradient);*/
-                }
-            }
-        }
-#endif
-
-        private static Tensor CropKernel(Tensor input, int b, int x, int y, Kernel kernel)
+        private static Tensor CropKernel(Tensor input, int b, int x, int y, Kernel kernel, bool cropGradient)
         {
             Tensor res = new Tensor(null, new Shape(Shape.BWHC, 1, kernel.Width, kernel.Height, input.Shape.GetAxis(Axis.C)));
 
+            int xb = Math.Max(-kernel.PaddingX, 0);
+            int xe = input.Shape.GetAxis(Axis.X) - 1 - xb;
+            int yb = Math.Max(-kernel.PaddingY, 0);
+            int ye = input.Shape.GetAxis(Axis.Y) - 1 - yb;
+
             for (int ix = x; ix < x + kernel.Width; ix++)
             {
-                if (ix.Between(0, input.Shape.GetAxis(Axis.X) - 1))
+                if (ix.Between(xb, xe))
                 {
                     for (int iy = y; iy < y + kernel.Height; iy++)
                     {
-                        if (iy.Between(0, input.Shape.GetAxis(Axis.Y) - 1))
+                        if (iy.Between(yb, ye))
                         {
                             for (int ic = 0; ic < input.Shape.GetAxis(Axis.C); ic++)
                             {
-                                res[0, ix - x, iy - y, ic] = input[b, ix, iy, ic];
+                                res[0, ix - x, iy - y, ic] = cropGradient ?
+                                    input.Gradient[input.Shape.Position(b, ix, iy, ic)] :
+                                    input.Weights[input.Shape.Position(b, ix, iy, ic)];
                             }
                         }
                     }
@@ -498,51 +324,66 @@
             return res;
         }
 
-        private static float[] CalculateY(Tensor w, Tensor x, Tensor b, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
+        private static Tensor CalculateY(Tensor w, Tensor x, Tensor b, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
         {
-            List<float> res = new List<float>();
+            Tensor y = new Tensor(null,
+                new Shape(
+                    Shape.BWHC,
+                    x.Shape.GetAxis(Axis.B),
+                    kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)),
+                    kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)),
+                    x.Shape.GetAxis(Axis.C)));
 
-            for (int ib = 0, iib = x.Shape.GetAxis(Axis.B); ib < iib; ib++)
+            for (int ib = 0, iib = y.Shape.GetAxis(Axis.B); ib < iib; ib++)
             {
-                for (int ix = 0, xpos = -kernel.PaddingX, iix = kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)); ix < iix; ix++, xpos += kernel.StrideX)
+                for (int ix = 0, xpos = -kernel.PaddingX, iix = y.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
                 {
-                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)); iy < iiy; iy++, ypos += kernel.StrideY)
+                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
-                        Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel);
-                        res.AddRange(FullyConnectedLayerTest.CalculateNeurons(w, k, b, numberOfFilters, matrixLayout));
+                        Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel, false);
+                        float[] features = FullyConnectedLayerTest.CalculateNeurons(w, k, b, numberOfFilters, matrixLayout);
+
+                        for (int ic = 0, iic = y.Shape.GetAxis(Axis.C); ic < iic; ic++)
+                        {
+                            y[ib, ix, iy, ic] = features[ic];
+                        }
                     }
                 }
             }
 
-            return res.ToArray();
+            return y;
         }
 
-        private static float[] CalculateDx(Tensor w, Tensor x, Tensor dy, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
+        private static Tensor CalculateDX(Tensor w, Tensor x, Tensor y, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
         {
-            float[] res = new float[x.Length];
+            Tensor dx = new Tensor(null, x.Axes);
 
-            for (int ix = 0, xpos = -kernel.PaddingX, iix = dy.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
+            int xb = Math.Max(-kernel.PaddingX, 0);
+            int xe = x.Shape.GetAxis(Axis.X) - 1 - xb;
+            int yb = Math.Max(-kernel.PaddingY, 0);
+            int ye = x.Shape.GetAxis(Axis.Y) - 1 - yb;
+
+            for (int ib = 0, iib = x.Shape.GetAxis(Axis.B); ib < iib; ib++)
             {
-                for (int iy = 0, ypos = -kernel.PaddingY, iiy = dy.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
+                for (int ix = 0, xpos = -kernel.PaddingX, iix = y.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
                 {
-                    Tensor subdy = new Tensor(null, new Shape(Shape.BWHC, 1, 1, 1, numberOfFilters));
-                    subdy.Set(dy.Weights.Skip(dy.Shape.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
-
-                    Tensor subdx = new Tensor(null, new Shape(Shape.BWHC, 1, kernel.Width, kernel.Height, numberOfFilters));
-                    subdx.Set(FullyConnectedLayerTest.CalculateDx(w, subdy, numberOfFilters, matrixLayout));
-
-                    for (int kx = 0; kx < kernel.Width; kx++)
+                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
-                        for (int ky = 0; ky < kernel.Height; ky++)
+                        Tensor kdy = ConvolutionLayerTest.CropKernel(y, ib, ix, iy, new Kernel(1, 1, 1, 1), true);
+
+                        Tensor kdx = new Tensor(null, new Shape(Shape.BWHC, 1, kernel.Width, kernel.Height, numberOfFilters));
+                        kdx.Set(FullyConnectedLayerTest.CalculateDx(w, kdy, numberOfFilters, matrixLayout));
+
+                        for (int kx = xpos; kx < xpos + kernel.Width; kx++)
                         {
-                            for (int kc = 0; kc < numberOfFilters; kc++)
+                            for (int ky = ypos; ky < ypos + kernel.Height; ky++)
                             {
-                                int kxpos = xpos + kx;
-                                int kypos = ypos + ky;
-                                if (kxpos >= 0 && kxpos < x.Shape.GetAxis(Axis.X) &&
-                                    kypos >= 0 && kypos < x.Shape.GetAxis(Axis.Y))
+                                if (kx.Between(xb, xe) && ky.Between(yb, ye))
                                 {
-                                    res[x.Shape.Position(0, kxpos, kypos, kc)] += subdx[0, kx, ky, kc];
+                                    for (int kc = 0; kc < numberOfFilters; kc++)
+                                    {
+                                        dx.Gradient[x.Shape.Position(ib, kx, ky, kc)] += kdx[0, kx - xpos, ky - ypos, kc];
+                                    }
                                 }
                             }
                         }
@@ -550,38 +391,53 @@
                 }
             }
 
-            return res;
+            return dx;
         }
 
-        private static float[] CalculateDB(Tensor dy, int numberOfFilters)
+        private static Tensor CalculateDB(Tensor y)
         {
-            int count = dy.Length / numberOfFilters;
+            int y0 = y.Shape.GetAxis(Axis.B);
+            int y1 = y.Shape.GetAxis(Axis.X);
+            int y2 = y.Shape.GetAxis(Axis.Y);
+            int y3 = y.Shape.GetAxis(Axis.C);
+            int ystride3 = y.Shape.GetStride(Axis.C);
 
-            return Enumerable.Range(0, numberOfFilters).Select(neuron =>
+            Tensor db = new Tensor(null, new[] { y3 });
+
+            for (int iy0 = 0; iy0 < y0; iy0++)
             {
-                return Enumerable.Range(0, count).Sum(i => dy[(numberOfFilters * i) + neuron]);
-            }).ToArray();
-        }
-
-        private static float[] CalculateDW(Tensor w, Tensor x, Tensor dy, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
-        {
-            float[] res = new float[w.Length];
-
-            for (int ix = 0, xpos = -kernel.PaddingX, iix = dy.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
-            {
-                for (int iy = 0, ypos = -kernel.PaddingY, iiy = dy.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
+                for (int iy1 = 0; iy1 < y1; iy1++)
                 {
-                    Tensor subx = ConvolutionLayerTest.CropKernel(x, 0, xpos, ypos, kernel);
-
-                    Tensor subdy = new Tensor(null, new Shape(Shape.BWHC, 1, 1, 1, numberOfFilters));
-                    subdy.Set(dy.Weights.Skip(dy.Shape.Position(0, ix, iy, 0)).Take(numberOfFilters).ToArray());
-
-                    float[] dw = FullyConnectedLayerTest.CalculateDW(subx, subdy, matrixLayout);
-                    Mathematics.Add(res.Length, dw, 0, res, 0);
+                    for (int iy2 = 0; iy2 < y2; iy2++)
+                    {
+                        Mathematics.Add(y3, y.Gradient, y.Shape.Position(iy0, iy1, iy2, 0), ystride3, db.Gradient, 0, 1);
+                    }
                 }
             }
 
-            return res;
+            return db;
+        }
+
+        private static Tensor CalculateDW(Tensor w, Tensor x, Tensor y, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
+        {
+            Tensor dw = new Tensor(null, w.Axes);
+
+            for (int ib = 0, iib = y.Shape.GetAxis(Axis.B); ib < iib; ib++)
+            {
+                for (int ix = 0, xpos = -kernel.PaddingX, iix = y.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
+                {
+                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
+                    {
+                        Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel, false);
+                        Tensor kdy = ConvolutionLayerTest.CropKernel(y, ib, ix, iy, new Kernel(1, 1, 1, 1), true);
+
+                        float[] dww = FullyConnectedLayerTest.CalculateDW(k, kdy, matrixLayout);
+                        Mathematics.Add(dw.Length, dww, 0, dw.Gradient, 0);
+                    }
+                }
+            }
+
+            return dw;
         }
     }
 }

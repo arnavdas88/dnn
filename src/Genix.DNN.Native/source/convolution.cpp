@@ -13,44 +13,6 @@ void __forceinline tile(const int count, const int length, const float* src, flo
 	}
 }
 
-int __forceinline output_size_floor(const int size, const int ksize, const int kstride, const int kpadding)
-{
-	return (max(size - ksize + (2 * kpadding), 0) / kstride) + 1;
-}
-
-int __forceinline divide_ceiling(const int value, const int divisor)
-{
-	return (value + divisor - 1) / divisor;
-}
-
-int __forceinline output_size_ceiling(const int size, const int ksize, const int kstride, const int kpadding)
-{
-	return divide_ceiling(max(size - ksize + (2 * kpadding), 0), kstride) + 1;
-}
-
-void __forceinline matmul(
-	const int m, const int n, const int k,
-	const float* A, const int lda,
-	const float* B, const int ldb,
-	float* C, const int ldc)
-{
-	::cblas_sgemm(
-		CblasColMajor,
-		CblasNoTrans,
-		CblasNoTrans,
-		m,
-		n,
-		k,
-		1.0f,
-		A,
-		lda,
-		B,
-		ldb,
-		1.0f,
-		C,
-		ldc);
-}
-
 GENIXAPI(void, convolution)(
 	const int ksize1,
 	const int ksize2,
@@ -145,13 +107,159 @@ GENIXAPI(void, convolution)(
 						iy1++;
 					}
 
-					matmul(
+					::cblas_sgemm(
+						CblasColMajor, CblasNoTrans, CblasNoTrans,
 						y3, n, k,
+						1.0f,
 						www + (ptrdiff_t(ixy1) * kstep), ldw,
 						xww + (ptrdiff_t(ix1) * xstride1), ldx,
+						1.0f,
 						yww + (ptrdiff_t(iy1) * ystride1), ldy);
 				}
 			}
 		}
 	}/*);*/
 }
+
+GENIXAPI(void, convolution_gradient)(
+	const int ksize1,
+	const int ksize2,
+	const int kstride1,
+	const int kstride2,
+	const int kpadding1,
+	const int kpadding2,
+	const float* ww,
+	float* dww,
+	float* dbw,
+	const int* waxes,
+	const int* wstrides,
+	const float* xw,
+	float* dxw,
+	const int* xaxes,
+	const int* xstrides,
+	const float* dyw,
+	const int* yaxes,
+	const int* ystrides)
+{
+	const int w0 = waxes[0];
+	const int w1 = waxes[1];
+	const int wstride0 = wstrides[0];
+	const int wstride1 = wstrides[1];
+
+	const int x0 = xaxes[0];
+	const int x1 = xaxes[1];
+	const int x2 = xaxes[2];
+	const int xstride0 = xstrides[0];
+	const int xstride1 = xstrides[1];
+	const int xstride2 = xstrides[2];
+
+	const int y0 = yaxes[0];
+	const int y1 = yaxes[1];
+	const int y2 = yaxes[2];
+	const int y3 = yaxes[3];	// number of channels
+	const int ystride0 = ystrides[0];
+	const int ystride1 = ystrides[1];
+	const int ystride2 = ystrides[2];
+
+	const int ldw = y3;
+	const int ldx = kstride1 * xstride1;
+	const int ldy = ystride1;
+	const int kstep = ksize2 * xstride2 * ldw;
+
+	// if kpadding1 or kpadding2 are negative we need to shrink working area of x tensor
+	if (kpadding1 < 0)
+	{
+		const int off = -ptrdiff_t(kpadding1) * xstride1;
+		xw += off;
+		dxw += off;
+	}
+
+	if (kpadding2 < 0)
+	{
+		const int off = -ptrdiff_t(kpadding2) * xstride2;
+		xw += off;
+		dxw += off;
+	}
+
+	const int x1e = x1 + (2 * min(kpadding1, 0));
+	const int x2e = x2 + (2 * min(kpadding2, 0));
+
+	float* ones = (float*)::alloca(ptrdiff_t(y0) * y1 * sizeof(float));
+	for (int i = 0; i < y0 * y1; i++) { ones[i] = 1.0f; }
+
+	for (int iy2 = 0; iy2 < y2; iy2++) {
+		//parallel_for(0, y2, [&](int iy2) {
+
+		const float* www = ww;
+		float* dwww = dww;
+		const float* xww = xw;
+		float* dxww = dxw;
+		const float* dyww = dyw + (ptrdiff_t(iy2) * ystride2);
+
+		// 1. Calculate biases
+		////for (int ixy0 = 0; ixy0 < x0; ixy0++, dyww += ystride0)
+		{
+			::cblas_sgemv(
+				CblasColMajor, CblasNoTrans,
+				y3, y0 * y1,
+				1.0f,
+				dyww, ldy,
+				ones, 1,
+				1.0f,
+				dbw, 1);
+		}
+
+		// 2. calculate w and x gradients
+		const int ix2 = (iy2 * kstride2) - max(kpadding2, 0);
+		const int ix2e = min(ix2 + ksize2, x2e);
+		const int k = (ix2e - max(ix2, 0)) * xstride2;
+
+		// k may be zero if the current portion of input tensor
+		// is completely in the padding area
+		if (k > 0)
+		{
+			const int xoff = ptrdiff_t(max(ix2, 0)) * xstride2;
+			xww += xoff;
+			dxww += xoff;
+			const int woff = ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
+			www += woff;
+			dwww += woff;
+
+			for (int ixy0 = 0; ixy0 < x0; ixy0++, xww += xstride0, dxww += xstride0, dyww += ystride0)
+			{
+				for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
+				{
+					int ix1 = ixy1 - max(kpadding1, 0);
+					int iy1 = 0;
+					int n = min(y1, ((x1e - ix1 - 1) / kstride1 + 1));
+
+					while (ix1 < 0)
+					{
+						ix1 += kstride1;
+						n--;
+						iy1++;
+					}
+
+					::cblas_sgemm(
+						CblasColMajor, CblasNoTrans, CblasTrans,
+						y3, k, n,
+						1.0f,
+						dyww + (ptrdiff_t(iy1) * ystride1), ldy,
+						xww + (ptrdiff_t(ix1) * xstride1), ldx,
+						1.0f,
+						dwww + (ptrdiff_t(ixy1) * kstep), ldw);
+
+					::cblas_sgemm(
+						CblasColMajor, CblasTrans, CblasNoTrans,
+						k, n, y3,
+						1.0f,
+						www + (ptrdiff_t(ixy1) * kstep), ldw,
+						dyww + (ptrdiff_t(iy1) * ystride1), ldy,
+						1.0f,
+						dxww + (ptrdiff_t(ix1) * xstride1), ldx);
+				}
+			}
+		}
+	}/*);*/
+}
+

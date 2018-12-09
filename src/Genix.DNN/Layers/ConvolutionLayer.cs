@@ -41,7 +41,7 @@ namespace Genix.DNN.Layers
             MatrixLayout matrixLayout,
             RandomNumberGenerator<float> random)
         {
-            this.Initialize(shape, numberOfFilters, kernel, matrixLayout, random);
+            this.Initialize(shape, numberOfFilters, kernel, MatrixLayout.ColumnMajor /*matrixLayout*/, random);
         }
 
         /// <summary>
@@ -84,6 +84,13 @@ namespace Genix.DNN.Layers
             this.NumberOfNeurons,
             this.Kernel.ToString(1, 1));
 
+        /// <inheritdoc />
+        public override MatrixLayout MatrixLayout
+        {
+            get => MatrixLayout.ColumnMajor;
+            private protected set { }
+        }
+
         /// <summary>
         /// Gets the convolution kernel.
         /// </summary>
@@ -102,52 +109,23 @@ namespace Genix.DNN.Layers
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal override void OptimizeForLearning()
+        {
+            // matrices are always in column-major layout - no optimization
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal override void OptimizeForTesting()
+        {
+            // matrices are always in column-major layout - no optimization
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
         {
             return new[] { session.Convolution(xs[0], this.W, this.B, this.Kernel, this.NumberOfNeurons, this.MatrixLayout) };
-
-            /*Tensor x = xs[0];
-
-            IList<Tensor> ys;
-            if (this.Kernel.SameAsInput(x.Shape.GetAxis(Axis.X), x.Shape.GetAxis(Axis.Y)))
-            {
-                ys = base.Forward(session, xs);
-            }
-            else
-            {
-                Tensor temp = session.StackKernels(x, this.Kernel);
-                ys = base.Forward(session, new[] { temp });
-            }
-
-            // reshape the tensor so it matches the layer output
-            session.ReshapeIP(ys[0], ConvolutionLayer.CalculateOutputShape(x.Shape, this.NumberOfNeurons, this.Kernel));
-
-            return ys;*/
-        }
-
-        /// <summary>
-        /// Computes the dimensions of the layer's output tensor.
-        /// </summary>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
-        /// <param name="numberOfFilters">The number of filters in the layer.</param>
-        /// <param name="kernel">The convolution kernel.</param>
-        /// <returns>
-        /// The shape of the layer's output tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Shape CalculateOutputShape(Shape shape, int numberOfFilters, Kernel kernel)
-        {
-            if (shape == null)
-            {
-                throw new ArgumentNullException(nameof(shape));
-            }
-
-            return new Shape(
-                shape.Format,
-                shape.GetAxis(Axis.B),
-                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
-                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
-                numberOfFilters);
         }
 
         /// <summary>
@@ -187,7 +165,12 @@ namespace Genix.DNN.Layers
             this.Initialize(numberOfFilters, matrixLayout, weightsShape, biasesShape, random);
             this.Kernel = kernel;
 
-            this.OutputShape = ConvolutionLayer.CalculateOutputShape(shape, numberOfFilters, kernel);
+            this.OutputShape = new Shape(
+                shape.Format,
+                shape.GetAxis(Axis.B),
+                kernel.CalculateOutputWidth(shape.GetAxis(Axis.X)),
+                kernel.CalculateOutputHeight(shape.GetAxis(Axis.Y)),
+                numberOfFilters);
         }
     }
 }

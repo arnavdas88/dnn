@@ -75,7 +75,7 @@ namespace Genix.DNN.Layers
         /// The <see cref="Genix.Core.MatrixLayout"/> enumeration.
         /// </value>
         [JsonProperty("matrixLayout")]
-        public MatrixLayout MatrixLayout { get; private set; }
+        public virtual MatrixLayout MatrixLayout { get; private protected set; }
 
         /// <summary>
         /// Gets the weights for the layer.

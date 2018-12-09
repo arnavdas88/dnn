@@ -233,7 +233,7 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="x">The tensor to attach the gradient to.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AttachGradient(Tensor x)
+        internal void AllocateGradient(Tensor x)
         {
             if (this.cache.TryGetValue(x.Length, out Stack<float[]> stack) && stack.Count > 0)
             {
@@ -248,25 +248,14 @@ namespace Genix.DNN
         /// </summary>
         /// <param name="xs">The tensors to attach the gradient to.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AttachGradients(Tensor[] xs)
+        internal void AllocateGradients(Tensor[] xs)
         {
             for (int i = 0, ii = xs.Length; i < ii; i++)
             {
-                this.AttachGradient(xs[i]);
+                this.AllocateGradient(xs[i]);
             }
         }
 #endif
-
-        /*internal string PrintSessionReport()
-        {
-#if SESSION_DIAG
-            return string.Join(
-                Environment.NewLine,
-                this.performance.Select(kvp => string.Format(CultureInfo.InvariantCulture, "{0}: {1}", kvp.Key, kvp.Value / count)));
-#else
-            return null;
-#endif
-        }*/
 
         internal string PrintPerformanceReport(int count)
         {

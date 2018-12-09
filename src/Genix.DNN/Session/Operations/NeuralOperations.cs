@@ -860,6 +860,41 @@ namespace Genix.DNN
                                 y.Axes,
                                 y.Strides);
 
+#if !NOLEARNING
+                    if (calculateGradient)
+                    {
+                        session.Push(
+                            ActionName,
+                            () =>
+                            {
+                                lock (w)
+                                {
+                                    lock (b)
+                                    {
+                                        NativeMethods.convolution_gradient(
+                                            kernel.Width,
+                                            kernel.Height,
+                                            kernel.StrideX,
+                                            kernel.StrideY,
+                                            kernel.PaddingX,
+                                            kernel.PaddingY,
+                                            w.Weights,
+                                            w.Gradient,
+                                            b.Gradient,
+                                            w.Axes,
+                                            w.Strides,
+                                            x.Weights,
+                                            x.Gradient,
+                                            x.Axes,
+                                            x.Strides,
+                                            y.Gradient,
+                                            y.Axes,
+                                            y.Strides);
+                                    }
+                                }
+                            });
+                    }
+#endif
                     return y;
                 });
         }
@@ -1197,6 +1232,27 @@ namespace Genix.DNN
                 [In] int[] xaxes,
                 [In] int[] xstrides,
                 [Out] float[] yw,
+                [In] int[] yaxes,
+                [In] int[] ystrides);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void convolution_gradient(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [In] float[] ww,
+                [Out] float[] dww,
+                [Out] float[] dbw,
+                [In] int[] waxes,
+                [In] int[] wstrides,
+                [In] float[] xw,
+                [Out] float[] dxw,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
+                [In] float[] dyw,
                 [In] int[] yaxes,
                 [In] int[] ystrides);
 

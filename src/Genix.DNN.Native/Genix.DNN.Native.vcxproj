@@ -135,7 +135,6 @@
     <ClCompile Include="source\CTC.cpp" />
     <ClCompile Include="source\LRN.cpp" />
     <ClCompile Include="source\RNN.cpp" />
-    <ClCompile Include="source\stackkernels.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

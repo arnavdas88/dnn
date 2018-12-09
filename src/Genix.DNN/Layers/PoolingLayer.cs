@@ -23,7 +23,7 @@ namespace Genix.DNN.Layers
         /// <param name="shape">The shape of the layer's input tensor.</param>
         /// <param name="kernel">The pooling kernel.</param>
         protected PoolingLayer(Shape shape, Kernel kernel)
-            : base(1, PoolingLayer.CalculateOutputShape(shape, kernel))
+            : base(1, kernel.CalculateOutputShape(shape))
         {
             this.Kernel = kernel;
         }
@@ -54,16 +54,5 @@ namespace Genix.DNN.Layers
         /// </value>
         [JsonProperty("Kernel")]
         public Kernel Kernel { get; protected set; }
-
-        /// <summary>
-        /// Computes the shape of the layer's output tensor.
-        /// </summary>
-        /// <param name="shape">The shape of the layer's input tensor.</param>
-        /// <param name="kernel">The pooling kernel.</param>
-        /// <returns>
-        /// The shape of the layer's output tensor.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Shape CalculateOutputShape(Shape shape, Kernel kernel) => kernel.CalculateOutputShape(shape);
     }
 }

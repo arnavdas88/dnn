@@ -45,7 +45,7 @@
 
             for (int i = 0, ii = expected.Length; i < ii; i++)
             {
-                Assert.AreEqual(expected[i], actual[i], 1e-5f, i.ToString(CultureInfo.InvariantCulture));
+                Assert.AreEqual(expected[i], actual[i], 1e-4f, i.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -53,7 +53,7 @@
         {
             for (int i = 0; i < length; i++)
             {
-                Assert.AreEqual(expected[i], actual[i], 1e-5f, i.ToString(CultureInfo.InvariantCulture));
+                Assert.AreEqual(expected[i], actual[i], 1e-4f, i.ToString(CultureInfo.InvariantCulture));
             }
         }
 

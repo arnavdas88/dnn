@@ -609,87 +609,6 @@ namespace Genix.DNN
                 });
         }
 
-#if false
-        /// <summary>
-        /// Crops the three-dimensional sub-tensors from a specified tensor by using the specified kernel,
-        /// and then stacks the sub-tensors batch-wise in the destination tensor.
-        /// </summary>
-        /// <param name="session">The scope that executes this operation.</param>
-        /// <param name="x">The tensor that contains the data.</param>
-        /// <param name="kernel">The kernel to apply to <c>x</c>.</param>
-        /// <returns>
-        /// The <see cref="Tensor"/> that contains computed data.
-        /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Tensor StackKernels(this Session session, Tensor x, Kernel kernel)
-        {
-            const string ActionName = "stack kernels";
-
-            return session.RunOperation(
-                ActionName,
-                () =>
-                {
-                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
-
-                    int y1 = kernel.CalculateOutputWidth(x.Axes[1]);
-                    int y2 = kernel.CalculateOutputHeight(x.Axes[2]);
-
-#if true
-                    Tensor y = session.AllocateTensor(
-                        ActionName,
-                        new Shape(new int[] { x.Shape.GetAxis(Axis.B) * y1 * y2, kernel.Width * kernel.Height * x.Shape.GetAxis(Axis.C) }),
-                        calculateGradient);
-#else
-                    Tensor y = session.AllocateTensor(
-                        ActionName,
-                        new Shape(Shape.BWHC, x.Axes[0] * y1 * y2, kernel.Width, kernel.Height, x.Axes[3]),
-                        calculateGradient);
-#endif
-
-                    NativeMethods.stack_kernels(
-                        kernel.Width,
-                        kernel.Height,
-                        kernel.StrideX,
-                        kernel.StrideY,
-                        kernel.PaddingX,
-                        kernel.PaddingY,
-                        x.Weights,
-                        x.Axes,
-                        x.Strides,
-                        y.Weights,
-                        y.Length,
-                        new int[] { 0, y1, y2 },
-                        y.Strides);
-
-#if !NOLEARNING
-                    if (calculateGradient)
-                    {
-                        session.Push(
-                            ActionName,
-                            () =>
-                            {
-                                NativeMethods.stack_kernels_gradient(
-                                    kernel.Width,
-                                    kernel.Height,
-                                    kernel.StrideX,
-                                    kernel.StrideY,
-                                    kernel.PaddingX,
-                                    kernel.PaddingY,
-                                    x.Gradient,
-                                    x.Axes,
-                                    x.Strides,
-                                    y.Gradient,
-                                    new int[] { 0, y1, y2 },
-                                    y.Strides);
-                            });
-                    }
-#endif
-
-                    return y;
-                });
-        }
-#endif
-
         /// <summary>
         /// Compacts a tensor along the specified axis by choosing a maximum value out of group of elements.
         /// </summary>
@@ -1227,43 +1146,6 @@ namespace Genix.DNN
                     }
                 }
             }
-        }
-
-        [SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
-        {
-            private const string DllName = "Genix.DNN.Native.dll";
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void stack_kernels(
-                int ksize1,
-                int ksize2,
-                int kstride1,
-                int kstride2,
-                int kpadding1,
-                int kpadding2,
-                [In] float[] xw,
-                [In] int[] xaxes,
-                [In] int[] xstrides,
-                [Out] float[] yw,
-                int ywlen,
-                [In] int[] yaxes,
-                [In] int[] ystrides);
-
-            [DllImport(NativeMethods.DllName)]
-            public static extern void stack_kernels_gradient(
-                int ksize1,
-                int ksize2,
-                int kstride1,
-                int kstride2,
-                int kpadding1,
-                int kpadding2,
-                [Out] float[] dxw,
-                [In] int[] xaxes,
-                [In] int[] xstrides,
-                [In] float[] dyw,
-                [In] int[] yaxes,
-                [In] int[] ystrides);
         }
     }
 }
