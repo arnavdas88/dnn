@@ -239,10 +239,6 @@
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 1, 2, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 1, 2, -1, -2), 2),
                 (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 2, -1, -2), 2),
-
-                //(new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 1, 1, -1, -2), 2),
-
-                //(new Shape(Shape.BWHC, -1, 1, 6, 1), new Kernel(1, 2, 1, 1, 0, -2), 1),
             };
 
             foreach ((Shape shape, Kernel kernel, int numberOfFilters) in testCases)
@@ -260,7 +256,7 @@
 
                     for (int mb = 1; mb <= 3; mb++)
                     {
-                        Session session = new Session();
+                        Session session = new Session(true);
 
                         layer.W.ClearGradient();
                         layer.B.ClearGradient();

@@ -638,8 +638,6 @@ namespace Genix.DNN
                 ActionName,
                 () =>
                 {
-                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
-
                     int xaxis = x.Axes[axis];
                     int xstride = x.Strides[axis];
 
@@ -647,6 +645,8 @@ namespace Genix.DNN
                     {
                         throw new ArgumentException("The axis dimension must be a count multiple.");
                     }
+
+                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
 
                     // allocate destination
                     Tensor y = session.AllocateTensor(ActionName, x.Shape.Reshape(axis, xaxis / count), calculateGradient);

@@ -90,6 +90,7 @@ namespace Genix.DNN
             return result;
         }
 
+#if !NOLEARNING
         /// <summary>
         /// Adds an operation to the graph.
         /// </summary>
@@ -99,14 +100,13 @@ namespace Genix.DNN
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Push(string actionName, Action action)
         {
-#if !NOLEARNING
 #if SESSION_DIAG
             this.actions.Push((actionName, action));
 #else
             this.actions.Push(action);
 #endif
-#endif
         }
+#endif
 
         /// <summary>
         /// Executes all the action in the graph backwards.
@@ -226,36 +226,6 @@ namespace Genix.DNN
 
             return ys;
         }
-
-#if !NOLEARNING
-        /// <summary>
-        /// Attaches the gradient to the tensor.
-        /// </summary>
-        /// <param name="x">The tensor to attach the gradient to.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AllocateGradient(Tensor x)
-        {
-            if (this.cache.TryGetValue(x.Length, out Stack<float[]> stack) && stack.Count > 0)
-            {
-                x.AttachGradient(stack.Pop(), true);
-            }
-
-            x.CalculateGradient = true;
-        }
-
-        /// <summary>
-        /// Attaches the gradient to the tensors.
-        /// </summary>
-        /// <param name="xs">The tensors to attach the gradient to.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void AllocateGradients(Tensor[] xs)
-        {
-            for (int i = 0, ii = xs.Length; i < ii; i++)
-            {
-                this.AllocateGradient(xs[i]);
-            }
-        }
-#endif
 
         internal string PrintPerformanceReport(int count)
         {

@@ -312,36 +312,38 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () =>
-                        {
-                            int xstride1K = xstride1 * kstride1;
-                            int xstride2K = xstride2 * kstride2;
-
-                            float[] dxw = x.Gradient;
-                            float[] dyw = y.Gradient;
-                            float alpha = 1.0f / (ksize1 * ksize2);
-
-                            // cycle by the output
-                            for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
+                        session.Push(
+                            ActionName,
+                            () =>
                             {
-                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                int xstride1K = xstride1 * kstride1;
+                                int xstride2K = xstride2 * kstride2;
+
+                                float[] dxw = x.Gradient;
+                                float[] dyw = y.Gradient;
+                                float alpha = 1.0f / (ksize1 * ksize2);
+
+                                // cycle by the output
+                                for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
                                 {
-                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                                    for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                     {
-                                        // cycle by the kernel
-                                        int ike1 = MinMax.Min(ix1 + ksize1, x1);
-                                        int ike2 = MinMax.Min(ix2 + ksize2, x2);
-                                        for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                                        for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
                                         {
-                                            for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                            // cycle by the kernel
+                                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
+                                            for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
                                             {
-                                                Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                                for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                                {
+                                                    Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        });
+                            });
                     }
 #endif
 
@@ -568,38 +570,40 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (calculateGradient)
                     {
-                        session.Push(ActionName, () =>
-                        {
-                            int xstride1K = xstride1 * kstride1;
-                            int xstride2K = xstride2 * kstride2;
-
-                            float[] xw = x.Weights;
-                            float[] yw = y.Weights;
-                            float[] dxw = x.Gradient;
-                            float[] dyw = y.Gradient;
-
-                            // cycle by the output
-                            for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
+                        session.Push(
+                            ActionName,
+                            () =>
                             {
-                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
+                                int xstride1K = xstride1 * kstride1;
+                                int xstride2K = xstride2 * kstride2;
+
+                                float[] xw = x.Weights;
+                                float[] yw = y.Weights;
+                                float[] dxw = x.Gradient;
+                                float[] dyw = y.Gradient;
+
+                                // cycle by the output
+                                for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
                                 {
-                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
+                                    for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
                                     {
-                                        // cycle by the kernel
-                                        int ike1 = MinMax.Min(ix1 + ksize1, x1);
-                                        int ike2 = MinMax.Min(ix2 + ksize2, x2);
-                                        for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
+                                        for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
                                         {
-                                            for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                            // cycle by the kernel
+                                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
+                                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
+                                            for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
                                             {
-                                                // cycle inside the kernel
-                                                Mathematics.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
+                                                for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
+                                                {
+                                                    // cycle inside the kernel
+                                                    Mathematics.MatchAndAdd(xstride2, dyw, yw, ypos2, dxw, xw, xpos2K);
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        });
+                            });
                     }
 #endif
 
@@ -830,7 +834,7 @@ namespace Genix.DNN
                 ActionName,
                 () =>
                 {
-                    bool calculateGradient = session.CalculateGradients && x.CalculateGradient;
+                    bool calculateGradient = session.CalculateGradients;
 
                     Tensor y = session.AllocateTensor(
                         ActionName,
@@ -884,7 +888,7 @@ namespace Genix.DNN
                                             w.Axes,
                                             w.Strides,
                                             x.Weights,
-                                            x.Gradient,
+                                            x.CalculateGradient ? x.Gradient : null,
                                             x.Axes,
                                             x.Strides,
                                             y.Gradient,

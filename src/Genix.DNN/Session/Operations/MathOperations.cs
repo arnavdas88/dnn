@@ -275,10 +275,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Mathematics.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0);
-                            });
+                            () => Mathematics.AddProductC(y.Length, y.Gradient, 0, alpha, x.Gradient, 0));
                     }
 #endif
 
@@ -650,10 +647,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Nonlinearity.ReLUGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
-                            });
+                            () => Nonlinearity.ReLUGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -685,10 +679,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Nonlinearity.ReLUGradientIP(x.Length, x.Gradient, 0, x.Weights, 0);
-                            });
+                            () => Nonlinearity.ReLUGradientIP(x.Length, x.Gradient, 0, x.Weights, 0));
                     }
 #endif
 
@@ -726,10 +717,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Nonlinearity.SigmoidGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
-                            });
+                            () => Nonlinearity.SigmoidGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -767,10 +755,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Nonlinearity.TanhGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0);
-                            });
+                            () => Nonlinearity.TanhGradient(x.Length, x.Gradient, 0, false, y.Weights, 0, y.Gradient, 0));
                     }
 #endif
 
@@ -800,7 +785,9 @@ namespace Genix.DNN
 #if !NOLEARNING
                     if (session.CalculateGradients && x.CalculateGradient)
                     {
-                        session.Push(ActionName, () => Nonlinearity.TanhGradientIP(x.Length, x.Gradient, 0, x.Weights, 0));
+                        session.Push(
+                            ActionName,
+                            () => Nonlinearity.TanhGradientIP(x.Length, x.Gradient, 0, x.Weights, 0));
                     }
 #endif
 
@@ -838,10 +825,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Trigonometry.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
-                            });
+                            () => Trigonometry.SinGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 
@@ -879,10 +863,7 @@ namespace Genix.DNN
                     {
                         session.Push(
                             ActionName,
-                            () =>
-                            {
-                                Trigonometry.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0);
-                            });
+                            () => Trigonometry.CosGradient(x.Length, x.Weights, x.Gradient, 0, false, y.Weights, y.Gradient, 0));
                     }
 #endif
 
