@@ -965,41 +965,50 @@ namespace Genix.DNN
                                 ActionName,
                                 () =>
                                 {
-                                    if (a.CalculateGradient)
-                                    {
-                                        lock (a)
+                                    CommonParallel.Invoke(
+                                        new System.Threading.Tasks.ParallelOptions() { MaxDegreeOfParallelism = -1 },
+                                        () =>
                                         {
-                                            if (!transa)
+                                            if (a.CalculateGradient)
                                             {
-                                                // dA += dC * B
-                                                Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0, false);
+                                                lock (a)
+                                                {
+                                                    if (!transa)
+                                                    {
+                                                        // dA += dC * B
+                                                        Matrix.VxV(matrixLayout, m, k, c.Gradient, 0, b.Weights, 0, a.Gradient, 0, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        // dA += B * dC
+                                                        Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0, false);
+                                                    }
+                                                }
                                             }
-                                            else
+                                        },
+                                        () =>
+                                        {
+                                            if (b.CalculateGradient)
                                             {
-                                                // dA += B * dC
-                                                Matrix.VxV(matrixLayout, m, k, b.Weights, 0, c.Gradient, 0, a.Gradient, 0, false);
+                                                lock (b)
+                                                {
+                                                    // dB += !transa ? A' * dC : A * dC
+                                                    Matrix.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, false);
+                                                }
                                             }
-                                        }
-                                    }
-
-                                    if (b.CalculateGradient)
-                                    {
-                                        lock (b)
+                                        },
+                                        () =>
                                         {
-                                            // dB += !transa ? A' * dC : A * dC
-                                            Matrix.MxV(matrixLayout, m, k, a.Weights, 0, !transa, c.Gradient, 0, b.Gradient, 0, false);
-                                        }
-                                    }
+                                            if (bias?.CalculateGradient ?? false)
+                                            {
+                                                lock (bias)
+                                                {
+                                                    bias.AddGradient(c.Gradient);
+                                                }
 
-                                    if (bias?.CalculateGradient ?? false)
-                                    {
-                                        lock (bias)
-                                        {
-                                            bias.AddGradient(c.Gradient);
-                                        }
-
-                                        bias.Validate();
-                                    }
+                                                bias.Validate();
+                                            }
+                                        });
                                 });
                         }
 #endif
@@ -1015,51 +1024,60 @@ namespace Genix.DNN
                                 ActionName,
                                 () =>
                                 {
-                                    if (a.CalculateGradient)
-                                    {
-                                        lock (a)
+                                    CommonParallel.Invoke(
+                                        new System.Threading.Tasks.ParallelOptions() { MaxDegreeOfParallelism = -1 },
+                                        () =>
                                         {
-                                            if (!transa)
+                                            if (a.CalculateGradient)
                                             {
-                                                // dA += !transb ? dC * B' : dC * B
-                                                Matrix.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, false);
+                                                lock (a)
+                                                {
+                                                    if (!transa)
+                                                    {
+                                                        // dA += !transb ? dC * B' : dC * B
+                                                        Matrix.MxM(matrixLayout, m, n, k, c.Gradient, 0, false, b.Weights, 0, !transb, a.Gradient, 0, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        // dA += !transb ? B * dC' : B' * dC'
+                                                        Matrix.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, false);
+                                                    }
+                                                }
                                             }
-                                            else
-                                            {
-                                                // dA += !transb ? B * dC' : B' * dC'
-                                                Matrix.MxM(matrixLayout, k, n, m, b.Weights, 0, transb, c.Gradient, 0, true, a.Gradient, 0, false);
-                                            }
-                                        }
-                                    }
-
-                                    if (b.CalculateGradient)
-                                    {
-                                        lock (b)
+                                        },
+                                        () =>
                                         {
-                                            if (!transb)
+                                            if (b.CalculateGradient)
                                             {
-                                                // dB += !transa ? A' * dC : A * dC
-                                                Matrix.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, false);
+                                                lock (b)
+                                                {
+                                                    if (!transb)
+                                                    {
+                                                        // dB += !transa ? A' * dC : A * dC
+                                                        Matrix.MxM(matrixLayout, k, m, n, a.Weights, 0, !transa, c.Gradient, 0, false, b.Gradient, 0, false);
+                                                    }
+                                                    else
+                                                    {
+                                                        // dB += !transa ? dC' * A : dC' * A'
+                                                        Matrix.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, false);
+                                                    }
+                                                }
                                             }
-                                            else
-                                            {
-                                                // dB += !transa ? dC' * A : dC' * A'
-                                                Matrix.MxM(matrixLayout, n, m, k, c.Gradient, 0, true, a.Weights, 0, transa, b.Gradient, 0, false);
-                                            }
-                                        }
-                                    }
-
-                                    if (bias?.CalculateGradient ?? false)
-                                    {
-                                        float[] ones = Vectors.Create(n, 1.0f);
-
-                                        lock (bias)
+                                        },
+                                        () =>
                                         {
-                                            Matrix.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, false);
-                                        }
+                                            if (bias?.CalculateGradient ?? false)
+                                            {
+                                                float[] ones = Vectors.Create(n, 1.0f);
 
-                                        bias.Validate();
-                                    }
+                                                lock (bias)
+                                                {
+                                                    Matrix.MxV(matrixLayout, m, n, c.Gradient, 0, false, ones, 0, bias.Gradient, 0, false);
+                                                }
+
+                                                bias.Validate();
+                                            }
+                                        });
                                 });
                         }
 #endif

@@ -19,6 +19,7 @@
         private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void ConstructorTest1()
         {
             Shape shape = new Shape(Shape.BWHC, 2, 10, 12, 3);
@@ -49,6 +50,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest2()
         {
@@ -56,6 +58,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest3()
         {
@@ -63,7 +66,8 @@
             Assert.IsNotNull(new ConvolutionLayer(shape, 100, null, MatrixLayout.ColumnMajor, null));
         }
 
-        [TestMethod, TestCategory("SRN")]
+        [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void ArchitectureConstructorTest1()
         {
             Shape shape = new Shape(Shape.BWHC, 2, 10, 12, 3);
@@ -93,7 +97,8 @@
             Assert.IsTrue(layer.B.Weights.Take(layer.B.Length).All(x => x == 0.0f));
         }
 
-        [TestMethod, TestCategory("SRN")]
+        [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentException))]
         public void ArchitectureConstructorTest2()
         {
@@ -111,14 +116,16 @@
             }
         }
 
-        [TestMethod, TestCategory("SRN")]
+        [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest3()
         {
             Assert.IsNotNull(new ConvolutionLayer(null, "16C3", null));
         }
 
-        [TestMethod, TestCategory("SRN")]
+        [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest4()
         {
@@ -126,6 +133,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void CopyConstructorTest1()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
@@ -135,6 +143,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
@@ -142,6 +151,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void EnumGradientsTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
@@ -150,6 +160,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void CloneTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
@@ -159,6 +170,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void SerializeTest()
         {
             Shape shape = new Shape(Shape.BWHC, -1, 20, 20, 10);
@@ -170,6 +182,7 @@
         }
 
         [TestMethod]
+        [TestCategory("ConvolutionLayer")]
         public void ForwardBackwardTest()
         {
             (Shape shape, Kernel kernel, int numberOfFilters)[] testCases = new (Shape, Kernel, int)[]

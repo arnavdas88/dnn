@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <stdlib.h>
 #include "mkl.h"
 
 #include <ppl.h>
@@ -239,78 +238,116 @@ GENIXAPI(void, convolution_gradient)(
 		kpadding2 = 0;
 	}
 
-	float* ones = (float*)::alloca(ptrdiff_t(y1) * sizeof(float));
-	for (int i = 0; i < y1; i++) { ones[i] = 1.0f; }
+	parallel_invoke(
+		// 1. Calculate biases gradient
+		[&] {
+			const int n = y0 * y1 * y2;
+			float* ones = new float[n];
+			for (int i = 0; i < n; i++) { ones[i] = 1.0f; }
 
-	for (int iy02 = 0; iy02 < y0 * y2; iy02++) {
-	//parallel_for(0, y0 * y2, [&](int iy02) {
+			::cblas_sgemv(
+				CblasColMajor, CblasNoTrans,
+				y3, n,
+				1.0f,
+				dyw, y3,
+				ones, 1,
+				1.0f,
+				dbw, 1);
 
-		const int ixy0 = iy02 / y2;
-		const int iy2 = iy02 % y2;
+			delete[] ones;
+		},
+		// 2. Calculate weights gradient
+		[&] {
+			parallel_for(0, ksize1, [&](int ixy1) {
 
-		const float* www = ww;
-		float* dwww = dww;
-		const float* xww = xw + (ptrdiff_t(ixy0) * xstride0);
-		float* dxww = dxw + (ptrdiff_t(ixy0) * xstride0);
-		const float* dyww = dyw + (ptrdiff_t(iy2) * ystride2) + (ptrdiff_t(ixy0) * ystride0);
+				float* dwww = dww + (ptrdiff_t(ixy1) * kstep);
+				const float* xww = xw;
 
-		// 1. Calculate biases
-		::cblas_sgemv(
-			CblasColMajor, CblasNoTrans,
-			y3, y1,
-			1.0f,
-			dyww, ldy,
-			ones, 1,
-			1.0f,
-			dbw, 1);
-
-		// 2. calculate w and x gradients
-		const int ix2 = (iy2 * kstride2) - kpadding2;
-		const int ix2e = min(ix2 + ksize2, x2);
-		const int k = (ix2e - max(ix2, 0)) * xstride2;
-
-		// k may be zero if the current portion of input tensor
-		// is completely in the padding area
-		if (k > 0)
-		{
-			const int xoff = ptrdiff_t(max(ix2, 0)) * xstride2;
-			xww += xoff;
-			dxww += xoff;
-			const int woff = ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
-			www += woff;
-			dwww += woff;
-
-			for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
-			{
-				const int iy1 = ixy1 < kpadding1 ? (kpadding1 - ixy1 + kstride1 - 1) / kstride1 : 0;
-				const int ix1 = ixy1 - kpadding1 + (iy1 * kstride1);
-				const int n = min(y1, ((x1 - (ixy1 - kpadding1) - 1) / kstride1 + 1)) - iy1;
-
-				if (n > 0)
+				for (int ixy0 = 0; ixy0 < y0; ixy0++, xww += xstride0)
 				{
-					::cblas_sgemm(
-						CblasColMajor, CblasNoTrans, CblasTrans,
-						y3, k, n,
-						1.0f,
-						dyww + (ptrdiff_t(iy1) * ystride1), ldy,
-						xww + (ptrdiff_t(ix1) * xstride1), ldx,
-						1.0f,
-						dwww + (ptrdiff_t(ixy1) * kstep), ldw);
-
-					if (dxw != NULL)
+					for (int iy2 = 0; iy2 < y2; iy2++)
 					{
-						::cblas_sgemm(
-							CblasColMajor, CblasTrans, CblasNoTrans,
-							k, n, y3,
-							1.0f,
-							www + (ptrdiff_t(ixy1) * kstep), ldw,
-							dyww + (ptrdiff_t(iy1) * ystride1), ldy,
-							1.0f,
-							dxww + (ptrdiff_t(ix1) * xstride1), ldx);
+						const float* dyww = dyw + (ptrdiff_t(iy2) * ystride2) + (ptrdiff_t(ixy0) * ystride0);
+
+						const int ix2 = (iy2 * kstride2) - kpadding2;
+						const int ix2e = min(ix2 + ksize2, x2);
+						const int k = (ix2e - max(ix2, 0)) * xstride2;
+
+						// k may be zero if the current portion of input tensor
+						// is completely in the padding area
+						if (k > 0)
+						{
+							const int iy1 = ixy1 < kpadding1 ? (kpadding1 - ixy1 + kstride1 - 1) / kstride1 : 0;
+							const int ix1 = ixy1 - kpadding1 + (iy1 * kstride1);
+							const int n = min(y1, ((x1 - (ixy1 - kpadding1) - 1) / kstride1 + 1)) - iy1;
+
+							if (n > 0)
+							{
+								::cblas_sgemm(
+									CblasColMajor, CblasNoTrans, CblasTrans,
+									y3, k, n,
+									1.0f,
+									dyww + (ptrdiff_t(iy1) * ystride1), ldy,
+									xww + (ptrdiff_t(ix1) * xstride1) + (ptrdiff_t(max(ix2, 0)) * xstride2), ldx,
+									1.0f,
+									dwww + (ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw), ldw);
+							}
+						}
 					}
+				}
+			});
+		},
+		// 3. Calculate x gradient
+		[&] {
+			if (dxw != NULL)
+			{
+				const int iy2step = (ksize2 + kstride2 - 1) / kstride2;
+				for (int iy2start = 0; iy2start < iy2step; iy2start++)
+				{
+					//for (int iy2 = iy2start; iy2 < y2; iy2 += iy2step) {
+					parallel_for(iy2start, y2, iy2step, [&](int iy2) {
+
+						for (int ixy0 = 0; ixy0 < y0; ixy0++)
+						{
+							const float* www = ww;
+							float* dxww = dxw + (ptrdiff_t(ixy0) * xstride0);
+							const float* dyww = dyw + (ptrdiff_t(iy2) * ystride2) + (ptrdiff_t(ixy0) * ystride0);
+
+							const int ix2 = (iy2 * kstride2) - kpadding2;
+							const int ix2e = min(ix2 + ksize2, x2);
+							const int k = (ix2e - max(ix2, 0)) * xstride2;
+
+							// k may be zero if the current portion of input tensor
+							// is completely in the padding area
+							if (k > 0)
+							{
+								dxww += ptrdiff_t(max(ix2, 0)) * xstride2;
+								www += ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
+
+								for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
+								{
+									const int iy1 = ixy1 < kpadding1 ? (kpadding1 - ixy1 + kstride1 - 1) / kstride1 : 0;
+									const int ix1 = ixy1 - kpadding1 + (iy1 * kstride1);
+									const int n = min(y1, ((x1 - (ixy1 - kpadding1) - 1) / kstride1 + 1)) - iy1;
+
+									if (n > 0)
+									{
+										::cblas_sgemm(
+											CblasColMajor, CblasTrans, CblasNoTrans,
+											k, n, y3,
+											1.0f,
+											www + (ptrdiff_t(ixy1) * kstep), ldw,
+											dyww + (ptrdiff_t(iy1) * ystride1), ldy,
+											1.0f,
+											dxww + (ptrdiff_t(ix1) * xstride1), ldx);
+									}
+								}
+							}
+						}
+					});
 				}
 			}
 		}
-	}/*);*/
+	);
 }
 
