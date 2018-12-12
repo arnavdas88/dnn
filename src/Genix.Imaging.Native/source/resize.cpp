@@ -23,8 +23,8 @@ enum _GenixInterpolationType : int
 
 GENIXAPI(int, resize)(
 	const int bitsPerPixel,
-	const int widthsrc, const int heightsrc, const unsigned __int64* src, const int stridesrc,
-	const int widthdst, const int heightdst, unsigned __int64* dst, const int stridedst,
+	const int widthsrc, const int heightsrc, const Ipp8u* src, const int srcstep,
+	const int widthdst, const int heightdst, Ipp8u* dst, const int dststep,
 	const int interpolationType, BOOL antialiasing, float valueB, float valueC, const unsigned numLobes,
 	const int borderType, const unsigned borderValue)
 {
@@ -38,7 +38,7 @@ GENIXAPI(int, resize)(
 
 	IppStatus(__stdcall *func)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
 	IppStatus(__stdcall *funcWithBorder)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, const Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
-	IppStatus(__stdcall *funcAliasing)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
+	IppStatus(__stdcall *funcAliasing)(const Ipp8u*, Ipp32s, Ipp8u*, Ipp32s, IppiPoint, IppiSize, IppiBorderType, const Ipp8u*, const IppiResizeSpec_32f*, Ipp8u*) = NULL;
 
 	IppiInterpolationType ippInterpolationType;
 	switch (interpolationType)
@@ -165,24 +165,20 @@ GENIXAPI(int, resize)(
 	if (funcAliasing != NULL)
 	{
 		check_sts(status = (*funcAliasing)(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src, srcstep,
+			dst, dststep,
 			{ 0, 0 },
 			dstSize,
 			ippBorderType,
-			(Ipp8u*)&borderValue,
+			(const Ipp8u*)&borderValue,
 			pSpec,
 			pBuffer));
 	}
 	else if (funcWithBorder != NULL)
 	{
 		check_sts(status = (*funcWithBorder)(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src, srcstep,
+			dst, dststep,
 			{ 0, 0 },
 			dstSize,
 			ippBorderType,
@@ -193,10 +189,8 @@ GENIXAPI(int, resize)(
 	else if (func != NULL)
 	{
 		check_sts(status = (*func)(
-			(const Ipp8u*)src,
-			stridesrc * sizeof(unsigned __int64),
-			(Ipp8u*)dst,
-			stridedst * sizeof(unsigned __int64),
+			src, srcstep,
+			dst, dststep,
 			{ 0, 0 },
 			dstSize,
 			pSpec,

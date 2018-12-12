@@ -232,7 +232,7 @@ namespace Genix.MachineLearning.Imaging
 
             if (image.Width != w || image.Height != h)
             {
-                image = image.FitToSize(w, h, ScalingOptions.None);
+                image = image.FitToSize(w, h, new ScalingOptions());
             }
 
             int stride = image.Stride;

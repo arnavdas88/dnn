@@ -81,68 +81,63 @@ namespace Genix.Imaging
             System.Windows.Media.Matrix matrix = System.Windows.Media.Matrix.Identity;
             matrix.Scale((double)width / this.Width, (double)height / this.Height);
 
+#if false
             dst = this.Affine(dst, matrix, BorderType.BorderConst, this.WhiteColor);
             Debug.Assert(width == dst.Width && height == dst.Height, "Image dimensions are wrong.");
             return dst;
-#if false
-
-            if (this.BitsPerPixel == 1 &&
-                width > 16 &&
-                height > 16 &&
-                options.HasFlag(ScalingOptions.Upscale1Bpp))
-            {
-#if true
-                Image image8bpp = this.Convert1To8(255, 0);
-                Image imageScaled = new Image(width, height, image8bpp);
-
-                // swap bytes to little-endian and back
-                if (NativeMethods.scale8(
-                    image8bpp.Width,
-                    image8bpp.Height,
-                    image8bpp.Stride,
-                    image8bpp.Bits,
-                    imageScaled.Width,
-                    imageScaled.Height,
-                    imageScaled.Stride,
-                    imageScaled.Bits) != 0)
-                {
-                    throw new OutOfMemoryException();
-                }
-
-                using (Pix pixs = imageScaled.CreatePix())
-                {
-                    using (Pix pixd = pixs.pixOtsu(false))
-                    {
-                        if (pixd != null)
-                        {
-                            return pixd.CreateImage(this.HorizontalResolution, this.VerticalResolution);
-                        }
-                    }
-                }
 #else
-                using (Pix pixs = this.Convert1To8(255, 0).CreatePix())
-                {
-                    using (Pix pixd1 = pixs.pixScaleToSize(width, height))
-                    {
-                        using (Pix pixd = pixd1.pixOtsu(false))
-                        {
-                            if (pixd != null)
-                            {
-                                return pixd.CreateImage(this.HorizontalResolution, this.VerticalResolution);
-                            }
-                        }
-                    }
-                }
-#endif
+            // IPP does not support 1bpp images - convert to 8bpp
+            Image src;
+            bool convert1bpp = false;
+            if (this.BitsPerPixel == 1)
+            {
+                src = this.Convert1To8(null);
+                convert1bpp = true;
+            }
+            else
+            {
+                src = this;
             }
 
-            using (Pix pixs = this.CreatePix())
+            bool inplace = dst == this;
+            dst = src.CreateTemplate(dst, width, height, src.BitsPerPixel);
+
+            IPP.Execute(() =>
             {
-                using (Pix pixd = pixs.pixScaleToSize(width, height))
-                {
-                    return pixd.CreateImage(this.HorizontalResolution, this.VerticalResolution);
-                }
+                return NativeMethods.resize(
+                    src.BitsPerPixel,
+                    src.Width,
+                    src.Height,
+                    src.Bits,
+                    src.Stride8,
+                    dst.Width,
+                    dst.Height,
+                    dst.Bits,
+                    dst.Stride8,
+                    options.InterpolationType,
+                    options.Antialiasing,
+                    options.ValueB,
+                    options.ValueC,
+                    options.Lobes,
+                    BorderType.BorderConst,
+                    src.WhiteColor);
+            });
+
+            dst.AppendTransform(new MatrixTransform(matrix));
+
+            // convert back to 1bpp
+            if (convert1bpp)
+            {
+                dst.Convert8To1(dst, 1);
             }
+
+            if (inplace)
+            {
+                this.Attach(dst);
+                return this;
+            }
+
+            return dst;
 #endif
         }
 
@@ -927,16 +922,16 @@ namespace Genix.Imaging
                 int widthsrc,
                 int heightsrc,
                 [In] ulong[] src,
-                int stridesrc,
+                int srcstep,
                 int widthdst,
                 int heightdst,
                 [Out] ulong[] dst,
-                int stridedst,
+                int dststep,
                 InterpolationType interpolationType,
                 [MarshalAs(UnmanagedType.Bool)] bool antializing,
                 float valueB,
                 float valueC,
-                uint numLobes,
+                int numLobes,
                 BorderType borderType,
                 uint borderValue);
         }

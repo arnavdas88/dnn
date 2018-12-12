@@ -102,7 +102,7 @@ namespace Genix.Imaging.Lab
                         double verticalFactor = (double)height / image.Height;
                         double scaleFactor = Math.Min(horizontalFactor, verticalFactor);
 
-                        image.Scale(image, scaleFactor, ScalingOptions.None);
+                        image.Scale(image, scaleFactor, new ScalingOptions());
                     }
                 }
                 else
@@ -110,7 +110,7 @@ namespace Genix.Imaging.Lab
                     if (image.Height > height)
                     {
                         double scaleFactor = (double)height / image.Height;
-                        image.Scale(image, scaleFactor, ScalingOptions.None);
+                        image.Scale(image, scaleFactor, new ScalingOptions());
                     }
                 }
 
@@ -131,7 +131,7 @@ namespace Genix.Imaging.Lab
                             newHeight = 1;
                         }
 
-                        image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
+                        image.ScaleToSize(image, newWidth, newHeight, new ScalingOptions());
                     }
                     else
                     {
@@ -147,7 +147,7 @@ namespace Genix.Imaging.Lab
                             newHeight = 1;
                         }
 
-                        image.ScaleToSize(image, newWidth, newHeight, ScalingOptions.None);
+                        image.ScaleToSize(image, newWidth, newHeight, new ScalingOptions());
 
                         double angle = 0.5 * this.normalDistribution.Generate();
                         image = image.Inflate(image.Height, 0, image.Height, 0, BorderType.BorderConst, image.WhiteColor);
