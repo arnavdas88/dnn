@@ -12,6 +12,17 @@ void __forceinline tile(const int count, const int length, const float* src, flo
 	}
 }
 
+template <typename _Index_type, typename _Function>
+void _parallel_for(_Index_type _First0, _Index_type _Last0, _Index_type _First1, _Index_type _Last1, const _Function& _Func, const auto_partitioner& _Part = auto_partitioner())
+{
+	_Index_type count = (_Last0 - _First0) * (_Last1 - _First1);
+	parallel_for(0, count, [&](_Index_type i) {
+		const _Index_type i0 = (i / (_Last1 - _First1)) + _First0;
+		const _Index_type i1 = (i % (_Last1 - _First1)) + _First1;
+		_Func(i0, i1);
+	}, _Part);
+}
+
 GENIXAPI(void, convolution)(
 	const int ksize1,
 	const int ksize2,
@@ -118,11 +129,9 @@ GENIXAPI(void, convolution)(
 			kpadding2 = 0;
 		}
 
-		//for (int iy02 = 0; iy02 < y0 * y2; iy02++) {
-		parallel_for(0, y0 * y2, [&](int iy02) {
-
-			const int ixy0 = iy02 / y2;
-			const int iy2 = iy02 % y2;
+		//for (int ixy0 = 0; ixy0 < y0; ixy0++) {
+		//	for (int iy2 = 0; iy2 < y2; iy2++) {
+		_parallel_for(0, y0, 0, y2, [&](int ixy0, int iy2) {
 
 			const float* www = ww;
 			const float* xww = xw + (ptrdiff_t(ixy0) * xstride0);
@@ -163,6 +172,7 @@ GENIXAPI(void, convolution)(
 				}
 			}
 		});
+		//}}
 	}
 }
 
@@ -258,6 +268,7 @@ GENIXAPI(void, convolution_gradient)(
 		},
 		// 2. Calculate weights gradient
 		[&] {
+			//for (int ixy1 = 0; ixy1 < ksize1; ixy1++) {
 			parallel_for(0, ksize1, [&](int ixy1) {
 
 				float* dwww = dww + (ptrdiff_t(ixy1) * kstep);

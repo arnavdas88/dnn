@@ -15,7 +15,7 @@
             Image image = new Image(118, 133, 1, 200, 200);
             image.SetWhite();
 
-            image.ScaleToSize(image, 113, 124, ScalingOptions.None);
+            image.ScaleToSize(image, 113, 124, new ScalingOptions());
         }
 
         [TestMethod]

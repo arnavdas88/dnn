@@ -84,13 +84,6 @@ namespace Genix.DNN.Layers
             this.NumberOfNeurons,
             this.Kernel.ToString(1, 1));
 
-        /// <inheritdoc />
-        public override MatrixLayout MatrixLayout
-        {
-            get => MatrixLayout.ColumnMajor;
-            private protected set { }
-        }
-
         /// <summary>
         /// Gets the convolution kernel.
         /// </summary>
