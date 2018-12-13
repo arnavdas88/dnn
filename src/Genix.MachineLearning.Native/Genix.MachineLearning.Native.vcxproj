@@ -128,6 +128,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="source\kernels.cpp" />
     <ClCompile Include="source\kmeans.cpp" />
+    <ClCompile Include="source\optimizers.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

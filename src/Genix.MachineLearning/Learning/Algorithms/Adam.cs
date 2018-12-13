@@ -52,11 +52,11 @@ namespace Genix.MachineLearning.Learning
         public float Eps { get; set; } = 1e-8f;
 
         /// <inheritdoc />
-        public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
+        public void ComputeDeltas(int epoch, int length, float[] gradient, int totalSamples)
         {
             (float[] gsum, float[] xsum) = this.accumulators.GetAccumulator(
                 gradient,
-                g => (new float[g.Length], new float[g.Length]));
+                () => (new float[length], new float[length]));
 
             float learningRate = -this.LearningRate;
             float beta1 = this.Beta1;
@@ -67,7 +67,7 @@ namespace Genix.MachineLearning.Learning
             float beta2bias = 1.0f - (float)Math.Pow(beta2, totalSamples);
             float eps = this.Eps;
 
-            for (int i = 0, ii = gradient.Length; i < ii; i++)
+            for (int i = 0; i < length; i++)
             {
                 float g = gradient[i];
 

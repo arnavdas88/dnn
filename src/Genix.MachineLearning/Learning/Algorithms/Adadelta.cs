@@ -9,6 +9,8 @@ namespace Genix.MachineLearning.Learning
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Runtime.InteropServices;
+    using System.Security;
 
     /// <summary>
     /// ADADELTA algorithm for training neural nets.
@@ -55,11 +57,11 @@ namespace Genix.MachineLearning.Learning
         public float Eps { get; set; } = 1e-8f;
 
         /// <inheritdoc />
-        public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
+        public void ComputeDeltas(int epoch, int length, float[] gradient, int totalSamples)
         {
             (float[] gsum, float[] xsum) = this.accumulators.GetAccumulator(
                 gradient,
-                g => (new float[g.Length], new float[g.Length]));
+                () => (new float[length], new float[length]));
 
             /*float learningRate = -this.LearningRate;
             if (this.Decay != 0.0f && epoch > 0)
@@ -67,7 +69,9 @@ namespace Genix.MachineLearning.Learning
                 learningRate /= 1.0f + (this.Decay * epoch);
             }*/
 
-            float rho = this.Rho;
+            NativeMethods.adadelta(gradient.Length, gradient, gsum, xsum, this.Rho, this.Eps);
+
+            /*float rho = this.Rho;
             float rhoinv = 1.0f - rho;
             float eps = this.Eps;
 
@@ -81,7 +85,22 @@ namespace Genix.MachineLearning.Learning
 
                 Debug.Assert(!float.IsNaN(g), "Tensor contains invalid weight.");
                 gradient[i] = g;
-            }
+            }*/
+        }
+
+        [SuppressUnmanagedCodeSecurity]
+        private static class NativeMethods
+        {
+            private const string DllName = "Genix.MachineLearning.Native.dll";
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void adadelta(
+                int n,
+                [In, Out] float[] gradient,
+                [In, Out] float[] gsum,
+                [In, Out] float[] xsum,
+                float rho,
+                float eps);
         }
     }
 }

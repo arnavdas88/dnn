@@ -15,8 +15,9 @@ namespace Genix.MachineLearning.Learning
         /// Computes gradient deltas for a mini batch.
         /// </summary>
         /// <param name="epoch">The zero-based index of learning epoch.</param>
+        /// <param name="length">The gradient length.</param>
         /// <param name="gradient">The gradient to compute.</param>
         /// <param name="totalSamples">The total number of sample processed to the moment.</param>
-        void ComputeDeltas(int epoch, float[] gradient, int totalSamples);
+        void ComputeDeltas(int epoch, int length, float[] gradient, int totalSamples);
     }
 }

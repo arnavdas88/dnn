@@ -19,12 +19,11 @@ namespace Genix.MachineLearning.Learning
         {
         }
 
-        public T GetAccumulator(float[] gradient, Func<float[], T> factory)
+        public T GetAccumulator(float[] gradient, Func<T> factory)
         {
-            T value;
-            if (!this.TryGetValue(gradient, out value))
+            if (!this.TryGetValue(gradient, out T value))
             {
-                value = factory(gradient);
+                value = factory();
                 this.TryAdd(gradient, value);
             }
 

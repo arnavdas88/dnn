@@ -211,12 +211,13 @@ namespace Genix.MachineLearning.Learning
             float l1 = 0.0f;
             float l2 = 0.0f;
 
+            int length = layer.w.Length;
             float[] w = layer.w.Weights;
             float[] dw = layer.w.Gradient;
 
             if (batchSize > 1)
             {
-                Mathematics.MulC(layer.w.Length, 1.0f / batchSize, dw, 0);
+                Mathematics.MulC(length, 1.0f / batchSize, dw, 0);
             }
 
             float rateL1 = this.RateL1 * layer.RateL1Multiplier;
@@ -224,7 +225,7 @@ namespace Genix.MachineLearning.Learning
             {
                 l1 = layer.w.L1Norm() * rateL1;
 
-                for (int i = 0, ii = w.Length; i < ii; i++)
+                for (int i = 0; i < length; i++)
                 {
                     dw[i] += rateL1 * (w[i] > 0 ? 1 : -1);
                 }
@@ -235,7 +236,7 @@ namespace Genix.MachineLearning.Learning
             {
                 l2 = layer.w.L2Norm() * rateL2;
 
-                Mathematics.AddProductC(layer.w.Length, w, 0, rateL2, dw, 0);
+                Mathematics.AddProductC(length, w, 0, rateL2, dw, 0);
             }
 
             if (!float.IsNaN(this.ClipValue))
@@ -243,11 +244,11 @@ namespace Genix.MachineLearning.Learning
                 layer.w.ClipGradient(-this.ClipValue, this.ClipValue);
             }
 
-            algorithm.ComputeDeltas(epoch, dw, totalSamples);
+            algorithm.ComputeDeltas(epoch, length, dw, totalSamples);
             layer.w.Validate();
 
             // update weights
-            Mathematics.Add(layer.w.Length, dw, 0, w, 0);
+            Mathematics.Add(length, dw, 0, w, 0);
 
             // zero out gradient so that we can begin accumulating anew
             layer.w.ClearGradient();

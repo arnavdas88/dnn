@@ -54,7 +54,7 @@ namespace Genix.MachineLearning.Learning
         public bool Nesterov { get; set; } = false;
 
         /// <inheritdoc />
-        public void ComputeDeltas(int epoch, float[] gradient, int totalSamples)
+        public void ComputeDeltas(int epoch, int length, float[] gradient, int totalSamples)
         {
             float learningRate = this.LearningRate;
             if (this.Decay != 0.0f && epoch > 0)
@@ -68,7 +68,7 @@ namespace Genix.MachineLearning.Learning
                 // get accumulator
                 float[] velocity = this.accumulators.GetAccumulator(
                     gradient,
-                    g => new float[g.Length]);
+                    () => new float[length]);
 
                 if (this.Nesterov)
                 {
