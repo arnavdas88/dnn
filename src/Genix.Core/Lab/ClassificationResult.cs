@@ -8,6 +8,7 @@ namespace Genix.Lab
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using Genix.Core;
@@ -219,10 +220,10 @@ namespace Genix.Lab
         public override string ToString() =>
             string.Join(
                 ",",
-                this.SourceId,
+                this.SourceId.ToFileName(true),
                 this.Predicted?.ToString()?.Qualify() ?? string.Empty,
                 this.Expected?.ToString()?.Qualify() ?? string.Empty,
-                this.Confidence,
+                this.Confidence.ToString("F4", CultureInfo.InvariantCulture),
                 this.IsAccepted ? 1 : 0);
     }
 }

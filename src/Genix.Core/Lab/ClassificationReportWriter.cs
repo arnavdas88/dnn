@@ -201,22 +201,12 @@ namespace Genix.Lab
         /// <param name="summary">Classification results for the class.</param>
         private static void WriteClassificationErrors(TextWriter writer, ClassSummary<T> summary)
         {
-            int acceptedErrors = summary.Errors.Count(/*error => error.IsAccepted*/);
+            int acceptedErrors = summary.Errors.Count();
             if (acceptedErrors > 0)
             {
                 writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0} ({1})", summary.Label, acceptedErrors));
                 writer.WriteLine();
-                foreach (ClassificationResult<T> error in summary.Errors)
-                {
-                    ////if (error.IsAccepted)
-                    {
-                        writer.WriteLine(
-                            "{0},{1},{2:F4}",
-                            error.SourceId.ToFileName(true),
-                            error.Predicted,
-                            error.Confidence);
-                    }
-                }
+                ClassificationResult<T>.Write(writer, summary.Errors);
 
                 writer.WriteLine("-----------------------------------------------------------------------------");
                 writer.WriteLine();
