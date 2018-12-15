@@ -116,197 +116,58 @@ namespace Genix.DNN
 
                     Tensor y = session.AllocateTensor(ActionName, kernel.CalculateOutputShape(x.Shape), calculateGradient);
 
-                    int ksize1, ksize2, kstride1, kstride2;
-                    int x0, x1, x2, xstride0, xstride1, xstride2;
-                    int y1, y2, ystride0, ystride1, ystride2;
-
                     switch (x.Shape.Format)
                     {
                         case Shape.BWHC:
-                            ksize1 = kernel.Width;
-                            ksize2 = kernel.Height;
-                            kstride1 = kernel.StrideX;
-                            kstride2 = kernel.StrideY;
-
-                            x0 = x.Axes[0];
-                            x1 = x.Axes[1];
-                            x2 = x.Axes[2];
-
-                            xstride0 = x.Strides[0];
-                            xstride1 = x.Strides[1];
-                            xstride2 = x.Strides[2];
-
-                            y1 = y.Axes[1];
-                            y2 = y.Axes[2];
-
-                            ystride0 = y.Strides[0];
-                            ystride1 = y.Strides[1];
-                            ystride2 = y.Strides[2];
+                            NativeMethods.avgpooling(
+                                kernel.Width,
+                                kernel.Height,
+                                kernel.StrideX,
+                                kernel.StrideY,
+                                0,
+                                0,
+                                x.Weights,
+                                x.Axes,
+                                x.Strides,
+                                y.Weights,
+                                y.Axes,
+                                y.Strides);
                             break;
 
                         case Shape.BHWC:
-                            ksize1 = kernel.Height;
-                            ksize2 = kernel.Width;
-                            kstride1 = kernel.StrideY;
-                            kstride2 = kernel.StrideX;
-
-                            x0 = x.Axes[0];
-                            x1 = x.Axes[1];
-                            x2 = x.Axes[2];
-
-                            xstride0 = x.Strides[0];
-                            xstride1 = x.Strides[1];
-                            xstride2 = x.Strides[2];
-
-                            y1 = y.Axes[1];
-                            y2 = y.Axes[2];
-
-                            ystride0 = y.Strides[0];
-                            ystride1 = y.Strides[1];
-                            ystride2 = y.Strides[2];
+                            NativeMethods.avgpooling(
+                                kernel.Height,
+                                kernel.Width,
+                                kernel.StrideY,
+                                kernel.StrideX,
+                                0,
+                                0,
+                                x.Weights,
+                                x.Axes,
+                                x.Strides,
+                                y.Weights,
+                                y.Axes,
+                                y.Strides);
                             break;
 
                         case Shape.BCHW:
-                            ksize1 = kernel.Height;
-                            ksize2 = kernel.Width;
-                            kstride1 = kernel.StrideY;
-                            kstride2 = kernel.StrideX;
-
-                            x0 = x.Axes[0] * x.Axes[1];
-                            x1 = x.Axes[2];
-                            x2 = x.Axes[3];
-
-                            xstride0 = x.Strides[1];
-                            xstride1 = x.Strides[2];
-                            xstride2 = x.Strides[3];
-
-                            y1 = y.Axes[2];
-                            y2 = y.Axes[3];
-
-                            ystride0 = y.Strides[1];
-                            ystride1 = y.Strides[2];
-                            ystride2 = y.Strides[3];
+                            NativeMethods.avgpooling(
+                                kernel.Height,
+                                kernel.Width,
+                                kernel.StrideY,
+                                kernel.StrideX,
+                                0,
+                                0,
+                                x.Weights,
+                                new[] { x.Axes[0] * x.Axes[1], x.Axes[2], x.Axes[3] },
+                                new[] { x.Strides[1], x.Strides[2], x.Strides[3] },
+                                y.Weights,
+                                new[] { y.Axes[0] * y.Axes[1], y.Axes[2], y.Axes[3] },
+                                new[] { y.Strides[1], y.Strides[2], y.Strides[3] });
                             break;
 
                         default:
                             throw new NotSupportedException("The tensor shape is not supported by this operation.");
-                    }
-
-                    Pool();
-
-                    void Pool()
-                    {
-                        int xstride1K = xstride1 * kstride1;
-                        int xstride2K = xstride2 * kstride2;
-
-                        float[] wspw = new float[xstride1];
-                        float[] xw = x.Weights;
-                        float[] yw = y.Weights;
-
-                        if (ksize1 == 2 && ksize2 == 2)
-                        {
-                            Pool2x2();
-                        }
-                        else if (ksize1 == 2 && ksize2 == 1 && kstride2 == 1)
-                        {
-                            Pool2x1();
-                        }
-                        else
-                        {
-                            PoolNxN();
-                        }
-
-                        Mathematics.DivC(y.Length, ksize1 * ksize2, yw, 0);
-
-                        void Pool2x2()
-                        {
-                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                            {
-                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                                {
-                                    if (ix1 + 1 < x1)
-                                    {
-                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
-                                    }
-                                    else
-                                    {
-                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                                    }
-
-                                    for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
-                                    {
-                                        if (ix2 + 1 < x2)
-                                        {
-                                            Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-                                        }
-                                        else
-                                        {
-                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        void Pool2x1()
-                        {
-                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                            {
-                                for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                                {
-                                    if (ix1 + 1 < x1)
-                                    {
-                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, yw, ypos1);
-                                    }
-                                    else
-                                    {
-                                        Vectors.Copy(xstride1, xw, xpos1, yw, ypos1);
-                                    }
-                                }
-                            }
-                        }
-
-                        void PoolNxN()
-                        {
-                            for (int ix0 = 0, xpos0 = 0, ypos0 = 0; ix0 < x0; ix0++, xpos0 += xstride0, ypos0 += ystride0)
-                            {
-                                for (int ix1 = 0, iy1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                                {
-                                    int ix1e = MinMax.Min(ix1 + ksize1, x1);
-                                    if (ix1e - ix1 == 1)
-                                    {
-                                        Vectors.Copy(xstride1, xw, xpos1, wspw, 0);
-                                    }
-                                    else
-                                    {
-                                        Mathematics.Add(xstride1, xw, xpos1, xw, xpos1 + xstride1, wspw, 0);
-
-                                        for (int i = ix1 + 2, pos = xpos1 + (2 * xstride1); i < ix1e; i++, pos += xstride1)
-                                        {
-                                            Mathematics.Add(xstride1, xw, pos, wspw, 0, wspw, 0);
-                                        }
-                                    }
-
-                                    for (int ix2 = 0, iy2 = 0, ypos2 = ypos1, wspos = 0; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += xstride2, wspos += xstride2K)
-                                    {
-                                        int ix2e = MinMax.Min(ix2 + ksize2, x2);
-                                        if (ix2e - ix2 == 1)
-                                        {
-                                            Vectors.Copy(xstride2, wspw, wspos, yw, ypos2);
-                                        }
-                                        else
-                                        {
-                                            Mathematics.Add(xstride2, wspw, wspos, wspw, wspos + xstride2, yw, ypos2);
-
-                                            for (int i = ix2 + 2, pos = wspos + (2 * xstride2); i < ix2e; i++, pos += xstride2)
-                                            {
-                                                Mathematics.Add(xstride2, wspw, pos, yw, ypos2, yw, ypos2);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
 
 #if !NOLEARNING
@@ -316,6 +177,86 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
+#if true
+                                int ksize1, ksize2, kstride1, kstride2;
+                                int x0, x1, x2, xstride0, xstride1, xstride2;
+                                int y0, y1, y2, ystride0, ystride1, ystride2;
+
+                                switch (x.Shape.Format)
+                                {
+                                    case Shape.BWHC:
+                                        ksize1 = kernel.Width;
+                                        ksize2 = kernel.Height;
+                                        kstride1 = kernel.StrideX;
+                                        kstride2 = kernel.StrideY;
+
+                                        x0 = x.Axes[0];
+                                        x1 = x.Axes[1];
+                                        x2 = x.Axes[2];
+
+                                        xstride0 = x.Strides[0];
+                                        xstride1 = x.Strides[1];
+                                        xstride2 = x.Strides[2];
+
+                                        y0 = y.Axes[0];
+                                        y1 = y.Axes[1];
+                                        y2 = y.Axes[2];
+
+                                        ystride0 = y.Strides[0];
+                                        ystride1 = y.Strides[1];
+                                        ystride2 = y.Strides[2];
+                                        break;
+
+                                    case Shape.BHWC:
+                                        ksize1 = kernel.Height;
+                                        ksize2 = kernel.Width;
+                                        kstride1 = kernel.StrideY;
+                                        kstride2 = kernel.StrideX;
+
+                                        x0 = x.Axes[0];
+                                        x1 = x.Axes[1];
+                                        x2 = x.Axes[2];
+
+                                        xstride0 = x.Strides[0];
+                                        xstride1 = x.Strides[1];
+                                        xstride2 = x.Strides[2];
+
+                                        y0 = y.Axes[0];
+                                        y1 = y.Axes[1];
+                                        y2 = y.Axes[2];
+
+                                        ystride0 = y.Strides[0];
+                                        ystride1 = y.Strides[1];
+                                        ystride2 = y.Strides[2];
+                                        break;
+
+                                    case Shape.BCHW:
+                                        ksize1 = kernel.Height;
+                                        ksize2 = kernel.Width;
+                                        kstride1 = kernel.StrideY;
+                                        kstride2 = kernel.StrideX;
+
+                                        x0 = x.Axes[0] * x.Axes[1];
+                                        x1 = x.Axes[2];
+                                        x2 = x.Axes[3];
+
+                                        xstride0 = x.Strides[1];
+                                        xstride1 = x.Strides[2];
+                                        xstride2 = x.Strides[3];
+
+                                        y0 = y.Axes[0] * y.Axes[1];
+                                        y1 = y.Axes[2];
+                                        y2 = y.Axes[3];
+
+                                        ystride0 = y.Strides[1];
+                                        ystride1 = y.Strides[2];
+                                        ystride2 = y.Strides[3];
+                                        break;
+
+                                    default:
+                                        throw new NotSupportedException("The tensor shape is not supported by this operation.");
+                                }
+
                                 int xstride1K = xstride1 * kstride1;
                                 int xstride2K = xstride2 * kstride2;
 
@@ -343,6 +284,58 @@ namespace Genix.DNN
                                         }
                                     }
                                 }
+#else
+                                switch (x.Shape.Format)
+                                {
+                                    case Shape.BWHC:
+                                        NativeMethods.avgpooling_gradient(
+                                            kernel.Width,
+                                            kernel.Height,
+                                            kernel.StrideX,
+                                            kernel.StrideY,
+                                            0,
+                                            0,
+                                            x.Gradient,
+                                            x.Axes,
+                                            x.Strides,
+                                            y.Gradient,
+                                            y.Axes,
+                                            y.Strides);
+                                        break;
+
+                                    case Shape.BHWC:
+                                        NativeMethods.avgpooling_gradient(
+                                            kernel.Height,
+                                            kernel.Width,
+                                            kernel.StrideY,
+                                            kernel.StrideX,
+                                            0,
+                                            0,
+                                            x.Gradient,
+                                            x.Axes,
+                                            x.Strides,
+                                            y.Gradient,
+                                            y.Axes,
+                                            y.Strides);
+                                        break;
+
+                                    case Shape.BCHW:
+                                        NativeMethods.avgpooling_gradient(
+                                            kernel.Height,
+                                            kernel.Width,
+                                            kernel.StrideY,
+                                            kernel.StrideX,
+                                            0,
+                                            0,
+                                            x.Gradient,
+                                            new[] { x.Axes[0] * x.Axes[1], x.Axes[2], x.Axes[3] },
+                                            new[] { x.Strides[1], x.Strides[2], x.Strides[3] },
+                                            y.Gradient,
+                                            new[] { y.Axes[0] * y.Axes[1], y.Axes[2], y.Axes[3] },
+                                            new[] { y.Strides[1], y.Strides[2], y.Strides[3] });
+                                        break;
+                                }
+#endif
                             });
                     }
 #endif
@@ -574,6 +567,7 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
+#if true
                                 int xstride1K = xstride1 * kstride1;
                                 int xstride2K = xstride2 * kstride2;
 
@@ -603,6 +597,8 @@ namespace Genix.DNN
                                         }
                                     }
                                 }
+#else
+#endif
                             });
                     }
 #endif
@@ -1219,6 +1215,36 @@ namespace Genix.DNN
                 int b,
                 [In] int[] axes,
                 [In] int[] strides);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void avgpooling(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [In] float[] xw,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
+                [Out] float[] yw,
+                [In] int[] yaxes,
+                [In] int[] ystrides);
+
+            [DllImport(NativeMethods.DllName)]
+            public static extern void avgpooling_gradient(
+                int ksize1,
+                int ksize2,
+                int kstride1,
+                int kstride2,
+                int kpadding1,
+                int kpadding2,
+                [In, Out] float[] dxw,
+                [In] int[] xaxes,
+                [In] int[] xstrides,
+                [In] float[] dyw,
+                [In] int[] yaxes,
+                [In] int[] ystrides);
 
             [DllImport(NativeMethods.DllName)]
             public static extern void convolution(

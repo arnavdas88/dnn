@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using Genix.Core;
     using Genix.DNN;
     using Genix.DNN.Layers;
     using Genix.MachineLearning;
@@ -46,7 +47,10 @@
             }),
         };
 
+        private readonly RandomNumberGenerator<float> random = new RandomGeneratorF();
+
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ConstructorTest1()
         {
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sources[0].shape, new Kernel(2, 2, 2, 2));
@@ -60,6 +64,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ConstructorTest2()
         {
             AveragePoolingLayer layer = new AveragePoolingLayer(AveragePoolingLayerTest.sources[0].shape, new Kernel(3, 2, 1, 2));
@@ -73,6 +78,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ArchitectureConstructorTest1()
         {
             string architecture = "AP3x2";
@@ -88,6 +94,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ArchitectureConstructorTest2()
         {
             string architecture = "AP3x2+2(S)";
@@ -103,6 +110,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ArchitectureConstructorTest3()
         {
             string architecture = "AP3x2+2x1(S)";
@@ -118,6 +126,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void ArchitectureConstructorTest4()
         {
             string architecture = "AP2";
@@ -133,6 +142,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         [ExpectedException(typeof(ArgumentException))]
         public void ArchitectureConstructorTest5()
         {
@@ -151,6 +161,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest6()
         {
@@ -158,6 +169,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ArchitectureConstructorTest7()
         {
@@ -165,6 +177,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void CopyConstructorTest1()
         {
             AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sources[0].shape, new Kernel(3, 2, 1, 2));
@@ -173,6 +186,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CopyConstructorTest2()
         {
@@ -180,6 +194,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTest4()
         {
@@ -187,6 +202,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void CloneTest()
         {
             AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sources[0].shape, new Kernel(2, 2, 2, 2));
@@ -195,6 +211,7 @@
         }
 
         [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
         public void SerializeTest()
         {
             AveragePoolingLayer layer1 = new AveragePoolingLayer(AveragePoolingLayerTest.sources[0].shape, new Kernel(2, 2, 2, 2));
@@ -202,6 +219,78 @@
             AveragePoolingLayer layer2 = JsonConvert.DeserializeObject<AveragePoolingLayer>(s1);
             string s2 = JsonConvert.SerializeObject(layer2);
             Assert.AreEqual(s1, s2);
+        }
+
+        [TestMethod]
+        [TestCategory("AveragePoolingLayer")]
+        public void ForwardBackwardTest()
+        {
+            (Shape shape, Kernel kernel)[] testCases = new (Shape, Kernel)[]
+            {
+                /*(new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(1, 2, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 1, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 2, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 3, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 2, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 3, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 3, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 4, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 4, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 4, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 5, 1, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 5, 1, 1)),
+
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(1, 2, 2, 1)),*/
+                (new Shape(Shape.BWHC, -1, 4, 3, 1), new Kernel(2, 1, 2, 1)),
+                /*(new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 2, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 3, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 2, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 3, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 3, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 4, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 4, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 4, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 5, 2, 1)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 5, 2, 1)),
+
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(1, 2, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 1, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 2, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(2, 3, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 2, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 3, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 3, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(3, 4, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 4, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 4, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(4, 5, 1, 2)),
+                (new Shape(Shape.BWHC, -1, 10, 9, 2), new Kernel(5, 5, 1, 2)),*/
+            };
+
+            foreach ((Shape shape, Kernel kernel) in testCases)
+            {
+                AveragePoolingLayer layer = new AveragePoolingLayer(shape, kernel);
+
+                for (int mb = 1; mb <= 3; mb++)
+                {
+                    Session session = new Session(true);
+
+                    Tensor x = new Tensor(null, shape.Reshape(Axis.B, mb));
+                    x.Randomize(this.random);
+
+                    Tensor y = layer.Forward(session, new[] { x })[0];
+
+                    Tensor expected = AveragePoolingLayerTest.CalculateY(x, kernel);
+                    Helpers.AreTensorsEqual(expected, y);
+
+                    // unroll the graph
+                    y.RandomizeGradient(this.random);
+                    session.Unroll();
+
+                    Tensor expectedDX = AveragePoolingLayerTest.CalculateDX(x, y, kernel);
+                    Helpers.AreGradientsEqual(expectedDX, x);
+                }
+            }
         }
 
         [TestMethod]
@@ -842,6 +931,80 @@
                 Tensor expectedDx = session.Tile(expectedDxTemp, (int)Axis.B, i);
                 Helpers.AreArraysEqual(expectedDx.Length, expectedDx.Weights, x.Gradient);
             }
+        }
+
+        private static Tensor CalculateY(Tensor x, Kernel kernel)
+        {
+            Tensor y = new Tensor(null,
+                new Shape(
+                    x.Shape.Format,
+                    x.Shape.GetAxis(Axis.B),
+                    kernel.CalculateOutputWidth(x.Shape.GetAxis(Axis.X)),
+                    kernel.CalculateOutputHeight(x.Shape.GetAxis(Axis.Y)),
+                    x.Shape.GetAxis(Axis.C)));
+
+            for (int ib = 0, iib = y.Shape.GetAxis(Axis.B); ib < iib; ib++)
+            {
+                for (int ix = 0, xpos = -kernel.PaddingX, iix = y.Shape.GetAxis(Axis.X); ix < iix; ix++, xpos += kernel.StrideX)
+                {
+                    for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
+                    {
+                        Tensor k = x.CropKernel(ib, xpos, ypos, kernel, false, out int kernelArea);
+
+                        for (int ic = 0; ic < y.Shape.GetAxis(Axis.C); ic++)
+                        {
+                            float sum = 0;
+                            for (int ikx = 0; ikx < kernel.Width; ikx++)
+                            {
+                                for (int iky = 0; iky < kernel.Height; iky++)
+                                {
+                                    sum += k[k.Shape.Position(0, ikx, iky, ic)];
+                                }
+                            }
+
+                            y[y.Shape.Position(ib, ix, iy, ic)] = sum / kernel.Size;
+                        }
+                    }
+                }
+            }
+
+            return y;
+        }
+
+        private static Tensor CalculateDX(Tensor x, Tensor dy, Kernel kernel)
+        {
+            Tensor dx = new Tensor(null, x.Shape);
+
+            for (int ib = 0; ib < dy.Shape.GetAxis(Axis.B); ib++)
+            {
+                for (int iy1 = 0, ix1 = -kernel.PaddingX; iy1 < dy.Shape.GetAxis(Axis.X); iy1++, ix1 += kernel.StrideX)
+                {
+                    for (int iy2 = 0, ix2 = -kernel.PaddingY; iy2 < dy.Shape.GetAxis(Axis.Y); iy2++, ix2 += kernel.StrideY)
+                    {
+                        int ikb1 = MinMax.Max(ix1, 0);
+                        int ike1 = MinMax.Min(ix1 + kernel.Width, x.Shape.GetAxis(Axis.X));
+                        int ikb2 = MinMax.Max(ix2, 0);
+                        int ike2 = MinMax.Min(ix2 + kernel.Height, x.Shape.GetAxis(Axis.Y));
+
+                        float alpha = 1.0f / kernel.Size;
+
+                        for (int ic = 0; ic < dy.Shape.GetAxis(Axis.C); ic++)
+                        {
+                            float value = dy.Gradient[dy.Shape.Position(ib, iy1, iy2, ic)] * alpha;
+
+                            for (int ik1 = ikb1; ik1 < ike1; ik1++)
+                            {
+                                for (int ik2 = ikb2; ik2 < ike2; ik2++)
+                                {
+                                    dx.Gradient[dx.Shape.Position(ib, ik1, ik2, ic)] += value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return dx;
         }
     }
 }

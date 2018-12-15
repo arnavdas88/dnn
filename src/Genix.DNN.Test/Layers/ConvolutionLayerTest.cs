@@ -302,37 +302,6 @@
             }
         }
 
-        private static Tensor CropKernel(Tensor input, int b, int x, int y, Kernel kernel, bool cropGradient)
-        {
-            Tensor res = new Tensor(null, new Shape(Shape.BWHC, 1, kernel.Width, kernel.Height, input.Shape.GetAxis(Axis.C)));
-
-            int xb = Math.Max(-kernel.PaddingX, 0);
-            int xe = input.Shape.GetAxis(Axis.X) - 1 - xb;
-            int yb = Math.Max(-kernel.PaddingY, 0);
-            int ye = input.Shape.GetAxis(Axis.Y) - 1 - yb;
-
-            for (int ix = x; ix < x + kernel.Width; ix++)
-            {
-                if (ix.Between(xb, xe))
-                {
-                    for (int iy = y; iy < y + kernel.Height; iy++)
-                    {
-                        if (iy.Between(yb, ye))
-                        {
-                            for (int ic = 0; ic < input.Shape.GetAxis(Axis.C); ic++)
-                            {
-                                res[0, ix - x, iy - y, ic] = cropGradient ?
-                                    input.Gradient[input.Shape.Position(b, ix, iy, ic)] :
-                                    input.Weights[input.Shape.Position(b, ix, iy, ic)];
-                            }
-                        }
-                    }
-                }
-            }
-
-            return res;
-        }
-
         private static Tensor CalculateY(Tensor w, Tensor x, Tensor b, Kernel kernel, int numberOfFilters, MatrixLayout matrixLayout)
         {
             Tensor y = new Tensor(null,
@@ -349,7 +318,7 @@
                 {
                     for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
-                        Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel, false);
+                        Tensor k = x.CropKernel(ib, xpos, ypos, kernel, false, out int kernelArea);
                         float[] features = FullyConnectedLayerTest.CalculateNeurons(w, k, b, numberOfFilters, matrixLayout);
 
                         for (int ic = 0, iic = y.Shape.GetAxis(Axis.C); ic < iic; ic++)
@@ -378,7 +347,7 @@
                 {
                     for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
-                        Tensor kdy = ConvolutionLayerTest.CropKernel(y, ib, ix, iy, new Kernel(1, 1, 1, 1), true);
+                        Tensor kdy = y.CropKernel(ib, ix, iy, new Kernel(1, 1, 1, 1), true, out int kernelArea);
 
                         Tensor kdx = new Tensor(null, new Shape(Shape.BWHC, 1, kernel.Width, kernel.Height, numberOfFilters));
                         kdx.Set(FullyConnectedLayerTest.CalculateDx(w, kdy, numberOfFilters, matrixLayout));
@@ -437,8 +406,8 @@
                 {
                     for (int iy = 0, ypos = -kernel.PaddingY, iiy = y.Shape.GetAxis(Axis.Y); iy < iiy; iy++, ypos += kernel.StrideY)
                     {
-                        Tensor k = ConvolutionLayerTest.CropKernel(x, ib, xpos, ypos, kernel, false);
-                        Tensor kdy = ConvolutionLayerTest.CropKernel(y, ib, ix, iy, new Kernel(1, 1, 1, 1), true);
+                        Tensor k = x.CropKernel(ib, xpos, ypos, kernel, false, out int kernelArea);
+                        Tensor kdy = y.CropKernel(ib, ix, iy, new Kernel(1, 1, 1, 1), true, out kernelArea);
 
                         float[] dww = FullyConnectedLayerTest.CalculateDW(k, kdy, matrixLayout);
                         Mathematics.Add(dw.Length, dww, 0, dw.Gradient, 0);

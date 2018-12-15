@@ -21,6 +21,57 @@
             return (T)constructor.Invoke(null);
         }
 
+        public static Tensor CropKernel(this Tensor input, int b, int x, int y, Kernel kernel, bool cropGradient, out int kernelArea)
+        {
+            Tensor output = new Tensor(null, new Shape(input.Shape.Format, 1, kernel.Width, kernel.Height, input.Shape.GetAxis(Axis.C)));
+
+            int xb = Math.Max(-kernel.PaddingX, 0);
+            int xe = input.Shape.GetAxis(Axis.X) - 1 - xb;
+            int yb = Math.Max(-kernel.PaddingY, 0);
+            int ye = input.Shape.GetAxis(Axis.Y) - 1 - yb;
+
+            for (int ix = x; ix < x + kernel.Width; ix++)
+            {
+                if (ix.Between(xb, xe))
+                {
+                    for (int iy = y; iy < y + kernel.Height; iy++)
+                    {
+                        if (iy.Between(yb, ye))
+                        {
+                            for (int ic = 0; ic < input.Shape.GetAxis(Axis.C); ic++)
+                            {
+                                int inpos = input.Shape.Position(b, ix, iy, ic);
+                                int outpos = output.Shape.Position(0, ix - x, iy - y, ic);
+
+                                output[outpos] = cropGradient ? input.Gradient[inpos] : input[inpos];
+                            }
+                        }
+                    }
+                }
+            }
+
+            int xarea = 0;
+            int yarea = 0;
+            for (int ix = x; ix < x + kernel.Width; ix++)
+            {
+                if (ix.Between(xb, xe))
+                {
+                    xarea++;
+                }
+            }
+
+            for (int iy = y; iy < y + kernel.Height; iy++)
+            {
+                if (iy.Between(yb, ye))
+                {
+                    yarea++;
+                }
+            }
+
+            kernelArea = xarea * yarea;
+            return output;
+        }
+
         public static void AreTensorsEqual(Tensor expected, Tensor actual)
         {
             CollectionAssert.AreEqual(expected.Axes, actual.Axes);
