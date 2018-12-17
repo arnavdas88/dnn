@@ -124,8 +124,8 @@ namespace Genix.DNN
                                 kernel.Height,
                                 kernel.StrideX,
                                 kernel.StrideY,
-                                0,
-                                0,
+                                kernel.PaddingX,
+                                kernel.PaddingY,
                                 x.Weights,
                                 x.Axes,
                                 x.Strides,
@@ -140,8 +140,8 @@ namespace Genix.DNN
                                 kernel.Width,
                                 kernel.StrideY,
                                 kernel.StrideX,
-                                0,
-                                0,
+                                kernel.PaddingY,
+                                kernel.PaddingX,
                                 x.Weights,
                                 x.Axes,
                                 x.Strides,
@@ -156,8 +156,8 @@ namespace Genix.DNN
                                 kernel.Width,
                                 kernel.StrideY,
                                 kernel.StrideX,
-                                0,
-                                0,
+                                kernel.PaddingY,
+                                kernel.PaddingX,
                                 x.Weights,
                                 new[] { x.Axes[0] * x.Axes[1], x.Axes[2], x.Axes[3] },
                                 new[] { x.Strides[1], x.Strides[2], x.Strides[3] },
@@ -177,114 +177,6 @@ namespace Genix.DNN
                             ActionName,
                             () =>
                             {
-#if true
-                                int ksize1, ksize2, kstride1, kstride2;
-                                int x0, x1, x2, xstride0, xstride1, xstride2;
-                                int y0, y1, y2, ystride0, ystride1, ystride2;
-
-                                switch (x.Shape.Format)
-                                {
-                                    case Shape.BWHC:
-                                        ksize1 = kernel.Width;
-                                        ksize2 = kernel.Height;
-                                        kstride1 = kernel.StrideX;
-                                        kstride2 = kernel.StrideY;
-
-                                        x0 = x.Axes[0];
-                                        x1 = x.Axes[1];
-                                        x2 = x.Axes[2];
-
-                                        xstride0 = x.Strides[0];
-                                        xstride1 = x.Strides[1];
-                                        xstride2 = x.Strides[2];
-
-                                        y0 = y.Axes[0];
-                                        y1 = y.Axes[1];
-                                        y2 = y.Axes[2];
-
-                                        ystride0 = y.Strides[0];
-                                        ystride1 = y.Strides[1];
-                                        ystride2 = y.Strides[2];
-                                        break;
-
-                                    case Shape.BHWC:
-                                        ksize1 = kernel.Height;
-                                        ksize2 = kernel.Width;
-                                        kstride1 = kernel.StrideY;
-                                        kstride2 = kernel.StrideX;
-
-                                        x0 = x.Axes[0];
-                                        x1 = x.Axes[1];
-                                        x2 = x.Axes[2];
-
-                                        xstride0 = x.Strides[0];
-                                        xstride1 = x.Strides[1];
-                                        xstride2 = x.Strides[2];
-
-                                        y0 = y.Axes[0];
-                                        y1 = y.Axes[1];
-                                        y2 = y.Axes[2];
-
-                                        ystride0 = y.Strides[0];
-                                        ystride1 = y.Strides[1];
-                                        ystride2 = y.Strides[2];
-                                        break;
-
-                                    case Shape.BCHW:
-                                        ksize1 = kernel.Height;
-                                        ksize2 = kernel.Width;
-                                        kstride1 = kernel.StrideY;
-                                        kstride2 = kernel.StrideX;
-
-                                        x0 = x.Axes[0] * x.Axes[1];
-                                        x1 = x.Axes[2];
-                                        x2 = x.Axes[3];
-
-                                        xstride0 = x.Strides[1];
-                                        xstride1 = x.Strides[2];
-                                        xstride2 = x.Strides[3];
-
-                                        y0 = y.Axes[0] * y.Axes[1];
-                                        y1 = y.Axes[2];
-                                        y2 = y.Axes[3];
-
-                                        ystride0 = y.Strides[1];
-                                        ystride1 = y.Strides[2];
-                                        ystride2 = y.Strides[3];
-                                        break;
-
-                                    default:
-                                        throw new NotSupportedException("The tensor shape is not supported by this operation.");
-                                }
-
-                                int xstride1K = xstride1 * kstride1;
-                                int xstride2K = xstride2 * kstride2;
-
-                                float[] dxw = x.Gradient;
-                                float[] dyw = y.Gradient;
-                                float alpha = 1.0f / (ksize1 * ksize2);
-
-                                // cycle by the output
-                                for (int ix0 = 0, ypos0 = 0, xpos0 = 0; ix0 < x0; ix0++, ypos0 += ystride0, xpos0 += xstride0)
-                                {
-                                    for (int iy1 = 0, ix1 = 0, ypos1 = ypos0, xpos1 = xpos0; iy1 < y1; iy1++, ix1 += kstride1, ypos1 += ystride1, xpos1 += xstride1K)
-                                    {
-                                        for (int iy2 = 0, ix2 = 0, ypos2 = ypos1, xpos2 = xpos1; iy2 < y2; iy2++, ix2 += kstride2, ypos2 += ystride2, xpos2 += xstride2K)
-                                        {
-                                            // cycle by the kernel
-                                            int ike1 = MinMax.Min(ix1 + ksize1, x1);
-                                            int ike2 = MinMax.Min(ix2 + ksize2, x2);
-                                            for (int ik1 = ix1, xpos1K = xpos2; ik1 < ike1; ik1++, xpos1K += xstride1)
-                                            {
-                                                for (int ik2 = ix2, xpos2K = xpos1K; ik2 < ike2; ik2++, xpos2K += xstride2)
-                                                {
-                                                    Mathematics.AddProductC(ystride2, dyw, ypos2, alpha, dxw, xpos2K);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-#else
                                 switch (x.Shape.Format)
                                 {
                                     case Shape.BWHC:
@@ -293,8 +185,8 @@ namespace Genix.DNN
                                             kernel.Height,
                                             kernel.StrideX,
                                             kernel.StrideY,
-                                            0,
-                                            0,
+                                            kernel.PaddingX,
+                                            kernel.PaddingY,
                                             x.Gradient,
                                             x.Axes,
                                             x.Strides,
@@ -309,8 +201,8 @@ namespace Genix.DNN
                                             kernel.Width,
                                             kernel.StrideY,
                                             kernel.StrideX,
-                                            0,
-                                            0,
+                                            kernel.PaddingY,
+                                            kernel.PaddingX,
                                             x.Gradient,
                                             x.Axes,
                                             x.Strides,
@@ -325,8 +217,8 @@ namespace Genix.DNN
                                             kernel.Width,
                                             kernel.StrideY,
                                             kernel.StrideX,
-                                            0,
-                                            0,
+                                            kernel.PaddingY,
+                                            kernel.PaddingX,
                                             x.Gradient,
                                             new[] { x.Axes[0] * x.Axes[1], x.Axes[2], x.Axes[3] },
                                             new[] { x.Strides[1], x.Strides[2], x.Strides[3] },
@@ -335,7 +227,6 @@ namespace Genix.DNN
                                             new[] { y.Strides[1], y.Strides[2], y.Strides[3] });
                                         break;
                                 }
-#endif
                             });
                     }
 #endif

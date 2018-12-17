@@ -6,10 +6,8 @@
 
 namespace Genix.DNN.Layers
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Genix.Core;
@@ -76,10 +74,7 @@ namespace Genix.DNN.Layers
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal override IList<Tensor> Forward(Session session, IList<Tensor> xs)
-        {
-            return new[] { session.AveragePooling(xs[0], this.Kernel) };
-        }
+        internal override IList<Tensor> Forward(Session session, IList<Tensor> xs) => new[] { session.AveragePooling(xs[0], this.Kernel) };
 
         /// <summary>
         /// Extracts the pooling kernel from layer architecture.
@@ -90,7 +85,7 @@ namespace Genix.DNN.Layers
         private static Kernel KernelFromArchitecture(string architecture)
         {
             GroupCollection groups = Layer.ParseArchitecture(architecture, AveragePoolingLayer.ArchitecturePattern);
-            return Layer.ParseKernel(groups, 2, null, false);
+            return Layer.ParseKernel(groups, 2, null, true);
         }
     }
 }
