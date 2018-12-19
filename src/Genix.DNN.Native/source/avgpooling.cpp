@@ -4,6 +4,8 @@
 #include <ppl.h>
 using namespace concurrency;
 
+#define MT
+
 void __forceinline sum(const int n, const float* a, const float* b, float* y)
 {
 	for (int i = 0; i < n; i++)
@@ -136,11 +138,33 @@ void __forceinline mulc(const int n, const float* x, const float a, float* y)
 	}
 }
 
-void __forceinline add_productc(const int n, const float* x, const float a, float* y)
+void __forceinline add_productc(const int n, const float* x, const float alpha, float* a)
 {
 	for (int i = 0; i < n; i++)
 	{
-		y[i] += x[i] * a;
+		a[i] += x[i] * alpha;
+	}
+}
+
+void __forceinline add_productc(const int n, const float* x, const float alpha, float* a, float* b)
+{
+	for (int i = 0; i < n; i++)
+	{
+		float v = x[i] * alpha;
+		a[i] += v;
+		b[i] += v;
+	}
+}
+
+void __forceinline add_productc(const int n, const float* x, const float alpha, float* a, float* b, float* c, float* d)
+{
+	for (int i = 0; i < n; i++)
+	{
+		float v = x[i] * alpha;
+		a[i] += v;
+		b[i] += v;
+		c[i] += v;
+		d[i] += v;
 	}
 }
 
@@ -201,10 +225,15 @@ GENIXAPI(void, avgpooling)(
 
 	if (ksize1 == 2 && ksize2 == 2)
 	{
-		for (int ixy0 = 0; ixy0 < y0; ixy0++) {
-			for (int iy1 = 0; iy1 < y1; iy1++) {
-				//_parallel_for(0, y0, 0, y1, [&](int ixy0, int iy1) {
-
+#ifdef MT
+		_parallel_for(0, y0, 0, y1, [&](int ixy0, int iy1)
+		{
+#else
+		for (int ixy0 = 0; ixy0 < y0; ixy0++)
+		{
+			for (int iy1 = 0; iy1 < y1; iy1++)
+			{
+#endif
 				const int ix1 = (iy1 * kstride1) - kpadding1;
 				const int ix1b = max(ix1, 0);
 				const int ix1e = min(ix1 + ksize1, x1);
@@ -229,7 +258,7 @@ GENIXAPI(void, avgpooling)(
 					{
 						const int ix2b = max(ix2, 0);
 						const int ix2e = min(ix2 + ksize2, x2);
-						const float* xww2 = (xww1 != NULL ? xww1 : xww) + (ix2b * xstride2);
+						const float* xww2 = (xww1 != NULL ? xww1 : xww) + (ptrdiff_t(ix2b) * xstride2);
 
 						switch (ix2e - ix2b)
 						{
@@ -254,16 +283,24 @@ GENIXAPI(void, avgpooling)(
 				{
 					::memset(yww, 0, ystride1 * sizeof(float));
 				}
-				/*});*/
+#ifdef MT
+			});
+#else
 			}
 		}
+#endif
 	}
 	else
 	{
-		for (int ixy0 = 0; ixy0 < y0; ixy0++) {
-			for (int iy1 = 0; iy1 < y1; iy1++) {
-				//_parallel_for(0, y0, 0, y1, [&](int ixy0, int iy1) {
-
+#ifdef MT
+		_parallel_for(0, y0, 0, y1, [&](int ixy0, int iy1)
+		{
+#else
+		for (int ixy0 = 0; ixy0 < y0; ixy0++)
+		{
+			for (int iy1 = 0; iy1 < y1; iy1++)
+			{
+#endif
 				const int ix1 = (iy1 * kstride1) - kpadding1;
 				const int ix1b = max(ix1, 0);
 				const int ix1e = min(ix1 + ksize1, x1);
@@ -325,7 +362,7 @@ GENIXAPI(void, avgpooling)(
 						int size2 = ix2e - ix2b;
 						if (size2 > 0)
 						{
-							const float* xww2 = (xww1 != NULL ? xww1 : xww) + (ix2b * xstride2);
+							const float* xww2 = (xww1 != NULL ? xww1 : xww) + (ptrdiff_t(ix2b) * xstride2);
 
 							switch (size2)
 							{
@@ -383,9 +420,12 @@ GENIXAPI(void, avgpooling)(
 				{
 					::memset(yww, 0, ystride1 * sizeof(float));
 				}
-				/*});*/
+#ifdef MT
+			});
+#else
 			}
 		}
+#endif
 	}
 }
 
@@ -409,6 +449,7 @@ GENIXAPI(void, avgpooling_gradient)(
 	const int xstride0 = xstrides[0];
 	const int xstride1 = xstrides[1];
 	const int xstride2 = xstrides[2];
+	const int xstride1K = xstride1 * kstride1;
 	const int xstride2K = xstride2 * kstride2;
 
 	const int y0 = yaxes[0];
@@ -433,51 +474,117 @@ GENIXAPI(void, avgpooling_gradient)(
 		kpadding2 = 0;
 	}
 
-	const int iy2step = (ksize2 + kstride2 - 1) / kstride2;
-	for (int iy2start = 0; iy2start < iy2step; iy2start++)
+	const float alpha = 1.0f / (ksize1 * ksize2);
+
+	if (ksize1 == 2 && ksize2 == 2 && kstride1 == 2 && kstride2 == 2)
 	{
-		for (int iy2 = iy2start; iy2 < y2; iy2 += iy2step) {
-		//parallel_for(iy2start, y2, iy2step, [&](int iy2) {
-
-			float* buf = new float[ystride2];
-
-			float* dxww = dxw;
-			const float* dyww = dyw + (ptrdiff_t(iy2) * ystride2);
-			for (int ixy0 = 0; ixy0 < y0; ixy0++, dxww += xstride0, dyww += ystride0)
+#ifdef MT
+		parallel_for(0, y1, [&](int iy1)
+#else
+		for (int iy1 = 0; iy1 < y1; iy1++)
+#endif
+		{
+			float* dxw0 = dxw;
+			const float* dyw0 = dyw + (ptrdiff_t(iy1) * ystride1);
+			for (int ix0 = 0; ix0 < x0; ix0++, dyw0 += ystride0, dxw0 += xstride0)
 			{
-				const int ix2 = (iy2 * kstride2) - kpadding2;
-				const int ix2b = max(ix2, 0);
-				const int ix2e = min(ix2 + ksize2, x2);
+				const int ix1 = (iy1 * 2) - kpadding1;
+				const int kb1 = max(ix1, 0);
+				const int ke1 = min(ix1 + 2, x1);
+				float* dxw1 = dxw0 + (ptrdiff_t(kb1) * xstride1);
+				const float* dyw2 = dyw0;
 
-				// portion of input tensormay be completely in the padding area
-				if (ix2b < ix2e)
+				switch (ke1 - kb1)
 				{
-					const float* dyww1 = dyww;
-					for (int iy1 = 0; iy1 < y1; iy1++, dyww1 += ystride1)
+				case 2:
+					for (int iy2 = 0, ix2 = -kpadding2; iy2 < y2; iy2++, ix2 += 2, dyw2 += ystride2)
 					{
-						const int ix1 = (iy1 * kstride1) - kpadding1;
-						const int ix1b = max(ix1, 0);
-						const int ix1e = min(ix1 + ksize1, x1);
+						const int kb2 = max(ix2, 0);
+						const int ke2 = min(ix2 + 2, x2);
+						float* dxw2 = dxw1 + (ptrdiff_t(kb2) * xstride2);
 
-						if (ix1b < ix1e)
+						switch (ke2 - kb2)
 						{
-							mulc(ystride2, dyww1, 1.0f / (ksize1 * ksize2), buf);
+						case 2:
+							add_productc(ystride2, dyw2, alpha, dxw2, dxw2 + xstride1, dxw2 + xstride2, dxw2 + xstride1 + xstride2);
+							break;
 
-							float* dxww1 = dxww + (ix1b * xstride1) + (ix2b * xstride2);
-							for (int ik1 = ix1b; ik1 < ix1e; ik1++, dxww1 += xstride1)
+						case 1:
+							add_productc(ystride2, dyw2, alpha, dxw2, dxw2 + xstride1);
+							break;
+						}
+					}
+					break;
+
+				case 1:
+					for (int iy2 = 0, ix2 = -kpadding2; iy2 < y2; iy2++, ix2 += 2, dyw2 += ystride2)
+					{
+						const int kb2 = max(ix2, 0);
+						const int ke2 = min(ix2 + 2, x2);
+						float* dxw2 = dxw1 + (ptrdiff_t(kb2) * xstride2);
+
+						switch (ke2 - kb2)
+						{
+						case 2:
+							add_productc(ystride2, dyw2, alpha, dxw2, dxw2 + xstride2);
+							break;
+
+						case 1:
+							add_productc(ystride2, dyw2, alpha, dxw2);
+							break;
+						}
+					}
+					break;
+				}
+			}
+		}
+#ifdef MT
+		);
+#endif
+	}
+	else
+	{
+		// cycle by the output
+		const int iy1step = (ksize1 + kstride1 - 1) / kstride1;
+		for (int iy1start = 0; iy1start < iy1step; iy1start++)
+		{
+#ifdef MT
+			parallel_for(iy1start, y1, iy1step, [&](int iy1)
+#else
+			for (int iy1 = iy1start; iy1 < y1; iy1 += iy1step)
+#endif
+			{
+				float* dxw0 = dxw;
+				const float* dyw0 = dyw + (ptrdiff_t(iy1) * ystride1);
+				for (int ix0 = 0; ix0 < x0; ix0++, dyw0 += ystride0, dxw0 += xstride0)
+				{
+					const int ix1 = (iy1 * kstride1) - kpadding1;
+					const int kb1 = max(ix1, 0);
+					const int ke1 = min(ix1 + ksize1, x1);
+					float* dxw2 = dxw0 + (ptrdiff_t(kb1) * xstride1);
+					const float* dyw2 = dyw0;
+
+					for (int iy2 = 0, ix2 = -kpadding2; iy2 < y2; iy2++, ix2 += kstride2, dyw2 += ystride2)
+					{
+						const int kb2 = max(ix2, 0);
+						const int ke2 = min(ix2 + ksize2, x2);
+						float* dkxw1 = dxw2 + (ptrdiff_t(kb2) * xstride2);
+
+						// cycle by the kernel
+						for (int ik1 = kb1; ik1 < ke1; ik1++, dkxw1 += xstride1)
+						{
+							float* dkxw2 = dkxw1;
+							for (int ik2 = kb2; ik2 < ke2; ik2++, dkxw2 += xstride2)
 							{
-								float* dxww2 = dxww1;
-								for (int ik2 = ix2b; ik2 < ix2e; ik2++, dxww2 += xstride2)
-								{
-									add(ystride2, buf, dxww2);
-								}
+								add_productc(ystride2, dyw2, alpha, dkxw2);
 							}
 						}
 					}
 				}
 			}
-
-			delete[] buf;
-		}/*);*/
+#ifdef MT
+			);
+#endif
+		}
 	}
 }

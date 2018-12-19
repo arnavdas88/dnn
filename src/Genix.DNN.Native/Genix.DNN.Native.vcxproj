@@ -130,10 +130,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="source\avgpooling.cpp" />
     <ClCompile Include="source\convolution.cpp" />
     <ClCompile Include="source\CTC.cpp" />
     <ClCompile Include="source\LRN.cpp" />
-    <ClCompile Include="source\pooling.cpp" />
+    <ClCompile Include="source\maxpooling.cpp" />
     <ClCompile Include="source\RNN.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

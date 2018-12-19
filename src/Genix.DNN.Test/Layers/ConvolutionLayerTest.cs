@@ -185,118 +185,65 @@
         [TestCategory("ConvolutionLayer")]
         public void ForwardBackwardTest()
         {
-            (Shape shape, Kernel kernel, int numberOfFilters)[] testCases = new (Shape, Kernel, int)[]
+            const int numberOfFilters = 2;
+            foreach (MatrixLayout matrixLayout in new[] { MatrixLayout.ColumnMajor/*, MatrixLayout.RowMajor*/ })
             {
-                // no padding
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 1, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 1, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 1, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 1, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 1, 1, 0, 0), 2),
-
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 2, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 2, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 2, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 2, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 2, 1, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 2, 1, 0, 0), 2),
-
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 2, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 1, 2, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 1, 2, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 1, 2, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 1, 2, 0, 0), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 1, 2, 0, 0), 2),
-
-                // positive padding (expand)
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 1, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 2, 1, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 1, 1, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 1, 1, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 1, 1, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 1, 1, 2, 3), 2),
-
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 2, 1, 3, 2), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 2, 1, 3, 2), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 2, 1, 3, 2), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 2, 1, 3, 2), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 2, 1, 3, 2), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 2, 1, 3, 2), 2),
-
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(1, 2, 1, 2, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 1, 1, 2, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 2, 1, 2, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(2, 3, 1, 2, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 2, 1, 2, 2, 3), 2),
-                (new Shape(Shape.BWHC, -1, 5, 4, 2), new Kernel(3, 3, 1, 2, 2, 3), 2),
-
-                // negative padding (shrinking)
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 1, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 1, 2, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 1, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 1, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 1, 1, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 1, -1, -2), 2),
-
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 2, 1, -2, -1), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 1, 2, 1, -2, -1), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 2, 1, -2, -1), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 2, 1, -2, -1), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 2, 1, -2, -1), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 2, 1, -2, -1), 2),
-
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(1, 2, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 1, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 2, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(2, 3, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 2, 1, 2, -1, -2), 2),
-                (new Shape(Shape.BWHC, -1, 10, 8, 2), new Kernel(3, 3, 1, 2, -1, -2), 2),
-            };
-
-            foreach ((Shape shape, Kernel kernel, int numberOfFilters) in testCases)
-            {
-                foreach (MatrixLayout matrixLayout in Enum.GetValues(typeof(MatrixLayout)).OfType<MatrixLayout>())
+                foreach (string format in new[] { Shape.BWHC/*, Shape.BHWC, Shape.BCHW*/ })
                 {
-                    if (matrixLayout != MatrixLayout.ColumnMajor)
+                    Shape shape = new Shape(format, -1, 13, 11, 2);
+                    foreach (int kw in new[] { 1, 2, 3, 4, 5 })
                     {
-                        continue;
-                    }
+                        foreach (int kh in new[] { 1, 2, 3, 4, 5 })
+                        {
+                            foreach (int kstridex in new[] { 1, 2, 3 })
+                            {
+                                foreach (int kstridey in new[] { 1, 2, 3 })
+                                {
+                                    foreach (int kpaddingx in new[] { 0, 2, -2 })
+                                    {
+                                        foreach (int kpaddingy in new[] { 0, 2, -2 })
+                                        {
+                                            Kernel kernel = new Kernel(kw, kh, kstridex, kstridey, kpaddingx, kpaddingy);
+                                            ConvolutionLayer layer = new ConvolutionLayer(shape, numberOfFilters, kernel, matrixLayout, null);
+                                            layer.W.Randomize(this.random);
+                                            layer.B.Randomize(this.random);
 
-                    ConvolutionLayer layer = new ConvolutionLayer(shape, numberOfFilters, kernel, matrixLayout, null);
-                    layer.W.Randomize(this.random);
-                    layer.B.Randomize(this.random);
+                                            for (int mb = 1; mb <= 3; mb++)
+                                            {
+                                                Session session = new Session(true);
 
-                    for (int mb = 1; mb <= 3; mb++)
-                    {
-                        Session session = new Session(true);
+                                                layer.W.ClearGradient();
+                                                layer.B.ClearGradient();
 
-                        layer.W.ClearGradient();
-                        layer.B.ClearGradient();
+                                                Tensor x = new Tensor(null, shape.Reshape(Axis.B, mb));
+                                                x.Randomize(this.random);
 
-                        Tensor x = new Tensor(null, shape.Reshape(Axis.B, mb));
-                        x.Randomize(this.random);
+                                                Tensor y = layer.Forward(session, new[] { x })[0];
 
-                        Tensor y = layer.Forward(session, new[] { x })[0];
+                                                Tensor expected = ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, numberOfFilters, matrixLayout);
+                                                Helpers.AreTensorsEqual(expected, y);
 
-                        Tensor expected = ConvolutionLayerTest.CalculateY(layer.W, x, layer.B, kernel, numberOfFilters, matrixLayout);
-                        Helpers.AreTensorsEqual(expected, y);
+                                                // unroll the graph
+                                                y.RandomizeGradient(this.random);
+                                                session.Unroll();
 
-                        // unroll the graph
-                        y.RandomizeGradient(this.random);
-                        session.Unroll();
+                                                // should be dy * numberOfCells in y
+                                                Tensor expectedDB = ConvolutionLayerTest.CalculateDB(y);
+                                                Helpers.AreGradientsEqual(expectedDB, layer.B);
 
-                        // should be dy * numberOfCells in y
-                        Tensor expectedDB = ConvolutionLayerTest.CalculateDB(y);
-                        Helpers.AreGradientsEqual(expectedDB, layer.B);
+                                                // should be dy * x'
+                                                Tensor expectedDW = ConvolutionLayerTest.CalculateDW(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
+                                                Helpers.AreGradientsEqual(expectedDW, layer.W);
 
-                        // should be dy * x'
-                        Tensor expectedDW = ConvolutionLayerTest.CalculateDW(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
-                        Helpers.AreGradientsEqual(expectedDW, layer.W);
-
-                        // should be dW' * dy
-                        Tensor expectedDX = ConvolutionLayerTest.CalculateDX(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
-                        Helpers.AreGradientsEqual(expectedDX, x);
+                                                // should be dW' * dy
+                                                Tensor expectedDX = ConvolutionLayerTest.CalculateDX(layer.W, x, y, kernel, numberOfFilters, matrixLayout);
+                                                Helpers.AreGradientsEqual(expectedDX, x);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

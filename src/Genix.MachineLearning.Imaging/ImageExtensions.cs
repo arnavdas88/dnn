@@ -109,7 +109,7 @@ namespace Genix.MachineLearning.Imaging
             // calculate tensor width
             if (w == -1)
             {
-                w = image.Width.MulDiv(h, image.Height);
+                w = image.Width.MulDiv(h, image.Height).RoundUp(16);
             }
 
             Shape shape = new Shape(format, 1, w, h, image.BitsPerPixel > 8 ? 3 : 1);

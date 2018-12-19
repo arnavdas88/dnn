@@ -4,6 +4,8 @@
 #include <ppl.h>
 using namespace concurrency;
 
+#define MT
+
 void __forceinline tile(const int count, const int length, const float* src, float* dst, const int dststep)
 {
 	for (int i = 0; i < count; i++, dst += dststep)
@@ -12,6 +14,7 @@ void __forceinline tile(const int count, const int length, const float* src, flo
 	}
 }
 
+#ifdef MT
 template <typename _Index_type, typename _Function>
 void _parallel_for(_Index_type _First0, _Index_type _Last0, _Index_type _First1, _Index_type _Last1, const _Function& _Func, const auto_partitioner& _Part = auto_partitioner())
 {
@@ -22,6 +25,7 @@ void _parallel_for(_Index_type _First0, _Index_type _Last0, _Index_type _First1,
 		_Func(i0, i1);
 	}, _Part);
 }
+#endif
 
 GENIXAPI(void, convolution)(
 	const int ksize1,
@@ -129,50 +133,59 @@ GENIXAPI(void, convolution)(
 			kpadding2 = 0;
 		}
 
-		//for (int ixy0 = 0; ixy0 < y0; ixy0++) {
-		//	for (int iy2 = 0; iy2 < y2; iy2++) {
-		_parallel_for(0, y0, 0, y2, [&](int ixy0, int iy2) {
-
-			const float* www = ww;
-			const float* xww = xw + (ptrdiff_t(ixy0) * xstride0);
-			float* yww = yw + (ptrdiff_t(iy2) * ystride2) + (ptrdiff_t(ixy0) * ystride0);
-
-			// 1. initialize destination tensor with biases
-			tile(y1, y3, bw, yww, ldy);
-
-			// 2. add matrix product to destination
-			const int ix2 = (iy2 * kstride2) - kpadding2;
-			const int ix2e = min(ix2 + ksize2, x2);
-			const int k = (ix2e - max(ix2, 0)) * xstride2;
-
-			// k may be zero if the current portion of input tensor
-			// is completely in the padding area
-			if (k > 0)
+#ifdef MT
+		_parallel_for(0, y0, 0, y2, [&](int ixy0, int iy2)
+		{
+#else
+		for (int ixy0 = 0; ixy0 < y0; ixy0++)
+		{
+			for (int iy2 = 0; iy2 < y2; iy2++)
 			{
-				xww += ptrdiff_t(max(ix2, 0)) * xstride2;
-				www += ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
+#endif
+				const float* www = ww;
+				const float* xww = xw + (ptrdiff_t(ixy0) * xstride0);
+				float* yww = yw + (ptrdiff_t(iy2) * ystride2) + (ptrdiff_t(ixy0) * ystride0);
 
-				for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
+				// 1. initialize destination tensor with biases
+				tile(y1, y3, bw, yww, ldy);
+
+				// 2. add matrix product to destination
+				const int ix2 = (iy2 * kstride2) - kpadding2;
+				const int ix2e = min(ix2 + ksize2, x2);
+				const int k = (ix2e - max(ix2, 0)) * xstride2;
+
+				// k may be zero if the current portion of input tensor
+				// is completely in the padding area
+				if (k > 0)
 				{
-					const int iy1 = ixy1 < kpadding1 ? (kpadding1 - ixy1 + kstride1 - 1) / kstride1 : 0;
-					const int ix1 = ixy1 - kpadding1 + (iy1 * kstride1);
-					const int n = min(y1, ((x1 - (ixy1 - kpadding1) - 1) / kstride1 + 1)) - iy1;
+					xww += ptrdiff_t(max(ix2, 0)) * xstride2;
+					www += ptrdiff_t(max(-ix2, 0)) * xstride2 * ldw;
 
-					if (n > 0)
+					for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
 					{
-						::cblas_sgemm(
-							CblasColMajor, CblasNoTrans, CblasNoTrans,
-							y3, n, k,
-							1.0f,
-							www + (ptrdiff_t(ixy1) * kstep), ldw,
-							xww + (ptrdiff_t(ix1) * xstride1), ldx,
-							1.0f,
-							yww + (ptrdiff_t(iy1) * ystride1), ldy);
+						const int iy1 = ixy1 < kpadding1 ? (kpadding1 - ixy1 + kstride1 - 1) / kstride1 : 0;
+						const int ix1 = ixy1 - kpadding1 + (iy1 * kstride1);
+						const int n = min(y1, ((x1 - (ixy1 - kpadding1) - 1) / kstride1 + 1)) - iy1;
+
+						if (n > 0)
+						{
+							::cblas_sgemm(
+								CblasColMajor, CblasNoTrans, CblasNoTrans,
+								y3, n, k,
+								1.0f,
+								www + (ptrdiff_t(ixy1) * kstep), ldw,
+								xww + (ptrdiff_t(ix1) * xstride1), ldx,
+								1.0f,
+								yww + (ptrdiff_t(iy1) * ystride1), ldy);
+						}
 					}
 				}
-			}
+#ifdef MT
 		});
-		//}}
+#else
+		}
+		}
+#endif
 	}
 }
 
@@ -248,9 +261,12 @@ GENIXAPI(void, convolution_gradient)(
 		kpadding2 = 0;
 	}
 
+#ifdef MT
 	parallel_invoke(
-		// 1. Calculate biases gradient
-		[&] {
+		[&]
+#endif
+		{
+			// 1. Calculate biases gradient
 			const int n = y0 * y1 * y2;
 			float* ones = new float[n];
 			for (int i = 0; i < n; i++) { ones[i] = 1.0f; }
@@ -265,12 +281,18 @@ GENIXAPI(void, convolution_gradient)(
 				dbw, 1);
 
 			delete[] ones;
-		},
-		// 2. Calculate weights gradient
-		[&] {
-			//for (int ixy1 = 0; ixy1 < ksize1; ixy1++) {
-			parallel_for(0, ksize1, [&](int ixy1) {
-
+		}
+#ifdef MT
+		, [&]
+#endif
+		{
+			// 2. Calculate weights gradient
+#ifdef MT
+			parallel_for(0, ksize1, [&](int ixy1)
+#else
+			for (int ixy1 = 0; ixy1 < ksize1; ixy1++)
+#endif
+			{
 				float* dwww = dww + (ptrdiff_t(ixy1) * kstep);
 				const float* xww = xw;
 
@@ -306,18 +328,28 @@ GENIXAPI(void, convolution_gradient)(
 						}
 					}
 				}
+#ifdef MT
 			});
-		},
-		// 3. Calculate x gradient
-		[&] {
+#else
+			}
+#endif
+		}
+#ifdef MT
+			, [&]
+#endif
+		{
+			// 3. Calculate x gradient
 			if (dxw != NULL)
 			{
 				const int iy2step = (ksize2 + kstride2 - 1) / kstride2;
 				for (int iy2start = 0; iy2start < iy2step; iy2start++)
 				{
-					//for (int iy2 = iy2start; iy2 < y2; iy2 += iy2step) {
-					parallel_for(iy2start, y2, iy2step, [&](int iy2) {
-
+#ifdef MT
+					parallel_for(iy2start, y2, iy2step, [&](int iy2)
+#else
+					for (int iy2 = iy2start; iy2 < y2; iy2 += iy2step)
+#endif
+					{
 						for (int ixy0 = 0; ixy0 < y0; ixy0++)
 						{
 							const float* www = ww;
@@ -355,10 +387,16 @@ GENIXAPI(void, convolution_gradient)(
 								}
 							}
 						}
+#ifdef MT
 					});
+#else
+					}
+#endif
 				}
 			}
 		}
-	);
+#ifdef MT
+		);
+#endif
 }
 

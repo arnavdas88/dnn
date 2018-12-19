@@ -37,7 +37,10 @@
     <ClCompile Include="source\convolution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\pooling.cpp">
+    <ClCompile Include="source\avgpooling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\maxpooling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
